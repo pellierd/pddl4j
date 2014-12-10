@@ -1,0 +1,118 @@
+<project name="PDDL4J Project" default="build" basedir=".">
+
+	<property name="version" value="v2.0" />
+	<property name="src_dir" value="${basedir}/src" />
+	<property name="class_dir" value="${basedir}/classes" />
+	<property name="doc_dir" value="${basedir}/doc/api" />
+	<property name="lib_dir" value="${basedir}/lib" />	
+	<property name="dev_dir" value="${basedir}/dev" />
+	
+	<property name="javacc_home" value="${dev_dir}/javacc/" />
+	<property name="javacc_target" value="src/pddl4j/parser/lexer/Lexer.jj" />
+	<property name="javacc_output" value="src/pddl4j/parser/lexer" />
+	
+	<property name="pddl4j" value="pddl4j" />
+	<property name="pddl4j.parser" value="pddl4j/parser" />
+	<property name="pddl4j.parser.lexer" value="pddl4j/parser/lexer" />
+			
+	<property name="repository.path" value="/cvsroot/pdd4j"/>
+	<property name="ip.cvs" value="pdd4j.cvs.sourceforge.net"/>	
+	<property name="cvs.module" value="PDDL4J"/>
+	
+	
+	<mkdir dir="${class_dir}"/>
+	<mkdir dir="${lib_dir}"/>
+	
+	<target name="build" depends="pddl4j" description="Build PDDL4J Project packages" >
+		<echo>PDDL4J Project is successfully built</echo>
+	</target>
+	
+	<target name="rebuild" depends="clean, build" description="Rebuild PDDL4J Project packages" >
+		<echo>PDDL4J Project is successfully rebuilt</echo>
+	</target>	
+	
+	<target name="pddl4j.parser.lexer" description="Build pddl4j.parser.lexer package">
+		<echo>Build pddl4j.parser package</echo>
+		<javacc target="${javacc_target}" 
+			debugparser="false" 
+			outputdirectory="${javacc_output}" 
+			javacchome="${javacc_home}"/>
+	</target>
+	
+	<target name="pddl4j" depends="pddl4j.parser.lexer" description="Build pddl4j.parser package">
+		<echo>Build pddl4j.parser package</echo>
+			<javac 
+				classpath="${class_dir}" 
+				srcdir="${src_dir}" 
+				destdir="${class_dir}" 
+				deprecation="yes"
+				includes="**/*.java" 
+				optimize="yes"
+				source="1.6" 
+				debug="on"
+			/>
+	</target>		
+	
+	<target name="clean" depends="" description="Clean the PDDL4J Project">
+		<echo>PDDL4J Project is successfully cleaned</echo>
+		<delete>
+			<fileset dir="${class_dir}" includes="**/*.class" />
+			<fileset dir="${javacc_output}" includes="*.java" />
+		</delete>
+	</target>
+
+	<target name="doc" description="Generate the PDDL4J Project Documentation">
+		<javadoc 
+			sourcepath="${src_dir}" 
+			destdir="${doc_dir}" 
+			packagenames="pddl4j.parser,pddl4j.planner,pddl4j.preprocessing,pddl4j.heuristics,pddl4j.util"
+			access="protected" 
+			source="1.6" 
+			linksource="no"
+			overview="${src_dir}/overview.html"
+			Windowtitle="PDDL4J Project ${version}"
+			Author="Damien Pellier"
+			Version="${version}">
+		</javadoc>
+	</target>
+	
+	<target name="jar" description="Build PDDL4J Jar">
+		<jar destfile="${lib_dir}/pddl4j.jar" 
+			basedir="${class_dir}" 
+			includes="**/*.class"
+			excludes="**/tests/*">
+			<manifest>
+				<attribute name="Built-By" value="Damien Pellier" />
+				<attribute name="Premain-Class" value="pddl4j.util.MemoryAgent" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="cvs-checkout" description="Checkouts project from CVS repository">
+			<echo>Checkout project from CVS repository</echo>
+			<cvs command="checkout" 
+				package="${cvs.module}" 
+				cvsRoot=":pserver:anonymous@${ip.cvs}:${repository.path}"  
+				dest="${basedir}"
+			/>
+	</target>
+		
+	<target name="cvs-update" description="Updates modifications from CVS repository">
+		<echo>Updates modifications from CVS repository</echo>		
+		<cvs command="update" 
+			cvsRoot=":pserver:anonymous@${ip.cvs}:${repository.path}"
+		/>
+	</target>
+	
+	<target name="cvs-commit" description="Commits modifications to CVS repository">
+		<echo>Commits modifications to CVS repository</echo>	
+		<input message="User:" addproperty="user.cvs"/>
+		<input message="Commit message:" addproperty="cvs.commit.msg"/>	
+		<cvs command="commit -m '${cvs.commit.msg}'" 
+			cvsRoot=":ext:${user.cvs}@${ip.cvs}:${repository.path}"
+			cvsRsh="ssh"
+		/>
+	</target>
+	
+</project>
+

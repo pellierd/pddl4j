@@ -1,0 +1,3427 @@
+/*
+ * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
+
+options {
+    STATIC=false;
+    IGNORE_CASE=true;
+}
+
+PARSER_BEGIN(Lexer)
+
+package pddl4j.parser.lexer;
+
+import pddl4j.parser.Connective;
+import pddl4j.parser.DerivedPredicate;
+import pddl4j.parser.ErrorManager;
+import pddl4j.parser.Parser;
+import pddl4j.parser.Exp;
+import pddl4j.parser.Domain;
+import pddl4j.parser.Problem;
+import pddl4j.parser.NamedTypedList;
+import pddl4j.parser.Op;
+import pddl4j.parser.RequireKey;
+import pddl4j.parser.Symbol;
+import pddl4j.parser.TypedSymbol;
+
+import java.io.FileInputStream;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+public class Lexer {
+	
+	private static final int PRIMITIVE_TYPE = 0;
+	private static final int VARIABLE = 1;
+	private static final int CONSTANT = 2;
+	private static final int TERM = 3;
+	private static final int ATOMIC_FUNCTION_SKELETON = 4;	
+	private static final int PARSER_PROBLEM = 5;
+	private static final int PARSER_DOMAIN = 5;
+		
+	private Domain domain = null;
+	public Domain getDomain() { return this.domain; }
+
+	private Problem problem = null;
+	public Problem getProblem() { return this.problem; }	
+	
+    private File file;
+	public File getFile() { return this.file; }
+	public void setFile(File file) { this.file = file; }
+		
+	private ErrorManager mgr;
+	public ErrorManager getErrorManager() { return this.mgr; }
+	public void setErrorManager(ErrorManager mgr) { this.mgr = mgr; }
+	
+	private void error(Throwable e, int line, int column) {
+		String message = new String();
+		if (e.getClass().equals(TokenMgrError.class)) {
+			String[] tmp = e.getMessage().split(" ");
+			int l = -1;
+			int c = -1;
+			int i = 0;
+  			for (i = 0 ; i < tmp.length; i++) {
+  				if (tmp[i].equals("line") && i+1 < tmp.length) {
+  					l = Integer.parseInt(tmp[i+1].substring(0, tmp[i+1].length()-1));
+  				}
+  				if (tmp[i].equals("column") && i+1 < tmp.length) {
+  					c = Integer.parseInt(tmp[i+1].substring(0, tmp[i+1].length()-1));
+  				}
+  			}
+			message = e.getMessage().split(".  ")[1];
+			this.mgr.logLexicalError(message, this.file, l, c);
+		} else if (e.getClass().equals(ParseException.class)) {
+  			ParseException pe = (ParseException) e;
+  			message = generateErrorMesssage(pe);
+  			this.mgr.logLexicalError(message, this.file, 
+  				pe.currentToken.beginLine, pe.currentToken.beginColumn);
+  		}
+  		this.skipToNextBlock();
+	}	
+	
+	public boolean isRequirement(RequireKey key) {
+		if (domain != null && this.problem != null) {
+			return this.domain.getRequirements().contains(key)
+			|| this.problem.getRequirements().contains(key);
+		} else if (domain != null && this.problem == null) {
+			return this.domain.getRequirements().contains(key);
+		} else if (problem != null && this.domain == null) {
+			return this.problem.getRequirements().contains(key);
+		} else {
+			return false;
+		}
+	}
+	
+	public Set<RequireKey> getRequirements() {
+		return this.domain.getRequirements();
+	}
+		
+	private void skipToNextBlock() {
+		Token t1;
+		Token t2;
+		do {
+  			t1 = getNextToken();  	
+  			t2 = getToken(2);	  			
+  		} while (t1.kind != EOF
+  			&& t2 != null 
+	  		&& t2.kind != REQUIREMENTS
+	  		&& t2.kind != PREDICATES
+	  		&& t2.kind != TYPES
+	  		&& t2.kind != CONSTANTS
+	  		&& t2.kind != FUNCTIONS
+	  		&& t2.kind != ACTION
+	  		&& t2.kind != DURATIVE_ACTION
+	  		&& t2.kind != DERIVED
+	  		&& t2.kind != OBJECTS
+	  		&& t2.kind != INIT
+	  		&& t2.kind != GOAL
+  			&& t2.kind != METRIC
+  			&& t2.kind != EOF);
+	}
+	
+	private String generateErrorMesssage(ParseException pe) {
+        StringBuffer expected = new StringBuffer();
+        boolean expectedSeq = false;
+        int maxSize = 0;
+        for (int i = 0; i < pe.expectedTokenSequences.length; i++) {
+            if (maxSize < pe.expectedTokenSequences[i].length) {
+                maxSize = pe.expectedTokenSequences[i].length;
+            }
+            for (int j = 0; j < pe.expectedTokenSequences[i].length; j++) {
+                expected.append(pe.tokenImage[pe.expectedTokenSequences[i][j]]).append(" ");
+                expectedSeq = true;
+            }
+            if (pe.expectedTokenSequences[i][pe.expectedTokenSequences[i].length - 1] != 0) {
+                expected.append("...");
+            }
+            if (i < pe.expectedTokenSequences.length - 1) {
+                expected.append("\n").append("    ");
+            }
+        }
+        String retval = "unexpected token \"" + pe.currentToken.next.image + "\".";
+        if (expectedSeq) {
+        	if (pe.expectedTokenSequences.length == 1) {
+            	retval += "\nWas expecting:" + "\n" + "    ";
+        	} else {
+            	retval += "\nWas expecting one of:" + "\n" + "    ";
+        	}
+        	retval += expected.toString();
+        }
+        return retval;
+    }
+	
+}		
+PARSER_END(Lexer)
+
+
+SKIP : 
+{ 
+	" "
+| 	"\t"
+|	"\n" 
+| 	"\r"
+}
+MORE : 
+{
+	"//" : IN_SINGLE_LINE_COMMENT 
+|	";" : IN_SINGLE_LINE_COMMENT 
+|	<"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+|	"/*" : IN_MULTI_LINE_COMMENT 
+}
+<IN_SINGLE_LINE_COMMENT>
+	SPECIAL_TOKEN : { 
+		<SINGLE_LINE_COMMENT: "\n" | "\r" | "\r\n" > : DEFAULT 
+	}
+<IN_FORMAL_COMMENT>
+	SPECIAL_TOKEN :	{
+		<FORMAL_COMMENT: "*/" > : DEFAULT
+	}
+<IN_MULTI_LINE_COMMENT>
+	SPECIAL_TOKEN : {
+		<MULTI_LINE_COMMENT: "*/" > : DEFAULT
+	}
+<IN_SINGLE_LINE_COMMENT,IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT> 
+	MORE : {
+		< ~[] > 
+}
+
+TOKEN :
+{
+  	< LEFT_BRACKET: "(">
+| 	< RIGHT_BRACKET: ")">
+}
+
+TOKEN : {
+	< DEFINE : "define" >
+|	< DOMAIN : "domain" >
+|	< REQUIREMENTS : ":requirements" >
+|	< TYPES : ":types" >
+|	< EITHER : "either" >
+|	< CONSTANTS : ":constants" >
+|	< PREDICATES : ":predicates" >
+|	< FUNCTIONS : ":functions" >
+|	< ACTION : ":action" >
+|	< PARAMETERS : ":parameters" >
+|	< PRECONDITION : ":precondition" >
+|	< EFFECT : ":effect" >
+|	< PREFERENCE : "preference" >
+|	< WHEN : "when" >
+|	< DURATIVE_ACTION : ":durative-action" >
+|	< DURATION : ":duration" >
+|	< CONDITION : ":condition" >
+|	< DERIVED : ":derived" >
+|	< PROBLEM : "problem" >
+|	< P_DOMAIN : ":domain" >
+|	< OBJECTS	: ":objects" >
+|	< INIT : ":init" >
+|	< GOAL: ":goal" >
+|	< METRIC : ":metric" >
+}
+
+TOKEN : {
+	< STRIPS : ":strips" >
+|	< TYPING : ":typing" >
+|	< NEGATIVE_PRECONDITIONS : ":negative-preconditions" >
+|	< DISJUNCTIVE_PRECONDITIONS : ":disjunctive-preconditions" >
+|	< EQUALITY : ":equality" >
+|	< EXISTENTIAL_PRECONDITIONS : ":existential-preconditions" >
+|	< UNIVERSAL_PRECONDITIONS : ":universal-preconditions" >
+|	< QUANTIFIED_PRECONDITIONS : ":quantified-preconditions" >
+|	< CONDITIONAL_EFFECTS : ":conditional-effects" >
+|	< ACTION_COSTS : ":action-costs" >
+|   < FLUENTS : ":fluents" >
+|   < NUMERIC_FLUENTS : ":numeric-fluents" >
+|   < OBJECT_FLUENTS : ":object-fluents" >
+|   < GOAL_UTILITIES : ":goal-utilities" >
+|	< ADL : ":adl" >
+|	< DURATIVE_ACTIONS : ":durative-actions" >
+|	< DERIVED_PREDICATES : ":derived-predicates" >
+|	< TIMED_INITIAL_LITERALS : ":timed-initial-literals" >
+|	< PREFERENCES : ":preferences" >
+|	< CONSTRAINTS : ":constraints" >
+|	< CONTINUS_EFFECTS : ":continus-effects" >
+|	< DURATION_INEQUALITIES : ":duration-inequalities" >
+}
+
+TOKEN :
+{
+	< GREATER : ">" >
+|	< LESS : "<" >
+|	< GEQUAL : ">=" >
+|	< LEQUAL : "<=" >
+|	< EQUAL : "=" >
+}
+
+TOKEN :
+{
+	< MUL : "*" >
+|	< DIV : "/" >
+|	< ADD : "+" >
+|	< SUB : "-" >
+}
+
+TOKEN :
+{
+	<ASSIGN : "assign" >
+|	<SCALE_UP : "scale-up" >
+|	<SCALE_DOWN : "scale-down" >
+|	<INCREASE : "increase" >
+|	<DECREASE : "decrease" >
+}
+
+TOKEN :
+{
+    < OR : "or" >
+|   < AND : "and" >
+|   < IMPLY : "imply" >
+| 	< NOT : "not" >
+|	< FORALL : "forall" >
+|	< EXISTS : "exists" >
+}
+
+TOKEN :
+{
+	< ALWAYS : "always" >
+|	< SOMETIME : "sometime" >
+|	< WITHIN : "within" >
+|	< AT_MOST_ONCE : "at-most-once" >
+|	< SOMETIME_AFTER : "sometime-after" >
+|	< SOMETIME_BEFORE : "sometime-before" >
+|	< ALWAYS_WITHIN : "always-within" >
+|	< HOLD_DURING : "hold-during" >
+|	< HOLD_AFTER : "hold-after" >
+|	< AT: "at" >
+|	< START : "start">
+|	< END : "end">
+|	< OVER : "over">
+|	< ALL : "all">
+|	< TOTAL_TIME : "total-time" >	
+|	< TOTAL_COST : "total-cost" >	
+|	< MAXIMIZE : "maximize" >
+|	< MINIMIZE : "minimize" >
+|	< IS_VIOLATED : "is-violated" >
+}
+
+TOKEN :
+{
+	< VAR_DURATION : "?duration" >
+|	< CONTINUOUS_VARIABLE : "#t" >
+}
+
+TOKEN :
+{
+	< NUMBER_TYPE : "number" >
+|	< OBJECT_TYPE : "object" >
+}
+
+
+TOKEN :
+{
+	< VARIABLE_SYMBOL : ("?" <LETTER> (<LETTER> | <SEPARATOR> | <DIGIT>)*) >
+|	< SYMBOL : ((<LETTER> (<LETTER> | "-" | <DIGIT>)*)) >
+|	< NUMBER :  (<DIGIT>)+ ("." (<DIGIT>)*)? >
+|	< #DIGIT : ["0"-"9"] >
+|	< #LETTER : ["a"-"z","A"-"Z","_"] >
+|	< #SEPARATOR : ["_","-"] >  
+}
+
+Token right_bracket() :
+{
+	Token t = null;
+}
+{
+	t=<RIGHT_BRACKET> { return t;}
+}
+
+Token left_bracket() :
+{
+	Token t = null;
+}
+{
+	t=<LEFT_BRACKET> { return t;}
+}
+
+void domain() : 
+{
+	Exp node = null;
+	Symbol name = null;
+}
+{
+	try {
+		left_bracket() <DEFINE> left_bracket() <DOMAIN> 
+			name=domain_name() {
+				this.domain = new Domain(name);	
+			}
+		right_bracket()
+		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
+		[LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
+		[LOOKAHEAD(2) constants_def()]
+		[LOOKAHEAD(2) predicates_def()]
+		[LOOKAHEAD(2, { 
+			this.isRequirement(RequireKey.FLUENTS) 
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
+			|| this.isRequirement(RequireKey.ACTION_COSTS)
+		}) functions_def()]
+		[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) constraints(Lexer.PARSER_DOMAIN)]
+		(structure_def())*
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void domain_and_problem() : 
+{
+}
+{
+	domain()
+	problem()
+}
+	
+void require_def(int type) : 
+{ 
+	Token t = null;
+	Set<RequireKey> requirements = null;
+	if (type == Lexer.PARSER_DOMAIN) {
+		this.domain.addRequirement(RequireKey.STRIPS);
+	}
+}
+{
+	try {
+		t=left_bracket() <REQUIREMENTS> 
+			(requirements=require_key() {
+				if (type == Lexer.PARSER_DOMAIN) {
+					for (RequireKey r : requirements) {
+						this.domain.addRequirement(r);
+					}
+				} else {
+					for (RequireKey r : requirements) {
+						this.problem.addRequirement(r);
+					}
+				}
+			})+ right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+Set<RequireKey> require_key() : 
+{ 
+	Set<RequireKey> requirements = new LinkedHashSet<RequireKey>();
+}
+{
+	(	<STRIPS> { 
+			requirements.add(RequireKey.STRIPS);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	| 	<TYPING> { 
+			requirements.add(RequireKey.TYPING);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		} 
+	| 	<NEGATIVE_PRECONDITIONS> { 
+			requirements.add(RequireKey.NEGATIVE_PRECONDITIONS);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<DISJUNCTIVE_PRECONDITIONS> { 
+			requirements.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<EQUALITY> { 
+			requirements.add(RequireKey.EQUALITY);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<EXISTENTIAL_PRECONDITIONS> { 
+			requirements.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			if (requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)) {
+				requirements.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+			}
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<UNIVERSAL_PRECONDITIONS> { 
+			requirements.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+			if (requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)) {
+				requirements.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+			}
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<QUANTIFIED_PRECONDITIONS> { 
+			requirements.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+			requirements.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+			requirements.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<CONDITIONAL_EFFECTS> { 
+			requirements.add(RequireKey.CONDITIONAL_EFFECTS);
+			if (requirements.contains(RequireKey.STRIPS) 
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
+			}
+		}
+	|	<FLUENTS> { 
+			requirements.add(RequireKey.FLUENTS);
+			requirements.add(RequireKey.NUMERIC_FLUENTS);
+			requirements.add(RequireKey.OBJECT_FLUENTS);
+		}	
+	|	<NUMERIC_FLUENTS> { 
+			requirements.add(RequireKey.NUMERIC_FLUENTS);
+			if (requirements.contains(RequireKey.OBJECT_FLUENTS)) {
+				requirements.add(RequireKey.FLUENTS);
+			}	
+		}
+	|	<OBJECT_FLUENTS> { 
+			requirements.add(RequireKey.OBJECT_FLUENTS);
+			if (requirements.contains(RequireKey.NUMERIC_FLUENTS)) {
+				requirements.add(RequireKey.FLUENTS);
+			}	
+		}
+	|	<GOAL_UTILITIES> { 
+			requirements.add(RequireKey.GOAL_UTILITIES);
+		}
+	|	<ADL> { 
+			requirements.add(RequireKey.ADL);
+			requirements.add(RequireKey.STRIPS);
+			requirements.add(RequireKey.TYPING);
+			requirements.add(RequireKey.NEGATIVE_PRECONDITIONS);
+			requirements.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+			requirements.add(RequireKey.EQUALITY);
+			requirements.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+			requirements.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			requirements.add(RequireKey.CONDITIONAL_EFFECTS);
+		}
+	|	<ACTION_COSTS> { 
+			requirements.add(RequireKey.ACTION_COSTS);
+		}
+	|	<DURATIVE_ACTIONS> { 
+			requirements.add(RequireKey.DURATIVE_ACTIONS);
+			requirements.add(RequireKey.DURATION_INEQUALITIES);
+		}
+	|	<DERIVED_PREDICATES> { 
+			requirements.add(RequireKey.DERIVED_PREDICATES);
+		}
+	| 	<TIMED_INITIAL_LITERALS> { 
+			requirements.add(RequireKey.TIMED_INITIAL_LITERALS);
+		}
+	|	<PREFERENCES> { 
+			requirements.add(RequireKey.PREFERENCES);
+		}
+	|	<CONSTRAINTS> { 
+			requirements.add(RequireKey.CONSTRAINTS);
+		}
+	|	<CONTINUS_EFFECTS> { 
+			requirements.add(RequireKey.CONTINOUS_EFFECTS);
+		}
+	|	<DURATION_INEQUALITIES> { 
+			requirements.add(RequireKey.DURATION_INEQUALITIES);
+		})
+	{ return requirements; } 
+}	
+	
+	
+void type_def():
+{ 
+	List<TypedSymbol> typedList = null;
+}
+{
+	try {
+		left_bracket() <TYPES> 
+			typedList=typed_list(Lexer.PRIMITIVE_TYPE) 
+		right_bracket()  {
+			for (TypedSymbol type : typedList) {
+				this.domain.addType(type);
+			}
+//			for (TypedSymbol token : this.types_def) {
+//				if (token.getTypes().isEmpty()) {
+//					token.addType(Parser.OBJECT);
+//				}
+//			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+List<TypedSymbol> typed_list(int kind) :
+{
+	Symbol t;
+	List<Symbol> types = null;
+	List<TypedSymbol> typedList = new ArrayList<TypedSymbol>();
+	List<Symbol> tmp = new ArrayList<Symbol>();
+	List<TypedSymbol> nextTypedList = null;
+}
+{
+	(	LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
+			(t=primitive_type() {
+				tmp.add(t);
+			})* 
+			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
+				<SUB> types=type() nextTypedList=typed_list(kind))? {
+				if (types == null) {
+					types = new ArrayList<Symbol>();
+				}
+				for (Symbol s : tmp) {
+					TypedSymbol ts = new TypedSymbol(s);
+					for (Symbol type : types) {
+						ts.addType(type);
+					}
+					typedList.add(ts);
+				}
+				if (nextTypedList != null) {
+					typedList.addAll(nextTypedList);
+				}
+			}
+	|	LOOKAHEAD(2, {kind == Lexer.CONSTANT})	
+			(t=constant() {
+				tmp.add(t);
+			})* 
+			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
+				<SUB> types=type() nextTypedList=typed_list(kind))? {
+				if (types == null) {
+					types = new ArrayList<Symbol>();
+				}
+				for (Symbol s : tmp) {
+					TypedSymbol ts = new TypedSymbol(s);
+					for (Symbol type : types) {
+						ts.addType(type);
+					}
+					typedList.add(ts);
+				}
+				if (nextTypedList != null) {
+					typedList.addAll(nextTypedList);
+				}
+			}
+	|	LOOKAHEAD(2, {kind == Lexer.VARIABLE})	
+			(t=variable() {
+				tmp.add(t);
+			})* 
+			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
+				<SUB> types=type() nextTypedList=typed_list(kind))? {
+				if (types == null) {
+					types = new ArrayList<Symbol>();
+					types.add(Parser.OBJECT);
+				}
+				for (Symbol s : tmp) {
+					TypedSymbol ts = new TypedSymbol(s);
+					for (Symbol type : types) {
+						ts.addType(type);
+					}
+					typedList.add(ts);
+				}
+				if (nextTypedList != null) {
+					typedList.addAll(nextTypedList);
+				}
+			}
+	) { 
+		return typedList;
+	}
+}
+
+List<Symbol> type() :
+{
+	Symbol s;
+	List<Symbol> type = new ArrayList<Symbol>();
+}
+{
+	(	left_bracket() <EITHER> 
+		(LOOKAHEAD(2) s=primitive_type() {
+			type.add(s);
+		})+ 
+	right_bracket()
+	|	s=primitive_type() {
+		type.add(s);
+	}) { 
+		return type;
+	}
+}	
+
+Symbol primitive_type() :
+{
+	Token t = token;
+}
+{
+(	t=<OBJECT_TYPE>
+|	t=<NUMBER_TYPE>  
+| 	t=<SYMBOL>)
+	{ 
+		return new Symbol(Symbol.Kind.TYPE, t);
+	}
+}
+
+void constants_def() :
+{
+	List<TypedSymbol> typedList = null;
+}
+{
+	try {
+		left_bracket() <CONSTANTS> 
+			typedList=typed_list(Lexer.CONSTANT) 
+		right_bracket() { 
+			for (TypedSymbol constant : typedList) {
+				this.domain.addConstant(constant);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+Symbol constant() :
+{
+	Token t;
+}
+{
+	(	t=<SYMBOL> 
+	|	t=<AT>
+	| 	t=<END> 
+	| 	t=<START> 
+	| 	t=<OVER>) {
+		return new Symbol(Symbol.Kind.CONSTANT, t);
+	}
+}
+
+void predicates_def() :
+{ 
+	NamedTypedList predicate = null;
+}
+{
+	try {
+		left_bracket() <PREDICATES> 
+			(LOOKAHEAD(2) predicate=atomic_formula_skeleton() {
+				this.domain.addPredicate(predicate);
+			})+ 
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	} 
+}
+
+NamedTypedList atomic_formula_skeleton() :
+{
+	Symbol predicate = null;
+	List<TypedSymbol> typedList = null;
+}
+{
+	<LEFT_BRACKET>
+		predicate=predicate() 
+		typedList=typed_list(Lexer.VARIABLE) 
+	right_bracket() { 
+		NamedTypedList l = new NamedTypedList(predicate);
+		for (TypedSymbol s : typedList) {
+			l.add(s);
+		}
+		return l;
+	}
+}
+
+Symbol predicate() :
+{
+	Token t;
+}
+{
+	(t=<SYMBOL> 
+| 	t=<AT>
+| 	t=<END> 
+| 	t=<START> 
+| 	t=<OVER>) {
+		return new Symbol(Symbol.Kind.PREDICATE, t);
+	}
+}
+
+Symbol variable() :
+{
+	Token t = token;
+}
+{
+	t=<VARIABLE_SYMBOL> { return new Symbol(Symbol.Kind.VARIABLE, t); }
+} 
+
+void functions_def():
+{ 
+	List<NamedTypedList> functions = null;
+}
+{
+	try {
+		left_bracket() <FUNCTIONS> 
+			functions=function_typed_list(Lexer.ATOMIC_FUNCTION_SKELETON) 
+		right_bracket() { 
+			for (NamedTypedList function: functions) {
+				this.domain.addFunction(function);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+NamedTypedList atomic_function_skeleton() :
+{
+	Symbol functor = null;
+	List<TypedSymbol> typedList = null;
+}
+{
+	left_bracket() 
+		functor=functor()
+		typedList=typed_list(Lexer.VARIABLE) 
+	<RIGHT_BRACKET>
+	{ 
+		NamedTypedList l = new NamedTypedList(functor);
+		for (TypedSymbol s : typedList) {
+			l.add(s);
+		}
+		return l;
+	}
+}
+
+Symbol functor() :
+{
+	Token t;
+}
+{
+	(t=<SYMBOL> | t=<TOTAL_COST>) {
+		return new Symbol(Symbol.Kind.FUNCTOR, t);
+	}
+}
+
+List<NamedTypedList> function_typed_list(int type) :
+{
+	NamedTypedList namedTypedList = null;
+	List<NamedTypedList> typedListList = new ArrayList<NamedTypedList>();
+	List<NamedTypedList> nextNamedTypedList = null;
+	List<Symbol> typeList = null;
+}
+{
+	(LOOKAHEAD(2) namedTypedList=atomic_function_skeleton() {
+		typedListList.add(namedTypedList);
+	})* 
+	(<SUB> typeList=function_type() {
+			for (Symbol t : typeList) {
+				namedTypedList.addType(t);
+			}
+		} 		
+		nextNamedTypedList=function_typed_list(type) {
+			typedListList.addAll(nextNamedTypedList);
+		}
+	)? 
+	{ 
+		// To keep compatibility with PDDL 3.0: if no type is set it is number
+		for (NamedTypedList ntl : typedListList) {
+			if (ntl.getTypes().isEmpty()) {
+				ntl.addType(Parser.NUMBER);
+			}
+		}
+		return typedListList; 
+	}
+}
+
+List<Symbol> function_type() :
+{
+	Token token;
+	Symbol symbol;
+	List<Symbol> typesList = new ArrayList<Symbol>();
+}
+{
+		LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS) 
+			|| this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.ACTION_COSTS)})
+		token=<NUMBER_TYPE> {  
+			typesList.add(new Symbol(Symbol.Kind.TYPE, token)); 
+			return typesList;
+		}
+	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.OBJECT_FLUENTS) || this.isRequirement(RequireKey.FLUENTS)})
+		token=<OBJECT_TYPE> { 
+			typesList.add(new Symbol(Symbol.Kind.TYPE, token)); 
+			return typesList;
+		}
+	|  LOOKAHEAD(2, {this.isRequirement(RequireKey.OBJECT_FLUENTS) || this.isRequirement(RequireKey.FLUENTS)})	
+		left_bracket() <EITHER> 
+		(LOOKAHEAD(2) symbol=primitive_type() { 
+				typesList.add(symbol); 
+		})+ 
+		right_bracket() {
+			return typesList;
+		}	
+}
+
+Exp con_gd() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=and_con_gd()
+	|	LOOKAHEAD(2) node=forall_con_gd()
+	|	LOOKAHEAD(2) node=at_end_con_gd()
+	|	LOOKAHEAD(2) node=always_con_gd()
+	|	LOOKAHEAD(2) node=sometime_con_gd() 
+	|	LOOKAHEAD(2) node=within_con_gd() 
+	|	LOOKAHEAD(2) node=at_most_once_con_gd()
+	|	LOOKAHEAD(2) node=sometime_after_con_gd()
+	|	LOOKAHEAD(2) node=sometime_before_con_gd()
+	|	LOOKAHEAD(2) node=always_within_con_gd()
+	|	LOOKAHEAD(2) node=hold_during_con_gd()
+	|	LOOKAHEAD(2) node=hold_after_con_gd()
+	) { 
+		return node;
+	}
+}
+
+Exp and_con_gd() :
+{
+	Exp conGD = new Exp(Connective.AND);
+	Exp child = null;
+}
+{
+	left_bracket() <AND> 
+		(LOOKAHEAD(2) child=con_gd() {
+			conGD.addChild(child);
+		})* right_bracket()
+	{ 
+		return conGD;
+	}
+}
+
+Exp forall_con_gd() :
+{
+	Exp conGD = new Exp(Connective.FORALL);
+	Exp child = null;
+	List<TypedSymbol> typedList = null;
+}
+{
+	left_bracket() <FORALL> 
+		left_bracket() 
+			typedList=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		child=con_gd() 
+	right_bracket()
+	{ 
+		conGD.setVariables(typedList);
+		conGD.addChild(child);
+		return conGD;
+	}
+}
+
+Exp at_end_con_gd() :
+{
+	Exp conGD = new Exp(Connective.AT_END);
+	Exp node = null;
+}
+{
+		left_bracket() <AT> <END> 
+			node=node() 
+		right_bracket()
+	{ 
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp always_con_gd() :
+{
+	Exp conGD = new Exp(Connective.ALWAYS);
+	Exp node = null;
+}
+{
+	left_bracket() <ALWAYS> 
+		node=node() 
+	right_bracket()
+	{ 
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp sometime_con_gd() :
+{
+	Exp conGD = new Exp(Connective.SOMETIME);
+	Exp node = null;
+}
+{
+	left_bracket() <SOMETIME> 
+		node=node() 
+	right_bracket()
+	{ 
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp within_con_gd() :
+{
+	Exp conGD = new Exp(Connective.WITHIN);
+	Token toekn = null;
+	Exp node = null;
+}
+{
+	left_bracket() <WITHIN> 
+		token=<NUMBER> 
+		node=node() 
+	right_bracket()
+	{ 
+		Exp n1 = new Exp(Connective.NUMBER);
+		n1.setValue(Double.parseDouble(token.image));
+		conGD.addChild(n1);
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp at_most_once_con_gd() :
+{
+	Exp conGD = new Exp(Connective.AT_MOST_ONCE);
+	Exp node = null;
+}
+{
+	left_bracket() <AT_MOST_ONCE> 
+		node=node() 
+	right_bracket()
+	{ 
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp sometime_after_con_gd() :
+{
+	Exp conGD = new Exp(Connective.SOMETIME_AFTER);
+	Exp gd1 = null;
+	Exp gd2 = null;
+}
+{
+	left_bracket() <SOMETIME_AFTER> 
+		gd1=node()
+		gd2=node()
+	right_bracket()
+	{ 
+		conGD.addChild(gd1);
+		conGD.addChild(gd2);
+		return conGD;
+	}
+}
+
+Exp sometime_before_con_gd() :
+{
+	Exp conGD = new Exp(Connective.SOMETIME_BEFORE);
+	Exp gd1 = null;
+	Exp gd2 = null;
+}
+{
+	left_bracket() <SOMETIME_BEFORE> 
+		gd1=node() 
+		gd2=node() 
+	right_bracket()
+	{ 
+		conGD.addChild(gd1);
+		conGD.addChild(gd2);
+		return conGD;
+	}
+}
+
+Exp always_within_con_gd() :
+{
+	Exp conGD = new Exp(Connective.SOMETIME_BEFORE);
+	Token token = null;
+	Exp gd1 = null;
+	Exp gd2 = null;
+}
+{
+	left_bracket() <ALWAYS_WITHIN> 
+		token=<NUMBER> 
+		gd1=node() 
+		gd2=node()
+	right_bracket()
+	{ 
+		Exp n1 = new Exp(Connective.NUMBER);
+		n1.setValue(Double.parseDouble(token.image));
+		conGD.addChild(n1);
+		conGD.addChild(gd1);
+		conGD.addChild(gd2);
+		return conGD;
+	}
+}
+
+Exp hold_during_con_gd() :
+{
+	Exp conGD = new Exp(Connective.HOLD_DURING);
+	Token token1 = null;
+	Token token2 = null;
+	Exp node = null;
+}
+{
+	left_bracket() <HOLD_DURING> 
+		token1=<NUMBER>
+		token2=<NUMBER>
+		node=node()
+	right_bracket() 
+	{ 
+		Exp n1 = new Exp(Connective.NUMBER);
+		n1.setValue(Double.parseDouble(token1.image));
+		conGD.addChild(n1);
+		Exp n2 = new Exp(Connective.NUMBER);
+		n2.setValue(Double.parseDouble(token2.image));
+		conGD.addChild(n2);
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp hold_after_con_gd() :
+{
+	Exp conGD = new Exp(Connective.HOLD_AFTER);
+	Token token = null;
+	Exp node = null;
+}
+{
+	left_bracket() <HOLD_AFTER> 
+		token=<NUMBER> 
+		node=node()
+	right_bracket() 
+	{ 
+		Exp n1 = new Exp(Connective.NUMBER);
+		n1.setValue(Double.parseDouble(token.image));
+		conGD.addChild(n1);
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+Exp node() : 
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) 
+			node=atomic_formula(Lexer.TERM) 		
+	|	LOOKAHEAD(2) 
+			node=and_gd()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS)}) 
+			node=or_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.NEGATIVE_PRECONDITIONS)}) 
+			node=not_gd() 
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS) 
+				&& this.isRequirement(RequireKey.NEGATIVE_PRECONDITIONS)}) 
+			node=imply_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.EXISTENTIAL_PRECONDITIONS)}) 
+			node=exists_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) 
+			node=forall_gd()
+	| 	LOOKAHEAD(3, { this.isRequirement(RequireKey.EQUALITY)}) 
+			node=equal_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS) 
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) 
+			node=f_comp()
+	) { 
+		return node;
+	}
+}
+
+Exp equal_gd() :
+{
+	Exp node = null;
+}
+{
+	(LOOKAHEAD(2) 
+		node=not_equal_atomic_formula()
+|	LOOKAHEAD(2)
+		node=equal_atomic_formula()
+	) {
+		return node;	
+	}
+}
+
+Exp not_equal_atomic_formula() :
+{
+	Exp node = new Exp(Connective.NOT);
+	Exp c = null;
+}
+{
+	left_bracket() 
+		<NOT> 
+		c=equal_gd() 
+	right_bracket() {
+	 	node.addChild(c);
+		return node;
+	}
+}
+
+Exp equal_atomic_formula() :
+{
+	Exp node = new Exp(Connective.EQUAL_ATOM);
+	List<Symbol> atom = new ArrayList<Symbol>();
+	Symbol t1 = null;
+	Symbol t2 = null;
+}
+{
+	left_bracket() <EQUAL> 
+		t1=term()
+		t2=term()
+	right_bracket() {
+	 	atom.add(t1);
+	 	atom.add(t2);
+	 	node.setAtom(atom);
+		return node;
+	}
+}
+
+Exp and_gd() : 
+{
+	Exp node = new Exp(Connective.AND);
+	Exp s = null;
+}
+{
+	left_bracket() <AND> (LOOKAHEAD(2) s=node() {
+		node.addChild(s);
+	})* right_bracket()
+	{ 
+		return node;
+	}
+}
+
+Exp or_gd() : 
+{
+	Exp node = new Exp(Connective.OR);
+	Exp s = null;
+}
+{
+	left_bracket() <OR> (LOOKAHEAD(2) s=node() {
+		node.addChild(s);
+	})* right_bracket()
+	{ 
+		return node;
+	}
+}
+
+Exp not_gd() : 
+{
+	Exp node = new Exp(Connective.NOT);
+	Exp s = null;
+}
+{
+	left_bracket() <NOT> s=node() right_bracket() 
+	{ 
+		node.addChild(s);
+		return node;
+	}
+}
+
+Exp imply_gd() : 
+{
+	Exp node = new Exp(Connective.OR);
+	Exp p = null;
+	Exp q = null;
+}
+{
+	left_bracket() <IMPLY> p=node() q=node() right_bracket() 
+	{ 
+		Exp not_p = new Exp(Connective.NOT);
+		not_p.addChild(p);
+		node.addChild(not_p);
+		node.addChild(q);
+		return node;
+	}
+}
+
+Exp exists_gd() : 
+{
+	Exp node = new Exp(Connective.EXISTS);
+	List<TypedSymbol> typedList = null;
+	Exp s = null;
+}
+{
+	left_bracket() <EXISTS> 
+		left_bracket() 
+			typedList=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		s=node() 
+	right_bracket() { 
+		node.setVariables(typedList);
+		node.addChild(s);
+		return node;
+	}
+}
+
+Exp forall_gd() : 
+{
+	Exp node = new Exp(Connective.FORALL);
+	List<TypedSymbol> typedList = null;
+	Exp s = null;
+}
+{
+	left_bracket() <FORALL> 
+		left_bracket() 
+			typedList=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		s=node() 
+	right_bracket() { 
+		node.setVariables(typedList);
+		node.addChild(s);
+		return node;
+	}
+}
+	
+Exp atomic_formula(int type) :
+{
+	Exp node = new Exp(Connective.ATOM);
+	List<Symbol> atom = new ArrayList<Symbol>();
+	Symbol t = null;
+}
+{
+	<LEFT_BRACKET> t=predicate() {
+		atom.add(t);
+	} 
+	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
+			atom.add(t);
+		})* 
+	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
+			atom.add(t);
+		})* 
+	) right_bracket() { 
+		node.setAtom(atom);
+		return node;
+	}
+}
+		
+Symbol term() :
+{
+	Symbol t = null;
+}
+{
+	(	t=constant() 
+	|	t=variable() 
+	) { 
+		return t;
+	}
+}
+
+/*Exp function_term() :
+{
+	Exp node = new Exp(Connective.F_EXP);
+	List<Symbol> function = new ArrayList<Symbol>();
+	Symbol t = null;
+}
+{
+	<LEFT_BRACKET> t=functor() {
+		function.add(t);
+	} 
+	(t=constant() | t=variable()) {
+			function.add(t);
+	})* 
+	right_bracket() {
+		node.setAtom() 
+		return node;
+	}
+}*/
+
+
+Exp literal(int type) :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=atomic_formula(type) 
+	| 	LOOKAHEAD(2) node=not_atomic_formula(type)
+	) { 
+		return node;
+	}
+}
+
+Exp not_atomic_formula(int type) :
+{
+	Exp node = new Exp(Connective.NOT);
+	Exp s = null;
+}
+{		
+	left_bracket() <NOT> 
+		s=atomic_formula(type) 
+	right_bracket() { 
+		node.addChild(s);
+		return node;
+	}
+}
+
+Exp f_comp() :
+{
+	Exp node = null;
+}
+{
+	node=binary_comp() { 
+		return node;
+	}
+}
+
+Exp binary_comp() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=greater_comp()
+	|	LOOKAHEAD(2) node=less_comp()
+	|	LOOKAHEAD(2) node=greater_equal_comp()
+	|	LOOKAHEAD(2) node=less_equal_comp()
+	|	LOOKAHEAD(2) node=equal_comp()
+	) { 
+		return node;
+	}
+}
+
+Exp greater_comp() :
+{
+	Exp node = new Exp(Connective.GREATER);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <GREATER> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp greater_equal_comp() :
+{
+	Exp node = new Exp(Connective.GREATER_OR_EQUAL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <GEQUAL> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp less_equal_comp() :
+{
+	Exp node = new Exp(Connective.LESS_OR_EQUAL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <LEQUAL> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp less_comp() :
+{
+	Exp node = new Exp(Connective.LESS);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <LESS> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp equal_comp() :
+{
+	Exp node = new Exp(Connective.EQUAL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <EQUAL> 
+		op1=f_exp()
+		op2=f_exp() 
+
+	right_bracket() { 
+	 	node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp f_exp() :
+{
+	Exp node = new Exp(Connective.F_EXP);
+	Exp child = null;
+}
+{
+	(	child=number() 
+	|	LOOKAHEAD(2) child=op()
+	|	LOOKAHEAD(2) child=f_head()
+	) { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp number() :
+{
+	Token t = null;
+}
+{
+	t=<NUMBER> 
+	{ 
+		Exp node = new Exp(Connective.NUMBER);
+		node.setValue(Double.parseDouble(t.image));
+		return node;
+	}
+}
+	
+Exp op() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=binary_operation()
+	|	LOOKAHEAD(2) node=unary_op()
+	) { 
+		return node;
+	}
+}
+
+Exp binary_operation():
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=add_op()
+	|	LOOKAHEAD(2) node=substract_op()
+	|	LOOKAHEAD(2) node=multiply_op()
+	|	LOOKAHEAD(2) node=divide_op()
+	) { 
+		return node;
+	}
+}
+
+Exp add_op() :
+{
+	Exp node = new Exp(Connective.PLUS);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <ADD> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket()
+	{ 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp substract_op() :
+{
+	Exp node = new Exp(Connective.MINUS);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <SUB> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp multiply_op() :
+{
+	Exp node = new Exp(Connective.MUL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <MUL> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp divide_op() :
+{
+	Exp node = new Exp(Connective.DIV);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <DIV> 
+		op1=f_exp() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp unary_op() :
+{
+	Exp node = new Exp(Connective.UMINUS);
+	Exp op1 = null;
+}
+{
+	left_bracket() <SUB> 
+		op1=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		return node;
+	}
+}
+
+Exp f_head() :
+{
+	Exp node = new Exp(Connective.FN_HEAD);
+	List<Symbol> tokenList = new ArrayList<Symbol>();
+	Symbol s = null;
+}
+{
+	(left_bracket() s=functor() {
+		tokenList.add(s);
+	} (LOOKAHEAD(2) s=term() {
+		tokenList.add(s);
+	})* right_bracket()
+| 	s=functor() { tokenList.add(s); }) {
+		node.setAtom(tokenList);
+		return node;
+	}
+}
+
+void structure_def() :
+{
+	Op op = null;
+	DerivedPredicate dp = null;
+}
+{
+	( 	LOOKAHEAD(2) 
+			op=action_def() { 
+				this.domain.addOperator(op);
+			}
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) 
+			op=durative_action_def() { 
+				this.domain.addOperator(op); 
+			}
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DERIVED_PREDICATES)}) 
+			dp=derived_def() { 
+				this.domain.addDerivedPredicate(dp); 
+			}
+	) 
+}
+
+DerivedPredicate derived_def() :
+{
+	NamedTypedList head = null;
+	Exp body = null;
+}
+{	
+	try {
+		<LEFT_BRACKET>  <DERIVED>
+			head=atomic_formula_skeleton()
+			body=node()
+		<RIGHT_BRACKET>
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new DerivedPredicate(head, body);
+	}
+}
+
+Op action_def() :
+{
+	Symbol name = null;
+	List<TypedSymbol> parameters = null;
+	Exp preconds = null;
+	Exp effects = null;
+}
+{
+	try {
+		left_bracket() <ACTION> name=action_name()
+			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+			<PRECONDITION> preconds=pre_gd()
+			<EFFECT> effects=effect() 
+			right_bracket() 
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{ 
+		return new Op(name, parameters, preconds, effects);
+	}
+}
+
+Symbol action_name() :
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> { 
+		return new Symbol(Symbol.Kind.ACTION, t);
+	}
+}
+
+Exp pre_gd() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(3, { this.isRequirement(RequireKey.PREFERENCES)}) node=pref_gd()
+	|	LOOKAHEAD(2) node=and_pre_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) node=forall_pre_gd()
+	|	LOOKAHEAD(2) node=empty_or()
+	|	LOOKAHEAD(2) node=node()
+	) { 
+		return node;
+	}
+}
+
+Exp empty_or() :
+{
+	Token t = token;
+}
+{
+	t=<LEFT_BRACKET> <RIGHT_BRACKET>
+	{ 
+		return new Exp(Connective.OR);
+	}
+}
+
+Exp and_pre_gd() :
+{
+	Token t = token;
+	Exp node = new Exp(Connective.AND);
+	Exp s;
+}
+{
+	t=left_bracket() <AND> 
+		(s=pre_gd() {
+			node.addChild(s);
+		})* right_bracket()
+	{ 
+		return node;
+	}
+}	
+
+Exp forall_pre_gd() :
+{
+	Exp node = new Exp(Connective.FORALL);	
+	List<TypedSymbol> vars = null;
+	Exp s = null;
+}
+{
+	left_bracket() <FORALL> 
+		left_bracket() 
+			vars=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		s=pre_gd() 
+	right_bracket()
+	{ 
+		node.setVariables(vars);
+		node.addChild(s);
+		return node;
+	}
+}
+
+Exp pref_gd() :
+{
+	Symbol pref_name = null;
+	Exp node = null;
+}
+{
+	left_bracket() <PREFERENCE> 
+		[pref_name=pref_name()] 
+		node=node()
+	right_bracket() { 
+		node.setPrefName(pref_name);
+		return node; 
+	}
+}
+	
+Symbol pref_name() :
+{
+	Token t = null;
+}
+{
+	t=<SYMBOL> { 
+		return new Symbol(Symbol.Kind.PREFERENCE, t);
+	}
+}
+
+Exp effect() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=and_c_effect()
+	|	LOOKAHEAD(2) node=c_effect()
+	) { 
+		return node;
+	}
+}
+
+Exp and_c_effect() :
+{
+	Exp node = new Exp(Connective.AND);
+	Exp s = null;
+}
+{
+	left_bracket() <AND> (LOOKAHEAD(2) s=c_effect() {
+		node.addChild(s);
+	})* right_bracket()
+	{ 
+		return node;
+	}
+}
+
+Exp c_effect() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) node=forall_effect()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) node=when_con_effect()
+	|	LOOKAHEAD(2) node=p_effect()
+	) { 
+		return node;
+	}
+}
+
+Exp forall_effect() :
+{
+	Exp node = new Exp(Connective.FORALL);	
+	List<TypedSymbol> vars = null;
+	Exp s = null;
+}
+{
+	left_bracket() <FORALL> 
+		left_bracket() 
+			vars=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		s=effect() 
+	right_bracket() { 
+		node.setVariables(vars);
+		node.addChild(s);
+		return node;
+	}
+}
+
+Exp when_con_effect() :
+{
+	Exp node = new Exp(Connective.WHEN);	
+	Exp condition = null;
+	Exp effects = null;
+}
+{
+	left_bracket() <WHEN> 
+		condition=node() 
+		effects=cond_effect() 
+	right_bracket() { 
+		node.addChild(condition);
+		node.addChild(effects);
+		return node;
+	}
+}
+
+Exp cond_effect() :
+{
+	Exp node = null;	
+}
+{
+	(	LOOKAHEAD(2) node=and_p_effect()
+	|	LOOKAHEAD(2) node=p_effect()
+	) { 
+		return node;
+	}
+}
+
+Exp and_p_effect() :
+{
+	Exp node = new Exp(Connective.AND);
+	Exp s = null;
+}
+{
+	left_bracket() <AND> (LOOKAHEAD(2) s=p_effect() {
+		node.addChild(s);
+	})* right_bracket()  
+	{
+		return node; 
+	}
+}
+
+Exp p_effect() :
+{
+	Exp node = null;
+}
+{
+ 	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS) 
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) node=assign_op()		
+	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.ACTION_COSTS) }) node=increase_total_cost()
+	
+	
+	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
+	) { 
+		return node;
+	}
+}
+
+Exp increase_total_cost() :
+{
+	Exp node = new Exp(Connective.INCREASE);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <INCREASE> 
+		op1=total_cost() 
+		op2=numeric_term() 
+	right_bracket()
+	{ 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp total_cost() :
+{	
+	Token t;
+}
+{
+	<LEFT_BRACKET> t=<TOTAL_COST> <RIGHT_BRACKET> {
+		Exp node = new Exp(Connective.FN_HEAD);
+		List<Symbol> function = new ArrayList<Symbol>();
+		function.add(new Symbol(Symbol.Kind.FUNCTOR, t));
+		node.setAtom(function);	
+		return node;
+	} 
+}
+
+Exp numeric_term() :
+{
+	List<Symbol> tokenList = new ArrayList<Symbol>();
+	Symbol s = null;
+}
+{
+	left_bracket() s=functor() {
+		tokenList.add(s);
+	} (LOOKAHEAD(2) s=term() {
+		tokenList.add(s);
+	})* right_bracket() { 
+		Exp node = new Exp(Connective.FN_HEAD);
+		node.setAtom(tokenList);
+		return node;
+	}
+| 	node=number() {
+		return node;
+	}
+}
+
+Exp assign_op() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=assign()
+	|	LOOKAHEAD(2) node=scale_up()
+	|	LOOKAHEAD(2) node=scale_down()
+	|	LOOKAHEAD(2) node=increase()
+	|	LOOKAHEAD(2) node=decrease()
+	) { 
+		return node;
+	}
+}
+
+Exp assign() :
+{
+	Exp node = new Exp(Connective.ASSIGN);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <ASSIGN> 
+		op1=f_head() 
+		op2=f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp scale_up() :
+{
+	Exp node = new Exp(Connective.SCALE_UP);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <SCALE_UP> 
+		op1=f_head() 
+		op2=f_exp() 
+	right_bracket()
+	{ 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}	 
+ 
+Exp scale_down() :
+{
+	Exp node = new Exp(Connective.SCALE_DOWN);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <SCALE_DOWN> 
+		op1=f_head() 
+		op2=f_exp() 
+	right_bracket()
+	{ 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp increase() :
+{
+	Exp node = new Exp(Connective.INCREASE);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <INCREASE> 
+		op1=f_head() 
+		op2=f_exp() 
+	right_bracket()
+	{ 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp decrease() :
+{
+	Exp node = new Exp(Connective.DECREASE);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <DECREASE> 
+		op1=f_head() 
+		op2=f_exp() 
+	right_bracket()
+	{ 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Op durative_action_def() :
+{
+	Symbol name = null;
+	List<TypedSymbol> parameters = null;
+	Exp duration = null;
+	Exp condition = null;
+	Exp effect = null;
+}
+{
+	try {
+		left_bracket() <DURATIVE_ACTION> name=da_symbol()
+			<PARAMETERS> 
+				left_bracket() 
+					parameters=typed_list(Lexer.VARIABLE) 
+				right_bracket()
+			<DURATION> duration=duration_constraint()
+			<CONDITION> condition=da_gd()
+			<EFFECT> effect=da_effect()
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{ 
+		return new Op(name, parameters, condition, effect, duration);
+	}
+}
+
+Symbol da_symbol() :
+{
+	Token t = null;
+}
+{
+	t=<SYMBOL> { 
+		return new Symbol(Symbol.Kind.ACTION, t);
+	}
+}
+
+Exp duration_constraint() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=empty_or() 
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) node=and_simple_duration_constraint()
+	|	LOOKAHEAD(2) node=simple_duration_constraint()
+	) { 
+		return node;
+	}
+}
+
+Exp and_simple_duration_constraint() :
+{
+	Exp node = new Exp(Connective.AND);
+	Exp child = null;
+}
+{
+	left_bracket() <AND> 
+		(LOOKAHEAD(2) child=simple_duration_constraint(){
+			node.addChild(child);
+		})+ 
+	right_bracket() { 
+		return node;
+	}
+}
+
+Exp simple_duration_constraint() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=d_op()
+	|	LOOKAHEAD(2) node=at_simple_duration_constraint()
+	) { 
+		return node;
+	}
+}
+
+Exp at_simple_duration_constraint() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(3) node=at_start_simple_duration_constraint()
+	| 	LOOKAHEAD(3) node=at_end_simple_duration_constraint()
+	) { 
+		return node;
+	}
+}
+
+Exp at_start_simple_duration_constraint() :
+{
+	Exp node = new Exp(Connective.AT_START);
+	Exp child;
+}
+{
+	left_bracket() <AT> <START> 
+		child=simple_duration_constraint() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp at_end_simple_duration_constraint() :
+{
+	Exp node = new Exp(Connective.AT_END);
+	Exp child;
+}
+{
+	<LEFT_BRACKET> <AT> <END> 
+		child=simple_duration_constraint() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp d_op() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) 
+			node=equal_d_op()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) 
+			node=gequal_d_op()
+	| 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) 
+			node=lequal_d_op()
+	) { 
+		return node;
+	}
+}
+
+Exp equal_d_op() :
+{
+	Exp node = new Exp(Connective.EQUAL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <EQUAL> 
+		op1=var_duration() 
+		op2=d_value() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp gequal_d_op() :
+{
+	Exp node = new Exp(Connective.GREATER_OR_EQUAL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	<LEFT_BRACKET> <GEQUAL> 
+		op1=var_duration() 
+		op2=d_value() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp lequal_d_op() :
+{
+	Exp node = new Exp(Connective.LESS_OR_EQUAL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <LEQUAL> 
+		op1=var_duration() 
+		op2=d_value() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp var_duration() :
+{
+	Exp node = new Exp(Connective.TIME_VAR);
+	Token t = null;
+}
+{
+	t=<VAR_DURATION>
+	{ 
+		node.setVariable(new Symbol(Symbol.Kind.DURATION_VARIABLE, t));
+		return node;
+	}
+}
+
+Exp d_value() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=number() 
+	| 	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS) 
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) node=f_exp()
+	) { 
+		return node;
+	}
+}
+
+Exp da_gd():
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=pref_timed_gd() 
+	|	LOOKAHEAD(2) node=and_da_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) 
+			node=forall_da_gd()
+	) { 
+		return node;
+	}
+}
+
+Exp forall_da_gd() :
+{
+	Exp node = new Exp(Connective.FORALL);
+	Exp child = null;
+	List<TypedSymbol> typedList = null;
+}
+{
+	<LEFT_BRACKET> <FORALL> 
+		left_bracket() 
+			typedList=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		child=da_gd() 
+	right_bracket()
+	{ 
+		node.setVariables(typedList);
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp and_da_gd() :
+{
+	Exp node = new Exp(Connective.AND);
+	Exp child = null;
+}
+{
+	<LEFT_BRACKET> <AND> 
+		(LOOKAHEAD(2) child=da_gd() {
+			node.addChild(child);
+		})* 
+	right_bracket() { 
+		return node;
+	}
+}
+
+Exp pref_timed_gd() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) 
+			node=timed_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.PREFERENCES)}) 
+			node=named_pref_timed_gd()
+	) { 
+		return node;
+	}
+}
+
+Exp named_pref_timed_gd() :
+{
+	Symbol pref_name = null;
+	Exp node = null;
+}
+{
+	left_bracket() <PREFERENCE> 
+		[pref_name=pref_name()] 
+		node=timed_gd() 
+	right_bracket() { 
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+Exp timed_gd() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=at_timed_gd()
+	|	LOOKAHEAD(2) node=over_timed_gd()
+	) { 
+		return node;
+	}
+}
+
+Exp over_timed_gd() :
+{
+	Exp node = new Exp(Connective.OVER_ALL);
+	Exp child = null;
+}
+{
+	left_bracket() <OVER> <ALL> 
+		child=node()
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp at_timed_gd() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(3) node=at_start_timed_gd()
+	|	LOOKAHEAD(2) node=at_end_timed_gd()
+	) { 
+		return node;
+	}
+}
+
+Exp at_start_timed_gd() :
+{
+	Exp node = new Exp(Connective.AT_START);
+	Exp child = null;
+}
+{
+	left_bracket() <AT> <START> 
+		child=node() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp at_end_timed_gd() :
+{
+	Exp node = new Exp(Connective.AT_END);
+	Exp child = null;
+}
+{
+	left_bracket() <AT> <END> 
+		child=node()
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp da_effect() :
+{
+	Exp node = null;
+}
+{
+	(	
+		LOOKAHEAD(2) 
+			node=and_da_effect() 
+	| 	LOOKAHEAD(2) 
+			node=timed_effect()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) 
+			node=forall_da_effect()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) 
+			node=when_da_effect()
+	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.FLUENTS) 
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) 
+			node=da_assign_op()
+	
+	) { 
+		return node;
+	}
+}
+
+Exp da_assign_op() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_assign()
+	|	LOOKAHEAD(2) node=da_scale_up()
+	|	LOOKAHEAD(2) node=da_scale_down()
+	|	LOOKAHEAD(2) node=da_increase()
+	|	LOOKAHEAD(2) node=da_decrease()
+	) { 
+		return node;
+	}
+}
+
+Exp da_assign() :
+{
+	Exp node = new Exp(Connective.ASSIGN);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <ASSIGN> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp da_scale_up() :
+{
+	Exp node = new Exp(Connective.SCALE_UP);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <SCALE_UP> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}	 
+ 
+Exp da_scale_down() :
+{
+	Exp node = new Exp(Connective.SCALE_DOWN);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <SCALE_DOWN> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp da_increase() :
+{
+	Exp node = new Exp(Connective.INCREASE);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <INCREASE> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp da_decrease() :
+{
+	Exp node = new Exp(Connective.DECREASE);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <DECREASE> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp when_da_effect() :
+{
+	Exp node = new Exp(Connective.WHEN);
+	Exp condition = null;
+	Exp effect = null;
+}
+{
+	left_bracket() <WHEN> 
+		condition=da_gd()
+		effect=da_effect()
+	right_bracket() { 
+		node.addChild(condition);
+		node.addChild(effect);
+		return node;
+	}
+}
+
+
+Exp forall_da_effect() :
+{
+	Exp node = new Exp(Connective.FORALL);
+	List<TypedSymbol> typedList = null;
+	Exp child = null;
+}
+{
+	left_bracket() <FORALL> 
+		left_bracket() 
+			typedList=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		child=da_effect() 
+	right_bracket() { 
+		node.setVariables(typedList);
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp and_da_effect() :
+{
+	Exp node = new Exp(Connective.AND);
+	Exp child = null;
+}
+{
+	left_bracket() <AND> 
+		(LOOKAHEAD(2) child=da_effect() {
+			node.addChild(child);
+		})* 
+	right_bracket() { 
+		return node;
+	}
+}
+
+Exp timed_effect() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) 
+			node=at_a_effect()
+	|	LOOKAHEAD(3, {this.isRequirement(RequireKey.CONTINOUS_EFFECTS)}) 
+			node=assign_op_t() 
+	) { 
+		return node;
+	}
+}
+
+Exp at_f_assign_da() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(3) node=at_start_f_assign_da()
+	|	LOOKAHEAD(3) node=at_end_f_assign_da()
+	) { 
+		return node;
+	}
+}
+
+Exp at_start_f_assign_da() :
+{
+	Exp node = new Exp(Connective.AT_START);
+	Exp child;
+}
+{
+	left_bracket() <AT> <START> 
+		child=f_assign_da() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+
+Exp at_end_f_assign_da() :
+{
+	Exp node = new Exp(Connective.AT_END);
+	Exp child;
+}
+{
+	left_bracket() <AT> <END> 
+		child=f_assign_da() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp at_a_effect() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(4) node=at_start_a_effect()
+	|	LOOKAHEAD(4) node=at_end_a_effect()
+	) { 
+		return node;
+	}
+}
+
+
+Exp a_effect() :
+{
+	Exp node = null;
+}
+{
+ 	(	LOOKAHEAD(2) node=f_assign_da()
+	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
+	|	LOOKAHEAD(2) node=when_con_effect()
+	|	LOOKAHEAD(2) node=forall_effect()
+	) { 
+		return node;
+	}
+}
+
+Exp at_start_a_effect() :
+{
+	Exp node = new Exp(Connective.AT_START);
+	Exp child = null;
+}
+{
+	left_bracket() <AT> <START> 
+		child=a_effect()
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+
+Exp at_end_a_effect() :
+{
+	Exp node = new Exp(Connective.AT_END);
+	Exp child = null;
+}
+{
+	left_bracket() <AT> <END> 
+		child=a_effect() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp assign_op_t() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=increase_assign_op_t()
+	|	LOOKAHEAD(2) node=decrease_assign_op_t() 
+	) { 
+		return node;
+	}
+}
+
+Exp increase_assign_op_t() :
+{
+	Exp node = new Exp(Connective.ASSIGN);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <INCREASE> 
+		op1=f_head() 
+		op2=f_exp_t() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp decrease_assign_op_t() :
+{
+	Exp node = new Exp(Connective.ASSIGN);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <DECREASE> 
+		op1=f_head() 
+		op2=f_exp_t() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp f_exp_t() :
+{
+	Exp node = new Exp(Connective.F_EXP_T);
+	Symbol continuous_variable_name = null;
+	Exp child = null;
+}
+{
+	(	LOOKAHEAD(2) 
+			left_bracket() <MUL> 
+				continuous_variable_name=continuous_variable() 
+				child=f_exp() 
+			right_bracket()
+	| 	LOOKAHEAD(2) 
+			left_bracket() <MUL> 
+				child=f_exp() 
+				continuous_variable_name=continuous_variable() 
+			right_bracket()
+	| 	LOOKAHEAD(2) 
+		continuous_variable_name=continuous_variable() 
+	) { 
+		node.setVariable(continuous_variable_name);
+		if (child != null) node.addChild(child);
+		return node;
+	}
+}
+
+Symbol continuous_variable() :
+{
+	Token t = null;
+}
+{
+	t=<CONTINUOUS_VARIABLE>  { 
+		return new Symbol(Symbol.Kind.CONTINUOUS_VARIABLE, t);
+	}
+}
+
+Exp f_assign_da() :
+{
+	Exp node = null;
+}
+{	
+	(	LOOKAHEAD(2) node=da_assign() 
+	|	LOOKAHEAD(2) node=da_scale_up() 
+	|	LOOKAHEAD(2) node=da_scale_down() 
+	|	LOOKAHEAD(2) node=da_increase()
+	|	LOOKAHEAD(2) node=da_decrease()
+	) { 
+		return node;
+	}
+}
+
+Exp f_exp_da() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_op()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) node=var_duration()
+	|	LOOKAHEAD(2) node=f_exp()
+	) { 
+		return node;
+	}
+}
+
+
+Exp da_op() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_add_op() 
+	|	LOOKAHEAD(2) node=da_substract_op()
+	|	LOOKAHEAD(2) node=da_multiply_op()
+	|	LOOKAHEAD(2) node=da_divide_op()
+	) { 
+		return node;
+	}
+}
+
+Exp da_add_op() :
+{
+	Exp node = new Exp(Connective.PLUS);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <ADD> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp da_substract_op() :
+{
+	Exp node = new Exp(Connective.MINUS);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <SUB>  
+		(	LOOKAHEAD(3) (op1=f_head() [op2=f_exp_da()]) 
+	| 	LOOKAHEAD(3) ([LOOKAHEAD(2) op2=f_exp_da()] op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		if (op2 != null) node.addChild(op2);
+		return node;
+	}
+}
+
+Exp da_multiply_op() :
+{
+	Exp node = new Exp(Connective.MUL);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <MUL> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp da_divide_op() :
+{
+	Exp node = new Exp(Connective.DIV);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <DIV> 
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da()) 
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+void problem() :
+{
+	Exp node = null;
+	Symbol name = null;
+}
+{
+	try {
+		left_bracket() <DEFINE> 
+		left_bracket() <PROBLEM> 
+			name=problem_name() {
+				this.problem = new Problem(name);
+			}
+		right_bracket()
+		left_bracket() <P_DOMAIN> 
+			domain_problem_name()
+		right_bracket()
+		[LOOKAHEAD(2) require_def(Lexer.PROBLEM)]
+		[LOOKAHEAD(2) object_declaration()]
+		init()
+		goal()
+		
+		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) constraints(Lexer.PROBLEM)]
+		[LOOKAHEAD(2) metric_spec()]
+		// [length-spec()] not implemented
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	
+}
+
+Symbol problem_name() :
+{ Token t = null; }
+{ 
+	t=<SYMBOL> {  return new Symbol(Symbol.Kind.PROBLEM, t); }
+}
+
+void domain_problem_name() :
+{ Token t = null; }
+{
+	t=<SYMBOL> {  this.problem.setDomain(new Symbol(Symbol.Kind.DOMAIN, t)); }
+}
+
+Symbol domain_name() :
+{ Token t = null; }
+{
+	t=<SYMBOL> { return new Symbol(Symbol.Kind.DOMAIN, t); }
+}
+
+void object_declaration() :
+{
+	List<TypedSymbol> typedList = null;
+}
+{
+	try {
+		left_bracket() <OBJECTS> 
+			typedList=typed_list(Lexer.CONSTANT) 
+		right_bracket() { 
+			for (TypedSymbol object : typedList) {
+				this.problem.addObject(object);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void init() :
+{
+	Exp node = null;
+}
+{
+	try {
+		left_bracket() <INIT> 
+			(LOOKAHEAD(2) node=init_el() {
+				this.problem.addInitialFact(node);
+			})* 
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+	
+
+Exp init_el() :
+{
+	Exp node = null;
+}
+{
+	(	
+		LOOKAHEAD(3, {this.isRequirement(RequireKey.TIMED_INITIAL_LITERALS)}) node=timed_literal()
+	|	LOOKAHEAD(2) node=literal(Lexer.CONSTANT)
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.FLUENTS) 
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
+			|| this.isRequirement(RequireKey.ACTION_COSTS)}) node=equal_init_el() 
+	) { 
+		return node;
+	}
+}
+
+Exp equal_init_el() :
+{
+	Exp node = new Exp(Connective.FN_ATOM);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{	
+	left_bracket() <EQUAL> 
+		op1=constant_f_head()
+		op2=number() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+Exp timed_literal() :
+{
+	Exp node = new Exp(Connective.DURATION_ATOM);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() <AT> 
+		op1=number() 
+		op2=literal(Lexer.CONSTANT) 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+void goal() :
+{
+	Exp node = null;
+	Boolean goal_utilities = false;
+	if (this.isRequirement(RequireKey.GOAL_UTILITIES)
+			&& !this.isRequirement(RequireKey.PREFERENCES)) {
+		this.getRequirements().add(RequireKey.PREFERENCES);
+		goal_utilities = true;
+	}
+		
+}
+{
+	try {
+		left_bracket() <GOAL> 
+		node=pre_gd()
+		right_bracket() { 
+			this.problem.setGoal(node);
+			if (goal_utilities) {
+				this.getRequirements().remove(RequireKey.PREFERENCES);
+			}
+	   	}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	
+}
+
+void constraints(int type) :
+{
+	Exp conGD = null;
+}
+{
+	try {
+		<LEFT_BRACKET> <CONSTRAINTS> 
+			conGD=pref_con_gd() 
+		right_bracket() { 
+			if (type == Lexer.PARSER_DOMAIN) {
+				this.domain.setConstraints(conGD);
+			} else {
+				this.problem.setConstraints(conGD);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+Exp pref_con_gd() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) 
+			node=and_pref_con_gd()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) 
+			node=forall_pref_con_gd()
+	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.PREFERENCES)}) 
+			node=named_pref_con_gd()
+	|	LOOKAHEAD(2) 
+			node=con_gd() 
+	) {
+		return node; 
+	}
+}
+
+Exp and_pref_con_gd() :
+{
+	Exp node = new Exp(Connective.AND);
+	Exp child;
+}
+{
+	left_bracket() <AND> 
+		(LOOKAHEAD(2) child=pref_con_gd() {
+			node.addChild(child);
+		})* right_bracket()
+	{ 
+		return node;
+	}
+}
+
+Exp named_pref_con_gd() :
+{
+	Exp node = null;
+	Symbol pref_name = null;
+}
+{
+	left_bracket() <PREFERENCE> 
+		[pref_name=pref_name()] 
+		node=con_gd() 
+	right_bracket() { 
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+Exp forall_pref_con_gd() :
+{
+	Exp node = new Exp(Connective.FORALL);
+	List<TypedSymbol> typedList = null;
+	Exp child = null;
+}
+{
+	left_bracket() <FORALL> 
+		left_bracket() 
+			typedList=typed_list(Lexer.VARIABLE) 
+		right_bracket() 
+		child=pref_con_gd() 
+	right_bracket() { 
+		node.setVariables(typedList);
+		node.addChild(child);
+		return node;
+	}
+}
+
+void metric_spec() :
+{
+	Exp node = null;
+}
+{	
+	try {
+		(	LOOKAHEAD(3) node=maximize()
+		| 	LOOKAHEAD(3) node=minimize() 
+		)
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{ 
+		this.problem.setMetric(node);
+	}
+}
+
+Exp maximize() :
+{
+	Exp node = new Exp(Connective.MAXIMIZE);
+	Exp child = null;
+}
+{
+	left_bracket() 
+		<METRIC>
+		<MAXIMIZE> 
+		child=metric_f_exp() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp minimize() :
+{
+	Exp node = new Exp(Connective.MINIMIZE);
+	Exp child = null;
+}
+{
+	left_bracket() 
+		<METRIC> 
+		<MINIMIZE> 
+		child=metric_f_exp() 
+	right_bracket() { 
+		node.addChild(child);
+		return node;
+	}
+}
+
+Exp metric_f_exp() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=op_metric_f_exp()
+	|	LOOKAHEAD(2) node=number()
+	|	LOOKAHEAD(2) node=constant_f_head()
+	|	LOOKAHEAD(2) node=total_time()
+	|	LOOKAHEAD(2) node=violated_pref_exp()
+	) { 
+		return node;
+	}
+}
+
+Exp violated_pref_exp() :
+{
+	Exp node = new Exp(Connective.IS_VIOLATED);
+	Symbol pref_name = null;
+}
+{
+	left_bracket() 
+		<IS_VIOLATED> 
+		pref_name=pref_name() 
+	right_bracket() { 
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+Exp constant_f_head() :
+{
+	Exp node = new Exp(Connective.FN_HEAD);
+	List<Symbol> function = new ArrayList<Symbol>();
+	Symbol functor = null;
+	Symbol argument = null;
+}
+{
+	left_bracket() 
+		functor=functor() { function.add(functor); } 
+		(LOOKAHEAD(2) argument=constant(){
+			function.add(argument);
+		})* 
+	right_bracket() { 
+		node.setAtom(function);
+		return node;
+	}
+}
+
+Exp total_time() :
+{
+	Exp node = new Exp(Connective.FN_HEAD);
+	Token t;
+}
+{
+	(LOOKAHEAD(3) 
+		left_bracket() t=<TOTAL_TIME> right_bracket() 
+| 	LOOKAHEAD(2) 
+		t=<TOTAL_TIME>) {	 
+			List<Symbol> atom = new ArrayList<Symbol>();
+			atom.add(new Symbol(Symbol.Kind.FUNCTOR, t)); 
+			node.setAtom(atom);
+			return node;
+		}
+}
+
+Exp op_metric_f_exp() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=add_op_metric_f_exp()
+	|	LOOKAHEAD(2) node=substract_op_metric_f_exp()
+	| 	LOOKAHEAD(2) node=multi_op_metric_f_exp()
+	| 	LOOKAHEAD(2) node=div_op_metric_f_exp()
+	) { 
+		return node;
+	}
+}
+
+Exp add_op_metric_f_exp() :
+{
+	Exp node = new Exp(Connective.PLUS);
+	Exp op = null;
+}
+{
+	left_bracket() 
+		<ADD> 
+		op=metric_f_exp() { node.addChild(op); }
+		(LOOKAHEAD(2) op=metric_f_exp() {
+			node.addChild(op);
+		})+ 
+	right_bracket() { 
+		return node;
+	}
+}
+
+Exp substract_op_metric_f_exp() :
+{
+	Exp node = new Exp(Connective.MINUS);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() 
+		<SUB> 
+		op1=metric_f_exp() 
+		[op2=metric_f_exp()]
+	right_bracket() { 
+		node.addChild(op1);
+		if (op2 != null) node.addChild(op2);
+		return node;
+	}
+}
+
+Exp div_op_metric_f_exp() :
+{
+	Exp node = new Exp(Connective.DIV);
+	Exp op1 = null;
+	Exp op2 = null;
+}
+{
+	left_bracket() 
+		<DIV> 
+		op1=metric_f_exp() 
+		op2=metric_f_exp() 
+	right_bracket() { 
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+
+Exp multi_op_metric_f_exp() :
+{
+	Exp node = new Exp(Connective.MUL);
+	Exp op = null;
+}
+{
+	left_bracket() 
+		<MUL> 
+		op=metric_f_exp() { node.addChild(op); }
+		(LOOKAHEAD(2) op=metric_f_exp() {
+			node.addChild(op);
+		})+ 
+	right_bracket() { 
+		return node;
+	}
+}
+
