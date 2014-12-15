@@ -8,7 +8,8 @@ http://lig-membres.imag.fr/pellier/
 
 2. Description 
 
-PDDL4J is an open source library under XXX licence (To add). 
+PDDL4J is an open source library under LGPL licence.
+ 
 The purpose of the PDDL4J is to facilitate the  java implementation of planners 
 based on the PDDL (Planning Description Language). The library contains a 
 parser on the last version of PDDL 3.0 and all the classes need to manipulate its 
@@ -53,5 +54,5 @@ java -javaagent:lib/pddl4j.jar -server -Xms2048m -Xmx2048m -classpath lib/pddl4j
 	pddl4j.examples.ahsp.AHSP -o problems/blocksworld/domain.pddl \\
 	-f problems/blocksworld/p15.pddl
 
-Note: A set of planning problems is available in the directory "problems".
+Note: A set of planning problems is available in the web site of the international planning competition: http://ipc.icaps-conference.org
 
