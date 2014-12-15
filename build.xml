@@ -48,7 +48,7 @@
 				deprecation="yes"
 				includes="**/*.java" 
 				optimize="yes"
-				source="1.6" 
+				source="1.7"
 				debug="on"
 			/>
 	</target>		
@@ -67,7 +67,7 @@
 			destdir="${doc_dir}" 
 			packagenames="pddl4j.parser,pddl4j.planner,pddl4j.preprocessing,pddl4j.heuristics,pddl4j.util"
 			access="protected" 
-			source="1.6" 
+			source="1.7" 
 			linksource="no"
 			overview="${src_dir}/overview.html"
 			Windowtitle="PDDL4J Project ${version}"
