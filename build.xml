@@ -88,31 +88,5 @@
 		</jar>
 	</target>
 
-	<target name="cvs-checkout" description="Checkouts project from CVS repository">
-			<echo>Checkout project from CVS repository</echo>
-			<cvs command="checkout" 
-				package="${cvs.module}" 
-				cvsRoot=":pserver:anonymous@${ip.cvs}:${repository.path}"  
-				dest="${basedir}"
-			/>
-	</target>
-		
-	<target name="cvs-update" description="Updates modifications from CVS repository">
-		<echo>Updates modifications from CVS repository</echo>		
-		<cvs command="update" 
-			cvsRoot=":pserver:anonymous@${ip.cvs}:${repository.path}"
-		/>
-	</target>
-	
-	<target name="cvs-commit" description="Commits modifications to CVS repository">
-		<echo>Commits modifications to CVS repository</echo>	
-		<input message="User:" addproperty="user.cvs"/>
-		<input message="Commit message:" addproperty="cvs.commit.msg"/>	
-		<cvs command="commit -m '${cvs.commit.msg}'" 
-			cvsRoot=":ext:${user.cvs}@${ip.cvs}:${repository.path}"
-			cvsRsh="ssh"
-		/>
-	</target>
-	
 </project>
 
