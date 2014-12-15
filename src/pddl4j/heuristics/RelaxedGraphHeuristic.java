@@ -35,7 +35,7 @@ import pddl4j.util.CondBitExp;
  * implementation of the fast forward planner proposed by J. Hoffmann. The relaxed planning computed
  * does not compute mutual exclusion. To have more information about this implementation see
  * Hoffmann, J. and Nebel, B. (2001). The FF Planning System: Fast Plan Generation Through Heuristic
- * Search. Journal of Artificial Intelligence Research, 14(1):253Ð302.
+ * Search. Journal of Artificial Intelligence Research, 14(1):253-302.
  * 
  * @author Damien Pellier
  * @version 1.0 20.08.2010
