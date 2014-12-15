@@ -40,7 +40,7 @@ import pddl4j.util.IntExp;
  * This implementation is based on the implementation of
  * the STAN planner proposed D. Long and M. Fox. To have more information about this implementation
  * see D. Long, M. Fox (1999). Efficient Implementation of the Plan Graph in STAN. Journal of
- * Artificial Intelligence Research, 10(1):87Ð115.
+ * Artificial Intelligence Research, 10(1):87-115.
  * 
  * @author Damien Pellier
  * @version 1.0 20.08.2010
