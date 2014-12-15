@@ -46,7 +46,7 @@ pddl4j distribution.
 
 3.3 Examples
 
-Examples are available on the "examples" directory of the distribution. For instance, 
+Examples are available in the "examples" directory of the distribution. For instance, 
 this archive contains a simple planner based on A* search strategy called AHSP. To launch
 the example use the following command line:
 
