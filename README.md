@@ -1,4 +1,4 @@
-##PDDL4J library (version 2.0)</##
+##PDDL4J library (version 2.0)##
 Date: 09/02/2011
 
 ###1. Contact###
@@ -65,6 +65,7 @@ it.
 First, generate the documentation
 > ant doc
 
+
 All the documentation are contained in the doc directory.
 
 ####3.5 How to run examples ?####
@@ -74,9 +75,9 @@ instance, this archive contains a simple planner based on A* search strategy
 called AHSP. To launch the example use the following command line:
 
 > java -javaagent:lib/pddl4j.jar -server -Xms2048m -Xmx2048m -classpath lib/pddl4j.jar 
-	pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl \\
-	-f pddl/blocksworld/p15.pddl
+>	pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl
+>	-f pddl/blocksworld/p15.pddl
 
 Note: A set of planning problems is available in the web site of the international 
-planning competition: http://ipc.icaps-conference.org
+planning competition: http://ipc.icaps-conference.org.
 
