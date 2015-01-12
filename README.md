@@ -60,13 +60,13 @@ The pddl4j library can be used as a jar file called "pddl4j.jar" in the "lib"
 directory of the release. Therefore, include the jar in our classpath and enjoy
 it.
 
-####3.4 How to use the doc ?
+####3.4 How to access the documentation?
 
-First, generate the documentation: 
+All the documentations are contained in the doc directory.
+
+To generate the javadoc just type:
 > ant doc
 
-All the documentation are contained in the doc directory.
-
 ####3.5 How to run examples ?
 
 Examples are available in the "examples" directory of the distribution. For 
