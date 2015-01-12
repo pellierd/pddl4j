@@ -38,7 +38,7 @@ PDDL language.
   * a set of useful pre-processing mechanisms in order to instantiate and 
 simply operators into ground actions based on inertia properties.  
   * a set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
-  * several examples of planners using PDDL4J. 
+  * several examples of planners using PDDL4J. 
 
 ###3. How to use the PDDL4J library ?###
 
@@ -62,10 +62,9 @@ directory of the release. Therefore, include the jar in our classpath and enjoy
 it.
 
 ####3.4 How to use the doc ?####
-
-First, generate the documentation
+:
+First, generate the documentation=:
 > ant doc
-
 
 All the documentation are contained in the doc directory.
 
