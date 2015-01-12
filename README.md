@@ -66,7 +66,8 @@ it.
 
 To generate the javadoc just type:
 > ant doc
-
+
+
 ####3.5 How to run examples ?
 
 Examples are available in the "examples" directory of the distribution. For 
