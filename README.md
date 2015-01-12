@@ -78,7 +78,13 @@ called AHSP. To launch the example use the following command line:
     pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl
     -f pddl/blocksworld/p15.pddl
 
-
+```javascript
+function fancyAlert(arg) {
+if(arg) {
+$.facebox({div:'#foo'})
+}
+}
+```
 
 
 
