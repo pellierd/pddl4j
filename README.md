@@ -62,8 +62,8 @@ directory of the release. Therefore, include the jar in our classpath and enjoy
 it.
 
 ####3.4 How to use the doc ?
-:
-First, generate the documentation:
+
+First, generate the documentation: 
 > ant doc
 
 All the documentation are contained in the doc directory.
