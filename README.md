@@ -76,7 +76,7 @@ called AHSP. To launch the example use the following command line:
 ```java -javaagent:lib/pddl4j.jar -server -Xms2048m -Xmx2048m -classpath lib/pddl4j.jar 
 	pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl
 	-f pddl/blocksworld/p15.pddl
-'''
+```
 
 Note: A set of planning problems is available in the web site of the international 
 planning competition: http://ipc.icaps-conference.org.
