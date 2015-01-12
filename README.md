@@ -1,4 +1,5 @@
-##PDDL4J library (version 2.0)##
+##PDDL4J library##
+(version 2.0)
 Date: 09/02/2011
 
 ###1. Contact###
@@ -6,7 +7,7 @@ Date: 09/02/2011
 - Damien Pellier (damien.pellier@imag.fr)
 - http://lig-membres.imag.fr/pellier/
 
-###2. Description### 
+###2. Description###
 
 PDDL4J is an open source library under LGPL license.
  
