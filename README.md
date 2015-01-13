@@ -1,5 +1,4 @@
 ##PDDL4J library
-09/02/2011 (version 2.0)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.13921.svg)](http://dx.doi.org/10.5281/zenodo.13921)
 
 ###1. Contact
