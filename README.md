@@ -62,7 +62,7 @@ it.
 
 ####3.4 How to access the documentation?
 
-All the documentations are contained in the doc directory.
+All the documentations are contained in the doc directory.
 
 To generate the javadoc just type:
 > ant doc
