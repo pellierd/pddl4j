@@ -259,7 +259,6 @@ public final class Preprocessing {
 		// Check that the domain and the problem are ADL otherwise the preprocessing is not
 		// implemented for the moment.
 		Set<RequireKey> adl = new HashSet<RequireKey>();
-		adl.add(RequireKey.ADL);
 		adl.add(RequireKey.STRIPS);
 		adl.add(RequireKey.TYPING);
 		adl.add(RequireKey.EQUALITY);
