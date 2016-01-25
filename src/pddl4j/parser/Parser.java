@@ -894,6 +894,9 @@ public final class Parser {
 			} else {
 				TypedSymbol constant = this.domain.getConstant(s);
 				if (constant == null) {
+					constant = this.problem.getObject(s);
+				}
+				if (constant == null) {
 					this.mgr.logParserError("constant \"" + s.getImage() + "\" is undefined",
 							this.lexer.getFile(), s.getBeginLine(), s.getBeginColumn());
 					checked = false;
