@@ -7,8 +7,8 @@ lib
 
 # Generated files #
 ###################
-src/pddl4j/parser/lexer/*
-!src/pddl4j/parser/lexer/Lexer.jj
+src/fr/uga/pddl4j/parser/lexer/*
+!src/fr/uga/pddl4j/parser/lexer/Lexer.jj
 
 # Logs and databases #
 ######################
