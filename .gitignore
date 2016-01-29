@@ -1,0 +1,40 @@
+# Compiled source #
+###################
+bin
+out
+lib
+*.class
+
+# Generated files #
+###################
+src/pddl4j/parser/lexer/*
+!src/pddl4j/parser/lexer/Lexer.jj
+
+# Logs and databases #
+######################
+*.log
+
+# Generated documentation #
+###########################
+doc/api
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# IDE files or directories #
+############################
+#intelliJ
+.idea
+*.iml
+#eclipse
+.project
+.metadata
+*.launch
