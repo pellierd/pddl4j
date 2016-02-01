@@ -1,15 +1,15 @@
 <project name="PDDL4J Project" default="build" basedir=".">
 
 	<property name="version" value="v2.0" />
-	<property name="src_dir" value="${basedir}/src" />
+	<property name="src_dir" value="${basedir}/src/main/java" />
 	<property name="class_dir" value="${basedir}/classes" />
 	<property name="doc_dir" value="${basedir}/doc/api" />
 	<property name="lib_dir" value="${basedir}/lib" />
 	<property name="dev_dir" value="${basedir}/dev" />
 
 	<property name="javacc_home" value="${dev_dir}/javacc/" />
-	<property name="javacc_target" value="src/fr/uga/pddl4j/parser/lexer/Lexer.jj" />
-	<property name="javacc_output" value="src/fr/uga/pddl4j/parser/lexer" />
+	<property name="javacc_target" value="src/main/java/fr/uga/pddl4j/parser/lexer/Lexer.jj" />
+	<property name="javacc_output" value="src/main/java/fr/uga/pddl4j/parser/lexer" />
 
 	<property name="pddl4j" value="pddl4j" />
 	<property name="pddl4j.parser" value="pddl4j/parser" />
