@@ -3,12 +3,13 @@
 bin
 out
 lib
+build/
 *.class
 
 # Generated files #
 ###################
-src/fr/uga/pddl4j/parser/lexer/*
-!src/fr/uga/pddl4j/parser/lexer/Lexer.jj
+src/main/java/fr/uga/pddl4j/parser/lexer*
+!src/main/java/fr/uga/pddl4j/parser/lexer/Lexer.jj
 
 # Logs and databases #
 ######################
@@ -31,10 +32,15 @@ Thumbs.db
 
 # IDE files or directories #
 ############################
+
 #intelliJ
 .idea
 *.iml
+
 #eclipse
 .project
 .metadata
 *.launch
+
+#gradle
+.gradle/
