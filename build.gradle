@@ -48,7 +48,7 @@ task run (type: JavaExec, dependsOn: build){
 
     jvmArgs = ["-javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar", "-server", "-Xms2048m", "-Xmx2048m"]
 
-    description = "Run AHSP plannin algorithm"
-    main = "fr.uga.pddl4j.examples.ahsp.AHSP"
+    description = "Run HSP plannin algorithm"
+    main = "fr.uga.pddl4j.planners.hsp.HSP"
     classpath = sourceSets.main.runtimeClasspath
 }
