@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.examples.ahsp;
+package fr.uga.pddl4j.planners.hsp;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,7 +47,7 @@ import fr.uga.pddl4j.util.MemoryAgent;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class AHSP {
+public final class HSP {
 
 	/**
 	 * The default heuristic.
@@ -122,7 +122,7 @@ public final class AHSP {
 	 *
 	 * @param arguments the arguments of the planner.
 	 */
-	private AHSP(final Properties arguments) {
+	private HSP(final Properties arguments) {
 		this.arguments = arguments;
 	}
 
@@ -134,8 +134,8 @@ public final class AHSP {
 	 */
 	public CodedProblem parseAndEncode() {
 		final Parser parser = new Parser();
-		final String ops = (String) this.arguments.get(AHSP.Argument.DOMAIN);
-		final String facts = (String) this.arguments.get(AHSP.Argument.PROBLEM);
+		final String ops = (String) this.arguments.get(HSP.Argument.DOMAIN);
+		final String facts = (String) this.arguments.get(HSP.Argument.PROBLEM);
 		try {
 			parser.parse(ops, facts);
 		} catch (FileNotFoundException e) {
@@ -146,7 +146,7 @@ public final class AHSP {
 		}
 		final Domain domain = parser.getDomain();
 		final Problem problem = parser.getProblem();
-		final int traceLevel = (Integer) this.arguments.get(AHSP.Argument.TRACE_LEVEL);
+		final int traceLevel = (Integer) this.arguments.get(HSP.Argument.TRACE_LEVEL);
 		if (traceLevel > 0 && traceLevel != 8) {
 			System.out.println();
 			System.out.println("Parsing domain file \"" + new File(ops).getName()
@@ -178,7 +178,7 @@ public final class AHSP {
 		if (pb.isSolvable()) plan = this.AStarSearch(pb);
 
 		// The rest it is just to print the result
-		final int traceLevel = (Integer) this.arguments.get(AHSP.Argument.TRACE_LEVEL);
+		final int traceLevel = (Integer) this.arguments.get(HSP.Argument.TRACE_LEVEL);
 		if (traceLevel > 0 && traceLevel != 8) {
 			if (pb.isSolvable()) {
 				if (plan != null) {
@@ -209,7 +209,7 @@ public final class AHSP {
 			System.out.printf("\n\n");
 		}
 		if (traceLevel == 8) {
-			String problem = (String) this.arguments.get(AHSP.Argument.PROBLEM);
+			String problem = (String) this.arguments.get(HSP.Argument.PROBLEM);
 			String[] str_array = problem.split("/");
 			String pb_file = str_array[str_array.length - 1];
 			String pb_name = pb_file.substring(0, pb_file.indexOf("."));
@@ -237,7 +237,7 @@ public final class AHSP {
 	 */
 	private List<String> AStarSearch(final CodedProblem problem) {
 		final long begin = System.currentTimeMillis();
-		final Heuristic.Type type = (Heuristic.Type) this.arguments.get(AHSP.Argument.HEURISTIC_TYPE);
+		final Heuristic.Type type = (Heuristic.Type) this.arguments.get(HSP.Argument.HEURISTIC_TYPE);
 		final Heuristic heuristic = HeuristicToolKit.createHeuristic(type, problem);
 		// Get the initial state from the planning problem
 		final BitState init = new BitState(problem.getInit());
@@ -245,7 +245,7 @@ public final class AHSP {
 		final Map<BitState, Node> closeSet = new HashMap<BitState, Node>();
 		final Map<BitState, Node> openSet = new HashMap<BitState, Node>();
 		// Initialize the opened list (store the pending node)
-		final double weight = (Double) this.arguments.get(AHSP.Argument.WEIGHT);
+		final double weight = (Double) this.arguments.get(HSP.Argument.WEIGHT);
 		// The list stores the node ordered according to the A* (f = g + h) function
 		final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new Comparator<Node>() {
 			public int compare(final Node n1, final Node n2) {
@@ -266,7 +266,7 @@ public final class AHSP {
 		openSet.put(init, root);
 		List<String> plan = null;
 
-		final int CPUTime = (Integer) this.arguments.get(AHSP.Argument.CPU_TIME);
+		final int CPUTime = (Integer) this.arguments.get(HSP.Argument.CPU_TIME);
 		// Start of the search
 		while (!open.isEmpty() && plan == null && this.searching_time < CPUTime) {
 			// Pop the first node in the pending list open
@@ -357,10 +357,10 @@ public final class AHSP {
 	}
 
 	/**
-	 * The main method of the <code>AHSP</code> example. The command line syntax is as follow:
+	 * The main method of the <code>HSP</code> example. The command line syntax is as follow:
 	 *
 	 * <pre>
-	 * usage of AHSP:
+	 * usage of HSP:
 	 *
  	 * OPTIONS   DESCRIPTIONS
   	 *
@@ -407,9 +407,9 @@ public final class AHSP {
 	 */
 	public static void main(String[] args) {
 		// Parse the command line
-		final Properties arguments = AHSP.parseArguments(args);
+		final Properties arguments = HSP.parseArguments(args);
 		// Create the planner
-		AHSP planner = new AHSP(arguments);
+		HSP planner = new HSP(arguments);
 		// Parse and encode the PDDL file into compact representation
 		final CodedProblem problem = planner.parseAndEncode();
 		// Search for a solution and print the result
@@ -423,18 +423,18 @@ public final class AHSP {
 	 * @return The arguments of the planner.
 	 */
 	private static Properties parseArguments(String[] args) {
-		final Properties arguments = AHSP.getDefaultArguments();
+		final Properties arguments = HSP.getDefaultArguments();
 		try {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equalsIgnoreCase("-o") && ((i + 1) < args.length)) {
-					arguments.put(AHSP.Argument.DOMAIN, args[i + 1]);
+					arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
 					if (!new File(args[i + 1]).exists()) {
 						System.out.println("operators file does not exist");
 						System.exit(0);
 					}
 					i++;
 				} else if (args[i].equalsIgnoreCase("-f") && ((i + 1) < args.length)) {
-					arguments.put(AHSP.Argument.PROBLEM, args[i + 1]);
+					arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
 					if (!new File(args[i + 1]).exists()) {
 						System.out.println("facts file does not exist");
 						System.exit(0);
@@ -442,52 +442,52 @@ public final class AHSP {
 					i++;
 				} else if (args[i].equalsIgnoreCase("-t") && ((i + 1) < args.length)) {
 					final int cpu = Integer.valueOf(args[i + 1]) * 1000;
-					if (cpu < 0) AHSP.printUsage();
+					if (cpu < 0) HSP.printUsage();
 					i++;
-					arguments.put(AHSP.Argument.CPU_TIME, cpu);
+					arguments.put(HSP.Argument.CPU_TIME, cpu);
 				} else if (args[i].equalsIgnoreCase("-u") && ((i + 1) < args.length)) {
 					final int heuristic = Integer.valueOf(args[i + 1]);
-					if (heuristic < 0 || heuristic > 8) AHSP.printUsage();
+					if (heuristic < 0 || heuristic > 8) HSP.printUsage();
 					if (heuristic == 0) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.FAST_FORWARD);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.FAST_FORWARD);
 					} else if (heuristic == 1) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM);
 					} else if (heuristic == 2) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM_MUTEX);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM_MUTEX);
 					} else if (heuristic == 3) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM);
 					} else if (heuristic == 4) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2);
 					} else if (heuristic == 5) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2M);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2M);
 					} else if (heuristic == 6) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.COMBO);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.COMBO);
 					} else if (heuristic == 7) {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.MAX);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.MAX);
 					} else {
-						arguments.put(AHSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SET_LEVEL);
+						arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SET_LEVEL);
 					}
 					i++;
 				} else if (args[i].equalsIgnoreCase("-w") && ((i + 1) < args.length)) {
 					final double weight = Double.valueOf(args[i + 1]);
-					if (weight < 0) AHSP.printUsage();
-					arguments.put(AHSP.Argument.WEIGHT, weight);
+					if (weight < 0) HSP.printUsage();
+					arguments.put(HSP.Argument.WEIGHT, weight);
 					i++;
 				} else if (args[i].equalsIgnoreCase("-i") && ((i + 1) < args.length)) {
 					final int level = Integer.valueOf(args[i + 1]);
-					if (level < 0) AHSP.printUsage();
-					arguments.put(AHSP.Argument.TRACE_LEVEL, level);
+					if (level < 0) HSP.printUsage();
+					arguments.put(HSP.Argument.TRACE_LEVEL, level);
 					i++;
 				} else {
-					AHSP.printUsage();
+					HSP.printUsage();
 				}
 			}
-			if (arguments.get(AHSP.Argument.DOMAIN) == null
-					|| arguments.get(AHSP.Argument.PROBLEM) == null) {
-				AHSP.printUsage();
+			if (arguments.get(HSP.Argument.DOMAIN) == null
+					|| arguments.get(HSP.Argument.PROBLEM) == null) {
+				HSP.printUsage();
 			}
 		} catch (Throwable t) {
-			AHSP.printUsage();
+			HSP.printUsage();
 		}
 		return arguments;
 	}
@@ -496,7 +496,7 @@ public final class AHSP {
 	 * This method print the usage of the command-line planner.
 	 */
 	private static void printUsage() {
-		System.out.println("\nusage of ahsp:\n");
+		System.out.println("\nusage of hsp:\n");
 		System.out.println("OPTIONS   DESCRIPTIONS\n");
 		System.out.println("-o <str>    operator file name");
 		System.out.println("-f <str>    fact file name");
@@ -544,10 +544,10 @@ public final class AHSP {
 	 */
 	private static Properties getDefaultArguments() {
 		final Properties options = new Properties();
-		options.put(AHSP.Argument.HEURISTIC_TYPE, AHSP.DEFAULT_HEURISTIC);
-		options.put(AHSP.Argument.WEIGHT, AHSP.DEFAULT_WHEIGHT);
-		options.put(AHSP.Argument.CPU_TIME, AHSP.DEFAULT_CPU_TIME * 1000);
-		options.put(AHSP.Argument.TRACE_LEVEL, AHSP.DEFAULT_TRACE_LEVEL);
+		options.put(HSP.Argument.HEURISTIC_TYPE, HSP.DEFAULT_HEURISTIC);
+		options.put(HSP.Argument.WEIGHT, HSP.DEFAULT_WHEIGHT);
+		options.put(HSP.Argument.CPU_TIME, HSP.DEFAULT_CPU_TIME * 1000);
+		options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
 		return options;
 	}
 }
