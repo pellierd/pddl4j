@@ -9,44 +9,44 @@
 ###2. Description
 
 PDDL4J is an open source library under LGPL license.
- 
-The purpose of PDDL4J is to facilitate the development of JAVA tools for 
-Automated Planning based on PDDL language (Planning Domain Description 
-Language). Automated planning and scheduling, in the relevant literature often 
+
+The purpose of PDDL4J is to facilitate the development of JAVA tools for
+Automated Planning based on PDDL language (Planning Domain Description
+Language). Automated planning and scheduling, in the relevant literature often
 denoted as simply planning, is a branch of artificial intelligence that concerns
- the realization of strategies or action sequences, typically for execution by 
-intelligent agents, autonomous robots and unmanned vehicles. 
+ the realization of strategies or action sequences, typically for execution by
+intelligent agents, autonomous robots and unmanned vehicles.
 
 PDDL was originally developed by Drew McDermott and the 1998 planning competition
-committee. It was inspired by the need to encourage the empirical comparison of 
-planning systems and the exchange of planning benchmarks within the community. 
+committee. It was inspired by the need to encourage the empirical comparison of
+planning systems and the exchange of planning benchmarks within the community.
 Its development improved the communication of research results and triggered an
  explosion in performance, expressivity and robustness of planning systems.
 
-PDDL has become a de facto standard language for describing planning domains, 
-not only for the competition but more widely, as it offers an opportunity to 
-carry out empirical evaluation of planning systems on a growing collection of 
-generally adopted standard benchmark domains. The emergence of a language 
-standard will have an impact on the entire field, influencing what is seen as 
-central and what peripheral in the development of planning systems. 
+PDDL has become a de facto standard language for describing planning domains,
+not only for the competition but more widely, as it offers an opportunity to
+carry out empirical evaluation of planning systems on a growing collection of
+generally adopted standard benchmark domains. The emergence of a language
+standard will have an impact on the entire field, influencing what is seen as
+central and what peripheral in the development of planning systems.
 
 The library contains:
-  * a PDDL 3.1 parser and all the classes need to manipulate its 
+  * a PDDL 3.1 parser and all the classes need to manipulate its
 concepts. The parser can be configured to accept only specified requirements of
-PDDL language. 
-  * a set of useful pre-processing mechanisms in order to instantiate and 
-simply operators into ground actions based on inertia properties.  
+PDDL language.
+  * a set of useful pre-processing mechanisms in order to instantiate and
+simply operators into ground actions based on inertia properties.
   * a set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
-  * several examples of planners using PDDL4J. 
+  * several examples of planners using PDDL4J.
 
 ###3. How to use the PDDL4J library ?
 
-The pddl4j library is package with "ant". If ant is not installed on your computer,
-go to http://ant.apache.org/ and install it.
+The pddl4j library is package with "gradle". If ant is not installed on your computer,
+go to https://gradle.org/ and install it.
 
 ####3.1 How to build PDDL4J ?
 
-Type at the root of the PDDL4J distribution: 
+Type at the root of the PDDL4J distribution:
 > ./gradlew build
 
 The jar "pddl4j-VERSION.jar" is available in the build/libs directory.
@@ -67,14 +67,14 @@ To generate the javadoc just type:
 
 ####3.5 How to run examples ?
 
-Examples are available in the "examples" directory of the distribution. For 
-instance, this archive contains a simple planner based on A* search strategy 
+Examples are available in the "examples" directory of the distribution. For
+instance, this archive contains a simple planner based on A* search strategy
 called AHSP. To launch the example use the following command line:
 
 > java -javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
 Or use the gradle run command:
-> gradle run -PArgs='-o','pddl/blocksworld/domain.pddl','-f','pddl/blocksworld/p15.pddl' 
+> gradle run -PArgs='-o','pddl/blocksworld/domain.pddl','-f','pddl/blocksworld/p15.pddl'
 
-Note: A set of planning problems is available in the web site of the international 
+Note: A set of planning problems is available in the web site of the international
 planning competition: http://ipc.icaps-conference.org.
