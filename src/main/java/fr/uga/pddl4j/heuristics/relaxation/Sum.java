@@ -17,16 +17,14 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics;
+package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.preprocessing.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.preprocessing.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
 
 /**
- * This class implements the MAX heuristic. (for more details on this heuristic see Blai Bonet and
+ * This class implements the SUM_ID heuristic. (for more details on this heuristic see Blai Bonet and
  * Hector Geffner, Planning as Heuristic Search, Artificial Intelligence 129, 2001, Elsevier)
  * <p>
  * The principle of this heuristics function <i>h</i> is to resolved a relaxed the planning problem
@@ -39,50 +37,52 @@ import fr.uga.pddl4j.util.BitState;
  * where <i>O(p)</i> stands for the actions <i>op</i> that add <i>p</i>, i.e., with <i>p</i> in
  * <i>Add(op)</i>, and <i>gs(Prec(op))</i>, to be defined below, stands for the estimated cost of
  * achieving the preconditions of action <i>op</i> from <i>s</i>. The cost <i>gs(C)</i> of a sets
- * of atoms is defined as the max costs of individual atoms:
+ * of atoms is defined as the weighted sum of the costs of individual atoms:
  * <ul>
- * <li> <i>hmax(C)</i> = max <i>gs(r)</i> for all <i>r</i> in <i>C</i> (max costs)
+ * <li> <i>hsum(C)</i> = sum <i>gs(r)</i> for all <i>r</i> in <i>C</i> (additive costs)
  * </ul>
- * The max heuristic unlike the additive heuristic SUM_ID is admissible as the cost of achieving a
- * set of atoms cannot be lower than the cost of achieving each of the atoms in the set. On the other
- * hand, the max heuristic is often less informative. In fact, while the additive heuristic combines
- * the costs of all subgoals, the max heuristic focuses only on the most difficult subgoals ignoring
- * all others.
- * <p>
- * <b>Warning:</b> The max heuristic is admissible.
+ * The heuristic assumes that subgoals are independent. This is not true in general as the
+ * achievement of some subgoals can make the achievement of the other subgoals more or less
+ * difficult. For this reason, the additive heuristic is not admissible (i.e., it may overestimate
+ * the true costs).
+ *
+ * <b>Warning:</b> The sum heuristic is admissible.
  *
  * @author D. Pellier
  * @version 1.0 - 11.06.2010
  *
  * @see RelaxedGraphHeuristic
  */
-public final class Max extends RelaxedGraphHeuristic {
+public final class Sum extends RelaxedGraphHeuristic {
 
 	/**
-	 * Creates a new <code>MAX</code> heuristic for a specified planning problem.
+	 * Creates a new <code>SUM_ID</code> heuristic for a specified planning problem.
 	 *
 	 * @param problem the planning problem.
 	 * @throws NullPointerException if <code>problem == null</code>.
 	 */
-	public Max(final CodedProblem problem) {
+	public Sum(final CodedProblem problem) {
 		super(problem);
-		super.setAdmissible(true);
+		super.setAdmissible(false);
 	}
 
 	/**
-	 * Return the estimated distance to the goal to reach the specified state. If the return value is
+	 * Return the distance to the goal state from the specified state. If the return value is
 	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state.
+	 * state. More precisely, this method returns the level of the planning graph where all the
+	 * propositions of the goal are reached without any mutex or <code>Integer.MAX_VALUE</code>
+	 * otherwise.
 	 *
 	 * @param state the state from which the distance to the goal must be estimated.
 	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state.
-	 * @throws NullPointerException if <code>state == null && goal == null</code>.
+	 * @return the distance to the goal state from the specified state or
+	 *         <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
+	 * @throws NullPointerException if <code>state == null</code>.
 	 */
 	public int estimate(final BitState state, final BitExp goal) {
 		super.setGoal(goal);
-		super.expandRelaxedPlanningGraph(state);
-		return super.isGoalReachable() ? super.getMaxValue() : Integer.MAX_VALUE;
+		this.expandRelaxedPlanningGraph(state);
+		return super.isGoalReachable() ? super.getSumValue(): Integer.MAX_VALUE;
 	}
 
 }

@@ -16,59 +16,46 @@
  * You should have received a copy of the GNU General Public License
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
+package fr.uga.pddl4j.heuristics.relaxation;
 
-package fr.uga.pddl4j.heuristics;
-
-import fr.uga.pddl4j.preprocessing.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.preprocessing.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
 
 /**
- * This class implement the adjusted sum 2M heuristic. This heuristic improves the adjusted sum 2
- * heuristic by replacing the computation of the interaction degree of the of the adjusted sum 2
+ * This class implement the adjusted sum 2 heuristic. This heuristic improves the adjusted sum
+ * heuristic by replacing the computation of the <code>cost(S)</code> by the used the relaxed plan
  * heuristic. Now, we have the following heuristic:
  * <pre>
- * hadjsum2M(S) := cost(S) + delta(S)
+ * hadjsum2(S) := cost(S) + delta(S)
  * </pre>
  * where
  * <ul>
- * <li> <tt>cost(S) := 1 +  cost(S + prec(a) - add(a))</tt></li>
- * <li> <tt>delta(S) := max(lev({p, q} - max{levl(p), level(q)})</tt>for all <tt>p</tt> in
- * <tt>S</tt></li>
+ * <li> <code>cost(S) := 1 +  cost(S + prec(a) - add(a))</code>
+ * <li> <code>delta(S) := lev(S) - max(lev(p))</code> for all <code>p</code> in <code>S</code>
  * </ul>
- * <p>
- * Note that computing <tt>delta(S)</tt> is equivalent to compute the set level heuristic.
- * <p>
- * <b>Warning:</b> The adjusted sum 2M heuristic is not admissible.
+ *
+ * <b>Warning:</b> The adjusted sum heuristic is not admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 01.09.2010
+ * @version 1.0 - 10.06.2010
  *
  * @see AdjustedSum
  * @see Max
  * @see FastForward
  * @see Sum
  */
-public final class AjustedSum2M extends RelaxedGraphHeuristic {
+public final class AdjustedSum2 extends RelaxedGraphHeuristic {
 
 	/**
-	 * The set level heuristic used to compute the delta function, i.e., the interaction degree
-	 * among propositions of the goal.
-	 */
-	private SetLevel delta;
-
-	/**
-	 * Creates a new <code>AJUSTED_SUM2M</code> heuristic for a specified planning problem.
+	 * Creates a new <code>AdjustedSum2</code> heuristic for a specified planning problem.
 	 *
 	 * @param problem the planning problem.
 	 * @throws NullPointerException if <code>problem == null</code>.
 	 */
-	public AjustedSum2M(CodedProblem problem) {
+	public AdjustedSum2(CodedProblem problem) {
 		super(problem);
 		super.setAdmissible(false);
-		this.delta = new SetLevel(problem);
 	}
 
 	/**
@@ -83,13 +70,9 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
 	 */
 	public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
 		super.setGoal(goal);
-		// First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
-		super.expandRelaxedPlanningGraph(state);
-		// Second, we expand the relaxed planning graph with mutex to compute the set level heuristic
-		this.delta.expandPlanningGraph(state);
-		// If the goal was not reached, it means that the goal is unreachable
-		return super.isGoalReachable() ? super.getRelaxedPlanValue()
-				+ (this.delta.estimate(state, goal) - super.getMaxValue()) : Integer.MAX_VALUE;
+		final int level = super.expandRelaxedPlanningGraph(state);
+		return super.isGoalReachable() ?
+				super.getRelaxedPlanValue() + (level - super.getMaxValue()) : Integer.MAX_VALUE;
 	}
 
 }

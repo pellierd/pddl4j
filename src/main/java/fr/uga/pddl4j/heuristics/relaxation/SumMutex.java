@@ -17,11 +17,8 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics;
+package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.preprocessing.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.preprocessing.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;

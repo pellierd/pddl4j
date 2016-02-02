@@ -29,23 +29,16 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Properties;
 
-import fr.uga.pddl4j.heuristics.Heuristic;
-import fr.uga.pddl4j.heuristics.HeuristicToolKit;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.preprocessing.CodedProblem;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.heuristics.HeuristicToolKit;
-import fr.uga.pddl4j.heuristics.Heuristic;
 import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.preprocessing.CodedProblem;
 import fr.uga.pddl4j.preprocessing.Preprocessing;
-import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 /**

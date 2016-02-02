@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics;
+package fr.uga.pddl4j.heuristics.relaxation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,10 +27,7 @@ import java.util.List;
 import fr.uga.pddl4j.preprocessing.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.preprocessing.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.util.CondBitExp;
