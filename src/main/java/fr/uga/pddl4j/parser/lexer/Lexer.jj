@@ -2021,6 +2021,7 @@ Exp numeric_term() :
 {
 	List<Symbol> tokenList = new ArrayList<Symbol>();
 	Symbol s = null;
+	Exp node = null;
 }
 {
 	left_bracket() s=functor() {
@@ -2028,7 +2029,7 @@ Exp numeric_term() :
 	} (LOOKAHEAD(2) s=term() {
 		tokenList.add(s);
 	})* right_bracket() {
-		Exp node = new Exp(Connective.FN_HEAD);
+		node = new Exp(Connective.FN_HEAD);
 		node.setAtom(tokenList);
 		return node;
 	}
