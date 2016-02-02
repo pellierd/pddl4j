@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.IntExp;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.IntExp;
 
@@ -83,10 +81,10 @@ final class PreInstantiation {
 	 * @param operators the list of operators to simplified.
 	 */
 	static void extractInertia(final List<IntOp> operators) {
-		final int nbPredicates = Preprocessing.tableOfPredicates.size();
-		Preprocessing.tableOfInertia = new ArrayList<Inertia>(nbPredicates);
+		final int nbPredicates = Encoder.tableOfPredicates.size();
+		Encoder.tableOfInertia = new ArrayList<Inertia>(nbPredicates);
 		for (int i = 0; i < nbPredicates; i++) {
-			Preprocessing.tableOfInertia.add(Inertia.INERTIA);
+			Encoder.tableOfInertia.add(Inertia.INERTIA);
 		}
 		for (final IntOp op : operators) {
 			PreInstantiation.extract(op.getEffects());
@@ -103,12 +101,12 @@ final class PreInstantiation {
 		switch (exp.getConnective()) {
 		case ATOM:
 			int predicate = exp.getPredicate();
-			switch (Preprocessing.tableOfInertia.get(predicate)) {
+			switch (Encoder.tableOfInertia.get(predicate)) {
 			case INERTIA:
-				Preprocessing.tableOfInertia.set(predicate, Inertia.NEGATIVE);
+				Encoder.tableOfInertia.set(predicate, Inertia.NEGATIVE);
 				break;
 			case POSITIVE:
-				Preprocessing.tableOfInertia.set(predicate, Inertia.FLUENT);
+				Encoder.tableOfInertia.set(predicate, Inertia.FLUENT);
 				break;
 			}
 			break;
@@ -131,12 +129,12 @@ final class PreInstantiation {
 			final IntExp neg = exp.getChildren().get(0);
 			if (neg.getConnective().equals(Connective.ATOM)) {
 				predicate = neg.getPredicate();
-				switch (Preprocessing.tableOfInertia.get(predicate)) {
+				switch (Encoder.tableOfInertia.get(predicate)) {
 				case INERTIA:
-					Preprocessing.tableOfInertia.set(predicate, Inertia.POSITIVE);
+					Encoder.tableOfInertia.set(predicate, Inertia.POSITIVE);
 					break;
 				case NEGATIVE:
-					Preprocessing.tableOfInertia.set(predicate, Inertia.FLUENT);
+					Encoder.tableOfInertia.set(predicate, Inertia.FLUENT);
 					break;
 				}
 			}
@@ -188,19 +186,19 @@ final class PreInstantiation {
 	 * @param init the initial state.
 	 */
 	static void inferTypesFromInertia(final Set<IntExp> init) {
-		Preprocessing.tableOfInferredDomains = new ArrayList<Set<Integer>>(Preprocessing.tableOfPredicates.size());
-		for (int i = 0; i < Preprocessing.tableOfPredicates.size(); i++) {
-			if (Preprocessing.tableOfTypedPredicates.get(i).size() == 1
-					&& Preprocessing.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
+		Encoder.tableOfInferredDomains = new ArrayList<Set<Integer>>(Encoder.tableOfPredicates.size());
+		for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
+			if (Encoder.tableOfTypedPredicates.get(i).size() == 1
+					&& Encoder.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
 				final Set<Integer> newTypeDomain = new LinkedHashSet<Integer>();
 				for (final IntExp fact : init) {
 					if (fact.getPredicate() == i) {
 						newTypeDomain.add(fact.getArguments()[0]);
 					}
 				}
-				Preprocessing.tableOfInferredDomains.add(newTypeDomain);
+				Encoder.tableOfInferredDomains.add(newTypeDomain);
 			} else {
-				Preprocessing.tableOfInferredDomains.add(null);
+				Encoder.tableOfInferredDomains.add(null);
 			}
 		}
 	}
@@ -211,10 +209,10 @@ final class PreInstantiation {
 	 * @param init the initial state.
 	 */
 	static void createPredicatesTables(final Set<IntExp> init) {
-		final int tableSize = Preprocessing.tableOfConstants.size();
-		final int nbPredicate = Preprocessing.tableOfPredicates.size();
-		Preprocessing.predicatesTables = new ArrayList<List<IntMatrix>>(nbPredicate);
-		for (final List<Integer> arguments : Preprocessing.tableOfTypedPredicates) {
+		final int tableSize = Encoder.tableOfConstants.size();
+		final int nbPredicate = Encoder.tableOfPredicates.size();
+		Encoder.predicatesTables = new ArrayList<List<IntMatrix>>(nbPredicate);
+		for (final List<Integer> arguments : Encoder.tableOfTypedPredicates) {
 			final int arity = arguments.size();
 			final int nbTables = (int) Math.pow(2, arity);
 			final List<IntMatrix> pTables = new ArrayList<IntMatrix>(nbTables);
@@ -222,12 +220,12 @@ final class PreInstantiation {
 				final int dimension = Integer.bitCount(j);
 				pTables.add(new IntMatrix(tableSize, dimension));
 			}
-			Preprocessing.predicatesTables.add(pTables);
+			Encoder.predicatesTables.add(pTables);
 		}
 
 		for (final IntExp fact : init) {
-			final int arity = Preprocessing.tableOfTypedPredicates.get(fact.getPredicate()).size();
-			final List<IntMatrix> pTables = Preprocessing.predicatesTables.get(fact.getPredicate());
+			final int arity = Encoder.tableOfTypedPredicates.get(fact.getPredicate()).size();
+			final List<IntMatrix> pTables = Encoder.predicatesTables.get(fact.getPredicate());
 			final int[] set = new int[arity];
 			final int[] args = fact.getArguments();
 			for (final IntMatrix intMatrix : pTables) {
@@ -304,7 +302,7 @@ final class PreInstantiation {
 		System.out.println("Tables of predicates:");
 		for (int predicate = 0; predicate < tables.size(); predicate++) {
 			final List<IntMatrix> pTables = tables.get(predicate);
-			final int arity = Preprocessing.tableOfTypedPredicates.get(predicate).size();
+			final int arity = Encoder.tableOfTypedPredicates.get(predicate).size();
 			final int[] mask = new int[arity];
 			for (int i = 0; i < pTables.size(); i++) {
 				this.print(predicate, arity, mask, new int[0], tables);
@@ -327,7 +325,7 @@ final class PreInstantiation {
 		if (index.length == arity) {
 			final StringBuffer str = new StringBuffer();
 			str.append("(");
-			str.append(Preprocessing.tableOfPredicates.get(predicate));
+			str.append(Encoder.tableOfPredicates.get(predicate));
 			int var = 0;
 			int realIndexSize = 0;
 			for (int i = 0; i < index.length; i++) {
@@ -336,7 +334,7 @@ final class PreInstantiation {
 					var++;
 				} else {
 					realIndexSize++;
-					str.append(" " + Preprocessing.tableOfConstants.get(index[i]));
+					str.append(" " + Encoder.tableOfConstants.get(index[i]));
 				}
 			}
 			str.append(")");
@@ -361,7 +359,7 @@ final class PreInstantiation {
 			newIndex[index.length] = -1;
 			this.print(predicate, arity, mask, newIndex, tables);
 		} else {
-			for (int i = 0; i < Preprocessing.tableOfConstants.size(); i++) {
+			for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
 				final int[] newIndex = new int[index.length + 1];
 				for (int j = 0 ; j < index.length; j++) {
 					newIndex[j] = index[j];
@@ -409,28 +407,28 @@ final class PreInstantiation {
 					final int dtIndex = op.getTypeOfParameters(index);
 
 					// Compute the
-					final String declaredType = Preprocessing.tableOfTypes.get(dtIndex);
+					final String declaredType = Encoder.tableOfTypes.get(dtIndex);
 					final int itIndex = inertia.getPredicate();
-					final String inertiaType = Preprocessing.tableOfPredicates.get(itIndex);
+					final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
 
 					final String sti = declaredType + "^" + inertiaType;
-					int ti = Preprocessing.tableOfTypes.indexOf(sti);
+					int ti = Encoder.tableOfTypes.indexOf(sti);
 					if (ti == -1) {
-						ti = Preprocessing.tableOfTypes.size();
-						Preprocessing.tableOfTypes.add(sti);
-						final Set<Integer> dt1 = new LinkedHashSet<Integer>(Preprocessing.tableOfDomains.get(dtIndex));
-						dt1.retainAll(Preprocessing.tableOfInferredDomains.get(itIndex));
-						Preprocessing.tableOfDomains.add(dt1);
+						ti = Encoder.tableOfTypes.size();
+						Encoder.tableOfTypes.add(sti);
+						final Set<Integer> dt1 = new LinkedHashSet<Integer>(Encoder.tableOfDomains.get(dtIndex));
+						dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
+						Encoder.tableOfDomains.add(dt1);
 					}
 
 					final String sts = declaredType + "\\" + inertiaType;
-					int ts = Preprocessing.tableOfTypes.indexOf(sts);
+					int ts = Encoder.tableOfTypes.indexOf(sts);
 					if (ts == -1) {
-						ts = Preprocessing.tableOfTypes.size();
-						Preprocessing.tableOfTypes.add(sts);
-						final Set<Integer> dt2 = new LinkedHashSet<Integer>(Preprocessing.tableOfDomains.get(dtIndex));
-						dt2.removeAll(Preprocessing.tableOfInferredDomains.get(itIndex));
-						Preprocessing.tableOfDomains.add(dt2);
+						ts = Encoder.tableOfTypes.size();
+						Encoder.tableOfTypes.add(sts);
+						final Set<Integer> dt2 = new LinkedHashSet<Integer>(Encoder.tableOfDomains.get(dtIndex));
+						dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
+						Encoder.tableOfDomains.add(dt2);
 					}
 
 
@@ -589,7 +587,7 @@ final class PreInstantiation {
 		final List<IntExp> unaryInertia = new ArrayList<IntExp>();
 		switch (exp.getConnective()) {
 		case ATOM:
-			if (Preprocessing.tableOfInferredDomains.get(exp.getPredicate()) != null) {
+			if (Encoder.tableOfInferredDomains.get(exp.getPredicate()) != null) {
 				unaryInertia.add(exp);
 			}
 			break;

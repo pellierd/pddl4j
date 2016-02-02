@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.preprocessing.CodedProblem;
+import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
 

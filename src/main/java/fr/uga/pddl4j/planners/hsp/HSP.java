@@ -33,11 +33,11 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.preprocessing.CodedProblem;
+import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.preprocessing.Preprocessing;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 
@@ -155,12 +155,12 @@ public final class HSP {
 					+ "\" done successfully\n");
 		}
 		if (traceLevel == 8) {
-			Preprocessing.setLogLevel(0);
+			Encoder.setLogLevel(0);
 		} else {
-			Preprocessing.setLogLevel(Math.max(0, traceLevel - 1));
+			Encoder.setLogLevel(Math.max(0, traceLevel - 1));
 		}
 		long begin = System.currentTimeMillis();
-		final CodedProblem pb = Preprocessing.encode(domain, problem);
+		final CodedProblem pb = Encoder.encode(domain, problem);
 		long end = System.currentTimeMillis();
 		this.preprocessing_time = end - begin;
 		this.problem_memory = MemoryAgent.deepSizeOf(pb);
@@ -192,7 +192,7 @@ public final class HSP {
 			} else {
 				System.out.printf("goal can be simplified to FALSE. no plan will solve it\n\n");
 			}
-			System.out.printf("\ntime spent: %8.2f seconds preprocessing ("
+			System.out.printf("\ntime spent: %8.2f seconds encoding ("
 					+ pb.getOperators().size() + " ops, " + pb.getRevelantFacts().size()
 					+ " facts)\n", (this.preprocessing_time / 1000.0));
 			System.out.printf("            %8.2f seconds searching\n",
@@ -391,7 +391,7 @@ public final class HSP {
 	 *                - problem name
 	 *                - number of operators
  	 *               - number of facts
-	 *                - preprocessing time in seconds
+	 *                - encoding time in seconds
 	 *                - memory used for problem representation in MBytes
 	 *                - number of states explored
 	 *                - searching time in seconds
@@ -525,7 +525,7 @@ public final class HSP {
 		System.out.println("               - problem name");
 		System.out.println("               - number of operators");
 		System.out.println("               - number of facts");
-		System.out.println("               - preprocessing time in seconds");
+		System.out.println("               - encoding time in seconds");
 		System.out.println("               - memory used for problem representation in MBytes");
 		System.out.println("               - number of states explored");
 		System.out.println("               - searching time in seconds");

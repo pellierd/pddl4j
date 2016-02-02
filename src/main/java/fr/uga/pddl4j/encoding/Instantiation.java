@@ -17,14 +17,13 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.IntExp;
 
@@ -54,7 +53,7 @@ final class Instantiation {
 			boolean toInstantied = true;
 			int i = 0;
 			while (i < op.getArity() && toInstantied) {
-				toInstantied = !Preprocessing.tableOfDomains.get(op.getTypeOfParameters(i)).isEmpty();
+				toInstantied = !Encoder.tableOfDomains.get(op.getTypeOfParameters(i)).isEmpty();
 				i++;
 			}
 			if (toInstantied) {
@@ -125,7 +124,7 @@ final class Instantiation {
 				}
 			}
 		} else {
-			final Set<Integer> values = Preprocessing.tableOfDomains.get(op.getTypeOfParameters(index));
+			final Set<Integer> values = Encoder.tableOfDomains.get(op.getTypeOfParameters(index));
 			for (Integer value : values) {
 				if (!op.isAlreadyInstantiatedWith(value)) {
 					final int varIndex = -index - 1;
@@ -167,7 +166,7 @@ final class Instantiation {
 				// Remove quantified expression where the domain of the quantified variable is empty
 				if ((ei.getConnective().equals(Connective.FORALL)
 						|| ei.getConnective().equals(Connective.EXISTS))
-						&& Preprocessing.tableOfDomains.get(ei.getType()).isEmpty()) {
+						&& Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
 					i.remove();
 					continue;
 				}
@@ -185,7 +184,7 @@ final class Instantiation {
 				// Remove quantified expression where the domain of the quantified variable is empty
 				if ((ei.getConnective().equals(Connective.FORALL)
 						|| ei.getConnective().equals(Connective.EXISTS))
-						&& Preprocessing.tableOfDomains.get(ei.getType()).isEmpty()) {
+						&& Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
 					i.remove();
 					continue;
 				}
@@ -197,7 +196,7 @@ final class Instantiation {
 			}
 			break;
 		case FORALL:
-			Set<Integer> constants = Preprocessing.tableOfDomains.get(exp.getType());
+			Set<Integer> constants = Encoder.tableOfDomains.get(exp.getType());
 			IntExp qExp = exp.getChildren().get(0);
 			int var = exp.getVariable();
 			exp.setConnective(Connective.AND);
@@ -216,7 +215,7 @@ final class Instantiation {
 			Instantiation.expandQuantifiedExpression(exp);
 			break;
 		case EXISTS:
-			constants = Preprocessing.tableOfDomains.get(exp.getType());
+			constants = Encoder.tableOfDomains.get(exp.getType());
 			qExp = exp.getChildren().get(0);
 			var = exp.getVariable();
 			exp.setConnective(Connective.OR);
@@ -743,10 +742,10 @@ final class Instantiation {
 		int j = 0;
 		int max = 1;
 		final int[] index = new int[indexSize];
-		final List<Integer> predArg = Preprocessing.tableOfTypedPredicates.get(predicate);
+		final List<Integer> predArg = Encoder.tableOfTypedPredicates.get(predicate);
 		for (int i = 0; i < mask.length; i++) {
 			if (mask[i] == 0) {
-				max *= Preprocessing.tableOfDomains.get(predArg.get(i)).size();
+				max *= Encoder.tableOfDomains.get(predArg.get(i)).size();
 			} else {
 				index[j] = args[i];
 				j++;
@@ -755,11 +754,11 @@ final class Instantiation {
 		}
 		// Get the number of unifying ground instances of the specified expression that are
 		// contained in the initial state.
-		final int n = Preprocessing.predicatesTables.get(predicate).get(PreInstantiation.toInt(mask)).get(index);
+		final int n = Encoder.predicatesTables.get(predicate).get(PreInstantiation.toInt(mask)).get(index);
 		// CASE 1: If the expression is a positive inertia and the number of unifying ground
 		// instances of the specified expression that are contained in the initial state is equal to
 		// 0 then the expression is simplified to FALSE.
-		final Inertia inertia = Preprocessing.tableOfInertia.get(predicate);
+		final Inertia inertia = Encoder.tableOfInertia.get(predicate);
 		if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
 			exp.setConnective(Connective.FALSE);
 		}

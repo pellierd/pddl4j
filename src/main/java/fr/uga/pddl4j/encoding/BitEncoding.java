@@ -17,17 +17,13 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
@@ -120,7 +116,7 @@ final class BitEncoding {
 						hasUnConditionalEffects = true;
 					}
 				} else {
-					throw new RuntimeException("unexpected expression " + Preprocessing.toString(ei));
+					throw new RuntimeException("unexpected expression " + Encoder.toString(ei));
 				}
 			}
 			if (hasUnConditionalEffects) {
@@ -146,40 +142,40 @@ final class BitEncoding {
 		}
 		BitExp newGoal = null;
 		BitEncoding.toDNF(goal);
-		Preprocessing.codedGoal = new ArrayList<BitExp>(goal.getChildren().size());
+		Encoder.codedGoal = new ArrayList<BitExp>(goal.getChildren().size());
 		for (IntExp exp : goal.getChildren()) {
 			if (exp.getConnective().equals(Connective.ATOM)) {
 				IntExp and = new IntExp(Connective.AND);
 				and.getChildren().add(exp);
-				Preprocessing.codedGoal.add(BitEncoding.encode(and, map));
+				Encoder.codedGoal.add(BitEncoding.encode(and, map));
 			} else {
-				Preprocessing.codedGoal.add(BitEncoding.encode(exp, map));
+				Encoder.codedGoal.add(BitEncoding.encode(exp, map));
 			}
 		}
-		if (Preprocessing.codedGoal.size() > 1) {
+		if (Encoder.codedGoal.size() > 1) {
 			// Create a new dummy fact to encode the goal
-			final int dummy_predicate_index = Preprocessing.tableOfPredicates.size();
-			Preprocessing.tableOfPredicates.add(Constants.DUMMY_GOAL);
-			Preprocessing.tableOfTypedPredicates.add(new ArrayList<Integer>());
+			final int dummy_predicate_index = Encoder.tableOfPredicates.size();
+			Encoder.tableOfPredicates.add(Constants.DUMMY_GOAL);
+			Encoder.tableOfTypedPredicates.add(new ArrayList<Integer>());
 			IntExp dummy_goal = new IntExp(Connective.ATOM);
 			dummy_goal.setPredicate(dummy_predicate_index);
 			dummy_goal.setArguments(new int[0]);
-			final int dummy_goal_index = Preprocessing.tableOfRevelantFacts.size();
-			Preprocessing.tableOfRevelantFacts.add(dummy_goal);
+			final int dummy_goal_index = Encoder.tableOfRevelantFacts.size();
+			Encoder.tableOfRevelantFacts.add(dummy_goal);
 			map.put(dummy_goal, dummy_goal_index);
 			newGoal = new BitExp();
 			newGoal.getPositive().set(dummy_goal_index);
 			final CondBitExp cond_effect = new CondBitExp(newGoal);
 			// for each disjunction create a dummy action
-			for (BitExp dis : Preprocessing.codedGoal) {
+			for (BitExp dis : Encoder.codedGoal) {
 				final BitOp op = new BitOp(Constants.DUMMY_OPERATOR, 0);
 				op.setDummy(true);
 				op.setPreconditions(dis);
 				op.getCondEffects().add(cond_effect);
-				Preprocessing.operators.add(op);
+				Encoder.operators.add(op);
 			}
 		} else {
-			newGoal = Preprocessing.codedGoal.get(0);
+			newGoal = Encoder.codedGoal.get(0);
 		}
 		return newGoal;
 	}
@@ -243,11 +239,11 @@ final class BitEncoding {
 				} else if (ei.getConnective().equals(Connective.TRUE)) {
 					// do nothing
 				} else {
-					throw new RuntimeException("unexpected expression " + Preprocessing.toString(exp));
+					throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
 				}
 			}
 		} else {
-			System.out.println(Preprocessing.toString(exp));
+			System.out.println(Encoder.toString(exp));
 			System.exit(0);
 		}
 		return bitExp;
@@ -355,7 +351,7 @@ final class BitEncoding {
 			exp.getChildren().add(copy);
 			break;
 		default:
-			throw new RuntimeException("unexpected expression " + Preprocessing.toString(exp));
+			throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
 		}
 	}
 
@@ -434,7 +430,7 @@ final class BitEncoding {
 			exp.getChildren().add(and);
 			break;
 		default:
-			throw new RuntimeException("unexpected expression " + Preprocessing.toString(exp));
+			throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
 		}
 	}
 }

@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,14 +34,7 @@ import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
-import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
 
 /**
  * <p>
@@ -49,7 +42,7 @@ import fr.uga.pddl4j.util.IntExp;
  * efficient manner (see On the Instantiation of ADL Operators Involving Arbitrary First-Order
  * Formulas. Koehler, J. and Hoffmann, J.).
  * <p>
- * Preprocessing starts by generating the code tables, which map strings to unique numbers, i.e., we
+ * Encoder starts by generating the code tables, which map strings to unique numbers, i.e., we
  * obtain one number for each predicate name, variable name, and constant name. Internally, all
  * subsequently described operations work over trees of numbers representing the formulas. Now from
  * the generated code tables, the operators, the initial state and the goal are encoded according to
@@ -72,7 +65,7 @@ import fr.uga.pddl4j.util.IntExp;
  * almost no time at all.
  * </p>
  * <p>
- * Then, the preprocessing creates the predicates tables to count the number of occurrences of each
+ * Then, the encoding creates the predicates tables to count the number of occurrences of each
  * predicate and instantiate the operators and simplified them. After this first instantiation, the
  * operators are simplifies again with the ground inertia information. So far we have only
  * considered the predicates which are never made true or false by a planning operator. These were
@@ -96,7 +89,7 @@ import fr.uga.pddl4j.util.IntExp;
  * the planning process. They are therefore relevant to the representation of the planning problem.
  * </p>
  * <p>
- * Then, preprocessing extracts relevant facts from the instantiated operator. A relevant fact is
+ * Then, encoding extracts relevant facts from the instantiated operator. A relevant fact is
  * defines as follow:
  * </p>
  * <p>
@@ -111,8 +104,8 @@ import fr.uga.pddl4j.util.IntExp;
  * in disjunctive and conjunctive normal form, before being encoding in a compact bit set
  * representation.
  * </p>
- * <b>Warning:</b> the preprocessing is only implemented for ADL problems.
- *
+ * <b>Warning:</b> the encoding is only implemented for ADL problems.
+ * <p>
  * Revisions:
  * <ul>
  * <li>23.01.2013: add of the case when the goal can be simplified to TRUE. The coded problem
@@ -122,7 +115,7 @@ import fr.uga.pddl4j.util.IntExp;
  * @author D. Pellier
  * @version 1.0 - 08.06.2010
  */
-public final class Preprocessing {
+public final class Encoder {
 
 	/**
 	 * The table of types.
@@ -214,7 +207,7 @@ public final class Preprocessing {
 	/**
 	 * Creates a new planner.
 	 */
-	private Preprocessing() {
+	private Encoder() {
 	}
 
 	/**
@@ -223,7 +216,7 @@ public final class Preprocessing {
 	 * @return the log level of the planner.
 	 */
 	public static int getLogLevel() {
-		return Preprocessing.logLevel;
+		return Encoder.logLevel;
 	}
 
 	/**
@@ -246,7 +239,7 @@ public final class Preprocessing {
 	public static void setLogLevel(final int level) throws IllegalArgumentException {
 		if (level < 0)
 			throw new IllegalArgumentException("level < 0");
-		Preprocessing.logLevel = level;
+		Encoder.logLevel = level;
 	}
 
 	/**
@@ -262,7 +255,7 @@ public final class Preprocessing {
 	public static CodedProblem encode(final Domain domain, final Problem problem)
 			throws IllegalArgumentException {
 
-		// Check that the domain and the problem are ADL otherwise the preprocessing is not
+		// Check that the domain and the problem are ADL otherwise the encoding is not
 		// implemented for the moment.
 		Set<RequireKey> adl = new HashSet<RequireKey>();
 		adl.add(RequireKey.ADL);
@@ -317,33 +310,33 @@ public final class Preprocessing {
 		final IntExp intGoal = IntEncoding.encodeGoal(problem.getGoal());
 
 		// Just for logging
-		if (Preprocessing.logLevel == 1 || Preprocessing.logLevel == 2) {
-			Preprocessing.printTableOfConstants();
+		if (Encoder.logLevel == 1 || Encoder.logLevel == 2) {
+			Encoder.printTableOfConstants();
 			System.out.println();
-			Preprocessing.printTableOfPredicates();
+			Encoder.printTableOfPredicates();
 			System.out.println();
-			Preprocessing.printTableOfTypes();
+			Encoder.printTableOfTypes();
 		}
 
 		// Just for logging
-		if (Preprocessing.logLevel == 2) {
+		if (Encoder.logLevel == 2) {
 			System.out.println("\nCoded initial state:");
 			System.out.print("(and");
 			for (IntExp f : intInit) {
 				System.out.print(" ");
-				System.out.println(Preprocessing.toString(f));
+				System.out.println(Encoder.toString(f));
 			}
 			System.out.println(")");
 			System.out.println("\nCoded goal state:");
 			System.out.print("(and");
 			for (IntExp g : intGoal.getChildren()) {
 				System.out.print(" ");
-				System.out.println(Preprocessing.toString(g));
+				System.out.println(Encoder.toString(g));
 			}
 			System.out.println(")");
 			System.out.println("\nCoded operators:");
 			for (IntOp op : intOps) {
-				System.out.println(Preprocessing.toString(op));
+				System.out.println(Encoder.toString(op));
 				System.out.println();
 			}
 		}
@@ -363,32 +356,32 @@ public final class Preprocessing {
 		PreInstantiation.createPredicatesTables(intInit);
 
 		// Just for logging
-		if (Preprocessing.logLevel == 3 || Preprocessing.logLevel == 4) {
-			Preprocessing.printTableOfInertia();
+		if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
+			Encoder.printTableOfInertia();
 		}
 		// Just for logging
-		if (Preprocessing.logLevel == 4) {
+		if (Encoder.logLevel == 4) {
 			System.out.print("\n");
-			Preprocessing.printTableOfConstants();
+			Encoder.printTableOfConstants();
 			System.out.print("\n");
-			Preprocessing.printTableOfTypes();
+			Encoder.printTableOfTypes();
 			System.out.print("\n");
 			System.out.println("\nPre-instantiation initial state:");
 			System.out.print("(and");
 			for (IntExp f : intInit) {
 				System.out.print(" ");
-				System.out.println(Preprocessing.toString(f));
+				System.out.println(Encoder.toString(f));
 			}
 			System.out.println(")");
 			System.out.println("\nPre-instantiation goal state:");
 			System.out.print("(and");
 			for (IntExp g : intGoal.getChildren()) {
 				System.out.print(" ");
-				System.out.println(Preprocessing.toString(g));
+				System.out.println(Encoder.toString(g));
 			}
 			System.out.println("\nPre-instantiation operators with infered types (" + intOps.size() +" ops):");
 			for (IntOp op : intOps) {
-				System.out.println(Preprocessing.toString(op));
+				System.out.println(Encoder.toString(op));
 			}
 		}
 
@@ -401,31 +394,31 @@ public final class Preprocessing {
 		// Expand the quantified expression in the goal
 		Instantiation.expandQuantifiedExpression(intGoal);
 		// The tables of predicates are no more needed
-		Preprocessing.predicatesTables = null;
+		Encoder.predicatesTables = null;
 
 		// Just for logging
-		if (Preprocessing.logLevel == 5) {
+		if (Encoder.logLevel == 5) {
 			System.out.print("\n");
-			Preprocessing.printTableOfConstants();
+			Encoder.printTableOfConstants();
 			System.out.print("\n");
-			Preprocessing.printTableOfTypes();
+			Encoder.printTableOfTypes();
 			System.out.print("\n");
 			System.out.println("\nPre-instantiation initial state:");
 			System.out.print("(and");
 			for (IntExp f : intInit) {
 				System.out.print(" ");
-				System.out.println(Preprocessing.toString(f));
+				System.out.println(Encoder.toString(f));
 			}
 			System.out.println(")");
 			System.out.println("\nPre-instantiation goal state:");
 			System.out.print("(and");
 			for (final IntExp g : intGoal.getChildren()) {
 				System.out.print(" ");
-				System.out.println(Preprocessing.toString(g));
+				System.out.println(Encoder.toString(g));
 			}
 			System.out.println("\nPre-instantiation operators with infered types (" + intOps.size() +" ops):");
 			for (final IntOp op : intOps) {
-				System.out.println(Preprocessing.toString(op));
+				System.out.println(Encoder.toString(op));
 
 			}
 		}
@@ -443,11 +436,11 @@ public final class Preprocessing {
 		// Simplify the goal with ground inertia information
 		PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInit);
 		// The table of ground inertia are no more needed
-		Preprocessing.tableOfGroundInertia = null;
+		Encoder.tableOfGroundInertia = null;
 
 		// Just for logging
-		if (Preprocessing.logLevel == 6) {
-			Preprocessing.printRelevantFactsTable();
+		if (Encoder.logLevel == 6) {
+			Encoder.printRelevantFactsTable();
 		}
 
 		// *****************************************************************************************
@@ -458,44 +451,44 @@ public final class Preprocessing {
 		// Create a map of the relevant facts with their index to speedup the bit set encoding of
 		// the operators
 		final Map<IntExp, Integer> map = new LinkedHashMap<IntExp, Integer>(
-				Preprocessing.tableOfRevelantFacts.size());
+				Encoder.tableOfRevelantFacts.size());
 		int index = 0;
-		for (IntExp fact : Preprocessing.tableOfRevelantFacts) {
+		for (IntExp fact : Encoder.tableOfRevelantFacts) {
 			map.put(fact, index);
 			index++;
 		}
 
 		// Creates the list of bit operators
-		Preprocessing.operators = new ArrayList<BitOp>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
+		Encoder.operators = new ArrayList<BitOp>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
 		// Encode the goal in bit set representation
 		if (!intGoal.getChildren().isEmpty()) { // Case where the goal was not already simplify to TRUE
-			Preprocessing.goal = BitEncoding.encodeGoal(intGoal, map);
+			Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
 		} else {
-			Preprocessing.goal = new BitExp();
+			Encoder.goal = new BitExp();
 		}
 
 		// Encode the initial state in bit set representation
-		Preprocessing.init = BitEncoding.encodeInit(intInit, map);
+		Encoder.init = BitEncoding.encodeInit(intInit, map);
 		// Encode the operators in bit set representation
-		Preprocessing.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
+		Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
 		// The list of instantiated operators is no more needed.
 		intOps = null;
 
 
 		// Just for logging
-		if (Preprocessing.logLevel == 7) {
+		if (Encoder.logLevel == 7) {
 			System.out.println("\nfinal operators:");
-			for (BitOp op : Preprocessing.operators) {
-				System.out.println(Preprocessing.toString(op));
+			for (BitOp op : Encoder.operators) {
+				System.out.println(Encoder.toString(op));
 			}
 
 			System.out.println("\nfinal initial state:");
-			System.out.println(Preprocessing.toString(Preprocessing.init));
+			System.out.println(Encoder.toString(Encoder.init));
 
 			System.out.println("\nfinal goal state:");
-			if (Preprocessing.goal != null && !Preprocessing.goal.isEmpty()) {
-				System.out.println(Preprocessing.toString(Preprocessing.goal));
-			} else if (Preprocessing.goal.isEmpty()){
+			if (Encoder.goal != null && !Encoder.goal.isEmpty()) {
+				System.out.println(Encoder.toString(Encoder.goal));
+			} else if (Encoder.goal.isEmpty()){
 				System.out.println("goal can be simplified to TRUE");
 			} else {
 				System.out.println("goal can be simplified to FALSE");
@@ -504,25 +497,25 @@ public final class Preprocessing {
 		}
 
 		final CodedProblem codedProblem = new CodedProblem();
-		codedProblem.setGoal(Preprocessing.goal);
-		codedProblem.setInit(Preprocessing.init);
-		codedProblem.setOperators(Preprocessing.operators);
-		codedProblem.setConstants(Preprocessing.tableOfConstants);
-		codedProblem.setDomains(Preprocessing.tableOfDomains);
-		codedProblem.setFunctions(Preprocessing.tableOfFunctions);
-		codedProblem.setInertia(Preprocessing.tableOfInertia);
-		codedProblem.setInferedDomains(Preprocessing.tableOfInferredDomains);
-		codedProblem.setPredicates(Preprocessing.tableOfPredicates);
-		codedProblem.setRevelantFacts(Preprocessing.tableOfRevelantFacts);
-		codedProblem.setFunctionsSignatures(Preprocessing.tableOfTypedFunctions);
-		codedProblem.setPredicatesSignatures(Preprocessing.tableOfTypedPredicates);
-		codedProblem.setTypes(Preprocessing.tableOfTypes);
+		codedProblem.setGoal(Encoder.goal);
+		codedProblem.setInit(Encoder.init);
+		codedProblem.setOperators(Encoder.operators);
+		codedProblem.setConstants(Encoder.tableOfConstants);
+		codedProblem.setDomains(Encoder.tableOfDomains);
+		codedProblem.setFunctions(Encoder.tableOfFunctions);
+		codedProblem.setInertia(Encoder.tableOfInertia);
+		codedProblem.setInferedDomains(Encoder.tableOfInferredDomains);
+		codedProblem.setPredicates(Encoder.tableOfPredicates);
+		codedProblem.setRevelantFacts(Encoder.tableOfRevelantFacts);
+		codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
+		codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
+		codedProblem.setTypes(Encoder.tableOfTypes);
 		return codedProblem;
 
 	}
 
 	// *********************************************************************************************
-	// Methods for printing the different structures used during preprocessing
+	// Methods for printing the different structures used during encoding
 	// *********************************************************************************************
 
 	/**
@@ -530,9 +523,9 @@ public final class Preprocessing {
 	 */
 	static void printTableOfTypes() {
 		System.out.println("Types table:");
-		for (int i = 0; i < Preprocessing.tableOfTypes.size(); i++) {
-			System.out.print(i + ": " + Preprocessing.tableOfTypes.get(i) + ":");
-			Set<Integer> domain = Preprocessing.tableOfDomains.get(i);
+		for (int i = 0; i < Encoder.tableOfTypes.size(); i++) {
+			System.out.print(i + ": " + Encoder.tableOfTypes.get(i) + ":");
+			Set<Integer> domain = Encoder.tableOfDomains.get(i);
 			for (Integer constant : domain) {
 				System.out.print(" " + constant);
 			}
@@ -545,8 +538,8 @@ public final class Preprocessing {
 	 */
 	static void printTableOfConstants() {
 		System.out.println("Constants table:");
-		for (int i = 0; i < Preprocessing.tableOfConstants.size(); i++) {
-			System.out.println(i + ": " + Preprocessing.tableOfConstants.get(i));
+		for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
+			System.out.println(i + ": " + Encoder.tableOfConstants.get(i));
 		}
 	}
 
@@ -555,12 +548,12 @@ public final class Preprocessing {
 	 */
 	static void printTableOfPredicates() {
 		System.out.println("Predicates table:");
-		for (int i = 0; i < Preprocessing.tableOfPredicates.size(); i++) {
-			String predicate = Preprocessing.tableOfPredicates.get(i);
+		for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
+			String predicate = Encoder.tableOfPredicates.get(i);
 			System.out.print(i + ": " + predicate + " :");
-			for (int j = 0; j < Preprocessing.tableOfTypedPredicates.get(i).size(); j++) {
+			for (int j = 0; j < Encoder.tableOfTypedPredicates.get(i).size(); j++) {
 				System.out.print(" "
-						+ Preprocessing.tableOfTypes.get(Preprocessing.tableOfTypedPredicates
+						+ Encoder.tableOfTypes.get(Encoder.tableOfTypedPredicates
 								.get(i).get(j)));
 			}
 			System.out.println();
@@ -572,12 +565,12 @@ public final class Preprocessing {
 	 */
 	static void printTableOfFunctions() {
 		System.out.println("Functions table:");
-		for (int i = 0; i < Preprocessing.tableOfFunctions.size(); i++) {
-			String predicate = Preprocessing.tableOfFunctions.get(i);
+		for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
+			String predicate = Encoder.tableOfFunctions.get(i);
 			System.out.print(i + ": " + predicate + ":");
-			for (int j = 0; j < Preprocessing.tableOfTypedFunctions.get(i).size(); j++) {
+			for (int j = 0; j < Encoder.tableOfTypedFunctions.get(i).size(); j++) {
 				System.out.print(" "
-						+ Preprocessing.tableOfTypes.get(Preprocessing.tableOfTypedFunctions.get(i)
+						+ Encoder.tableOfTypes.get(Encoder.tableOfTypedFunctions.get(i)
 								.get(j)));
 			}
 			System.out.println();
@@ -589,9 +582,9 @@ public final class Preprocessing {
 	 */
 	static void printTableOfInertia() {
 		System.out.println("Inertias table:");
-		for (int i = 0; i < Preprocessing.tableOfPredicates.size(); i++) {
-			String predicate = Preprocessing.tableOfPredicates.get(i);
-			System.out.println(i + ": " + predicate + " : " + Preprocessing.tableOfInertia.get(i));
+		for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
+			String predicate = Encoder.tableOfPredicates.get(i);
+			System.out.println(i + ": " + predicate + " : " + Encoder.tableOfInertia.get(i));
 		}
 	}
 
@@ -600,9 +593,9 @@ public final class Preprocessing {
 	 */
 	static void printRelevantFactsTable() {
 		System.out.println("selected the following facts as relevant:");
-		for (int i = 0; i < Preprocessing.tableOfRevelantFacts.size(); i++) {
+		for (int i = 0; i < Encoder.tableOfRevelantFacts.size(); i++) {
 			System.out.println(i + ": "
-					+ Preprocessing.toString(Preprocessing.tableOfRevelantFacts.get(i)));
+					+ Encoder.toString(Encoder.tableOfRevelantFacts.get(i)));
 		}
 	}
 
@@ -611,8 +604,8 @@ public final class Preprocessing {
 	 */
 	static void printGoal() {
 		System.out.println("Goal state is:");
-		for (BitExp exp : Preprocessing.codedGoal) {
-			System.out.println(Preprocessing.toString(exp));
+		for (BitExp exp : Encoder.codedGoal) {
+			System.out.println(Encoder.toString(exp));
 		}
 	}
 
@@ -623,9 +616,9 @@ public final class Preprocessing {
 	 * @return a string representation of the specified operator.
 	 */
 	static String toString(final IntOp op) {
-		return StringEncoder.toString(op, Preprocessing.tableOfConstants,
-				Preprocessing.tableOfTypes, Preprocessing.tableOfPredicates,
-				Preprocessing.tableOfFunctions);
+		return StringEncoder.toString(op, Encoder.tableOfConstants,
+				Encoder.tableOfTypes, Encoder.tableOfPredicates,
+				Encoder.tableOfFunctions);
 	}
 
 	/**
@@ -636,7 +629,7 @@ public final class Preprocessing {
 	 * @return a string representation of the specified operator.
 	 */
 	static final String toShortString(final IntOp op) {
-		return StringEncoder.toShortString(op, Preprocessing.tableOfConstants);
+		return StringEncoder.toShortString(op, Encoder.tableOfConstants);
 	}
 
 	/**
@@ -646,9 +639,9 @@ public final class Preprocessing {
 	 * @return a string representation of the specified operator.
 	 */
 	static String toString(final BitOp op) {
-		return StringEncoder.toString(op, Preprocessing.tableOfConstants,
-				Preprocessing.tableOfTypes, Preprocessing.tableOfPredicates,
-				Preprocessing.tableOfFunctions, Preprocessing.tableOfRevelantFacts);
+		return StringEncoder.toString(op, Encoder.tableOfConstants,
+				Encoder.tableOfTypes, Encoder.tableOfPredicates,
+				Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
 	}
 
 	/**
@@ -658,9 +651,9 @@ public final class Preprocessing {
 	 * @return a string representation of the specified expression.
 	 */
 	static String toString(final IntExp exp) {
-		return StringEncoder.toString(exp, Preprocessing.tableOfConstants,
-				Preprocessing.tableOfTypes, Preprocessing.tableOfPredicates,
-				Preprocessing.tableOfFunctions);
+		return StringEncoder.toString(exp, Encoder.tableOfConstants,
+				Encoder.tableOfTypes, Encoder.tableOfPredicates,
+				Encoder.tableOfFunctions);
 	}
 
 	/**
@@ -670,9 +663,9 @@ public final class Preprocessing {
 	 * @return a string representation of the specified expression.
 	 */
 	static String toString(BitExp exp) {
-		return StringEncoder.toString(exp, Preprocessing.tableOfConstants,
-				Preprocessing.tableOfTypes, Preprocessing.tableOfPredicates,
-				Preprocessing.tableOfFunctions, Preprocessing.tableOfRevelantFacts);
+		return StringEncoder.toString(exp, Encoder.tableOfConstants,
+				Encoder.tableOfTypes, Encoder.tableOfPredicates,
+				Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
 	}
 
 	/**
@@ -682,9 +675,9 @@ public final class Preprocessing {
 	 * @return a string representation of the specified expression.
 	 */
 	static String toString(CondBitExp exp) {
-			return StringEncoder.toString(exp, Preprocessing.tableOfConstants,
-					Preprocessing.tableOfTypes, Preprocessing.tableOfPredicates,
-					Preprocessing.tableOfFunctions, Preprocessing.tableOfRevelantFacts);
+			return StringEncoder.toString(exp, Encoder.tableOfConstants,
+					Encoder.tableOfTypes, Encoder.tableOfPredicates,
+					Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
 	}
 
 	/**
@@ -692,8 +685,8 @@ public final class Preprocessing {
 	 */
 	static void printTableOfGroundInertia() {
 		System.out.println("Ground inertia table:");
-		for (Entry<IntExp, Inertia> e : Preprocessing.tableOfGroundInertia.entrySet()) {
-			System.out.println(Preprocessing.toString(e.getKey()) + ": " + e.getValue());
+		for (Entry<IntExp, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
+			System.out.println(Encoder.toString(e.getKey()) + ": " + e.getValue());
 		}
 	}
 

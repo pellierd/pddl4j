@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.preprocessing.CodedProblem;
+import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.BitVector;

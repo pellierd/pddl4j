@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -30,15 +30,10 @@ import fr.uga.pddl4j.parser.Op;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.util.IntExp;
-import fr.uga.pddl4j.parser.DerivedPredicate;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Exp;
 import fr.uga.pddl4j.parser.NamedTypedList;
-import fr.uga.pddl4j.parser.Op;
-import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
-import fr.uga.pddl4j.util.IntExp;
 
 /**
  * This class implements all the methods needed to encode operators, goal and initial state loaded
@@ -62,11 +57,11 @@ final class IntEncoding {
 	static void encodeTypes(final Domain domain) {
 		final List<TypedSymbol> types = domain.getTypes();
 		final int nbTypes = types.size();
-		Preprocessing.tableOfTypes = new ArrayList<String>(nbTypes);
-		Preprocessing.tableOfDomains = new ArrayList<Set<Integer>>(nbTypes);
+		Encoder.tableOfTypes = new ArrayList<String>(nbTypes);
+		Encoder.tableOfDomains = new ArrayList<Set<Integer>>(nbTypes);
 		for (TypedSymbol type : types) {
-			Preprocessing.tableOfTypes.add(type.getImage());
-			Preprocessing.tableOfDomains.add(new LinkedHashSet<Integer>());
+			Encoder.tableOfTypes.add(type.getImage());
+			Encoder.tableOfDomains.add(new LinkedHashSet<Integer>());
 		}
 	}
 
@@ -126,14 +121,14 @@ final class IntEncoding {
 				for (Symbol type : types) {
 					final String image = type.getImage();
 					newType += "~" + image;
-					int typeIndex = Preprocessing.tableOfTypes.indexOf(image);
-					final Set<Integer> typeDomain = Preprocessing.tableOfDomains.get(typeIndex);
+					int typeIndex = Encoder.tableOfTypes.indexOf(image);
+					final Set<Integer> typeDomain = Encoder.tableOfDomains.get(typeIndex);
 					newTypeDomain.addAll(typeDomain);
 				}
-				int index = Preprocessing.tableOfTypes.indexOf(newType);
+				int index = Encoder.tableOfTypes.indexOf(newType);
 				if (index == -1) {
-					Preprocessing.tableOfDomains.add(new LinkedHashSet<Integer>(newTypeDomain));
-					Preprocessing.tableOfTypes.add(newType);
+					Encoder.tableOfDomains.add(new LinkedHashSet<Integer>(newTypeDomain));
+					Encoder.tableOfTypes.add(newType);
 				}
 			}
 		}
@@ -222,20 +217,20 @@ final class IntEncoding {
 	 */
 	static void encodeConstants(final Domain domain, final Problem problem) {
 		final List<TypedSymbol> constants = domain.getConstants();
-		Preprocessing.tableOfConstants = new ArrayList<String>(domain.getConstants().size());
+		Encoder.tableOfConstants = new ArrayList<String>(domain.getConstants().size());
 		constants.addAll(problem.getObjects());
 		for (TypedSymbol constant : constants) {
-			int ic = Preprocessing.tableOfConstants.indexOf(constant.getImage());
+			int ic = Encoder.tableOfConstants.indexOf(constant.getImage());
 			if (ic == -1) {
-				ic = Preprocessing.tableOfConstants.size();
-				Preprocessing.tableOfConstants.add(constant.getImage());
+				ic = Encoder.tableOfConstants.size();
+				Encoder.tableOfConstants.add(constant.getImage());
 			}
 			final LinkedList<Symbol> types = new LinkedList<Symbol>(constant.getTypes());
 			while (!types.isEmpty()) {
 				Symbol type = types.poll();
-				final int it = Preprocessing.tableOfTypes.indexOf(type.getImage());
+				final int it = Encoder.tableOfTypes.indexOf(type.getImage());
 				types.addAll(domain.getType(type).getTypes());
-				Preprocessing.tableOfDomains.get(it).add(ic);
+				Encoder.tableOfDomains.get(it).add(ic);
 			}
 		}
 	}
@@ -248,10 +243,10 @@ final class IntEncoding {
 	static void encodePredicates(final Domain domain) {
 		final List<NamedTypedList> predicates = domain.getPredicates();
 		final int nbPredicates = predicates.size();
-		Preprocessing.tableOfPredicates = new ArrayList<String>(nbPredicates);
-		Preprocessing.tableOfTypedPredicates = new ArrayList<List<Integer>>(nbPredicates);
+		Encoder.tableOfPredicates = new ArrayList<String>(nbPredicates);
+		Encoder.tableOfTypedPredicates = new ArrayList<List<Integer>>(nbPredicates);
 		for (NamedTypedList predicate : predicates) {
-			Preprocessing.tableOfPredicates.add(predicate.getName().getImage());
+			Encoder.tableOfPredicates.add(predicate.getName().getImage());
 			final List<TypedSymbol> arguments = predicate.getArguments();
 			final List<Integer> argType = new ArrayList<Integer>(arguments.size());
 			for (TypedSymbol arg : arguments) {
@@ -262,12 +257,12 @@ final class IntEncoding {
 						image.append("~");
 						image.append(type.getImage());
 					}
-					argType.add(Preprocessing.tableOfTypes.indexOf(image.toString()));
+					argType.add(Encoder.tableOfTypes.indexOf(image.toString()));
 				} else {
-					argType.add(Preprocessing.tableOfTypes.indexOf(types.get(0).getImage()));
+					argType.add(Encoder.tableOfTypes.indexOf(types.get(0).getImage()));
 				}
 			}
-			Preprocessing.tableOfTypedPredicates.add(argType);
+			Encoder.tableOfTypedPredicates.add(argType);
 		}
 	}
 
@@ -278,10 +273,10 @@ final class IntEncoding {
 	 */
 	static void encodeFunctions(final Domain domain) {
 		final List<NamedTypedList> functions = domain.getFunctions();
-		Preprocessing.tableOfFunctions = new ArrayList<String>(functions.size());
-		Preprocessing.tableOfTypedFunctions = new ArrayList<List<Integer>>(functions.size());
+		Encoder.tableOfFunctions = new ArrayList<String>(functions.size());
+		Encoder.tableOfTypedFunctions = new ArrayList<List<Integer>>(functions.size());
 		for (NamedTypedList function : functions) {
-			Preprocessing.tableOfFunctions.add(function.getName().getImage());
+			Encoder.tableOfFunctions.add(function.getName().getImage());
 			List<TypedSymbol> arguments = function.getArguments();
 			List<Integer> argType = new ArrayList<Integer>(arguments.size());
 			for (int j = 0; j < arguments.size(); j++) {
@@ -292,12 +287,12 @@ final class IntEncoding {
 						type.append("~");
 						type.append(types.get(k).getImage());
 					}
-					argType.add(Preprocessing.tableOfTypes.indexOf(type.toString()));
+					argType.add(Encoder.tableOfTypes.indexOf(type.toString()));
 				} else {
-					argType.add(Preprocessing.tableOfTypes.indexOf(types.get(0).getImage()));
+					argType.add(Encoder.tableOfTypes.indexOf(types.get(0).getImage()));
 				}
 			}
-			Preprocessing.tableOfTypedFunctions.add(argType);
+			Encoder.tableOfTypedFunctions.add(argType);
 
 		}
 	}
@@ -355,7 +350,7 @@ final class IntEncoding {
 		for (int i = 0; i < op.getArity(); i++) {
 			final TypedSymbol parameter = op.getParameters().get(i);
 			final String typeImage = IntEncoding.toStringType(parameter.getTypes());
-			final int type = Preprocessing.tableOfTypes.indexOf(typeImage);
+			final int type = Encoder.tableOfTypes.indexOf(typeImage);
 			intOp.setTypeOfParameter(i, type);
 			variables.add(parameter.getImage());
 		}
@@ -405,35 +400,35 @@ final class IntEncoding {
 				if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
 					args[i] = -variables.indexOf(argument.getImage()) - 1;
 				} else {
-					args[i] = Preprocessing.tableOfConstants.indexOf(argument.getImage());
+					args[i] = Encoder.tableOfConstants.indexOf(argument.getImage());
 				}
 			}
 			intExp.setArguments(args);
 			break;
 		case FN_HEAD:
 			final String functor = exp.getAtom().get(0).getImage();
-			intExp.setPredicate(Preprocessing.tableOfFunctions.indexOf(functor));
+			intExp.setPredicate(Encoder.tableOfFunctions.indexOf(functor));
 			args = new int[exp.getAtom().size() - 1];
 			for (int i = 1; i < exp.getAtom().size(); i++) {
 				final Symbol argument = exp.getAtom().get(i);
 				if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
 					args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
 				} else {
-					args[i - 1] = Preprocessing.tableOfConstants.indexOf(argument.getImage());
+					args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
 				}
 			}
 			intExp.setArguments(args);
 			break;
 		case ATOM:
 			final String predicate = exp.getAtom().get(0).getImage();
-			intExp.setPredicate(Preprocessing.tableOfPredicates.indexOf(predicate));
+			intExp.setPredicate(Encoder.tableOfPredicates.indexOf(predicate));
 			args = new int[exp.getAtom().size() - 1];
 			for (int i = 1; i < exp.getAtom().size(); i++) {
 				final Symbol argument = exp.getAtom().get(i);
 				if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
 					args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
 				} else {
-					args[i - 1] = Preprocessing.tableOfConstants.indexOf(argument.getImage());
+					args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
 				}
 			}
 			intExp.setArguments(args);
@@ -449,7 +444,7 @@ final class IntEncoding {
 			final List<String> newVariables = new ArrayList<String>(variables);
 			final List<TypedSymbol> qvar = exp.getVariables();
 			final String type = IntEncoding.toStringType(qvar.get(0).getTypes());
-			int typeIndex = Preprocessing.tableOfTypes.indexOf(type);
+			int typeIndex = Encoder.tableOfTypes.indexOf(type);
 			intExp.setType(typeIndex);
 			intExp.setVariable(-variables.size() - 1);
 			newVariables.add(qvar.get(0).getImage());

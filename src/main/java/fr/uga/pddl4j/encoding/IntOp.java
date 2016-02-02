@@ -17,11 +17,10 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.Arrays;
 
-import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.AbstractCodedOp;
 import fr.uga.pddl4j.util.IntExp;

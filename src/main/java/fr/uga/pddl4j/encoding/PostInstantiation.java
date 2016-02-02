@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,12 +27,11 @@ import java.util.List;
 import java.util.Set;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.IntExp;
 
 /**
  * <p>
- * This class contains the methods needed for the post instantiation step the preprocessing. In
+ * This class contains the methods needed for the post instantiation step the encoding. In
  * other words, it contains methods to extract the relevant facts from the instantiated operators
  * and methods to simplify the operator based on ground inertia information.
  * </p>
@@ -81,10 +80,10 @@ final class PostInstantiation {
 			PostInstantiation.extractRelevantFacts(op.getPreconditions(), relevants, init);
 			PostInstantiation.extractRelevantFacts(op.getEffects(), relevants, init);
 		}
-		Preprocessing.tableOfRevelantFacts = new ArrayList<IntExp>(relevants.size());
+		Encoder.tableOfRevelantFacts = new ArrayList<IntExp>(relevants.size());
 		for (IntExp exp : relevants) {
 			final IntExp relevant = new IntExp(exp);
-			Preprocessing.tableOfRevelantFacts.add(relevant);
+			Encoder.tableOfRevelantFacts.add(relevant);
 		}
 	}
 
@@ -521,7 +520,7 @@ final class PostInstantiation {
 			final Set<IntExp> init) {
 		switch (exp.getConnective()) {
 		case ATOM:
-			Inertia inertia = Preprocessing.tableOfGroundInertia.get(exp);
+			Inertia inertia = Encoder.tableOfGroundInertia.get(exp);
 			if (inertia == null)
 				inertia = Inertia.INERTIA;
 			// An initial fact, which is a negative ground inertia, is never made FALSE and thus
@@ -655,7 +654,7 @@ final class PostInstantiation {
 	 * @param operators the list of instantiated operators.
 	 */
 	static void extractGroundInertia(final List<IntOp> operators) {
-		Preprocessing.tableOfGroundInertia = new LinkedHashMap<IntExp, Inertia>(
+		Encoder.tableOfGroundInertia = new LinkedHashMap<IntExp, Inertia>(
 				Constants.DEFAULT_RELEVANT_FACTS_TABLE);
 		for (IntOp op : operators) {
 			PostInstantiation.extractGroundInertia(op.getEffects());
@@ -671,15 +670,15 @@ final class PostInstantiation {
 	private static void extractGroundInertia(final IntExp exp) {
 		switch (exp.getConnective()) {
 		case ATOM:
-			Inertia inertia = Preprocessing.tableOfGroundInertia.get(exp);
+			Inertia inertia = Encoder.tableOfGroundInertia.get(exp);
 			if (inertia == null)
 				inertia = Inertia.INERTIA;
 			switch (inertia) {
 			case INERTIA:
-				Preprocessing.tableOfGroundInertia.put(exp, Inertia.NEGATIVE);
+				Encoder.tableOfGroundInertia.put(exp, Inertia.NEGATIVE);
 				break;
 			case POSITIVE:
-				Preprocessing.tableOfGroundInertia.put(exp, Inertia.FLUENT);
+				Encoder.tableOfGroundInertia.put(exp, Inertia.FLUENT);
 				break;
 			}
 			break;
@@ -701,15 +700,15 @@ final class PostInstantiation {
 		case NOT:
 			final IntExp neg = exp.getChildren().get(0);
 			if (neg.getConnective().equals(Connective.ATOM)) {
-				inertia = Preprocessing.tableOfGroundInertia.get(neg);
+				inertia = Encoder.tableOfGroundInertia.get(neg);
 				if (inertia == null)
 					inertia = Inertia.INERTIA;
 				switch (inertia) {
 				case INERTIA:
-					Preprocessing.tableOfGroundInertia.put(neg, Inertia.POSITIVE);
+					Encoder.tableOfGroundInertia.put(neg, Inertia.POSITIVE);
 					break;
 				case NEGATIVE:
-					Preprocessing.tableOfGroundInertia.put(neg, Inertia.FLUENT);
+					Encoder.tableOfGroundInertia.put(neg, Inertia.FLUENT);
 					break;
 				}
 			}

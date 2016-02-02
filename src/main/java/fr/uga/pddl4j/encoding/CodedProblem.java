@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,8 +26,6 @@ import java.util.List;
 
 import java.util.Set;
 
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
@@ -382,7 +380,7 @@ public class CodedProblem implements Serializable {
 	}
 
 	/**
-	 * Returns <code>true</code> if this problem is solvable, i.e., if its goal was not simplified to FALSE during the preprocessing.
+	 * Returns <code>true</code> if this problem is solvable, i.e., if its goal was not simplified to FALSE during the encoding.
 	 *
 	 * @return <code>true</code> if this problem is solvable; <code>false</code>.
 	 */

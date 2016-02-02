@@ -17,10 +17,10 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 /**
- * This interface defines the constants used during the preprocessing.
+ * This interface defines the constants used during the encoding.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010

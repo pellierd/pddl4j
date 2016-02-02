@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.preprocessing;
+package fr.uga.pddl4j.encoding;
 
 import java.util.BitSet;
 import java.util.List;
@@ -25,13 +25,12 @@ import java.util.List;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
 /**
  * This class implements the methods needed to convert the compact encoded objects used in the
- * preprocessing into string representation.
+ * encoding into string representation.
  *
  * @author D. Pellier
  * @version 1.0 - 11.06.2010
