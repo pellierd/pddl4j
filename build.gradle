@@ -1,0 +1,54 @@
+plugins {
+    id "ca.coglinc.javacc" version "2.3.1"
+}
+apply plugin: 'java'
+//apply plugin: 'checkstyle'
+
+configurations.all{
+    resolutionStrategy.force 'net.java.dev.javacc:javacc:4.0'
+}
+group 'fr.uga'
+version '2.0.0.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.10'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+compileJavacc {
+    inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
+    outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer')
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart',
+                'Implementation-Version': version,
+                'Gradle-Version':'Gradle 2.10',
+                'Built-By': 'Damien Pellier',
+                'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent'
+    }
+}
+
+task run (type: JavaExec, dependsOn: build){
+    if (project.hasProperty("Args")) {
+        println("arguments list : "+Args)
+        args(Args.split(','))
+    }else{
+        println("No argument found")
+    }
+
+    jvmArgs = ["-javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar", "-server", "-Xms2048m", "-Xmx2048m"]
+
+    description = "Run AHSP plannin algorithm"
+    main = "fr.uga.pddl4j.examples.ahsp.AHSP"
+    classpath = sourceSets.main.runtimeClasspath
+}

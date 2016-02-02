@@ -47,16 +47,13 @@ go to http://ant.apache.org/ and install it.
 ####3.1 How to build PDDL4J ?
 
 Type at the root of the PDDL4J distribution: 
-> ant rebuild 
+> ./gradlew build
 
-To build the jar type:
-> ant jar
-
-The jar "pddl4j.jar" is available in the lib directory.
+The jar "pddl4j-VERSION.jar" is available in the build/libs directory.
 
 ####3.3 How to use binary distribution ?
 
-The pddl4j library can be used as a jar file called "pddl4j.jar" in the "lib" 
+The pddl4j library can be used as a jar file called "pddl4j-VERSION.jar" in the "libs"
 directory of the release. Therefore, include the jar in our classpath and enjoy
 it.
 
@@ -65,7 +62,7 @@ it.
 All the documentations are contained in the doc directory.
 
 To generate the javadoc just type:
-> ant doc
+> ./gradlew javadoc
 
 
 ####3.5 How to run examples ?
@@ -74,9 +71,10 @@ Examples are available in the "examples" directory of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy 
 called AHSP. To launch the example use the following command line:
 
-> java -javaagent:lib/pddl4j.jar -server -Xms2048m -Xmx2048m -classpath lib/pddl4j.jar
->    pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl
->    -f pddl/blocksworld/p15.pddl
+> java -javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+
+Or use the gradle run command:
+> gradle run -PArgs='-o','pddl/blocksworld/domain.pddl','-f','pddl/blocksworld/p15.pddl' 
 
 Note: A set of planning problems is available in the web site of the international 
 planning competition: http://ipc.icaps-conference.org.
