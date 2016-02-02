@@ -114,9 +114,7 @@ public class Exp implements Serializable {
 		if (other.getVariable() != null) {
 			this.variable = new Symbol(other.getVariable());
 		}
-		if (other.getVariable() != null) {
-			this.value = other.getValue();
-		}
+		this.value = other.getValue();
 	}
 
 	/**
