@@ -9,16 +9,12 @@ plugins {
 }
 apply plugin: 'java'
 apply plugin: 'findbugs'
-//apply plugin: 'checkstyle'
+apply plugin: 'checkstyle'
 
 
 group 'fr.uga'
 version '2.0.0.0-SNAPSHOT'
 sourceCompatibility = 1.8
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
-}
 
 repositories {
     mavenCentral()
@@ -30,7 +26,11 @@ dependencies {
 
 compileJavacc {
     inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
-    outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer')
+    outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
+}
+
+checkstyle {
+    toolVersion = "6.15"
 }
 
 jar {
@@ -41,6 +41,10 @@ jar {
                 'Built-By': 'Damien Pellier',
                 'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent'
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.10'
 }
 
 task run (type: JavaExec, dependsOn: build){
@@ -74,4 +78,30 @@ javadoc.doFirst() {
     exclude "**/lexer/**"
 }
 
+checkstyleMain.doFirst() {
+    excludeLexer(checkstyleMain)
+}
+
+checkstyleMain.doLast() {
+    printCheckstyleVersion()
+}
+
+checkstyleTest.doFirst(){
+    excludeLexer(checkstyleTest)
+}
+
+checkstyleTest.doLast(){
+    printCheckstyleVersion()
+}
+
 defaultTasks 'clean', 'build'
+
+// Exclude lexer source form task
+def excludeLexer(task) {
+    task.exclude("**/lexer/**")
+}
+
+// Display the current version use by checkstyle plugin
+def printCheckstyleVersion(){
+    println("Checkstyle version: "+checkstyle.toolVersion)
+}
