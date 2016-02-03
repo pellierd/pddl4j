@@ -54,3 +54,6 @@ task run (type: JavaExec, dependsOn: build){
     main = "fr.uga.pddl4j.planners.hsp.HSP"
     classpath = sourceSets.main.runtimeClasspath
 }
+
+
+defaultTasks 'clean', 'build'
