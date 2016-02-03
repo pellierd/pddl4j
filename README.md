@@ -77,7 +77,7 @@ called AHSP. To launch the example use the following command line:
 > java -javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
 Or use the gradle run command:
-> gradle run -PArgs='-o','pddl/blocksworld/domain.pddl','-f','pddl/blocksworld/p15.pddl'
+> gradle run -PArgs=-o,pddl/blocksworld/domain.pddl,-f,pddl/blocksworld/p15.pddl
 
 Note: A set of planning problems is available in the web site of the international
 planning competition: http://ipc.icaps-conference.org.

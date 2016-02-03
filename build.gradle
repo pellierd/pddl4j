@@ -49,7 +49,7 @@ task run (type: JavaExec, dependsOn: build){
         args(Args.split(','))
     }
 
-    jvmArgs = ["-javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar", "-server", "-Xms2048m", "-Xmx2048m"]
+    jvmArgs = ["-javaagent:"+project.buildDir.name+"/libs/"+project.name+"-"+project.version+".jar", "-server", "-Xms2048m", "-Xmx2048m"]
 
     description = "Run HSP plannin algorithm"
     main = "fr.uga.pddl4j.planners.hsp.HSP"
@@ -65,10 +65,13 @@ clean.doLast() {
 }
 
 findbugsMain.doLast() {
-    println("Find bug process completed without finding issue")
+    println("Find bug process completed without finding an issue")
 }
 
 findbugsMain.onlyIf() { project.hasProperty('findbug') }
 
+javadoc.doFirst() {
+    exclude "**/lexer/**"
+}
 
 defaultTasks 'clean', 'build'
