@@ -1,12 +1,16 @@
+buildscript {
+    configurations.all {
+        resolutionStrategy.force 'net.java.dev.javacc:javacc:6.1.2'
+    }
+}
+
 plugins {
     id "ca.coglinc.javacc" version "2.3.1"
 }
 apply plugin: 'java'
 //apply plugin: 'checkstyle'
 
-configurations.all{
-    resolutionStrategy.force 'net.java.dev.javacc:javacc:4.0'
-}
+
 group 'fr.uga'
 version '2.0.0.0-SNAPSHOT'
 sourceCompatibility = 1.8
@@ -40,10 +44,8 @@ jar {
 
 task run (type: JavaExec, dependsOn: build){
     if (project.hasProperty("Args")) {
-        println("arguments list : "+Args)
+        println("arguments list : " + Args)
         args(Args.split(','))
-    }else{
-        println("No argument found")
     }
 
     jvmArgs = ["-javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar", "-server", "-Xms2048m", "-Xmx2048m"]
