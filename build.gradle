@@ -56,6 +56,14 @@ task run (type: JavaExec, dependsOn: build){
     classpath = sourceSets.main.runtimeClasspath
 }
 
+task cleanGenerated(type:Delete) {
+    delete fileTree(dir: "src/main/java/fr/uga/pddl4j/parser/lexer", exclude:"Lexer.jj")
+}
+
+clean.doLast() {
+    cleanGenerated.execute()
+}
+
 findbugsMain.doLast() {
     println("Find bug process completed without finding issue")
 }
