@@ -8,6 +8,7 @@ plugins {
     id "ca.coglinc.javacc" version "2.3.1"
 }
 apply plugin: 'java'
+apply plugin: 'findbugs'
 //apply plugin: 'checkstyle'
 
 
@@ -54,6 +55,12 @@ task run (type: JavaExec, dependsOn: build){
     main = "fr.uga.pddl4j.planners.hsp.HSP"
     classpath = sourceSets.main.runtimeClasspath
 }
+
+findbugsMain.doLast() {
+    println("Find bug process completed without finding issue")
+}
+
+findbugsMain.onlyIf() { project.hasProperty('findbug') }
 
 
 defaultTasks 'clean', 'build'

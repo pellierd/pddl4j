@@ -49,6 +49,9 @@ go to https://gradle.org/ and install it.
 Type at the root of the PDDL4J distribution:
 > ./gradlew build
 
+if you want to build the project with findbug:
+> ./gradlew build -Pfindbug
+
 The jar "pddl4j-VERSION.jar" is available in the build/libs directory.
 
 ####3.3 How to use binary distribution ?
