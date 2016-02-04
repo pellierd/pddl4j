@@ -39,12 +39,12 @@ simply operators into ground actions based on inertia properties.
   * a set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
   * several examples of planners using PDDL4J.
 
-###3. How to use the PDDL4J library ?
+###3. How to use the PDDL4J library?
 
 The pddl4j library is package with "gradle". If ant is not installed on your computer,
 go to https://gradle.org/ and install it.
 
-####3.1 How to build PDDL4J ?
+####3.1 How to build PDDL4J?
 
 Type at the root of the PDDL4J distribution:
 > ./gradlew build
@@ -54,7 +54,7 @@ if you want to build the project with findbug:
 
 The jar "pddl4j-VERSION.jar" is available in the build/libs directory.
 
-####3.3 How to use binary distribution ?
+####3.3 How to use binary distribution?
 
 The pddl4j library can be used as a jar file called "pddl4j-VERSION.jar" in the "libs"
 directory of the release. Therefore, include the jar in our classpath and enjoy
@@ -68,11 +68,11 @@ To generate the javadoc just type:
 > ./gradlew javadoc
 
 
-####3.5 How to run examples ?
+####3.5 How to run existing planner?
 
-Examples are available in the "examples" directory of the distribution. For
+Planners are available in the "planners" package of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy
-called AHSP. To launch the example use the following command line:
+called HSP. To launch this planner use the following command line:
 
 > java -javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
