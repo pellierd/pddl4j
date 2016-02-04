@@ -14,8 +14,8 @@ insert_final_newline = true
 [*.java]
 charset = utf-8
 
-# 4 space indentation
+# 4 spaces indentation
 [*.java]
 indent_style = space
 indent_size = 4
-continuation_indent_size = 2
+#continuation_indent_size = 2
