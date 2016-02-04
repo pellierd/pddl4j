@@ -76,6 +76,8 @@ findbugsMain.onlyIf() { project.hasProperty('findbug') }
 
 javadoc.doFirst() {
     exclude "**/lexer/**"
+    failOnError false
+
 }
 
 checkstyleMain.doFirst() {
