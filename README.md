@@ -74,7 +74,7 @@ Examples are available in the "examples" directory of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy
 called AHSP. To launch the example use the following command line:
 
-> java -javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.examples.ahsp.AHSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+> java -javaagent:build/libs/pddl4j-2.0.0.0-SNAPSHOT.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
 Or use the gradle run command:
 > gradle run -PArgs=-o,pddl/blocksworld/domain.pddl,-f,pddl/blocksworld/p15.pddl
