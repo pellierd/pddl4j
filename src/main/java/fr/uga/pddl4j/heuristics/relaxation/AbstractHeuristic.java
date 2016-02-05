@@ -19,12 +19,12 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import java.util.List;
-
-import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.BitExp;
+import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.IntExp;
+
+import java.util.List;
 
 /**
  * This abstract class implements the basic methods of all heuristics.
@@ -34,97 +34,98 @@ import fr.uga.pddl4j.util.IntExp;
  */
 public abstract class AbstractHeuristic implements Heuristic {
 
-	/**
-	 * The goal to reached.
-	 */
-	private BitExp goal;
+    /**
+     * The goal to reached.
+     */
+    private BitExp goal;
 
-	/**
-	 * The list of facts of the relaxed problem.
-	 */
-	private List<IntExp> facts;
+    /**
+     * The list of facts of the relaxed problem.
+     */
+    private List<IntExp> facts;
 
-	/**
-	 * The lists of operators of the relaxed problem.
-	 */
-	private List<BitOp> operators;
+    /**
+     * The lists of operators of the relaxed problem.
+     */
+    private List<BitOp> operators;
 
-	/**
-	 * The boolean flag used to indicate if the heuristic is admissible.
-	 */
-	private boolean isAdmissible;
+    /**
+     * The boolean flag used to indicate if the heuristic is admissible.
+     */
+    private boolean isAdmissible;
 
-	/**
-	 * Create a new heuristic for a specified planning problem. By default the heuristic is
-	 * considered as admissible.
-	 *
-	 * @param problem the problem to solve.
-	 * @throws NullPointerException if <code>problem == null</code>.
-	 */
-	protected AbstractHeuristic(final CodedProblem problem) throws NullPointerException {
-		if (problem == null)
-			throw new NullPointerException("problem == null");
-		this.facts = problem.getRevelantFacts();
-		this.goal = problem.getGoal();
-		this.operators = problem.getOperators();
-		this.isAdmissible = true;
-	}
+    /**
+     * Create a new heuristic for a specified planning problem. By default the heuristic is
+     * considered as admissible.
+     *
+     * @param problem the problem to solve.
+     * @throws NullPointerException if <code>problem == null</code>.
+     */
+    protected AbstractHeuristic(final CodedProblem problem) throws NullPointerException {
+        if (problem == null) {
+            throw new NullPointerException("problem == null");
+        }
+        this.facts = problem.getRevelantFacts();
+        this.goal = problem.getGoal();
+        this.operators = problem.getOperators();
+        this.isAdmissible = true;
+    }
 
-	/**
-	 * Returns <code>true</code> if this heuristic is admissible.
-	 *
-	 * @return <code>true</code> if this heuristic is admissible.
-	 */
-	public boolean isAdmissible() {
-		return this.isAdmissible;
-	}
+    /**
+     * Returns <code>true</code> if this heuristic is admissible.
+     *
+     * @return <code>true</code> if this heuristic is admissible.
+     */
+    public boolean isAdmissible() {
+        return this.isAdmissible;
+    }
 
-	/**
-	 * Marks the heuristic as admissible or not.
-	 *
-	 * @param isAdmissible the admissible flag.
-	 */
-	protected final void setAdmissible(boolean isAdmissible) {
-		this.isAdmissible = isAdmissible;
-	}
+    /**
+     * Marks the heuristic as admissible or not.
+     *
+     * @param isAdmissible the admissible flag.
+     */
+    protected final void setAdmissible(boolean isAdmissible) {
+        this.isAdmissible = isAdmissible;
+    }
 
-	/**
-	 * Returns the goal of the relaxed problem to solve in order to compute the heuristic.
-	 *
-	 * @return the goal.
-	 */
-	protected final BitExp getGoal() {
-		return this.goal;
-	}
+    /**
+     * Returns the goal of the relaxed problem to solve in order to compute the heuristic.
+     *
+     * @return the goal.
+     */
+    protected final BitExp getGoal() {
+        return this.goal;
+    }
 
-	/**
-	 * Set the goal of the the relaxed problem to solve in order to compute the heuristic.
-	 *
-	 * @param goal the goal.
-	 * @throws NullPointerException if <code>goal == null</code>.
-	 */
-	protected void setGoal(final BitExp goal) throws NullPointerException {
-		if (!goal.equals(this.goal)) {
-			this.goal = goal;
-		}
-	}
+    /**
+     * Set the goal of the the relaxed problem to solve in order to compute the heuristic.
+     *
+     * @param goal the goal.
+     * @throws NullPointerException if <code>goal == null</code>.
+     */
+    protected void setGoal(final BitExp goal) throws NullPointerException {
+        if (!goal.equals(this.goal)) {
+            this.goal = goal;
+        }
+    }
 
-	/**
-	 * Returns the relevant facts of the relaxed problem to solve in order to compute the heuristic.
-	 *
-	 * @return the relevant facts.
-	 */
-	protected final List<IntExp> getRevelantFacts() {
-		return this.facts;
-	}
+    /**
+     * Returns the relevant facts of the relaxed problem to solve in order to compute the heuristic.
+     *
+     * @return the relevant facts.
+     */
+    protected final List<IntExp> getRevelantFacts() {
+        return this.facts;
+    }
 
-	/**
-	 * Returns the operators of the relaxed problem to solve in order to compute the heuristic.
-	 *
-	 * @return the operators.
-	 */
-	protected final List<BitOp> getOperators() {
-		return this.operators;
-	}
+    /**
+     * Returns the operators of the relaxed problem to solve in order to compute the heuristic.
+     *
+     * @return the operators.
+     */
+    protected final List<BitOp> getOperators() {
+        return this.operators;
+    }
 
 }

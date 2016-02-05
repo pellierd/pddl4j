@@ -19,11 +19,11 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import java.io.Serializable;
-
-import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
+
+import java.io.Serializable;
+
 
 /**
  * This interface defines the methods accessible from all heuristics. An heuristic is a function
@@ -32,76 +32,77 @@ import fr.uga.pddl4j.util.BitState;
  * <p>
  * To have an good overview of the planning heuristics developed in this package see D. Bryce and S.
  * Kambhampati. "A Tutorial on Planning Graph Based Reachability Heuristics", 2006.
+ * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
 public interface Heuristic extends Serializable {
 
-	/**
-	 * Return the estimated distance to the goal to reach the specified state. If the return value is
-	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state.
-	 *
-	 * @param state the state from which the distance to the goal must be estimated.
-	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state.
-	 * @throws NullPointerException if <code>state == null && goal == null</code>.
-	 */
-	public int estimate(final BitState state, final BitExp goal) throws NullPointerException;
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     */
+    public int estimate(final BitState state, final BitExp goal) throws NullPointerException;
 
-	/**
-	 * Returns <code>true</code> if this heuristic is admissible.
-	 *
-	 * @return <code>true</code> if this heuristic is admissible.
-	 */
-	public boolean isAdmissible();
+    /**
+     * Returns <code>true</code> if this heuristic is admissible.
+     *
+     * @return <code>true</code> if this heuristic is admissible.
+     */
+    public boolean isAdmissible();
 
-	/**
-	 * The type of heuristic implemented.
-	 *
-	 * @author D. Pellier
-	 * @version 1.0 - 09.02.2011
-	 */
-	public enum Type {
+    /**
+     * The type of heuristic implemented.
+     *
+     * @author D. Pellier
+     * @version 1.0 - 09.02.2011
+     */
+    public enum Type {
 
-		/**
-		 * The type for the <code>AdjustedSum</code> heuristic.
-		 */
-		AJUSTED_SUM,
-		/**
-		 * The type for the <code>AdjustedSum2</code> heuristic.
-		 */
-		AJUSTED_SUM2,
-		/**
-		 * The type for the <code>AdjustedSum2M</code> heuristic.
-		 */
-		AJUSTED_SUM2M,
-		/**
-		 * The type for the <code>Combo</code> heuristic.
-		 */
-		COMBO,
-		/**
-		 * The type for the <code>Max</code> heuristic.
-		 */
-		MAX,
-		/**
-		 * The type for the <code>FastForward</code> heuristic.
-		 */
-		FAST_FORWARD,
-		/**
-		 * The type for the <code>SetLevel</code> heuristic.
-		 */
-		SET_LEVEL,
-		/**
-		 * The type for the <code>Sum</code> heuristic.
-		 */
-		SUM,
-		/**
-		 * The type for the <code>SumMutex</code> heuristic.
-		 */
-		SUM_MUTEX,
+        /**
+         * The type for the <code>AdjustedSum</code> heuristic.
+         */
+        AJUSTED_SUM,
+        /**
+         * The type for the <code>AdjustedSum2</code> heuristic.
+         */
+        AJUSTED_SUM2,
+        /**
+         * The type for the <code>AdjustedSum2M</code> heuristic.
+         */
+        AJUSTED_SUM2M,
+        /**
+         * The type for the <code>Combo</code> heuristic.
+         */
+        COMBO,
+        /**
+         * The type for the <code>Max</code> heuristic.
+         */
+        MAX,
+        /**
+         * The type for the <code>FastForward</code> heuristic.
+         */
+        FAST_FORWARD,
+        /**
+         * The type for the <code>SetLevel</code> heuristic.
+         */
+        SET_LEVEL,
+        /**
+         * The type for the <code>Sum</code> heuristic.
+         */
+        SUM,
+        /**
+         * The type for the <code>SumMutex</code> heuristic.
+         */
+        SUM_MUTEX,
 
-	}
+    }
 
 }

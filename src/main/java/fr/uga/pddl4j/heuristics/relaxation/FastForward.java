@@ -36,16 +36,16 @@ import fr.uga.pddl4j.util.BitState;
  * should be choose when no NOOP is available ? It is certainly a good idea to select an achiever
  * whose preconditions seems to be "easy". From the graph building phase, we can obtain a simple
  * measure for the operators_difficulty of an action's preconditions as follows:
- *
+ * </p>
  * <pre>
  * difficulty(o) := SUM_ID(min { i | p is member of the fact layer at time i }) with p in pre(o)
  * </pre>
- *
+ * <p>
  * The operators_difficulty of each action can be set when it is first inserted into the graph.
  * During plan extraction, facing a fact for which no NOOP is available, we then simply selected an
  * achieving action with minimal operators_difficulty. This heuristic works well in situation where
  * there are severals ways to achieve one fact. but some ways need less effort than others.
- * <p>
+ * </p>
  * <b>Warning:</b> The relaxed plan heuristic is not admissible.
  *
  * @author D. Pellier
@@ -54,31 +54,31 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class FastForward extends RelaxedGraphHeuristic {
 
-	/**
-	 * Creates a new <code>FastForward</code> heuristic for a specified planning problem.
-	 *
-	 * @param problem the planning problem.
-	 * @throws NullPointerException if <code>problem == null</code>.
-	 */
-	public FastForward(CodedProblem problem) {
-		super(problem);
-		super.setAdmissible(false);
-	}
+    /**
+     * Creates a new <code>FastForward</code> heuristic for a specified planning problem.
+     *
+     * @param problem the planning problem.
+     * @throws NullPointerException if <code>problem == null</code>.
+     */
+    public FastForward(CodedProblem problem) {
+        super(problem);
+        super.setAdmissible(false);
+    }
 
-	/**
-	 * Return the estimated distance to the goal to reach the specified state. If the return value is
-	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state.
-	 *
-	 * @param state the state from which the distance to the goal must be estimated.
-	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state.
-	 * @throws NullPointerException if <code>state == null && goal == null</code>.
-	 */
-	public int estimate(final BitState state, final BitExp goal) {
-		super.setGoal(goal);
-		super.expandRelaxedPlanningGraph(state);
-		return super.isGoalReachable() ? super.getRelaxedPlanValue() : Integer.MAX_VALUE;
-	}
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     */
+    public int estimate(final BitState state, final BitExp goal) {
+        super.setGoal(goal);
+        super.expandRelaxedPlanningGraph(state);
+        return super.isGoalReachable() ? super.getRelaxedPlanValue() : Integer.MAX_VALUE;
+    }
 
 }

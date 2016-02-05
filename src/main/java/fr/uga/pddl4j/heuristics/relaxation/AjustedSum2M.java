@@ -38,12 +38,11 @@ import fr.uga.pddl4j.util.BitState;
  * </ul>
  * <p>
  * Note that computing <tt>delta(S)</tt> is equivalent to compute the set level heuristic.
- * <p>
+ * </p>
  * <b>Warning:</b> The adjusted sum 2M heuristic is not admissible.
  *
  * @author D. Pellier
  * @version 1.0 - 01.09.2010
- *
  * @see AdjustedSum
  * @see Max
  * @see FastForward
@@ -51,43 +50,43 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class AjustedSum2M extends RelaxedGraphHeuristic {
 
-	/**
-	 * The set level heuristic used to compute the delta function, i.e., the interaction degree
-	 * among propositions of the goal.
-	 */
-	private SetLevel delta;
+    /**
+     * The set level heuristic used to compute the delta function, i.e., the interaction degree
+     * among propositions of the goal.
+     */
+    private SetLevel delta;
 
-	/**
-	 * Creates a new <code>AJUSTED_SUM2M</code> heuristic for a specified planning problem.
-	 *
-	 * @param problem the planning problem.
-	 * @throws NullPointerException if <code>problem == null</code>.
-	 */
-	public AjustedSum2M(CodedProblem problem) {
-		super(problem);
-		super.setAdmissible(false);
-		this.delta = new SetLevel(problem);
-	}
+    /**
+     * Creates a new <code>AJUSTED_SUM2M</code> heuristic for a specified planning problem.
+     *
+     * @param problem the planning problem.
+     * @throws NullPointerException if <code>problem == null</code>.
+     */
+    public AjustedSum2M(CodedProblem problem) {
+        super(problem);
+        super.setAdmissible(false);
+        this.delta = new SetLevel(problem);
+    }
 
-	/**
-	 * Return the estimated distance to the goal to reach the specified state. If the return value is
-	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state.
-	 *
-	 * @param state the state from which the distance to the goal must be estimated.
-	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state.
-	 * @throws NullPointerException if <code>state == null && goal == null</code>.
-	 */
-	public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
-		super.setGoal(goal);
-		// First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
-		super.expandRelaxedPlanningGraph(state);
-		// Second, we expand the relaxed planning graph with mutex to compute the set level heuristic
-		this.delta.expandPlanningGraph(state);
-		// If the goal was not reached, it means that the goal is unreachable
-		return super.isGoalReachable() ? super.getRelaxedPlanValue()
-				+ (this.delta.estimate(state, goal) - super.getMaxValue()) : Integer.MAX_VALUE;
-	}
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     */
+    public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
+        super.setGoal(goal);
+        // First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
+        super.expandRelaxedPlanningGraph(state);
+        // Second, we expand the relaxed planning graph with mutex to compute the set level heuristic
+        this.delta.expandPlanningGraph(state);
+        // If the goal was not reached, it means that the goal is unreachable
+        return super.isGoalReachable() ? super.getRelaxedPlanValue()
+            + (this.delta.estimate(state, goal) - super.getMaxValue()) : Integer.MAX_VALUE;
+    }
 
 }

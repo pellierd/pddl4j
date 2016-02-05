@@ -26,41 +26,40 @@ import fr.uga.pddl4j.encoding.CodedProblem;
  *
  * @author D. Pellier
  * @version 1.0 - 09.02.2011
- *
  * @see Heuristic
  */
 public final class HeuristicToolKit {
 
-	/**
-	 * Create an heuristic of a specified type.
-	 *
-	 * @param type the type of the heuristic to create.
-	 * @param problem the problem for which the heuristic is created.
-	 * @return the heuristic created.
-	 * @throws NullPointerException if <code>type == null || problem == null<code<.
-	 */
-	public static Heuristic createHeuristic(final Heuristic.Type type, final CodedProblem problem) {
-		Heuristic heuristic = null;
-		if (type.equals(Heuristic.Type.FAST_FORWARD)) {
-			heuristic = new FastForward(problem);
-		} else if (type.equals(Heuristic.Type.SUM)) {
-			heuristic = new Sum(problem);
-		} else if (type.equals(Heuristic.Type.SUM_MUTEX)) {
-			heuristic = new SumMutex(problem);
-		} else if (type.equals(Heuristic.Type.AJUSTED_SUM)) {
-			heuristic = new AdjustedSum(problem);
-		} else if (type.equals(Heuristic.Type.AJUSTED_SUM2)) {
-			heuristic = new AdjustedSum2(problem);
-		} else if (type.equals(Heuristic.Type.AJUSTED_SUM2M)) {
-			heuristic = new AjustedSum2M(problem);
-		} else if (type.equals(Heuristic.Type.COMBO)) {
-			heuristic = new Combo(problem);
-		} else if (type.equals(Heuristic.Type.MAX)) {
-			heuristic = new Max(problem);
-		} else if (type.equals(Heuristic.Type.SET_LEVEL)) {
-			heuristic = new SetLevel(problem);
-		}
-		return heuristic;
-	}
+    /**
+     * Create an heuristic of a specified type.
+     *
+     * @param type    the type of the heuristic to create.
+     * @param problem the problem for which the heuristic is created.
+     * @return the heuristic created.
+     * @throws NullPointerException if <code>type == null || problem == null</code>.
+     */
+    public static Heuristic createHeuristic(final Heuristic.Type type, final CodedProblem problem) {
+        Heuristic heuristic = null;
+        if (type.equals(Heuristic.Type.FAST_FORWARD)) {
+            heuristic = new FastForward(problem);
+        } else if (type.equals(Heuristic.Type.SUM)) {
+            heuristic = new Sum(problem);
+        } else if (type.equals(Heuristic.Type.SUM_MUTEX)) {
+            heuristic = new SumMutex(problem);
+        } else if (type.equals(Heuristic.Type.AJUSTED_SUM)) {
+            heuristic = new AdjustedSum(problem);
+        } else if (type.equals(Heuristic.Type.AJUSTED_SUM2)) {
+            heuristic = new AdjustedSum2(problem);
+        } else if (type.equals(Heuristic.Type.AJUSTED_SUM2M)) {
+            heuristic = new AjustedSum2M(problem);
+        } else if (type.equals(Heuristic.Type.COMBO)) {
+            heuristic = new Combo(problem);
+        } else if (type.equals(Heuristic.Type.MAX)) {
+            heuristic = new Max(problem);
+        } else if (type.equals(Heuristic.Type.SET_LEVEL)) {
+            heuristic = new SetLevel(problem);
+        }
+        return heuristic;
+    }
 
 }

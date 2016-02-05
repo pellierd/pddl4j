@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
+
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
@@ -34,12 +35,10 @@ import fr.uga.pddl4j.util.BitState;
  * <li> <code>cost(S) := 1 +  cost(S + prec(a) - add(a))</code>
  * <li> <code>delta(S) := lev(S) - max(lev(p))</code> for all <code>p</code> in <code>S</code>
  * </ul>
- *
  * <b>Warning:</b> The adjusted sum heuristic is not admissible.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
- *
  * @see AdjustedSum
  * @see Max
  * @see FastForward
@@ -47,32 +46,32 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class AdjustedSum2 extends RelaxedGraphHeuristic {
 
-	/**
-	 * Creates a new <code>AdjustedSum2</code> heuristic for a specified planning problem.
-	 *
-	 * @param problem the planning problem.
-	 * @throws NullPointerException if <code>problem == null</code>.
-	 */
-	public AdjustedSum2(CodedProblem problem) {
-		super(problem);
-		super.setAdmissible(false);
-	}
+    /**
+     * Creates a new <code>AdjustedSum2</code> heuristic for a specified planning problem.
+     *
+     * @param problem the planning problem.
+     * @throws NullPointerException if <code>problem == null</code>.
+     */
+    public AdjustedSum2(CodedProblem problem) {
+        super(problem);
+        super.setAdmissible(false);
+    }
 
-	/**
-	 * Return the estimated distance to the goal to reach the specified state. If the return value is
-	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state.
-	 *
-	 * @param state the state from which the distance to the goal must be estimated.
-	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state.
-	 * @throws NullPointerException if <code>state == null && goal == null</code>.
-	 */
-	public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
-		super.setGoal(goal);
-		final int level = super.expandRelaxedPlanningGraph(state);
-		return super.isGoalReachable() ?
-				super.getRelaxedPlanValue() + (level - super.getMaxValue()) : Integer.MAX_VALUE;
-	}
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     */
+    public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
+        super.setGoal(goal);
+        final int level = super.expandRelaxedPlanningGraph(state);
+        return super.isGoalReachable() ? super.getRelaxedPlanValue() + (level - super.getMaxValue())
+            : Integer.MAX_VALUE;
+    }
 
 }
