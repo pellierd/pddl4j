@@ -30,121 +30,123 @@ import java.io.Serializable;
  */
 public class BitExp implements Serializable {
 
-	/**
-	 * The bit state used to store the positive facts of the expression.
-	 */
-	private BitVector positive;
+    /**
+     * The bit state used to store the positive facts of the expression.
+     */
+    private BitVector positive;
 
-	/**
-	 * The bit set used to store the positive facts of the expression.
-	 */
-	private BitVector negative;
+    /**
+     * The bit set used to store the positive facts of the expression.
+     */
+    private BitVector negative;
 
-	/**
-	 * Creates a new bit set expression. By default the expression has no positive and no negative
-	 * fact.
-	 */
-	public BitExp() {
-		this(new BitVector(), new BitVector());
-	}
+    /**
+     * Creates a new bit set expression. By default the expression has no positive and no negative
+     * fact.
+     */
+    public BitExp() {
+        this(new BitVector(), new BitVector());
+    }
 
-	/**
-	 * Creates a new bit expression from an other one.
-	 *
-	 * @param other the other one.
-	 * @throws NullPointerException if <code>other == null</code>.
-	 */
-	public BitExp(final BitExp other) throws NullPointerException {
-		this();
-		if (other == null)
-			throw new NullPointerException("other == null");
-		this.positive.or(other.positive);
-		this.negative.or(other.negative);
-	}
+    /**
+     * Creates a new bit expression from an other one.
+     *
+     * @param other the other one.
+     * @throws NullPointerException if <code>other == null</code>.
+     */
+    public BitExp(final BitExp other) throws NullPointerException {
+        this();
+        if (other == null) {
+            throw new NullPointerException("other == null");
+        }
+        this.positive.or(other.positive);
+        this.negative.or(other.negative);
+    }
 
-	/**
-	 * Creates a new bit expression from a specified positive and negative bit set that represent
-	 * respectively the positive and the negative fact of the expression.
-	 *
-	 * @param positive the bit set that represents the positive facts of the expression.
-	 * @param negative the bit set that represents the negative facts of the expression.
-	 * @throws NullPointerException if <code>positive == null || negative == null</code>.
-	 */
-	public BitExp(BitVector positive, BitVector negative) throws NullPointerException {
-		if (positive == null || negative == null)
-			throw new NullPointerException("positive == null || negative == null");
-		this.positive = positive;
-		this.negative = negative;
-	}
+    /**
+     * Creates a new bit expression from a specified positive and negative bit set that represent
+     * respectively the positive and the negative fact of the expression.
+     *
+     * @param positive the bit set that represents the positive facts of the expression.
+     * @param negative the bit set that represents the negative facts of the expression.
+     * @throws NullPointerException if <code>positive == null || negative == null</code>.
+     */
+    public BitExp(BitVector positive, BitVector negative) throws NullPointerException {
+        if (positive == null || negative == null) {
+            throw new NullPointerException("positive == null || negative == null");
+        }
+        this.positive = positive;
+        this.negative = negative;
+    }
 
-	/**
-	 * Returns the bit set that represents the positive facts of the expression.
-	 *
-	 * @return the bit set that represents the positive facts of the expression.
-	 */
-	public final BitVector getPositive() {
-		return this.positive;
-	}
+    /**
+     * Returns the bit set that represents the positive facts of the expression.
+     *
+     * @return the bit set that represents the positive facts of the expression.
+     */
+    public final BitVector getPositive() {
+        return this.positive;
+    }
 
-	/**
-	 * Returns the bit set that represents the negative facts of the expression.
-	 *
-	 * @return the bit set that represents the negative facts of the expression.
-	 */
-	public final BitVector getNegative() {
-		return negative;
-	}
+    /**
+     * Returns the bit set that represents the negative facts of the expression.
+     *
+     * @return the bit set that represents the negative facts of the expression.
+     */
+    public final BitVector getNegative() {
+        return negative;
+    }
 
-	/**
-	 * Returns if the expression is empty, i.e., the expression has no positive and no negative
-	 * facts. Such an expression is always true.
-	 *
-	 * @return <code>true</code> if the expression is empty; <code>false</code> otherwise.
-	 */
-	public final boolean isEmpty() {
-		return this.positive.isEmpty() && this.negative.isEmpty();
-	}
+    /**
+     * Returns if the expression is empty, i.e., the expression has no positive and no negative
+     * facts. Such an expression is always true.
+     *
+     * @return <code>true</code> if the expression is empty; <code>false</code> otherwise.
+     */
+    public final boolean isEmpty() {
+        return this.positive.isEmpty() && this.negative.isEmpty();
+    }
 
-	/**
-	 * Returns the cardinality of the bit expression, i.e., the number of propositions contained in
-	 * the expression.
-	 *
-	 * @return the cardinality of the bit expression.
-	 */
-	public final int cardinality() {
-		return this.positive.cardinality() + this.negative.cardinality();
-	}
+    /**
+     * Returns the cardinality of the bit expression, i.e., the number of propositions contained in
+     * the expression.
+     *
+     * @return the cardinality of the bit expression.
+     */
+    public final int cardinality() {
+        return this.positive.cardinality() + this.negative.cardinality();
+    }
 
-	/**
-	 * Returns the hash code value of the expression.
-	 *
-	 * @return the hash code value of the expression.
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + this.negative.hashCode();
-		result = prime * result + this.positive.hashCode();
-		return result;
-	}
+    /**
+     * Returns the hash code value of the expression.
+     *
+     * @return the hash code value of the expression.
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + this.negative.hashCode();
+        result = prime * result + this.positive.hashCode();
+        return result;
+    }
 
-	/**
-	 * Return if a specified object is equals to this expression. The specified object is equal to
-	 * the expression if and only if the object is an instance of the class <code>BitExp</code>
-	 * and it has the same positive and negative facts.
-	 *
-	 * @param obj the specified object to compared.
-	 * @return <code>true</code> if the specified object is equal to the expression;
-	 *         <code>false</code> otherwise.
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(final Object obj) {
-		if (obj != null && obj instanceof BitExp) {
-			BitExp other = (BitExp) obj;
-			return this.positive.equals(other.positive) && this.negative.equals(other.negative);
-		}
-		return false;
-	}
+    /**
+     * Return if a specified object is equals to this expression. The specified object is equal to
+     * the expression if and only if the object is an instance of the class <code>BitExp</code>
+     * and it has the same positive and negative facts.
+     *
+     * @param obj the specified object to compared.
+     * @return <code>true</code> if the specified object is equal to the expression;
+     * <code>false</code> otherwise.
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(final Object obj) {
+        if (obj != null && obj instanceof BitExp) {
+            BitExp other = (BitExp) obj;
+            return this.positive.equals(other.positive) && this.negative.equals(other.negative);
+        }
+        return false;
+    }
 
 }
