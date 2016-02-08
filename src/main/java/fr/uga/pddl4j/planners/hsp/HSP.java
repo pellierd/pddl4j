@@ -380,11 +380,11 @@ public final class HSP {
      *
      * OPTIONS   DESCRIPTIONS
      *
-     * -o <str>    operator file name
-     * -f <str>    fact file name
-     * -w <num>    the weight used in the a star search (preset: 1)
-     * -t <num>    specifies the maximum CPU-time in seconds (preset: 300)
-     * -u <num>    specifies the heuristic to used (preset: 0)
+     * -o <i>str</i>   operator file name
+     * -f <i>str</i>   fact file name
+     * -w <i>num</i>   the weight used in the a star search (preset: 1)
+     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 300)
+     * -u <i>num</i>   specifies the heuristic to used (preset: 0)
      *      0      ff heuristic
      *      1      sum heuristic
      *      2      sum mutex heuristic
@@ -394,7 +394,7 @@ public final class HSP {
      *      6      combo heuristic
      *      7      max heuristic
      *      8      set-level heuristic
-     * -i <num>    run-time information level (preset: 1)
+     * -i <i>num</i>   run-time information level (preset: 1)
      *      0      nothing
      *      1      info on action number, search and plan
      *      2      1 + info on problem constants, types and predicates
@@ -406,7 +406,7 @@ public final class HSP {
      *      8      line representation:
      *                - problem name
      *                - number of operators
-     *               - number of facts
+     *                - number of facts
      *                - encoding time in seconds
      *                - memory used for problem representation in MBytes
      *                - number of states explored
@@ -418,7 +418,7 @@ public final class HSP {
      * -h          print this message
      *
      * </pre>
-     *
+     *</p>
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
