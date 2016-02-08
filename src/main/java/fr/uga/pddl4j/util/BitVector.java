@@ -65,8 +65,8 @@ public class BitVector extends BitSet {
      * Creates a new <code>BitVector</code> from an other state. This constructor is the copy
      * constructor.
      *
-     * @param vector the other <code>BitVector</code to copy.
-     * @throws NullPointerException if <code>vector == null</code>.
+     * @param vector the other <code>BitVector</code> to copy
+     * @throws NullPointerException if <code>vector == null</code>
      */
     public BitVector(final BitVector vector) throws NullPointerException {
         this();

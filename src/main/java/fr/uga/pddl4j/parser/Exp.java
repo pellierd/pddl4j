@@ -147,11 +147,10 @@ public class Exp implements Serializable {
     }
 
     /**
-     * Adds a son to this node.
-     *
-     * @param exp the son to add.
-     * @return <code>true</code< if the node was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified node is null.
+     * Attach a new son to this node.
+     * @param exp the son to add
+     * @return <code>true</code> if the node was added; <code>false</code> otherwise
+     * @throws NullPointerException if the specified node is null
      */
     public boolean addChild(final Exp exp) throws NullPointerException {
         if (exp == null) {
