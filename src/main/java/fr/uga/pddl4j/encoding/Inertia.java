@@ -42,20 +42,20 @@ package fr.uga.pddl4j.encoding;
  * @version 1.0 - 07.04.2010
  */
 public enum Inertia {
-	/**
-	 * The positive inertia.
-	 */
-	POSITIVE,
-	/**
-	 * The negative inertia.
-	 */
-	NEGATIVE,
-	/**
-	 * The positive and negative inertia.
-	 */
-	INERTIA,
-	/**
-	 * The inertia which are neither positive nor negative.
-	 */
-	FLUENT;
+    /**
+     * The positive inertia.
+     */
+    POSITIVE,
+    /**
+     * The negative inertia.
+     */
+    NEGATIVE,
+    /**
+     * The positive and negative inertia.
+     */
+    INERTIA,
+    /**
+     * The inertia which are neither positive nor negative.
+     */
+    FLUENT;
 }

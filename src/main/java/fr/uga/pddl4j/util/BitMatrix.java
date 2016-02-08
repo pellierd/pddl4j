@@ -53,7 +53,7 @@ public final class BitMatrix {
     /**
      * Creates a new bit matrix with a specified number of rows and columns.
      *
-     * @param rows The number of rows of the matrix.
+     * @param rows    The number of rows of the matrix.
      * @param columns The number of column of the matrix.
      */
     public BitMatrix(final int rows, final int columns) {
@@ -77,43 +77,43 @@ public final class BitMatrix {
     /**
      * Sets the bit at a specified row and column position to true.
      *
-     * @param i the row position.
-     * @param j the column position.
+     * @param row the row position.
+     * @param col the column position.
      */
-    public void set(final int i, final int j) {
-        this.bitsets[i].set(j);
+    public void set(final int row, final int col) {
+        this.bitsets[row].set(col);
     }
 
     /**
      * Sets the bit at a specified row and column position to false.
      *
-     * @param i the row position.
-     * @param j the column position.
+     * @param row the row position.
+     * @param col the column position.
      */
-    public void clear(final int i, final int j) {
-        this.bitsets[i].clear(j);
+    public void clear(final int row, final int col) {
+        this.bitsets[row].clear(col);
     }
 
     /**
      * Returns the ith row of the matrix.
      *
-     * @param i the index of the row.
+     * @param row the index of the row.
      * @return the ith row of the matrix.
      */
-    public BitSet getRow(final int i) {
-        return this.bitsets[i];
+    public BitSet getRow(final int row) {
+        return this.bitsets[row];
     }
 
     /**
      * Returns the jth column of the matrix.
      *
-     * @param j the index of the column.
+     * @param col the index of the column.
      * @return the jth column of the matrix.
      */
-    public BitSet getColumn(final int j) {
+    public BitSet getColumn(final int col) {
         final BitSet column = new BitSet(this.rows);
         for (int i = 0; i < this.rows; i++) {
-            column.set(i, this.bitsets[i].get(j));
+            column.set(i, this.bitsets[i].get(col));
         }
         return column;
     }
@@ -121,12 +121,12 @@ public final class BitMatrix {
     /**
      * Returns the value of the bit at a specific position in the matrix.
      *
-     * @param i The row of the bit.
-     * @param j The column of the bit.
+     * @param row The row of the bit.
+     * @param col The column of the bit.
      * @return the value of the bit at a specific position in the matrix.
      */
-    public boolean get(final int i, final int j) {
-        return this.bitsets[i].get(j);
+    public boolean get(final int row, final int col) {
+        return this.bitsets[row].get(col);
     }
 
     /**
@@ -166,7 +166,7 @@ public final class BitMatrix {
      *
      * @param obj the object to compared.
      * @return <code>true</code> if this matrix is equals to an other object;
-     *         <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(final Object obj) {

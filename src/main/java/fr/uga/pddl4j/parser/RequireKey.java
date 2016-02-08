@@ -26,7 +26,7 @@ package fr.uga.pddl4j.parser;
  * @version 1.0 - 28.01.2010
  */
 public enum RequireKey {
-	 /**
+    /**
      * The PDDL :strips requirement.
      */
     STRIPS(":strips"),
@@ -136,7 +136,7 @@ public enum RequireKey {
      */
     public String getImage() {
         return this.image;
-     }
+    }
 
     /**
      * Returns a string representation of this require key.

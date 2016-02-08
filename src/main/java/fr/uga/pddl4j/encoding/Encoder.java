@@ -19,28 +19,29 @@
 
 package fr.uga.pddl4j.encoding;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
+import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
-import fr.uga.pddl4j.parser.Domain;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * <p>
  * This class implements the pre-processing needed to instantiate and encode planning problem in an
  * efficient manner (see On the Instantiation of ADL Operators Involving Arbitrary First-Order
  * Formulas. Koehler, J. and Hoffmann, J.).
+ * </p>
  * <p>
  * Encoder starts by generating the code tables, which map strings to unique numbers, i.e., we
  * obtain one number for each predicate name, variable name, and constant name. Internally, all
@@ -49,6 +50,7 @@ import fr.uga.pddl4j.parser.Domain;
  * the integer code tables. Then, proceeds over the domain and problem description and collects all
  * used relation names. For each relation it checks if it satisfies one of the following
  * definitions:
+ * </p>
  * <p>
  * <i>Definition:</i> A relation is a positive inertia iff it does not occur positively in an
  * unconditional effect or the consequent of a conditional effect of an operator.
@@ -71,9 +73,11 @@ import fr.uga.pddl4j.parser.Domain;
  * considered the predicates which are never made true or false by a planning operator. These were
  * used to constrain the instantiation process. Once the set of all actions has been determined, one
  * can similarly define the ground facts that are never made true or false by one of the actions.
+ * </p>
  * <p>
  * <i>Definition:</i> A ground fact is a positive ground inertia iff it does not occur positively
  * in an unconditional effect or the consequent of a conditional effect of an action.
+ * </p>
  * <p>
  * <i>Definition:</i> A ground fact is a negative ground inertia iff it does not occur negatively
  * in an unconditional effect or the consequent of a conditional effect of an action.
@@ -111,583 +115,585 @@ import fr.uga.pddl4j.parser.Domain;
  * <li>23.01.2013: add of the case when the goal can be simplified to TRUE. The coded problem
  * returned contained in that case an empty goal expression (<code>BitExp.isEmpty()</code>). </li>
  * </ul>
+ * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 08.06.2010
  */
 public final class Encoder {
 
-	/**
-	 * The table of types.
-	 */
-	static List<String> tableOfTypes;
-
-	/**
-	 * The table of inferred domains based on unary inertia encoding.
-	 */
-	static List<Set<Integer>> tableOfInferredDomains;
-
-	/**
-	 * The domain of associated to the type.
-	 */
-	static List<Set<Integer>> tableOfDomains;
-
-	/**
-	 * The table of constants.
-	 */
-	static List<String> tableOfConstants;
-
-	/**
-	 * The table of predicates.
-	 */
-	static List<String> tableOfPredicates;
-
-	/**
-	 * The table that contains the types of the arguments of the predicates.
-	 */
-	static List<List<Integer>> tableOfTypedPredicates;
-
-	/**
-	 * The table of the functions.
-	 */
-	static List<String> tableOfFunctions;
-
-	/**
-	 * The table that contains the types of the arguments of the functions.
-	 */
-	static List<List<Integer>> tableOfTypedFunctions;
-
-	/**
-	 * The table that defines for each predicates its type of inertia.
-	 */
-	static List<Inertia> tableOfInertia;
-
-	/**
-	 * The log level of the planner.
-	 */
-	static int logLevel;
-
-	/**
-	 * The table that contains the ground inertia.
-	 */
-	static Map<IntExp, Inertia> tableOfGroundInertia;
-
-	/**
-	 * The list of predicates tables used to count the occurrence of a specified predicate in the
-	 * initial state.
-	 */
-	static List<List<IntMatrix>> predicatesTables;
-
-	/**
-	 * The table of the relevant facts.
-	 */
-	static List<IntExp> tableOfRevelantFacts;
-
-	/**
-	 * The list of instantiated operator encoded into bit sets.
-	 */
-	static List<BitOp> operators;
-
-	/**
-	 * The goal.
-	 */
-	static BitExp goal;
-
-	/**
-	 * The encoded goal.
-	 */
-	static List<BitExp> codedGoal;
-
-
-	/**
-	 * The initial state.
-	 */
-	static BitExp init;
-
-	/**
-	 * Creates a new planner.
-	 */
-	private Encoder() {
-	}
-
-	/**
-	 * Returns the log level of the planner.
-	 *
-	 * @return the log level of the planner.
-	 */
-	public static int getLogLevel() {
-		return Encoder.logLevel;
-	}
-
-	/**
-	 * Set the log level of the planner. By default:
-	 * <ul>
-	 * <li> 0 - nothing </li>
-	 * <li> 1 - 1 + info on problem constants, types and predicates</li>
-	 * <li> 2 - 1 + 2 + loaded operators, initial and goal state</li>
-	 * <li> 3 - 1 + predicates and their inertia status</li>
-	 * <li> 4 - 1 + 4 + goal state and operators with unary inertia encoded</li>
-	 * <li> 5 - 1 + actions, initial and goal state after expansion of variables</li>
-	 * <li> 6 - 1 + facts selected as relevant to the problem</li>
-	 * <li> 7 - 1 + final domain representation</li>
-	 * <li> > 100 - 1 + various debugging information</li>
-	 * </ul>
-	 *
-	 * @param level the log level of the planner.
-	 * @throws IllegalArgumentException if <code>level < 0</code>.
-	 */
-	public static void setLogLevel(final int level) throws IllegalArgumentException {
-		if (level < 0)
-			throw new IllegalArgumentException("level < 0");
-		Encoder.logLevel = level;
-	}
-
-	/**
-	 * Instantiate, simplify and encode the problem in a compact representation. (see On the
-	 * Instantiation of ADL Operators Involving Arbitrary First-Order Formulas. Koehler, J. and
-	 * Hoffmann, J.):
-	 *
-	 * @param domain the domain to encode.
-	 * @param problem the problem to encode.
-	 * @return the problem encoded.
-	 * @throws IllegalArgumentException if the problem to encode is not ADL.
-	 */
-	public static CodedProblem encode(final Domain domain, final Problem problem)
-			throws IllegalArgumentException {
-
-		// Check that the domain and the problem are ADL otherwise the encoding is not
-		// implemented for the moment.
-		Set<RequireKey> adl = new HashSet<RequireKey>();
-		adl.add(RequireKey.ADL);
-		adl.add(RequireKey.STRIPS);
-		adl.add(RequireKey.TYPING);
-		adl.add(RequireKey.EQUALITY);
-		adl.add(RequireKey.NEGATIVE_PRECONDITIONS);
-		adl.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
-		adl.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
-		adl.add(RequireKey.UNIVERSAL_PRECONDITIONS);
-		adl.add(RequireKey.QUANTIFIED_PRECONDITIONS);
-		adl.add(RequireKey.CONDITIONAL_EFFECTS);
-
-		Set<RequireKey> requirements = new LinkedHashSet<RequireKey>();
-		requirements.addAll(domain.getRequirements());
-		requirements.addAll(problem.getRequirements());
-		for (RequireKey rk : requirements) {
-			if (!adl.contains(rk)) {
-				throw new IllegalArgumentException("problem to encode not ADL");
-			}
-		}
-
-
-		// *****************************************************************************************
-		// Step 1: Standardization
-		// *****************************************************************************************
-
-		// Standardize the variables symbol contained in the domain
-		domain.standardize();
-		// Standardize the variables symbol contained in the domain
-		problem.standardize();
-
-		// *****************************************************************************************
-		// Step 2: Integer encoding
-		// *****************************************************************************************
-
-		// Encode the types declared in the domain
-		IntEncoding.encodeTypes(domain);
-		// Encode the constants declared in the domain and the objects of the problem
-		IntEncoding.encodeConstants(domain, problem);
-		// Encode the type of the form (either t1 t2...) declared in the domain and the problem
-		IntEncoding.encodeEitherTypes(domain, problem);
-		// Encode the predicates defined in the domain.
-		IntEncoding.encodePredicates(domain);
-		// Encode the functions defined in the domain.
-		IntEncoding.encodeFunctions(domain);
-		// Encode operators in integer representation
-		List<IntOp> intOps = IntEncoding.encodeOperators(domain.getOperators());
-		// Encode the initial state in integer representation
-		final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
-		// Encode the goal in integer representation
-		final IntExp intGoal = IntEncoding.encodeGoal(problem.getGoal());
-
-		// Just for logging
-		if (Encoder.logLevel == 1 || Encoder.logLevel == 2) {
-			Encoder.printTableOfConstants();
-			System.out.println();
-			Encoder.printTableOfPredicates();
-			System.out.println();
-			Encoder.printTableOfTypes();
-		}
-
-		// Just for logging
-		if (Encoder.logLevel == 2) {
-			System.out.println("\nCoded initial state:");
-			System.out.print("(and");
-			for (IntExp f : intInit) {
-				System.out.print(" ");
-				System.out.println(Encoder.toString(f));
-			}
-			System.out.println(")");
-			System.out.println("\nCoded goal state:");
-			System.out.print("(and");
-			for (IntExp g : intGoal.getChildren()) {
-				System.out.print(" ");
-				System.out.println(Encoder.toString(g));
-			}
-			System.out.println(")");
-			System.out.println("\nCoded operators:");
-			for (IntOp op : intOps) {
-				System.out.println(Encoder.toString(op));
-				System.out.println();
-			}
-		}
-
-		// *****************************************************************************************
-		// Step 3: PreInstantiation
-		// *****************************************************************************************
-
-		// Computed inertia from the encode operators
-		PreInstantiation.extractInertia(intOps);
-		// Infer the type from the unary inertia
-		PreInstantiation.inferTypesFromInertia(intInit);
-		// Simply the encoded operators with the inferred types.
-		intOps = PreInstantiation.simplifyOperatorsWithInferedTypes(intOps);
-		// Create the predicates tables used to count the occurrences of the predicates in the
-		// initial state
-		PreInstantiation.createPredicatesTables(intInit);
-
-		// Just for logging
-		if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
-			Encoder.printTableOfInertia();
-		}
-		// Just for logging
-		if (Encoder.logLevel == 4) {
-			System.out.print("\n");
-			Encoder.printTableOfConstants();
-			System.out.print("\n");
-			Encoder.printTableOfTypes();
-			System.out.print("\n");
-			System.out.println("\nPre-instantiation initial state:");
-			System.out.print("(and");
-			for (IntExp f : intInit) {
-				System.out.print(" ");
-				System.out.println(Encoder.toString(f));
-			}
-			System.out.println(")");
-			System.out.println("\nPre-instantiation goal state:");
-			System.out.print("(and");
-			for (IntExp g : intGoal.getChildren()) {
-				System.out.print(" ");
-				System.out.println(Encoder.toString(g));
-			}
-			System.out.println("\nPre-instantiation operators with infered types (" + intOps.size() +" ops):");
-			for (IntOp op : intOps) {
-				System.out.println(Encoder.toString(op));
-			}
-		}
-
-		// *****************************************************************************************
-		// Step 4: Instantiation
-		// *****************************************************************************************
-
-		// Instantiate the operators
-		intOps = Instantiation.instantiateOperators(intOps);
-		// Expand the quantified expression in the goal
-		Instantiation.expandQuantifiedExpression(intGoal);
-		// The tables of predicates are no more needed
-		Encoder.predicatesTables = null;
-
-		// Just for logging
-		if (Encoder.logLevel == 5) {
-			System.out.print("\n");
-			Encoder.printTableOfConstants();
-			System.out.print("\n");
-			Encoder.printTableOfTypes();
-			System.out.print("\n");
-			System.out.println("\nPre-instantiation initial state:");
-			System.out.print("(and");
-			for (IntExp f : intInit) {
-				System.out.print(" ");
-				System.out.println(Encoder.toString(f));
-			}
-			System.out.println(")");
-			System.out.println("\nPre-instantiation goal state:");
-			System.out.print("(and");
-			for (final IntExp g : intGoal.getChildren()) {
-				System.out.print(" ");
-				System.out.println(Encoder.toString(g));
-			}
-			System.out.println("\nPre-instantiation operators with infered types (" + intOps.size() +" ops):");
-			for (final IntOp op : intOps) {
-				System.out.println(Encoder.toString(op));
-
-			}
-		}
-
-		// *****************************************************************************************
-		// Step 5: PostInstantiation
-		// *****************************************************************************************
-
-		// Extract the ground inertia from the instantiated operators
-		PostInstantiation.extractGroundInertia(intOps);
-		// Simplify the operators with the ground inertia information previously extracted
-		PostInstantiation.simplyOperatorsWithGroundInertia(intOps, intInit);
-		// Extract the relevant facts from the simplified and instantiated operators
-		PostInstantiation.extractRelevantFacts(intOps, intInit);
-		// Simplify the goal with ground inertia information
-		PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInit);
-		// The table of ground inertia are no more needed
-		Encoder.tableOfGroundInertia = null;
-
-		// Just for logging
-		if (Encoder.logLevel == 6) {
-			Encoder.printRelevantFactsTable();
-		}
-
-		// *****************************************************************************************
-		// Step 6: Finalization and bit set encoding of the problem
-		// *****************************************************************************************
-
-
-		// Create a map of the relevant facts with their index to speedup the bit set encoding of
-		// the operators
-		final Map<IntExp, Integer> map = new LinkedHashMap<IntExp, Integer>(
-				Encoder.tableOfRevelantFacts.size());
-		int index = 0;
-		for (IntExp fact : Encoder.tableOfRevelantFacts) {
-			map.put(fact, index);
-			index++;
-		}
-
-		// Creates the list of bit operators
-		Encoder.operators = new ArrayList<BitOp>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
-		// Encode the goal in bit set representation
-		if (!intGoal.getChildren().isEmpty()) { // Case where the goal was not already simplify to TRUE
-			Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
-		} else {
-			Encoder.goal = new BitExp();
-		}
-
-		// Encode the initial state in bit set representation
-		Encoder.init = BitEncoding.encodeInit(intInit, map);
-		// Encode the operators in bit set representation
-		Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
-		// The list of instantiated operators is no more needed.
-		intOps = null;
-
-
-		// Just for logging
-		if (Encoder.logLevel == 7) {
-			System.out.println("\nfinal operators:");
-			for (BitOp op : Encoder.operators) {
-				System.out.println(Encoder.toString(op));
-			}
-
-			System.out.println("\nfinal initial state:");
-			System.out.println(Encoder.toString(Encoder.init));
-
-			System.out.println("\nfinal goal state:");
-			if (Encoder.goal != null && !Encoder.goal.isEmpty()) {
-				System.out.println(Encoder.toString(Encoder.goal));
-			} else if (Encoder.goal.isEmpty()){
-				System.out.println("goal can be simplified to TRUE");
-			} else {
-				System.out.println("goal can be simplified to FALSE");
-			}
-
-		}
-
-		final CodedProblem codedProblem = new CodedProblem();
-		codedProblem.setGoal(Encoder.goal);
-		codedProblem.setInit(Encoder.init);
-		codedProblem.setOperators(Encoder.operators);
-		codedProblem.setConstants(Encoder.tableOfConstants);
-		codedProblem.setDomains(Encoder.tableOfDomains);
-		codedProblem.setFunctions(Encoder.tableOfFunctions);
-		codedProblem.setInertia(Encoder.tableOfInertia);
-		codedProblem.setInferedDomains(Encoder.tableOfInferredDomains);
-		codedProblem.setPredicates(Encoder.tableOfPredicates);
-		codedProblem.setRevelantFacts(Encoder.tableOfRevelantFacts);
-		codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
-		codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
-		codedProblem.setTypes(Encoder.tableOfTypes);
-		return codedProblem;
-
-	}
-
-	// *********************************************************************************************
-	// Methods for printing the different structures used during encoding
-	// *********************************************************************************************
-
-	/**
-	 * Print the table of types.
-	 */
-	static void printTableOfTypes() {
-		System.out.println("Types table:");
-		for (int i = 0; i < Encoder.tableOfTypes.size(); i++) {
-			System.out.print(i + ": " + Encoder.tableOfTypes.get(i) + ":");
-			Set<Integer> domain = Encoder.tableOfDomains.get(i);
-			for (Integer constant : domain) {
-				System.out.print(" " + constant);
-			}
-			System.out.println();
-		}
-	}
-
-	/**
-	 * Print the table of constants.
-	 */
-	static void printTableOfConstants() {
-		System.out.println("Constants table:");
-		for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
-			System.out.println(i + ": " + Encoder.tableOfConstants.get(i));
-		}
-	}
-
-	/**
-	 * Print the table of predicates.
-	 */
-	static void printTableOfPredicates() {
-		System.out.println("Predicates table:");
-		for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
-			String predicate = Encoder.tableOfPredicates.get(i);
-			System.out.print(i + ": " + predicate + " :");
-			for (int j = 0; j < Encoder.tableOfTypedPredicates.get(i).size(); j++) {
-				System.out.print(" "
-						+ Encoder.tableOfTypes.get(Encoder.tableOfTypedPredicates
-								.get(i).get(j)));
-			}
-			System.out.println();
-		}
-	}
-
-	/**
-	 * Print the table of functions.
-	 */
-	static void printTableOfFunctions() {
-		System.out.println("Functions table:");
-		for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
-			String predicate = Encoder.tableOfFunctions.get(i);
-			System.out.print(i + ": " + predicate + ":");
-			for (int j = 0; j < Encoder.tableOfTypedFunctions.get(i).size(); j++) {
-				System.out.print(" "
-						+ Encoder.tableOfTypes.get(Encoder.tableOfTypedFunctions.get(i)
-								.get(j)));
-			}
-			System.out.println();
-		}
-	}
-
-	/**
-	 * Print the table of inertia.
-	 */
-	static void printTableOfInertia() {
-		System.out.println("Inertias table:");
-		for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
-			String predicate = Encoder.tableOfPredicates.get(i);
-			System.out.println(i + ": " + predicate + " : " + Encoder.tableOfInertia.get(i));
-		}
-	}
-
-	/**
-	 * Print the relevant facts table.
-	 */
-	static void printRelevantFactsTable() {
-		System.out.println("selected the following facts as relevant:");
-		for (int i = 0; i < Encoder.tableOfRevelantFacts.size(); i++) {
-			System.out.println(i + ": "
-					+ Encoder.toString(Encoder.tableOfRevelantFacts.get(i)));
-		}
-	}
-
-	/**
-	 * Print the goal.
-	 */
-	static void printGoal() {
-		System.out.println("Goal state is:");
-		for (BitExp exp : Encoder.codedGoal) {
-			System.out.println(Encoder.toString(exp));
-		}
-	}
-
-	/**
-	 * Returns a string representation of the specified operator.
-	 *
-	 * @param op the operator to print.
-	 * @return a string representation of the specified operator.
-	 */
-	static String toString(final IntOp op) {
-		return StringEncoder.toString(op, Encoder.tableOfConstants,
-				Encoder.tableOfTypes, Encoder.tableOfPredicates,
-				Encoder.tableOfFunctions);
-	}
-
-	/**
-	 * Returns a short string representation of the specified operator, i.e., only its name and the
-	 * value of its parameters.
-	 *
-	 * @param op the operator.
-	 * @return a string representation of the specified operator.
-	 */
-	static final String toShortString(final IntOp op) {
-		return StringEncoder.toShortString(op, Encoder.tableOfConstants);
-	}
-
-	/**
-	 * Returns a string representation of the specified operator.
-	 *
-	 * @param op the operator to print.
-	 * @return a string representation of the specified operator.
-	 */
-	static String toString(final BitOp op) {
-		return StringEncoder.toString(op, Encoder.tableOfConstants,
-				Encoder.tableOfTypes, Encoder.tableOfPredicates,
-				Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
-	}
-
-	/**
-	 * Returns a string representation of an expression.
-	 *
-	 * @param exp the expression.
-	 * @return a string representation of the specified expression.
-	 */
-	static String toString(final IntExp exp) {
-		return StringEncoder.toString(exp, Encoder.tableOfConstants,
-				Encoder.tableOfTypes, Encoder.tableOfPredicates,
-				Encoder.tableOfFunctions);
-	}
-
-	/**
-	 * Returns a string representation of a bit expression.
-	 *
-	 * @param exp the expression.
-	 * @return a string representation of the specified expression.
-	 */
-	static String toString(BitExp exp) {
-		return StringEncoder.toString(exp, Encoder.tableOfConstants,
-				Encoder.tableOfTypes, Encoder.tableOfPredicates,
-				Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
-	}
-
-	/**
-	 * Returns a string representation of a conditional bit expression.
-	 *
-	 * @param exp the conditional expression.
-	 * @return a string representation of the specified expression.
-	 */
-	static String toString(CondBitExp exp) {
-			return StringEncoder.toString(exp, Encoder.tableOfConstants,
-					Encoder.tableOfTypes, Encoder.tableOfPredicates,
-					Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
-	}
-
-	/**
-	 * Print the table of inertia.
-	 */
-	static void printTableOfGroundInertia() {
-		System.out.println("Ground inertia table:");
-		for (Entry<IntExp, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
-			System.out.println(Encoder.toString(e.getKey()) + ": " + e.getValue());
-		}
-	}
+    /**
+     * The table of types.
+     */
+    static List<String> tableOfTypes;
+
+    /**
+     * The table of inferred domains based on unary inertia encoding.
+     */
+    static List<Set<Integer>> tableOfInferredDomains;
+
+    /**
+     * The domain of associated to the type.
+     */
+    static List<Set<Integer>> tableOfDomains;
+
+    /**
+     * The table of constants.
+     */
+    static List<String> tableOfConstants;
+
+    /**
+     * The table of predicates.
+     */
+    static List<String> tableOfPredicates;
+
+    /**
+     * The table that contains the types of the arguments of the predicates.
+     */
+    static List<List<Integer>> tableOfTypedPredicates;
+
+    /**
+     * The table of the functions.
+     */
+    static List<String> tableOfFunctions;
+
+    /**
+     * The table that contains the types of the arguments of the functions.
+     */
+    static List<List<Integer>> tableOfTypedFunctions;
+
+    /**
+     * The table that defines for each predicates its type of inertia.
+     */
+    static List<Inertia> tableOfInertia;
+
+    /**
+     * The log level of the planner.
+     */
+    static int logLevel;
+
+    /**
+     * The table that contains the ground inertia.
+     */
+    static Map<IntExp, Inertia> tableOfGroundInertia;
+
+    /**
+     * The list of predicates tables used to count the occurrence of a specified predicate in the
+     * initial state.
+     */
+    static List<List<IntMatrix>> predicatesTables;
+
+    /**
+     * The table of the relevant facts.
+     */
+    static List<IntExp> tableOfRevelantFacts;
+
+    /**
+     * The list of instantiated operator encoded into bit sets.
+     */
+    static List<BitOp> operators;
+
+    /**
+     * The goal.
+     */
+    static BitExp goal;
+
+    /**
+     * The encoded goal.
+     */
+    static List<BitExp> codedGoal;
+
+
+    /**
+     * The initial state.
+     */
+    static BitExp init;
+
+    /**
+     * Creates a new planner.
+     */
+    private Encoder() {
+    }
+
+    /**
+     * Returns the log level of the planner.
+     *
+     * @return the log level of the planner.
+     */
+    public static int getLogLevel() {
+        return Encoder.logLevel;
+    }
+
+    /**
+     * Set the log level of the planner. By default:
+     * <ul>
+     * <li> 0 - nothing </li>
+     * <li> 1 - 1 + info on problem constants, types and predicates</li>
+     * <li> 2 - 1 + 2 + loaded operators, initial and goal state</li>
+     * <li> 3 - 1 + predicates and their inertia status</li>
+     * <li> 4 - 1 + 4 + goal state and operators with unary inertia encoded</li>
+     * <li> 5 - 1 + actions, initial and goal state after expansion of variables</li>
+     * <li> 6 - 1 + facts selected as relevant to the problem</li>
+     * <li> 7 - 1 + final domain representation</li>
+     * <li> > 100 - 1 + various debugging information</li>
+     * </ul>
+     *
+     * @param level the log level of the planner.
+     * @throws IllegalArgumentException if <code>level < 0</code>.
+     */
+    public static void setLogLevel(final int level) throws IllegalArgumentException {
+        if (level < 0) {
+            throw new IllegalArgumentException("level < 0");
+        }
+        Encoder.logLevel = level;
+    }
+
+    /**
+     * Instantiate, simplify and encode the problem in a compact representation. (see On the
+     * Instantiation of ADL Operators Involving Arbitrary First-Order Formulas. Koehler, J. and
+     * Hoffmann, J.):
+     *
+     * @param domain  the domain to encode.
+     * @param problem the problem to encode.
+     * @return the problem encoded.
+     * @throws IllegalArgumentException if the problem to encode is not ADL.
+     */
+    public static CodedProblem encode(final Domain domain, final Problem problem)
+        throws IllegalArgumentException {
+
+        // Check that the domain and the problem are ADL otherwise the encoding is not
+        // implemented for the moment.
+        Set<RequireKey> adl = new HashSet<RequireKey>();
+        adl.add(RequireKey.ADL);
+        adl.add(RequireKey.STRIPS);
+        adl.add(RequireKey.TYPING);
+        adl.add(RequireKey.EQUALITY);
+        adl.add(RequireKey.NEGATIVE_PRECONDITIONS);
+        adl.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+        adl.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+        adl.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+        adl.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+        adl.add(RequireKey.CONDITIONAL_EFFECTS);
+
+        Set<RequireKey> requirements = new LinkedHashSet<RequireKey>();
+        requirements.addAll(domain.getRequirements());
+        requirements.addAll(problem.getRequirements());
+        for (RequireKey rk : requirements) {
+            if (!adl.contains(rk)) {
+                throw new IllegalArgumentException("problem to encode not ADL");
+            }
+        }
+
+
+        // *****************************************************************************************
+        // Step 1: Standardization
+        // *****************************************************************************************
+
+        // Standardize the variables symbol contained in the domain
+        domain.standardize();
+        // Standardize the variables symbol contained in the domain
+        problem.standardize();
+
+        // *****************************************************************************************
+        // Step 2: Integer encoding
+        // *****************************************************************************************
+
+        // Encode the types declared in the domain
+        IntEncoding.encodeTypes(domain);
+        // Encode the constants declared in the domain and the objects of the problem
+        IntEncoding.encodeConstants(domain, problem);
+        // Encode the type of the form (either t1 t2...) declared in the domain and the problem
+        IntEncoding.encodeEitherTypes(domain, problem);
+        // Encode the predicates defined in the domain.
+        IntEncoding.encodePredicates(domain);
+        // Encode the functions defined in the domain.
+        IntEncoding.encodeFunctions(domain);
+        // Encode operators in integer representation
+        List<IntOp> intOps = IntEncoding.encodeOperators(domain.getOperators());
+        // Encode the initial state in integer representation
+        final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
+        // Encode the goal in integer representation
+        final IntExp intGoal = IntEncoding.encodeGoal(problem.getGoal());
+
+        // Just for logging
+        if (Encoder.logLevel == 1 || Encoder.logLevel == 2) {
+            Encoder.printTableOfConstants();
+            System.out.println();
+            Encoder.printTableOfPredicates();
+            System.out.println();
+            Encoder.printTableOfTypes();
+        }
+
+        // Just for logging
+        if (Encoder.logLevel == 2) {
+            System.out.println("\nCoded initial state:");
+            System.out.print("(and");
+            for (IntExp f : intInit) {
+                System.out.print(" ");
+                System.out.println(Encoder.toString(f));
+            }
+            System.out.println(")");
+            System.out.println("\nCoded goal state:");
+            System.out.print("(and");
+            for (IntExp g : intGoal.getChildren()) {
+                System.out.print(" ");
+                System.out.println(Encoder.toString(g));
+            }
+            System.out.println(")");
+            System.out.println("\nCoded operators:");
+            for (IntOp op : intOps) {
+                System.out.println(Encoder.toString(op));
+                System.out.println();
+            }
+        }
+
+        // *****************************************************************************************
+        // Step 3: PreInstantiation
+        // *****************************************************************************************
+
+        // Computed inertia from the encode operators
+        PreInstantiation.extractInertia(intOps);
+        // Infer the type from the unary inertia
+        PreInstantiation.inferTypesFromInertia(intInit);
+        // Simply the encoded operators with the inferred types.
+        intOps = PreInstantiation.simplifyOperatorsWithInferedTypes(intOps);
+        // Create the predicates tables used to count the occurrences of the predicates in the
+        // initial state
+        PreInstantiation.createPredicatesTables(intInit);
+
+        // Just for logging
+        if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
+            Encoder.printTableOfInertia();
+        }
+        // Just for logging
+        if (Encoder.logLevel == 4) {
+            System.out.print("\n");
+            Encoder.printTableOfConstants();
+            System.out.print("\n");
+            Encoder.printTableOfTypes();
+            System.out.print("\n");
+            System.out.println("\nPre-instantiation initial state:");
+            System.out.print("(and");
+            for (IntExp f : intInit) {
+                System.out.print(" ");
+                System.out.println(Encoder.toString(f));
+            }
+            System.out.println(")");
+            System.out.println("\nPre-instantiation goal state:");
+            System.out.print("(and");
+            for (IntExp g : intGoal.getChildren()) {
+                System.out.print(" ");
+                System.out.println(Encoder.toString(g));
+            }
+            System.out.println("\nPre-instantiation operators with infered types (" + intOps.size() + " ops):");
+            for (IntOp op : intOps) {
+                System.out.println(Encoder.toString(op));
+            }
+        }
+
+        // *****************************************************************************************
+        // Step 4: Instantiation
+        // *****************************************************************************************
+
+        // Instantiate the operators
+        intOps = Instantiation.instantiateOperators(intOps);
+        // Expand the quantified expression in the goal
+        Instantiation.expandQuantifiedExpression(intGoal);
+        // The tables of predicates are no more needed
+        Encoder.predicatesTables = null;
+
+        // Just for logging
+        if (Encoder.logLevel == 5) {
+            System.out.print("\n");
+            Encoder.printTableOfConstants();
+            System.out.print("\n");
+            Encoder.printTableOfTypes();
+            System.out.print("\n");
+            System.out.println("\nPre-instantiation initial state:");
+            System.out.print("(and");
+            for (IntExp f : intInit) {
+                System.out.print(" ");
+                System.out.println(Encoder.toString(f));
+            }
+            System.out.println(")");
+            System.out.println("\nPre-instantiation goal state:");
+            System.out.print("(and");
+            for (final IntExp g : intGoal.getChildren()) {
+                System.out.print(" ");
+                System.out.println(Encoder.toString(g));
+            }
+            System.out.println("\nPre-instantiation operators with infered types (" + intOps.size() + " ops):");
+            for (final IntOp op : intOps) {
+                System.out.println(Encoder.toString(op));
+
+            }
+        }
+
+        // *****************************************************************************************
+        // Step 5: PostInstantiation
+        // *****************************************************************************************
+
+        // Extract the ground inertia from the instantiated operators
+        PostInstantiation.extractGroundInertia(intOps);
+        // Simplify the operators with the ground inertia information previously extracted
+        PostInstantiation.simplyOperatorsWithGroundInertia(intOps, intInit);
+        // Extract the relevant facts from the simplified and instantiated operators
+        PostInstantiation.extractRelevantFacts(intOps, intInit);
+        // Simplify the goal with ground inertia information
+        PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInit);
+        // The table of ground inertia are no more needed
+        Encoder.tableOfGroundInertia = null;
+
+        // Just for logging
+        if (Encoder.logLevel == 6) {
+            Encoder.printRelevantFactsTable();
+        }
+
+        // *****************************************************************************************
+        // Step 6: Finalization and bit set encoding of the problem
+        // *****************************************************************************************
+
+
+        // Create a map of the relevant facts with their index to speedup the bit set encoding of
+        // the operators
+        final Map<IntExp, Integer> map = new LinkedHashMap<IntExp, Integer>(
+            Encoder.tableOfRevelantFacts.size());
+        int index = 0;
+        for (IntExp fact : Encoder.tableOfRevelantFacts) {
+            map.put(fact, index);
+            index++;
+        }
+
+        // Creates the list of bit operators
+        Encoder.operators = new ArrayList<BitOp>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
+        // Encode the goal in bit set representation
+        if (!intGoal.getChildren().isEmpty()) { // Case where the goal was not already simplify to TRUE
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
+        } else {
+            Encoder.goal = new BitExp();
+        }
+
+        // Encode the initial state in bit set representation
+        Encoder.init = BitEncoding.encodeInit(intInit, map);
+        // Encode the operators in bit set representation
+        Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
+        // The list of instantiated operators is no more needed.
+        intOps = null;
+
+
+        // Just for logging
+        if (Encoder.logLevel == 7) {
+            System.out.println("\nfinal operators:");
+            for (BitOp op : Encoder.operators) {
+                System.out.println(Encoder.toString(op));
+            }
+
+            System.out.println("\nfinal initial state:");
+            System.out.println(Encoder.toString(Encoder.init));
+
+            System.out.println("\nfinal goal state:");
+            if (Encoder.goal != null && !Encoder.goal.isEmpty()) {
+                System.out.println(Encoder.toString(Encoder.goal));
+            } else if (Encoder.goal.isEmpty()) {
+                System.out.println("goal can be simplified to TRUE");
+            } else {
+                System.out.println("goal can be simplified to FALSE");
+            }
+
+        }
+
+        final CodedProblem codedProblem = new CodedProblem();
+        codedProblem.setGoal(Encoder.goal);
+        codedProblem.setInit(Encoder.init);
+        codedProblem.setOperators(Encoder.operators);
+        codedProblem.setConstants(Encoder.tableOfConstants);
+        codedProblem.setDomains(Encoder.tableOfDomains);
+        codedProblem.setFunctions(Encoder.tableOfFunctions);
+        codedProblem.setInertia(Encoder.tableOfInertia);
+        codedProblem.setInferedDomains(Encoder.tableOfInferredDomains);
+        codedProblem.setPredicates(Encoder.tableOfPredicates);
+        codedProblem.setRevelantFacts(Encoder.tableOfRevelantFacts);
+        codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
+        codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
+        codedProblem.setTypes(Encoder.tableOfTypes);
+        return codedProblem;
+
+    }
+
+    // *********************************************************************************************
+    // Methods for printing the different structures used during encoding
+    // *********************************************************************************************
+
+    /**
+     * Print the table of types.
+     */
+    static void printTableOfTypes() {
+        System.out.println("Types table:");
+        for (int i = 0; i < Encoder.tableOfTypes.size(); i++) {
+            System.out.print(i + ": " + Encoder.tableOfTypes.get(i) + ":");
+            Set<Integer> domain = Encoder.tableOfDomains.get(i);
+            for (Integer constant : domain) {
+                System.out.print(" " + constant);
+            }
+            System.out.println();
+        }
+    }
+
+    /**
+     * Print the table of constants.
+     */
+    static void printTableOfConstants() {
+        System.out.println("Constants table:");
+        for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
+            System.out.println(i + ": " + Encoder.tableOfConstants.get(i));
+        }
+    }
+
+    /**
+     * Print the table of predicates.
+     */
+    static void printTableOfPredicates() {
+        System.out.println("Predicates table:");
+        for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
+            String predicate = Encoder.tableOfPredicates.get(i);
+            System.out.print(i + ": " + predicate + " :");
+            for (int j = 0; j < Encoder.tableOfTypedPredicates.get(i).size(); j++) {
+                System.out.print(" "
+                    + Encoder.tableOfTypes.get(Encoder.tableOfTypedPredicates
+                    .get(i).get(j)));
+            }
+            System.out.println();
+        }
+    }
+
+    /**
+     * Print the table of functions.
+     */
+    static void printTableOfFunctions() {
+        System.out.println("Functions table:");
+        for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
+            String predicate = Encoder.tableOfFunctions.get(i);
+            System.out.print(i + ": " + predicate + ":");
+            for (int j = 0; j < Encoder.tableOfTypedFunctions.get(i).size(); j++) {
+                System.out.print(" "
+                    + Encoder.tableOfTypes.get(Encoder.tableOfTypedFunctions.get(i)
+                    .get(j)));
+            }
+            System.out.println();
+        }
+    }
+
+    /**
+     * Print the table of inertia.
+     */
+    static void printTableOfInertia() {
+        System.out.println("Inertias table:");
+        for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
+            String predicate = Encoder.tableOfPredicates.get(i);
+            System.out.println(i + ": " + predicate + " : " + Encoder.tableOfInertia.get(i));
+        }
+    }
+
+    /**
+     * Print the relevant facts table.
+     */
+    static void printRelevantFactsTable() {
+        System.out.println("selected the following facts as relevant:");
+        for (int i = 0; i < Encoder.tableOfRevelantFacts.size(); i++) {
+            System.out.println(i + ": "
+                + Encoder.toString(Encoder.tableOfRevelantFacts.get(i)));
+        }
+    }
+
+    /**
+     * Print the goal.
+     */
+    static void printGoal() {
+        System.out.println("Goal state is:");
+        for (BitExp exp : Encoder.codedGoal) {
+            System.out.println(Encoder.toString(exp));
+        }
+    }
+
+    /**
+     * Returns a short string representation of the specified operator, i.e., only its name and the
+     * value of its parameters.
+     *
+     * @param op the operator.
+     * @return a string representation of the specified operator.
+     */
+    static final String toShortString(final IntOp op) {
+        return StringEncoder.toShortString(op, Encoder.tableOfConstants);
+    }
+
+    /**
+     * Returns a string representation of the specified operator.
+     *
+     * @param op the operator to print.
+     * @return a string representation of the specified operator.
+     */
+    static String toString(final IntOp op) {
+        return StringEncoder.toString(op, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions);
+    }
+
+    /**
+     * Returns a string representation of the specified operator.
+     *
+     * @param op the operator to print.
+     * @return a string representation of the specified operator.
+     */
+    static String toString(final BitOp op) {
+        return StringEncoder.toString(op, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
+    }
+
+    /**
+     * Returns a string representation of an expression.
+     *
+     * @param exp the expression.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(final IntExp exp) {
+        return StringEncoder.toString(exp, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions);
+    }
+
+    /**
+     * Returns a string representation of a bit expression.
+     *
+     * @param exp the expression.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(BitExp exp) {
+        return StringEncoder.toString(exp, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
+    }
+
+    /**
+     * Returns a string representation of a conditional bit expression.
+     *
+     * @param exp the conditional expression.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(CondBitExp exp) {
+        return StringEncoder.toString(exp, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
+    }
+
+    /**
+     * Print the table of inertia.
+     */
+    static void printTableOfGroundInertia() {
+        System.out.println("Ground inertia table:");
+        for (Entry<IntExp, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
+            System.out.println(Encoder.toString(e.getKey()) + ": " + e.getValue());
+        }
+    }
 
 }

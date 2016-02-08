@@ -27,30 +27,30 @@ package fr.uga.pddl4j.encoding;
  */
 interface Constants {
 
-	/**
-	 * The default logging level.
-	 */
-	static final int DEFAULT_LOGGING_LEVEL = 1;
+    /**
+     * The default logging level.
+     */
+    static final int DEFAULT_LOGGING_LEVEL = 1;
 
-	/**
-	 * The default size of the table of relevant facts.
-	 */
-	static final int DEFAULT_RELEVANT_FACTS_TABLE = 1000;
+    /**
+     * The default size of the table of relevant facts.
+     */
+    static final int DEFAULT_RELEVANT_FACTS_TABLE = 1000;
 
-	/**
-	 * The name of the dummy predicate used to replace the goal when the goal is a disjunction.
-	 */
-	static final String DUMMY_GOAL = "dummy_goal";
+    /**
+     * The name of the dummy predicate used to replace the goal when the goal is a disjunction.
+     */
+    static final String DUMMY_GOAL = "dummy_goal";
 
-	/**
-	 * The name of the dummy operator that produce the dummy goal.
-	 */
-	static final String DUMMY_OPERATOR = "dummy_operator";
+    /**
+     * The name of the dummy operator that produce the dummy goal.
+     */
+    static final String DUMMY_OPERATOR = "dummy_operator";
 
-	/**
-	 * The default size of the operators table.
-	 */
-	static final int DEFAULT_OPERATORS_TABLE_SIZE = 1000;
+    /**
+     * The default size of the operators table.
+     */
+    static final int DEFAULT_OPERATORS_TABLE_SIZE = 1000;
 
 
 }

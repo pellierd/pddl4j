@@ -27,7 +27,6 @@ import fr.uga.pddl4j.util.BitState;
  * This class implements the SUM_ID mutex heuristic is an adaptation of the sum heuristic where mutual
  * exclusion are computed. For more details on the sum heuristic see Blai Bonet and Hector Geffner,
  * Planning as Heuristic Search, Artificial Intelligence 129, 2001, Elsevier.
- * <p>
  * <b>Warning:</b> The sum heuristic is not admissible.
  *
  * @author D. Pellier
@@ -37,33 +36,33 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class SumMutex extends GraphHeuristic {
 
-	/**
-	 * Creates a new <code>SUM_MUTEX</code> heuristic for a specified planning problem.
-	 *
-	 * @param problem the planning problem.
-	 * @throws NullPointerException if <code>problem == null</code>.
-	 */
-	public SumMutex(CodedProblem problem) {
-		super(problem);
-		super.setAdmissible(false);
-	}
+    /**
+     * Creates a new <code>SUM_MUTEX</code> heuristic for a specified planning problem.
+     *
+     * @param problem the planning problem.
+     * @throws NullPointerException if <code>problem == null</code>.
+     */
+    public SumMutex(CodedProblem problem) {
+        super(problem);
+        super.setAdmissible(false);
+    }
 
-	/**
-	 * Return the distance to the goal state from the specified state. If the return value is
-	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state. More precisely, this method returns the level of the planning graph where all the
-	 * propositions of the goal are reached without any mutex or <code>Integer.MAX_VALUE</code>
-	 * otherwise.
-	 *
-	 * @param state the state from which the distance to the goal must be estimated.
-	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state or
-	 *         <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
-	 * @throws NullPointerException if <code>state == null</code>.
-	 */
-	public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
-		super.setGoal(goal);
-		super.expandPlanningGraph(state);
-		return super.isGoalReachable() ? this.getSumValue() : Integer.MAX_VALUE;
-	}
+    /**
+     * Return the distance to the goal state from the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state. More precisely, this method returns the level of the planning graph where all the
+     * propositions of the goal are reached without any mutex or <code>Integer.MAX_VALUE</code>
+     * otherwise.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the distance to the goal state from the specified state or
+     * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
+     * @throws NullPointerException if <code>state == null</code>.
+     */
+    public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
+        super.setGoal(goal);
+        super.expandPlanningGraph(state);
+        return super.isGoalReachable() ? this.getSumValue() : Integer.MAX_VALUE;
+    }
 }

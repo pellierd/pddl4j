@@ -27,67 +27,70 @@ package fr.uga.pddl4j.util;
  */
 public class BitState extends BitVector {
 
-	/**
-	 * Creates a new state.
-	 */
-	public BitState() {
-		super();
-	}
+    /**
+     * Creates a new state.
+     */
+    public BitState() {
+        super();
+    }
 
-	/**
-	 * Creates a new state from a specified <code>BitExp</code>.
-	 *
-	 * @param exp the <code>BitExp</code> that represents the logical state.
-	 * @throws NullPointerException if <code>exp == null</code>.
-	 */
-	public BitState(final BitExp exp) throws NullPointerException {
-		this();
-		if (exp == null)
-			throw new NullPointerException("exp == null");
-		this.or(exp.getPositive());
-		this.andNot(exp.getNegative());
-	}
+    /**
+     * Creates a new state from a specified <code>BitExp</code>.
+     *
+     * @param exp the <code>BitExp</code> that represents the logical state.
+     * @throws NullPointerException if <code>exp == null</code>.
+     */
+    public BitState(final BitExp exp) throws NullPointerException {
+        this();
+        if (exp == null) {
+            throw new NullPointerException("exp == null");
+        }
+        this.or(exp.getPositive());
+        this.andNot(exp.getNegative());
+    }
 
-	/**
-	 * Creates a new state from an other state. This constructor is the copy constructor.
-	 *
-	 * @param state the other state to copy.
-	 * @throws NullPointerException if <code>state == null</code>.
-	 */
-	public BitState(final BitState state) throws NullPointerException {
-		this();
-		if (state == null)
-			throw new NullPointerException("state == null");
-		this.or(state);
-	}
+    /**
+     * Creates a new state from an other state. This constructor is the copy constructor.
+     *
+     * @param state the other state to copy.
+     * @throws NullPointerException if <code>state == null</code>.
+     */
+    public BitState(final BitState state) throws NullPointerException {
+        this();
+        if (state == null) {
+            throw new NullPointerException("state == null");
+        }
+        this.or(state);
+    }
 
-	/**
-	 * Applies a specified <code>BitExp</code> to this state. In other word, the positive facts of
-	 * the specified expression are added to this state and the negative ones are delete.
-	 *
-	 * @param exp the expression to apply.
-	 * @throws NullPointerException if <code>exp == null</code>.
-	 */
-	public final void apply(final BitExp exp) throws NullPointerException {
-		if (exp == null)
-			throw new NullPointerException("exp == null");
-		this.or(exp.getPositive());
-		this.andNot(exp.getNegative());
-	}
+    /**
+     * Applies a specified <code>BitExp</code> to this state. In other word, the positive facts of
+     * the specified expression are added to this state and the negative ones are delete.
+     *
+     * @param exp the expression to apply.
+     * @throws NullPointerException if <code>exp == null</code>.
+     */
+    public final void apply(final BitExp exp) throws NullPointerException {
+        if (exp == null) {
+            throw new NullPointerException("exp == null");
+        }
+        this.or(exp.getPositive());
+        this.andNot(exp.getNegative());
+    }
 
-	/**
-	 * Returns <code>true</code> if this state satisfy a specified expression.
-	 *
-	 * @param exp the expression to be tested.
-	 * @return <code>true</code> if this state satisfy a specified expression; <code>false</code>
-	 *         otherwise.
-	 * @throws NullPointerException if <code>exp == null</code>.
-	 */
-	public final boolean satisfy(final BitExp exp) throws NullPointerException {
-		if (exp == null)
-			throw new NullPointerException("exp == null");
-		return this.include(exp.getPositive()) && this.exclude(exp.getNegative());
+    /**
+     * Returns <code>true</code> if this state satisfy a specified expression.
+     *
+     * @param exp the expression to be tested.
+     * @return <code>true</code> if this state satisfy a specified expression; <code>false</code> otherwise.
+     * @throws NullPointerException if <code>exp == null</code>.
+     */
+    public final boolean satisfy(final BitExp exp) throws NullPointerException {
+        if (exp == null) {
+            throw new NullPointerException("exp == null");
+        }
+        return this.include(exp.getPositive()) && this.exclude(exp.getNegative());
 
-	}
+    }
 
 }

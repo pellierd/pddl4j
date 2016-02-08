@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
+
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
@@ -36,11 +37,11 @@ import fr.uga.pddl4j.util.BitState;
  * <code>lev(p1) <= lev(p2) <= ... <= lev(pn)</code> where <code>lev(p)</code> is the level
  * where the proposition <code>p</code> appears for the first time the planning graph. Under the
  * assumption that all propositions are independent, we have
- *
+ * </p>
  * <pre>
  * code(S) := cost(S - p1) + cost(p1)
  * </pre>
- *
+ * <p>
  * Since <code>lev(p1) <= lev(S - p1)</code>, proposition is possibly achieved before the set
  * <code>S - p1</code>. Now, we assume that there are no positive interactions among the
  * propositions, but there may be negative interactions. Therefore, upon achieving
@@ -52,17 +53,17 @@ import fr.uga.pddl4j.util.BitState;
  * <code>S - p1 </code> and achieving <code>p1</code> (because the planning graph has to expand
  * up to <code>lev(S)</code> to achieve both <code>S - p1</code> and <code>p1</code>). To
  * take this negative interaction into account, we assign:
- *
+ * </p>
  * <pre>
  * cost(S) := cost(S - p1) + cost(p1) + (lev(S) - lev(S - p1))
  * </pre>
- *
+ * </p>
  * Applying this formula to <code>S - p1, S - p1 - p2</code> and so one, we derive:
- *
+ * <p>
  * <pre>
  * cost(S) := sum(cost(pi) + lev(S) - lev(pn) for all pi in S.
  * </pre>
- *
+ * </p>
  * Note that <code>lev(pn) = max(lev(pi))</code> for all <code>pi</code> in <code>S</code> as
  * per our setup. Thus the estimate above is composed of the sum heuristic function
  * <code>hsum = sum(cost(pi))</code> for all <code>pi</code> in <code>S</code> and an
@@ -75,52 +76,50 @@ import fr.uga.pddl4j.util.BitState;
  * <pre>
  * delta(S) := lev(S) - max(lev(p)) for all p in S.
  * </pre>
- *
+ * </p>
  * It should be noted that the notion of binary interaction degree is only a special case of the
  * above definition for a set of two propositions. In addition, when there is no negative
  * interaction among subgoals, <code>delta(S) = 0</code>, as expected. We have the following
  * heuristic:
- *
+ * <p>
  * <pre>
  * hadjsum(S) := sum(cost(pi)) + delta(S) or all pi in S.
  * </pre>
- *
+ * </p>
  * <b>Warning:</b> The adjusted sum heuristic is not admissible.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
- *
  * @see Sum
  * @see Max
  */
 public final class AdjustedSum extends RelaxedGraphHeuristic {
 
-	/**
-	 * Creates a new <code>AdjustedSum</code> heuristic for a specified planning problem.
-	 *
-	 * @param problem the planning problem.
-	 * @throws NullPointerException if <code>problem == null</code>.
-	 */
-	public AdjustedSum(CodedProblem problem) {
-		super(problem);
-		super.setAdmissible(false);
-	}
+    /**
+     * Creates a new <code>AdjustedSum</code> heuristic for a specified planning problem.
+     *
+     * @param problem the planning problem.
+     * @throws NullPointerException if <code>problem == null</code>.
+     */
+    public AdjustedSum(CodedProblem problem) {
+        super(problem);
+        super.setAdmissible(false);
+    }
 
-	/**
-	 * Return the estimated distance to the goal to reach the specified state. If the return value is
-	 * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-	 * state.
-	 *
-	 * @param state the state from which the distance to the goal must be estimated.
-	 * @param goal the goal expression.
-	 * @return the distance to the goal state from the specified state.
-	 * @throws NullPointerException if <code>state == null && goal == null</code>.
-	 */
-	public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
-		super.setGoal(goal);
-		final int level = super.expandRelaxedPlanningGraph(state);
-		return super.isGoalReachable() ?
-				super.getSumValue() + (level - super.getMaxValue()) : Integer.MAX_VALUE;
-	}
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     */
+    public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
+        super.setGoal(goal);
+        final int level = super.expandRelaxedPlanningGraph(state);
+        return super.isGoalReachable() ? super.getSumValue() + (level - super.getMaxValue()) : Integer.MAX_VALUE;
+    }
 
 }
