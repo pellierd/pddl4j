@@ -7,6 +7,9 @@ buildscript {
 plugins {
     id "ca.coglinc.javacc" version "2.3.1"
 }
+plugins {
+    id "org.sonarqube" version "1.2"
+}
 apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
