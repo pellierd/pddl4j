@@ -16,7 +16,7 @@ apply plugin: 'checkstyle'
 
 
 group 'fr.uga'
-version '3.0.0-SNAPSHOT'
+version '3.0.0'
 sourceCompatibility = 1.8
 
 repositories {
@@ -76,12 +76,14 @@ findbugsMain.doLast() {
 }
 
 findbugsMain.onlyIf() { project.hasProperty('findbug') }
+findbugsTest.onlyIf() { project.hasProperty('findbug') }
 
 javadoc.doFirst() {
-    exclude "**/lexer/**"
+    excludeLexer(javadoc)
     failOnError false
-
 }
+
+checkstyleMain.onlyIf() { !project.hasProperty('noCheckStyle') }
 
 checkstyleMain.doFirst() {
     excludeLexer(checkstyleMain)
@@ -90,6 +92,8 @@ checkstyleMain.doFirst() {
 checkstyleMain.doLast() {
     printCheckstyleVersion()
 }
+
+checkstyleTest.onlyIf() { !project.hasProperty('noCheckStyle') }
 
 checkstyleTest.doFirst(){
     excludeLexer(checkstyleTest)
