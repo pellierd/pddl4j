@@ -1,5 +1,5 @@
 ##PDDL4J library
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.13921.svg)](http://dx.doi.org/10.5281/zenodo.13921)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45971.svg)](http://dx.doi.org/10.5281/zenodo.45971)
 
 ###1. Contact
 
