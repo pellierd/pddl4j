@@ -247,6 +247,13 @@ public class ParserTest {
         }
     }
 
+    /**
+     * Search for all domain file (domain.pddl or xxx-domain.pddl) and parse all domain/problem couple
+     * if any.
+     *
+     * @param localTestPath the path where to begin research
+     * @return A String stream containing error reports if any
+     */
     private Stream<String> executeTests(String localTestPath) {
 
         // Go into subdirectories
@@ -259,6 +266,12 @@ public class ParserTest {
         return Stream.concat(validate(localTestPath).stream(), results);
     }
 
+    /**
+     * Instantiate the Parser and parse all domains and problems in the specified test path.
+     *
+     * @param currentTestPath the path where try to find domain and problems pddl files
+     * @return all issues report as a ArrayList of String
+     */
     private ArrayList<String> validate(String currentTestPath) {
         final Parser parser = new Parser();
         final ArrayList<String> errors = new ArrayList<>();
@@ -267,10 +280,12 @@ public class ParserTest {
         String problemFile;
         String currentProblem;
 
+        // Counting the number of problem files
         int nbTest = new File(currentTestPath)
             .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"))
             .length;
 
+        // Check if there is on domain per problem or a shared domain for all
         if (!new File(currentDomain).exists()) {
             oneDomainPerProblem = true;
         }
