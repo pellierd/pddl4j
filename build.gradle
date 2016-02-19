@@ -78,6 +78,11 @@ findbugsMain.doLast() {
 findbugsMain.onlyIf() { project.hasProperty('findbug') }
 findbugsTest.onlyIf() { project.hasProperty('findbug') }
 
+findbugs {
+    effort= "max"
+    reportLevel = "low"
+}
+
 javadoc.doFirst() {
     excludeLexer(javadoc)
     failOnError false
