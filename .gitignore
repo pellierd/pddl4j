@@ -19,6 +19,10 @@ src/main/java/fr/uga/pddl4j/parser/lexer*
 ###########################
 doc/api
 
+#       Test files        #
+###########################
+benchmarks
+
 # OS generated files #
 ######################
 .DS_Store
