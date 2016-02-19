@@ -119,15 +119,19 @@ final class IntEncoding {
         for (TypedSymbol elt : list) {
             final List<Symbol> types = elt.getTypes();
             if (types.size() > 1) {
-                String newType = "either";
+                String newType;
                 Set<Integer> newTypeDomain = new LinkedHashSet<Integer>();
+                StringBuffer buf = new StringBuffer();
+                buf.append("either");
                 for (Symbol type : types) {
                     final String image = type.getImage();
-                    newType += "~" + image;
+                    buf.append("~");
+                    buf.append(image);
                     int typeIndex = Encoder.tableOfTypes.indexOf(image);
                     final Set<Integer> typeDomain = Encoder.tableOfDomains.get(typeIndex);
                     newTypeDomain.addAll(typeDomain);
                 }
+                newType = buf.toString();
                 int index = Encoder.tableOfTypes.indexOf(newType);
                 if (index == -1) {
                     Encoder.tableOfDomains.add(new LinkedHashSet<Integer>(newTypeDomain));
