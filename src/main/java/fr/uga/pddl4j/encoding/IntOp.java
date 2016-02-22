@@ -156,7 +156,7 @@ final class IntOp extends AbstractCodedOp {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof IntOp) {
             final IntOp other = (IntOp) obj;
-            return this.name.equals(other.name) && this.instantiations.equals(other.instantiations);
+            return this.name.equals(other.name) && Arrays.equals(this.instantiations, other.instantiations);
         }
         return false;
     }
