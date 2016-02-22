@@ -79,10 +79,10 @@ final class Instantiation {
         final List<IntOp> instOps = new ArrayList<IntOp>(100);
         Instantiation.expandQuantifiedExpression(operator.getPreconditions());
         Instantiation.simplify(operator.getPreconditions());
-        if (!operator.getPreconditions().equals(Connective.FALSE)) {
+        if (!operator.getPreconditions().getConnective().equals(Connective.FALSE)) {
             Instantiation.expandQuantifiedExpression(operator.getEffects());
             Instantiation.simplify(operator.getEffects());
-            if (!operator.getEffects().equals(Connective.FALSE)) {
+            if (!operator.getEffects().getConnective().equals(Connective.FALSE)) {
                 Instantiation.instantiate(operator, 0, bound, instOps);
             }
         }
