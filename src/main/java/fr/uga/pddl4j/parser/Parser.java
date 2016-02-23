@@ -20,13 +20,17 @@
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Lexer;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -584,51 +588,71 @@ public final class Parser {
         List<TypedSymbol> types = this.domain.getTypes();
         boolean checked = true;
 
-        if (types.isEmpty()) {
-            checked = true;
-        } else if (types.size() == 1 && types.get(0).equals(Parser.OBJECT)) {
-            checked = true;
-        } else {
-            boolean typedObjectDeclared = false;
-            Set<Symbol> set = new HashSet<Symbol>();
-            Set<Symbol> typesToAdd = new HashSet<Symbol>();
-            for (TypedSymbol type : types) {
-                if (type.equals(Parser.OBJECT) && !type.getTypes().isEmpty()) {
+        // Gathering types declaration
+        final Map<String, TypedSymbol> map = new HashMap<String, TypedSymbol>();
+        map.put(Parser.OBJECT.getImage(), new TypedSymbol(Parser.OBJECT));
+
+        for (TypedSymbol type : types) {
+            System.out.println(type);
+            // Special cas for the type object
+            if ((type.equals(Parser.OBJECT) || type.equals(Parser.NUMBER)) && !type.getTypes().isEmpty()) {
                     this.mgr.logParserError("type \"" + type.getImage()
-                        + "\" cannot be used as subtype", this.lexer.getFile(), type
+                        + "\" cannot be used as derived type", this.lexer.getFile(), type
                         .getBeginLine(), type.getBeginColumn());
-                }
-                /*if (type.equals(Parser.NUMBER) && !type.getTypes().isEmpty()) {
-                    this.mgr.logParserError("type \"" + type.getImage()
-                            + "\" cannot be used as subtype", this.lexer.getFile(), type
-                            .getBeginLine(), type.getBeginColumn());
-                }*/
-                if (set.contains(type)) {
                     checked = false;
-                    this.mgr.logParserError("type \"" + type.getImage()
-                        + "\" already defined", this.lexer.getFile(), type
-                        .getBeginLine(), type.getBeginColumn());
-                } else {
-                    set.add(type);
-                }
+            }
+            // General case
+            else {
+                // check if all super types are defined otherwise create a new type inhereted from object
                 for (Symbol superType : type.getTypes()) {
-                    typedObjectDeclared |= superType.equals(Parser.OBJECT);
-                    if (!set.contains(superType) && !typesToAdd.contains(superType)) {
-                        if (typedObjectDeclared) {
-                            checked = false;
-                            this.mgr.logParserError("type \"" + superType.getImage() + "\" undefined",
-                                this.lexer.getFile(), superType.getBeginLine(), superType
-                                    .getBeginColumn());
-                        } else {
-                            typesToAdd.add(superType);
-                        }
+                    if (!types.contains(superType)) {
+                        final TypedSymbol st = new TypedSymbol(superType);
+                        map.put(st.getImage(), st);
                     }
                 }
-            }
-            for (Symbol type : typesToAdd) {
-                this.domain.getTypes().add(new TypedSymbol(type));
+                // If the type was already encountered, it means that there is multiple inheritance
+                // thus the super types are gathered
+                TypedSymbol t = map.get(type.getImage());
+                if (t == null) {
+                    map.put(type.getImage(), type);
+                } else {
+                    final Set<Symbol> set = new HashSet<Symbol>();
+                    set.addAll(t.getTypes());
+                    set.addAll(type.getTypes());
+                    t.getTypes().clear();
+                    t.getTypes().addAll(set);
+                }
             }
         }
+
+        // Check the consistency of the declaration of types, i.e., check for each type if there is a loop in the type
+        // hierarchy
+        boolean consistent = true;
+        Iterator<TypedSymbol> iterator = map.values().iterator();
+        while (iterator.hasNext() && consistent) {
+            final TypedSymbol type = iterator.next();
+            final LinkedList<TypedSymbol> open = new LinkedList<TypedSymbol>();
+            open.add(type);
+            while (!open.isEmpty() && consistent) {
+                final TypedSymbol current = open.poll();
+                for (Symbol st : current.getTypes()) {
+                    final TypedSymbol c = map.get(st.getImage());
+                    consistent  = !c.equals(type);
+                    open.add(c);
+                }
+            }
+            if (!consistent) {
+                this.mgr.logParserError("Inconsistent types declaration for type \"" + type.getImage()
+                    + "\"", this.lexer.getFile(), type.getBeginLine(), type.getBeginColumn());
+            }
+        }
+
+        // Add a copie of the type to the planning domain.
+        this.domain.getTypes().clear();
+        for (Symbol type : map.values()) {
+            this.domain.getTypes().add(new TypedSymbol(type));
+        }
+        checked = consistent;
         return checked;
     }
 

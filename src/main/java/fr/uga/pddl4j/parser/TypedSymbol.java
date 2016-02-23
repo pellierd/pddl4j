@@ -108,10 +108,8 @@ public final class TypedSymbol extends Symbol {
             } else if (this.types.size() == 2) {
                 str.append("(either");
                 for (int i = 0; i < this.types.size(); i++) {
-                    if (!this.types.get(i).equals(Parser.OBJECT)) {
-                        str.append(" ");
-                        str.append(this.types.get(i).toString().toUpperCase());
-                    }
+                    str.append(" ");
+                    str.append(this.types.get(i).toString().toUpperCase());
                 }
                 str.append(")");
             }
