@@ -373,7 +373,8 @@ public class Domain implements Serializable {
      *
      * @return the hash code value of this domain.
      */
-    public int hashcode() {
+    @Override
+    public int hashCode() {
         return this.name.hashCode();
     }
 
