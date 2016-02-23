@@ -492,12 +492,12 @@ public final class Encoder {
             System.out.println(Encoder.toString(Encoder.init));
 
             System.out.println("\nfinal goal state:");
-            if (Encoder.goal != null && !Encoder.goal.isEmpty()) {
-                System.out.println(Encoder.toString(Encoder.goal));
-            } else if (Encoder.goal.isEmpty()) {
-                System.out.println("goal can be simplified to TRUE");
-            } else {
+            if(Encoder.goal == null) { // Goal null
                 System.out.println("goal can be simplified to FALSE");
+            } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty
+                System.out.println(Encoder.toString(Encoder.goal));
+            } else { // Goal not Null and empty
+                System.out.println("goal can be simplified to TRUE");
             }
 
         }

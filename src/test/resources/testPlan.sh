@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.0.4-SNAPSHOT
+VERSION=3.0.5-SNAPSHOT
 PROBLEM=""
 TYPE=""
 
