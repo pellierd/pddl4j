@@ -556,11 +556,15 @@ public class Exp implements Serializable {
         if (object != null && object instanceof Exp) {
             Exp other = (Exp) object;
             return this.connective.equals(other.connective)
-                && ((this.atom == null && other.atom == null) || (this.atom.equals(other.atom)))
+                && ((this.atom == null && other.atom == null)
+                    || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
                 && this.children.equals(other.children)
-                && ((this.prefName == null && other.prefName == null) || (this.prefName.equals(other.prefName)))
-                && ((this.variables == null && other.variables == null) || (this.variables.equals(other.variables)))
-                && ((this.value == null && other.value == null) || (this.value.equals(other.value)));
+                && ((this.prefName == null && other.prefName == null)
+                    || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
+                && ((this.variables == null && other.variables == null)
+                    || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
+                && ((this.value == null && other.value == null)
+                    || (this.value != null && other.value != null && this.value.equals(other.value)));
         }
         return false;
     }
