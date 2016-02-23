@@ -593,7 +593,6 @@ public final class Parser {
         map.put(Parser.OBJECT.getImage(), new TypedSymbol(Parser.OBJECT));
 
         for (TypedSymbol type : types) {
-            System.out.println(type);
             // Special cas for the type object
             if ((type.equals(Parser.OBJECT) || type.equals(Parser.NUMBER)) && !type.getTypes().isEmpty()) {
                     this.mgr.logParserError("type \"" + type.getImage()
@@ -606,8 +605,8 @@ public final class Parser {
                 // check if all super types are defined otherwise create a new type inhereted from object
                 for (Symbol superType : type.getTypes()) {
                     if (!types.contains(superType)) {
-                        final TypedSymbol st = new TypedSymbol(superType);
-                        map.put(st.getImage(), st);
+                        TypedSymbol st = new TypedSymbol(superType);
+                        map.put(superType.getImage(), st);
                     }
                 }
                 // If the type was already encountered, it means that there is multiple inheritance
@@ -616,7 +615,7 @@ public final class Parser {
                 if (t == null) {
                     map.put(type.getImage(), type);
                 } else {
-                    final Set<Symbol> set = new HashSet<Symbol>();
+                    Set<Symbol> set = new HashSet<Symbol>();
                     set.addAll(t.getTypes());
                     set.addAll(type.getTypes());
                     t.getTypes().clear();
@@ -625,8 +624,8 @@ public final class Parser {
             }
         }
 
-        // Check the consistency of the declaration of types, i.e., check for each type if there is a loop in the type
-        // hierarchy
+
+        // Check the consistency of the types declaration, i.e., if there is no loop in the types declaration
         boolean consistent = true;
         Iterator<TypedSymbol> iterator = map.values().iterator();
         while (iterator.hasNext() && consistent) {
@@ -647,9 +646,9 @@ public final class Parser {
             }
         }
 
-        // Add a copie of the type to the planning domain.
+        // Add a copy of the types to the planning domain.
         this.domain.getTypes().clear();
-        for (Symbol type : map.values()) {
+        for (TypedSymbol type : map.values()) {
             this.domain.getTypes().add(new TypedSymbol(type));
         }
         checked = consistent;
