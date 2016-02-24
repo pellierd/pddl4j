@@ -1051,7 +1051,7 @@ Exp sometime_con_gd() :
 Exp within_con_gd() :
 {
 	Exp conGD = new Exp(Connective.WITHIN);
-	Token toekn = null;
+	Token token = null;
 	Exp node = null;
 }
 {
