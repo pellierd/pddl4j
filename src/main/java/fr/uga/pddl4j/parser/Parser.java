@@ -741,6 +741,7 @@ public final class Parser {
         Set<String> set = new HashSet<String>();
         boolean checked = true;
         for (NamedTypedList function : functions) {
+            Symbol functionSymbol = function.getName();
             for (TypedSymbol variable : function.getArguments()) {
                 for (Symbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
@@ -752,7 +753,7 @@ public final class Parser {
                     }
                 }
             }
-            Symbol functionSymbol = function.getName();
+
             String str = functionSymbol.getImage() + "/" + function.getArguments().size();
             if (!set.add(str)) {
                 this.mgr.logParserError("predicate \"" + str + "\" declared twice", this.lexer
