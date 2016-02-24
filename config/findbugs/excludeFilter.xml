@@ -12,4 +12,8 @@
 		<Class name="fr.uga.pddl4j.parser.Connective" />
 		<Method name="getImage" />
 	</Match>
+	<Match>
+		<Class name="fr.uga.pddl4j.parser.Parser" />
+		<Method name="parse" />
+	</Match>
 </FindBugsFilter>
