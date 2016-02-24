@@ -442,14 +442,14 @@ public final class HSP {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("operators file does not exist");
-                        System.exit(0);
+                        throw new RuntimeException("operators file does not exist: " + args[i + 1]);
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-f") && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("facts file does not exist");
-                        System.exit(0);
+                        throw new RuntimeException("facts file does not exist: " + args[i + 1]);
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-t") && ((i + 1) < args.length)) {
@@ -554,7 +554,6 @@ public final class HSP {
         System.out.println("               - solution plan length");
         System.out.println("     > 100  1 + various debugging information");
         System.out.println("-h          print this message\n\n");
-        System.exit(0);
     }
 
     /**

@@ -248,7 +248,7 @@ final class BitEncoding {
             }
         } else {
             System.out.println(Encoder.toString(exp));
-            System.exit(0);
+            throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
         }
         return bitExp;
     }
