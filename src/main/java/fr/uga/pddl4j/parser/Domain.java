@@ -35,6 +35,8 @@ import java.util.Set;
  */
 public class Domain implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The name of the domain.
      */

@@ -30,6 +30,8 @@ import java.util.List;
  */
 public final class TypedSymbol extends Symbol {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The list of the types of this symbol.
      */

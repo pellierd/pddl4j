@@ -39,6 +39,8 @@ import java.util.Set;
  */
 public class CodedProblem implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The table of types.
      */

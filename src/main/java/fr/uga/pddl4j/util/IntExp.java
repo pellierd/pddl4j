@@ -34,6 +34,8 @@ import java.util.List;
  */
 public class IntExp implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The constant used to encode the specific predicate equal.
      */

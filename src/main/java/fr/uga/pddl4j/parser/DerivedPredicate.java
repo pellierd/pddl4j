@@ -32,6 +32,8 @@ import java.util.Map;
  */
 public class DerivedPredicate implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The head of the derived predicate.
      */

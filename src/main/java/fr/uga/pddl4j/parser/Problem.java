@@ -33,6 +33,8 @@ import java.util.Set;
  */
 public class Problem implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The name of the problem.
      */

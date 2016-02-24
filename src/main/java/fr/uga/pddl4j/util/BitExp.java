@@ -30,6 +30,8 @@ import java.io.Serializable;
  */
 public class BitExp implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The bit state used to store the positive facts of the expression.
      */

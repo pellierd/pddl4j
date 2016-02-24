@@ -31,6 +31,8 @@ import java.util.List;
  */
 public class NamedTypedList implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The name of the typed list.
      */

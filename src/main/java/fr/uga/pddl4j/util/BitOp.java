@@ -32,6 +32,8 @@ import java.util.List;
  */
 public class BitOp extends AbstractCodedOp {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The preconditions of the operator.
      */

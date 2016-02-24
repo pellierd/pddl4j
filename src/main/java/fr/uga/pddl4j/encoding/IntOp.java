@@ -34,6 +34,8 @@ import java.util.Arrays;
  */
 final class IntOp extends AbstractCodedOp {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The expression that represents the preconditions of the operator.
      */
