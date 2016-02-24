@@ -21,6 +21,7 @@ package fr.uga.pddl4j.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This class implements a typed symbol.
@@ -106,12 +107,12 @@ public final class TypedSymbol extends Symbol {
         if (!this.equals(Parser.OBJECT) && !this.equals(Parser.NUMBER)) {
             str.append(" - ");
             if (this.types.size() == 1) {
-                str.append(this.types.get(0).toString().toUpperCase());
+                str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));
             } else if (this.types.size() == 2) {
                 str.append("(either");
                 for (int i = 0; i < this.types.size(); i++) {
                     str.append(" ");
-                    str.append(this.types.get(i).toString().toUpperCase());
+                    str.append(this.types.get(i).toString().toUpperCase(Locale.ENGLISH));
                 }
                 str.append(")");
             }
