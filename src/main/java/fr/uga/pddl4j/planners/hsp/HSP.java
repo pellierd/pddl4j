@@ -156,7 +156,7 @@ public final class HSP {
         }
         if (!parser.getErrorManager().isEmpty()) {
             parser.getErrorManager().printAll();
-            System.exit(0);
+            return null;
         }
         final Domain domain = parser.getDomain();
         final Problem problem = parser.getProblem();
@@ -421,8 +421,11 @@ public final class HSP {
         HSP planner = new HSP(arguments);
         // Parse and encode the PDDL file into compact representation
         final CodedProblem problem = planner.parseAndEncode();
-        // Search for a solution and print the result
-        planner.search(problem);
+
+        if(problem != null) {
+            // Search for a solution and print the result
+            planner.search(problem);
+        }
     }
 
     /**
