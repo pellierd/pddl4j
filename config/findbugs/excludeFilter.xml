@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FindBugsFilter>
+	<Match>
+		<Class name="~fr.uga.pddl4j.parser.lexer\.[^.]+"/>
+	</Match>
+	<Match>
+		<Class name="fr.uga.pddl4j.util.MemoryAgent" />
+		<Method name="isSharedFlyweight" />
+	</Match>
+</FindBugsFilter>

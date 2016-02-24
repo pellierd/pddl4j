@@ -72,16 +72,17 @@ clean.doLast() {
     cleanGenerated.execute()
 }
 
+findbugsMain.onlyIf() { project.hasProperty('findbugs') }
+findbugsTest.onlyIf() { project.hasProperty('findbugs') }
+
 findbugsMain.doLast() {
     println("Find bug process completed without finding an issue")
 }
 
-findbugsMain.onlyIf() { project.hasProperty('findbug') }
-findbugsTest.onlyIf() { project.hasProperty('findbug') }
-
 findbugs {
     effort= "max"
     reportLevel = "low"
+    excludeFilter = file("$rootProject.projectDir/config/findbugs/excludeFilter.xml")
 }
 
 javadoc.doFirst() {
