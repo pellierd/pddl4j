@@ -453,14 +453,14 @@ public final class HSP {
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-t") && ((i + 1) < args.length)) {
-                    final int cpu = Integer.valueOf(args[i + 1]) * 1000;
+                    final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         HSP.printUsage();
                     }
                     i++;
                     arguments.put(HSP.Argument.CPU_TIME, cpu);
                 } else if (args[i].equalsIgnoreCase("-u") && ((i + 1) < args.length)) {
-                    final int heuristic = Integer.valueOf(args[i + 1]);
+                    final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
                         HSP.printUsage();
                     }
@@ -492,7 +492,7 @@ public final class HSP {
                     arguments.put(HSP.Argument.WEIGHT, weight);
                     i++;
                 } else if (args[i].equalsIgnoreCase("-i") && ((i + 1) < args.length)) {
-                    final int level = Integer.valueOf(args[i + 1]);
+                    final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         HSP.printUsage();
                     }
