@@ -1121,7 +1121,7 @@ Exp sometime_before_con_gd() :
 
 Exp always_within_con_gd() :
 {
-	Exp conGD = new Exp(Connective.SOMETIME_BEFORE);
+	Exp conGD = new Exp(Connective.ALWAYS_WITHIN);
 	Token token = null;
 	Exp gd1 = null;
 	Exp gd2 = null;
