@@ -422,7 +422,7 @@ public final class HSP {
         // Parse and encode the PDDL file into compact representation
         final CodedProblem problem = planner.parseAndEncode();
 
-        if(problem != null) {
+        if (problem != null) {
             // Search for a solution and print the result
             planner.search(problem);
         }

@@ -239,8 +239,7 @@ public class Exp implements Serializable {
     /**
      * Returns the name of the preference.
      *
-     * @return the name of the preference or <code>null</code> if the preference name was not
-     * initialized.
+     * @return the name of the preference or <code>null</code> if the preference name was not initialized.
      */
     public final Symbol getPrefName() {
         return this.prefName;
@@ -548,8 +547,8 @@ public class Exp implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
-     * not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     * atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
+     *     not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
+     *     atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object object) {
@@ -597,7 +596,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to test.
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
-     * this expression; <code>false</code> otherwise.
+     *     this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Exp exp) {
         Iterator<Exp> it = this.getChildren().iterator();
@@ -664,7 +663,7 @@ public class Exp implements Serializable {
      * @exception MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression()
      */
-    public String toString() throws MalformedExpException{
+    public String toString() throws MalformedExpException {
         return this.toString("");
     }
 

@@ -20,18 +20,16 @@
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Lexer;
-import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -595,13 +593,10 @@ public final class Parser {
         for (TypedSymbol type : types) {
             // Special cas for the type object
             if ((type.equals(Parser.OBJECT) || type.equals(Parser.NUMBER)) && !type.getTypes().isEmpty()) {
-                    this.mgr.logParserError("type \"" + type.getImage()
-                        + "\" cannot be used as derived type", this.lexer.getFile(), type
-                        .getBeginLine(), type.getBeginColumn());
-                    checked = false;
-            }
-            // General case
-            else {
+                this.mgr.logParserError("type \"" + type.getImage() + "\" cannot be used as derived type",
+                    this.lexer.getFile(),type.getBeginLine(), type.getBeginColumn());
+                checked = false;
+            } else { // General case
                 // check if all super types are defined otherwise create a new type inhereted from object
                 for (Symbol superType : type.getTypes()) {
                     if (!types.contains(superType)) {
