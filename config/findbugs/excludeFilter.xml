@@ -16,4 +16,12 @@
 		<Class name="fr.uga.pddl4j.parser.Parser" />
 		<Method name="parse" />
 	</Match>
+    <Match>
+        <Class name="fr.uga.pddl4j.util.IntExp" />
+        <Method name="getArguments" />
+    </Match>
+    <Match>
+        <Class name="fr.uga.pddl4j.util.IntExp" />
+        <Method name="setArguments" />
+    </Match>
 </FindBugsFilter>
