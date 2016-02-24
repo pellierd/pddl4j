@@ -58,7 +58,7 @@ public class MemoryAgent {
     /**
      * The default value of the <code>SKIP_STATIC_FIELD</code> flag.
      */
-    public static boolean DEFAULT_SKIP_STATIC_FIELD = false;
+    public static final boolean DEFAULT_SKIP_STATIC_FIELD = false;
 
     /**
      * The flag used to indicate if static field must be skip during the computation process.
@@ -68,7 +68,7 @@ public class MemoryAgent {
     /**
      * The default value of the <code>SKIP_FINAL_FIELD</code> flag.
      */
-    public static boolean DEFAULT_SKIP_FINAL_FIELD = false;
+    public static final boolean DEFAULT_SKIP_FINAL_FIELD = false;
 
     /**
      * The flag used to indicate if final field must be skip during the computation process.
@@ -78,7 +78,7 @@ public class MemoryAgent {
     /**
      * The default value of the <code>SKIP_FLYWEIGHT_FIELD</code> flag.
      */
-    public static boolean DEFAULT_SKIP_FLYWEIGHT_FIELD = false;
+    public static final boolean DEFAULT_SKIP_FLYWEIGHT_FIELD = false;
 
     /**
      * The flag used to indicate if flyweight field must be skip during the computation process.
