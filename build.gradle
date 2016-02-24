@@ -16,7 +16,7 @@ apply plugin: 'checkstyle'
 
 
 group 'fr.uga'
-version '3.0.10-SNAPSHOT'
+version '3.0.11-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
@@ -72,8 +72,8 @@ clean.doLast() {
     cleanGenerated.execute()
 }
 
-findbugsMain.onlyIf() { project.hasProperty('findbugs') }
-findbugsTest.onlyIf() { project.hasProperty('findbugs') }
+findbugsMain.onlyIf() { project.hasProperty('findbug') }
+findbugsTest.onlyIf() { project.hasProperty('findbug') }
 
 findbugsMain.doLast() {
     println("Find bug process completed without finding an issue")
