@@ -96,6 +96,16 @@ public final class TypedSymbol extends Symbol {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     /**
      * Returns a string representation of this typed symbol.
      *

@@ -160,4 +160,14 @@ public final class Node extends BitState {
     public final double getValueF(double weight) {
         return weight * this.heuristic + this.cost;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

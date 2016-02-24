@@ -1,12 +1,12 @@
 #!/bin/bash
 
-VERSION=3.0.17-SNAPSHOT
+VERSION=3.0.18-SNAPSHOT
 PROBLEM=""
 TYPE=""
 
-echo "### Execute 16 HSP planifications on blocks world problems"
+echo "### Execute 20 HSP planifications on blocks world problems"
 TYPE=blocksworld
-for ((i=1 ; i<17 ; i++))
+for ((i=1 ; i<21 ; i++))
     do
     if [ ${i} -lt 10 ]
         then PROBLEM=p0${i}.pddl
