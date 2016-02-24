@@ -8,4 +8,8 @@
 		<Class name="fr.uga.pddl4j.util.MemoryAgent" />
 		<Method name="isSharedFlyweight" />
 	</Match>
+	<Match>
+		<Class name="fr.uga.pddl4j.parser.Connective" />
+		<Method name="getImage" />
+	</Match>
 </FindBugsFilter>
