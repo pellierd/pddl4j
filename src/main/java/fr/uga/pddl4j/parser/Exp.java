@@ -148,6 +148,7 @@ public class Exp implements Serializable {
 
     /**
      * Attach a new son to this node.
+     *
      * @param exp the son to add
      * @return <code>true</code> if the node was added; <code>false</code> otherwise
      * @throws NullPointerException if the specified node is null
@@ -239,7 +240,7 @@ public class Exp implements Serializable {
      * Returns the name of the preference.
      *
      * @return the name of the preference or <code>null</code> if the preference name was not
-     *     initialized.
+     * initialized.
      */
     public final Symbol getPrefName() {
         return this.prefName;
@@ -304,10 +305,12 @@ public class Exp implements Serializable {
     }
 
     /**
-     * Renames the variables contained in the expression. The variable renames have the form ?X1,
-     * ..., ?Xn.
+     * Renames the variables contained in the expression. The variable renames have the form ?X1,..., ?Xn.
+     *
+     * @exception MalformedExpException if this expression is malformed.
+     * @see this#isMalformedExpression()
      */
-    public void renameVariables() {
+    public void renameVariables() throws MalformedExpException {
         this.renameVariables(new LinkedHashMap<String, String>());
     }
 
@@ -316,8 +319,13 @@ public class Exp implements Serializable {
      * already renamed. The variable renames have the form ?X1, ..., ?Xn.
      *
      * @param context the images of the renamed variable.
+     * @exception MalformedExpException if this expression is malformed.
+     * @see this#isMalformedExpression()
      */
-    public void renameVariables(final Map<String, String> context) {
+    public void renameVariables(final Map<String, String> context) throws MalformedExpException {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+        }
         switch (this.getConnective()) {
             case ATOM:
             case FN_HEAD:
@@ -401,9 +409,14 @@ public class Exp implements Serializable {
 
     /**
      * Moves the negation inward the expression.
+     *
+     * @exception MalformedExpException if this expression is malformed.
+     * @see this#isMalformedExpression()
      */
-    public void moveNegationInward() {
-
+    public void moveNegationInward() throws MalformedExpException {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+        }
         switch (this.connective) {
             case AND:
             case OR:
@@ -535,8 +548,8 @@ public class Exp implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
-     *     not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     *     atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
+     * not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
+     * atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object object) {
@@ -580,7 +593,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to test.
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
-     *     this expression; <code>false</code> otherwise.
+     * this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Exp exp) {
         Iterator<Exp> it = this.getChildren().iterator();
@@ -644,8 +657,10 @@ public class Exp implements Serializable {
      *
      * @return a string representation of this node.
      * @see java.lang.Object#toString()
+     * @exception MalformedExpException if the expression is malformed.
+     * @see this#isMalformedExpression()
      */
-    public String toString() {
+    public String toString() throws MalformedExpException{
         return this.toString("");
     }
 
@@ -654,18 +669,25 @@ public class Exp implements Serializable {
      *
      * @param offset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
+     * @exception MalformedExpException if the expression is malformed.
+     * @see this#isMalformedExpression()
      */
     private String toString(String offset) {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+        }
         StringBuffer str = new StringBuffer();
         switch (this.connective) {
             case ATOM:
             case FN_HEAD:
                 str.append("(");
-                for (int i = 0; i < this.atom.size() - 1; i++) {
-                    str.append(this.atom.get(i).toString());
-                    str.append(" ");
+                if (!this.atom.isEmpty()) {
+                    for (int i = 0; i < this.atom.size() - 1; i++) {
+                        str.append(this.atom.get(i).toString());
+                        str.append(" ");
+                    }
+                    str.append(this.atom.get(this.atom.size() - 1).toString());
                 }
-                str.append(this.atom.get(this.atom.size() - 1).toString());
                 str.append(")");
                 break;
             case EQUAL_ATOM:
@@ -684,11 +706,13 @@ public class Exp implements Serializable {
                 offset += "  ";
                 str.append("(");
                 str.append(this.getConnective().getImage());
-                str.append(" ");
-                for (int i = 0; i < this.children.size() - 1; i++) {
-                    str.append(this.children.get(i).toString(offset) + "\n" + offset);
+                if (!this.children.isEmpty()) {
+                    str.append(" ");
+                    for (int i = 0; i < this.children.size() - 1; i++) {
+                        str.append(this.children.get(i).toString(offset) + "\n" + offset);
+                    }
+                    str.append(this.children.get(this.children.size() - 1).toString(offset));
                 }
-                str.append(this.children.get(this.children.size() - 1).toString(offset));
                 str.append(")");
                 offset = offset.substring(0, offset.length() - 2);
                 break;
@@ -820,4 +844,95 @@ public class Exp implements Serializable {
         }
         return str.toString();
     }
+
+    /**
+     * Return if this expression is malformed. An expression is considered as well in the following cases:
+     * <li>Empty OR and AND expressions, i.e., without any children, are considered as well formed.</li>
+     * <li>Quantified expressions (EXISTS, FORALL) is well formed if it has at least one quantified variable and one
+     * child expression.</li>
+     * <li>ATOM and F_HEAD expressions without any symbols as arguments are considered as well formed.</li>
+     * <li>EQUAL_ATOM expression with two symbols as arguments is considered as well formed.</li>
+     * <li>NOT, UMINUS, AT_START, AT_END, OVER_ALL, ALWAYS, SOMETIME, AT_MOST_ONCE, MINIMIZE, MAXIMIZE and F_EXP_T
+     * expressions must have at least one child expression to be considered as well formed.</li>
+     * <li>FN_ATOM, WHEN, DURATION_ATOM, LESS, LESS_OR_EQUAL, EQUAL, GREATER, GREATER_OR_EQUAL, ASSIGN, INCREASE,
+     * DECREASE, SCALE_UP, SCALE_DOWN, MUL, DIV, MINUS, PLUS, SOMETIME_AFTER, SOMETIME_BEFORE, HOLD_AFTER and WITHIN
+     * must have at least two children expressions to be considered as well formed.</li>
+     * <li>ALWAYS_WITHIN and HOLD_DURING must have at least three children expressions to be considered as well formed.
+     * </li>
+     *
+     * @return <code>true</code> if the expression is malformed; <code>false</code> otherwise.
+     */
+    public boolean isMalformedExpression() {
+        boolean malformed = false;
+        switch (this.connective) {
+            case EQUAL_ATOM:
+                malformed = this.atom.size() == 2;
+                break;
+            case FORALL:
+            case EXISTS:
+                malformed = this.variables.isEmpty() || this.children.isEmpty()
+                    && this.children.get(0).isMalformedExpression();
+                break;
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+                malformed = this.children.size() != 3
+                    && this.children.get(0).isMalformedExpression()
+                    && this.children.get(1).isMalformedExpression()
+                    && this.children.get(2).isMalformedExpression();
+                break;
+            case FN_ATOM:
+            case WHEN:
+            case DURATION_ATOM:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case HOLD_AFTER:
+            case WITHIN:
+                malformed = this.children.size() != 2
+                    && this.children.get(0).isMalformedExpression()
+                    && this.children.get(1).isMalformedExpression();
+                break;
+            case NOT:
+            case UMINUS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case ALWAYS:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case F_EXP_T:
+                malformed = this.children.size() != 1
+                    && this.children.get(0).isMalformedExpression();
+                break;
+            case ATOM:
+            case FN_HEAD:
+            case TIME_VAR:
+            case NUMBER:
+            case IS_VIOLATED:
+            case AND:
+            case OR:
+                break;
+            default:
+                // do nothing
+
+        }
+        return malformed;
+    }
 }
+
+
