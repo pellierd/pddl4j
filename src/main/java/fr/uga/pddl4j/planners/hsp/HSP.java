@@ -265,14 +265,7 @@ public final class HSP {
         // The list stores the node ordered according to the A* (f = g + h) function
         final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new Comparator<Node>() {
             public int compare(final Node n1, final Node n2) {
-                final double diff = n1.getValueF(weight) - n2.getValueF(weight);
-                if (diff < 0) {
-                    return -1;
-                } else if (diff > 0) {
-                    return 1;
-                } else {
-                    return 0;
-                }
+                return Double.compare(n1.getValueF(weight), n2.getValueF(weight));
             }
         });
         // Creates the root node of the tree search
