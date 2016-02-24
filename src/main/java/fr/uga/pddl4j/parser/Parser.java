@@ -1143,12 +1143,6 @@ public final class Parser {
                 System.out.println("no ok");
                 parser.mgr.printAll();
             }
-
-            Domain domain = parser.getDomain();
-            Problem problem = parser.getProblem();
-            Exp goal = problem.getGoal();
-            System.out.println(goal);
-
         } else {
             System.out.println("\nusage of parser:\n");
             System.out.println("OPTIONS   DESCRIPTIONS\n");
