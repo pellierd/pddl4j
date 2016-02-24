@@ -28,6 +28,7 @@ dependencies {
 }
 
 compileJavacc {
+    arguments = [debug_parser: 'false']
     inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
     outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
 }
