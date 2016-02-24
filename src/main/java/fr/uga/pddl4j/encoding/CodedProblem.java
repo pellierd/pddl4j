@@ -121,7 +121,7 @@ public class CodedProblem implements Serializable {
         super();
         this.types = new ArrayList<String>();
         for (String str : other.types) {
-            this.types.add(new String(str));
+            this.types.add(str);
         }
         this.domains = new ArrayList<Set<Integer>>();
         for (Set<Integer> si : other.domains) {
@@ -133,11 +133,11 @@ public class CodedProblem implements Serializable {
         }
         this.constants = new ArrayList<String>();
         for (String str : other.constants) {
-            this.constants.add(new String(str));
+            this.constants.add(str);
         }
         this.predicates = new ArrayList<String>();
         for (String str : other.predicates) {
-            this.predicates.add(new String(str));
+            this.predicates.add(str);
         }
         this.predicatesSignatures = new ArrayList<List<Integer>>();
         for (List<Integer> si : other.predicatesSignatures) {
@@ -149,7 +149,7 @@ public class CodedProblem implements Serializable {
         }
         this.functions = new ArrayList<String>();
         for (String str : other.functions) {
-            this.functions.add(new String(str));
+            this.functions.add(str);
         }
         this.functionsSignatures = new ArrayList<List<Integer>>();
         for (List<Integer> si : other.functionsSignatures) {

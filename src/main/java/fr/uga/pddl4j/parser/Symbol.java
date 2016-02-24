@@ -136,7 +136,7 @@ public class Symbol implements Serializable {
             throw new NullPointerException("symbol == null");
         }
         this.kind = symbol.getKind();
-        this.image = new String(symbol.getImage());
+        this.image = symbol.getImage();
         this.beginLine = symbol.getBeginLine();
         this.beginColumn = symbol.getBeginColumn();
         this.endLine = symbol.getEndLine();
