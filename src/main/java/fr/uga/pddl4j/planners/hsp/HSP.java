@@ -33,6 +33,7 @@ import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -263,11 +264,7 @@ public final class HSP {
         // Initialize the opened list (store the pending node)
         final double weight = (Double) this.arguments.get(HSP.Argument.WEIGHT);
         // The list stores the node ordered according to the A* (f = g + h) function
-        final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new Comparator<Node>() {
-            public int compare(final Node n1, final Node n2) {
-                return Double.compare(n1.getValueF(weight), n2.getValueF(weight));
-            }
-        });
+        final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new NodeComparator(weight));
         // Creates the root node of the tree search
         final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
         // Adds the root to the list of pending nodes
@@ -568,5 +565,31 @@ public final class HSP {
         options.put(HSP.Argument.CPU_TIME, HSP.DEFAULT_CPU_TIME * 1000);
         options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
         return options;
+    }
+
+    /**
+     * Node comparator class for HSP planner.
+     */
+    private static class NodeComparator implements Comparator<Node>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * The weight of the heuristic use for the comparison
+         */
+        private double weight;
+
+        /**
+         * Build the Node comparator object base on heuristic weight
+         * @param weight the heuristic weight
+         */
+        public NodeComparator(double weight) {
+            this.weight = weight;
+        }
+
+        @Override
+        public int compare(final Node n1, final Node n2) {
+            return Double.compare(n1.getValueF(weight), n2.getValueF(weight));
+        }
     }
 }
