@@ -52,7 +52,7 @@ final class Instantiation {
      * @return the list of instantiated operators.
      */
     static List<IntOp> instantiateOperators(final List<IntOp> operators) {
-        final List<IntOp> instOps = new ArrayList<IntOp>(1000);
+        final List<IntOp> instOps = new ArrayList<>(1000);
         for (IntOp op : operators) {
             // If an operator has a parameter with a empty domain the operator must be removed
             boolean toInstantied = true;
@@ -76,7 +76,7 @@ final class Instantiation {
      * @return the list of operators instantiated corresponding the specified operator.
      */
     static List<IntOp> instantiate(final IntOp operator, final int bound) {
-        final List<IntOp> instOps = new ArrayList<IntOp>(100);
+        final List<IntOp> instOps = new ArrayList<>(100);
         Instantiation.expandQuantifiedExpression(operator.getPreconditions());
         Instantiation.simplify(operator.getPreconditions());
         if (!operator.getPreconditions().getConnective().equals(Connective.FALSE)) {
@@ -331,7 +331,7 @@ final class Instantiation {
                 if (arg1 == arg2) {
                     // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                     exp.setConnective(Connective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0 && arg1 != arg2) {
+                } else if (arg1 >= 0 && arg2 >= 0) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
                     exp.setConnective(Connective.FALSE);
                 }
@@ -356,9 +356,7 @@ final class Instantiation {
                             final IntExp ej = ei.getChildren().get(j);
                             if (ej.getConnective().equals(Connective.FALSE)) {
                                 exp.setConnective(Connective.FALSE);
-                            } else if (ej.getConnective().equals(Connective.TRUE)) {
-                                // do nothing
-                            } else {
+                            } else if (!ej.getConnective().equals(Connective.TRUE)) {
                                 exp.getChildren().add(i + added, ej);
                                 added++;
                             }
@@ -387,9 +385,7 @@ final class Instantiation {
                                     final IntExp ej = consequent.getChildren().get(j);
                                     if (ej.getConnective().equals(Connective.FALSE)) {
                                         exp.setConnective(Connective.FALSE);
-                                    } else if (ej.getConnective().equals(Connective.TRUE)) {
-                                        // do nothing
-                                    } else {
+                                    } else if (!ej.getConnective().equals(Connective.TRUE)) {
                                         exp.getChildren().add(i + added, ej);
                                         added++;
                                     }
@@ -436,9 +432,7 @@ final class Instantiation {
                             final IntExp ej = ei.getChildren().get(j);
                             if (ej.getConnective().equals(Connective.TRUE)) {
                                 exp.setConnective(Connective.TRUE);
-                            } else if (ej.getConnective().equals(Connective.FALSE)) {
-                                // do nothing
-                            } else {
+                            } else if (!ej.getConnective().equals(Connective.FALSE)) {
                                 exp.getChildren().add(i + added, ej);
                                 added++;
                             }
@@ -467,9 +461,7 @@ final class Instantiation {
                                     final IntExp ej = consequent.getChildren().get(j);
                                     if (ej.getConnective().equals(Connective.TRUE)) {
                                         exp.setConnective(Connective.TRUE);
-                                    } else if (ej.getConnective().equals(Connective.FALSE)) {
-                                        // do nothing
-                                    } else {
+                                    } else if (!ej.getConnective().equals(Connective.FALSE)) {
                                         exp.getChildren().add(i + added, ej);
                                         added++;
                                     }
@@ -620,7 +612,7 @@ final class Instantiation {
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1 == arg2) {
                     exp.setConnective(Connective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0 && arg1 != arg2) {
+                } else if (arg1 >= 0 && arg2 >= 0) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
                     exp.setConnective(Connective.FALSE);
                 }
