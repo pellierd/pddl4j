@@ -33,6 +33,7 @@ import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -156,7 +157,7 @@ public final class HSP {
         }
         if (!parser.getErrorManager().isEmpty()) {
             parser.getErrorManager().printAll();
-            System.exit(0);
+            return null;
         }
         final Domain domain = parser.getDomain();
         final Problem problem = parser.getProblem();
@@ -198,31 +199,31 @@ public final class HSP {
         if (traceLevel > 0 && traceLevel != 8) {
             if (pb.isSolvable()) {
                 if (plan != null) {
-                    System.out.printf("\nfound plan as follows:\n\n");
+                    System.out.printf("%nfound plan as follows:%n%n");
                     for (int i = 0; i < plan.size(); i++) {
-                        System.out.printf("time step %4d: %s\n", i, plan.get(i));
+                        System.out.printf("time step %4d: %s%n", i, plan.get(i));
                     }
                 } else {
-                    System.out.printf("\nno plan found\n\n");
+                    System.out.printf("%nno plan found%n%n");
                 }
             } else {
-                System.out.printf("goal can be simplified to FALSE. no plan will solve it\n\n");
+                System.out.printf("goal can be simplified to FALSE. no plan will solve it%n%n");
             }
-            System.out.printf("\ntime spent: %8.2f seconds encoding ("
+            System.out.printf("%ntime spent: %8.2f seconds encoding ("
                 + pb.getOperators().size() + " ops, " + pb.getRevelantFacts().size()
-                + " facts)\n", (this.preprocessingTime / 1000.0));
-            System.out.printf("            %8.2f seconds searching\n",
+                + " facts)%n", (this.preprocessingTime / 1000.0));
+            System.out.printf("            %8.2f seconds searching%n",
                 (this.searchingTime / 1000.0));
-            System.out.printf("            %8.2f seconds total time\n",
+            System.out.printf("            %8.2f seconds total time%n",
                 ((this.preprocessingTime + searchingTime) / 1000.0));
-            System.out.printf("\n");
-            System.out.printf("memory used: %8.2f MBytes for problem representation\n",
+            System.out.printf("%n");
+            System.out.printf("memory used: %8.2f MBytes for problem representation%n",
                 +(this.problemMemory / (1024.0 * 1024.0)));
-            System.out.printf("             %8.2f MBytes for searching\n",
+            System.out.printf("             %8.2f MBytes for searching%n",
                 +(this.searchingMemory / (1024.0 * 1024.0)));
-            System.out.printf("             %8.2f MBytes total\n",
+            System.out.printf("             %8.2f MBytes total%n",
                 +((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0)));
-            System.out.printf("\n\n");
+            System.out.printf("%n%n");
         }
         if (traceLevel == 8) {
             String problem = (String) this.arguments.get(HSP.Argument.PROBLEM);
@@ -233,13 +234,13 @@ public final class HSP {
                 pb.getRevelantFacts().size(), (this.preprocessingTime / 1000.0),
                 (this.problemMemory / (1024.0 * 1024.0)), this.nbOfExploredNodes);
             if (plan != null) {
-                System.out.printf("%8.2f %8.2f %8.2f %8.2f %5d\n", (this.searchingTime / 1000.0),
+                System.out.printf("%8.2f %8.2f %8.2f %8.2f %5d%n", (this.searchingTime / 1000.0),
                     ((this.preprocessingTime + searchingTime) / 1000.0),
                     (this.searchingMemory / (1024.0 * 1024.0)),
                     ((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0)),
                     plan.size());
             } else {
-                System.out.printf("%8s %8s %8s %8s %5s\n", "-", "-", "-", "-", "-");
+                System.out.printf("%8s %8s %8s %8s %5s%n", "-", "-", "-", "-", "-");
             }
         }
     }
@@ -263,18 +264,7 @@ public final class HSP {
         // Initialize the opened list (store the pending node)
         final double weight = (Double) this.arguments.get(HSP.Argument.WEIGHT);
         // The list stores the node ordered according to the A* (f = g + h) function
-        final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new Comparator<Node>() {
-            public int compare(final Node n1, final Node n2) {
-                final double diff = n1.getValueF(weight) - n2.getValueF(weight);
-                if (diff < 0) {
-                    return -1;
-                } else if (diff > 0) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-        });
+        final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new NodeComparator(weight));
         // Creates the root node of the tree search
         final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
         // Adds the root to the list of pending nodes
@@ -428,8 +418,11 @@ public final class HSP {
         HSP planner = new HSP(arguments);
         // Parse and encode the PDDL file into compact representation
         final CodedProblem problem = planner.parseAndEncode();
-        // Search for a solution and print the result
-        planner.search(problem);
+
+        if (problem != null) {
+            // Search for a solution and print the result
+            planner.search(problem);
+        }
     }
 
     /**
@@ -446,25 +439,25 @@ public final class HSP {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("operators file does not exist");
-                        System.exit(0);
+                        throw new RuntimeException("operators file does not exist: " + args[i + 1]);
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-f") && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("facts file does not exist");
-                        System.exit(0);
+                        throw new RuntimeException("facts file does not exist: " + args[i + 1]);
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-t") && ((i + 1) < args.length)) {
-                    final int cpu = Integer.valueOf(args[i + 1]) * 1000;
+                    final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         HSP.printUsage();
                     }
                     i++;
                     arguments.put(HSP.Argument.CPU_TIME, cpu);
                 } else if (args[i].equalsIgnoreCase("-u") && ((i + 1) < args.length)) {
-                    final int heuristic = Integer.valueOf(args[i + 1]);
+                    final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
                         HSP.printUsage();
                     }
@@ -496,7 +489,7 @@ public final class HSP {
                     arguments.put(HSP.Argument.WEIGHT, weight);
                     i++;
                 } else if (args[i].equalsIgnoreCase("-i") && ((i + 1) < args.length)) {
-                    final int level = Integer.valueOf(args[i + 1]);
+                    final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         HSP.printUsage();
                     }
@@ -558,7 +551,6 @@ public final class HSP {
         System.out.println("               - solution plan length");
         System.out.println("     > 100  1 + various debugging information");
         System.out.println("-h          print this message\n\n");
-        System.exit(0);
     }
 
     /**
@@ -573,5 +565,31 @@ public final class HSP {
         options.put(HSP.Argument.CPU_TIME, HSP.DEFAULT_CPU_TIME * 1000);
         options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
         return options;
+    }
+
+    /**
+     * Node comparator class for HSP planner.
+     */
+    private static class NodeComparator implements Comparator<Node>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * The weight of the heuristic use for the comparison.
+         */
+        private double weight;
+
+        /**
+         * Build the Node comparator object base on heuristic weight.
+         * @param weight the heuristic weight
+         */
+        public NodeComparator(double weight) {
+            this.weight = weight;
+        }
+
+        @Override
+        public int compare(final Node n1, final Node n2) {
+            return Double.compare(n1.getValueF(weight), n2.getValueF(weight));
+        }
     }
 }

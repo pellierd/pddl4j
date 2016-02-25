@@ -34,6 +34,8 @@ import java.util.Arrays;
  */
 final class IntOp extends AbstractCodedOp {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The expression that represents the preconditions of the operator.
      */
@@ -156,7 +158,7 @@ final class IntOp extends AbstractCodedOp {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof IntOp) {
             final IntOp other = (IntOp) obj;
-            return this.name.equals(other.name) && this.instantiations.equals(other.instantiations);
+            return this.name.equals(other.name) && Arrays.equals(this.instantiations, other.instantiations);
         }
         return false;
     }
@@ -170,7 +172,7 @@ final class IntOp extends AbstractCodedOp {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + instantiations.hashCode();
+        result = prime * result + Arrays.hashCode(instantiations);
         result = prime * result + name.hashCode();
         return result;
     }

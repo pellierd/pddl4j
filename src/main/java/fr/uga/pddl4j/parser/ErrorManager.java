@@ -36,6 +36,8 @@ import java.util.TreeSet;
  */
 public class ErrorManager implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The set used to store the messages.
      */

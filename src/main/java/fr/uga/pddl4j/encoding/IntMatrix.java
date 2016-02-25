@@ -29,6 +29,8 @@ import java.io.Serializable;
  */
 final class IntMatrix implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The integer array used to store the matrix.
      */

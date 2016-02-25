@@ -36,6 +36,8 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class SumMutex extends GraphHeuristic {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new <code>SUM_MUTEX</code> heuristic for a specified planning problem.
      *

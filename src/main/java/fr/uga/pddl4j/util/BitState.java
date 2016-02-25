@@ -27,6 +27,8 @@ package fr.uga.pddl4j.util;
  */
 public class BitState extends BitVector {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new state.
      */

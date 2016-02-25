@@ -281,9 +281,13 @@ public class ParserTest {
         String currentProblem;
 
         // Counting the number of problem files
-        int nbTest = new File(currentTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"))
-            .length;
+        File[] pbFileList = new File(currentTestPath)
+            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"));
+
+        int nbTest = 0;
+        if (pbFileList != null) {
+            nbTest = pbFileList.length;
+        }
 
         // Check if there is on domain per problem or a shared domain for all
         if (!new File(currentDomain).exists()) {

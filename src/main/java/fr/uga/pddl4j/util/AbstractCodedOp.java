@@ -96,12 +96,14 @@ public abstract class AbstractCodedOp implements CodedOp {
      * @throws IllegalArgumentException if <code>parameters.length != instantiations.length</code>.
      */
     protected AbstractCodedOp(final String name, final int[] parameters, final int[] instantiations) {
-        if (parameters.length != instantiations.length) {
-            throw new IllegalArgumentException("parameters.length != instantiations.length");
-        }
         if (name == null || parameters == null || instantiations == null) {
             throw new NullPointerException("name == null || parameters == null || instantiations == null");
         }
+
+        if (parameters.length != instantiations.length) {
+            throw new IllegalArgumentException("parameters.length != instantiations.length");
+        }
+
         this.name = name;
         this.parameters = parameters;
         this.instantiations = instantiations;

@@ -22,6 +22,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.parser.lexer.Token;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -135,7 +136,7 @@ public class Symbol implements Serializable {
             throw new NullPointerException("symbol == null");
         }
         this.kind = symbol.getKind();
-        this.image = new String(symbol.getImage());
+        this.image = symbol.getImage();
         this.beginLine = symbol.getBeginLine();
         this.beginColumn = symbol.getBeginColumn();
         this.endLine = symbol.getEndLine();
@@ -154,7 +155,7 @@ public class Symbol implements Serializable {
             throw new NullPointerException();
         }
         this.kind = kind;
-        this.image = token.image.toLowerCase();
+        this.image = token.image.toLowerCase(Locale.ENGLISH);
         this.beginLine = token.beginLine;
         this.beginColumn = token.beginColumn;
         this.endLine = token.endLine;
@@ -178,7 +179,7 @@ public class Symbol implements Serializable {
             throw new NullPointerException();
         }
         this.kind = kind;
-        this.image = image.toLowerCase();
+        this.image = image.toLowerCase(Locale.ENGLISH);
         this.beginLine = beginLine;
         this.beginColumn = beginColumn;
         this.endLine = endLine;

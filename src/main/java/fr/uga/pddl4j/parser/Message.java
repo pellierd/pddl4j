@@ -223,7 +223,8 @@ public class Message implements Serializable, Comparable<Message> {
      * @return the hash code value of this message.
      * @see java.lang.Object#hashCode()
      */
-    public int hashcode() {
+    @Override
+    public int hashCode() {
         return this.line + this.column + this.file.hashCode();
     }
 

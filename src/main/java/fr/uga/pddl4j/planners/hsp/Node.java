@@ -29,6 +29,8 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class Node extends BitState {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The parent node of this node.
      */
@@ -157,5 +159,15 @@ public final class Node extends BitState {
      */
     public final double getValueF(double weight) {
         return weight * this.heuristic + this.cost;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

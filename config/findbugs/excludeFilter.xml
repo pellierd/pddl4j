@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FindBugsFilter>
+	<Match>
+		<Class name="~fr.uga.pddl4j.parser.lexer\.[^.]+"/>
+	</Match>
+	<Match>
+		<Class name="fr.uga.pddl4j.util.MemoryAgent" />
+		<Method name="isSharedFlyweight" />
+	</Match>
+	<Match>
+		<Class name="fr.uga.pddl4j.parser.Connective" />
+		<Method name="getImage" />
+	</Match>
+	<Match>
+		<Class name="fr.uga.pddl4j.parser.Parser" />
+		<Method name="parse" />
+	</Match>
+    <Match>
+        <Class name="fr.uga.pddl4j.util.IntExp" />
+        <Method name="getArguments" />
+    </Match>
+    <Match>
+        <Class name="fr.uga.pddl4j.util.IntExp" />
+        <Method name="setArguments" />
+    </Match>
+</FindBugsFilter>

@@ -183,7 +183,7 @@ final class StringEncoder {
                         exp.getChildren().size() - 1), constants, types, predicates, functions, offset));
                 }
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                // offset = offset.substring(0, offset.length() - 2); //Unused affectation because String is immutable
                 break;
             case FORALL:
             case EXISTS:
@@ -200,7 +200,7 @@ final class StringEncoder {
                         functions, offset));
                 }
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case NUMBER:
                 str.append(exp.getValue());
@@ -210,20 +210,18 @@ final class StringEncoder {
                     functions, offset));
                 break;
             case F_EXP_T:
-                str.append(exp.getConnective());
-                /*
-                 * if (this.children.isEmpty()) { str.append(this.getVariable()); } else {
-                 * str.append("("); str.append(this.getConnective()); str.append(" ");
-                 * str.append(this.getVariable()); str.append(" ");
-                 * str.append(this.toString(cn.getChildren().get(0))); }
-                 */
-                break;
-            case TIME_VAR:
-                // str.append(cn.getVariable());
-                break;
+            /*
+             * if (this.children.isEmpty()) { str.append(this.getVariable()); } else {
+             * str.append("("); str.append(this.getConnective()); str.append(" ");
+             * str.append(this.getVariable()); str.append(" ");
+             * str.append(this.toString(cn.getChildren().get(0))); }
+             */
             case TRUE:
             case FALSE:
                 str.append(exp.getConnective());
+                break;
+            case TIME_VAR:
+                // str.append(cn.getVariable());
                 break;
             case FN_ATOM:
             case WHEN:

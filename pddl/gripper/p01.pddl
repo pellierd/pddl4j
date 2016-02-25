@@ -1,6 +1,6 @@
 (define (problem gripper-x-1)
-   (:requirements :typing)
    (:domain gripper-typed)
+   (:requirements :typing)
    (:objects rooma roomb - room
              ball4 ball3 ball2 ball1 - ball)
    (:init (at-robby rooma)

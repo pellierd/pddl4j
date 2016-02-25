@@ -35,6 +35,8 @@ import java.util.Set;
  */
 public class Domain implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The name of the domain.
      */
@@ -373,7 +375,8 @@ public class Domain implements Serializable {
      *
      * @return the hash code value of this domain.
      */
-    public int hashcode() {
+    @Override
+    public int hashCode() {
         return this.name.hashCode();
     }
 

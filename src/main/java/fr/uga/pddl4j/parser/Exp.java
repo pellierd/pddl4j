@@ -239,8 +239,7 @@ public class Exp implements Serializable {
     /**
      * Returns the name of the preference.
      *
-     * @return the name of the preference or <code>null</code> if the preference name was not
-     * initialized.
+     * @return the name of the preference or <code>null</code> if the preference name was not initialized.
      */
     public final Symbol getPrefName() {
         return this.prefName;
@@ -548,19 +547,23 @@ public class Exp implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
-     * not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     * atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
+     *     not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
+     *     atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object object) {
         if (object != null && object instanceof Exp) {
             Exp other = (Exp) object;
             return this.connective.equals(other.connective)
-                && ((this.atom == null && other.atom == null) || (this.atom.equals(other.atom)))
+                && ((this.atom == null && other.atom == null)
+                    || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
                 && this.children.equals(other.children)
-                && ((this.prefName == null && other.prefName == null) || (this.prefName.equals(other.prefName)))
-                && ((this.variables == null && other.variables == null) || (this.variables.equals(other.variables)))
-                && ((this.value == null && other.value == null) || (this.value.equals(other.value)));
+                && ((this.prefName == null && other.prefName == null)
+                    || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
+                && ((this.variables == null && other.variables == null)
+                    || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
+                && ((this.value == null && other.value == null)
+                    || (this.value != null && other.value != null && this.value.equals(other.value)));
         }
         return false;
     }
@@ -593,7 +596,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to test.
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
-     * this expression; <code>false</code> otherwise.
+     *     this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Exp exp) {
         Iterator<Exp> it = this.getChildren().iterator();
@@ -660,7 +663,7 @@ public class Exp implements Serializable {
      * @exception MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression()
      */
-    public String toString() throws MalformedExpException{
+    public String toString() throws MalformedExpException {
         return this.toString("");
     }
 
@@ -714,7 +717,7 @@ public class Exp implements Serializable {
                     str.append(this.children.get(this.children.size() - 1).toString(offset));
                 }
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case FORALL:
             case EXISTS:
@@ -730,7 +733,7 @@ public class Exp implements Serializable {
                 str.append(")\n" + offset);
                 str.append(this.children.get(0).toString(offset));
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case NUMBER:
                 str.append(this.value);
