@@ -260,7 +260,7 @@ public class IntExp implements Serializable {
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
                 && Arrays.equals(this.arguments, other.arguments)
-                && this.value == other.value
+                && Double.compare(this.value,other.value) == 0
                 && this.variable == other.variable
                 && this.type == other.type
                 && this.children.equals(other.children);
