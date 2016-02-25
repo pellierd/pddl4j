@@ -183,7 +183,7 @@ final class StringEncoder {
                         exp.getChildren().size() - 1), constants, types, predicates, functions, offset));
                 }
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                // offset = offset.substring(0, offset.length() - 2); //Unused affectation because String is immutable
                 break;
             case FORALL:
             case EXISTS:
@@ -200,7 +200,7 @@ final class StringEncoder {
                         functions, offset));
                 }
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case NUMBER:
                 str.append(exp.getValue());

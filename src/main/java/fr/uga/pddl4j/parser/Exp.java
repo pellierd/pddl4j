@@ -717,7 +717,7 @@ public class Exp implements Serializable {
                     str.append(this.children.get(this.children.size() - 1).toString(offset));
                 }
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case FORALL:
             case EXISTS:
@@ -733,7 +733,7 @@ public class Exp implements Serializable {
                 str.append(")\n" + offset);
                 str.append(this.children.get(0).toString(offset));
                 str.append(")");
-                offset = offset.substring(0, offset.length() - 2);
+                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case NUMBER:
                 str.append(this.value);
