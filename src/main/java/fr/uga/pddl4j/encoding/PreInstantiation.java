@@ -532,8 +532,6 @@ final class PreInstantiation {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
-                PreInstantiation.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                break;
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -612,8 +610,6 @@ final class PreInstantiation {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
-                unaryInertia.addAll(PreInstantiation.collectUnaryInertia(exp.getChildren().get(0)));
-                break;
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
