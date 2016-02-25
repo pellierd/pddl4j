@@ -162,8 +162,8 @@ public final class Node extends BitState {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     @Override

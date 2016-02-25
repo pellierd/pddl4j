@@ -281,11 +281,11 @@ public class ParserTest {
         String currentProblem;
 
         // Counting the number of problem files
-         File[] pbFileList = new File(currentTestPath)
-                .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"));
+        File[] pbFileList = new File(currentTestPath)
+            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"));
 
         int nbTest = 0;
-        if(pbFileList != null) {
+        if (pbFileList != null) {
             nbTest = pbFileList.length;
         }
 

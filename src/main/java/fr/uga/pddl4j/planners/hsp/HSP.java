@@ -575,12 +575,12 @@ public final class HSP {
         private static final long serialVersionUID = 1L;
 
         /**
-         * The weight of the heuristic use for the comparison
+         * The weight of the heuristic use for the comparison.
          */
         private double weight;
 
         /**
-         * Build the Node comparator object base on heuristic weight
+         * Build the Node comparator object base on heuristic weight.
          * @param weight the heuristic weight
          */
         public NodeComparator(double weight) {
