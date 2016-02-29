@@ -19,9 +19,11 @@
 
 package fr.uga.pddl4j.parser;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
 import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,6 +81,8 @@ import java.util.Set;
  * @version 1.0 - 28.01.10
  */
 public final class Parser {
+
+    private static Logger logger = LogManager.getLogger(Parser.class);
 
     /**
      * The specific symbol object.
