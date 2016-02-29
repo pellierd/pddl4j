@@ -28,7 +28,6 @@ import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.io.File;
@@ -259,12 +258,12 @@ public final class HSP {
         // Get the initial state from the planning problem
         final BitState init = new BitState(problem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
-        final Map<BitState, Node> closeSet = new HashMap<BitState, Node>();
-        final Map<BitState, Node> openSet = new HashMap<BitState, Node>();
+        final Map<BitState, Node> closeSet = new HashMap<>();
+        final Map<BitState, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
         final double weight = (Double) this.arguments.get(HSP.Argument.WEIGHT);
         // The list stores the node ordered according to the A* (f = g + h) function
-        final PriorityQueue<Node> open = new PriorityQueue<Node>(100, new NodeComparator(weight));
+        final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(weight));
         // Creates the root node of the tree search
         final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
         // Adds the root to the list of pending nodes
@@ -290,13 +289,12 @@ public final class HSP {
                     if (op.isApplicable(current)) {
                         Node state = new Node(current);
                         // Apply the effect of the applicable operator
-                        for (CondBitExp ce : op.getCondEffects()) {
-                            // Test if the condition of the effect is satisfied in the current state
-                            if (current.satisfy(ce.getCondition())) {
-                                // Apply the effect to the successor node
-                                state.apply(ce.getEffects());
-                            }
-                        }
+                        // Test if the condition of the effect is satisfied in the current state
+                        // Apply the effect to the successor node
+                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce -> {
+                            // Apply the effect to the successor node
+                            state.apply(ce.getEffects());
+                        });
                         final int g = current.getCost() + 1;
                         Node result = openSet.get(state);
                         if (result == null) {
@@ -351,7 +349,7 @@ public final class HSP {
      */
     private List<String> extract(final Node node, final CodedProblem problem) {
         Node n = node;
-        final LinkedList<String> plan = new LinkedList<String>();
+        final LinkedList<String> plan = new LinkedList<>();
         while (n.getOperator() != -1) {
             final BitOp op = problem.getOperators().get(n.getOperator());
             if (!op.isDummy()) {
@@ -503,7 +501,7 @@ public final class HSP {
                 || arguments.get(HSP.Argument.PROBLEM) == null) {
                 HSP.printUsage();
             }
-        } catch (Throwable throwable) {
+        } catch (RuntimeException runExp) {
             HSP.printUsage();
         }
         return arguments;
