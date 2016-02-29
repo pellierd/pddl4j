@@ -29,6 +29,8 @@ import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,6 +50,8 @@ import java.util.Properties;
  * @version 1.0 - 14.06.2010
  */
 public final class HSP {
+
+    private static final Logger LOGGER = LogManager.getLogger(HSP.class);
 
     /**
      * The default heuristic.
@@ -151,8 +155,7 @@ public final class HSP {
         try {
             parser.parse(ops, facts);
         } catch (FileNotFoundException fnfException) {
-            //TODO manage the error here
-            fnfException.printStackTrace();
+            LOGGER.error(fnfException);
         }
         if (!parser.getErrorManager().isEmpty()) {
             parser.getErrorManager().printAll();
@@ -502,7 +505,7 @@ public final class HSP {
                 HSP.printUsage();
             }
         } catch (RuntimeException runExp) {
-            HSP.printUsage();
+            LOGGER.fatal("\nUnexpected error:", runExp);
         }
         return arguments;
     }

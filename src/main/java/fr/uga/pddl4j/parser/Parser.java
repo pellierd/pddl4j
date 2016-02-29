@@ -82,7 +82,7 @@ import java.util.Set;
  */
 public final class Parser {
 
-    private static Logger logger = LogManager.getLogger(Parser.class);
+    private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
     /**
      * The specific symbol object.
@@ -103,6 +103,11 @@ public final class Parser {
      * The specific symbol total-costs.
      */
     public static final Symbol TOTAL_TIME = new Symbol(Symbol.Kind.FUNCTOR, "total-time");
+
+    /**
+     * Message for unhandled error
+     */
+    private static final String UNEXP_ERROR_MESSAGE = "\nUnexpected error";
 
     /**
      * The error manager of the parser.
@@ -158,11 +163,9 @@ public final class Parser {
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
         } catch (RuntimeException exception) {
-            //System.out.println("\nUnexpected error:");
-            exception.printStackTrace(System.out);
+            LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
         } catch (ParseException pe) {
-            pe.printStackTrace();
-            System.err.println("Parse error in domain() call");
+            LOGGER.error("Parse error in domain() call", pe);
         }
     }
 
@@ -190,11 +193,9 @@ public final class Parser {
             this.checkProblemConstraints();
             this.checkMetric();
         } catch (RuntimeException exception) {
-            //System.out.println("\nUnexpected error:");
-            exception.printStackTrace(System.out);
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         } catch (ParseException pe) {
-            pe.printStackTrace();
-            System.err.println("Parse error in problem() call");
+            LOGGER.error("Parse error in problem() call", pe);
         }
     }
 
@@ -232,8 +233,7 @@ public final class Parser {
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
         } catch (Exception exception) {
-            //System.out.println("\nUnexpected error:");
-            //exception.printStackTrace(System.out);
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
 
@@ -292,8 +292,7 @@ public final class Parser {
             this.checkProblemConstraints();
             this.checkMetric();
         } catch (Exception exception) {
-            //System.out.println("\nUnexpected error:");
-            //exception.printStackTrace(System.out);
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
 
@@ -1121,7 +1120,7 @@ public final class Parser {
             try {
                 parser.parse(args[1]);
             } catch (FileNotFoundException fnfException) {
-                System.out.println(fnfException.getMessage());
+                LOGGER.error("Parsing problem error", fnfException);
             }
             if (parser.mgr.isEmpty()) {
                 System.out.println("ok");
@@ -1135,7 +1134,7 @@ public final class Parser {
             try {
                 parser.parse(args[1], args[3]);
             } catch (FileNotFoundException fnfException) {
-                System.out.println(fnfException.getMessage());
+                LOGGER.error("domain or problem missing", fnfException);
             }
             if (parser.mgr.isEmpty()) {
                 System.out.println("ok");

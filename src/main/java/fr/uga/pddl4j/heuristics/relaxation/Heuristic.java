@@ -22,8 +22,6 @@ package fr.uga.pddl4j.heuristics.relaxation;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
 
-import java.io.Serializable;
-
 
 /**
  * This interface defines the methods accessible from all heuristics. An heuristic is a function
@@ -37,7 +35,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public interface Heuristic extends Serializable {
+public interface Heuristic {
 
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is

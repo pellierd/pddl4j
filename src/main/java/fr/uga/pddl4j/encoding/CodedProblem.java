@@ -24,7 +24,6 @@ import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,9 +36,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public class CodedProblem implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class CodedProblem {
 
     /**
      * The table of types.
