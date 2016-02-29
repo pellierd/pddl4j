@@ -45,7 +45,11 @@ jar {
                 'Implementation-Version': version,
                 'Gradle-Version':'Gradle 2.10',
                 'Built-By': 'Damien Pellier',
-                'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent'
+                'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
+                'Main-Class': 'fr.uga.pddl4j.planners.hsp.HSP'
+    }
+    doFirst {
+        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
     }
 }
 
