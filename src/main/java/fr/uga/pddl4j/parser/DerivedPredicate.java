@@ -122,7 +122,7 @@ public class DerivedPredicate implements Serializable {
      */
     public void normalize() {
         // Rename the head of the derived predicate
-        final Map<String, String> context = new LinkedHashMap<String, String>();
+        final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol> arguments = this.getHead().getArguments();
         for (int i = 0; i < arguments.size(); i++) {
             final TypedSymbol argument = arguments.get(i);

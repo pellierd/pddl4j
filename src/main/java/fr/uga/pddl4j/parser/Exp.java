@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.exceptions.MalformedExpException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;

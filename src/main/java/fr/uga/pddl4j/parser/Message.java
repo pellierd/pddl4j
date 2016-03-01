@@ -265,7 +265,7 @@ public class Message implements Serializable, Comparable<Message> {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         if (this.type == Type.LEXICAL_ERROR) {
             str.append("Lexical error");
         } else if (this.type == Type.PARSER_ERROR) {

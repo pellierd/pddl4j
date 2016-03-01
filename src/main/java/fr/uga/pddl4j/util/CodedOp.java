@@ -34,7 +34,7 @@ public interface CodedOp extends Serializable {
      *
      * @return the name of this operator
      */
-    public String getName();
+    String getName();
 
     /**
      * Set the name of the operator.
@@ -42,7 +42,7 @@ public interface CodedOp extends Serializable {
      * @param name the name to set.
      * @throws NullPointerException if <code>name == null</code>.
      */
-    public void setName(final String name) throws NullPointerException;
+    void setName(final String name) throws NullPointerException;
 
     /**
      * Returns the type of the parameter at the specified index.
@@ -51,7 +51,7 @@ public interface CodedOp extends Serializable {
      * @return the type of the parameter at the specified index.
      * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      */
-    public int getTypeOfParameters(final int index) throws ArrayIndexOutOfBoundsException;
+    int getTypeOfParameters(final int index) throws ArrayIndexOutOfBoundsException;
 
     /**
      * Set a new type the parameter at a specified index.
@@ -61,7 +61,7 @@ public interface CodedOp extends Serializable {
      * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      * @throws IllegalArgumentException       if type < 0.
      */
-    public void setTypeOfParameter(final int index, final int type)
+    void setTypeOfParameter(final int index, final int type)
         throws ArrayIndexOutOfBoundsException, IllegalArgumentException;
 
     /**
@@ -71,7 +71,7 @@ public interface CodedOp extends Serializable {
      * @return the value of the parameter.
      * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      */
-    public int getValueOfParameter(final int index) throws ArrayIndexOutOfBoundsException;
+    int getValueOfParameter(final int index) throws ArrayIndexOutOfBoundsException;
 
     /**
      * Instantiate a parameter of the operator at a specified index with a value.
@@ -88,7 +88,7 @@ public interface CodedOp extends Serializable {
      * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      * @throws IllegalArgumentException       if value < 0.
      */
-    public void setValueOfParameter(final int index, final int value)
+    void setValueOfParameter(final int index, final int value)
         throws ArrayIndexOutOfBoundsException, IllegalArgumentException;
 
     /**
@@ -96,6 +96,6 @@ public interface CodedOp extends Serializable {
      *
      * @return the arity of the operator.
      */
-    public int getArity();
+    int getArity();
 
 }

@@ -60,8 +60,8 @@ public class NamedTypedList implements Serializable {
             throw new NullPointerException("list == null");
         }
         this.name = new Symbol(list.getName());
-        this.arguments = new ArrayList<TypedSymbol>();
-        this.types = new ArrayList<Symbol>();
+        this.arguments = new ArrayList<>();
+        this.types = new ArrayList<>();
         for (TypedSymbol symbol : list.getArguments()) {
             this.arguments.add(new TypedSymbol(symbol));
         }
@@ -78,8 +78,8 @@ public class NamedTypedList implements Serializable {
             throw new NullPointerException();
         }
         this.name = name;
-        this.arguments = new ArrayList<TypedSymbol>();
-        this.types = new ArrayList<Symbol>();
+        this.arguments = new ArrayList<>();
+        this.types = new ArrayList<>();
     }
 
     /**
@@ -202,7 +202,7 @@ public class NamedTypedList implements Serializable {
      * @return a string representation of this named typed list.
      */
     public String toString() {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         str.append("(");
         str.append(this.name.toString());
         for (int i = 0; i < this.arguments.size(); i++) {

@@ -102,11 +102,11 @@ final class IntEncoding {
     static void encodeTypes(final Domain domain) {
         final List<TypedSymbol> types = domain.getTypes();
         final int nbTypes = types.size();
-        Encoder.tableOfTypes = new ArrayList<String>(nbTypes);
-        Encoder.tableOfDomains = new ArrayList<Set<Integer>>(nbTypes);
+        Encoder.tableOfTypes = new ArrayList<>(nbTypes);
+        Encoder.tableOfDomains = new ArrayList<>(nbTypes);
         for (TypedSymbol type : types) {
             Encoder.tableOfTypes.add(type.getImage());
-            Encoder.tableOfDomains.add(new LinkedHashSet<Integer>());
+            Encoder.tableOfDomains.add(new LinkedHashSet<>());
         }
     }
 
@@ -120,8 +120,8 @@ final class IntEncoding {
             final List<Symbol> types = elt.getTypes();
             if (types.size() > 1) {
                 String newType;
-                Set<Integer> newTypeDomain = new LinkedHashSet<Integer>();
-                StringBuffer buf = new StringBuffer();
+                Set<Integer> newTypeDomain = new LinkedHashSet<>();
+                StringBuilder buf = new StringBuilder();
                 buf.append("either");
                 for (Symbol type : types) {
                     final String image = type.getImage();
@@ -134,7 +134,7 @@ final class IntEncoding {
                 newType = buf.toString();
                 int index = Encoder.tableOfTypes.indexOf(newType);
                 if (index == -1) {
-                    Encoder.tableOfDomains.add(new LinkedHashSet<Integer>(newTypeDomain));
+                    Encoder.tableOfDomains.add(new LinkedHashSet<>(newTypeDomain));
                     Encoder.tableOfTypes.add(newType);
                 }
             }
@@ -226,7 +226,7 @@ final class IntEncoding {
      */
     static void encodeConstants(final Domain domain, final Problem problem) {
         final List<TypedSymbol> constants = domain.getConstants();
-        Encoder.tableOfConstants = new ArrayList<String>(domain.getConstants().size());
+        Encoder.tableOfConstants = new ArrayList<>(domain.getConstants().size());
         constants.addAll(problem.getObjects());
         for (TypedSymbol constant : constants) {
             int ic = Encoder.tableOfConstants.indexOf(constant.getImage());
@@ -234,7 +234,7 @@ final class IntEncoding {
                 ic = Encoder.tableOfConstants.size();
                 Encoder.tableOfConstants.add(constant.getImage());
             }
-            final LinkedList<Symbol> types = new LinkedList<Symbol>(constant.getTypes());
+            final LinkedList<Symbol> types = new LinkedList<>(constant.getTypes());
             while (!types.isEmpty()) {
                 Symbol type = types.poll();
                 final int it = Encoder.tableOfTypes.indexOf(type.getImage());
@@ -252,16 +252,16 @@ final class IntEncoding {
     static void encodePredicates(final Domain domain) {
         final List<NamedTypedList> predicates = domain.getPredicates();
         final int nbPredicates = predicates.size();
-        Encoder.tableOfPredicates = new ArrayList<String>(nbPredicates);
-        Encoder.tableOfTypedPredicates = new ArrayList<List<Integer>>(nbPredicates);
+        Encoder.tableOfPredicates = new ArrayList<>(nbPredicates);
+        Encoder.tableOfTypedPredicates = new ArrayList<>(nbPredicates);
         for (NamedTypedList predicate : predicates) {
             Encoder.tableOfPredicates.add(predicate.getName().getImage());
             final List<TypedSymbol> arguments = predicate.getArguments();
-            final List<Integer> argType = new ArrayList<Integer>(arguments.size());
+            final List<Integer> argType = new ArrayList<>(arguments.size());
             for (TypedSymbol arg : arguments) {
                 final List<Symbol> types = arg.getTypes();
                 if (types.size() > 1) {
-                    final StringBuffer image = new StringBuffer("either");
+                    final StringBuilder image = new StringBuilder("either");
                     for (Symbol type : types) {
                         image.append("~");
                         image.append(type.getImage());
@@ -282,16 +282,16 @@ final class IntEncoding {
      */
     static void encodeFunctions(final Domain domain) {
         final List<NamedTypedList> functions = domain.getFunctions();
-        Encoder.tableOfFunctions = new ArrayList<String>(functions.size());
-        Encoder.tableOfTypedFunctions = new ArrayList<List<Integer>>(functions.size());
+        Encoder.tableOfFunctions = new ArrayList<>(functions.size());
+        Encoder.tableOfTypedFunctions = new ArrayList<>(functions.size());
         for (NamedTypedList function : functions) {
             Encoder.tableOfFunctions.add(function.getName().getImage());
             List<TypedSymbol> arguments = function.getArguments();
-            List<Integer> argType = new ArrayList<Integer>(arguments.size());
+            List<Integer> argType = new ArrayList<>(arguments.size());
             for (int j = 0; j < arguments.size(); j++) {
                 List<Symbol> types = arguments.get(j).getTypes();
                 if (types.size() > 1) {
-                    StringBuffer type = new StringBuffer("either");
+                    StringBuilder type = new StringBuilder("either");
                     for (int k = 0; k < types.size(); k++) {
                         type.append("~");
                         type.append(types.get(k).getImage());
@@ -313,7 +313,7 @@ final class IntEncoding {
      * @return encoded the list of operators encoded.
      */
     static List<IntOp> encodeOperators(final List<Op> ops) {
-        final List<IntOp> intOps = new ArrayList<IntOp>();
+        final List<IntOp> intOps = new ArrayList<>();
         for (Op op : ops) {
             intOps.add(IntEncoding.encodeOperator(op));
         }
@@ -327,7 +327,7 @@ final class IntEncoding {
      * @return the initial state encoded.
      */
     static Set<IntExp> encodeInit(final List<Exp> init) {
-        final Set<IntExp> intInit = new LinkedHashSet<IntExp>();
+        final Set<IntExp> intInit = new LinkedHashSet<>();
         for (Exp fact : init) {
             intInit.add(IntEncoding.encodeExp(fact));
         }
@@ -354,7 +354,7 @@ final class IntEncoding {
     private static IntOp encodeOperator(final Op op) {
         final IntOp intOp = new IntOp(op.getName().getImage(), op.getArity());
         // Encode the parameters of the operator
-        final List<String> variables = new ArrayList<String>(op.getArity());
+        final List<String> variables = new ArrayList<>(op.getArity());
         for (int i = 0; i < op.getArity(); i++) {
             final TypedSymbol parameter = op.getParameters().get(i);
             final String typeImage = IntEncoding.toStringType(parameter.getTypes());
@@ -378,7 +378,7 @@ final class IntEncoding {
      * @return the integer representation of the specified expression.
      */
     private static IntExp encodeExp(final Exp exp) {
-        return IntEncoding.encodeExp(exp, new ArrayList<String>());
+        return IntEncoding.encodeExp(exp, new ArrayList<>());
     }
 
     /**
@@ -449,7 +449,7 @@ final class IntEncoding {
                 break;
             case FORALL:
             case EXISTS:
-                final List<String> newVariables = new ArrayList<String>(variables);
+                final List<String> newVariables = new ArrayList<>(variables);
                 final List<TypedSymbol> qvar = exp.getVariables();
                 final String type = IntEncoding.toStringType(qvar.get(0).getTypes());
                 int typeIndex = Encoder.tableOfTypes.indexOf(type);
@@ -531,7 +531,7 @@ final class IntEncoding {
      * @return the string representation of this type.
      */
     private static String toStringType(final List<Symbol> types) {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         if (types.size() > 1) {
             str.append("either");
             for (Symbol type : types) {

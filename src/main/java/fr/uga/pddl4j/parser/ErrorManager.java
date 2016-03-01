@@ -47,7 +47,7 @@ public class ErrorManager implements Serializable {
      * Creates a new error manager.
      */
     public ErrorManager() {
-        this.msg = new TreeSet<Message>();
+        this.msg = new TreeSet<>();
     }
 
     /**
@@ -106,7 +106,7 @@ public class ErrorManager implements Serializable {
      * @return The list of messages.
      */
     public Set<Message> getMessages(File file) {
-        Set<Message> messages = new LinkedHashSet<Message>();
+        Set<Message> messages = new LinkedHashSet<>();
         for (Message msg : this.msg) {
             if (msg.getFile().equals(file)) {
                 messages.add(msg);
@@ -123,7 +123,7 @@ public class ErrorManager implements Serializable {
      * @return The list of messages of a specific type concerning a specific file.
      */
     public Set<Message> getMessages(Message.Type type, File file) {
-        Set<Message> messages = new LinkedHashSet<Message>();
+        Set<Message> messages = new LinkedHashSet<>();
         for (Message msg : this.msg) {
             if (msg.getType().equals(type) && msg.getFile().equals(file)) {
                 messages.add(msg);
@@ -139,7 +139,7 @@ public class ErrorManager implements Serializable {
      * @return The list of messages of a specific type
      */
     public Set<Message> getMessages(Message.Type type) {
-        Set<Message> messages = new LinkedHashSet<Message>();
+        Set<Message> messages = new LinkedHashSet<>();
         for (Message msg : this.msg) {
             if (msg.getType().equals(type)) {
                 messages.add(msg);

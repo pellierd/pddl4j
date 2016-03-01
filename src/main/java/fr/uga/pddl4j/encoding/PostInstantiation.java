@@ -76,12 +76,12 @@ final class PostInstantiation {
      * @param init      the initial state.
      */
     static void extractRelevantFacts(final List<IntOp> operators, final Set<IntExp> init) {
-        final Set<IntExp> relevants = new LinkedHashSet<IntExp>(10000);
+        final Set<IntExp> relevants = new LinkedHashSet<>(10000);
         for (IntOp op : operators) {
             PostInstantiation.extractRelevantFacts(op.getPreconditions(), relevants, init);
             PostInstantiation.extractRelevantFacts(op.getEffects(), relevants, init);
         }
-        Encoder.tableOfRevelantFacts = new ArrayList<IntExp>(relevants.size());
+        Encoder.tableOfRevelantFacts = new ArrayList<>(relevants.size());
         for (IntExp exp : relevants) {
             final IntExp relevant = new IntExp(exp);
             Encoder.tableOfRevelantFacts.add(relevant);
@@ -197,7 +197,7 @@ final class PostInstantiation {
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1 == arg2) {
                     exp.setConnective(Connective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0 && arg1 != arg2) {
+                } else if (arg1 >= 0 && arg2 >= 0) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
                     exp.setConnective(Connective.FALSE);
                 }
@@ -461,7 +461,7 @@ final class PostInstantiation {
     static void simplyOperatorsWithGroundInertia(final List<IntOp> operators, final Set<IntExp> init) {
 
         // Then for each instantiated operator try to simplify it.
-        final List<IntOp> tmpOps = new ArrayList<IntOp>(operators.size());
+        final List<IntOp> tmpOps = new ArrayList<>(operators.size());
         for (IntOp op : operators) {
             PostInstantiation.simplifyWithGroundInertia(op.getPreconditions(), false, init);
             PostInstantiation.simplify(op.getPreconditions());
@@ -651,7 +651,7 @@ final class PostInstantiation {
      * @param operators the list of instantiated operators.
      */
     static void extractGroundInertia(final List<IntOp> operators) {
-        Encoder.tableOfGroundInertia = new LinkedHashMap<IntExp, Inertia>(
+        Encoder.tableOfGroundInertia = new LinkedHashMap<>(
             Constants.DEFAULT_RELEVANT_FACTS_TABLE);
         for (IntOp op : operators) {
             PostInstantiation.extractGroundInertia(op.getEffects());

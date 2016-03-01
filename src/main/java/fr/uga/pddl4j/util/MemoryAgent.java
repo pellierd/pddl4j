@@ -164,7 +164,7 @@ public class MemoryAgent {
      *     objectToSize and by all the objects reachable from it
      */
     public static long deepSizeOf(Object object) {
-        final Map<Object, Object> doneObj = new IdentityHashMap<Object, Object>();
+        final Map<Object, Object> doneObj = new IdentityHashMap<>();
         return MemoryAgent.deepSizeOf(object, doneObj, 0);
     }
 
@@ -197,10 +197,8 @@ public class MemoryAgent {
                 final Object o;
                 try {
                     o = field.get(obj);
-                } catch (IllegalArgumentException iargException) {
+                } catch (IllegalArgumentException | IllegalAccessException iargException) {
                     throw new RuntimeException(iargException);
-                } catch (IllegalAccessException iaException) {
-                    throw new RuntimeException(iaException);
                 }
                 if (MemoryAgent.isComputable(field)) {
                     size += MemoryAgent.deepSizeOf(o, doneObj, depth + 1);

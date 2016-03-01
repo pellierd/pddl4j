@@ -116,55 +116,55 @@ public class CodedProblem {
      */
     public CodedProblem(CodedProblem other) {
         super();
-        this.types = new ArrayList<String>();
+        this.types = new ArrayList<>();
         for (String str : other.types) {
             this.types.add(str);
         }
-        this.domains = new ArrayList<Set<Integer>>();
+        this.domains = new ArrayList<>();
         for (Set<Integer> si : other.domains) {
-            final Set<Integer> copy = new LinkedHashSet<Integer>();
+            final Set<Integer> copy = new LinkedHashSet<>();
             for (Integer i : si) {
                 copy.add(i);
             }
             this.domains.add(copy);
         }
-        this.constants = new ArrayList<String>();
+        this.constants = new ArrayList<>();
         for (String str : other.constants) {
             this.constants.add(str);
         }
-        this.predicates = new ArrayList<String>();
+        this.predicates = new ArrayList<>();
         for (String str : other.predicates) {
             this.predicates.add(str);
         }
-        this.predicatesSignatures = new ArrayList<List<Integer>>();
+        this.predicatesSignatures = new ArrayList<>();
         for (List<Integer> si : other.predicatesSignatures) {
-            final List<Integer> copy = new ArrayList<Integer>();
+            final List<Integer> copy = new ArrayList<>();
             for (Integer i : si) {
                 copy.add(i);
             }
             this.predicatesSignatures.add(copy);
         }
-        this.functions = new ArrayList<String>();
+        this.functions = new ArrayList<>();
         for (String str : other.functions) {
             this.functions.add(str);
         }
-        this.functionsSignatures = new ArrayList<List<Integer>>();
+        this.functionsSignatures = new ArrayList<>();
         for (List<Integer> si : other.functionsSignatures) {
-            final List<Integer> copy = new ArrayList<Integer>();
+            final List<Integer> copy = new ArrayList<>();
             for (Integer i : si) {
                 copy.add(i);
             }
             this.functionsSignatures.add(copy);
         }
-        this.inertia = new ArrayList<Inertia>();
+        this.inertia = new ArrayList<>();
         for (Inertia i : other.inertia) {
             this.inertia.add(i);
         }
-        this.revelantFacts = new ArrayList<IntExp>();
+        this.revelantFacts = new ArrayList<>();
         for (IntExp exp : other.revelantFacts) {
             this.revelantFacts.add(new IntExp(exp));
         }
-        this.operators = new ArrayList<BitOp>();
+        this.operators = new ArrayList<>();
         for (BitOp exp : other.operators) {
             this.operators.add(new BitOp(exp));
         }

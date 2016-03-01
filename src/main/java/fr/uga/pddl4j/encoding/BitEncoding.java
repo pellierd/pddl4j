@@ -75,7 +75,7 @@ final class BitEncoding {
         // Normalize the operators
         BitEncoding.normalize(operators);
 
-        final List<BitOp> ops = new ArrayList<BitOp>(operators.size());
+        final List<BitOp> ops = new ArrayList<>(operators.size());
         for (IntOp op : operators) {
             final int arity = op.getArity();
             final BitOp bOp = new BitOp(op.getName(), arity);
@@ -141,9 +141,9 @@ final class BitEncoding {
         if (goal.getConnective().equals(Connective.FALSE)) {
             return null;
         }
-        BitExp newGoal = null;
+        BitExp newGoal;
         BitEncoding.toDNF(goal);
-        Encoder.codedGoal = new ArrayList<BitExp>(goal.getChildren().size());
+        Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
         for (IntExp exp : goal.getChildren()) {
             if (exp.getConnective().equals(Connective.ATOM)) {
                 IntExp and = new IntExp(Connective.AND);
@@ -157,7 +157,7 @@ final class BitEncoding {
             // Create a new dummy fact to encode the goal
             final int dummy_predicate_index = Encoder.tableOfPredicates.size();
             Encoder.tableOfPredicates.add(Constants.DUMMY_GOAL);
-            Encoder.tableOfTypedPredicates.add(new ArrayList<Integer>());
+            Encoder.tableOfTypedPredicates.add(new ArrayList<>());
             IntExp dummyGoal = new IntExp(Connective.ATOM);
             dummyGoal.setPredicate(dummy_predicate_index);
             dummyGoal.setArguments(new int[0]);
@@ -262,7 +262,7 @@ final class BitEncoding {
      * @param operators the list of operators to normalize.
      */
     private static void normalize(final List<IntOp> operators) {
-        final List<IntOp> tmpOps = new ArrayList<IntOp>(operators.size() + 100);
+        final List<IntOp> tmpOps = new ArrayList<>(operators.size() + 100);
         for (IntOp op : operators) {
             BitEncoding.toCNF(op.getEffects());
             BitEncoding.simplify(op.getEffects());
@@ -382,17 +382,13 @@ final class BitEncoding {
                 break;
             case AND:
                 children = exp.getChildren();
-                for (int i = 0; i < children.size(); i++) {
-                    final IntExp ei = children.get(i);
-                    BitEncoding.toDNF(ei);
-                }
+                children.forEach(BitEncoding::toDNF);
                 IntExp dnf = exp.getChildren().get(0);
                 for (int i = 1; i < exp.getChildren().size(); i++) {
                     final IntExp orExp = exp.getChildren().get(i);
                     final IntExp newOr = new IntExp(Connective.OR);
-                    for (IntExp ej : dnf.getChildren()) {
+                    for (IntExp newAnd : dnf.getChildren()) {
                         for (IntExp ek : orExp.getChildren()) {
-                            final IntExp newAnd = ej;
                             for (IntExp el : ek.getChildren()) {
                                 if (!newAnd.getChildren().contains(el)) {
                                     if (el.getConnective().equals(Connective.OR)

@@ -125,7 +125,7 @@ public enum RequireKey {
      *
      * @param image the image of the require key. The image of the require key must be not null.
      */
-    private RequireKey(String image) {
+    RequireKey(String image) {
         this.image = image;
     }
 

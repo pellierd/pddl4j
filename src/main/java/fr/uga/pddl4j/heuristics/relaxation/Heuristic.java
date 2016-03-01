@@ -47,14 +47,14 @@ public interface Heuristic {
      * @return the distance to the goal state from the specified state.
      * @throws NullPointerException if <code>state == null && goal == null</code>.
      */
-    public int estimate(final BitState state, final BitExp goal) throws NullPointerException;
+    int estimate(final BitState state, final BitExp goal) throws NullPointerException;
 
     /**
      * Returns <code>true</code> if this heuristic is admissible.
      *
      * @return <code>true</code> if this heuristic is admissible.
      */
-    public boolean isAdmissible();
+    boolean isAdmissible();
 
     /**
      * The type of heuristic implemented.
@@ -62,7 +62,7 @@ public interface Heuristic {
      * @author D. Pellier
      * @version 1.0 - 09.02.2011
      */
-    public enum Type {
+    enum Type {
 
         /**
          * The type for the <code>AdjustedSum</code> heuristic.
