@@ -91,7 +91,7 @@ public class IntExp implements Serializable {
             this.arguments = Arrays.copyOf(other.getArguments(), other.getArguments().length);
         }
         List<IntExp> otherChildren = other.getChildren();
-        this.children = new ArrayList<IntExp>(otherChildren.size());
+        this.children = new ArrayList<>(otherChildren.size());
         for (IntExp child : otherChildren) {
             this.children.add(new IntExp(child));
         }
@@ -108,7 +108,7 @@ public class IntExp implements Serializable {
     public IntExp(final Connective connective) {
         this.connective = connective;
         this.arguments = null;
-        this.children = new ArrayList<IntExp>();
+        this.children = new ArrayList<>();
     }
 
     /**

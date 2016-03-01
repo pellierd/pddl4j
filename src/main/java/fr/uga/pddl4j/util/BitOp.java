@@ -53,7 +53,7 @@ public class BitOp extends AbstractCodedOp {
     public BitOp(final BitOp other) {
         super(other);
         this.preconditions = new BitExp(other.getPreconditions());
-        this.effects = new ArrayList<CondBitExp>();
+        this.effects = new ArrayList<>();
         for (CondBitExp effect : other.getCondEffects()) {
             this.effects.add(new CondBitExp(effect));
         }
@@ -68,7 +68,7 @@ public class BitOp extends AbstractCodedOp {
     public BitOp(final String name, final int arity) {
         super(name, arity);
         this.preconditions = new BitExp();
-        this.effects = new ArrayList<CondBitExp>();
+        this.effects = new ArrayList<>();
     }
 
     /**
