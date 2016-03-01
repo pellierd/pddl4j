@@ -20,6 +20,10 @@
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Lexer;
+import fr.uga.pddl4j.parser.lexer.ParseException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,6 +82,8 @@ import java.util.Set;
  */
 public final class Parser {
 
+    private static final Logger LOGGER = LogManager.getLogger(Parser.class);
+
     /**
      * The specific symbol object.
      */
@@ -97,6 +103,11 @@ public final class Parser {
      * The specific symbol total-costs.
      */
     public static final Symbol TOTAL_TIME = new Symbol(Symbol.Kind.FUNCTOR, "total-time");
+
+    /**
+     * Message for unhandled error
+     */
+    private static final String UNEXP_ERROR_MESSAGE = "\nUnexpected error";
 
     /**
      * The error manager of the parser.
@@ -151,9 +162,10 @@ public final class Parser {
             this.checkDomainConstraints();
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
-        } catch (Throwable exception) {
-            //System.out.println("\nUnexpected error:");
-            //exception.printStackTrace(System.out);
+        } catch (RuntimeException exception) {
+            LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
+        } catch (ParseException pe) {
+            LOGGER.error("Parse error in domain() call", pe);
         }
     }
 
@@ -180,9 +192,10 @@ public final class Parser {
             this.checkGoal();
             this.checkProblemConstraints();
             this.checkMetric();
-        } catch (Throwable exception) {
-            //System.out.println("\nUnexpected error:");
-            //exception.printStackTrace(System.out);
+        } catch (RuntimeException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        } catch (ParseException pe) {
+            LOGGER.error("Parse error in problem() call", pe);
         }
     }
 
@@ -219,9 +232,8 @@ public final class Parser {
             this.checkFunctionsDeclaration();
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
-        } catch (Throwable exception) {
-            //System.out.println("\nUnexpected error:");
-            //exception.printStackTrace(System.out);
+        } catch (Exception exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
 
@@ -279,9 +291,8 @@ public final class Parser {
             this.checkGoal();
             this.checkProblemConstraints();
             this.checkMetric();
-        } catch (Throwable exception) {
-            //System.out.println("\nUnexpected error:");
-            //exception.printStackTrace(System.out);
+        } catch (Exception exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
 
@@ -310,8 +321,7 @@ public final class Parser {
      *     <code>false</code> otherwise.
      */
     private boolean checkMetric() {
-        return (this.problem.getMetric() == null) ? true :
-            this.checkParserNode(this.problem.getMetric(), new LinkedList<TypedSymbol>());
+        return (this.problem.getMetric() == null) || this.checkParserNode(this.problem.getMetric(), new LinkedList<>());
     }
 
     /**
@@ -321,8 +331,8 @@ public final class Parser {
      *     <code>false</code> otherwise.
      */
     private boolean checkDomainConstraints() {
-        return (this.domain.getConstraints() == null) ? true : this.checkParserNode(this.domain
-            .getConstraints(), new LinkedList<TypedSymbol>());
+        return (this.domain.getConstraints() == null)
+            || this.checkParserNode(this.domain.getConstraints(), new LinkedList<>());
     }
 
     /**
@@ -332,8 +342,7 @@ public final class Parser {
      *     <code>false</code> otherwise.
      */
     private boolean checkProblemConstraints() {
-        return (this.problem.getConstraints() == null) ? true : this
-            .checkGroundedParserNode(this.problem.getConstraints());
+        return (this.problem.getConstraints() == null) || this.checkGroundedParserNode(this.problem.getConstraints());
     }
 
     /**
@@ -469,7 +478,7 @@ public final class Parser {
      */
     private boolean checkInitialFacts() {
         boolean checked = true;
-        LinkedList<Exp> stackGD = new LinkedList<Exp>();
+        LinkedList<Exp> stackGD = new LinkedList<>();
         stackGD.addAll(this.problem.getInit());
         while (!stackGD.isEmpty()) {
             Exp gd = stackGD.poll();
@@ -587,7 +596,7 @@ public final class Parser {
         boolean checked = true;
 
         // Gathering types declaration
-        final Map<String, TypedSymbol> map = new HashMap<String, TypedSymbol>();
+        final Map<String, TypedSymbol> map = new HashMap<>();
         map.put(Parser.OBJECT.getImage(), new TypedSymbol(Parser.OBJECT));
 
         for (TypedSymbol type : types) {
@@ -610,7 +619,7 @@ public final class Parser {
                 if (t == null) {
                     map.put(type.getImage(), type);
                 } else {
-                    Set<Symbol> set = new HashSet<Symbol>();
+                    Set<Symbol> set = new HashSet<>();
                     set.addAll(t.getTypes());
                     set.addAll(type.getTypes());
                     t.getTypes().clear();
@@ -625,7 +634,7 @@ public final class Parser {
         Iterator<TypedSymbol> iterator = map.values().iterator();
         while (iterator.hasNext() && consistent) {
             final TypedSymbol type = iterator.next();
-            final LinkedList<TypedSymbol> open = new LinkedList<TypedSymbol>();
+            final LinkedList<TypedSymbol> open = new LinkedList<>();
             open.add(type);
             while (!open.isEmpty() && consistent) {
                 final TypedSymbol current = open.poll();
@@ -658,7 +667,7 @@ public final class Parser {
      */
     private boolean checkConstantsDeclaration() {
         List<TypedSymbol> constants = this.domain.getConstants();
-        Set<Symbol> set = new HashSet<Symbol>();
+        Set<Symbol> set = new HashSet<>();
         boolean checked = true;
         for (TypedSymbol constant : constants) {
             if (!set.add(constant)) {
@@ -689,7 +698,7 @@ public final class Parser {
      */
     private boolean checkPredicatesDeclaration() {
         List<NamedTypedList> predicates = this.domain.getPredicates();
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         boolean checked = true;
         for (NamedTypedList predicate : predicates) {
             for (TypedSymbol variable : predicate.getArguments()) {
@@ -725,7 +734,7 @@ public final class Parser {
      */
     private boolean checkFunctionsDeclaration() {
 
-        Set<String> predicates = new HashSet<String>();
+        Set<String> predicates = new HashSet<>();
         for (NamedTypedList predicate : this.domain.getPredicates()) {
             Symbol predicateSymbol = predicate.getName();
             String str = predicateSymbol.getImage() + "/" + predicate.getArguments().size();
@@ -733,7 +742,7 @@ public final class Parser {
         }
 
         List<NamedTypedList> functions = this.domain.getFunctions();
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         boolean checked = true;
         for (NamedTypedList function : functions) {
             Symbol functionSymbol = function.getName();
@@ -816,10 +825,10 @@ public final class Parser {
         boolean checked = this.checkOperatorsUniqueness();
         for (Op op : this.domain.getOperators()) {
             if (this.checkOperatorsParameters(op)) {
-                checked = this.checkParserNode(op.getPreconditions(), op.getParameters());
-                checked = this.checkParserNode(op.getEffects(), op.getParameters());
+                checked &= this.checkParserNode(op.getPreconditions(), op.getParameters());
+                checked &=  this.checkParserNode(op.getEffects(), op.getParameters());
                 if (op.getDuration() != null) {
-                    checked = this.checkParserNode(op.getDuration(), op.getParameters());
+                    checked &= this.checkParserNode(op.getDuration(), op.getParameters());
                 }
             }
         }
@@ -838,14 +847,14 @@ public final class Parser {
      */
     private boolean checkParserNode(Exp exp, List<TypedSymbol> context) {
         boolean checked = true;
-        LinkedList<Exp> stackGD = new LinkedList<Exp>();
-        LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<List<TypedSymbol>>();
+        LinkedList<Exp> stackGD = new LinkedList<>();
+        LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(context);
         while (!stackGD.isEmpty()) {
             Exp gd = stackGD.poll();
             List<TypedSymbol> ctx = stackCtx.poll();
-            List<TypedSymbol> newCtx = new LinkedList<TypedSymbol>(ctx);
+            List<TypedSymbol> newCtx = new LinkedList<>(ctx);
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_HEAD:
@@ -910,9 +919,7 @@ public final class Parser {
                     checked = false;
                 } else {
                     final TypedSymbol arg = new TypedSymbol(s);
-                    for (Symbol type : param.getTypes()) {
-                        arg.addType(type);
-                    }
+                    param.getTypes().forEach(arg::addType);
                     atomSkeleton.add(arg);
                 }
             } else {
@@ -1012,24 +1019,22 @@ public final class Parser {
      *     of the seconds. <code>false</code> otherwise.
      */
     private boolean matchTypes(TypedSymbol s1, TypedSymbol s2) {
-        List<Symbol> copy = new LinkedList<Symbol>(s1.getTypes());
+        List<Symbol> copy = new LinkedList<>(s1.getTypes());
         copy.retainAll(s2.getTypes());
         boolean isSubType = !copy.isEmpty();
         Iterator<Symbol> i = s1.getTypes().iterator();
         while (i.hasNext() && !isSubType) {
             TypedSymbol type = this.domain.getType(i.next());
-            LinkedList<TypedSymbol> stack = new LinkedList<TypedSymbol>();
+            LinkedList<TypedSymbol> stack = new LinkedList<>();
             stack.push(type);
             while (!stack.isEmpty() && !isSubType) {
                 TypedSymbol t = stack.poll();
-                copy = new LinkedList<Symbol>(t.getTypes());
+                copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                for (Symbol s : t.getTypes()) {
-                    if (!s.equals(Parser.OBJECT)) {
-                        stack.push(this.domain.getType(s));
-                    }
-                }
+                t.getTypes().stream().filter(s -> !s.equals(Parser.OBJECT)).forEach(s -> {
+                    stack.push(this.domain.getType(s));
+                });
             }
         }
         return isSubType;
@@ -1045,20 +1050,19 @@ public final class Parser {
      */
     private boolean checkOperatorsParameters(Op op) {
         boolean checked = true;
-        Set<Symbol> set = new HashSet<Symbol>();
+        Set<Symbol> set = new HashSet<>();
         for (TypedSymbol parameter : op.getParameters()) {
-            Symbol s = parameter;
             if (!set.add(parameter)) {
-                this.mgr.logParserError("parameter \"" + s + "\" is defined twice in the action \""
-                    + op.getName() + "\"", this.lexer.getFile(), s.getBeginLine(), s
+                this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in the action \""
+                    + op.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
                     .getBeginColumn());
                 checked = false;
             }
             for (Symbol type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
-                            + s + "\" in the action \"" + op.getName() + "\" is undefined",
-                        this.lexer.getFile(), s.getBeginLine(), s.getBeginColumn());
+                            + parameter + "\" in the action \"" + op.getName() + "\" is undefined",
+                        this.lexer.getFile(), parameter.getBeginLine(), parameter.getBeginColumn());
                     checked = false;
                 }
             }
@@ -1073,7 +1077,7 @@ public final class Parser {
      */
     private boolean checkOperatorsUniqueness() {
         boolean checked = true;
-        Set<Symbol> set = new HashSet<Symbol>();
+        Set<Symbol> set = new HashSet<>();
         for (Op op : this.domain.getOperators()) {
             if (!set.add(op.getName())) {
                 Symbol opName = op.getName();
@@ -1116,7 +1120,7 @@ public final class Parser {
             try {
                 parser.parse(args[1]);
             } catch (FileNotFoundException fnfException) {
-                System.out.println(fnfException.getMessage());
+                LOGGER.error("Parsing problem error", fnfException);
             }
             if (parser.mgr.isEmpty()) {
                 System.out.println("ok");
@@ -1130,7 +1134,7 @@ public final class Parser {
             try {
                 parser.parse(args[1], args[3]);
             } catch (FileNotFoundException fnfException) {
-                System.out.println(fnfException.getMessage());
+                LOGGER.error("domain or problem missing", fnfException);
             }
             if (parser.mgr.isEmpty()) {
                 System.out.println("ok");

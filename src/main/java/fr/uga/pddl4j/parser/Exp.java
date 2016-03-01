@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class implements a parser node used in PDDL expressions.
@@ -95,23 +96,17 @@ public class Exp implements Serializable {
         }
         this.connective = other.getConnective();
         if (other.getAtom() != null) {
-            this.atom = new ArrayList<Symbol>();
-            for (Symbol symbol : other.getAtom()) {
-                this.atom.add(new Symbol(symbol));
-            }
+            this.atom = new ArrayList<>();
+            this.atom.addAll(other.getAtom().stream().map(Symbol::new).collect(Collectors.toList()));
         }
         if (other.getChildren() != null) {
-            this.children = new ArrayList<Exp>();
-            for (Exp exp : other.getChildren()) {
-                this.children.add(new Exp(exp));
-            }
+            this.children = new ArrayList<>();
+            this.children.addAll(other.getChildren().stream().map(Exp::new).collect(Collectors.toList()));
         }
         this.prefName = other.getPrefName();
         if (other.getVariables() != null) {
-            this.variables = new ArrayList<TypedSymbol>();
-            for (Symbol var : other.getVariables()) {
-                this.variables.add(new TypedSymbol(var));
-            }
+            this.variables = new ArrayList<>();
+            this.variables.addAll(other.getVariables().stream().map(TypedSymbol::new).collect(Collectors.toList()));
         }
         if (other.getVariable() != null) {
             this.variable = new Symbol(other.getVariable());
@@ -126,7 +121,7 @@ public class Exp implements Serializable {
         super();
         this.connective = Connective.AND;
         this.atom = null;
-        this.children = new ArrayList<Exp>();
+        this.children = new ArrayList<>();
         this.prefName = null;
         this.variables = null;
         this.value = null;
@@ -136,12 +131,12 @@ public class Exp implements Serializable {
      * Creates a new planning node with a specified connective.
      *
      * @param connective the connective.
-     * @throws NullPointerException if the specified connective is null.
+     * @throws RuntimeException if the specified connective is null.
      */
-    public Exp(final Connective connective) throws NullPointerException {
+    public Exp(final Connective connective) {
         this();
         if (connective == null) {
-            throw new NullPointerException();
+            throw new RuntimeException("Connective can not be null in Exp constructor");
         }
         this.connective = connective;
     }
@@ -151,11 +146,11 @@ public class Exp implements Serializable {
      *
      * @param exp the son to add
      * @return <code>true</code> if the node was added; <code>false</code> otherwise
-     * @throws NullPointerException if the specified node is null
+     * @throws RuntimeException if the specified node is null
      */
-    public boolean addChild(final Exp exp) throws NullPointerException {
+    public boolean addChild(final Exp exp) {
         if (exp == null) {
-            throw new NullPointerException();
+            throw new RuntimeException("exp can not be null in addChild call");
         }
         return this.children.add(exp);
     }
@@ -200,11 +195,11 @@ public class Exp implements Serializable {
      * Set the connective of this node.
      *
      * @param connective the connective.
-     * @throws NullPointerException if the specified connective is null.
+     * @throws RuntimeException if the specified connective is null.
      */
-    public void setConnective(final Connective connective) throws NullPointerException {
+    public void setConnective(final Connective connective) {
         if (connective == null) {
-            throw new NullPointerException();
+            throw new RuntimeException("Connective can not be null in setConnective call");
         }
         this.connective = connective;
     }
@@ -310,7 +305,7 @@ public class Exp implements Serializable {
      * @see this#isMalformedExpression()
      */
     public void renameVariables() throws MalformedExpException {
-        this.renameVariables(new LinkedHashMap<String, String>());
+        this.renameVariables(new LinkedHashMap<>());
     }
 
     /**
@@ -321,7 +316,7 @@ public class Exp implements Serializable {
      * @exception MalformedExpException if this expression is malformed.
      * @see this#isMalformedExpression()
      */
-    public void renameVariables(final Map<String, String> context) throws MalformedExpException {
+    public void renameVariables(final Map<String, String> context) {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
@@ -341,7 +336,7 @@ public class Exp implements Serializable {
                 break;
             case FORALL:
             case EXISTS:
-                final Map<String, String> newContext = new LinkedHashMap<String, String>(context);
+                final Map<String, String> newContext = new LinkedHashMap<>(context);
                 for (int i = 0; i < this.getVariables().size(); i++) {
                     final TypedSymbol variable = this.getVariables().get(i);
                     final String image = variable.renameVariables(newContext.size() + i);
@@ -419,9 +414,7 @@ public class Exp implements Serializable {
         switch (this.connective) {
             case AND:
             case OR:
-                for (int i = 0; i < this.children.size(); i++) {
-                    this.children.get(i).moveNegationInward();
-                }
+                this.children.forEach(fr.uga.pddl4j.parser.Exp::moveNegationInward);
                 break;
             case FORALL:
             case EXISTS:
@@ -599,9 +592,7 @@ public class Exp implements Serializable {
      *     this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Exp exp) {
-        Iterator<Exp> it = this.getChildren().iterator();
-        while (it.hasNext()) {
-            Exp s = it.next();
+        for (Exp s : this.getChildren()) {
             if (s.equals(exp) || s.contains(exp)) {
                 return true;
             }
@@ -641,7 +632,7 @@ public class Exp implements Serializable {
      * @return <code>true</code> if the specified expression <code>exp</code> was replaced;
      * <code>false</code> otherwise.
      */
-    public final boolean replace(final Exp e1, final Exp e2) {
+    /*public final boolean replace(final Exp e1, final Exp e2) {
         boolean replaced = false;
         for (int i = 0; i < this.getChildren().size(); i++) {
             Exp s = this.getChildren().get(i);
@@ -653,7 +644,7 @@ public class Exp implements Serializable {
             }
         }
         return replaced;
-    }
+    }*/
 
     /**
      * Returns a string representation of this node.
@@ -679,40 +670,36 @@ public class Exp implements Serializable {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         switch (this.connective) {
             case ATOM:
             case FN_HEAD:
                 str.append("(");
                 if (!this.atom.isEmpty()) {
                     for (int i = 0; i < this.atom.size() - 1; i++) {
-                        str.append(this.atom.get(i).toString());
-                        str.append(" ");
+                        str.append(this.atom.get(i).toString()).append(" ");
                     }
                     str.append(this.atom.get(this.atom.size() - 1).toString());
                 }
                 str.append(")");
                 break;
             case EQUAL_ATOM:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(" ");
+                str.append("(")
+                    .append(this.getConnective().getImage())
+                    .append(" ");
                 for (int i = 0; i < this.atom.size() - 1; i++) {
-                    str.append(this.atom.get(i).toString());
-                    str.append(" ");
+                    str.append(this.atom.get(i).toString()).append(" ");
                 }
-                str.append(this.atom.get(this.atom.size() - 1).toString());
-                str.append(")");
+                str.append(this.atom.get(this.atom.size() - 1).toString()).append(")");
                 break;
             case AND:
             case OR:
                 offset += "  ";
-                str.append("(");
-                str.append(this.getConnective().getImage());
+                str.append("(").append(this.getConnective().getImage());
                 if (!this.children.isEmpty()) {
                     str.append(" ");
                     for (int i = 0; i < this.children.size() - 1; i++) {
-                        str.append(this.children.get(i).toString(offset) + "\n" + offset);
+                        str.append(this.children.get(i).toString(offset)).append("\n").append(offset);
                     }
                     str.append(this.children.get(this.children.size() - 1).toString(offset));
                 }
@@ -722,17 +709,15 @@ public class Exp implements Serializable {
             case FORALL:
             case EXISTS:
                 offset += offset + "  ";
-                str.append(" (");
-                str.append(this.getConnective().getImage());
-                str.append(" (");
+                str.append(" (").append(this.getConnective().getImage()).append(" (");
                 for (int i = 0; i < this.variables.size() - 1; i++) {
-                    str.append(this.variables.get(i).toString());
-                    str.append(", ");
+                    str.append(this.variables.get(i).toString()).append(", ");
                 }
-                str.append(this.variables.get(this.variables.size() - 1).toString());
-                str.append(")\n" + offset);
-                str.append(this.children.get(0).toString(offset));
-                str.append(")");
+                str.append(this.variables.get(this.variables.size() - 1).toString())
+                    .append(")\n")
+                    .append(offset)
+                    .append(this.children.get(0).toString(offset))
+                    .append(")");
                 //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case NUMBER:
@@ -745,12 +730,9 @@ public class Exp implements Serializable {
                 if (this.children.isEmpty()) {
                     str.append(this.getVariable());
                 } else {
-                    str.append("(");
-                    str.append(this.getConnective().getImage());
-                    str.append(" ");
-                    str.append(this.getVariable());
-                    str.append(" ");
-                    str.append(this.children.get(0).toString(offset));
+                    str.append("(").append(this.getConnective().getImage()).append(" ")
+                        .append(this.getVariable()).append(" ")
+                        .append(this.children.get(0).toString(offset));
                 }
                 break;
             case TIME_VAR:
@@ -775,13 +757,11 @@ public class Exp implements Serializable {
             case PLUS:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(" ");
-                str.append(this.children.get(0).toString(offset));
-                str.append(" ");
-                str.append(this.children.get(1).toString(offset));
-                str.append(")");
+                str.append("(")
+                    .append(this.getConnective().getImage()).append(" ")
+                    .append(this.children.get(0).toString(offset)).append(" ")
+                    .append(this.children.get(1).toString(offset))
+                    .append(")");
                 break;
             case NOT:
             case UMINUS:
@@ -791,55 +771,45 @@ public class Exp implements Serializable {
             case ALWAYS:
             case SOMETIME:
             case AT_MOST_ONCE:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(" ");
-                str.append(this.getChildren().get(0).toString(offset));
-                str.append(")");
+                str.append("(")
+                    .append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).toString(offset))
+                    .append(")");
                 break;
             case MINIMIZE:
             case MAXIMIZE:
-                str.append(this.getConnective().getImage());
-                str.append(" ");
-                str.append(this.getChildren().get(0).getValue());
-                str.append(")");
+                str.append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue())
+                    .append(")");
                 break;
             case IS_VIOLATED:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(")");
+                str.append("(").append(this.getConnective().getImage()).append(")");
                 break;
             case HOLD_AFTER:
             case WITHIN:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(" ");
-                str.append(this.getChildren().get(0).getValue());
-                str.append(" ");
-                str.append(this.getChildren().get(1).toString(offset));
-                str.append(")");
+                str.append("(")
+                    .append(this.getConnective().getImage())
+                    .append(" ")
+                    .append(this.getChildren().get(0).getValue())
+                    .append(" ")
+                    .append(this.getChildren().get(1).toString(offset))
+                    .append(")");
                 break;
             case ALWAYS_WITHIN:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(" ");
-                str.append(this.getChildren().get(0).getValue());
-                str.append(" ");
-                str.append(this.getChildren().get(1).toString(offset));
-                str.append(" ");
-                str.append(this.getChildren().get(2).toString(offset));
-                str.append(")");
+                str.append("(")
+                    .append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue()).append(" ")
+                    .append(this.getChildren().get(1).toString(offset)).append(" ")
+                    .append(this.getChildren().get(2).toString(offset))
+                    .append(")");
                 break;
             case HOLD_DURING:
-                str.append("(");
-                str.append(this.getConnective().getImage());
-                str.append(" ");
-                str.append(this.getChildren().get(0).getValue());
-                str.append(" ");
-                str.append(this.getChildren().get(1).getValue());
-                str.append(" ");
-                str.append(this.getChildren().get(2).toString(offset));
-                str.append(")");
+                str.append("(")
+                    .append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue()).append(" ")
+                    .append(this.getChildren().get(1).getValue()).append(" ")
+                    .append(this.getChildren().get(2).toString(offset))
+                    .append(")");
                 break;
             default:
                 // do nothing
