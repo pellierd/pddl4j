@@ -57,5 +57,5 @@ public enum Inertia {
     /**
      * The inertia which are neither positive nor negative.
      */
-    FLUENT;
+    FLUENT
 }

@@ -81,7 +81,7 @@ final class PreInstantiation {
      */
     static void extractInertia(final List<IntOp> operators) {
         final int nbPredicates = Encoder.tableOfPredicates.size();
-        Encoder.tableOfInertia = new ArrayList<Inertia>(nbPredicates);
+        Encoder.tableOfInertia = new ArrayList<>(nbPredicates);
         for (int i = 0; i < nbPredicates; i++) {
             Encoder.tableOfInertia.add(Inertia.INERTIA);
         }
@@ -191,11 +191,11 @@ final class PreInstantiation {
      * @param init the initial state.
      */
     static void inferTypesFromInertia(final Set<IntExp> init) {
-        Encoder.tableOfInferredDomains = new ArrayList<Set<Integer>>(Encoder.tableOfPredicates.size());
+        Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.tableOfPredicates.size());
         for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
             if (Encoder.tableOfTypedPredicates.get(i).size() == 1
                 && Encoder.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
-                final Set<Integer> newTypeDomain = new LinkedHashSet<Integer>();
+                final Set<Integer> newTypeDomain = new LinkedHashSet<>();
                 for (final IntExp fact : init) {
                     if (fact.getPredicate() == i) {
                         newTypeDomain.add(fact.getArguments()[0]);
@@ -216,11 +216,11 @@ final class PreInstantiation {
     static void createPredicatesTables(final Set<IntExp> init) {
         final int tableSize = Encoder.tableOfConstants.size();
         final int nbPredicate = Encoder.tableOfPredicates.size();
-        Encoder.predicatesTables = new ArrayList<List<IntMatrix>>(nbPredicate);
+        Encoder.predicatesTables = new ArrayList<>(nbPredicate);
         for (final List<Integer> arguments : Encoder.tableOfTypedPredicates) {
             final int arity = arguments.size();
             final int nbTables = (int) Math.pow(2, arity);
-            final List<IntMatrix> pTables = new ArrayList<IntMatrix>(nbTables);
+            final List<IntMatrix> pTables = new ArrayList<>(nbTables);
             for (int j = 0; j < nbTables; j++) {
                 final int dimension = Integer.bitCount(j);
                 pTables.add(new IntMatrix(tableSize, dimension));
@@ -378,7 +378,7 @@ final class PreInstantiation {
      * @return the list of simplified operators.
      */
     static List<IntOp> simplifyOperatorsWithInferedTypes(final List<IntOp> operators) {
-        final List<IntOp> ops = new LinkedList<IntOp>();
+        final List<IntOp> ops = new LinkedList<>();
         for (final IntOp op : operators) {
             ops.addAll(PreInstantiation.simplifyOperatorsWithInferedTypes(op));
         }
@@ -386,15 +386,15 @@ final class PreInstantiation {
     }
 
     private static List<IntOp> simplifyOperatorsWithInferedTypes(final IntOp op) {
-        final List<IntExp> unaryInertia = new ArrayList<IntExp>();
+        final List<IntExp> unaryInertia = new ArrayList<>();
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(op.getPreconditions()));
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(op.getEffects()));
 
-        List<IntOp> operators = new LinkedList<IntOp>();
+        List<IntOp> operators = new LinkedList<>();
         operators.add(op);
 
         for (final IntExp inertia : unaryInertia) {
-            final List<IntOp> newOperators = new ArrayList<IntOp>();
+            final List<IntOp> newOperators = new ArrayList<>();
             for (final IntOp o : operators) {
                 if (o.getArity() > 0) {
 
@@ -416,7 +416,7 @@ final class PreInstantiation {
                     if (ti == -1) {
                         ti = Encoder.tableOfTypes.size();
                         Encoder.tableOfTypes.add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<Integer>(Encoder.tableOfDomains.get(dtIndex));
+                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
                         dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
                         Encoder.tableOfDomains.add(dt1);
                     }
@@ -426,7 +426,7 @@ final class PreInstantiation {
                     if (ts == -1) {
                         ts = Encoder.tableOfTypes.size();
                         Encoder.tableOfTypes.add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<Integer>(Encoder.tableOfDomains.get(dtIndex));
+                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
                         dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
                         Encoder.tableOfDomains.add(dt2);
                     }
@@ -585,7 +585,7 @@ final class PreInstantiation {
      * @return the list of unary inertia expression collected.
      */
     private static List<IntExp> collectUnaryInertia(final IntExp exp) {
-        final List<IntExp> unaryInertia = new ArrayList<IntExp>();
+        final List<IntExp> unaryInertia = new ArrayList<>();
         switch (exp.getConnective()) {
             case ATOM:
                 if (Encoder.tableOfInferredDomains.get(exp.getPredicate()) != null) {

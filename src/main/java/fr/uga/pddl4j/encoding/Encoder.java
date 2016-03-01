@@ -263,7 +263,7 @@ public final class Encoder {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.
-        Set<RequireKey> adl = new HashSet<RequireKey>();
+        Set<RequireKey> adl = new HashSet<>();
         adl.add(RequireKey.ADL);
         adl.add(RequireKey.STRIPS);
         adl.add(RequireKey.TYPING);
@@ -275,7 +275,7 @@ public final class Encoder {
         adl.add(RequireKey.QUANTIFIED_PRECONDITIONS);
         adl.add(RequireKey.CONDITIONAL_EFFECTS);
 
-        Set<RequireKey> requirements = new LinkedHashSet<RequireKey>();
+        Set<RequireKey> requirements = new LinkedHashSet<>();
         requirements.addAll(domain.getRequirements());
         requirements.addAll(problem.getRequirements());
         for (RequireKey rk : requirements) {
@@ -456,7 +456,7 @@ public final class Encoder {
 
         // Create a map of the relevant facts with their index to speedup the bit set encoding of
         // the operators
-        final Map<IntExp, Integer> map = new LinkedHashMap<IntExp, Integer>(
+        final Map<IntExp, Integer> map = new LinkedHashMap<>(
             Encoder.tableOfRevelantFacts.size());
         int index = 0;
         for (IntExp fact : Encoder.tableOfRevelantFacts) {
@@ -465,7 +465,7 @@ public final class Encoder {
         }
 
         // Creates the list of bit operators
-        Encoder.operators = new ArrayList<BitOp>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
+        Encoder.operators = new ArrayList<>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
         // Encode the goal in bit set representation
         if (!intGoal.getChildren().isEmpty()) { // Case where the goal was not already simplify to TRUE
             Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
