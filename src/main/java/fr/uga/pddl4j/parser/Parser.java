@@ -105,7 +105,7 @@ public final class Parser {
     public static final Symbol TOTAL_TIME = new Symbol(Symbol.Kind.FUNCTOR, "total-time");
 
     /**
-     * Message for unhandled error
+     * Message for unhandled error.
      */
     private static final String UNEXP_ERROR_MESSAGE = "\nUnexpected error";
 
