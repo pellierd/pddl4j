@@ -365,14 +365,14 @@ public final class Parser {
         if (exp == null) {
             return checked;
         }
-        LinkedList<Exp> stackGD = new LinkedList<Exp>();
-        LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<List<TypedSymbol>>();
+        LinkedList<Exp> stackGD = new LinkedList<>();
+        LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
-        stackCtx.add(new LinkedList<TypedSymbol>());
+        stackCtx.add(new LinkedList<>());
         while (!stackGD.isEmpty()) {
             Exp gd = stackGD.poll();
             List<TypedSymbol> ctx = stackCtx.poll();
-            List<TypedSymbol> newCtx = new LinkedList<TypedSymbol>(ctx);
+            List<TypedSymbol> newCtx = new LinkedList<>(ctx);
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_HEAD:

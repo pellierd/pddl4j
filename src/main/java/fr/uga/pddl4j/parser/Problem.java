@@ -93,9 +93,9 @@ public class Problem implements Serializable {
             throw new NullPointerException();
         }
         this.name = name;
-        this.requirements = new LinkedHashSet<RequireKey>();
-        this.objects = new ArrayList<TypedSymbol>();
-        this.initialFacts = new ArrayList<Exp>();
+        this.requirements = new LinkedHashSet<>();
+        this.objects = new ArrayList<>();
+        this.initialFacts = new ArrayList<>();
         this.goal = null;
         this.constraints = null;
         this.metric = null;
@@ -307,7 +307,7 @@ public class Problem implements Serializable {
      * @return a string representation of this problem.
      */
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("(define (problem ");
         str.append(this.name);
         str.append(")");

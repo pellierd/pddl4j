@@ -100,15 +100,15 @@ public class Domain implements Serializable {
             throw new NullPointerException();
         }
         this.name = name;
-        this.requirements = new LinkedHashSet<RequireKey>();
-        this.types = new ArrayList<TypedSymbol>();
+        this.requirements = new LinkedHashSet<>();
+        this.types = new ArrayList<>();
         this.types.add(new TypedSymbol(Parser.OBJECT));
-        this.constants = new ArrayList<TypedSymbol>();
-        this.predicates = new ArrayList<NamedTypedList>();
-        this.functions = new ArrayList<NamedTypedList>();
+        this.constants = new ArrayList<>();
+        this.predicates = new ArrayList<>();
+        this.functions = new ArrayList<>();
         this.constraints = null;
-        this.ops = new ArrayList<Op>();
-        this.derivedPredicates = new ArrayList<DerivedPredicate>();
+        this.ops = new ArrayList<>();
+        this.derivedPredicates = new ArrayList<>();
     }
 
     /**
@@ -390,17 +390,17 @@ public class Domain implements Serializable {
      *     of the seconds. <code>false</code> otherwise.
      */
     public boolean isSubType(TypedSymbol s1, TypedSymbol s2) {
-        List<Symbol> copy = new LinkedList<Symbol>(s1.getTypes());
+        List<Symbol> copy = new LinkedList<>(s1.getTypes());
         copy.retainAll(s2.getTypes());
         boolean isSubType = !copy.isEmpty();
         Iterator<Symbol> i = s1.getTypes().iterator();
         while (i.hasNext() && !isSubType) {
             TypedSymbol type = this.getType(i.next());
-            LinkedList<TypedSymbol> stack = new LinkedList<TypedSymbol>();
+            LinkedList<TypedSymbol> stack = new LinkedList<>();
             stack.push(type);
             while (!stack.isEmpty() && !isSubType) {
                 TypedSymbol t = stack.poll();
-                copy = new LinkedList<Symbol>(t.getTypes());
+                copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
                 for (Symbol s : t.getTypes()) {
@@ -450,7 +450,7 @@ public class Domain implements Serializable {
      * @return a string representation of this domain.
      */
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("(define (domain ");
         str.append(this.name);
         str.append(")");

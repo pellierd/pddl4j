@@ -93,7 +93,7 @@ public class Op implements Serializable {
             throw new NullPointerException();
         }
         this.name = new Symbol(other.getName());
-        this.parameters = new LinkedList<TypedSymbol>();
+        this.parameters = new LinkedList<>();
         for (TypedSymbol param : other.getParameters()) {
             this.parameters.add(new TypedSymbol(param));
         }
@@ -282,7 +282,7 @@ public class Op implements Serializable {
      */
     public void normalize(int index) {
         // Rename the parameters
-        final Map<String, String> context = new LinkedHashMap<String, String>();
+        final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol> parameters = this.getParameters();
         for (int j = 0; j < parameters.size(); j++) {
             final TypedSymbol parameter = parameters.get(j);
@@ -355,7 +355,7 @@ public class Op implements Serializable {
      * @return a string PDDL representation of the operator.
      */
     public String toString() {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         str.append("(:action " + this.name.toString() + "\n");
         str.append(":parameters (");
         for (int i = 0; i < this.parameters.size() - 1; i++) {

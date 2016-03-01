@@ -208,9 +208,9 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             if (debug) {
                 this.operators[negI] = "noop(not (" + problem.toString(proposition) + "))";
             }
-            final BitVector neg_precond = new BitVector();
-            neg_precond.set(negI);
-            this.preconditions[negI] = neg_precond;
+            final BitVector negPrecond = new BitVector();
+            negPrecond.set(negI);
+            this.preconditions[negI] = negPrecond;
             final BitVector neg_effect = new BitVector();
             neg_effect.set(negI);
             this.effects[negI] = neg_effect;
@@ -272,11 +272,11 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
         // Initialize the array that must contain the level of the positive propsLayer
         this.propositionsLevel = new int[this.nbPropositions];
         // Initialize the array that must contain propositions mutex
-        this.propositionsMutex = new ArrayList<BitMatrix>();
+        this.propositionsMutex = new ArrayList<>();
         // Initialize the array that must contain operators mutex
-        this.operatorsMutex = new ArrayList<BitMatrix>();
+        this.operatorsMutex = new ArrayList<>();
         // Initialize the array that must contain achievers
-        this.achievers = new ArrayList<BitMatrix>();
+        this.achievers = new ArrayList<>();
         // The bit vector that is used to store the new operators during expansion
         this.newOperators = new BitVector();
     }

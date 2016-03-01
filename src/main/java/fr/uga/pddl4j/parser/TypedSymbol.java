@@ -46,7 +46,7 @@ public final class TypedSymbol extends Symbol {
      */
     public TypedSymbol(final TypedSymbol symbol) {
         super(symbol);
-        this.types = new ArrayList<Symbol>();
+        this.types = new ArrayList<>();
         for (Symbol type : symbol.getTypes()) {
             this.types.add(new Symbol(type));
         }
@@ -63,7 +63,7 @@ public final class TypedSymbol extends Symbol {
     public TypedSymbol(final Symbol symbol) throws NullPointerException {
         super(symbol.getKind(), symbol.getImage(), symbol.getBeginLine(), symbol.getBeginColumn(), symbol
             .getEndLine(), symbol.getEndColumn());
-        this.types = new ArrayList<Symbol>();
+        this.types = new ArrayList<>();
         if (!symbol.equals(Parser.OBJECT) && !symbol.equals(Parser.NUMBER)) {
             this.types.add(Parser.OBJECT);
         }
@@ -112,7 +112,7 @@ public final class TypedSymbol extends Symbol {
      * @return a string representation of this typed symbol.
      */
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append(super.toString());
         if (!this.equals(Parser.OBJECT) && !this.equals(Parser.NUMBER)) {
             str.append(" - ");

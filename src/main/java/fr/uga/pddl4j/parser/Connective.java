@@ -226,7 +226,7 @@ public enum Connective {
      *
      * @param image the image of the connective. The image of the connective must be not null.
      */
-    private Connective(String image) {
+    Connective(String image) {
         this.image = image;
     }
 
