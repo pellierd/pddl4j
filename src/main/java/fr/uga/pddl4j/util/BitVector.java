@@ -52,9 +52,8 @@ public class BitVector extends BitSet {
      * Creates a new <code>BitVector</code> from a specified <code>BitExp</code>.
      *
      * @param exp the <code>BitExp</code> that represents <code>BitVector</code>.
-     * @throws NullPointerException if <code>exp == null</code>.
      */
-    public BitVector(final BitExp exp) throws NullPointerException {
+    public BitVector(final BitExp exp) {
         this();
         if (exp == null) {
             throw new NullPointerException("exp == null");
@@ -68,9 +67,8 @@ public class BitVector extends BitSet {
      * constructor.
      *
      * @param vector the other <code>BitVector</code> to copy
-     * @throws NullPointerException if <code>vector == null</code>
      */
-    public BitVector(final BitVector vector) throws NullPointerException {
+    public BitVector(final BitVector vector) {
         this();
         if (vector == null) {
             throw new NullPointerException("state == null");

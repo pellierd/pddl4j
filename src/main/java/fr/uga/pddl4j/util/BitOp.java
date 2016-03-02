@@ -152,12 +152,22 @@ public class BitOp extends AbstractCodedOp {
         final BitExp ucEffect = new BitExp();
         for (CondBitExp cEffect : this.effects) {
             if (cEffect.getCondition().isEmpty()) {
-                final BitExp cond_eff = cEffect.getEffects();
-                ucEffect.getPositive().or(cond_eff.getPositive());
-                ucEffect.getNegative().or(cond_eff.getNegative());
+                final BitExp condEff = cEffect.getEffects();
+                ucEffect.getPositive().or(condEff.getPositive());
+                ucEffect.getNegative().or(condEff.getNegative());
             }
         }
         return ucEffect;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }

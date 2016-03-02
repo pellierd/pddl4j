@@ -124,9 +124,8 @@ public class IntExp implements Serializable {
      * Set a new connective to this expression.
      *
      * @param connective the new connective to set.
-     * @throws NullPointerException if connective == null.
      */
-    public final void setConnective(final Connective connective) throws NullPointerException {
+    public final void setConnective(final Connective connective) {
         if (connective == null) {
             throw new NullPointerException("connective == null");
         }
@@ -254,6 +253,7 @@ public class IntExp implements Serializable {
      * @param object the other object.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object object) {
         if (object != null && object instanceof IntExp) {
             final IntExp other = (IntExp) object;
@@ -274,6 +274,7 @@ public class IntExp implements Serializable {
      * @return the hash code value of the expression.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

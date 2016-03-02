@@ -45,9 +45,8 @@ public class CondBitExp implements Serializable {
      * Creates a conditional bit expression from an other. This constructor is the copy constructor.
      *
      * @param other the other conditional bit expression.
-     * @throws NullPointerException if <code>other == null</code>.
      */
-    public CondBitExp(final CondBitExp other) throws NullPointerException {
+    public CondBitExp(final CondBitExp other) {
         if (other == null) {
             throw new NullPointerException("other == null");
         }
@@ -66,9 +65,8 @@ public class CondBitExp implements Serializable {
      * Creates a new conditional expression with some specified effects.
      *
      * @param effects the effects.
-     * @throws NullPointerException if <code>effects == null</code>.
      */
-    public CondBitExp(final BitExp effects) throws NullPointerException {
+    public CondBitExp(final BitExp effects)  {
         this(new BitExp(), effects);
     }
 
@@ -77,9 +75,8 @@ public class CondBitExp implements Serializable {
      *
      * @param conditions the conditions.
      * @param effects    the effects.
-     * @throws NullPointerException if <code>conditions == null || effects == null</code>.
      */
-    public CondBitExp(BitExp conditions, BitExp effects) throws NullPointerException {
+    public CondBitExp(BitExp conditions, BitExp effects) {
         this.setEffects(effects);
         this.setCondition(conditions);
     }
@@ -97,9 +94,8 @@ public class CondBitExp implements Serializable {
      * Sets the conditions of the conditional expression.
      *
      * @param conditions the conditions to set.
-     * @throws NullPointerException if <code>conditions == null</code>.
      */
-    public final void setCondition(BitExp conditions) throws NullPointerException {
+    public final void setCondition(BitExp conditions) {
         if (conditions == null) {
             throw new NullPointerException("conditions == null");
         }
@@ -134,6 +130,7 @@ public class CondBitExp implements Serializable {
      * @return the hash code of this conditional expression.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -153,6 +150,7 @@ public class CondBitExp implements Serializable {
      * <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof CondBitExp) {
             CondBitExp other = (CondBitExp) obj;
