@@ -624,29 +624,6 @@ public class Exp implements Serializable {
     }
 
     /**
-     * Replaces all the occurrences of a specified expression contained in this expression and
-     * returns <code>true</code> if and only if at least one occurrence was replaced.
-     *
-     * @param e1 the expression to be replaced.
-     * @param e2 the expression to replaced.
-     * @return <code>true</code> if the specified expression <code>exp</code> was replaced;
-     * <code>false</code> otherwise.
-     */
-    /*public final boolean replace(final Exp e1, final Exp e2) {
-        boolean replaced = false;
-        for (int i = 0; i < this.getChildren().size(); i++) {
-            Exp s = this.getChildren().get(i);
-            if (s.equals(e1)) {
-                this.getChildren().set(i, e2);
-                replaced = true;
-            } else {
-                replaced = replaced || s.replace(e1, e2);
-            }
-        }
-        return replaced;
-    }*/
-
-    /**
      * Returns a string representation of this node.
      *
      * @return a string representation of this node.
