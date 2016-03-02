@@ -56,39 +56,39 @@ public class MemoryAgent {
     private static Instrumentation instrumentation;
 
     /**
-     * The default value of the <code>SKIP_STATIC_FIELD</code> flag.
+     * The default value of the <code>skipStaticField</code> flag.
      */
     public static final boolean DEFAULT_SKIP_STATIC_FIELD = false;
 
     /**
-     * The flag used to indicate if static field must be skip during the computation process.
-     */
-    private static boolean SKIP_STATIC_FIELD = MemoryAgent.DEFAULT_SKIP_STATIC_FIELD;
-
-    /**
-     * The default value of the <code>SKIP_FINAL_FIELD</code> flag.
+     * The default value of the <code>skipFinalField</code> flag.
      */
     public static final boolean DEFAULT_SKIP_FINAL_FIELD = false;
 
     /**
-     * The flag used to indicate if final field must be skip during the computation process.
-     */
-    private static boolean SKIP_FINAL_FIELD = MemoryAgent.DEFAULT_SKIP_FINAL_FIELD;
-
-    /**
-     * The default value of the <code>SKIP_FLYWEIGHT_FIELD</code> flag.
+     * The default value of the <code>skipFlyweightField</code> flag.
      */
     public static final boolean DEFAULT_SKIP_FLYWEIGHT_FIELD = false;
 
     /**
      * The flag used to indicate if flyweight field must be skip during the computation process.
      */
-    private static boolean SKIP_FLYWEIGHT_FIELD = MemoryAgent.DEFAULT_SKIP_FLYWEIGHT_FIELD;
+    private static boolean skipFlyweightField = MemoryAgent.DEFAULT_SKIP_FLYWEIGHT_FIELD;
+
+    /**
+     * The flag used to indicate if static field must be skip during the computation process.
+     */
+    private static boolean skipStaticField = MemoryAgent.DEFAULT_SKIP_STATIC_FIELD;
+
+    /**
+     * The flag used to indicate if final field must be skip during the computation process.
+     */
+    private static boolean skipFinalField = MemoryAgent.DEFAULT_SKIP_FINAL_FIELD;
 
     /**
      * Creates a new <code>MemoryAgent</code>.
      */
-    public MemoryAgent() {
+    private MemoryAgent() {
         super();
     }
 
@@ -110,7 +110,7 @@ public class MemoryAgent {
      * @param flag <code>true</code> the final field must be skip; <code>false</code> otherwise.
      */
     public static void skipFinalField(boolean flag) {
-        MemoryAgent.SKIP_FINAL_FIELD = flag;
+        MemoryAgent.skipFinalField = flag;
     }
 
     /**
@@ -120,7 +120,7 @@ public class MemoryAgent {
      * @param flag <code>true</code> the static field must be skip; <code>false</code> otherwise.
      */
     public static void skipStaticField(boolean flag) {
-        MemoryAgent.SKIP_STATIC_FIELD = flag;
+        MemoryAgent.skipStaticField = flag;
     }
 
     /**
@@ -130,7 +130,7 @@ public class MemoryAgent {
      * @param flag <code>true</code> the flyweight object must be skip; <code>false</code> otherwise.
      */
     public static void skipFlyweightObject(boolean flag) {
-        MemoryAgent.SKIP_FLYWEIGHT_FIELD = flag;
+        MemoryAgent.skipFlyweightField = flag;
     }
 
     /**
@@ -149,7 +149,7 @@ public class MemoryAgent {
         if (MemoryAgent.instrumentation == null) {
             throw new IllegalStateException("Instrumentation environment not initialised.");
         }
-        if (MemoryAgent.SKIP_FLYWEIGHT_FIELD && MemoryAgent.isSharedFlyweight(object)) {
+        if (MemoryAgent.skipFlyweightField && MemoryAgent.isSharedFlyweight(object)) {
             return 0;
         }
         return MemoryAgent.instrumentation.getObjectSize(object);
@@ -180,7 +180,7 @@ public class MemoryAgent {
         if (obj == null) {
             return 0;
         }
-        long size = 0;
+        long size;
         if (doneObj.containsKey(obj)) {
             return 0;
         }
@@ -232,15 +232,11 @@ public class MemoryAgent {
      */
     private static boolean isComputable(final Field field) {
         final int modificatori = field.getModifiers();
-        if (MemoryAgent.isPrimitiveType(field.getType())) {
-            return false;
-        } else if (MemoryAgent.SKIP_STATIC_FIELD && Modifier.isStatic(modificatori)) {
-            return false;
-        } else if (MemoryAgent.SKIP_FINAL_FIELD && Modifier.isFinal(modificatori)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !MemoryAgent.isPrimitiveType(field.getType())
+            && !(MemoryAgent.skipStaticField
+            && Modifier.isStatic(modificatori))
+            && !(MemoryAgent.skipFinalField
+            && Modifier.isFinal(modificatori));
     }
 
     /**
@@ -257,19 +253,19 @@ public class MemoryAgent {
             if (obj instanceof Enum) {
                 return true;
             } else if (obj instanceof String) {
-                return (obj == ((String) obj).intern());
+                return obj == ((String) obj).intern();
             } else if (obj instanceof Boolean) {
-                return (obj == Boolean.TRUE || obj == Boolean.FALSE);
+                return obj == Boolean.TRUE || obj == Boolean.FALSE;
             } else if (obj instanceof Integer) {
-                return (obj == Integer.valueOf((Integer) obj));
+                return obj == Integer.valueOf((Integer) obj);
             } else if (obj instanceof Short) {
-                return (obj == Short.valueOf((Short) obj));
+                return obj == Short.valueOf((Short) obj);
             } else if (obj instanceof Byte) {
-                return (obj == Byte.valueOf((Byte) obj));
+                return obj == Byte.valueOf((Byte) obj);
             } else if (obj instanceof Long) {
-                return (obj == Long.valueOf((Long) obj));
+                return obj == Long.valueOf((Long) obj);
             } else if (obj instanceof Character) {
-                return (obj == Character.valueOf((Character) obj));
+                return obj == Character.valueOf((Character) obj);
             }
         }
         return false;

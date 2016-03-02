@@ -241,7 +241,7 @@ public final class Encoder {
      * @param level the log level of the planner.
      * @throws IllegalArgumentException if <code>level < 0</code>.
      */
-    public static void setLogLevel(final int level) throws IllegalArgumentException {
+    public static void setLogLevel(final int level) {
         if (level < 0) {
             throw new IllegalArgumentException("level < 0");
         }
@@ -258,8 +258,7 @@ public final class Encoder {
      * @return the problem encoded.
      * @throws IllegalArgumentException if the problem to encode is not ADL.
      */
-    public static CodedProblem encode(final Domain domain, final Problem problem)
-        throws IllegalArgumentException {
+    public static CodedProblem encode(final Domain domain, final Problem problem) {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.

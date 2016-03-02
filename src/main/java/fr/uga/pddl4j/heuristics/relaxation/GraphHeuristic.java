@@ -172,8 +172,8 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
 
         // Compute the number of unconditional operators of the problem
         this.nbOperators = this.nbPropositions;
-        final List<BitOp> operators = problem.getOperators();
-        for (BitOp op : operators) {
+        final List<BitOp> pbOperators = problem.getOperators();
+        for (BitOp op : pbOperators) {
             this.nbOperators += op.getCondEffects().size();
         }
 
@@ -211,37 +211,37 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             final BitVector negPrecond = new BitVector();
             negPrecond.set(negI);
             this.preconditions[negI] = negPrecond;
-            final BitVector neg_effect = new BitVector();
-            neg_effect.set(negI);
-            this.effects[negI] = neg_effect;
+            final BitVector negEffect = new BitVector();
+            negEffect.set(negI);
+            this.effects[negI] = negEffect;
         }
 
         // Start enumerating the unconditional opsLayer
         int uncondOpIndex = this.nbPropositions;
-        for (int opIndex = 0; opIndex < operators.size(); opIndex++) {
-            final BitOp op = operators.get(opIndex);
-            final List<CondBitExp> effects = op.getCondEffects();
+        for (int opIndex = 0; opIndex < pbOperators.size(); opIndex++) {
+            final BitOp op = pbOperators.get(opIndex);
+            final List<CondBitExp> condEffects = op.getCondEffects();
             // For each conditional effect we create a new operator
-            for (int ceIndex = 0; ceIndex < effects.size(); ceIndex++) {
-                final CondBitExp c_effect = effects.get(ceIndex);
+            for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
+                final CondBitExp cEffect = condEffects.get(ceIndex);
                 if (debug) {
                     this.operators[uncondOpIndex] = "(" + problem.toShortString(op) + ")_" + ceIndex;
                 }
                 final BitVector precond = new BitVector();
                 precond.or(op.getPreconditions().getPositive());
-                precond.or(c_effect.getCondition().getPositive());
+                precond.or(cEffect.getCondition().getPositive());
                 BitVector neg = op.getPreconditions().getNegative();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     precond.set(p + this.negOffset);
                 }
-                neg = c_effect.getCondition().getNegative();
+                neg = cEffect.getCondition().getNegative();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     precond.set(p + this.negOffset);
                 }
                 this.preconditions[uncondOpIndex] = precond;
                 final BitVector effect = new BitVector();
-                effect.or(c_effect.getEffects().getPositive());
-                neg = c_effect.getEffects().getNegative();
+                effect.or(cEffect.getEffects().getPositive());
+                neg = cEffect.getEffects().getNegative();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     effect.set(p + this.negOffset);
                 }
@@ -285,9 +285,9 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * Set the goal of the problem to solve in order to compute the heuristic.
      *
      * @param goal the goal.
-     * @throws NullPointerException if <code>goal == null</code>.
      */
-    protected final void setGoal(final BitExp goal) throws NullPointerException {
+    @Override
+    protected final void setGoal(final BitExp goal) {
         super.setGoal(goal);
         // Set the goal to the state representation
         this.bvgoal = new BitVector();
@@ -339,18 +339,18 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
         while (!this.goalReached && !this.levelOff) {
             this.levelOff = true;
             // Update the achiever of the level by adding achiever at previous level
-            final BitMatrix achievers = new BitMatrix(this.nbPropositions, this.nbOperators);
-            this.achievers.add(achievers);
+            final BitMatrix lAchievers = new BitMatrix(this.nbPropositions, this.nbOperators);
+            this.achievers.add(lAchievers);
             if (k > 0) {
-                final BitMatrix ak_1 = this.achievers.get(k - 1);
+                final BitMatrix ak1 = this.achievers.get(k - 1);
                 for (int p = 0; p < this.nbPropositions; p++) {
-                    achievers.getRow(p).or(ak_1.getRow(p));
+                    lAchievers.getRow(p).or(ak1.getRow(p));
                 }
             }
             // Clear the bit vector that will contain the operator to add at the next level
             this.newOperators.clear();
             // Initialize the bit vector that will contain the propositions to add at the next level
-            final BitVector new_propositions = new BitVector();
+            final BitVector newPropositions = new BitVector();
             // Add the NOOP operators
             this.opsLayer.or(this.propsLayer);
             // try only the operator not already in the planning graph
@@ -360,11 +360,11 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
                     && this.isMutexFree(this.preconditions[op], k)) {
                     this.opsLayer.set(op);
                     newOperators.set(op);
-                    final BitVector effects = this.effects[op];
-                    new_propositions.or(effects);
+                    final BitVector effs = this.effects[op];
+                    newPropositions.or(effs);
                     // Update the achiever to speed up the mutex computation
-                    for (int p = effects.nextSetBit(0); p >= 0; p = effects.nextSetBit(p + 1)) {
-                        achievers.set(p, op);
+                    for (int p = effs.nextSetBit(0); p >= 0; p = effs.nextSetBit(p + 1)) {
+                        lAchievers.set(p, op);
                     }
                     // If an operator is added so the graph is not level off
                     this.levelOff = false;
@@ -372,9 +372,9 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             }
 
             // Add the new effects of the applicable operator to the propositions layer
-            this.propsLayer.or(new_propositions);
+            this.propsLayer.or(newPropositions);
             // Update the level of the new propositions
-            for (int p = new_propositions.nextSetBit(0); p >= 0; p = new_propositions
+            for (int p = newPropositions.nextSetBit(0); p >= 0; p = newPropositions
                 .nextSetBit(p + 1)) {
                 if (this.propositionsLevel[p] == Integer.MAX_VALUE) {
                     this.propositionsLevel[p] = k;
@@ -387,8 +387,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             // Increment the level of the planning graph
             k++;
             // Check if the goal is reached
-            this.goalReached = (this.propsLayer.include(this.bvgoal) && this.isMutexFree(this.bvgoal,
-                k));
+            this.goalReached = this.propsLayer.include(this.bvgoal) && this.isMutexFree(this.bvgoal, k);
         }
         return k;
     }
@@ -400,20 +399,20 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      */
     private void updatePropositionsMutex(final int lev) {
         this.propositionsMutex.add(new BitMatrix(this.nbPropositions));
-        final BitMatrix pm_k = new BitMatrix(nbPropositions);
-        final BitMatrix pmk_1 = this.propositionsMutex.get(lev - 1);
-        this.propositionsMutex.add(pm_k);
+        final BitMatrix pmK = new BitMatrix(nbPropositions);
+        final BitMatrix pmk1 = this.propositionsMutex.get(lev - 1);
+        this.propositionsMutex.add(pmK);
         for (int pi = this.propsLayer.nextSetBit(0); pi >= 0; pi = this.propsLayer
             .nextSetBit(pi + 1)) {
             for (int pj = this.propsLayer.nextSetBit(0); pj >= 0; pj = this.propsLayer
                 .nextSetBit(pj + 1)) {
                 if (pi > pj && this.arePropositionsMutex(pi, pj, lev)) {
-                    pm_k.set(pi, pj);
-                    pm_k.set(pj, pi);
+                    pmK.set(pi, pj);
+                    pmK.set(pj, pi);
                 }
             }
         }
-        this.levelOff = pm_k.equals(pmk_1);
+        this.levelOff = pmK.equals(pmk1);
     }
 
     /**
@@ -426,12 +425,12 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             // Update the old mutex first
             final BitMatrix omk = new BitMatrix(this.nbOperators);
             this.operatorsMutex.add(omk);
-            final BitMatrix omk_1 = this.operatorsMutex.get(lev - 1);
+            final BitMatrix omk1 = this.operatorsMutex.get(lev - 1);
             for (int oi = this.opsLayer.nextSetBit(0); oi >= 0; oi = this.opsLayer
                 .nextSetBit(oi + 1)) {
                 for (int oj = this.opsLayer.nextSetBit(0); oj >= 0; oj = this.opsLayer
                     .nextSetBit(oj + 1)) {
-                    if (oi > oj && omk_1.get(oi, oj) && this.areOperatorsMutex(oi, oj, lev)) {
+                    if (oi > oj && omk1.get(oi, oj) && this.areOperatorsMutex(oi, oj, lev)) {
                         omk.set(oi, oj);
                         omk.set(oj, oi);
                     } else {
@@ -522,7 +521,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      *     otherwise.
      */
     private boolean arePropositionsMutex(final int pi, final int pj, final int lev) {
-        boolean mutex = (pj == (pi + super.getRevelantFacts().size()));
+        boolean mutex = pj == (pi + super.getRevelantFacts().size());
         if (!mutex && lev > 0) {
             final BitMatrix ak = this.achievers.get(lev - 1);
             final BitSet rak = ak.getRow(pi);
@@ -575,14 +574,14 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * @return <code>true</code> if two opsLayer are dependent, <code>false</code> otherwise.
      */
     private boolean areDependent(final int oi, final int oj) {
-        final BitVector eff_oi = this.effects[oi];
-        final BitVector eff_oj = this.effects[oj];
-        final BitVector pre_oi = this.preconditions[oi];
-        final BitVector pre_oj = this.preconditions[oj];
-        return !this.areConsistantStates(eff_oi, eff_oj)
-            || !this.areConsistantStates(eff_oi, pre_oj)
-            || !this.areConsistantStates(eff_oj, pre_oi)
-            || !this.areConsistantStates(pre_oi, pre_oj);
+        final BitVector effOi = this.effects[oi];
+        final BitVector effOj = this.effects[oj];
+        final BitVector preOi = this.preconditions[oi];
+        final BitVector preOj = this.preconditions[oj];
+        return !this.areConsistantStates(effOi, effOj)
+            || !this.areConsistantStates(effOi, preOj)
+            || !this.areConsistantStates(effOj, preOi)
+            || !this.areConsistantStates(preOi, preOj);
     }
 
     /**

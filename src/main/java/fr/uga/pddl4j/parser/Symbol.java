@@ -148,9 +148,8 @@ public class Symbol implements Serializable {
      *
      * @param kind  the kind of the symbol.
      * @param token the token.
-     * @throws NullPointerException if the specified image or kind is null.
      */
-    public Symbol(final Kind kind, final Token token) throws NullPointerException {
+    public Symbol(final Kind kind, final Token token) {
         if (token == null || kind == null) {
             throw new NullPointerException();
         }
@@ -171,10 +170,9 @@ public class Symbol implements Serializable {
      * @param beginColumn the begin column of the symbol.
      * @param endLine     the end line of the symbol.
      * @param endColumn   the end column of the symbol.
-     * @throws NullPointerException if the specified image or kind is null.
      */
     public Symbol(final Kind kind, final String image, final int beginLine, final int beginColumn,
-                  final int endLine, final int endColumn) throws NullPointerException {
+                  final int endLine, final int endColumn) {
         if (image == null || kind == null) {
             throw new NullPointerException();
         }
@@ -192,9 +190,8 @@ public class Symbol implements Serializable {
      *
      * @param kind  the kind of the symbol.
      * @param image the string image of the symbol.
-     * @throws NullPointerException if the specified image or kind is null.
      */
-    public Symbol(final Kind kind, final String image) throws NullPointerException {
+    public Symbol(final Kind kind, final String image) {
         this(kind, image, -1, -1, -1, -1);
     }
 
@@ -233,9 +230,8 @@ public class Symbol implements Serializable {
      * Sets a new image to this symbol.
      *
      * @param image the new image to set.
-     * @throws NullPointerException if the specified image is null.
      */
-    public final void setImage(String image) throws NullPointerException {
+    public final void setImage(String image) {
         if (image == null) {
             throw new NullPointerException("image == null");
         }
@@ -299,12 +295,12 @@ public class Symbol implements Serializable {
         if (index < 0) {
             throw new IllegalArgumentException("index < 0");
         }
-        String image = null;
+        String img = null;
         if (this.getKind().equals(Symbol.Kind.VARIABLE)) {
-            image = this.getImage();
+            img = this.getImage();
             this.setImage(Symbol.DEFAULT_VARIABLE_SYMBOL + index);
         }
-        return image;
+        return img;
     }
 
     /**
@@ -319,15 +315,15 @@ public class Symbol implements Serializable {
         if (context == null) {
             throw new NullPointerException("context == null");
         }
-        String image = null;
+        String img = null;
         if (this.getKind().equals(Symbol.Kind.VARIABLE)) {
-            image = this.getImage();
-            final String newImage = context.get(image);
+            img = this.getImage();
+            final String newImage = context.get(img);
             if (newImage != null) {
                 this.setImage(newImage);
             }
         }
-        return image;
+        return img;
     }
 
     /**
@@ -338,6 +334,7 @@ public class Symbol implements Serializable {
      *     is not null and of kind <tt>Symbol</tt> and it has the same image; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object object) {
         if (object != null && object instanceof Symbol) {
             Symbol other = (Symbol) object;
@@ -352,6 +349,7 @@ public class Symbol implements Serializable {
      * @return the hash code value of this symbol.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return this.image.hashCode();
     }
@@ -361,6 +359,7 @@ public class Symbol implements Serializable {
      *
      * @return a string representation of this symbol.
      */
+    @Override
     public String toString() {
         return this.image;
     }

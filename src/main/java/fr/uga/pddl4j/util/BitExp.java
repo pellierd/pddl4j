@@ -54,9 +54,8 @@ public class BitExp implements Serializable {
      * Creates a new bit expression from an other one.
      *
      * @param other the other one.
-     * @throws NullPointerException if <code>other == null</code>.
      */
-    public BitExp(final BitExp other) throws NullPointerException {
+    public BitExp(final BitExp other)  {
         this();
         if (other == null) {
             throw new NullPointerException("other == null");
@@ -71,9 +70,8 @@ public class BitExp implements Serializable {
      *
      * @param positive the bit set that represents the positive facts of the expression.
      * @param negative the bit set that represents the negative facts of the expression.
-     * @throws NullPointerException if <code>positive == null || negative == null</code>.
      */
-    public BitExp(BitVector positive, BitVector negative) throws NullPointerException {
+    public BitExp(BitVector positive, BitVector negative) {
         if (positive == null || negative == null) {
             throw new NullPointerException("positive == null || negative == null");
         }
@@ -125,6 +123,7 @@ public class BitExp implements Serializable {
      * @return the hash code value of the expression.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -143,6 +142,7 @@ public class BitExp implements Serializable {
      * <code>false</code> otherwise.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof BitExp) {
             BitExp other = (BitExp) obj;

@@ -593,7 +593,6 @@ public final class Parser {
     private boolean checkTypesDeclaration() {
 
         List<TypedSymbol> types = this.domain.getTypes();
-        boolean checked = true;
 
         // Gathering types declaration
         final Map<String, TypedSymbol> map = new HashMap<>();
@@ -604,7 +603,6 @@ public final class Parser {
             if ((type.equals(Parser.OBJECT) || type.equals(Parser.NUMBER)) && !type.getTypes().isEmpty()) {
                 this.mgr.logParserError("type \"" + type.getImage() + "\" cannot be used as derived type",
                     this.lexer.getFile(),type.getBeginLine(), type.getBeginColumn());
-                checked = false;
             } else { // General case
                 // check if all super types are defined otherwise create a new type inhereted from object
                 for (Symbol superType : type.getTypes()) {
@@ -655,8 +653,7 @@ public final class Parser {
         for (TypedSymbol type : map.values()) {
             this.domain.getTypes().add(new TypedSymbol(type));
         }
-        checked = consistent;
-        return checked;
+        return consistent;
     }
 
     /**
@@ -1032,9 +1029,8 @@ public final class Parser {
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                t.getTypes().stream().filter(s -> !s.equals(Parser.OBJECT)).forEach(s -> {
-                    stack.push(this.domain.getType(s));
-                });
+                t.getTypes().stream().filter(s -> !s.equals(Parser.OBJECT)).forEach(s ->
+                    stack.push(this.domain.getType(s)));
             }
         }
         return isSubType;
@@ -1114,7 +1110,7 @@ public final class Parser {
      */
     public static void main(String[] args) {
 
-        if (args.length == 2 && args[0].equals("-p")) {
+        if (args.length == 2 && "-p".equals(args[0])) {
             System.out.print("parse problem " + "\"" + args[1] + "\": ");
             Parser parser = new Parser();
             try {
@@ -1128,7 +1124,7 @@ public final class Parser {
                 System.out.println();
                 parser.mgr.printAll();
             }
-        } else if (args.length == 4 && args[0].equals("-o") && args[2].equals("-f")) {
+        } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
             System.out.print("parse files " + "\"" + args[1] + "\" and " + "\"" + args[3] + "\": ");
             Parser parser = new Parser();
             try {

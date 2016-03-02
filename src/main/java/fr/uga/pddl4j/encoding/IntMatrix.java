@@ -53,7 +53,7 @@ final class IntMatrix implements Serializable {
      * @param dimension the dimension of the matrix.
      * @throws IllegalArgumentException if size <= 0.
      */
-    public IntMatrix(final int size, final int dimension) throws IllegalArgumentException {
+    public IntMatrix(final int size, final int dimension) {
         if (size < 0) {
             throw new IllegalArgumentException("size <= 0");
         }
@@ -71,7 +71,7 @@ final class IntMatrix implements Serializable {
      * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
      *                                        index[i] < size does not hold.
      */
-    public final int get(final int[] index) throws ArrayIndexOutOfBoundsException {
+    public final int get(final int[] index) {
         return this.matrix[index(index)];
     }
 
@@ -83,7 +83,7 @@ final class IntMatrix implements Serializable {
      * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
      *                                        index[i] < size does not hold.
      */
-    public final void put(final int[] index, final int value) throws ArrayIndexOutOfBoundsException {
+    public final void put(final int[] index, final int value) {
         this.matrix[index(index)] = value;
     }
 
@@ -94,7 +94,7 @@ final class IntMatrix implements Serializable {
      * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
      *                                        index[i] < size does not hold.
      */
-    public final void increment(final int[] index) throws ArrayIndexOutOfBoundsException {
+    public final void increment(final int[] index) {
         this.matrix[index(index)]++;
     }
 
@@ -133,7 +133,7 @@ final class IntMatrix implements Serializable {
      * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
      *                                        index[i] < size does not hold.
      */
-    private final int index(final int[] index) throws ArrayIndexOutOfBoundsException {
+    private final int index(final int[] index) {
         if (index.length != this.dimension) {
             throw new ArrayIndexOutOfBoundsException();
         }
@@ -145,7 +145,7 @@ final class IntMatrix implements Serializable {
         // conversion E(i * t^r)
         int acces = 0;
         for (int i = index.length; i > 0; i--) {
-            acces += index[i - 1] * (int) Math.pow(size, (dimension - i));
+            acces += index[i - 1] * (int) Math.pow(size, (double)dimension - i);
         }
         return acces;
     }

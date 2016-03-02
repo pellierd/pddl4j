@@ -92,9 +92,8 @@ public class Domain implements Serializable {
      * Creates a new domain with a specific name.
      *
      * @param name the name of the domain.
-     * @throws NullPointerException if the specified name is null.
      */
-    public Domain(final Symbol name) throws NullPointerException {
+    public Domain(final Symbol name) {
         this();
         if (name == null) {
             throw new NullPointerException();
@@ -362,6 +361,7 @@ public class Domain implements Serializable {
      * @return <code>true</code> if the specified object is a non <code>null</code> instance of
      *     the class <code>PlDomain</code> and has the same name; <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object != null && object instanceof Domain) {
             Domain other = (Domain) object;
@@ -449,6 +449,7 @@ public class Domain implements Serializable {
      *
      * @return a string representation of this domain.
      */
+    @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append("(define (domain ");

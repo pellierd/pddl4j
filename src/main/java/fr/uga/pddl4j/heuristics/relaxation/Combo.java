@@ -73,9 +73,9 @@ public final class Combo extends RelaxedGraphHeuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
-     * @throws NullPointerException if <code>state == null && goal == null</code>.
      */
-    public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
+    @Override
+    public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         // First, we expand the relaxed planing graph to compute the sum heuristic
         super.expandRelaxedPlanningGraph(state);

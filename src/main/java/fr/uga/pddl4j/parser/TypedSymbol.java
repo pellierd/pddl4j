@@ -58,9 +58,8 @@ public final class TypedSymbol extends Symbol {
      * <code>Parser.NUMBER</code>, the typed list is creates with an empty list of super types.
      *
      * @param symbol the symbol.
-     * @throws NullPointerException if the specified symbol is null.
      */
-    public TypedSymbol(final Symbol symbol) throws NullPointerException {
+    public TypedSymbol(final Symbol symbol) {
         super(symbol.getKind(), symbol.getImage(), symbol.getBeginLine(), symbol.getBeginColumn(), symbol
             .getEndLine(), symbol.getEndColumn());
         this.types = new ArrayList<>();
@@ -82,9 +81,8 @@ public final class TypedSymbol extends Symbol {
      * Adds a type to this typed token.
      *
      * @param type the type to add.
-     * @throws NullPointerException if the specified type is null.
      */
-    public void addType(final Symbol type) throws NullPointerException {
+    public void addType(final Symbol type) {
         if (type == null) {
             throw new NullPointerException();
         }
@@ -97,7 +95,7 @@ public final class TypedSymbol extends Symbol {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         return super.equals(object);
     }
 
@@ -111,6 +109,7 @@ public final class TypedSymbol extends Symbol {
      *
      * @return a string representation of this typed symbol.
      */
+    @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append(super.toString());

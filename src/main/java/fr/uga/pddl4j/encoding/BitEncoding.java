@@ -155,24 +155,24 @@ final class BitEncoding {
         }
         if (Encoder.codedGoal.size() > 1) {
             // Create a new dummy fact to encode the goal
-            final int dummy_predicate_index = Encoder.tableOfPredicates.size();
+            final int dummyPredicateIndex = Encoder.tableOfPredicates.size();
             Encoder.tableOfPredicates.add(Constants.DUMMY_GOAL);
             Encoder.tableOfTypedPredicates.add(new ArrayList<>());
             IntExp dummyGoal = new IntExp(Connective.ATOM);
-            dummyGoal.setPredicate(dummy_predicate_index);
+            dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);
-            final int dummy_goal_index = Encoder.tableOfRevelantFacts.size();
+            final int dummyGoalIndex = Encoder.tableOfRevelantFacts.size();
             Encoder.tableOfRevelantFacts.add(dummyGoal);
-            map.put(dummyGoal, dummy_goal_index);
+            map.put(dummyGoal, dummyGoalIndex);
             newGoal = new BitExp();
-            newGoal.getPositive().set(dummy_goal_index);
-            final CondBitExp cond_effect = new CondBitExp(newGoal);
+            newGoal.getPositive().set(dummyGoalIndex);
+            final CondBitExp condEffect = new CondBitExp(newGoal);
             // for each disjunction create a dummy action
             for (BitExp dis : Encoder.codedGoal) {
                 final BitOp op = new BitOp(Constants.DUMMY_OPERATOR, 0);
                 op.setDummy(true);
                 op.setPreconditions(dis);
-                op.getCondEffects().add(cond_effect);
+                op.getCondEffects().add(condEffect);
                 Encoder.operators.add(op);
             }
         } else {

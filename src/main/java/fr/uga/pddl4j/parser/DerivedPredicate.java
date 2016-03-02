@@ -57,10 +57,8 @@ public class DerivedPredicate implements Serializable {
      *
      * @param head the head of the derived predicate.
      * @param body the body of the derived predicate.
-     * @throws NullPointerException if the specified head or body is null.
      */
-    public DerivedPredicate(final NamedTypedList head, final Exp body)
-        throws NullPointerException {
+    public DerivedPredicate(final NamedTypedList head, final Exp body) {
         this();
         if (head == null || body == null) {
             throw new NullPointerException();
@@ -82,9 +80,8 @@ public class DerivedPredicate implements Serializable {
      * Sets the head of the derived predicate.
      *
      * @param head the head to set.
-     * @throws NullPointerException if the specified head is null.
      */
-    public final void setHead(final NamedTypedList head) throws NullPointerException {
+    public final void setHead(final NamedTypedList head) {
         if (head == null) {
             throw new NullPointerException();
         }
@@ -104,9 +101,8 @@ public class DerivedPredicate implements Serializable {
      * Sets the body of this derived predicate.
      *
      * @param body the body to set.
-     * @throws NullPointerException if the specified body is null.
      */
-    public final void setBody(final Exp body) throws NullPointerException {
+    public final void setBody(final Exp body) {
         if (body == null) {
             throw new NullPointerException();
         }
@@ -142,6 +138,7 @@ public class DerivedPredicate implements Serializable {
      *     otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass().equals(this.getClass())) {
             final DerivedPredicate other = (DerivedPredicate) obj;
@@ -159,6 +156,7 @@ public class DerivedPredicate implements Serializable {
      * @return the hash code value of the derived predicate.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -173,6 +171,7 @@ public class DerivedPredicate implements Serializable {
      * @return a string representation of this derived predicate.
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return "(:derived " + this.head.toString() + " " + this.body.toString() + ")";
     }

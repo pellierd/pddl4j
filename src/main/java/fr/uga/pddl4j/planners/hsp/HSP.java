@@ -213,11 +213,11 @@ public final class HSP {
             }
             System.out.printf("%ntime spent: %8.2f seconds encoding ("
                 + pb.getOperators().size() + " ops, " + pb.getRevelantFacts().size()
-                + " facts)%n", (this.preprocessingTime / 1000.0));
+                + " facts)%n", this.preprocessingTime / 1000.0);
             System.out.printf("            %8.2f seconds searching%n",
-                (this.searchingTime / 1000.0));
+                this.searchingTime / 1000.0);
             System.out.printf("            %8.2f seconds total time%n",
-                ((this.preprocessingTime + searchingTime) / 1000.0));
+                (this.preprocessingTime + searchingTime) / 1000.0);
             System.out.printf("%n");
             System.out.printf("memory used: %8.2f MBytes for problem representation%n",
                 +(this.problemMemory / (1024.0 * 1024.0)));
@@ -233,13 +233,13 @@ public final class HSP {
             String pbFile = strArray[strArray.length - 1];
             String pbName = pbFile.substring(0, pbFile.indexOf("."));
             System.out.printf("%5s %8d %8d %8.2f %8.2f %10d", pbName, pb.getOperators().size(),
-                pb.getRevelantFacts().size(), (this.preprocessingTime / 1000.0),
-                (this.problemMemory / (1024.0 * 1024.0)), this.nbOfExploredNodes);
+                pb.getRevelantFacts().size(), this.preprocessingTime / 1000.0,
+                this.problemMemory / (1024.0 * 1024.0), this.nbOfExploredNodes);
             if (plan != null) {
-                System.out.printf("%8.2f %8.2f %8.2f %8.2f %5d%n", (this.searchingTime / 1000.0),
-                    ((this.preprocessingTime + searchingTime) / 1000.0),
-                    (this.searchingMemory / (1024.0 * 1024.0)),
-                    ((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0)),
+                System.out.printf("%8.2f %8.2f %8.2f %8.2f %5d%n", this.searchingTime / 1000.0,
+                    (this.preprocessingTime + searchingTime) / 1000.0,
+                    this.searchingMemory / (1024.0 * 1024.0),
+                    (this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0),
                     plan.size());
             } else {
                 System.out.printf("%8s %8s %8s %8s %5s%n", "-", "-", "-", "-", "-");
@@ -274,9 +274,9 @@ public final class HSP {
         openSet.put(init, root);
         List<String> plan = null;
 
-        final int CPUTime = (Integer) this.arguments.get(HSP.Argument.CPU_TIME);
+        final int cpuTime = (Integer) this.arguments.get(HSP.Argument.CPU_TIME);
         // Start of the search
-        while (!open.isEmpty() && plan == null && this.searchingTime < CPUTime) {
+        while (!open.isEmpty() && plan == null && this.searchingTime < cpuTime) {
             // Pop the first node in the pending list open
             final Node current = open.poll();
             openSet.remove(current);
@@ -294,10 +294,10 @@ public final class HSP {
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce -> {
+                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                             // Apply the effect to the successor node
-                            state.apply(ce.getEffects());
-                        });
+                            state.apply(ce.getEffects())
+                        );
                         final int g = current.getCost() + 1;
                         Node result = openSet.get(state);
                         if (result == null) {
@@ -436,28 +436,28 @@ public final class HSP {
         final Properties arguments = HSP.getDefaultArguments();
         try {
             for (int i = 0; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("-o") && ((i + 1) < args.length)) {
+                if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("operators file does not exist");
                         throw new RuntimeException("operators file does not exist: " + args[i + 1]);
                     }
                     i++;
-                } else if (args[i].equalsIgnoreCase("-f") && ((i + 1) < args.length)) {
+                } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("facts file does not exist");
                         throw new RuntimeException("facts file does not exist: " + args[i + 1]);
                     }
                     i++;
-                } else if (args[i].equalsIgnoreCase("-t") && ((i + 1) < args.length)) {
+                } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         HSP.printUsage();
                     }
                     i++;
                     arguments.put(HSP.Argument.CPU_TIME, cpu);
-                } else if (args[i].equalsIgnoreCase("-u") && ((i + 1) < args.length)) {
+                } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
                         HSP.printUsage();
@@ -483,13 +483,13 @@ public final class HSP {
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-w") && ((i + 1) < args.length)) {
-                    final double weight = Double.valueOf(args[i + 1]);
+                    final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
                         HSP.printUsage();
                     }
                     arguments.put(HSP.Argument.WEIGHT, weight);
                     i++;
-                } else if (args[i].equalsIgnoreCase("-i") && ((i + 1) < args.length)) {
+                } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         HSP.printUsage();

@@ -40,38 +40,32 @@ public interface CodedOp extends Serializable {
      * Set the name of the operator.
      *
      * @param name the name to set.
-     * @throws NullPointerException if <code>name == null</code>.
      */
-    void setName(final String name) throws NullPointerException;
+    void setName(final String name);
 
     /**
      * Returns the type of the parameter at the specified index.
      *
      * @param index the index of the parameter.
      * @return the type of the parameter at the specified index.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      */
-    int getTypeOfParameters(final int index) throws ArrayIndexOutOfBoundsException;
+    int getTypeOfParameters(final int index);
 
     /**
      * Set a new type the parameter at a specified index.
      *
      * @param index the index of the parameter.
      * @param type  the type to set.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
-     * @throws IllegalArgumentException       if type < 0.
      */
-    void setTypeOfParameter(final int index, final int type)
-        throws ArrayIndexOutOfBoundsException, IllegalArgumentException;
+    void setTypeOfParameter(final int index, final int type);
 
     /**
      * Returns the value of the parameter at a specified index.
      *
      * @param index the index.
      * @return the value of the parameter.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      */
-    int getValueOfParameter(final int index) throws ArrayIndexOutOfBoundsException;
+    int getValueOfParameter(final int index);
 
     /**
      * Instantiate a parameter of the operator at a specified index with a value.
@@ -85,11 +79,8 @@ public interface CodedOp extends Serializable {
      *
      * @param index the index of the parameter to instantiate.
      * @param value the value of instantiation.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
-     * @throws IllegalArgumentException       if value < 0.
      */
-    void setValueOfParameter(final int index, final int value)
-        throws ArrayIndexOutOfBoundsException, IllegalArgumentException;
+    void setValueOfParameter(final int index, final int value);
 
     /**
      * Returns the arity of the operator.

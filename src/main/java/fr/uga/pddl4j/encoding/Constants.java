@@ -25,7 +25,7 @@ package fr.uga.pddl4j.encoding;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-interface Constants {
+public final class Constants {
 
     /**
      * The default logging level.
@@ -51,6 +51,11 @@ interface Constants {
      * The default size of the operators table.
      */
     static final int DEFAULT_OPERATORS_TABLE_SIZE = 1000;
+
+    /**
+     * default private constructor to prevent form class instantiation.
+     */
+    private Constants() {}
 
 
 }

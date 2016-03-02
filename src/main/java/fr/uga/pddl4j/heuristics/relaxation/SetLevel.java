@@ -61,9 +61,9 @@ public final class SetLevel extends GraphHeuristic {
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state or
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
-     * @throws NullPointerException if <code>state == null</code>.
      */
-    public int estimate(final BitState state, final BitExp goal) throws NullPointerException {
+    @Override
+    public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         return this.expandPlanningGraph(state);
     }

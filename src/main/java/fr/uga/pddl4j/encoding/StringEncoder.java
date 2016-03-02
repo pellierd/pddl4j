@@ -55,7 +55,7 @@ final class StringEncoder {
      */
     static String toString(final IntOp op, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions) {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         str.append("Op " + op.getName() + "\n");
         str.append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
@@ -123,7 +123,7 @@ final class StringEncoder {
     private static String toString(final IntExp exp, final List<String> constants,
                                    final List<String> types, final List<String> predicates,
                                    final List<String> functions, String offset, final String separator) {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         switch (exp.getConnective()) {
             case ATOM:
                 str.append("(");
@@ -183,7 +183,7 @@ final class StringEncoder {
                         exp.getChildren().size() - 1), constants, types, predicates, functions, offset));
                 }
                 str.append(")");
-                // offset = offset.substring(0, offset.length() - 2); //Unused affectation because String is immutable
+                // offset = offset.substring(0, offset.length() - 2);
                 break;
             case FORALL:
             case EXISTS:
@@ -200,7 +200,7 @@ final class StringEncoder {
                         functions, offset));
                 }
                 str.append(")");
-                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
+                //offset = offset.substring(0, offset.length() - 2);
                 break;
             case NUMBER:
                 str.append(exp.getValue());

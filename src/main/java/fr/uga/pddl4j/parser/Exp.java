@@ -302,11 +302,8 @@ public class Exp implements Serializable {
 
     /**
      * Renames the variables contained in the expression. The variable renames have the form ?X1,..., ?Xn.
-     *
-     * @exception MalformedExpException if this expression is malformed.
-     * @see this#isMalformedExpression()
      */
-    public void renameVariables() throws MalformedExpException {
+    public void renameVariables() {
         this.renameVariables(new LinkedHashMap<>());
     }
 
@@ -340,9 +337,9 @@ public class Exp implements Serializable {
             case EXISTS:
                 final Map<String, String> newContext = new LinkedHashMap<>(context);
                 for (int i = 0; i < this.getVariables().size(); i++) {
-                    final TypedSymbol variable = this.getVariables().get(i);
-                    final String image = variable.renameVariables(newContext.size() + i);
-                    newContext.put(image, variable.getImage());
+                    final TypedSymbol var = this.getVariables().get(i);
+                    final String image = var.renameVariables(newContext.size() + i);
+                    newContext.put(image, var.getImage());
                 }
                 this.getChildren().get(0).renameVariables(newContext);
                 break;
@@ -406,10 +403,9 @@ public class Exp implements Serializable {
     /**
      * Moves the negation inward the expression.
      *
-     * @exception MalformedExpException if this expression is malformed.
      * @see this#isMalformedExpression()
      */
-    public void moveNegationInward() throws MalformedExpException {
+    public void moveNegationInward() {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
@@ -546,6 +542,7 @@ public class Exp implements Serializable {
      *     atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object object) {
         if (object != null && object instanceof Exp) {
             Exp other = (Exp) object;
@@ -569,6 +566,7 @@ public class Exp implements Serializable {
      * @return the hash code value of this expression.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -626,37 +624,14 @@ public class Exp implements Serializable {
     }
 
     /**
-     * Replaces all the occurrences of a specified expression contained in this expression and
-     * returns <code>true</code> if and only if at least one occurrence was replaced.
-     *
-     * @param e1 the expression to be replaced.
-     * @param e2 the expression to replaced.
-     * @return <code>true</code> if the specified expression <code>exp</code> was replaced;
-     * <code>false</code> otherwise.
-     */
-    /*public final boolean replace(final Exp e1, final Exp e2) {
-        boolean replaced = false;
-        for (int i = 0; i < this.getChildren().size(); i++) {
-            Exp s = this.getChildren().get(i);
-            if (s.equals(e1)) {
-                this.getChildren().set(i, e2);
-                replaced = true;
-            } else {
-                replaced = replaced || s.replace(e1, e2);
-            }
-        }
-        return replaced;
-    }*/
-
-    /**
      * Returns a string representation of this node.
      *
      * @return a string representation of this node.
      * @see java.lang.Object#toString()
-     * @exception MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression()
      */
-    public String toString() throws MalformedExpException {
+    @Override
+    public String toString() {
         return this.toString("");
     }
 

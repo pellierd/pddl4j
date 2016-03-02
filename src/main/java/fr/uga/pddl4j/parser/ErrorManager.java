@@ -86,8 +86,8 @@ public class ErrorManager implements Serializable {
      */
     private void print(Collection<Message> messages, PrintStream out) {
         if (messages != null) {
-            for (Message msg : messages) {
-                out.println(msg);
+            for (Message message : messages) {
+                out.println(message);
             }
         }
     }
@@ -107,9 +107,9 @@ public class ErrorManager implements Serializable {
      */
     public Set<Message> getMessages(File file) {
         Set<Message> messages = new LinkedHashSet<>();
-        for (Message msg : this.msg) {
-            if (msg.getFile().equals(file)) {
-                messages.add(msg);
+        for (Message message : this.msg) {
+            if (message.getFile().equals(file)) {
+                messages.add(message);
             }
         }
         return messages;
@@ -124,9 +124,9 @@ public class ErrorManager implements Serializable {
      */
     public Set<Message> getMessages(Message.Type type, File file) {
         Set<Message> messages = new LinkedHashSet<>();
-        for (Message msg : this.msg) {
-            if (msg.getType().equals(type) && msg.getFile().equals(file)) {
-                messages.add(msg);
+        for (Message message : this.msg) {
+            if (message.getType().equals(type) && message.getFile().equals(file)) {
+                messages.add(message);
             }
         }
         return messages;
@@ -140,9 +140,9 @@ public class ErrorManager implements Serializable {
      */
     public Set<Message> getMessages(Message.Type type) {
         Set<Message> messages = new LinkedHashSet<>();
-        for (Message msg : this.msg) {
-            if (msg.getType().equals(type)) {
-                messages.add(msg);
+        for (Message message : this.msg) {
+            if (message.getType().equals(type)) {
+                messages.add(message);
             }
         }
         return messages;

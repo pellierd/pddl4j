@@ -73,7 +73,7 @@ public class BitOp extends AbstractCodedOp {
 
     /**
      * Creates a new operator.
-     *
+     * TODO to remove: unused
      * @param name          the name of the operator.
      * @param arity         the arity of the operator.
      * @param preconditions the precondition of the operator.
@@ -145,16 +145,16 @@ public class BitOp extends AbstractCodedOp {
 
     /**
      * Returns the unconditional effects of the operator.
-     *
+     * TODO to remove: unused
      * @return the unconditional effects of the operator.
      */
     public BitExp getUnconditionalEffects() {
         final BitExp ucEffect = new BitExp();
         for (CondBitExp cEffect : this.effects) {
             if (cEffect.getCondition().isEmpty()) {
-                final BitExp cond_eff = cEffect.getEffects();
-                ucEffect.getPositive().or(cond_eff.getPositive());
-                ucEffect.getNegative().or(cond_eff.getNegative());
+                final BitExp condEff = cEffect.getEffects();
+                ucEffect.getPositive().or(condEff.getPositive());
+                ucEffect.getNegative().or(condEff.getNegative());
             }
         }
         return ucEffect;

@@ -55,7 +55,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      * @param other the other operator.
      * @throws NullPointerException if <code>other == null</code>.
      */
-    protected AbstractCodedOp(final BitOp other) throws NullPointerException {
+    protected AbstractCodedOp(final BitOp other) {
         if (other == null) {
             throw new NullPointerException("other == null");
         }
@@ -78,7 +78,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      * @param arity the arity of the operator.
      * @throws NullPointerException if <code>name == null</code>.
      */
-    protected AbstractCodedOp(final String name, final int arity) throws NullPointerException {
+    protected AbstractCodedOp(final String name, final int arity) {
         this.setName(name);
         this.parameters = new int[arity];
         this.instantiations = new int[arity];
@@ -115,6 +115,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @return the name of this operator
      */
+    @Override
     public final String getName() {
         return this.name;
     }
@@ -125,7 +126,8 @@ public abstract class AbstractCodedOp implements CodedOp {
      * @param name the name to set.
      * @throws NullPointerException if <code>name == null</code>.
      */
-    public final void setName(final String name) throws NullPointerException {
+    @Override
+    public final void setName(final String name) {
         if (name == null) {
             throw new NullPointerException("name == null");
         }
@@ -137,9 +139,9 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter.
      * @return the type of the parameter at the specified index.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      */
-    public final int getTypeOfParameters(final int index) throws ArrayIndexOutOfBoundsException {
+    @Override
+    public final int getTypeOfParameters(final int index) {
         return this.parameters[index];
     }
 
@@ -148,11 +150,10 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter.
      * @param type  the type to set.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      * @throws IllegalArgumentException       if type < 0.
      */
-    public final void setTypeOfParameter(final int index, final int type)
-        throws ArrayIndexOutOfBoundsException, IllegalArgumentException {
+    @Override
+    public final void setTypeOfParameter(final int index, final int type) {
         if (type < 0) {
             throw new IllegalArgumentException("type < 0");
         }
@@ -164,9 +165,9 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index.
      * @return the value of the parameter.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      */
-    public final int getValueOfParameter(final int index) throws ArrayIndexOutOfBoundsException {
+    @Override
+    public final int getValueOfParameter(final int index) {
         return this.instantiations[index];
     }
 
@@ -182,11 +183,10 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter to instantiate.
      * @param value the value of instantiation.
-     * @throws ArrayIndexOutOfBoundsException if 0 <= index < arity does not hold.
      * @throws IllegalArgumentException       if value < 0.
      */
-    public final void setValueOfParameter(final int index, final int value)
-        throws ArrayIndexOutOfBoundsException, IllegalArgumentException {
+    @Override
+    public final void setValueOfParameter(final int index, final int value) {
         if (value < 0) {
             throw new IllegalArgumentException("value < 0");
         }
@@ -198,6 +198,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @return the arity of the operator.
      */
+    @Override
     public final int getArity() {
         return this.parameters.length;
     }
@@ -229,6 +230,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      * @return <code>true</code> if this operator is equal to an object;
      * <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof CodedOp) {
             final CodedOp other = (CodedOp) obj;
@@ -244,6 +246,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @return a hash code value for this operator.
      */
+    @Override
     public int hashCode() {
         return this.getName().hashCode();
     }

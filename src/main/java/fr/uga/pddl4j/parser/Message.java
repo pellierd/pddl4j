@@ -86,10 +86,8 @@ public class Message implements Serializable, Comparable<Message> {
      * @param column  the column of the file concerned by this message.
      * @param file    the file concerned by this message.
      * @param content the content of the message.
-     * @throws NullPointerException if the specified type or file is null.
      */
-    public Message(final Type type, final int line, final int column, final File file,
-                   final String content) throws NullPointerException {
+    public Message(final Type type, final int line, final int column, final File file, final String content)  {
         if (type == null || file == null) {
             throw new NullPointerException();
         }
@@ -113,9 +111,8 @@ public class Message implements Serializable, Comparable<Message> {
      * Sets the type of the message.
      *
      * @param type the type of message to set.
-     * @throws NullPointerException if the specified type is null.
      */
-    public final void setType(final Type type) throws NullPointerException {
+    public final void setType(final Type type)  {
         if (type == null) {
             throw new NullPointerException();
         }
@@ -171,9 +168,8 @@ public class Message implements Serializable, Comparable<Message> {
      * Sets the file concerned by this message.
      *
      * @param file the file to set.
-     * @throws NullPointerException if the specified file is null.
      */
-    public final void setFile(File file) throws NullPointerException {
+    public final void setFile(File file) {
         if (file == null) {
             throw new NullPointerException();
         }
@@ -207,6 +203,7 @@ public class Message implements Serializable, Comparable<Message> {
      * @return <code>true</code>if an object is equals to this message; <code>false</code>.
      * @see java.lang.Object#equals(Object)
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof Message) {
             final Message other = (Message) obj;
@@ -244,6 +241,7 @@ public class Message implements Serializable, Comparable<Message> {
      *     to the defined order.
      * @see java.lang.Comparable#compareTo(Object)
      */
+    @Override
     public int compareTo(final Message other) {
         int value = this.file.compareTo(other.file);
         if (value == 0) {
@@ -264,6 +262,7 @@ public class Message implements Serializable, Comparable<Message> {
      * @return a string representation of this message.
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
         if (this.type == Type.LEXICAL_ERROR) {

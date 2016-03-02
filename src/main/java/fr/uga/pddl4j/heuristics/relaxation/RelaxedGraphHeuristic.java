@@ -125,9 +125,9 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
     protected RelaxedGraphHeuristic(final CodedProblem problem) {
         super(problem);
         // Get the number of relevant facts of the problem
-        final int nb_relevant_facts = super.getRevelantFacts().size();
+        final int nbRelevantFacts = super.getRevelantFacts().size();
         // Get the number of operators of the problem
-        final int nb_operators = super.getOperators().size();
+        final int nbOperators = super.getOperators().size();
         // Compute the number of unconditional operators
         int nbUncondOperators = 0;
         final List<BitOp> operators = problem.getOperators();
@@ -135,9 +135,9 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
             nbUncondOperators += op.getCondEffects().size();
         }
         // Initialize the array that must contain the level of the positive propositions
-        this.pPropLevel = new int[nb_relevant_facts];
+        this.pPropLevel = new int[nbRelevantFacts];
         // Initialize the array that must contain the level of the negative propositions
-        this.nPropLevel = new int[nb_relevant_facts];
+        this.nPropLevel = new int[nbRelevantFacts];
         // Initialize the array that must contain the level of the operators
         this.operatorsLevel = new int[nbUncondOperators];
         // Initialize the array that must contain the difficulty of the operators
@@ -150,19 +150,19 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         // Initialize the array that must contain for each operator its effects
         this.effects = new BitExp[nbUncondOperators];
         // Initialize the array that must contain for each operator its unconditional effects
-        this.unconditionalEffects = new BitExp[nb_operators];
+        this.unconditionalEffects = new BitExp[nbOperators];
         for (int i = 0; i < this.unconditionalEffects.length; i++) {
             this.unconditionalEffects[i] = new BitExp();
         }
         // The array that contains for each proposition the list of its unconditional operators
         this.unconditionalOperators = new int[nbUncondOperators][];
         // Initialize the array that must contain for each operator its preconditions' edges
-        this.precondEdges = new BitExp[nb_relevant_facts];
+        this.precondEdges = new BitExp[nbRelevantFacts];
         for (int i = 0; i < this.precondEdges.length; i++) {
             this.precondEdges[i] = new BitExp();
         }
         // Initialize the array that must contain for each operator its effects' edges
-        this.effectsEdges = new BitExp[nb_relevant_facts];
+        this.effectsEdges = new BitExp[nbRelevantFacts];
         for (int i = 0; i < this.effectsEdges.length; i++) {
             this.effectsEdges[i] = new BitExp();
         }
@@ -177,24 +177,24 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         // Start enumerating the unconditional operators
         for (int opIndex = 0; opIndex < operators.size(); opIndex++) {
             final BitOp op = operators.get(opIndex);
-            final List<CondBitExp> effects = op.getCondEffects();
+            final List<CondBitExp> condEffects = op.getCondEffects();
 
             // For each conditional effect we create a new operator
-            for (int ceIndex = 0; ceIndex < effects.size(); ceIndex++) {
-                final CondBitExp c_effect = effects.get(ceIndex);
+            for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
+                final CondBitExp cEffect = condEffects.get(ceIndex);
                 final int[] eff = {opIndex, ceIndex};
                 this.unconditionalOperators[uncondOpIndex] = eff;
 
                 // We pre-compute the preconditions' edges
                 final BitExp pre = new BitExp(op.getPreconditions());
-                final BitVector p_pre = pre.getPositive();
-                final BitVector n_pre = pre.getNegative();
-                p_pre.or(c_effect.getCondition().getPositive());
-                n_pre.or(c_effect.getCondition().getNegative());
-                for (int p = p_pre.nextSetBit(0); p >= 0; p = p_pre.nextSetBit(p + 1)) {
+                final BitVector pPre = pre.getPositive();
+                final BitVector nPre = pre.getNegative();
+                pPre.or(cEffect.getCondition().getPositive());
+                nPre.or(cEffect.getCondition().getNegative());
+                for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
                     this.precondEdges[p].getPositive().set(uncondOpIndex);
                 }
-                for (int p = n_pre.nextSetBit(0); p >= 0; p = n_pre.nextSetBit(p + 1)) {
+                for (int p = nPre.nextSetBit(0); p >= 0; p = nPre.nextSetBit(p + 1)) {
                     this.precondEdges[p].getNegative().set(uncondOpIndex);
                 }
 
@@ -202,13 +202,13 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                 this.preconditions[uncondOpIndex] = pre;
 
                 // We pre-compute the effects' edges
-                final BitExp effect = c_effect.getEffects();
-                final BitVector p_eff = effect.getPositive();
-                final BitVector n_eff = effect.getNegative();
-                for (int p = p_eff.nextSetBit(0); p >= 0; p = p_eff.nextSetBit(p + 1)) {
+                final BitExp effect = cEffect.getEffects();
+                final BitVector pEff = effect.getPositive();
+                final BitVector nEff = effect.getNegative();
+                for (int p = pEff.nextSetBit(0); p >= 0; p = pEff.nextSetBit(p + 1)) {
                     this.effectsEdges[p].getPositive().set(uncondOpIndex);
                 }
-                for (int p = n_eff.nextSetBit(0); p >= 0; p = n_eff.nextSetBit(p + 1)) {
+                for (int p = nEff.nextSetBit(0); p >= 0; p = nEff.nextSetBit(p + 1)) {
                     this.effectsEdges[p].getNegative().set(uncondOpIndex);
                 }
 
@@ -219,11 +219,11 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                 this.precondCardinality[uncondOpIndex] = pre.cardinality();
 
                 // We initialize the unconditional effects of the operator
-                if (c_effect.getCondition().isEmpty()) {
-                    final BitExp uncond_eff = this.unconditionalEffects[opIndex];
-                    final BitExp cond_eff = c_effect.getEffects();
-                    uncond_eff.getPositive().or(cond_eff.getPositive());
-                    uncond_eff.getNegative().or(cond_eff.getNegative());
+                if (cEffect.getCondition().isEmpty()) {
+                    final BitExp uncondEff = this.unconditionalEffects[opIndex];
+                    final BitExp condEff = cEffect.getEffects();
+                    uncondEff.getPositive().or(condEff.getPositive());
+                    uncondEff.getNegative().or(condEff.getNegative());
                 }
 
                 // We increment the counter of unconditional operator
@@ -249,7 +249,8 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
      * @param goal the goal.
      * @throws NullPointerException if <code>goal == null</code>.
      */
-    protected final void setGoal(final BitExp goal) throws NullPointerException {
+    @Override
+    protected final void setGoal(final BitExp goal) {
         super.setGoal(goal);
         this.goalCardinality = goal.cardinality();
     }
@@ -273,9 +274,9 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         Arrays.fill(this.operatorsDifficulty, Integer.MAX_VALUE);
 
         // The positive goal to reach
-        final BitVector p_goal = super.getGoal().getPositive();
+        final BitVector pGoal = super.getGoal().getPositive();
         // The negative goal to reach
-        final BitVector n_goal = super.getGoal().getNegative();
+        final BitVector nGoal = super.getGoal().getNegative();
         // The counter used to store the number of goal reach.
         this.goalCounter = 0;
 
@@ -290,36 +291,36 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         // All positive goal of the initial state are set to appear at level 0
         for (int p = ppk.nextSetBit(0); p >= 0; p = ppk.nextSetBit(p + 1)) {
             this.pPropLevel[p] = 0;
-            if (p_goal.get(p)) {
+            if (pGoal.get(p)) {
                 this.goalCounter++;
             }
         }
         // All negative goal of the initial state are set to appear at level 0
         for (int p = npk.nextSetBit(0); p >= 0; p = npk.nextSetBit(p + 1)) {
             this.nPropLevel[p] = 0;
-            if (n_goal.get(p)) {
+            if (nGoal.get(p)) {
                 this.goalCounter++;
             }
         }
 
         // The positive accumulator used to store the set of positive proposition already reached
-        final BitVector p_acc = new BitVector();
+        final BitVector pAcc = new BitVector();
         // The negative accumulator used to store the set of negative proposition already reached
-        final BitVector n_acc = new BitVector();
+        final BitVector nAcc = new BitVector();
 
         // We start building the relaxed planning graph
         // The graph is expanded until the goal and the fixed point of the graph is not reached
         while (this.goalCounter != this.goalCardinality && (!ppk.isEmpty() || !npk.isEmpty())) {
             // A bit vector used to store the new operator to add
-            final BitVector new_ops = new BitVector();
+            final BitVector newOps = new BitVector();
             // For each positive proposition of the proposition layer
             for (int p = ppk.nextSetBit(0); p >= 0; p = ppk.nextSetBit(p + 1)) {
                 // We get the operator that have this positive proposition as precondition
-                final BitVector p_edges = this.precondEdges[p].getPositive();
+                final BitVector pEdges = this.precondEdges[p].getPositive();
                 // We mark the positive proposition p has explored
-                p_acc.set(p);
+                pAcc.set(p);
                 // We update the counter associated to the operator precondition
-                for (int pe = p_edges.nextSetBit(0); pe >= 0; pe = p_edges.nextSetBit(pe + 1)) {
+                for (int pe = pEdges.nextSetBit(0); pe >= 0; pe = pEdges.nextSetBit(pe + 1)) {
                     // If the operator has a no-empty set of preconditions we increment its counter
                     if (this.precondCardinality[pe] != 0) {
                         this.precondCounters[pe]++;
@@ -327,18 +328,18 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                     // Finally, if the all the preconditions of an operator hold we mark the
                     // operator has new operator for the level
                     if (this.precondCounters[pe] == this.precondCardinality[pe]) {
-                        new_ops.set(pe);
+                        newOps.set(pe);
                     }
                 }
             }
             // For each negative proposition of the proposition layer
             for (int p = npk.nextSetBit(0); p >= 0; p = npk.nextSetBit(p + 1)) {
                 // We get the operator that have this positive proposition as precondition
-                final BitVector n_edges = this.precondEdges[p].getNegative();
+                final BitVector nEdges = this.precondEdges[p].getNegative();
                 // We mark the negative proposition p has explored
-                n_acc.set(p);
+                nAcc.set(p);
                 // We update the counter associated to the operator precondition
-                for (int pe = n_edges.nextSetBit(0); pe >= 0; pe = n_edges.nextSetBit(pe + 1)) {
+                for (int pe = nEdges.nextSetBit(0); pe >= 0; pe = nEdges.nextSetBit(pe + 1)) {
                     // If the operator has a no-empty set of preconditions we increment its counter
                     if (this.precondCardinality[pe] != 0) {
                         this.precondCounters[pe]++;
@@ -346,43 +347,43 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                     // Finally, if the all the preconditions of an operator hold we mark the
                     // operator has new operator for the level
                     if (this.precondCounters[pe] == this.precondCardinality[pe]) {
-                        new_ops.set(pe);
+                        newOps.set(pe);
                     }
                 }
             }
             // The bit vector used to the store the new positive proposition at the next level
-            final BitVector p_new_props = new BitVector();
+            final BitVector pNewProps = new BitVector();
             // The bit vector used to the store the new negative proposition at the next level
-            final BitVector n_new_props = new BitVector();
+            final BitVector nNewProps = new BitVector();
             // For each new operator at level k
-            for (int o = new_ops.nextSetBit(0); o >= 0; o = new_ops.nextSetBit(o + 1)) {
+            for (int o = newOps.nextSetBit(0); o >= 0; o = newOps.nextSetBit(o + 1)) {
                 // We mark o as appearing at the level k
                 this.operatorsLevel[o] = this.level;
                 // We accumulate the positive effects of o for the next proposition level k
-                p_new_props.or(this.effects[o].getPositive());
+                pNewProps.or(this.effects[o].getPositive());
                 // We accumulate the negative effects of o for the next proposition level k
-                n_new_props.or(this.effects[o].getNegative());
+                nNewProps.or(this.effects[o].getNegative());
                 // Then we compute the difficulty of operator as the sum of the level of their
                 // preconditions
                 this.operatorsDifficulty[o] = 0;
                 // First the sum of the positive preconditions
-                final BitVector p_pre = this.preconditions[o].getPositive();
-                for (int p = p_pre.nextSetBit(0); p >= 0; p = p_pre.nextSetBit(p + 1)) {
+                final BitVector pPre = this.preconditions[o].getPositive();
+                for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
                     this.operatorsDifficulty[o] += this.pPropLevel[p];
                 }
                 // First the sum of the negative preconditions
-                final BitVector n_pre = this.preconditions[o].getNegative();
-                for (int p = n_pre.nextSetBit(0); p >= 0; p = n_pre.nextSetBit(p + 1)) {
+                final BitVector nPre = this.preconditions[o].getNegative();
+                for (int p = nPre.nextSetBit(0); p >= 0; p = nPre.nextSetBit(p + 1)) {
                     this.operatorsDifficulty[o] += this.nPropLevel[p];
                 }
             }
 
             // Now, we compute the new proposition level just by adding positive and negative
             // propositions that was not yet encounter in the planning graph
-            ppk = p_new_props;
-            npk = n_new_props;
-            ppk.andNot(p_acc);
-            npk.andNot(n_acc);
+            ppk = pNewProps;
+            npk = nNewProps;
+            ppk.andNot(pAcc);
+            npk.andNot(nAcc);
 
             // We increment the counter level
             this.level++;
@@ -390,7 +391,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
             for (int p = ppk.nextSetBit(0); p >= 0; p = ppk.nextSetBit(p + 1)) {
                 this.pPropLevel[p] = this.level;
                 // Update the goal counter if a positive goal proposition is reached
-                if (p_goal.get(p)) {
+                if (pGoal.get(p)) {
                     this.goalCounter++;
                 }
             }
@@ -398,7 +399,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
             for (int p = npk.nextSetBit(0); p >= 0; p = npk.nextSetBit(p + 1)) {
                 this.nPropLevel[p] = this.level;
                 // Update the goal counter if a negative goal proposition is reached
-                if (n_goal.get(p)) {
+                if (nGoal.get(p)) {
                     this.goalCounter++;
                 }
             }
@@ -424,12 +425,12 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
      */
     protected final int getSumValue() {
         int value = 0;
-        final BitVector p_goal = super.getGoal().getPositive();
-        final BitVector n_goal = super.getGoal().getNegative();
-        for (int g = p_goal.nextSetBit(0); g >= 0; g = p_goal.nextSetBit(g + 1)) {
+        final BitVector pGoal = super.getGoal().getPositive();
+        final BitVector nGoal = super.getGoal().getNegative();
+        for (int g = pGoal.nextSetBit(0); g >= 0; g = pGoal.nextSetBit(g + 1)) {
             value += this.pPropLevel[g];
         }
-        for (int g = n_goal.nextSetBit(0); g >= 0; g = n_goal.nextSetBit(g + 1)) {
+        for (int g = nGoal.nextSetBit(0); g >= 0; g = nGoal.nextSetBit(g + 1)) {
             value += this.nPropLevel[g];
         }
         return value;
@@ -443,15 +444,15 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
      */
     protected final int getMaxValue() {
         int max = Integer.MIN_VALUE;
-        final BitVector p_goal = super.getGoal().getPositive();
-        final BitVector n_goal = super.getGoal().getNegative();
-        for (int g = p_goal.nextSetBit(0); g >= 0; g = p_goal.nextSetBit(g + 1)) {
+        final BitVector pGoal = super.getGoal().getPositive();
+        final BitVector nGoal = super.getGoal().getNegative();
+        for (int g = pGoal.nextSetBit(0); g >= 0; g = pGoal.nextSetBit(g + 1)) {
             final int gl = this.pPropLevel[g];
             if (gl > max) {
                 max = gl;
             }
         }
-        for (int g = n_goal.nextSetBit(0); g >= 0; g = n_goal.nextSetBit(g + 1)) {
+        for (int g = nGoal.nextSetBit(0); g >= 0; g = nGoal.nextSetBit(g + 1)) {
             final int gl = this.nPropLevel[g];
             if (gl > max) {
                 max = gl;
@@ -475,12 +476,12 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         for (int k = 0; k <= this.level; k++) {
             goals[k] = new BitExp();
         }
-        final BitVector p_goal = super.getGoal().getPositive();
-        final BitVector n_goal = super.getGoal().getNegative();
-        for (int g = p_goal.nextSetBit(0); g >= 0; g = p_goal.nextSetBit(g + 1)) {
+        final BitVector pGoal = super.getGoal().getPositive();
+        final BitVector nGoal = super.getGoal().getNegative();
+        for (int g = pGoal.nextSetBit(0); g >= 0; g = pGoal.nextSetBit(g + 1)) {
             goals[this.pPropLevel[g]].getPositive().set(g);
         }
-        for (int g = n_goal.nextSetBit(0); g >= 0; g = n_goal.nextSetBit(g + 1)) {
+        for (int g = nGoal.nextSetBit(0); g >= 0; g = nGoal.nextSetBit(g + 1)) {
             goals[this.nPropLevel[g]].getNegative().set(g);
         }
 
@@ -488,79 +489,79 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         for (int k = level; k > 0; k--) {
             // goals at level k
             final BitExp gk = goals[k];
-            final BitVector p_gk = gk.getPositive();
-            final BitVector n_gk = gk.getNegative();
+            final BitVector pGk = gk.getPositive();
+            final BitVector nGk = gk.getNegative();
             // goals at level k - 1
-            final BitExp gk_1 = goals[k - 1];
-            final BitVector p_gk_1 = gk_1.getPositive();
-            final BitVector n_gk_1 = gk_1.getNegative();
+            final BitExp gk1 = goals[k - 1];
+            final BitVector pGk1 = gk1.getPositive();
+            final BitVector nGk1 = gk1.getNegative();
             // Each positive goal at level k we need to find a resolver to support it
-            for (int pg = p_gk.nextSetBit(0); pg >= 0; pg = p_gk.nextSetBit(pg + 1)) {
+            for (int pg = pGk.nextSetBit(0); pg >= 0; pg = pGk.nextSetBit(pg + 1)) {
                 // Select the best resolver according to the difficulty heuristic
-                final int resolver_index = this.select(this.effectsEdges[pg].getPositive(), k);
-                if (resolver_index != -1) {
-                    final BitExp pre = this.preconditions[resolver_index];
-                    final BitVector p_pre = pre.getPositive();
-                    for (int p = p_pre.nextSetBit(0); p >= 0; p = p_pre.nextSetBit(p + 1)) {
-                        final int p_level = this.pPropLevel[p];
-                        if (p_level != 0 && !p_gk_1.get(p)) {
-                            goals[p_level].getPositive().set(p);
+                final int resolverIndex = this.select(this.effectsEdges[pg].getPositive(), k);
+                if (resolverIndex != -1) {
+                    final BitExp pre = this.preconditions[resolverIndex];
+                    final BitVector pPre = pre.getPositive();
+                    for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
+                        final int pLevel = this.pPropLevel[p];
+                        if (pLevel != 0 && !pGk1.get(p)) {
+                            goals[pLevel].getPositive().set(p);
                         }
                     }
-                    final BitVector n_pre = pre.getNegative();
-                    for (int p = n_pre.nextSetBit(0); p >= 0; p = n_pre.nextSetBit(p + 1)) {
-                        final int p_level = this.nPropLevel[p];
-                        if (p_level != 0 && !n_gk_1.get(p)) {
-                            goals[p_level].getNegative().set(p);
+                    final BitVector nPre = pre.getNegative();
+                    for (int p = nPre.nextSetBit(0); p >= 0; p = nPre.nextSetBit(p + 1)) {
+                        final int pLevel = this.nPropLevel[p];
+                        if (pLevel != 0 && !nGk1.get(p)) {
+                            goals[pLevel].getNegative().set(p);
                         }
                     }
                     // Get the effects of the operator marked them as true
-                    final BitExp effect = this.effects[resolver_index];
-                    final BitVector p_effect = effect.getPositive();
-                    final BitVector n_effect = effect.getNegative();
-                    p_gk_1.andNot(p_effect);
-                    n_gk_1.andNot(n_effect);
-                    p_gk.andNot(p_effect);
-                    n_gk.andNot(n_effect);
+                    final BitExp effect = this.effects[resolverIndex];
+                    final BitVector pEffect = effect.getPositive();
+                    final BitVector nEffect = effect.getNegative();
+                    pGk1.andNot(pEffect);
+                    nGk1.andNot(nEffect);
+                    pGk.andNot(pEffect);
+                    nGk.andNot(nEffect);
                     // We increment the number of action of the relaxed plan
                     value++;
                 } else { // NOOP case
-                    p_gk_1.clear(pg);
-                    p_gk.clear(pg);
+                    pGk1.clear(pg);
+                    pGk.clear(pg);
                 }
             }
             // Each negative goal at level k we need to find a resolver to support it
-            for (int ng = n_gk.nextSetBit(0); ng >= 0; ng = n_gk.nextSetBit(ng + 1)) {
-                final int resolver_index = this.select(this.effectsEdges[ng].getNegative(), k);
-                if (resolver_index != -1) {
-                    final BitExp pre = this.preconditions[resolver_index];
-                    final BitVector p_pre = pre.getPositive();
-                    for (int p = p_pre.nextSetBit(0); p >= 0; p = p_pre.nextSetBit(p + 1)) {
-                        final int p_level = this.pPropLevel[p];
-                        if (p_level != 0 && !p_gk_1.get(p)) {
-                            goals[p_level].getPositive().set(p);
+            for (int ng = nGk.nextSetBit(0); ng >= 0; ng = nGk.nextSetBit(ng + 1)) {
+                final int resolverIndex = this.select(this.effectsEdges[ng].getNegative(), k);
+                if (resolverIndex != -1) {
+                    final BitExp pre = this.preconditions[resolverIndex];
+                    final BitVector pPre = pre.getPositive();
+                    for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
+                        final int pLevel = this.pPropLevel[p];
+                        if (pLevel != 0 && !pGk1.get(p)) {
+                            goals[pLevel].getPositive().set(p);
                         }
                     }
-                    final BitVector n_pre = pre.getNegative();
-                    for (int p = n_pre.nextSetBit(0); p >= 0; p = n_pre.nextSetBit(p + 1)) {
-                        final int p_level = this.nPropLevel[p];
-                        if (p_level != 0 && !n_gk_1.get(p)) {
-                            goals[p_level].getNegative().set(p);
+                    final BitVector nPre = pre.getNegative();
+                    for (int p = nPre.nextSetBit(0); p >= 0; p = nPre.nextSetBit(p + 1)) {
+                        final int pLevel = this.nPropLevel[p];
+                        if (pLevel != 0 && !nGk1.get(p)) {
+                            goals[pLevel].getNegative().set(p);
                         }
                     }
                     // Get the effects of the operator marked them as true
-                    final BitExp effect = this.effects[resolver_index];
-                    final BitVector p_effect = effect.getPositive();
-                    final BitVector n_effect = effect.getNegative();
-                    p_gk_1.andNot(p_effect);
-                    n_gk_1.andNot(n_effect);
-                    p_gk.andNot(p_effect);
-                    n_gk.andNot(n_effect);
+                    final BitExp effect = this.effects[resolverIndex];
+                    final BitVector pEffect = effect.getPositive();
+                    final BitVector nEffect = effect.getNegative();
+                    pGk1.andNot(pEffect);
+                    nGk1.andNot(nEffect);
+                    pGk.andNot(pEffect);
+                    nGk.andNot(nEffect);
                     // We increment the number of action of the relaxed plan
                     value++;
                 } else { // NOOP case
-                    n_gk_1.set(ng);
-                    n_gk.clear(ng);
+                    nGk1.set(ng);
+                    nGk.clear(ng);
                 }
             }
         }

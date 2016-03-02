@@ -40,9 +40,8 @@ public class BitState extends BitVector {
      * Creates a new state from a specified <code>BitExp</code>.
      *
      * @param exp the <code>BitExp</code> that represents the logical state.
-     * @throws NullPointerException if <code>exp == null</code>.
      */
-    public BitState(final BitExp exp) throws NullPointerException {
+    public BitState(final BitExp exp) {
         this();
         if (exp == null) {
             throw new NullPointerException("exp == null");
@@ -55,9 +54,8 @@ public class BitState extends BitVector {
      * Creates a new state from an other state. This constructor is the copy constructor.
      *
      * @param state the other state to copy.
-     * @throws NullPointerException if <code>state == null</code>.
      */
-    public BitState(final BitState state) throws NullPointerException {
+    public BitState(final BitState state) {
         this();
         if (state == null) {
             throw new NullPointerException("state == null");
@@ -70,9 +68,8 @@ public class BitState extends BitVector {
      * the specified expression are added to this state and the negative ones are delete.
      *
      * @param exp the expression to apply.
-     * @throws NullPointerException if <code>exp == null</code>.
      */
-    public final void apply(final BitExp exp) throws NullPointerException {
+    public final void apply(final BitExp exp) {
         if (exp == null) {
             throw new NullPointerException("exp == null");
         }
@@ -85,9 +82,8 @@ public class BitState extends BitVector {
      *
      * @param exp the expression to be tested.
      * @return <code>true</code> if this state satisfy a specified expression; <code>false</code> otherwise.
-     * @throws NullPointerException if <code>exp == null</code>.
      */
-    public final boolean satisfy(final BitExp exp) throws NullPointerException {
+    public final boolean satisfy(final BitExp exp) {
         if (exp == null) {
             throw new NullPointerException("exp == null");
         }

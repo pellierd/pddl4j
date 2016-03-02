@@ -169,6 +169,7 @@ public final class BitMatrix {
      * <code>false</code> otherwise.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass().equals(this.getClass())) {
             final BitMatrix other = (BitMatrix) obj;
@@ -183,6 +184,7 @@ public final class BitMatrix {
      * @return the hash code value of this matrix.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return Arrays.hashCode(this.bitsets);
     }
@@ -192,6 +194,7 @@ public final class BitMatrix {
      *
      * @return a string representation of the matrix.
      */
+    @Override
     public String toString() {
         return Arrays.toString(this.bitsets);
     }
