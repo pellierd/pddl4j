@@ -86,9 +86,8 @@ public class Op implements Serializable {
      * Create a new operator from another.
      *
      * @param other the other operator.
-     * @throws NullPointerException if the specified operator is null;
      */
-    public Op(final Op other) throws NullPointerException {
+    public Op(final Op other)  {
         if (other == null) {
             throw new NullPointerException();
         }
@@ -111,11 +110,8 @@ public class Op implements Serializable {
      * @param parameters The list of parameters of the operator.
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
-     * @throws NullPointerException if the specified name, parameters, preconditions or effects are
-     *                              null.
      */
-    public Op(final Symbol name, final List<TypedSymbol> parameters, final Exp preconds, final Exp effects)
-        throws NullPointerException {
+    public Op(final Symbol name, final List<TypedSymbol> parameters, final Exp preconds, final Exp effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -157,9 +153,8 @@ public class Op implements Serializable {
      * Sets a new name to the operator.
      *
      * @param name the name to set.
-     * @throws NullPointerException if the specified name is null.
      */
-    public final void setName(final Symbol name) throws NullPointerException {
+    public final void setName(final Symbol name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -285,9 +280,9 @@ public class Op implements Serializable {
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol> parameters = this.getParameters();
         for (int j = 0; j < parameters.size(); j++) {
-            final TypedSymbol parameter = parameters.get(j);
-            final String image = parameter.renameVariables(index);
-            context.put(image, parameter.getImage());
+            final TypedSymbol params = parameters.get(j);
+            final String image = params.renameVariables(index);
+            context.put(image, params.getImage());
             index++;
         }
         // A hack to remove single atom in precondition
@@ -331,6 +326,7 @@ public class Op implements Serializable {
      *     the class <code>Op</code>, and has the same name; otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object object) {
         if (object != null && object instanceof Op) {
             final Op other = (Op) object;
@@ -345,6 +341,7 @@ public class Op implements Serializable {
      * @return the hash code value of the operator.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return this.name.hashCode();
     }
@@ -354,6 +351,7 @@ public class Op implements Serializable {
      *
      * @return a string PDDL representation of the operator.
      */
+    @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
         str.append("(:action " + this.name.toString() + "\n");

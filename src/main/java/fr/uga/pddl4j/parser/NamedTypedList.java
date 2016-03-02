@@ -71,9 +71,8 @@ public class NamedTypedList implements Serializable {
      * Creates new named typed list with a specified name.
      *
      * @param name the name of the list.
-     * @throws NullPointerException if the specified name is null.
      */
-    public NamedTypedList(final Symbol name) throws NullPointerException {
+    public NamedTypedList(final Symbol name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -95,9 +94,8 @@ public class NamedTypedList implements Serializable {
      * Sets the name of this typed list.
      *
      * @param name the name to set.
-     * @throws NullPointerException if the specified name is null.
      */
-    public final void setName(final Symbol name) throws NullPointerException {
+    public final void setName(final Symbol name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -126,9 +124,8 @@ public class NamedTypedList implements Serializable {
      * Adds a type to this name type list.
      *
      * @param type the type to add.
-     * @throws NullPointerException if the specified type is null.
      */
-    public void addType(final Symbol type) throws NullPointerException {
+    public void addType(final Symbol type)  {
         if (type == null) {
             throw new NullPointerException();
         }
@@ -149,6 +146,7 @@ public class NamedTypedList implements Serializable {
      *     same name and the same list of arguments and types; otherwise it returns <tt>false</tt>.
      * @see java.lang.Object#equals(Object)
      */
+    @Override
     public boolean equals(final Object object) {
         if (object != null && object instanceof NamedTypedList) {
             NamedTypedList other = (NamedTypedList) object;
@@ -165,6 +163,7 @@ public class NamedTypedList implements Serializable {
      * @return the hash code value of this named typed list.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return this.getName().hashCode() + this.arguments.hashCode() + this.types.hashCode();
     }
@@ -174,9 +173,8 @@ public class NamedTypedList implements Serializable {
      *
      * @param arg the argument to add.
      * @return <code>true</code> if the argument was added <code>false</code> otherwise.
-     * @throws NullPointerException if the specified argument is null.
      */
-    public boolean add(final TypedSymbol arg) throws NullPointerException {
+    public boolean add(final TypedSymbol arg) {
         if (arg == null) {
             throw new NullPointerException("arg == null");
         }
@@ -201,6 +199,7 @@ public class NamedTypedList implements Serializable {
      *
      * @return a string representation of this named typed list.
      */
+    @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
         str.append("(");

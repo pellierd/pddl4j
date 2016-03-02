@@ -239,12 +239,4 @@ public enum Connective {
         return this.image;
     }
 
-    /**
-     * Returns a string representation of this connective.
-     *
-     * @return a string representation of this connective.
-     */
-    public String toString() {
-        return super.toString();
-    }
 }

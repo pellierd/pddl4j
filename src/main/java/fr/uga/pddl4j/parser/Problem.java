@@ -85,9 +85,8 @@ public class Problem implements Serializable {
      * Creates a new problem with a specific name.
      *
      * @param name the name of the problem.
-     * @throws NullPointerException if the specified name is null.
      */
-    public Problem(final Symbol name) throws NullPointerException {
+    public Problem(final Symbol name) {
         this();
         if (name == null) {
             throw new NullPointerException();
@@ -114,9 +113,8 @@ public class Problem implements Serializable {
      * Sets the name of the problem.
      *
      * @param name the name to set.
-     * @throws NullPointerException if the specified name is null.
      */
-    public final void setName(final Symbol name) throws NullPointerException {
+    public final void setName(final Symbol name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -136,9 +134,8 @@ public class Problem implements Serializable {
      * Sets the domain of the problem.
      *
      * @param domain the domain to set.
-     * @throws NullPointerException if the specified domain is null.
      */
-    public final void setDomain(final Symbol domain) throws NullPointerException {
+    public final void setDomain(final Symbol domain)  {
         if (domain == null) {
             throw new NullPointerException();
         }
@@ -159,9 +156,8 @@ public class Problem implements Serializable {
      *
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified requirement is null.
      */
-    public final boolean addRequirement(final RequireKey requirement) throws NullPointerException {
+    public final boolean addRequirement(final RequireKey requirement) {
         if (requirement == null) {
             throw new NullPointerException();
         }
@@ -182,9 +178,8 @@ public class Problem implements Serializable {
      *
      * @param object the object to add.
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified object is null.
      */
-    public final boolean addObject(final TypedSymbol object) throws NullPointerException {
+    public final boolean addObject(final TypedSymbol object) {
         if (object == null) {
             throw new NullPointerException();
         }
@@ -205,9 +200,8 @@ public class Problem implements Serializable {
      *
      * @param fact the fact to add.
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified fact is null.
      */
-    public final boolean addInitialFact(final Exp fact) throws NullPointerException {
+    public final boolean addInitialFact(final Exp fact) {
         if (fact == null) {
             throw new NullPointerException();
         }
@@ -227,9 +221,8 @@ public class Problem implements Serializable {
      * Sets the goal of the problem.
      *
      * @param goal the goal to set.
-     * @throws NullPointerException if the specified goal is null.
      */
-    public final void setGoal(final Exp goal) throws NullPointerException {
+    public final void setGoal(final Exp goal) {
         if (goal == null) {
             throw new NullPointerException();
         }
@@ -306,6 +299,7 @@ public class Problem implements Serializable {
      *
      * @return a string representation of this problem.
      */
+    @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append("(define (problem ");
