@@ -25,7 +25,7 @@ package fr.uga.pddl4j.encoding;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-interface Constants {
+public final class Constants {
 
     /**
      * The default logging level.

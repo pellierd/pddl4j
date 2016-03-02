@@ -70,8 +70,7 @@ final class IntOp extends AbstractCodedOp {
      * @throws NullPointerException     if name == null.
      * @throws IllegalArgumentException if arity < 0.
      */
-    public IntOp(final String name, final int arity) throws IllegalArgumentException,
-        NullPointerException {
+    public IntOp(final String name, final int arity) {
         super(name, arity);
         if (arity < 0) {
             throw new IllegalArgumentException("arity < 0");
@@ -155,6 +154,7 @@ final class IntOp extends AbstractCodedOp {
      *     it has the same name and instantiated parameters; otherwise <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof IntOp) {
             final IntOp other = (IntOp) obj;
@@ -169,6 +169,7 @@ final class IntOp extends AbstractCodedOp {
      * @return the hash code value of the operator.
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

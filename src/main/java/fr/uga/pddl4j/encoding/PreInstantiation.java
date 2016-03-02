@@ -267,7 +267,7 @@ final class PreInstantiation {
         if (len > 0) {
             int res = mask[0];
             for (int i = 1; i < len; i++) {
-                res = (res << 1 | mask[i]);
+                res = res << 1 | mask[i];
             }
             return res;
         }
@@ -290,7 +290,7 @@ final class PreInstantiation {
             } else {
                 set[i] = 0;
                 add = 1;
-                overflow = (i == 0);
+                overflow = i == 0;
             }
         }
         return overflow ? null : set;
@@ -326,7 +326,7 @@ final class PreInstantiation {
     private void print(final int predicate, final int arity, final int[] mask, final int[] index,
                        final List<List<IntMatrix>> tables) {
         if (index.length == arity) {
-            final StringBuffer str = new StringBuffer();
+            final StringBuilder str = new StringBuilder();
             str.append("(");
             str.append(Encoder.tableOfPredicates.get(predicate));
             int var = 0;
@@ -436,7 +436,6 @@ final class PreInstantiation {
                     op1.setTypeOfParameter(index, ti);
                     PreInstantiation.replace(op1.getPreconditions(), inertia, Connective.TRUE, ti, ts);
                     PreInstantiation.replace(op1.getEffects(), inertia, Connective.TRUE, ti, ts);
-                    //this.printOp(op1);
                     if (!op1.getPreconditions().getConnective().equals(Connective.FALSE)
                         && !op1.getEffects().getConnective().equals(Connective.FALSE)) {
                         newOperators.add(op1);
