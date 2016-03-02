@@ -45,9 +45,8 @@ public interface Heuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
-     * @throws NullPointerException if <code>state == null && goal == null</code>.
      */
-    int estimate(final BitState state, final BitExp goal) throws NullPointerException;
+    int estimate(final BitState state, final BitExp goal);
 
     /**
      * Returns <code>true</code> if this heuristic is admissible.

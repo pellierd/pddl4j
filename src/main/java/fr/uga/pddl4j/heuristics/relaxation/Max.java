@@ -78,6 +78,7 @@ public final class Max extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      * @throws NullPointerException if <code>state == null && goal == null</code>.
      */
+    @Override
     public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         super.expandRelaxedPlanningGraph(state);

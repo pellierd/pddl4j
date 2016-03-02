@@ -59,9 +59,8 @@ public abstract class AbstractHeuristic implements Heuristic {
      * considered as admissible.
      *
      * @param problem the problem to solve.
-     * @throws NullPointerException if <code>problem == null</code>.
      */
-    protected AbstractHeuristic(final CodedProblem problem) throws NullPointerException {
+    protected AbstractHeuristic(final CodedProblem problem) {
         if (problem == null) {
             throw new NullPointerException("problem == null");
         }
@@ -76,6 +75,7 @@ public abstract class AbstractHeuristic implements Heuristic {
      *
      * @return <code>true</code> if this heuristic is admissible.
      */
+    @Override
     public boolean isAdmissible() {
         return this.isAdmissible;
     }
@@ -102,9 +102,8 @@ public abstract class AbstractHeuristic implements Heuristic {
      * Set the goal of the the relaxed problem to solve in order to compute the heuristic.
      *
      * @param goal the goal.
-     * @throws NullPointerException if <code>goal == null</code>.
      */
-    protected void setGoal(final BitExp goal) throws NullPointerException {
+    protected void setGoal(final BitExp goal) {
         if (!goal.equals(this.goal)) {
             this.goal = goal;
         }

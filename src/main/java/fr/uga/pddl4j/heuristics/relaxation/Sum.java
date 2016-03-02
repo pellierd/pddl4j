@@ -80,6 +80,7 @@ public final class Sum extends RelaxedGraphHeuristic {
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
      * @throws NullPointerException if <code>state == null</code>.
      */
+    @Override
     public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         this.expandRelaxedPlanningGraph(state);
