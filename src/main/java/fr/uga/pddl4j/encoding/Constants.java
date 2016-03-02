@@ -52,5 +52,10 @@ public final class Constants {
      */
     static final int DEFAULT_OPERATORS_TABLE_SIZE = 1000;
 
+    /**
+     * default private constructor to prevent form class instantiation.
+     */
+    private Constants() {}
+
 
 }

@@ -286,6 +286,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      *
      * @param goal the goal.
      */
+    @Override
     protected final void setGoal(final BitExp goal) {
         super.setGoal(goal);
         // Set the goal to the state representation

@@ -145,7 +145,7 @@ final class IntMatrix implements Serializable {
         // conversion E(i * t^r)
         int acces = 0;
         for (int i = index.length; i > 0; i--) {
-            acces += index[i - 1] * (int) Math.pow(size, dimension - i);
+            acces += index[i - 1] * (int) Math.pow(size, (double)dimension - i);
         }
         return acces;
     }

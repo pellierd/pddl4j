@@ -503,9 +503,9 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                     final BitExp pre = this.preconditions[resolverIndex];
                     final BitVector pPre = pre.getPositive();
                     for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
-                        final int p_level = this.pPropLevel[p];
-                        if (p_level != 0 && !pGk1.get(p)) {
-                            goals[p_level].getPositive().set(p);
+                        final int pLevel = this.pPropLevel[p];
+                        if (pLevel != 0 && !pGk1.get(p)) {
+                            goals[pLevel].getPositive().set(p);
                         }
                     }
                     final BitVector nPre = pre.getNegative();

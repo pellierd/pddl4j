@@ -315,15 +315,15 @@ public class Symbol implements Serializable {
         if (context == null) {
             throw new NullPointerException("context == null");
         }
-        String image = null;
+        String img = null;
         if (this.getKind().equals(Symbol.Kind.VARIABLE)) {
-            image = this.getImage();
-            final String newImage = context.get(image);
+            img = this.getImage();
+            final String newImage = context.get(img);
             if (newImage != null) {
                 this.setImage(newImage);
             }
         }
-        return image;
+        return img;
     }
 
     /**

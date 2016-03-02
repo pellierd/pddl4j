@@ -294,10 +294,10 @@ public final class HSP {
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce -> {
+                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                             // Apply the effect to the successor node
-                            state.apply(ce.getEffects());
-                        });
+                            state.apply(ce.getEffects())
+                        );
                         final int g = current.getCost() + 1;
                         Node result = openSet.get(state);
                         if (result == null) {
@@ -436,7 +436,7 @@ public final class HSP {
         final Properties arguments = HSP.getDefaultArguments();
         try {
             for (int i = 0; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("-o") && ((i + 1) < args.length)) {
+                if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         System.out.println("operators file does not exist");
@@ -483,13 +483,13 @@ public final class HSP {
                     }
                     i++;
                 } else if (args[i].equalsIgnoreCase("-w") && ((i + 1) < args.length)) {
-                    final double weight = Double.valueOf(args[i + 1]);
+                    final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
                         HSP.printUsage();
                     }
                     arguments.put(HSP.Argument.WEIGHT, weight);
                     i++;
-                } else if (args[i].equalsIgnoreCase("-i") && ((i + 1) < args.length)) {
+                } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         HSP.printUsage();

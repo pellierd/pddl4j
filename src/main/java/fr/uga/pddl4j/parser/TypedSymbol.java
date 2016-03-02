@@ -95,7 +95,7 @@ public final class TypedSymbol extends Symbol {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         return super.equals(object);
     }
 
