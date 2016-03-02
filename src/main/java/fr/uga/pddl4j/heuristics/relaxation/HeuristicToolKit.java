@@ -31,7 +31,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 public final class HeuristicToolKit {
 
     /**
-     * Private constructor just for prevent user to instantiate this class
+     * Private constructor just for prevent user to instantiate this class.
      */
     private HeuristicToolKit(){}
 
