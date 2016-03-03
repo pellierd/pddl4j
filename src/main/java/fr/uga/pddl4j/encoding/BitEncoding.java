@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
@@ -70,7 +71,8 @@ final class BitEncoding {
      * @param map       the map that associates to a specified expression its index.
      * @return the list of operators encoded into bit set.
      */
-    static List<BitOp> encodeOperators(final List<IntOp> operators, final Map<IntExp, Integer> map) {
+    static List<BitOp> encodeOperators(final List<IntOp> operators, final Map<IntExp, Integer> map)
+        throws UnexpectedExpressionException {
 
         // Normalize the operators
         BitEncoding.normalize(operators);
@@ -117,7 +119,7 @@ final class BitEncoding {
                         hasUnConditionalEffects = true;
                     }
                 } else {
-                    throw new RuntimeException("unexpected expression " + Encoder.toString(ei));
+                    throw new UnexpectedExpressionException(Encoder.toString(ei));
                 }
             }
             if (hasUnConditionalEffects) {
@@ -137,7 +139,7 @@ final class BitEncoding {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static BitExp encodeGoal(IntExp goal, final Map<IntExp, Integer> map) {
+    static BitExp encodeGoal(IntExp goal, final Map<IntExp, Integer> map) throws UnexpectedExpressionException {
         if (goal.getConnective().equals(Connective.FALSE)) {
             return null;
         }
@@ -215,7 +217,8 @@ final class BitEncoding {
      * @param map the map that associate to a specified expression its index.
      * @return the expression in bit set representation.
      */
-    private static BitExp encode(final IntExp exp, final Map<IntExp, Integer> map) {
+    private static BitExp encode(final IntExp exp, final Map<IntExp, Integer> map)
+        throws UnexpectedExpressionException {
         final BitExp bitExp = new BitExp();
         if (exp.getConnective().equals(Connective.ATOM)) {
             final Integer index = map.get(exp);
@@ -243,12 +246,12 @@ final class BitEncoding {
                 } else if (ei.getConnective().equals(Connective.TRUE)) {
                     // do nothing
                 } else {
-                    throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
+                    throw new UnexpectedExpressionException(Encoder.toString(exp));
                 }
             }
         } else {
             System.out.println(Encoder.toString(exp));
-            throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
+            throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
         return bitExp;
     }
@@ -261,7 +264,7 @@ final class BitEncoding {
      *
      * @param operators the list of operators to normalize.
      */
-    private static void normalize(final List<IntOp> operators) {
+    private static void normalize(final List<IntOp> operators) throws UnexpectedExpressionException {
         final List<IntOp> tmpOps = new ArrayList<>(operators.size() + 100);
         for (IntOp op : operators) {
             BitEncoding.toCNF(op.getEffects());
@@ -319,7 +322,7 @@ final class BitEncoding {
      *
      * @param exp the expression to transform in DNF.
      */
-    private static void toCNF(final IntExp exp) {
+    private static void toCNF(final IntExp exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case WHEN:
                 final IntExp antecedent = exp.getChildren().get(0);
@@ -355,7 +358,7 @@ final class BitEncoding {
                 exp.getChildren().add(copy);
                 break;
             default:
-                throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
     }
 
@@ -364,7 +367,7 @@ final class BitEncoding {
      *
      * @param exp the expression to transform in CNF.
      */
-    private static void toDNF(final IntExp exp) {
+    private static void toDNF(final IntExp exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case OR:
                 List<IntExp> children = exp.getChildren();
@@ -382,7 +385,9 @@ final class BitEncoding {
                 break;
             case AND:
                 children = exp.getChildren();
-                children.forEach(BitEncoding::toDNF);
+                for (IntExp child : children) {
+                    BitEncoding.toDNF(child);
+                }
                 IntExp dnf = exp.getChildren().get(0);
                 for (int i = 1; i < exp.getChildren().size(); i++) {
                     final IntExp orExp = exp.getChildren().get(i);
@@ -430,7 +435,7 @@ final class BitEncoding {
                 exp.getChildren().add(and);
                 break;
             default:
-                throw new RuntimeException("unexpected expression " + Encoder.toString(exp));
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
     }
 }

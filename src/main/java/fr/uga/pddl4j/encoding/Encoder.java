@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.RequireKey;
@@ -467,7 +468,12 @@ public final class Encoder {
         Encoder.operators = new ArrayList<>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
         // Encode the goal in bit set representation
         if (!intGoal.getChildren().isEmpty()) { // Case where the goal was not already simplify to TRUE
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
+            try {
+                Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
+            } catch (UnexpectedExpressionException uee) {
+                System.err.println("Error with unexpected expression: " + uee.getMessage());
+                return null;
+            }
         } else {
             Encoder.goal = new BitExp();
         }
@@ -475,7 +481,12 @@ public final class Encoder {
         // Encode the initial state in bit set representation
         Encoder.init = BitEncoding.encodeInit(intInit, map);
         // Encode the operators in bit set representation
-        Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
+        try {
+            Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
+        } catch (UnexpectedExpressionException uee) {
+            System.err.println("Error with unexpected expression: " + uee.getMessage());
+            return null;
+        }
         // The list of instantiated operators is no more needed.
         intOps = null;
 
