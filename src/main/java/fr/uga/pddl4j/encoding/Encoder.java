@@ -28,6 +28,8 @@ import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -123,6 +125,8 @@ import java.util.Set;
  * @version 1.0 - 08.06.2010
  */
 public final class Encoder {
+
+    private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
      * The table of types.
@@ -472,7 +476,7 @@ public final class Encoder {
             try {
                 Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
             } catch (UnexpectedExpressionException uee) {
-                System.err.println("Error with unexpected expression: " + uee.getMessage());
+                LOGGER.error("Error with unexpected expression", uee);
                 return null;
             }
         } else {
@@ -485,7 +489,7 @@ public final class Encoder {
         try {
             Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
         } catch (UnexpectedExpressionException uee) {
-            System.err.println("Error with unexpected expression: " + uee.getMessage());
+            LOGGER.error("Error with unexpected expression", uee);
             return null;
         }
         // The list of instantiated operators is no more needed.
