@@ -19,6 +19,9 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.exceptions.FatalException;
+import fr.uga.pddl4j.exceptions.NullParameterException;
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -264,7 +267,7 @@ public class Op implements Serializable {
      * @see Exp#renameVariables()
      * @see Exp#moveNegationInward()
      */
-    public void normalize() {
+    public void normalize() throws FatalException {
         this.normalize(0);
     }
 
@@ -275,7 +278,7 @@ public class Op implements Serializable {
      * @see Exp#renameVariables()
      * @see Exp#moveNegationInward()
      */
-    public void normalize(int index) {
+    public void normalize(int index) throws FatalException {
         // Rename the parameters
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol> parameters = this.getParameters();

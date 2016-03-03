@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.exceptions.FatalException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -283,7 +285,7 @@ public class Problem implements Serializable {
      * @see Op#normalize()
      * @see DerivedPredicate#normalize()
      */
-    public void standardize() {
+    public void standardize() throws FatalException {
         // Rename the constraints of the problem
         if (this.getConstraints() != null) {
             this.getConstraints().renameVariables();

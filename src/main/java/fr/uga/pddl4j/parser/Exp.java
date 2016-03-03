@@ -19,7 +19,9 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.MalformedExpException;
+import fr.uga.pddl4j.exceptions.NullParameterException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -138,7 +140,7 @@ public class Exp implements Serializable {
     public Exp(final Connective connective) {
         this();
         if (connective == null) {
-            throw new RuntimeException("Connective can not be null in Exp constructor");
+            throw new FatalException("Connective can not be null in Exp constructor");
         }
         this.connective = connective;
     }
@@ -152,7 +154,7 @@ public class Exp implements Serializable {
      */
     public boolean addChild(final Exp exp) {
         if (exp == null) {
-            throw new RuntimeException("exp can not be null in addChild call");
+            throw new FatalException("exp can not be null in addChild call");
         }
         return this.children.add(exp);
     }
@@ -199,9 +201,9 @@ public class Exp implements Serializable {
      * @param connective the connective.
      * @throws RuntimeException if the specified connective is null.
      */
-    public void setConnective(final Connective connective) {
+    public void setConnective(final Connective connective) throws NullParameterException {
         if (connective == null) {
-            throw new RuntimeException("Connective can not be null in setConnective call");
+            throw new NullParameterException("Connective can not be null in setConnective call");
         }
         this.connective = connective;
     }
@@ -405,14 +407,16 @@ public class Exp implements Serializable {
      *
      * @see this#isMalformedExpression()
      */
-    public void moveNegationInward() {
+    public void moveNegationInward() throws FatalException {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
         switch (this.connective) {
             case AND:
             case OR:
-                this.children.forEach(fr.uga.pddl4j.parser.Exp::moveNegationInward);
+                for (Exp exp : this.children) {
+                    exp.moveNegationInward();
+                }
                 break;
             case FORALL:
             case EXISTS:
@@ -479,57 +483,62 @@ public class Exp implements Serializable {
     /**
      * Negates the expression.
      */
-    private void negate() {
+    private void negate() throws FatalException {
         Exp exp = this.getChildren().get(0);
-        switch (exp.getConnective()) {
-            case FORALL:
-                this.setConnective(Connective.EXISTS);
-                Exp negation = new Exp(Connective.NOT);
-                negation.addChild(exp.getChildren().get(0));
-                negation.moveNegationInward();
-                this.children.set(0, negation);
-                break;
-            case EXISTS:
-                this.setConnective(Connective.FORALL);
-                this.setVariables(exp.getVariables());
-                negation = new Exp(Connective.NOT);
-                negation.addChild(exp.getChildren().get(0));
-                negation.moveNegationInward();
-                this.children.set(0, negation);
-                break;
-            case AND:
-                this.setConnective(Connective.OR);
-                this.children.clear();
-                for (int i = 0; i < exp.getChildren().size(); i++) {
-                    negation = new Exp(Connective.NOT);
-                    negation.addChild(exp.getChildren().get(i));
+        try {
+            switch (exp.getConnective()) {
+                case FORALL:
+                    this.setConnective(Connective.EXISTS);
+                    Exp negation = new Exp(Connective.NOT);
+                    negation.addChild(exp.getChildren().get(0));
                     negation.moveNegationInward();
-                    this.children.add(negation);
-                }
-                break;
-            case OR:
-                this.setConnective(Connective.AND);
-                this.children.clear();
-                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    this.children.set(0, negation);
+                    break;
+                case EXISTS:
+                    this.setConnective(Connective.FORALL);
+                    this.setVariables(exp.getVariables());
                     negation = new Exp(Connective.NOT);
-                    negation.addChild(exp.children.get(i));
+                    negation.addChild(exp.getChildren().get(0));
                     negation.moveNegationInward();
-                    this.children.add(negation);
-                }
-                break;
-            case NOT:
-                final Exp neg = exp.getChildren().get(0);
-                this.atom = neg.getAtom();
-                this.children = neg.getChildren();
-                this.connective = neg.getConnective();
-                this.prefName = neg.getPrefName();
-                this.value = neg.getValue();
-                this.variable = neg.getVariable();
-                this.variables = neg.getVariables();
-                this.moveNegationInward();
-                break;
-            default:
-                // do nothing
+                    this.children.set(0, negation);
+                    break;
+                case AND:
+                    this.setConnective(Connective.OR);
+                    this.children.clear();
+                    for (int i = 0; i < exp.getChildren().size(); i++) {
+                        negation = new Exp(Connective.NOT);
+                        negation.addChild(exp.getChildren().get(i));
+                        negation.moveNegationInward();
+                        this.children.add(negation);
+                    }
+                    break;
+                case OR:
+                    this.setConnective(Connective.AND);
+                    this.children.clear();
+                    for (int i = 0; i < exp.getChildren().size(); i++) {
+                        negation = new Exp(Connective.NOT);
+                        negation.addChild(exp.children.get(i));
+                        negation.moveNegationInward();
+                        this.children.add(negation);
+                    }
+                    break;
+                case NOT:
+                    final Exp neg = exp.getChildren().get(0);
+                    this.atom = neg.getAtom();
+                    this.children = neg.getChildren();
+                    this.connective = neg.getConnective();
+                    this.prefName = neg.getPrefName();
+                    this.value = neg.getValue();
+                    this.variable = neg.getVariable();
+                    this.variables = neg.getVariables();
+                    this.moveNegationInward();
+                    break;
+                default:
+                    // do nothing
+            }
+        } catch (NullParameterException npe) {
+            System.err.println("A null parameter has been pass to a non null method call: " + npe.getMessage());
+            throw new FatalException("Null parameter", npe);
         }
     }
 

@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
@@ -259,7 +260,7 @@ public final class Encoder {
      * @return the problem encoded.
      * @throws IllegalArgumentException if the problem to encode is not ADL.
      */
-    public static CodedProblem encode(final Domain domain, final Problem problem) {
+    public static CodedProblem encode(final Domain domain, final Problem problem) throws FatalException {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.
