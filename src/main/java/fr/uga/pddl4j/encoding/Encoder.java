@@ -492,9 +492,6 @@ public final class Encoder {
             LOGGER.error("Error with unexpected expression", uee);
             return null;
         }
-        // The list of instantiated operators is no more needed.
-        intOps = null;
-
 
         // Just for logging
         if (Encoder.logLevel == 7) {
