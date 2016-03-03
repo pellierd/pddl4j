@@ -413,16 +413,20 @@ public final class HSP {
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
-        // Parse the command line
-        final Properties arguments = HSP.parseArguments(args);
-        // Create the planner
-        HSP planner = new HSP(arguments);
-        // Parse and encode the PDDL file into compact representation
-        final CodedProblem problem = planner.parseAndEncode();
+        try {
+            // Parse the command line
+            final Properties arguments = HSP.parseArguments(args);
+            // Create the planner
+            HSP planner = new HSP(arguments);
+            // Parse and encode the PDDL file into compact representation
+            final CodedProblem problem = planner.parseAndEncode();
 
-        if (problem != null) {
-            // Search for a solution and print the result
-            planner.search(problem);
+            if (problem != null) {
+                // Search for a solution and print the result
+                planner.search(problem);
+            }
+        } catch (FileNotFoundException fnf) {
+            LOGGER.error(fnf.getMessage(), fnf);
         }
     }
 
@@ -432,22 +436,20 @@ public final class HSP {
      * @param args the arguments from the command line.
      * @return The arguments of the planner.
      */
-    private static Properties parseArguments(String[] args) {
+    private static Properties parseArguments(String[] args) throws FileNotFoundException {
         final Properties arguments = HSP.getDefaultArguments();
         try {
             for (int i = 0; i < args.length; i++) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
-                        System.out.println("operators file does not exist");
-                        throw new RuntimeException("operators file does not exist: " + args[i + 1]);
+                        throw new FileNotFoundException("operators file does not exist: " + args[i + 1]);
                     }
                     i++;
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
-                        System.out.println("facts file does not exist");
-                        throw new RuntimeException("facts file does not exist: " + args[i + 1]);
+                        throw new FileNotFoundException("facts file does not exist: " + args[i + 1]);
                     }
                     i++;
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {

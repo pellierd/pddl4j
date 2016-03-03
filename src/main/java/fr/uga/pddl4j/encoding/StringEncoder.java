@@ -292,7 +292,7 @@ final class StringEncoder {
      */
     static String toString(final BitOp op, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<IntExp> relevants) {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("Op " + op.getName() + "\n");
         str.append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
@@ -332,7 +332,7 @@ final class StringEncoder {
     static String toString(BitExp exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<IntExp> relevants) {
-        final StringBuffer str = new StringBuffer("(and");
+        final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
             str.append(" ");
@@ -365,7 +365,7 @@ final class StringEncoder {
     static String toString(CondBitExp exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<IntExp> relevants) {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
             str.append(StringEncoder.toString(exp.getEffects(),
                 constants, types, predicates, functions, relevants));
@@ -390,7 +390,7 @@ final class StringEncoder {
      * @return a string representation of the specified operator.
      */
     static String toShortString(final IntOp op, final List<String> constants) {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         str.append(op.getName());
         for (int i = 0; i < op.getArity(); i++) {
             final int index = op.getValueOfParameter(i);
@@ -412,7 +412,7 @@ final class StringEncoder {
      * @return a string representation of the specified operator.
      */
     static String toShortString(final BitOp op, final List<String> constants) {
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         str.append(op.getName());
         for (int i = 0; i < op.getArity(); i++) {
             final int index = op.getValueOfParameter(i);
