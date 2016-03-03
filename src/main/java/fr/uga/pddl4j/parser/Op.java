@@ -20,7 +20,6 @@
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.exceptions.FatalException;
-import fr.uga.pddl4j.exceptions.NullParameterException;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;

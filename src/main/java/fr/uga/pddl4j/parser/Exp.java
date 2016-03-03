@@ -22,6 +22,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.MalformedExpException;
 import fr.uga.pddl4j.exceptions.NullParameterException;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +51,8 @@ public class Exp implements Serializable {
      * The serial version id of the class.
      */
     private static final long serialVersionUID = 1943664302879209785L;
+
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(Exp.class);
 
     /**
      * The type of the node.
@@ -537,7 +541,7 @@ public class Exp implements Serializable {
                     // do nothing
             }
         } catch (NullParameterException npe) {
-            System.err.println("A null parameter has been pass to a non null method call: " + npe.getMessage());
+            LOGGER.error("A null parameter has been pass to a non null method call", npe);
             throw new FatalException("Null parameter", npe);
         }
     }
