@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.util;
 
+import fr.uga.pddl4j.exceptions.FatalException;
+
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -198,7 +200,7 @@ public class MemoryAgent {
                 try {
                     o = field.get(obj);
                 } catch (IllegalArgumentException | IllegalAccessException iargException) {
-                    throw new RuntimeException(iargException);
+                    throw new FatalException("Fatal error in field.get(obj) call", iargException);
                 }
                 if (MemoryAgent.isComputable(field)) {
                     size += MemoryAgent.deepSizeOf(o, doneObj, depth + 1);
