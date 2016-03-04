@@ -21,6 +21,8 @@ package fr.uga.pddl4j.planners.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.Encoder;
+import fr.uga.pddl4j.exceptions.ParseException;
+import fr.uga.pddl4j.exceptions.UsageException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.parser.Domain;
@@ -425,9 +427,12 @@ public final class HSP {
                 // Search for a solution and print the result
                 planner.search(problem);
             }
-        } catch (FileNotFoundException fnf) {
-            LOGGER.error(fnf.getMessage(), fnf);
-        } //Todo catch usage exception and call print usage
+        } catch (FileNotFoundException | ParseException exept) {
+            LOGGER.error(exept.getMessage(), exept);
+        } catch (UsageException uex) {
+            LOGGER.info(uex.getMessage());
+            HSP.printUsage();
+        }
     }
 
     /**
@@ -436,7 +441,8 @@ public final class HSP {
      * @param args the arguments from the command line.
      * @return The arguments of the planner.
      */
-    private static Properties parseArguments(String[] args) throws FileNotFoundException {
+    private static Properties parseArguments(String[] args)
+        throws FileNotFoundException, UsageException, ParseException {
         final Properties arguments = HSP.getDefaultArguments();
         try {
             for (int i = 0; i < args.length; i+=2) {
@@ -493,15 +499,14 @@ public final class HSP {
                     }
                     arguments.put(HSP.Argument.TRACE_LEVEL, level);
                 } else {
-                    HSP.printUsage(); //Todo throws usage exception here
+                    throw new UsageException("Unknown argument: " + args[i] + "or missing value");
                 }
             }
-            if (arguments.get(HSP.Argument.DOMAIN) == null
-                || arguments.get(HSP.Argument.PROBLEM) == null) {
-                HSP.printUsage(); //Todo throws usage exception here
+            if (arguments.get(HSP.Argument.DOMAIN) == null || arguments.get(HSP.Argument.PROBLEM) == null) {
+                throw new UsageException("Missing DOMAIN or PROBLEM");
             }
         } catch (RuntimeException runExp) {
-            LOGGER.fatal("\nUnexpected error:", runExp);
+            throw new ParseException("Error when parsing arguments", runExp);
         }
         return arguments;
     }
