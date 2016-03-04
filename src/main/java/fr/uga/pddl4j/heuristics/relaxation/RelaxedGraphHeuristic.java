@@ -110,7 +110,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
     /**
      * The number of goal propositions to reach.
      */
-    public int goalCardinality;
+    private int goalCardinality;
 
     /**
      * The level of the graph.
