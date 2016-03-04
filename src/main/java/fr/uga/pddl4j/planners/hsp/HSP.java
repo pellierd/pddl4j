@@ -445,7 +445,7 @@ public final class HSP {
         throws FileNotFoundException, UsageException, ParseException {
         final Properties arguments = HSP.getDefaultArguments();
         try {
-            for (int i = 0; i < args.length; i+=2) {
+            for (int i = 0; i < args.length; i += 2) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
