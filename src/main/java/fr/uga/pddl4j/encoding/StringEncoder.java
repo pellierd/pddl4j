@@ -213,7 +213,6 @@ final class StringEncoder {
                 str.append(exp.getConnective());
                 break;
             case TIME_VAR:
-                // str.append(cn.getVariable());
                 break;
             case FN_ATOM:
             case WHEN:
