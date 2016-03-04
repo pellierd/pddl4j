@@ -650,12 +650,12 @@ public class Exp implements Serializable {
     /**
      * Returns a string representation of this parser node.
      *
-     * @param offset the offset white space from the left used for indentation.
+     * @param baseOffset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
      * @exception MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression()
      */
-    private String toString(String offset) {
+    private String toString(String baseOffset) {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
@@ -683,7 +683,7 @@ public class Exp implements Serializable {
                 break;
             case AND:
             case OR:
-                offset += "  ";
+                String offset =  baseOffset + "  ";
                 str.append("(").append(this.getConnective().getImage());
                 if (!this.children.isEmpty()) {
                     str.append(" ");
@@ -697,15 +697,15 @@ public class Exp implements Serializable {
                 break;
             case FORALL:
             case EXISTS:
-                offset += offset + "  ";
+                String off = baseOffset + baseOffset + "  ";
                 str.append(" (").append(this.getConnective().getImage()).append(" (");
                 for (int i = 0; i < this.variables.size() - 1; i++) {
                     str.append(this.variables.get(i).toString()).append(", ");
                 }
                 str.append(this.variables.get(this.variables.size() - 1).toString())
                     .append(")\n")
-                    .append(offset)
-                    .append(this.children.get(0).toString(offset))
+                    .append(off)
+                    .append(this.children.get(0).toString(off))
                     .append(")");
                 //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
@@ -713,7 +713,7 @@ public class Exp implements Serializable {
                 str.append(this.value);
                 break;
             case F_EXP:
-                str.append(this.children.get(0).toString(offset));
+                str.append(this.children.get(0).toString(baseOffset));
                 break;
             case F_EXP_T:
                 if (this.children.isEmpty()) {
@@ -721,7 +721,7 @@ public class Exp implements Serializable {
                 } else {
                     str.append("(").append(this.getConnective().getImage()).append(" ")
                         .append(this.getVariable()).append(" ")
-                        .append(this.children.get(0).toString(offset));
+                        .append(this.children.get(0).toString(baseOffset));
                 }
                 break;
             case TIME_VAR:
@@ -748,8 +748,8 @@ public class Exp implements Serializable {
             case SOMETIME_BEFORE:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
-                    .append(this.children.get(0).toString(offset)).append(" ")
-                    .append(this.children.get(1).toString(offset))
+                    .append(this.children.get(0).toString(baseOffset)).append(" ")
+                    .append(this.children.get(1).toString(baseOffset))
                     .append(")");
                 break;
             case NOT:
@@ -762,7 +762,7 @@ public class Exp implements Serializable {
             case AT_MOST_ONCE:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
-                    .append(this.getChildren().get(0).toString(offset))
+                    .append(this.getChildren().get(0).toString(baseOffset))
                     .append(")");
                 break;
             case MINIMIZE:
@@ -781,15 +781,15 @@ public class Exp implements Serializable {
                     .append(" ")
                     .append(this.getChildren().get(0).getValue())
                     .append(" ")
-                    .append(this.getChildren().get(1).toString(offset))
+                    .append(this.getChildren().get(1).toString(baseOffset))
                     .append(")");
                 break;
             case ALWAYS_WITHIN:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.getChildren().get(0).getValue()).append(" ")
-                    .append(this.getChildren().get(1).toString(offset)).append(" ")
-                    .append(this.getChildren().get(2).toString(offset))
+                    .append(this.getChildren().get(1).toString(baseOffset)).append(" ")
+                    .append(this.getChildren().get(2).toString(baseOffset))
                     .append(")");
                 break;
             case HOLD_DURING:
@@ -797,7 +797,7 @@ public class Exp implements Serializable {
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.getChildren().get(0).getValue()).append(" ")
                     .append(this.getChildren().get(1).getValue()).append(" ")
-                    .append(this.getChildren().get(2).toString(offset))
+                    .append(this.getChildren().get(2).toString(baseOffset))
                     .append(")");
                 break;
             default:

@@ -278,14 +278,15 @@ public class Op implements Serializable {
      * @see Exp#moveNegationInward()
      */
     public void normalize(int index) throws FatalException {
+        int i = index;
         // Rename the parameters
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol> parameters = this.getParameters();
         for (int j = 0; j < parameters.size(); j++) {
             final TypedSymbol params = parameters.get(j);
-            final String image = params.renameVariables(index);
+            final String image = params.renameVariables(i);
             context.put(image, params.getImage());
-            index++;
+            i++;
         }
         // A hack to remove single atom in precondition
         if (this.preconditions.isLiteral()) {

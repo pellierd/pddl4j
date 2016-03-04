@@ -116,13 +116,13 @@ final class StringEncoder {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param offset     the offset white space from the left used for indentation.
+     * @param baseOffset     the offset white space from the left used for indentation.
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.
      */
     private static String toString(final IntExp exp, final List<String> constants,
                                    final List<String> types, final List<String> predicates,
-                                   final List<String> functions, String offset, final String separator) {
+                                   final List<String> functions, String baseOffset, final String separator) {
         final StringBuilder str = new StringBuilder();
         switch (exp.getConnective()) {
             case ATOM:
@@ -169,34 +169,34 @@ final class StringEncoder {
                 break;
             case AND:
             case OR:
-                offset += "  ";
+                String offsetOr = baseOffset + "  ";
                 str.append("(");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
                 if (!exp.getChildren().isEmpty()) {
                     for (int i = 0; i < exp.getChildren().size() - 1; i++) {
                         str.append(StringEncoder.toString(exp.getChildren().get(i), constants, types, predicates,
-                            functions, offset) + "\n"
-                            + offset);
+                            functions, offsetOr) + "\n"
+                            + offsetOr);
                     }
                     str.append(StringEncoder.toString(exp.getChildren().get(
-                        exp.getChildren().size() - 1), constants, types, predicates, functions, offset));
+                        exp.getChildren().size() - 1), constants, types, predicates, functions, offsetOr));
                 }
                 str.append(")");
                 break;
             case FORALL:
             case EXISTS:
-                offset += offset + "  ";
+                String offsetEx = baseOffset + baseOffset + "  ";
                 str.append(" (");
                 str.append(exp.getConnective().getImage());
                 str.append(" (");
                 str.append(Symbol.DEFAULT_VARIABLE_SYMBOL + (-exp.getVariable() - 1));
                 str.append(" - ");
                 str.append(types.get(exp.getType()));
-                str.append(")\n" + offset);
+                str.append(")\n" + offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                        functions, offset));
+                        functions, offsetEx));
                 }
                 str.append(")");
                 break;
@@ -205,7 +205,7 @@ final class StringEncoder {
                 break;
             case F_EXP:
                 str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                    functions, offset));
+                    functions, baseOffset));
                 break;
             case F_EXP_T:
             case TRUE:
@@ -237,10 +237,10 @@ final class StringEncoder {
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
                 str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                    functions, offset));
+                    functions, baseOffset));
                 str.append(" ");
                 str.append(StringEncoder.toString(exp.getChildren().get(1), constants, types, predicates,
-                    functions, offset));
+                    functions, baseOffset));
                 str.append(")");
                 break;
             case AT_START:
@@ -255,7 +255,7 @@ final class StringEncoder {
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
                 str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                    functions, offset));
+                    functions, baseOffset));
                 str.append(")");
                 break;
             case IS_VIOLATED:
