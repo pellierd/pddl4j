@@ -298,11 +298,12 @@ final class BitEncoding {
      * @param exp the expression.
      */
     private static void simplify(IntExp exp) {
-        boolean simplified = true;
-        while (simplified) {
+        boolean simplified;
+        int i = 0;
+        do {
             simplified = false;
             final List<IntExp> children = exp.getChildren();
-            for (int i = 0; i < children.size(); i++) {
+            while (i < children.size()) {
                 final IntExp ei = children.get(i);
                 if (ei.getConnective().equals(Connective.AND)
                     || ei.getConnective().equals(Connective.OR)) {
@@ -312,15 +313,17 @@ final class BitEncoding {
                         children.add(i, ej);
                         i++;
                     }
+                } else {
+                    i++;
                 }
             }
-        }
+        } while (simplified);
     }
 
     /**
-     * Convert an expression in disjunctive normal form (DNF).
+     * Convert an expression in conjunctive normal form (CNF).
      *
-     * @param exp the expression to transform in DNF.
+     * @param exp the expression to transform in CNF.
      */
     private static void toCNF(final IntExp exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
@@ -339,7 +342,8 @@ final class BitEncoding {
                 break;
             case AND:
                 final List<IntExp> children = exp.getChildren();
-                for (int i = 0; i < children.size(); i++) {
+                int i = 0;
+                while (i < children.size()) {
                     final IntExp ei = children.get(i);
                     BitEncoding.toCNF(ei);
                     exp.getChildren().remove(i);
@@ -363,22 +367,23 @@ final class BitEncoding {
     }
 
     /**
-     * Convert an expression in conjunctive normal form (CNF).
+     * Convert an expression in disjunctive normal form (DNF).
      *
-     * @param exp the expression to transform in CNF.
+     * @param exp the expression to transform in DNF.
      */
     private static void toDNF(final IntExp exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case OR:
                 List<IntExp> children = exp.getChildren();
-                for (int i = 0; i < children.size(); i++) {
-                    final IntExp ei = children.get(i);
+                int index = 0;
+                while ( index < children.size()) {
+                    final IntExp ei = children.get(index);
                     BitEncoding.toDNF(ei);
                     if (ei.getConnective().equals(Connective.OR)) {
-                        children.remove(i);
+                        children.remove(index);
                         for (IntExp ej : ei.getChildren()) {
-                            children.add(i, ej);
-                            i++;
+                            children.add(index, ej);
+                            index++;
                         }
                     }
                 }

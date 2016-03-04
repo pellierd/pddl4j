@@ -427,7 +427,7 @@ public final class HSP {
             }
         } catch (FileNotFoundException fnf) {
             LOGGER.error(fnf.getMessage(), fnf);
-        }
+        } //Todo catch usage exception and call print usage
     }
 
     /**
@@ -439,25 +439,22 @@ public final class HSP {
     private static Properties parseArguments(String[] args) throws FileNotFoundException {
         final Properties arguments = HSP.getDefaultArguments();
         try {
-            for (int i = 0; i < args.length; i++) {
+            for (int i = 0; i < args.length; i+=2) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         throw new FileNotFoundException("operators file does not exist: " + args[i + 1]);
                     }
-                    i++;
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         throw new FileNotFoundException("facts file does not exist: " + args[i + 1]);
                     }
-                    i++;
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         HSP.printUsage();
                     }
-                    i++;
                     arguments.put(HSP.Argument.CPU_TIME, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
@@ -483,28 +480,25 @@ public final class HSP {
                     } else {
                         arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SET_LEVEL);
                     }
-                    i++;
                 } else if (args[i].equalsIgnoreCase("-w") && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
                         HSP.printUsage();
                     }
                     arguments.put(HSP.Argument.WEIGHT, weight);
-                    i++;
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         HSP.printUsage();
                     }
                     arguments.put(HSP.Argument.TRACE_LEVEL, level);
-                    i++;
                 } else {
-                    HSP.printUsage();
+                    HSP.printUsage(); //Todo throws usage exception here
                 }
             }
             if (arguments.get(HSP.Argument.DOMAIN) == null
                 || arguments.get(HSP.Argument.PROBLEM) == null) {
-                HSP.printUsage();
+                HSP.printUsage(); //Todo throws usage exception here
             }
         } catch (RuntimeException runExp) {
             LOGGER.fatal("\nUnexpected error:", runExp);
