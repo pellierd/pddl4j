@@ -208,12 +208,6 @@ final class StringEncoder {
                     functions, offset));
                 break;
             case F_EXP_T:
-            /*
-             * if (this.children.isEmpty()) { str.append(this.getVariable()); } else {
-             * str.append("("); str.append(this.getConnective()); str.append(" ");
-             * str.append(this.getVariable()); str.append(" ");
-             * str.append(this.toString(cn.getChildren().get(0))); }
-             */
             case TRUE:
             case FALSE:
                 str.append(exp.getConnective());
