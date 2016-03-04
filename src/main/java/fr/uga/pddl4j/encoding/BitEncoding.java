@@ -375,14 +375,15 @@ final class BitEncoding {
         switch (exp.getConnective()) {
             case OR:
                 List<IntExp> children = exp.getChildren();
-                for (int i = 0; i < children.size(); i++) {
-                    final IntExp ei = children.get(i);
+                int index = 0;
+                while ( index < children.size()) {
+                    final IntExp ei = children.get(index);
                     BitEncoding.toDNF(ei);
                     if (ei.getConnective().equals(Connective.OR)) {
-                        children.remove(i);
+                        children.remove(index);
                         for (IntExp ej : ei.getChildren()) {
-                            children.add(i, ej);
-                            i++;
+                            children.add(index, ej);
+                            index++;
                         }
                     }
                 }
