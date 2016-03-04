@@ -183,7 +183,6 @@ final class StringEncoder {
                         exp.getChildren().size() - 1), constants, types, predicates, functions, offset));
                 }
                 str.append(")");
-                // offset = offset.substring(0, offset.length() - 2);
                 break;
             case FORALL:
             case EXISTS:
@@ -200,7 +199,6 @@ final class StringEncoder {
                         functions, offset));
                 }
                 str.append(")");
-                //offset = offset.substring(0, offset.length() - 2);
                 break;
             case NUMBER:
                 str.append(exp.getValue());
@@ -210,18 +208,11 @@ final class StringEncoder {
                     functions, offset));
                 break;
             case F_EXP_T:
-            /*
-             * if (this.children.isEmpty()) { str.append(this.getVariable()); } else {
-             * str.append("("); str.append(this.getConnective()); str.append(" ");
-             * str.append(this.getVariable()); str.append(" ");
-             * str.append(this.toString(cn.getChildren().get(0))); }
-             */
             case TRUE:
             case FALSE:
                 str.append(exp.getConnective());
                 break;
             case TIME_VAR:
-                // str.append(cn.getVariable());
                 break;
             case FN_ATOM:
             case WHEN:
