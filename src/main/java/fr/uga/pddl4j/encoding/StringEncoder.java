@@ -199,7 +199,6 @@ final class StringEncoder {
                         functions, offset));
                 }
                 str.append(")");
-                //offset = offset.substring(0, offset.length() - 2);
                 break;
             case NUMBER:
                 str.append(exp.getValue());
