@@ -167,11 +167,10 @@ public final class HSP {
         final Problem problem = parser.getProblem();
         final int traceLevel = (Integer) this.arguments.get(HSP.Argument.TRACE_LEVEL);
         if (traceLevel > 0 && traceLevel != 8) {
-            System.out.println();
-            System.out.println("Parsing domain file \"" + new File(ops).getName()
-                + "\" done successfully");
-            System.out.println("Parsing problem file \"" + new File(facts).getName()
-                + "\" done successfully\n");
+            StringBuilder strb = new StringBuilder();
+            strb.append("\nParsing domain file \"").append(new File(ops).getName()).append("\" done successfully")
+                .append("\nParsing problem file \"").append(new File(facts).getName()).append("\" done successfully\n");
+            LOGGER.trace(strb);
         }
         if (traceLevel == 8) {
             Encoder.setLogLevel(0);
@@ -200,53 +199,54 @@ public final class HSP {
 
         // The rest it is just to print the result
         final int traceLevel = (Integer) this.arguments.get(HSP.Argument.TRACE_LEVEL);
+        StringBuilder strb = new StringBuilder();
         if (traceLevel > 0 && traceLevel != 8) {
             if (pb.isSolvable()) {
                 if (plan != null) {
-                    System.out.printf("%nfound plan as follows:%n%n");
+                    strb.append(String.format("%nfound plan as follows:%n%n"));
                     for (int i = 0; i < plan.size(); i++) {
-                        System.out.printf("time step %4d: %s%n", i, plan.get(i));
+                        strb.append(String.format("time step %4d: %s%n", i, plan.get(i)));
                     }
                 } else {
-                    System.out.printf("%nno plan found%n%n");
+                    strb.append(String.format("%nno plan found%n%n"));
                 }
             } else {
-                System.out.printf("goal can be simplified to FALSE. no plan will solve it%n%n");
+                strb.append(String.format("goal can be simplified to FALSE. no plan will solve it%n%n"));
             }
-            System.out.printf("%ntime spent: %8.2f seconds encoding ("
+            strb.append(String.format("%ntime spent: %8.2f seconds encoding ("
                 + pb.getOperators().size() + " ops, " + pb.getRevelantFacts().size()
-                + " facts)%n", this.preprocessingTime / 1000.0);
-            System.out.printf("            %8.2f seconds searching%n",
-                this.searchingTime / 1000.0);
-            System.out.printf("            %8.2f seconds total time%n",
-                (this.preprocessingTime + searchingTime) / 1000.0);
-            System.out.printf("%n");
-            System.out.printf("memory used: %8.2f MBytes for problem representation%n",
-                +(this.problemMemory / (1024.0 * 1024.0)));
-            System.out.printf("             %8.2f MBytes for searching%n",
-                +(this.searchingMemory / (1024.0 * 1024.0)));
-            System.out.printf("             %8.2f MBytes total%n",
-                +((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0)));
-            System.out.printf("%n%n");
+                + " facts)%n", this.preprocessingTime / 1000.0))
+                .append(String.format("            %8.2f seconds searching%n",
+                    this.searchingTime / 1000.0))
+                .append(String.format("            %8.2f seconds total time%n",
+                    (this.preprocessingTime + searchingTime) / 1000.0))
+                .append(String.format("%nmemory used: %8.2f MBytes for problem representation%n",
+                    +(this.problemMemory / (1024.0 * 1024.0))))
+                .append(String.format("             %8.2f MBytes for searching%n",
+                        +(this.searchingMemory / (1024.0 * 1024.0))))
+                .append(String.format("             %8.2f MBytes total%n%n%n",
+                    +((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0))));
         }
         if (traceLevel == 8) {
             String problem = (String) this.arguments.get(HSP.Argument.PROBLEM);
             String[] strArray = problem.split("/");
             String pbFile = strArray[strArray.length - 1];
             String pbName = pbFile.substring(0, pbFile.indexOf("."));
-            System.out.printf("%5s %8d %8d %8.2f %8.2f %10d", pbName, pb.getOperators().size(),
+            strb.append(String.format("%5s %8d %8d %8.2f %8.2f %10d", pbName, pb.getOperators().size(),
                 pb.getRevelantFacts().size(), this.preprocessingTime / 1000.0,
-                this.problemMemory / (1024.0 * 1024.0), this.nbOfExploredNodes);
+                this.problemMemory / (1024.0 * 1024.0), this.nbOfExploredNodes));
             if (plan != null) {
-                System.out.printf("%8.2f %8.2f %8.2f %8.2f %5d%n", this.searchingTime / 1000.0,
+                strb.append(String.format("%8.2f %8.2f %8.2f %8.2f %5d%n", this.searchingTime / 1000.0,
                     (this.preprocessingTime + searchingTime) / 1000.0,
                     this.searchingMemory / (1024.0 * 1024.0),
                     (this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0),
-                    plan.size());
+                    plan.size()));
             } else {
-                System.out.printf("%8s %8s %8s %8s %5s%n", "-", "-", "-", "-", "-");
+                strb.append(String.format("%8s %8s %8s %8s %5s%n", "-", "-", "-", "-", "-"));
             }
         }
+
+        LOGGER.trace(strb);
     }
 
     /**
@@ -447,15 +447,15 @@ public final class HSP {
         try {
             for (int i = 0; i < args.length; i += 2) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         throw new FileNotFoundException("operators file does not exist: " + args[i + 1]);
                     }
+                    arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                     if (!new File(args[i + 1]).exists()) {
                         throw new FileNotFoundException("facts file does not exist: " + args[i + 1]);
                     }
+                    arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
@@ -486,7 +486,7 @@ public final class HSP {
                     } else {
                         arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SET_LEVEL);
                     }
-                } else if (args[i].equalsIgnoreCase("-w") && ((i + 1) < args.length)) {
+                } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
                         HSP.printUsage();
@@ -515,44 +515,49 @@ public final class HSP {
      * This method print the usage of the command-line planner.
      */
     private static void printUsage() {
-        System.out.println("\nusage of hsp:\n");
-        System.out.println("OPTIONS   DESCRIPTIONS\n");
-        System.out.println("-o <str>    operator file name");
-        System.out.println("-f <str>    fact file name");
-        System.out.println("-w <num>    the weight used in the a star seach (preset: 1)");
-        System.out.println("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)");
-        System.out.println("-u <num>    specifies the heuristic to used (preset: 0)");
-        System.out.println("     0      ff heuristic");
-        System.out.println("     1      sum heuristic");
-        System.out.println("     2      sum mutex heuristic");
-        System.out.println("     3      adjusted sum heuristic");
-        System.out.println("     4      adjusted sum 2 heuristic");
-        System.out.println("     5      adjusted sum 2M heuristic");
-        System.out.println("     6      combo heuristic");
-        System.out.println("     7      max heuristic");
-        System.out.println("     8      set-level heuristic");
-        System.out.println("-i <num>    run-time information level (preset: 1)");
-        System.out.println("     0      nothing");
-        System.out.println("     1      info on action number, search and plan");
-        System.out.println("     2      1 + info on problem constants, types and predicates");
-        System.out.println("     3      1 + 2 + loaded operators, initial and goal state");
-        System.out.println("     4      1 + predicates and their inertia status");
-        System.out.println("     5      1 + 4 + goal state and operators with unary inertia encoded");
-        System.out.println("     6      1 + actions, initial and goal state after expansion of variables");
-        System.out.println("     7      1 + final domain representation");
-        System.out.println("     8      line representation:");
-        System.out.println("               - problem name");
-        System.out.println("               - number of operators");
-        System.out.println("               - number of facts");
-        System.out.println("               - encoding time in seconds");
-        System.out.println("               - memory used for problem representation in MBytes");
-        System.out.println("               - number of states explored");
-        System.out.println("               - searching time in seconds");
-        System.out.println("               - memory used for searching in MBytes");
-        System.out.println("               - global memory used in MBytes");
-        System.out.println("               - solution plan length");
-        System.out.println("     > 100  1 + various debugging information");
-        System.out.println("-h          print this message\n\n");
+
+        StringBuilder strb = new StringBuilder();
+
+        strb.append("\nusage of hsp:\n")
+            .append("OPTIONS   DESCRIPTIONS\n")
+            .append("-o <str>    operator file name\n")
+            .append("-f <str>    fact file name\n")
+            .append("-w <num>    the weight used in the a star seach (preset: 1)\n")
+            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
+            .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
+            .append("     0      ff heuristic\n")
+            .append("     1      sum heuristic\n")
+            .append("     2      sum mutex heuristic\n")
+            .append("     3      adjusted sum heuristic\n")
+            .append("     4      adjusted sum 2 heuristic\n")
+            .append("     5      adjusted sum 2M heuristic\n")
+            .append("     6      combo heuristic\n")
+            .append("     7      max heuristic\n")
+            .append("     8      set-level heuristic\n")
+            .append("-i <num>    run-time information level (preset: 1)\n")
+            .append("     0      nothing\n")
+            .append("     1      info on action number, search and plan\n")
+            .append("     2      1 + info on problem constants, types and predicates\n")
+            .append("     3      1 + 2 + loaded operators, initial and goal state\n")
+            .append("     4      1 + predicates and their inertia status\n")
+            .append("     5      1 + 4 + goal state and operators with unary inertia encoded\n")
+            .append("     6      1 + actions, initial and goal state after expansion of variables\n")
+            .append("     7      1 + final domain representation\n")
+            .append("     8      line representation:\n")
+            .append("               - problem name\n")
+            .append("               - number of operators\n")
+            .append("               - number of facts\n")
+            .append("               - encoding time in seconds\n")
+            .append("               - memory used for problem representation in MBytes\n")
+            .append("               - number of states explored\n")
+            .append("               - searching time in seconds\n")
+            .append("               - memory used for searching in MBytes\n")
+            .append("               - global memory used in MBytes\n")
+            .append("               - solution plan length\n")
+            .append("     > 100  1 + various debugging information\n")
+            .append("-h          print this message\n\n");
+
+        LOGGER.trace(strb);
     }
 
     /**
