@@ -342,7 +342,8 @@ final class BitEncoding {
                 break;
             case AND:
                 final List<IntExp> children = exp.getChildren();
-                for (int i = 0; i < children.size(); i++) {
+                int i = 0;
+                while (i < children.size()) {
                     final IntExp ei = children.get(i);
                     BitEncoding.toCNF(ei);
                     exp.getChildren().remove(i);
