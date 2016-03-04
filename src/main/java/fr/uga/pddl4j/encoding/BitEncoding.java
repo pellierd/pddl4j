@@ -298,11 +298,12 @@ final class BitEncoding {
      * @param exp the expression.
      */
     private static void simplify(IntExp exp) {
-        boolean simplified = true;
-        while (simplified) {
+        boolean simplified;
+        int i = 0;
+        do {
             simplified = false;
             final List<IntExp> children = exp.getChildren();
-            for (int i = 0; i < children.size(); i++) {
+            while (i < children.size()) {
                 final IntExp ei = children.get(i);
                 if (ei.getConnective().equals(Connective.AND)
                     || ei.getConnective().equals(Connective.OR)) {
@@ -312,9 +313,11 @@ final class BitEncoding {
                         children.add(i, ej);
                         i++;
                     }
+                } else {
+                    i++;
                 }
             }
-        }
+        } while (simplified);
     }
 
     /**
