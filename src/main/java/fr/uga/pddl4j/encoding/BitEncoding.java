@@ -321,9 +321,9 @@ final class BitEncoding {
     }
 
     /**
-     * Convert an expression in disjunctive normal form (DNF).
+     * Convert an expression in conjunctive normal form (CNF).
      *
-     * @param exp the expression to transform in DNF.
+     * @param exp the expression to transform in CNF.
      */
     private static void toCNF(final IntExp exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
@@ -367,9 +367,9 @@ final class BitEncoding {
     }
 
     /**
-     * Convert an expression in conjunctive normal form (CNF).
+     * Convert an expression in disjunctive normal form (DNF).
      *
-     * @param exp the expression to transform in CNF.
+     * @param exp the expression to transform in DNF.
      */
     private static void toDNF(final IntExp exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
