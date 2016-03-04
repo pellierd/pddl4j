@@ -16,7 +16,7 @@ apply plugin: 'checkstyle'
 
 
 group 'fr.uga'
-version '3.0.31-SNAPSHOT'
+version '3.0.33-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {

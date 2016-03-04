@@ -430,7 +430,7 @@ public final class HSP {
         } catch (FileNotFoundException | ParseException exept) {
             LOGGER.error(exept.getMessage(), exept);
         } catch (UsageException uex) {
-            LOGGER.info(uex.getMessage());
+            LOGGER.info(uex);
             HSP.printUsage();
         }
     }
