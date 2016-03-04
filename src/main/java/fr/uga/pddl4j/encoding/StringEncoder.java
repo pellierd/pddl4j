@@ -183,7 +183,6 @@ final class StringEncoder {
                         exp.getChildren().size() - 1), constants, types, predicates, functions, offset));
                 }
                 str.append(")");
-                // offset = offset.substring(0, offset.length() - 2);
                 break;
             case FORALL:
             case EXISTS:
