@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is used to encode expressions in compact encoding, i.e., with integer representation.
@@ -92,9 +93,7 @@ public class IntExp implements Serializable {
         }
         List<IntExp> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
-        for (IntExp child : otherChildren) {
-            this.children.add(new IntExp(child));
-        }
+        this.children.addAll(otherChildren.stream().map(IntExp::new).collect(Collectors.toList()));
         this.variable = other.getVariable();
         this.type = other.getType();
         this.value = other.getValue();

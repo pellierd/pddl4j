@@ -21,6 +21,7 @@ package fr.uga.pddl4j.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -54,9 +55,7 @@ public class BitOp extends AbstractCodedOp {
         super(other);
         this.preconditions = new BitExp(other.getPreconditions());
         this.effects = new ArrayList<>();
-        for (CondBitExp effect : other.getCondEffects()) {
-            this.effects.add(new CondBitExp(effect));
-        }
+        this.effects.addAll(other.getCondEffects().stream().map(CondBitExp::new).collect(Collectors.toList()));
     }
 
     /**
@@ -150,13 +149,11 @@ public class BitOp extends AbstractCodedOp {
      */
     public BitExp getUnconditionalEffects() {
         final BitExp ucEffect = new BitExp();
-        for (CondBitExp cEffect : this.effects) {
-            if (cEffect.getCondition().isEmpty()) {
-                final BitExp condEff = cEffect.getEffects();
-                ucEffect.getPositive().or(condEff.getPositive());
-                ucEffect.getNegative().or(condEff.getNegative());
-            }
-        }
+        this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
+            final BitExp condEff = cEffect.getEffects();
+            ucEffect.getPositive().or(condEff.getPositive());
+            ucEffect.getNegative().or(condEff.getNegative());
+        });
         return ucEffect;
     }
 
