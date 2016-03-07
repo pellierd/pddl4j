@@ -218,8 +218,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
 
         // Start enumerating the unconditional opsLayer
         int uncondOpIndex = this.nbPropositions;
-        for (int opIndex = 0; opIndex < pbOperators.size(); opIndex++) {
-            final BitOp op = pbOperators.get(opIndex);
+        for (final BitOp op : pbOperators) {
             final List<CondBitExp> condEffects = op.getCondEffects();
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {

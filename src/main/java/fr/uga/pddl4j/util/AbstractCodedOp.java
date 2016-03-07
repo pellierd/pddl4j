@@ -61,13 +61,9 @@ public abstract class AbstractCodedOp implements CodedOp {
         }
         this.setName(other.getName());
         this.parameters = new int[other.getArity()];
-        for (int i = 0; i < other.getArity(); i++) {
-            this.parameters[i] = other.parameters[i];
-        }
+        System.arraycopy(other.parameters, 0, this.parameters, 0, other.getArity());
         this.instantiations = new int[other.getArity()];
-        for (int i = 0; i < other.getArity(); i++) {
-            this.instantiations[i] = other.instantiations[i];
-        }
+        System.arraycopy(other.instantiations, 0, this.instantiations, 0, other.getArity());
         this.dummy = other.isDummy();
     }
 

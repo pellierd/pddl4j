@@ -363,7 +363,7 @@ public final class Parser {
     private boolean checkGroundedParserNode(Exp exp) {
         boolean checked = true;
         if (exp == null) {
-            return checked;
+            return true;
         }
         LinkedList<Exp> stackGD = new LinkedList<>();
         LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<>();
@@ -604,13 +604,11 @@ public final class Parser {
                 this.mgr.logParserError("type \"" + type.getImage() + "\" cannot be used as derived type",
                     this.lexer.getFile(),type.getBeginLine(), type.getBeginColumn());
             } else { // General case
-                // check if all super types are defined otherwise create a new type inhereted from object
-                for (Symbol superType : type.getTypes()) {
-                    if (!types.contains(superType)) {
-                        TypedSymbol st = new TypedSymbol(superType);
-                        map.put(superType.getImage(), st);
-                    }
-                }
+                // check if all super types are defined otherwise create a new type inherited from object
+                type.getTypes().stream().filter(superType -> !types.contains(superType)).forEach(superType -> {
+                    TypedSymbol st = new TypedSymbol(superType);
+                    map.put(superType.getImage(), st);
+                });
                 // If the type was already encountered, it means that there is multiple inheritance
                 // thus the super types are gathered
                 TypedSymbol t = map.get(type.getImage());

@@ -54,8 +54,6 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class FastForward extends RelaxedGraphHeuristic {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Creates a new <code>FastForward</code> heuristic for a specified planning problem.
      *

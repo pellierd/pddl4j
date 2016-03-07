@@ -304,41 +304,29 @@ public class Problem implements Serializable {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append("(define (problem ");
-        str.append(this.name);
-        str.append(")");
-        str.append("\n(:domain ");
-        str.append(this.domain);
-        str.append(")");
-        str.append("\n(:requirements");
+        str.append("(define (problem ").append(this.name).append(")").append("\n(:domain ")
+            .append(this.domain).append(")").append("\n(:requirements");
         for (RequireKey r : this.requirements) {
-            str.append(" " + r);
+            str.append(" ").append(r);
         }
         str.append(")\n");
         if (!this.objects.isEmpty()) {
-            str.append("(:objets ");
+            str.append("(:objects ");
             for (TypedSymbol obj : this.objects) {
-                str.append("\n  " + obj);
+                str.append("\n  ").append(obj);
             }
             str.append("\n)\n");
         }
         str.append("(:init");
         for (Exp fact : this.initialFacts) {
-            str.append("\n  " + fact);
+            str.append("\n  ").append(fact);
         }
-        str.append("\n)\n");
-        str.append("(:goal ");
-        str.append("  " + this.goal);
-        str.append(")\n");
+        str.append("\n)\n").append("(:goal ").append("  ").append(this.goal).append(")\n");
         if (this.constraints != null) {
-            str.append("(:constraints ");
-            str.append("  " + this.constraints);
-            str.append(")\n");
+            str.append("(:constraints ").append("  ").append(this.constraints).append(")\n");
         }
         if (this.metric != null) {
-            str.append("(:metric ");
-            str.append("  " + this.metric);
-            str.append(")\n");
+            str.append("(:metric ").append("  ").append(this.metric).append(")\n");
         }
         str.append(")");
         return str.toString();

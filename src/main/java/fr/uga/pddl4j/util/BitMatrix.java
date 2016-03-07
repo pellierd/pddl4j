@@ -31,11 +31,6 @@ import java.util.BitSet;
 public final class BitMatrix {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 2831903376066135583L;
-
-    /**
      * The number of rows.
      */
     private int rows;

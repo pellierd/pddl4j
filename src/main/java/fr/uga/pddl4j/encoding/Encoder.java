@@ -518,7 +518,7 @@ public final class Encoder {
         codedProblem.setDomains(Encoder.tableOfDomains);
         codedProblem.setFunctions(Encoder.tableOfFunctions);
         codedProblem.setInertia(Encoder.tableOfInertia);
-        codedProblem.setInferedDomains(Encoder.tableOfInferredDomains);
+        codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicates(Encoder.tableOfPredicates);
         codedProblem.setRevelantFacts(Encoder.tableOfRevelantFacts);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class implements a problem where operators are instantiated and encoded in
@@ -46,7 +47,7 @@ public class CodedProblem {
     /**
      * The table of inferred domains based on unary inertia encoding.
      */
-    private List<Set<Integer>> inferedDomains;
+    private List<Set<Integer>> inferredDomains;
 
     /**
      * The domain of associated to the type.
@@ -106,8 +107,7 @@ public class CodedProblem {
     /**
      * The default constructor with a private package access to prevent instance creation.
      */
-    CodedProblem() {
-    }
+    CodedProblem() {}
 
     /**
      * Create a new <code>CodedProblem</code> copy of another.
@@ -117,57 +117,34 @@ public class CodedProblem {
     public CodedProblem(CodedProblem other) {
         super();
         this.types = new ArrayList<>();
-        for (String str : other.types) {
-            this.types.add(str);
-        }
+        this.types.addAll(other.types.stream().collect(Collectors.toList()));
         this.domains = new ArrayList<>();
         for (Set<Integer> si : other.domains) {
-            final Set<Integer> copy = new LinkedHashSet<>();
-            for (Integer i : si) {
-                copy.add(i);
-            }
+            final Set<Integer> copy = si.stream().collect(Collectors.toCollection(LinkedHashSet::new));
             this.domains.add(copy);
         }
         this.constants = new ArrayList<>();
-        for (String str : other.constants) {
-            this.constants.add(str);
-        }
+        this.constants.addAll(other.constants.stream().collect(Collectors.toList()));
         this.predicates = new ArrayList<>();
-        for (String str : other.predicates) {
-            this.predicates.add(str);
-        }
+        this.predicates.addAll(other.predicates.stream().collect(Collectors.toList()));
         this.predicatesSignatures = new ArrayList<>();
         for (List<Integer> si : other.predicatesSignatures) {
-            final List<Integer> copy = new ArrayList<>();
-            for (Integer i : si) {
-                copy.add(i);
-            }
+            final List<Integer> copy = si.stream().collect(Collectors.toList());
             this.predicatesSignatures.add(copy);
         }
         this.functions = new ArrayList<>();
-        for (String str : other.functions) {
-            this.functions.add(str);
-        }
+        this.functions.addAll(other.functions.stream().collect(Collectors.toList()));
         this.functionsSignatures = new ArrayList<>();
         for (List<Integer> si : other.functionsSignatures) {
-            final List<Integer> copy = new ArrayList<>();
-            for (Integer i : si) {
-                copy.add(i);
-            }
+            final List<Integer> copy = si.stream().collect(Collectors.toList());
             this.functionsSignatures.add(copy);
         }
         this.inertia = new ArrayList<>();
-        for (Inertia i : other.inertia) {
-            this.inertia.add(i);
-        }
+        this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
         this.revelantFacts = new ArrayList<>();
-        for (IntExp exp : other.revelantFacts) {
-            this.revelantFacts.add(new IntExp(exp));
-        }
+        this.revelantFacts.addAll(other.revelantFacts.stream().map(IntExp::new).collect(Collectors.toList()));
         this.operators = new ArrayList<>();
-        for (BitOp exp : other.operators) {
-            this.operators.add(new BitOp(exp));
-        }
+        this.operators.addAll(other.operators.stream().map(BitOp::new).collect(Collectors.toList()));
         this.goal = new BitExp(other.goal);
         this.init = new BitExp(other.init);
     }
@@ -192,18 +169,18 @@ public class CodedProblem {
 
     /**
      * TODO to remove: never used.
-     * @return the inferedDomains
+     * @return the inferredDomains
      */
-    final List<Set<Integer>> getInferedDomains() {
-        return this.inferedDomains;
+    final List<Set<Integer>> getInferredDomains() {
+        return this.inferredDomains;
     }
 
     /**
      * .
-     * @param inferedDomains the inferedDomains to set
+     * @param inferredDomains the inferredDomains to set
      */
-    final void setInferedDomains(final List<Set<Integer>> inferedDomains) {
-        this.inferedDomains = inferedDomains;
+    final void setInferredDomains(final List<Set<Integer>> inferredDomains) {
+        this.inferredDomains = inferredDomains;
     }
 
     /**

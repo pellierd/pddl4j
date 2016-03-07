@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * This class is used to to parse in the atomic formula skeleton and atomic function skeleton.
@@ -62,9 +63,7 @@ public class NamedTypedList implements Serializable {
         this.name = new Symbol(list.getName());
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
-        for (TypedSymbol symbol : list.getArguments()) {
-            this.arguments.add(new TypedSymbol(symbol));
-        }
+        this.arguments.addAll(list.getArguments().stream().map(TypedSymbol::new).collect(Collectors.toList()));
     }
 
     /**
@@ -204,8 +203,8 @@ public class NamedTypedList implements Serializable {
         final StringBuilder str = new StringBuilder();
         str.append("(");
         str.append(this.name.toString());
-        for (int i = 0; i < this.arguments.size(); i++) {
-            str.append(" " + this.arguments.get(i).toString());
+        for (TypedSymbol argument : this.arguments) {
+            str.append(" ").append(argument.toString());
         }
         str.append(")");
         if (!this.types.isEmpty()) {
@@ -214,12 +213,8 @@ public class NamedTypedList implements Serializable {
                 str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));
             } else if (this.types.size() == 2) {
                 str.append("(either");
-                for (int i = 0; i < this.types.size(); i++) {
-                    if (!this.types.get(i).equals(Parser.OBJECT)) {
-                        str.append(" ");
-                        str.append(this.types.get(i).toString().toUpperCase(Locale.ENGLISH));
-                    }
-                }
+                this.types.stream().filter(type -> !type.equals(Parser.OBJECT))
+                    .forEach(type -> str.append(" ").append(type.toString().toUpperCase(Locale.ENGLISH)));
                 str.append(")");
             }
         }

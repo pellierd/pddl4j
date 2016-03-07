@@ -417,9 +417,7 @@ public class Exp implements Serializable {
         switch (this.connective) {
             case AND:
             case OR:
-                for (Exp exp : this.children) {
-                    exp.moveNegationInward();
-                }
+                this.children.forEach(fr.uga.pddl4j.parser.Exp::moveNegationInward);
                 break;
             case FORALL:
             case EXISTS:

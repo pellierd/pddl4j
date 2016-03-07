@@ -117,9 +117,7 @@ final class PreInstantiation {
                 break;
             case AND:
             case OR:
-                for (final IntExp ei : exp.getChildren()) {
-                    PreInstantiation.extract(ei);
-                }
+                exp.getChildren().forEach(PreInstantiation::extract);
                 break;
             case FORALL:
             case EXISTS:
@@ -239,8 +237,8 @@ final class PreInstantiation {
             final int[] args = fact.getArguments();
             for (final IntMatrix intMatrix : pTables) {
                 int indexSize = 0;
-                for (int i = 0; i < set.length; i++) {
-                    if (set[i] == 1) {
+                for (int aSet : set) {
+                    if (aSet == 1) {
                         indexSize++;
                     }
                 }
@@ -279,21 +277,13 @@ final class PreInstantiation {
     }
 
     private static int[] incrementMask(final int[] set) {
-        int add = 1;
         boolean overflow = false;
         for (int i = set.length - 1; i >= 0; i--) {
-            if (set[i] == 0 && add == 0) {
-                set[i] = 0;
-                break;
-            } else if (set[i] == 0 && add == 1) {
-                set[i] = 1;
-                break;
-            } else if (set[i] == 1 && add == 0) {
+            if (set[i] == 0) {
                 set[i] = 1;
                 break;
             } else {
                 set[i] = 0;
-                add = 1;
                 overflow = i == 0;
             }
         }
@@ -335,42 +325,38 @@ final class PreInstantiation {
             str.append(Encoder.tableOfPredicates.get(predicate));
             int var = 0;
             int realIndexSize = 0;
-            for (int i = 0; i < index.length; i++) {
-                if (index[i] == -1) {
-                    str.append(" X" + var);
+            for (int anIndex : index) {
+                if (anIndex == -1) {
+                    str.append(" X").append(var);
                     var++;
                 } else {
                     realIndexSize++;
-                    str.append(" " + Encoder.tableOfConstants.get(index[i]));
+                    str.append(" ").append(Encoder.tableOfConstants.get(anIndex));
                 }
             }
             str.append(")");
             final int[] realIndex = new int[realIndexSize];
             int j = 0;
-            for (int i = 0; i < index.length; i++) {
-                if (index[i] != -1) {
-                    realIndex[j] = index[i];
+            for (int anIndex : index) {
+                if (anIndex != -1) {
+                    realIndex[j] = anIndex;
                     j++;
                 }
             }
             final int counter = tables.get(predicate).get(PreInstantiation.toInt(mask)).get(realIndex);
             if (counter != 0) {
-                str.append(" : " + counter);
+                str.append(" : ").append(counter);
                 LOGGER.trace(str);
             }
         } else if (mask[index.length] == 0) {
             final int[] newIndex = new int[index.length + 1];
-            for (int j = 0; j < index.length; j++) {
-                newIndex[j] = index[j];
-            }
+            System.arraycopy(index, 0, newIndex, 0, index.length);
             newIndex[index.length] = -1;
             this.print(predicate, arity, mask, newIndex, tables);
         } else {
             for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
                 final int[] newIndex = new int[index.length + 1];
-                for (int j = 0; j < index.length; j++) {
-                    newIndex[j] = index[j];
-                }
+                System.arraycopy(index, 0, newIndex, 0, index.length);
                 newIndex[index.length] = i;
                 this.print(predicate, arity, mask, newIndex, tables);
             }

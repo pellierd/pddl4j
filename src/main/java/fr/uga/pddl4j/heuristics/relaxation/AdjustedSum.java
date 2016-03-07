@@ -95,8 +95,6 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class AdjustedSum extends RelaxedGraphHeuristic {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Creates a new <code>AdjustedSum</code> heuristic for a specified planning problem.
      *

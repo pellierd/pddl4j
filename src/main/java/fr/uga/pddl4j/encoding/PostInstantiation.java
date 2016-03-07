@@ -684,9 +684,7 @@ final class PostInstantiation {
                 break;
             case AND:
             case OR:
-                for (IntExp ei : exp.getChildren()) {
-                    PostInstantiation.extractGroundInertia(ei);
-                }
+                exp.getChildren().forEach(PostInstantiation::extractGroundInertia);
                 break;
             case FORALL:
             case EXISTS:
