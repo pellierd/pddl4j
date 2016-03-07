@@ -19,8 +19,10 @@
 
 package fr.uga.pddl4j.parser;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -37,6 +39,8 @@ import java.util.TreeSet;
 public class ErrorManager implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = LogManager.getLogger(ErrorManager.class);
 
     /**
      * The set used to store the messages.
@@ -56,7 +60,7 @@ public class ErrorManager implements Serializable {
      * @param type the type of message to print.
      */
     public void print(Message.Type type) {
-        this.print(this.getMessages(type), System.out);
+        this.print(this.getMessages(type));
     }
 
     /**
@@ -65,7 +69,7 @@ public class ErrorManager implements Serializable {
      * @param file The file.
      */
     public void print(File file) {
-        this.print(this.getMessages(file), System.out);
+        this.print(this.getMessages(file));
     }
 
     /**
@@ -75,19 +79,18 @@ public class ErrorManager implements Serializable {
      * @param file the file.
      */
     public void print(Message.Type type, File file) {
-        this.print(this.getMessages(type, file), System.out);
+        this.print(this.getMessages(type, file));
     }
 
     /**
      * Print the message to the current output stream.
      *
      * @param messages the list of messages to print.
-     * @param out      the print stream where the message must be printed.
      */
-    private void print(Collection<Message> messages, PrintStream out) {
+    private void print(Collection<Message> messages) {
         if (messages != null) {
             for (Message message : messages) {
-                out.println(message);
+                LOGGER.trace(message);
             }
         }
     }
@@ -96,7 +99,7 @@ public class ErrorManager implements Serializable {
      * Print the all the message of the error manager.
      */
     public void printAll() {
-        this.print(this.msg, System.out);
+        this.print(this.msg);
     }
 
     /**

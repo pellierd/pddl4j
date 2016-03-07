@@ -25,6 +25,8 @@ import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,8 @@ import java.util.Set;
  * @version 1.0 - 10.06.2010
  */
 final class BitEncoding {
+
+    private static final Logger LOGGER = LogManager.getLogger(BitEncoding.class);
 
     /**
      * The default constructor with a private access to prevent instance creation.
@@ -250,7 +254,7 @@ final class BitEncoding {
                 }
             }
         } else {
-            System.out.println(Encoder.toString(exp));
+            LOGGER.error(Encoder.toString(exp));
             throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
         return bitExp;

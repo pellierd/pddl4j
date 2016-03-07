@@ -1110,8 +1110,10 @@ public final class Parser {
      */
     public static void main(String[] args) {
 
+        final StringBuilder strb = new StringBuilder();
+
         if (args.length == 2 && "-p".equals(args[0])) {
-            System.out.print("parse problem " + "\"" + args[1] + "\": ");
+            strb.append("parse problem ").append("\"").append(args[1]).append("\": ");
             Parser parser = new Parser();
             try {
                 parser.parse(args[1]);
@@ -1119,13 +1121,14 @@ public final class Parser {
                 LOGGER.error("Parsing problem error", fnfException);
             }
             if (parser.mgr.isEmpty()) {
-                System.out.println("ok");
+                strb.append("ok");
             } else {
-                System.out.println();
+                strb.append(System.lineSeparator());
                 parser.mgr.printAll();
             }
         } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
-            System.out.print("parse files " + "\"" + args[1] + "\" and " + "\"" + args[3] + "\": ");
+            strb.append("parse files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
+                .append("\": ");
             Parser parser = new Parser();
             try {
                 parser.parse(args[1], args[3]);
@@ -1133,17 +1136,18 @@ public final class Parser {
                 LOGGER.error("domain or problem missing", fnfException);
             }
             if (parser.mgr.isEmpty()) {
-                System.out.println("ok");
+                strb.append("ok");
             } else {
-                System.out.println("no ok");
+                strb.append("no ok");
                 parser.mgr.printAll();
             }
         } else {
-            System.out.println("\nusage of parser:\n");
-            System.out.println("OPTIONS   DESCRIPTIONS\n");
-            System.out.println("-p <str>    path for operator and fact file");
-            System.out.println("-o <str>    operator file name");
-            System.out.println("-f <str>    fact file name\n");
+            strb.append("\nusage of parser:\n").append("OPTIONS   DESCRIPTIONS\n")
+                .append("-p <str>    path for operator and fact file")
+                .append("-o <str>    operator file name")
+                .append("-f <str>    fact file name\n");
         }
+
+        LOGGER.trace(strb);
     }
 }

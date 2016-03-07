@@ -21,6 +21,8 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.IntExp;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,6 +49,8 @@ import java.util.Set;
  * @version 1.0 - 10.04.2010
  */
 final class PreInstantiation {
+
+    private static final Logger LOGGER = LogManager.getLogger(PreInstantiation.class);
 
     /**
      * The default constructor with a private access to prevent instance creation.
@@ -302,7 +306,7 @@ final class PreInstantiation {
      * @param tables predicates tables.
      */
     void printPredicatesTables(final List<List<IntMatrix>> tables) {
-        System.out.println("Tables of predicates:");
+        LOGGER.trace("Tables of predicates:");
         for (int predicate = 0; predicate < tables.size(); predicate++) {
             final List<IntMatrix> pTables = tables.get(predicate);
             final int arity = Encoder.tableOfTypedPredicates.get(predicate).size();
@@ -352,7 +356,7 @@ final class PreInstantiation {
             final int counter = tables.get(predicate).get(PreInstantiation.toInt(mask)).get(realIndex);
             if (counter != 0) {
                 str.append(" : " + counter);
-                System.out.println(str);
+                LOGGER.trace(str);
             }
         } else if (mask[index.length] == 0) {
             final int[] newIndex = new int[index.length + 1];
