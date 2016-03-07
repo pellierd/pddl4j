@@ -56,24 +56,23 @@ final class StringEncoder {
     static String toString(final IntOp op, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions) {
         final StringBuilder str = new StringBuilder();
-        str.append("Op " + op.getName() + "\n");
+        str.append("Op ").append(op.getName()).append("\n");
         str.append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
             final int index = op.getValueOfParameter(i);
             final String type = types.get(op.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL + i + " - " + type + " : ? \n");
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL + i + " - " + type + " : "
-                    + constants.get(index) + " " + "\n");
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                    .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n");
-        str.append(toString(op.getPreconditions(),
-            constants, types, predicates, functions) + "\n");
-        str.append("Effects:\n");
-        str.append(toString(op.getEffects(),
-            constants, types, predicates, functions) + "\n");
+        str.append("Preconditions:\n").append(toString(op.getPreconditions(), constants, types, predicates, functions))
+            .append("\n")
+            .append("Effects:\n")
+            .append(toString(op.getEffects(),constants, types, predicates, functions))
+            .append("\n");
         return str.toString();
     }
 
@@ -129,40 +128,35 @@ final class StringEncoder {
                 str.append("(");
                 str.append(predicates.get(exp.getPredicate()));
                 int[] args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    int index = args[i];
+                for (int index : args) {
                     if (index < 0) {
-                        str.append(" " + Symbol.DEFAULT_VARIABLE_SYMBOL + (-index - 1));
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" " + constants.get(index));
+                        str.append(" ").append(constants.get(index));
                     }
                 }
                 str.append(")");
                 break;
             case FN_HEAD:
-                str.append("(");
-                str.append(functions.get(exp.getPredicate()));
+                str.append("(").append(functions.get(exp.getPredicate()));
                 args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    int index = args[i];
+                for (int index : args) {
                     if (index < 0) {
-                        str.append(" " + Symbol.DEFAULT_VARIABLE_SYMBOL + (-index - 1));
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" " + constants.get(index));
+                        str.append(" ").append(constants.get(index));
                     }
                 }
                 str.append(")");
                 break;
             case EQUAL_ATOM:
-                str.append("(");
-                str.append("=");
+                str.append("(").append("=");
                 args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    int index = args[i];
+                for (int index : args) {
                     if (index < 0) {
-                        str.append(" " + Symbol.DEFAULT_VARIABLE_SYMBOL + (-index - 1));
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" " + constants.get(index));
+                        str.append(" ").append(constants.get(index));
                     }
                 }
                 str.append(")");
@@ -176,8 +170,7 @@ final class StringEncoder {
                 if (!exp.getChildren().isEmpty()) {
                     for (int i = 0; i < exp.getChildren().size() - 1; i++) {
                         str.append(StringEncoder.toString(exp.getChildren().get(i), constants, types, predicates,
-                            functions, offsetOr) + "\n"
-                            + offsetOr);
+                            functions, offsetOr)).append("\n").append(offsetOr);
                     }
                     str.append(StringEncoder.toString(exp.getChildren().get(
                         exp.getChildren().size() - 1), constants, types, predicates, functions, offsetOr));
@@ -187,13 +180,9 @@ final class StringEncoder {
             case FORALL:
             case EXISTS:
                 String offsetEx = baseOffset + baseOffset + "  ";
-                str.append(" (");
-                str.append(exp.getConnective().getImage());
-                str.append(" (");
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL + (-exp.getVariable() - 1));
-                str.append(" - ");
-                str.append(types.get(exp.getType()));
-                str.append(")\n" + offsetEx);
+                str.append(" (").append(exp.getConnective().getImage())
+                    .append(" (").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-exp.getVariable() - 1).append(" - ")
+                    .append(types.get(exp.getType())).append(")\n").append(offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
                         functions, offsetEx));
@@ -284,27 +273,22 @@ final class StringEncoder {
     static String toString(final BitOp op, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
-        str.append("Op " + op.getName() + "\n");
-        str.append("Instantiations:\n");
+        str.append("Op ").append(op.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
             final int index = op.getValueOfParameter(i);
             final String type = types.get(op.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL + i + " - " + type + " : ? \n");
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL + i + " - " + type + " : "
-                    + constants.get(index) + " " + "\n");
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                    .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n");
-        str.append(StringEncoder.toString(op.getPreconditions(),
-            constants, types, predicates, functions, relevants));
-        str.append("\n");
-        str.append("Effects:\n");
+        str.append("Preconditions:\n").append(StringEncoder.toString(op.getPreconditions(), constants, types,
+            predicates, functions, relevants)).append("\n").append("Effects:\n");
         for (CondBitExp condExp : op.getCondEffects()) {
-            str.append(StringEncoder.toString(condExp,
-                constants, types, predicates, functions, relevants));
-            str.append("\n");
+            str.append(StringEncoder.toString(condExp, constants, types, predicates, functions, relevants))
+                .append("\n");
         }
         return str.toString();
     }
@@ -326,17 +310,13 @@ final class StringEncoder {
         final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            str.append(" ");
-            str.append(StringEncoder.toString(relevants.get(i),
-                constants, types, predicates, functions));
-            str.append("\n");
+            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions))
+                .append("\n");
         }
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            str.append(" (not ");
-            str.append(StringEncoder.toString(relevants.get(i),
-                constants, types, predicates, functions));
-            str.append(")\n");
+            str.append(" (not ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates,
+                functions)).append(")\n");
         }
         str.append(")");
         return str.toString();
@@ -358,16 +338,11 @@ final class StringEncoder {
                            final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringEncoder.toString(exp.getEffects(),
-                constants, types, predicates, functions, relevants));
+            str.append(StringEncoder.toString(exp.getEffects(),constants, types, predicates, functions, relevants));
         } else {
-            str.append("(when ");
-            str.append(StringEncoder.toString(exp.getCondition(),
-                constants, types, predicates, functions, relevants));
-            str.append("\n");
-            str.append(StringEncoder.toString(exp.getEffects(),
-                constants, types, predicates, functions, relevants));
-            str.append(")");
+            str.append("(when ").append(StringEncoder.toString(exp.getCondition(),constants, types, predicates,
+                functions, relevants)).append("\n").append(StringEncoder.toString(exp.getEffects(), constants, types,
+                predicates, functions, relevants)).append(")");
         }
         return str.toString();
     }
@@ -388,7 +363,7 @@ final class StringEncoder {
             if (index == -1) {
                 str.append(" ?");
             } else {
-                str.append(" " + constants.get(index));
+                str.append(" ").append(constants.get(index));
             }
         }
         return str.toString();
@@ -410,7 +385,7 @@ final class StringEncoder {
             if (index == -1) {
                 str.append(" ?");
             } else {
-                str.append(" " + constants.get(index));
+                str.append(" ").append(constants.get(index));
             }
         }
         return str.toString();

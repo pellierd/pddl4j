@@ -55,13 +55,13 @@ final class Instantiation {
         final List<IntOp> instOps = new ArrayList<>(1000);
         for (IntOp op : operators) {
             // If an operator has a parameter with a empty domain the operator must be removed
-            boolean toInstantied = true;
+            boolean toInstantiate = true;
             int i = 0;
-            while (i < op.getArity() && toInstantied) {
-                toInstantied = !Encoder.tableOfDomains.get(op.getTypeOfParameters(i)).isEmpty();
+            while (i < op.getArity() && toInstantiate) {
+                toInstantiate = !Encoder.tableOfDomains.get(op.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
-            if (toInstantied) {
+            if (toInstantiate) {
                 instOps.addAll(Instantiation.instantiate(op));
             }
         }

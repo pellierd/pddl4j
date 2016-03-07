@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class implements all the methods needed to encode operators, goal and initial state loaded
@@ -150,9 +151,7 @@ final class IntEncoding {
         switch (exp.getConnective()) {
             case AND:
             case OR:
-                for (Exp ei : exp.getChildren()) {
-                    IntEncoding.encodeTypes(ei);
-                }
+                exp.getChildren().forEach(IntEncoding::encodeTypes);
                 break;
             case FORALL:
             case EXISTS:
@@ -288,13 +287,12 @@ final class IntEncoding {
             Encoder.tableOfFunctions.add(function.getName().getImage());
             List<TypedSymbol> arguments = function.getArguments();
             List<Integer> argType = new ArrayList<>(arguments.size());
-            for (int j = 0; j < arguments.size(); j++) {
-                List<Symbol> types = arguments.get(j).getTypes();
+            for (TypedSymbol argument : arguments) {
+                List<Symbol> types = argument.getTypes();
                 if (types.size() > 1) {
                     StringBuilder type = new StringBuilder("either");
-                    for (int k = 0; k < types.size(); k++) {
-                        type.append("~");
-                        type.append(types.get(k).getImage());
+                    for (Symbol type1 : types) {
+                        type.append("~").append(type1.getImage());
                     }
                     argType.add(Encoder.tableOfTypes.indexOf(type.toString()));
                 } else {
@@ -313,11 +311,7 @@ final class IntEncoding {
      * @return encoded the list of operators encoded.
      */
     static List<IntOp> encodeOperators(final List<Op> ops) {
-        final List<IntOp> intOps = new ArrayList<>();
-        for (Op op : ops) {
-            intOps.add(IntEncoding.encodeOperator(op));
-        }
-        return intOps;
+        return ops.stream().map(IntEncoding::encodeOperator).collect(Collectors.toList());
     }
 
     /**
@@ -327,11 +321,7 @@ final class IntEncoding {
      * @return the initial state encoded.
      */
     static Set<IntExp> encodeInit(final List<Exp> init) {
-        final Set<IntExp> intInit = new LinkedHashSet<>();
-        for (Exp fact : init) {
-            intInit.add(IntEncoding.encodeExp(fact));
-        }
-        return intInit;
+        return init.stream().map(IntEncoding::encodeExp).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**

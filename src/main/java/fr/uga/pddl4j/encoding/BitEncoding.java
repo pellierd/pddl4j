@@ -403,17 +403,15 @@ final class BitEncoding {
                     final IntExp newOr = new IntExp(Connective.OR);
                     for (IntExp newAnd : dnf.getChildren()) {
                         for (IntExp ek : orExp.getChildren()) {
-                            for (IntExp el : ek.getChildren()) {
-                                if (!newAnd.getChildren().contains(el)) {
-                                    if (el.getConnective().equals(Connective.OR)
-                                        || el.getConnective().equals(Connective.AND)
-                                        && el.getChildren().size() == 1) {
-                                        newAnd.getChildren().add(el.getChildren().get(0));
-                                    } else {
-                                        newAnd.getChildren().add(el);
-                                    }
+                            ek.getChildren().stream().filter(el -> !newAnd.getChildren().contains(el)).forEach(el -> {
+                                if (el.getConnective().equals(Connective.OR)
+                                    || el.getConnective().equals(Connective.AND)
+                                    && el.getChildren().size() == 1) {
+                                    newAnd.getChildren().add(el.getChildren().get(0));
+                                } else {
+                                    newAnd.getChildren().add(el);
                                 }
-                            }
+                            });
                             boolean add = true;
                             for (IntExp el : newAnd.getChildren()) {
                                 if (el.getConnective().equals(Connective.FALSE)) {
