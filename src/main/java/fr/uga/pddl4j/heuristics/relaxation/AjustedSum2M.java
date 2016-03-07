@@ -50,8 +50,6 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class AjustedSum2M extends RelaxedGraphHeuristic {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * The set level heuristic used to compute the delta function, i.e., the interaction degree
      * among propositions of the goal.
