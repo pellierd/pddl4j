@@ -272,9 +272,9 @@ public class Message implements Serializable, Comparable<Message> {
         } else {
             str.append("Parser warning");
         }
-        str.append(" at line " + this.line + ", column " + this.column);
-        str.append(", file (" + this.file + ")");
-        str.append(" : " + this.content);
+        str.append(" at line ").append(this.line).append(", column ").append(this.column)
+            .append(", file (").append(this.file).append(")")
+            .append(" : ").append(this.content);
         return str.toString();
 
 

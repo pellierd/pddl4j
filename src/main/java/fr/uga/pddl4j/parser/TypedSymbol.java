@@ -22,6 +22,7 @@ package fr.uga.pddl4j.parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * This class implements a typed symbol.
@@ -47,9 +48,7 @@ public final class TypedSymbol extends Symbol {
     public TypedSymbol(final TypedSymbol symbol) {
         super(symbol);
         this.types = new ArrayList<>();
-        for (Symbol type : symbol.getTypes()) {
-            this.types.add(new Symbol(type));
-        }
+        this.types.addAll(symbol.getTypes().stream().map(Symbol::new).collect(Collectors.toList()));
     }
 
     /**

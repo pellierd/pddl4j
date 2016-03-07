@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class implements a planning operator parsed
@@ -95,9 +96,7 @@ public class Op implements Serializable {
         }
         this.name = new Symbol(other.getName());
         this.parameters = new LinkedList<>();
-        for (TypedSymbol param : other.getParameters()) {
-            this.parameters.add(new TypedSymbol(param));
-        }
+        this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
         this.preconditions = new Exp(other.getPreconditions());
         this.effects = new Exp(other.getEffects());
         if (this.duration != null) {
@@ -282,8 +281,7 @@ public class Op implements Serializable {
         // Rename the parameters
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol> parameters = this.getParameters();
-        for (int j = 0; j < parameters.size(); j++) {
-            final TypedSymbol params = parameters.get(j);
+        for (final TypedSymbol params : parameters) {
             final String image = params.renameVariables(i);
             context.put(image, params.getImage());
             i++;
@@ -357,26 +355,21 @@ public class Op implements Serializable {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        str.append("(:action " + this.name.toString() + "\n");
-        str.append(":parameters (");
+        str.append("(:action ").append(this.name.toString()).append("\n").append(":parameters (");
         for (int i = 0; i < this.parameters.size() - 1; i++) {
-            str.append(this.parameters.get(i) + " ");
+            str.append(this.parameters.get(i)).append(" ");
         }
         if (!this.parameters.isEmpty()) {
             str.append(this.parameters.get(this.parameters.size() - 1).toString());
         }
         str.append(")");
         if (this.duration != null) {
-            str.append("\n:duration ");
-            str.append("\n  " + this.duration.toString());
-            str.append("\n:conditions ");
+            str.append("\n:duration ").append("\n  ").append(this.duration.toString()).append("\n:conditions ");
         } else {
             str.append("\n:precondition ");
         }
-        str.append("\n  " + this.preconditions.toString());
-        str.append("\n:effect ");
-        str.append("\n  " + this.effects.toString());
-        str.append("\n)");
+        str.append("\n  ").append(this.preconditions.toString()).append("\n:effect ").append("\n  ")
+            .append(this.effects.toString()).append("\n)");
         return str.toString();
     }
 }

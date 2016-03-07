@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the error manager used by the parser and java PDDL compiler.
@@ -89,9 +90,7 @@ public class ErrorManager implements Serializable {
      */
     private void print(Collection<Message> messages) {
         if (messages != null) {
-            for (Message message : messages) {
-                LOGGER.trace(message);
-            }
+            messages.forEach(LOGGER::trace);
         }
     }
 
@@ -109,13 +108,8 @@ public class ErrorManager implements Serializable {
      * @return The list of messages.
      */
     public Set<Message> getMessages(File file) {
-        Set<Message> messages = new LinkedHashSet<>();
-        for (Message message : this.msg) {
-            if (message.getFile().equals(file)) {
-                messages.add(message);
-            }
-        }
-        return messages;
+        return this.msg.stream().filter(message -> message.getFile().equals(file))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -126,13 +120,8 @@ public class ErrorManager implements Serializable {
      * @return The list of messages of a specific type concerning a specific file.
      */
     public Set<Message> getMessages(Message.Type type, File file) {
-        Set<Message> messages = new LinkedHashSet<>();
-        for (Message message : this.msg) {
-            if (message.getType().equals(type) && message.getFile().equals(file)) {
-                messages.add(message);
-            }
-        }
-        return messages;
+        return this.msg.stream().filter(message -> message.getType().equals(type) && message.getFile().equals(file))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -142,13 +131,8 @@ public class ErrorManager implements Serializable {
      * @return The list of messages of a specific type
      */
     public Set<Message> getMessages(Message.Type type) {
-        Set<Message> messages = new LinkedHashSet<>();
-        for (Message message : this.msg) {
-            if (message.getType().equals(type)) {
-                messages.add(message);
-            }
-        }
-        return messages;
+        return this.msg.stream().filter(message -> message.getType().equals(type))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**

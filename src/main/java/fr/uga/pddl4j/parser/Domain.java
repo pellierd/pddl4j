@@ -405,11 +405,7 @@ public class Domain implements Serializable {
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                for (Symbol s : t.getTypes()) {
-                    if (!s.equals(Parser.OBJECT)) {
-                        stack.push(this.getType(s));
-                    }
-                }
+                t.getTypes().stream().filter(s -> !s.equals(Parser.OBJECT)).forEach(s -> stack.push(this.getType(s)));
             }
         }
         return isSubType;
@@ -454,55 +450,47 @@ public class Domain implements Serializable {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append("(define (domain ");
-        str.append(this.name);
-        str.append(")");
-        str.append("\n(:requirements");
+        str.append("(define (domain ").append(this.name).append(")").append("\n(:requirements");
         for (RequireKey r : this.requirements) {
-            str.append(" " + r);
+            str.append(" ").append(r);
         }
         str.append(")\n");
         if (!this.types.isEmpty()) {
             str.append("(:types ");
-            for (TypedSymbol type : this.types) {
-                if (!type.equals(Parser.OBJECT) && !type.equals(Parser.NUMBER)) {
-                    str.append("\n  " + type);
-                }
-            }
+            this.types.stream().filter(type -> !type.equals(Parser.OBJECT) && !type.equals(Parser.NUMBER))
+                .forEach(type -> str.append("\n  ").append(type));
             str.append("\n)\n");
         }
         if (!this.constants.isEmpty()) {
             str.append("(:constants ");
             for (TypedSymbol c : this.constants) {
-                str.append("\n  " + c);
+                str.append("\n  ").append(c);
             }
             str.append("\n)\n");
         }
         if (!this.predicates.isEmpty()) {
             str.append("(:predicates ");
             for (NamedTypedList p : this.predicates) {
-                str.append("\n  " + p);
+                str.append("\n  ").append(p);
             }
             str.append("\n)\n");
         }
         if (!this.functions.isEmpty()) {
             str.append("(:functions ");
             for (NamedTypedList p : this.functions) {
-                str.append("\n  " + p);
+                str.append("\n  ").append(p);
             }
             str.append("\n  )\n");
         }
         if (this.constraints != null) {
-            str.append("(:constraints ");
-            str.append("  " + this.constraints);
-            str.append(")\n");
+            str.append("(:constraints ").append("  ").append(this.constraints).append(")\n");
         }
         for (DerivedPredicate dp : this.derivedPredicates) {
-            str.append(dp + "\n");
+            str.append(dp).append("\n");
         }
 
         for (Op op : this.ops) {
-            str.append(op + "\n");
+            str.append(op).append("\n");
         }
         str.append(")");
         return str.toString();
