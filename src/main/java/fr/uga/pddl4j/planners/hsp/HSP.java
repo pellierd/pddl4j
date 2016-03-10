@@ -214,7 +214,7 @@ public final class HSP {
                 strb.append(String.format("goal can be simplified to FALSE. no plan will solve it%n%n"));
             }
             strb.append(String.format("%ntime spent: %8.2f seconds encoding ("
-                + pb.getOperators().size() + " ops, " + pb.getRevelantFacts().size()
+                + pb.getOperators().size() + " ops, " + pb.getRelevantFacts().size()
                 + " facts)%n", this.preprocessingTime / 1000.0))
                 .append(String.format("            %8.2f seconds searching%n",
                     this.searchingTime / 1000.0))
@@ -233,7 +233,7 @@ public final class HSP {
             String pbFile = strArray[strArray.length - 1];
             String pbName = pbFile.substring(0, pbFile.indexOf("."));
             strb.append(String.format("%5s %8d %8d %8.2f %8.2f %10d", pbName, pb.getOperators().size(),
-                pb.getRevelantFacts().size(), this.preprocessingTime / 1000.0,
+                pb.getRelevantFacts().size(), this.preprocessingTime / 1000.0,
                 this.problemMemory / (1024.0 * 1024.0), this.nbOfExploredNodes));
             if (plan != null) {
                 strb.append(String.format("%8.2f %8.2f %8.2f %8.2f %5d%n", this.searchingTime / 1000.0,

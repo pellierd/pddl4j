@@ -81,10 +81,10 @@ final class PostInstantiation {
             PostInstantiation.extractRelevantFacts(op.getPreconditions(), relevants, init);
             PostInstantiation.extractRelevantFacts(op.getEffects(), relevants, init);
         }
-        Encoder.tableOfRevelantFacts = new ArrayList<>(relevants.size());
+        Encoder.tableOfRelevantFacts = new ArrayList<>(relevants.size());
         for (IntExp exp : relevants) {
             final IntExp relevant = new IntExp(exp);
-            Encoder.tableOfRevelantFacts.add(relevant);
+            Encoder.tableOfRelevantFacts.add(relevant);
         }
     }
 

@@ -192,7 +192,7 @@ public final class Encoder {
     /**
      * The table of the relevant facts.
      */
-    static List<IntExp> tableOfRevelantFacts;
+    static List<IntExp> tableOfRelevantFacts;
 
     /**
      * The list of instantiated operator encoded into bit sets.
@@ -459,9 +459,9 @@ public final class Encoder {
         // Create a map of the relevant facts with their index to speedup the bit set encoding of
         // the operators
         final Map<IntExp, Integer> map = new LinkedHashMap<>(
-            Encoder.tableOfRevelantFacts.size());
+            Encoder.tableOfRelevantFacts.size());
         int index = 0;
-        for (IntExp fact : Encoder.tableOfRevelantFacts) {
+        for (IntExp fact : Encoder.tableOfRelevantFacts) {
             map.put(fact, index);
             index++;
         }
@@ -520,7 +520,7 @@ public final class Encoder {
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicates(Encoder.tableOfPredicates);
-        codedProblem.setRevelantFacts(Encoder.tableOfRevelantFacts);
+        codedProblem.setRelevantFacts(Encoder.tableOfRelevantFacts);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
         codedProblem.setTypes(Encoder.tableOfTypes);
@@ -601,8 +601,8 @@ public final class Encoder {
      */
     static void printRelevantFactsTable(StringBuilder stringBuilder) {
         stringBuilder.append("selected the following facts as relevant:");
-        for (int i = 0; i < Encoder.tableOfRevelantFacts.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRevelantFacts.get(i)));
+        for (int i = 0; i < Encoder.tableOfRelevantFacts.size(); i++) {
+            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFacts.get(i)));
         }
     }
 
@@ -648,7 +648,7 @@ public final class Encoder {
     static String toString(final BitOp op) {
         return StringEncoder.toString(op, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
     }
 
     /**
@@ -672,7 +672,7 @@ public final class Encoder {
     static String toString(BitExp exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
     }
 
     /**
@@ -684,7 +684,7 @@ public final class Encoder {
     static String toString(CondBitExp exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRevelantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
     }
 
     /**

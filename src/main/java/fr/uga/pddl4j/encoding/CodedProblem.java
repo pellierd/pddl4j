@@ -87,7 +87,7 @@ public class CodedProblem {
     /**
      * The table of the relevant facts.
      */
-    private List<IntExp> revelantFacts;
+    private List<IntExp> relevantFacts;
 
     /**
      * The list of instantiated operator encoded into bit sets.
@@ -141,8 +141,8 @@ public class CodedProblem {
         }
         this.inertia = new ArrayList<>();
         this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
-        this.revelantFacts = new ArrayList<>();
-        this.revelantFacts.addAll(other.revelantFacts.stream().map(IntExp::new).collect(Collectors.toList()));
+        this.relevantFacts = new ArrayList<>();
+        this.relevantFacts.addAll(other.relevantFacts.stream().map(IntExp::new).collect(Collectors.toList()));
         this.operators = new ArrayList<>();
         this.operators.addAll(other.operators.stream().map(BitOp::new).collect(Collectors.toList()));
         this.goal = new BitExp(other.goal);
@@ -314,8 +314,8 @@ public class CodedProblem {
      *
      * @return the list of relevant facts used the problem.
      */
-    public final List<IntExp> getRevelantFacts() {
-        return this.revelantFacts;
+    public final List<IntExp> getRelevantFacts() {
+        return this.relevantFacts;
     }
 
     /**
@@ -323,8 +323,8 @@ public class CodedProblem {
      *
      * @param relavants the list of relevant facts to set.
      */
-    final void setRevelantFacts(final List<IntExp> relavants) {
-        this.revelantFacts = relavants;
+    final void setRelevantFacts(final List<IntExp> relavants) {
+        this.relevantFacts = relavants;
     }
 
     /**
@@ -410,7 +410,7 @@ public class CodedProblem {
      */
     public final String toString(final BitOp op) {
         return StringEncoder.toString(op, this.constants, this.types,
-            this.predicates, this.functions, this.revelantFacts);
+            this.predicates, this.functions, this.relevantFacts);
     }
 
     /**
@@ -444,7 +444,7 @@ public class CodedProblem {
      */
     public final String toString(BitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.revelantFacts);
+            this.predicates, this.functions, this.relevantFacts);
     }
 
     /**
@@ -455,6 +455,6 @@ public class CodedProblem {
      */
     public final String toString(CondBitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.revelantFacts);
+            this.predicates, this.functions, this.relevantFacts);
     }
 }

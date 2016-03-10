@@ -167,8 +167,8 @@ final class BitEncoding {
             IntExp dummyGoal = new IntExp(Connective.ATOM);
             dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);
-            final int dummyGoalIndex = Encoder.tableOfRevelantFacts.size();
-            Encoder.tableOfRevelantFacts.add(dummyGoal);
+            final int dummyGoalIndex = Encoder.tableOfRelevantFacts.size();
+            Encoder.tableOfRelevantFacts.add(dummyGoal);
             map.put(dummyGoal, dummyGoalIndex);
             newGoal = new BitExp();
             newGoal.getPositive().set(dummyGoalIndex);

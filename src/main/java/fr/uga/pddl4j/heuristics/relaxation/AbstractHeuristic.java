@@ -64,7 +64,7 @@ public abstract class AbstractHeuristic implements Heuristic {
         if (problem == null) {
             throw new NullPointerException("problem == null");
         }
-        this.facts = problem.getRevelantFacts();
+        this.facts = problem.getRelevantFacts();
         this.goal = problem.getGoal();
         this.operators = problem.getOperators();
         this.isAdmissible = true;

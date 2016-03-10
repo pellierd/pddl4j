@@ -61,7 +61,7 @@ public interface Heuristic {
      * @author D. Pellier
      * @version 1.0 - 09.02.2011
      */
-    enum Type {
+    enum  Type {
 
         /**
          * The type for the <code>AdjustedSum</code> heuristic.
