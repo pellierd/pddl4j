@@ -50,6 +50,16 @@ public abstract class AbstractCodedOp implements CodedOp {
     private boolean dummy;
 
     /**
+     * The cost of the operator.
+     */
+    private double cost;
+
+    /**
+     * The duration of the operator.
+     */
+    private double duration;
+
+    /**
      * Creates a new operator from an other.
      *
      * @param other the other operator.
@@ -65,24 +75,41 @@ public abstract class AbstractCodedOp implements CodedOp {
         this.instantiations = new int[other.getArity()];
         System.arraycopy(other.instantiations, 0, this.instantiations, 0, other.getArity());
         this.dummy = other.isDummy();
+        this.duration = other.getDuration();
+        this.cost = other.getCost();
     }
 
     /**
-     * Creates a new operator.
+     * Creates a new operator with a default cost and duration set to 1.0.
+     *
+     * @param name  the name of the operator.
+     * @param arity the arity of the operator.
+     * @param duration the duration ot the operator.
+     * @param cost the cost of the operator.
+     * @throws NullPointerException if <code>name == null</code>.
+     */
+    protected AbstractCodedOp(final String name, final int arity, final double duration, final double cost) {
+        this.setName(name);
+        this.parameters = new int[arity];
+        this.instantiations = new int[arity];
+        this.duration = duration;
+        this.cost = cost;
+        this.dummy = false;
+    }
+
+    /**
+     * Creates a new operator with a default cost and duration set to 1.0.
      *
      * @param name  the name of the operator.
      * @param arity the arity of the operator.
      * @throws NullPointerException if <code>name == null</code>.
      */
     protected AbstractCodedOp(final String name, final int arity) {
-        this.setName(name);
-        this.parameters = new int[arity];
-        this.instantiations = new int[arity];
-        this.dummy = false;
+        this(name, arity, CodedOp.DEFAULT_DURATION, CodedOp.DEFAULT_COST);
     }
 
     /**
-     * Creates a new operator.
+     * Creates a new operator. The default cost and duration of the operator is set to 1.0.
      *
      * @param name           the name of the operator.
      * @param parameters     the types of the parameters.
@@ -103,6 +130,8 @@ public abstract class AbstractCodedOp implements CodedOp {
         this.name = name;
         this.parameters = parameters;
         this.instantiations = instantiations;
+        this.cost = CodedOp.DEFAULT_COST;
+        this.duration = CodedOp.DEFAULT_DURATION;
         this.dummy = false;
     }
 
@@ -215,6 +244,46 @@ public abstract class AbstractCodedOp implements CodedOp {
      */
     public final void setDummy(boolean dummy) {
         this.dummy = dummy;
+    }
+
+    /**
+     * Returns the duration of the operator.
+     *
+     * @returns the duration of the operator.
+     */
+    @Override
+    public final double getDuration() {
+        return this.duration;
+    }
+
+    /**
+     * Sets the duration of the operator.
+     *
+     * @param duration the duration to set.
+     */
+    @Override
+    public final void setDuration(final double duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * Returns the cost of the operator.
+     *
+     * @return the cost of the operator.
+     */
+    @Override
+    public final double getCost() {
+        return this.cost;
+    }
+
+    /**
+     * Sets the cost of the operator.
+     *
+     * @param cost the cost to set.
+     */
+    @Override
+    public final void setCost(double cost) {
+        this.cost = cost;
     }
 
     /**

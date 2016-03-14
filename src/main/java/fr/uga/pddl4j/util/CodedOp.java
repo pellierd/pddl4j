@@ -30,6 +30,16 @@ import java.io.Serializable;
 public interface CodedOp extends Serializable {
 
     /**
+     * The default duration of an operator.
+     */
+    static final double DEFAULT_DURATION =  1.0;
+
+    /**
+     * The default cost of an operator.
+     */
+    static final double DEFAULT_COST =  1.0;
+
+    /**
      * Return the name of this operator.
      *
      * @return the name of this operator
@@ -88,5 +98,33 @@ public interface CodedOp extends Serializable {
      * @return the arity of the operator.
      */
     int getArity();
+
+    /**
+     * Returns the duration of the operator.
+     *
+     * @retun the duration of the operator.
+     */
+    double getDuration();
+
+    /**
+     * Sets the duration of the operator.
+     *
+     * @param duration the duration to set.
+     */
+    void setDuration(final double duration);
+
+    /**
+     * Returns the cost of the operator.
+     *
+     * @return the cost of the operator.
+     */
+    double getCost();
+
+    /**
+     * Sets the cost of the operator.
+     *
+     * @param cost the cost of the operator.
+     */
+    void setCost(final double cost);
 
 }
