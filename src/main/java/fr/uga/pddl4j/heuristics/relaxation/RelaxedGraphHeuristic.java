@@ -315,7 +315,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
             final BitVector newOps = new BitVector();
             // For each positive proposition of the proposition layer
             for (int p = ppk.nextSetBit(0); p >= 0; p = ppk.nextSetBit(p + 1)) {
-                // We get the operator that have this positive proposition as precondition
+                // We getActionSet the operator that have this positive proposition as precondition
                 final BitVector pEdges = this.precondEdges[p].getPositive();
                 // We mark the positive proposition p has explored
                 pAcc.set(p);
@@ -334,7 +334,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
             }
             // For each negative proposition of the proposition layer
             for (int p = npk.nextSetBit(0); p >= 0; p = npk.nextSetBit(p + 1)) {
-                // We get the operator that have this positive proposition as precondition
+                // We getActionSet the operator that have this positive proposition as precondition
                 final BitVector nEdges = this.precondEdges[p].getNegative();
                 // We mark the negative proposition p has explored
                 nAcc.set(p);

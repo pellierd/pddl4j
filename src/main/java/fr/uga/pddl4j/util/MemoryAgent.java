@@ -200,7 +200,7 @@ public class MemoryAgent {
                 try {
                     o = field.get(obj);
                 } catch (IllegalArgumentException | IllegalAccessException iargException) {
-                    throw new FatalException("Fatal error in field.get(obj) call", iargException);
+                    throw new FatalException("Fatal error in field.getActionSet(obj) call", iargException);
                 }
                 if (MemoryAgent.isComputable(field)) {
                     size += MemoryAgent.deepSizeOf(o, doneObj, depth + 1);

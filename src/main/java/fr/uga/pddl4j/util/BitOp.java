@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
  */
 public class BitOp extends AbstractCodedOp {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -144,7 +147,7 @@ public class BitOp extends AbstractCodedOp {
 
     /**
      * Returns the unconditional effects of the operator.
-     * TODO to remove: unused
+     *
      * @return the unconditional effects of the operator.
      */
     public BitExp getUnconditionalEffects() {

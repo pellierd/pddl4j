@@ -23,6 +23,7 @@ import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
+import fr.uga.pddl4j.util.Plan;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -456,5 +457,32 @@ public class CodedProblem {
     public final String toString(CondBitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.relevantFacts);
+    }
+
+    /**
+     * Return a string representation of a plan.
+     *
+     * @param plan the plan.
+     * @return a string representation of the specified plan.
+     */
+    public final String toString(final Plan plan) {
+        int max = Integer.MIN_VALUE;
+        for (Integer t : plan.timeSpecifiers()) {
+            for (BitOp a : plan.getActionSet(t)) {
+                int length = this.toShortString(a).length();
+                if (max < length) {
+                    max = length;
+                }
+            }
+        }
+        final int actionSize = max;
+        final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
+
+        StringBuffer str = new StringBuffer();
+        plan.timeSpecifiers().forEach(time ->
+            plan.getActionSet(time).forEach(a ->
+                str.append(String.format("%0" + timeSpecifierSize + "d: %" + actionSize + "s [%4.2f]%n",
+                        time, this.toShortString(a), a.getDuration()))));
+        return str.toString();
     }
 }

@@ -31,6 +31,7 @@ import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,8 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Properties;
@@ -192,7 +191,7 @@ public final class HSP {
      */
     public void search(final CodedProblem pb) {
 
-        List<String> plan = null;
+        SequentialPlan plan = null;
         if (pb.isSolvable()) {
             plan = this.aStarSearch(pb);
         }
@@ -204,9 +203,7 @@ public final class HSP {
             if (pb.isSolvable()) {
                 if (plan != null) {
                     strb.append(String.format("%nfound plan as follows:%n%n"));
-                    for (int i = 0; i < plan.size(); i++) {
-                        strb.append(String.format("time step %4d: %s%n", i, plan.get(i)));
-                    }
+                    strb.append(pb.toString(plan));
                 } else {
                     strb.append(String.format("%nno plan found%n%n"));
                 }
@@ -256,7 +253,7 @@ public final class HSP {
      * @param problem the coded planning problem to solve.
      * @return a solution plan or null if it does not exist.
      */
-    private List<String> aStarSearch(final CodedProblem problem) {
+    private SequentialPlan aStarSearch(final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic.Type type = (Heuristic.Type) this.arguments.get(HSP.Argument.HEURISTIC_TYPE);
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(type, problem);
@@ -274,7 +271,7 @@ public final class HSP {
         // Adds the root to the list of pending nodes
         open.add(root);
         openSet.put(init, root);
-        List<String> plan = null;
+        SequentialPlan plan = null;
 
         final int cpuTime = (Integer) this.arguments.get(HSP.Argument.CPU_TIME);
         // Start of the search
@@ -348,17 +345,17 @@ public final class HSP {
     /**
      * Extracts a plan from a specified node.
      *
-     * @param node    the node.
+     * @param node the node.
      * @param problem the problem.
      * @return the plan extracted from the specified node.
      */
-    private List<String> extract(final Node node, final CodedProblem problem) {
+    private SequentialPlan extract(final Node node, final CodedProblem problem) {
         Node n = node;
-        final LinkedList<String> plan = new LinkedList<>();
+        final SequentialPlan plan = new SequentialPlan();
         while (n.getOperator() != -1) {
             final BitOp op = problem.getOperators().get(n.getOperator());
             if (!op.isDummy()) {
-                plan.addFirst(problem.toShortString(op));
+                plan.add(0, op);
             }
             n = n.getParent();
         }
@@ -578,8 +575,6 @@ public final class HSP {
      * Node comparator class for HSP planner.
      */
     private static class NodeComparator implements Comparator<Node>, Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         /**
          * The weight of the heuristic use for the comparison.
