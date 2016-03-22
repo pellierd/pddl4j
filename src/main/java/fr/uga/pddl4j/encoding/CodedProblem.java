@@ -478,7 +478,7 @@ public class CodedProblem {
         final int actionSize = max;
         final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
 
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         plan.timeSpecifiers().forEach(time ->
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: %" + actionSize + "s [%4.2f]%n",

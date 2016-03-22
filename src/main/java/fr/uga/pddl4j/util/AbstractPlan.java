@@ -45,6 +45,7 @@ public abstract class AbstractPlan implements Plan {
      *
      * @return the size of the plan.
      */
+    @Override
     public final int size() {
         return this.timeSpecifiers().stream().mapToInt(t -> this.getActionSet(t).size()).sum();
     }
@@ -54,6 +55,7 @@ public abstract class AbstractPlan implements Plan {
      *
      * @retun the cost of the plan.
      */
+    @Override
     public double cost() {
         return this.timeSpecifiers().stream().mapToDouble(t ->
             this.getActionSet(t).stream().mapToDouble(a -> a.getCost()).sum()).sum();

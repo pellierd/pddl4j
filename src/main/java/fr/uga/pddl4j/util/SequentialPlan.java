@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -105,7 +106,7 @@ public class SequentialPlan extends AbstractPlan {
     @Override
     public final Set<BitOp> getActionSet(final int time) {
         if (this.isTimeSpecifierOutOfBound(time)) {
-            return null;
+            return Collections.emptySet();
         }
         Set<BitOp> ts = new HashSet<>();
         ts.add(this.actions.get(time));

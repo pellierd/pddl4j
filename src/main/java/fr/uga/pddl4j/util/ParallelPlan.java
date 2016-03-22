@@ -16,9 +16,11 @@
 package fr.uga.pddl4j.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 
 /**
  * This class implements a parallel plan based on the Graphplan planner semantic. A parallel plan in the Graphplan
@@ -90,9 +92,9 @@ public class ParallelPlan extends AbstractPlan {
      */
     @Override
     public final List<BitOp> actions() {
-        List<BitOp> actions = new ArrayList<>();
-        this.actions.forEach(actions::addAll);
-        return actions;
+        List<BitOp> acts = new ArrayList<>();
+        this.actions.forEach(acts::addAll);
+        return acts;
     }
 
     /**
@@ -106,7 +108,7 @@ public class ParallelPlan extends AbstractPlan {
     @Override
     public final Set<BitOp> getActionSet(final int time) {
         if (this.isTimeSpecifierOutOfBound(time)) {
-            return null;
+            return Collections.emptySet();
         }
         return this.getActionSet(time);
     }
@@ -168,6 +170,7 @@ public class ParallelPlan extends AbstractPlan {
      *     <code>false</code> otherwise.
      * @see Plan#contains(int, BitOp)
      */
+    @Override
     public final boolean contains(final int time, final BitOp action) {
         return !this.isTimeSpecifierOutOfBound(time) && this.actions.get(time).contains(action);
     }
@@ -177,6 +180,7 @@ public class ParallelPlan extends AbstractPlan {
      *
      * @see Plan#clear()
      */
+    @Override
     public final void clear() {
         this.actions.clear();
     }
