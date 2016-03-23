@@ -106,7 +106,7 @@ public class SequentialPlan extends AbstractPlan {
     @Override
     public final Set<BitOp> getActionSet(final int time) {
         if (this.isTimeSpecifierOutOfBound(time)) {
-            return Collections.emptySet();
+            return null;
         }
         Set<BitOp> ts = new HashSet<>();
         ts.add(this.actions.get(time));
