@@ -15,12 +15,7 @@
 
 package fr.uga.pddl4j.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * This class implements a temporal plan.
@@ -35,7 +30,7 @@ public class TemporalPlan extends AbstractPlan {
     /**
      * The list used to store the actions contained in the plan.
      */
-    private Map<Integer, Set<BitOp>> actions;
+    private TreeMap<Integer, Set<BitOp>> actions;
 
     /**
      * Creates a new empty temporal plan.
@@ -65,8 +60,15 @@ public class TemporalPlan extends AbstractPlan {
      */
     @Override
     public final double makespan() {
-        //TO DO
-        return 0.0;
+        double makespan = 0.0;
+        if (!this.isEmpty()) {
+            final int start = this.actions.firstKey();
+            final int last = this.actions.lastKey();
+            final BitOp action = this.actions.lastEntry().getValue().stream().max(
+                Comparator.comparing(a -> a.getDuration())).get();
+            makespan = last + action.getDuration() - start;
+        }
+        return makespan;
     }
 
     /**
