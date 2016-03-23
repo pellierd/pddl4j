@@ -401,6 +401,7 @@ public final class HSP {
      *                - memory used for problem representation in MBytes
      *                - number of states explored
      *                - searching time in seconds
+     *                - total time in seconds
      *                - memory used for searching in MBytes
      *                - global memory used in MBytes
      *                - solution plan length
@@ -548,6 +549,7 @@ public final class HSP {
             .append("               - memory used for problem representation in MBytes\n")
             .append("               - number of states explored\n")
             .append("               - searching time in seconds\n")
+            .append("               - total time in seconds\n")
             .append("               - memory used for searching in MBytes\n")
             .append("               - global memory used in MBytes\n")
             .append("               - solution plan length\n")
