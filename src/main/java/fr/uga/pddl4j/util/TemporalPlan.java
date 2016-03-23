@@ -15,8 +15,12 @@
 
 package fr.uga.pddl4j.util;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * This class implements a temporal plan.
@@ -26,7 +30,7 @@ import java.util.*;
  *
  * @since 3.0
  */
-public class TemporalPlan extends AbstractPlan{
+public class TemporalPlan extends AbstractPlan {
 
     /**
      * The list used to store the actions contained in the plan.

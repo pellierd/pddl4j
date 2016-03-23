@@ -108,7 +108,7 @@ public class SequentialPlan extends AbstractPlan {
         if (this.isTimeSpecifierOutOfBound(time)) {
             return null;
         }
-        Set<BitOp> ts = new HashSet<>();
+        final Set<BitOp> ts = new HashSet<>();
         ts.add(this.actions.get(time));
         return ts;
     }
