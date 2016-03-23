@@ -16,11 +16,10 @@
 package fr.uga.pddl4j.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-
 
 /**
  * This class implements a parallel plan based on the Graphplan planner semantic. A parallel plan in the Graphplan
@@ -108,7 +107,7 @@ public class ParallelPlan extends AbstractPlan {
     @Override
     public final Set<BitOp> getActionSet(final int time) {
         if (this.isTimeSpecifierOutOfBound(time)) {
-            return Collections.emptySet();
+            return null;
         }
         return this.getActionSet(time);
     }
@@ -183,6 +182,37 @@ public class ParallelPlan extends AbstractPlan {
     @Override
     public final void clear() {
         this.actions.clear();
+    }
+
+    /**
+     * Returns if the plan is equal to an other object. A plan is equal to an other object if the object is an instance
+     * of the same class and have the same action at the same time specifier. The equals method uses the equal method of
+     * the class BitOp to compare actions.
+     *
+     * @param obj the object to be compared.
+     *
+     * @return <code>true</code> if this plan is equal to the specified object; <code>false</code> otherwise.
+     * @see BitOp#equals(Object)
+     * @see java.lang.Object#equals(Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && this.getClass() == obj.getClass()) {
+            final ParallelPlan other = (ParallelPlan) obj;
+            return Objects.equals(actions, other.actions);
+        }
+        return false;
+    }
+
+    /**
+     * Returns the hash code of this plan.
+     *
+     * @return the hash code of this plan.
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(actions);
     }
 
     /**
