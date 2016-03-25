@@ -21,6 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
+import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.RequireKey;
@@ -469,7 +470,7 @@ public final class Encoder {
         // Creates the list of bit operators
         Encoder.operators = new ArrayList<>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
         // Encode the goal in bit set representation
-        if (!intGoal.getChildren().isEmpty()) { // Case where the goal was not already simplify to TRUE
+        if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM)) {
             try {
                 Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
             } catch (UnexpectedExpressionException uee) {
