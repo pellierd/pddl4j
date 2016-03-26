@@ -118,7 +118,8 @@ import java.util.Set;
  * Revisions:
  * <ul>
  * <li>23.01.2013: add of the case when the goal can be simplified to TRUE. The coded problem
- * returned contained in that case an empty goal expression (<code>BitExp.isEmpty()</code>). </li>
+ * returned contained in that case an empty goal expression (<code>BitExp.isEmpty()</code>).</li>
+ * <li>25.03.2016: Fix bug when the goal contains only one atom.</li>
  * </ul>
  * </p>
  *
