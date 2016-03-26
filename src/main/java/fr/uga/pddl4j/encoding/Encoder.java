@@ -341,10 +341,7 @@ public final class Encoder {
             for (IntExp f : intInit) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\n\nCoded goal state:\n").append("(and");
-            for (IntExp g : intGoal.getChildren()) {
-                stringBuilder.append(" ").append(Encoder.toString(g));
-            }
+            stringBuilder.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
             stringBuilder.append(")").append("\n\nCoded operators:\n\n");
             for (IntOp op : intOps) {
                 stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
