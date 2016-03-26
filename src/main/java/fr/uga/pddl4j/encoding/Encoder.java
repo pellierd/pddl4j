@@ -337,15 +337,15 @@ public final class Encoder {
 
         // Just for logging
         if (Encoder.logLevel == 2) {
-            stringBuilder.append("\nCoded initial state:").append("(and");
+            stringBuilder.append("\nCoded initial state:\n").append("(and");
             for (IntExp f : intInit) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\nCoded goal state:").append("(and");
+            stringBuilder.append(")").append("\n\nCoded goal state:\n").append("(and");
             for (IntExp g : intGoal.getChildren()) {
                 stringBuilder.append(" ").append(Encoder.toString(g));
             }
-            stringBuilder.append(")").append("\nCoded operators:");
+            stringBuilder.append(")").append("\n\nCoded operators:\n\n");
             for (IntOp op : intOps) {
                 stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
             }
@@ -379,16 +379,16 @@ public final class Encoder {
             Encoder.printTableOfConstants(stringBuilder);
             stringBuilder.append(System.lineSeparator());
             Encoder.printTableOfTypes(stringBuilder);
-            stringBuilder.append(System.lineSeparator()).append("\nPre-instantiation initial state:").append("(and");
+            stringBuilder.append(System.lineSeparator()).append("\nPre-instantiation initial state:\n").append("(and");
             for (IntExp f : intInit) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\nPre-instantiation goal state:").append("(and");
+            stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append("(and");
             for (IntExp g : intGoal.getChildren()) {
                 stringBuilder.append(" ").append(Encoder.toString(g));
             }
-            stringBuilder.append("\nPre-instantiation operators with infered types (").append(intOps.size())
-                .append(" ops):");
+            stringBuilder.append("\n\nPre-instantiation operators with infered types (").append(intOps.size())
+                .append(" ops):\n");
             for (IntOp op : intOps) {
                 stringBuilder.append(Encoder.toString(op));
             }
@@ -414,18 +414,18 @@ public final class Encoder {
             stringBuilder.append(System.lineSeparator());
             Encoder.printTableOfTypes(stringBuilder);
             stringBuilder.append(System.lineSeparator());
-            stringBuilder.append("\nPre-instantiation initial state:").append("(and");
+            stringBuilder.append("\nPre-instantiation initial state:\n").append("(and");
             for (IntExp f : intInit) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\nPre-instantiation goal state:").append("(and");
+            stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append("(and");
             for (final IntExp g : intGoal.getChildren()) {
                 stringBuilder.append(" ").append(Encoder.toString(g));
             }
-            stringBuilder.append("\nPre-instantiation operators with inferred types (").append(intOps.size())
-                .append(" ops):");
+            stringBuilder.append("\n\nPre-instantiation operators with inferred types (").append(intOps.size())
+                .append(" ops):\n\n");
             for (final IntOp op : intOps) {
-                stringBuilder.append(Encoder.toString(op));
+                stringBuilder.append(Encoder.toString(op)).append("\n");
             }
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
@@ -460,8 +460,7 @@ public final class Encoder {
 
         // Create a map of the relevant facts with their index to speedup the bit set encoding of
         // the operators
-        final Map<IntExp, Integer> map = new LinkedHashMap<>(
-            Encoder.tableOfRelevantFacts.size());
+        final Map<IntExp, Integer> map = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
         int index = 0;
         for (IntExp fact : Encoder.tableOfRelevantFacts) {
             map.put(fact, index);
@@ -538,13 +537,14 @@ public final class Encoder {
      * Print the table of types.
      */
     static void printTableOfTypes(StringBuilder stringBuilder) {
-        stringBuilder.append("Types table:");
+        stringBuilder.append("Types table:\n");
         for (int i = 0; i < Encoder.tableOfTypes.size(); i++) {
             stringBuilder.append(i).append(": ").append(Encoder.tableOfTypes.get(i)).append(":");
             Set<Integer> domain = Encoder.tableOfDomains.get(i);
             for (Integer constant : domain) {
                 stringBuilder.append(" ").append(constant);
             }
+            stringBuilder.append("\n");
         }
     }
 
@@ -552,9 +552,9 @@ public final class Encoder {
      * Print the table of constants.
      */
     static void printTableOfConstants(StringBuilder stringBuilder) {
-        stringBuilder.append("Constants table:");
+        stringBuilder.append("Constants table:\n");
         for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.tableOfConstants.get(i));
+            stringBuilder.append(i).append(": ").append(Encoder.tableOfConstants.get(i)).append("\n");
         }
     }
 
@@ -562,7 +562,7 @@ public final class Encoder {
      * Print the table of predicates.
      */
     static void printTableOfPredicates(StringBuilder stringBuilder) {
-        stringBuilder.append("Predicates table:");
+        stringBuilder.append("Predicates table:\n");
         for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
             String predicate = Encoder.tableOfPredicates.get(i);
             stringBuilder.append(i).append(": ").append(predicate).append(" :");
@@ -570,6 +570,7 @@ public final class Encoder {
                 stringBuilder.append(" ")
                     .append(Encoder.tableOfTypes.get(Encoder.tableOfTypedPredicates.get(i).get(j)));
             }
+            stringBuilder.append("\n");
         }
     }
 
@@ -577,13 +578,14 @@ public final class Encoder {
      * Print the table of functions.
      */
     static void printTableOfFunctions(StringBuilder stringBuilder) {
-        stringBuilder.append("Functions table:");
+        stringBuilder.append("Functions table:\n");
         for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
             String predicate = Encoder.tableOfFunctions.get(i);
             stringBuilder.append(i).append(": ").append(predicate).append(":");
             for (int j = 0; j < Encoder.tableOfTypedFunctions.get(i).size(); j++) {
                 stringBuilder.append(" ").append(Encoder.tableOfTypes.get(Encoder.tableOfTypedFunctions.get(i).get(j)));
             }
+            stringBuilder.append("\n");
         }
     }
 
@@ -591,10 +593,11 @@ public final class Encoder {
      * Print the table of inertia.
      */
     static void printTableOfInertia(StringBuilder stringBuilder) {
-        stringBuilder.append("Inertias table:");
+        stringBuilder.append("Inertias table:\n");
         for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
             String predicate = Encoder.tableOfPredicates.get(i);
             stringBuilder.append(i).append(": ").append(predicate).append(" : ").append(Encoder.tableOfInertia.get(i));
+            stringBuilder.append("\n");
         }
     }
 
@@ -602,9 +605,10 @@ public final class Encoder {
      * Print the relevant facts table.
      */
     static void printRelevantFactsTable(StringBuilder stringBuilder) {
-        stringBuilder.append("selected the following facts as relevant:");
+        stringBuilder.append("selected the following facts as relevant:\n");
         for (int i = 0; i < Encoder.tableOfRelevantFacts.size(); i++) {
             stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFacts.get(i)));
+            stringBuilder.append("\n");
         }
     }
 
@@ -612,9 +616,10 @@ public final class Encoder {
      * Print the goal.
      */
     static void printGoal(StringBuilder stringBuilder) {
-        stringBuilder.append("Goal state is:");
+        stringBuilder.append("Goal state is:\n");
         for (BitExp exp : Encoder.codedGoal) {
             stringBuilder.append(Encoder.toString(exp));
+            stringBuilder.append("\n");
         }
     }
 

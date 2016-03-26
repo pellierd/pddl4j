@@ -168,7 +168,8 @@ public final class HSP {
         if (traceLevel > 0 && traceLevel != 8) {
             StringBuilder strb = new StringBuilder();
             strb.append("\nParsing domain file \"").append(new File(ops).getName()).append("\" done successfully")
-                .append("\nParsing problem file \"").append(new File(facts).getName()).append("\" done successfully\n");
+                .append("\nParsing problem file \"").append(new File(facts).getName()).append("\" done successfully")
+                .append("\n\n");
             LOGGER.trace(strb);
         }
         if (traceLevel == 8) {
