@@ -380,10 +380,7 @@ public final class Encoder {
             for (IntExp f : intInit) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append("(and");
-            for (IntExp g : intGoal.getChildren()) {
-                stringBuilder.append(" ").append(Encoder.toString(g));
-            }
+            stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
             stringBuilder.append("\n\nPre-instantiation operators with infered types (").append(intOps.size())
                 .append(" ops):\n");
             for (IntOp op : intOps) {
