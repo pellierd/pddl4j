@@ -826,7 +826,7 @@ public class Exp implements Serializable {
         boolean malformed = false;
         switch (this.connective) {
             case EQUAL_ATOM:
-                malformed = this.atom.size() == 2;
+                malformed = this.atom.size() != 2;
                 break;
             case FORALL:
             case EXISTS:
