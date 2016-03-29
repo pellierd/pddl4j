@@ -426,10 +426,9 @@ public final class HSP {
                 // Search for a solution and print the result
                 planner.search(problem);
             }
-        } catch (FileNotFoundException | ParseException exept) {
-            LOGGER.error(exept.getMessage(), exept);
+        } catch (FileNotFoundException | ParseException exp) {
+            System.out.println(exp.getMessage());
         } catch (UsageException uex) {
-            LOGGER.info(uex);
             HSP.printUsage();
         }
     }
