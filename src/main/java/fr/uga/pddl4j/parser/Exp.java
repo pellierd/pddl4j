@@ -292,7 +292,7 @@ public class Exp implements Serializable {
      *
      * @return the value of this parser node.
      */
-    public final double getValue() {
+    public final Double getValue() {
         return this.value;
     }
 
