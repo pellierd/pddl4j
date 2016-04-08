@@ -208,6 +208,10 @@ public enum Connective {
      */
     HOLD_AFTER("hold-after"),
     /**
+     * The connective for the function term.
+     */
+    FUNCTION_TERM(""),
+    /**
      * The connective for expression of type TRUE.
      */
     TRUE("true"),

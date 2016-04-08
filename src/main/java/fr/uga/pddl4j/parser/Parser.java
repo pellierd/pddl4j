@@ -1141,8 +1141,8 @@ public final class Parser {
             }
         } else {
             strb.append("\nusage of parser:\n").append("OPTIONS   DESCRIPTIONS\n")
-                .append("-p <str>    path for operator and fact file")
-                .append("-o <str>    operator file name")
+                .append("-p <str>    path for operator and fact file\n")
+                .append("-o <str>    operator file name\n")
                 .append("-f <str>    fact file name\n");
         }
 

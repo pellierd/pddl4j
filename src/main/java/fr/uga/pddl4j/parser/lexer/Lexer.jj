@@ -881,8 +881,13 @@ Symbol functor() :
 	Token t;
 }
 {
-	(t=<SYMBOL> | t=<TOTAL_COST>) {
-		return new Symbol(Symbol.Kind.FUNCTOR, t);
+	( t=<SYMBOL>
+	| t=<TOTAL_COST>
+	| t=<AT>
+	| t=<END>
+    | t=<START>
+    | t=<OVER>) {
+	    return new Symbol(Symbol.Kind.FUNCTOR, t);
 	}
 }
 
@@ -931,19 +936,11 @@ List<Symbol> function_type() :
 			typesList.add(new Symbol(Symbol.Kind.TYPE, token));
 			return typesList;
 		}
-	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.OBJECT_FLUENTS) || this.isRequirement(RequireKey.FLUENTS)})
-		token=<OBJECT_TYPE> {
-			typesList.add(new Symbol(Symbol.Kind.TYPE, token));
-			return typesList;
-		}
-	|  LOOKAHEAD(2, {this.isRequirement(RequireKey.OBJECT_FLUENTS) || this.isRequirement(RequireKey.FLUENTS)})
-		left_bracket() <EITHER>
-		(LOOKAHEAD(2) symbol=primitive_type() {
-				typesList.add(symbol);
-		})+
-		right_bracket() {
-			return typesList;
-		}
+	| 	LOOKAHEAD(2, {(this.isRequirement(RequireKey.TYPING) && this.isRequirement(RequireKey.OBJECT_FLUENTS))
+        	                    || this.isRequirement(RequireKey.FLUENTS)})
+		    typesList=type() {
+		        return typesList;
+        }
 }
 
 Exp con_gd() :
@@ -1974,15 +1971,16 @@ Exp p_effect() :
 }
 {
  	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
-			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) node=assign_op()
-	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.ACTION_COSTS) }) node=increase_total_cost()
+    			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+    			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) node=assign_op()
+    	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.ACTION_COSTS) }) node=increase_total_cost()
 
 
-	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
-	) {
-		return node;
-	}
+    	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
+    	) {
+    		return node;
+    	}
+
 }
 
 Exp increase_total_cost() :
