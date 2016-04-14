@@ -328,7 +328,7 @@ public final class HSP extends AbstractPlanner {
             // Encodes and instantiates the problem in a compact representation
             begin = System.currentTimeMillis();
             final CodedProblem pb = factory.encode();
-            planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+            planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
             planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
             planner.getStatistics().setNumberOfActions(pb.getOperators().size());
             planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
