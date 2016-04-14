@@ -152,7 +152,7 @@ public final class HSP extends AbstractPlanner {
         openSet.put(init, root);
         SequentialPlan plan = null;
 
-        final int timeout = this.getTimeout();
+        final int timeout = this.getTimeout() * 1000;
         long time = 0;
         // Start of the search
         while (!open.isEmpty() && plan == null && time < timeout) {
