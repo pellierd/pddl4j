@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * This class implements a sequential plan. Actions in a sequential plan mus be consecutive.
+ * This class implements a sequential plan. Actions in a sequential plan must be consecutive.
  *
  * @author D. Pellier
  * @version 1.0 - 15.03.2016

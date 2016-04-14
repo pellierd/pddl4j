@@ -21,6 +21,8 @@ package fr.uga.pddl4j.planners.hsp;
 
 import fr.uga.pddl4j.util.BitState;
 
+import java.util.Comparator;
+
 /**
  * This class implements a node of the tree search.
  *
@@ -28,8 +30,6 @@ import fr.uga.pddl4j.util.BitState;
  * @version 1.0 - 14.06.2010
  */
 public final class Node extends BitState {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The parent node of this node.
@@ -151,23 +151,37 @@ public final class Node extends BitState {
 
     /**
      * Returns the value of the heuristic function, i.e.,
-     * <code>this.node.getCost() + this.node.getHeuristic()</code>.
+     * <code>this.node.getCost() + weight * this.node.getHeuristic()</code>.
      *
      * @param weight the weight of the heuristic.
      * @return the value of the heuristic function, i.e.,
      * <code>this.node.getCost() + this.node.getHeuristic()</code>.
      */
-    public final double getValueF(double weight) {
+    public final double getFValue(double weight) {
         return weight * this.heuristic + this.cost;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    /**
+     * Returns if a node is equal to an other object. The equals method has the same behaviour as the equals method of
+     * the class BitState.
+     *
+     * @param obj the other oject.
+     * @return <code>true</code> if the node is equal to the other specified object; <code>false</code> otherwise.
+     * @see BitState#equals(Object)
+     */
+    public boolean equals(final Object obj) {
         return super.equals(obj);
     }
 
-    @Override
+    /**
+     * Returns the hash code value of the node. The hashcode method has the same behaviour as the hashcode method of
+     * the class BitState.
+     *
+     * @return the hashcode value for this node.
+     * @see BitState#hashCode()
+     */
     public int hashCode() {
         return super.hashCode();
     }
+
 }

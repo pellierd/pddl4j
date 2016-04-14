@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.util;
 
 /**
- * This abstract class implements the main methods of a plan.
+ * This abstract class implements the main methods of a search.
  *
  * @author D. Pellier
  * @version 1.0 - 14.03.2016
@@ -26,14 +26,14 @@ package fr.uga.pddl4j.util;
 public abstract class AbstractPlan implements Plan {
 
     /**
-     * Creates a new empty plan.
+     * Creates a new empty search.
      */
     protected AbstractPlan() {
         super();
     }
 
     /**
-     * Creates a new plan from a an other one. The new plan is a deep copy of the specified plan in parameter.
+     * Creates a new search from a an other one. The new search is a deep copy of the specified search in parameter.
      */
     protected AbstractPlan(final Plan other) {
         this();
@@ -41,9 +41,9 @@ public abstract class AbstractPlan implements Plan {
     }
 
     /**
-     * Returns the size of the plan. The size of the plan is its number of actions.
+     * Returns the size of the search. The size of the search is its number of actions.
      *
-     * @return the size of the plan.
+     * @return the size of the search.
      */
     @Override
     public final int size() {
@@ -51,9 +51,9 @@ public abstract class AbstractPlan implements Plan {
     }
 
     /**
-     * Returns the cost of the plan. The cost of a plan is the sum of the cost of its actions.
+     * Returns the cost of the search. The cost of a search is the sum of the cost of its actions.
      *
-     * @retun the cost of the plan.
+     * @retun the cost of the search.
      */
     @Override
     public double cost() {
@@ -62,9 +62,9 @@ public abstract class AbstractPlan implements Plan {
     }
 
     /**
-     * Returns if the plan is empty.
+     * Returns if the search is empty.
      *
-     * @return <code>true</code> if the plan is empty; <code>false</code> otherwise.
+     * @return <code>true</code> if the search is empty; <code>false</code> otherwise.
      * @see Plan#isEmpty()
      */
     @Override

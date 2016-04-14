@@ -20,29 +20,31 @@
 package fr.uga.pddl4j.planners.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.Encoder;
-import fr.uga.pddl4j.exceptions.ParseException;
-import fr.uga.pddl4j.exceptions.UsageException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.parser.Problem;
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.planner.AbstractPlanner;
+import fr.uga.pddl4j.planner.ProblemFactory;
+import fr.uga.pddl4j.planner.Statistics;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Properties;
+
 
 /**
  * This class implements a simple forward planner based on A* algorithm.
@@ -50,222 +52,98 @@ import java.util.Properties;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class HSP {
+public final class HSP extends AbstractPlanner {
 
+    /**
+     * The logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(HSP.class);
 
     /**
      * The default heuristic.
      */
-    private static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
+    public static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
 
-    /**
-     * The default CPU time allocated to the search in seconds.
-     */
-    private static final int DEFAULT_CPU_TIME = 600;
-
-    /**
+    /*
      * The default weight of the heuristic.
      */
-    private static final double DEFAULT_WHEIGHT = 1.00;
+    public static final double DEFAULT_WEIGHT = 1.0;
 
     /**
-     * The default trace level.
+     * The type of heuristics that must use to solve the problem.
      */
-    private static final int DEFAULT_TRACE_LEVEL = 1;
+    private Heuristic.Type heuristic;
 
     /**
-     * The enumeration of the arguments of the planner.
+     * The weight set to the heuristic.
      */
-    private enum Argument {
-        /**
-         * The planning domain.
-         */
-        DOMAIN,
-        /**
-         * The planning problem.
-         */
-        PROBLEM,
-        /**
-         * The heuristic to use.
-         */
-        HEURISTIC_TYPE,
-        /**
-         * The weight of the heuristic.
-         */
-        WEIGHT,
-        /**
-         * The global time slot allocated to the search.
-         */
-        CPU_TIME,
-        /**
-         * The trace level.
-         */
-        TRACE_LEVEL
+    private double weight;
+
+    /**
+     * Creates a new HSP planner with the default parameters.
+     */
+    private HSP() {
+        super();
+        this.setHeuristic(HSP.DEFAULT_HEURISTIC);
+        this.setWeight(HSP.DEFAULT_WEIGHT);
     }
 
     /**
-     * The time needed to search a solution plan.
-     */
-    private long searchingTime;
-
-    /**
-     * The time needed to encode the planning problem.
-     */
-    private long preprocessingTime;
-
-    /**
-     * The memory used in bytes to search a solution plan.
-     */
-    private long searchingMemory;
-
-    /**
-     * The memory used in bytes to encode problem.
-     */
-    private long problemMemory;
-
-    /**
-     * The number of node explored.
-     */
-    private int nbOfExploredNodes;
-
-    /**
-     * The arguments of the planner.
-     */
-    private Properties arguments;
-
-    /**
-     * Creates a new planner.
+     * Returns the heuristic to use to solve the planning problem.
      *
-     * @param arguments the arguments of the planner.
+     * @return the heuristic to use to solve the planning problem.
+     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
      */
-    private HSP(final Properties arguments) {
-        this.arguments = arguments;
+    public final Heuristic.Type getHeuristic() {
+        return this.heuristic;
     }
 
     /**
-     * This method parses the PDDL files and encodes the corresponding planning problem into a
-     * compact representation.
+     * Sets the heuristic to use to solved the problem.
      *
-     * @return the encoded problem.
+     * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
-    public CodedProblem parseAndEncode() {
-        final Parser parser = new Parser();
-        final String ops = (String) this.arguments.get(HSP.Argument.DOMAIN);
-        final String facts = (String) this.arguments.get(HSP.Argument.PROBLEM);
-        try {
-            parser.parse(ops, facts);
-        } catch (FileNotFoundException fnfException) {
-            LOGGER.error(fnfException);
-        }
-        if (!parser.getErrorManager().isEmpty()) {
-            parser.getErrorManager().printAll();
-            return null;
-        }
-        final Domain domain = parser.getDomain();
-        final Problem problem = parser.getProblem();
-        final int traceLevel = (Integer) this.arguments.get(HSP.Argument.TRACE_LEVEL);
-        if (traceLevel > 0 && traceLevel != 8) {
-            StringBuilder strb = new StringBuilder();
-            strb.append("\nParsing domain file \"").append(new File(ops).getName()).append("\" done successfully")
-                .append("\nParsing problem file \"").append(new File(facts).getName()).append("\" done successfully")
-                .append("\n\n");
-            LOGGER.trace(strb);
-        }
-        if (traceLevel == 8) {
-            Encoder.setLogLevel(0);
-        } else {
-            Encoder.setLogLevel(Math.max(0, traceLevel - 1));
-        }
-        long begin = System.currentTimeMillis();
-        final CodedProblem pb = Encoder.encode(domain, problem);
-        long end = System.currentTimeMillis();
-        this.preprocessingTime = end - begin;
-        this.problemMemory = MemoryAgent.deepSizeOf(pb);
-        return pb;
+    public final void setHeuristic(final Heuristic.Type heuristic) {
+        Objects.requireNonNull(heuristic);
+        this.heuristic = heuristic;
     }
 
     /**
-     * Search a solution plan to a specified domain and problem.
+     * Returns the weight set to the heuristic.
      *
-     * @param pb the problem to solve.
+     * @return the weight set to the heuristic.
      */
-    public void search(final CodedProblem pb) {
-
-        SequentialPlan plan = null;
-        if (pb.isSolvable()) {
-            plan = this.aStarSearch(pb);
-        }
-
-        // The rest it is just to print the result
-        final int traceLevel = (Integer) this.arguments.get(HSP.Argument.TRACE_LEVEL);
-        StringBuilder strb = new StringBuilder();
-        if (traceLevel > 0 && traceLevel != 8) {
-            if (pb.isSolvable()) {
-                if (plan != null) {
-                    strb.append(String.format("%nfound plan as follows:%n%n"));
-                    strb.append(pb.toString(plan));
-                } else {
-                    strb.append(String.format("%nno plan found%n%n"));
-                }
-            } else {
-                strb.append(String.format("goal can be simplified to FALSE. no plan will solve it%n%n"));
-            }
-            strb.append(String.format("%ntime spent: %8.2f seconds encoding ("
-                + pb.getOperators().size() + " ops, " + pb.getRelevantFacts().size()
-                + " facts)%n", this.preprocessingTime / 1000.0))
-                .append(String.format("            %8.2f seconds searching%n",
-                    this.searchingTime / 1000.0))
-                .append(String.format("            %8.2f seconds total time%n",
-                    (this.preprocessingTime + searchingTime) / 1000.0))
-                .append(String.format("%nmemory used: %8.2f MBytes for problem representation%n",
-                    +(this.problemMemory / (1024.0 * 1024.0))))
-                .append(String.format("             %8.2f MBytes for searching%n",
-                        +(this.searchingMemory / (1024.0 * 1024.0))))
-                .append(String.format("             %8.2f MBytes total%n%n%n",
-                    +((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0))));
-        }
-        if (traceLevel == 8) {
-            String problem = (String) this.arguments.get(HSP.Argument.PROBLEM);
-            String[] strArray = problem.split("/");
-            String pbFile = strArray[strArray.length - 1];
-            String pbName = pbFile.substring(0, pbFile.indexOf("."));
-            strb.append(String.format("%5s %8d %8d %8.2f %8.2f %10d", pbName, pb.getOperators().size(),
-                pb.getRelevantFacts().size(), this.preprocessingTime / 1000.0,
-                this.problemMemory / (1024.0 * 1024.0), this.nbOfExploredNodes));
-            if (plan != null) {
-                strb.append(String.format("%8.2f %8.2f %8.2f %8.2f %5d%n", this.searchingTime / 1000.0,
-                    (this.preprocessingTime + searchingTime) / 1000.0,
-                    this.searchingMemory / (1024.0 * 1024.0),
-                    (this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0),
-                    plan.size()));
-            } else {
-                strb.append(String.format("%8s %8s %8s %8s %5s%n", "-", "-", "-", "-", "-"));
-            }
-        }
-
-        LOGGER.trace(strb);
+    public final double getHeuristicWeight() {
+        return this.weight;
     }
 
     /**
-     * Solves the planning problem and returns the first solution plan found. This method must be
-     * completed.
+     * Sets the wight of the heuristic.
      *
-     * @param problem the coded planning problem to solve.
-     * @return a solution plan or null if it does not exist.
+     * @param weight the weight of the heuristic. The weight must be positive.
      */
-    private SequentialPlan aStarSearch(final CodedProblem problem) {
+    public final void setWeight(final double weight) {
+        this.weight = weight;
+    }
+
+    /**
+     * Solves the planning problem and returns the first solution search found.
+     *
+     * @param problem the problem to be solved.
+     * @return a solution search or null if it does not exist.
+     */
+    public SequentialPlan search(final CodedProblem problem) {
+        Objects.requireNonNull(problem);
         final long begin = System.currentTimeMillis();
-        final Heuristic.Type type = (Heuristic.Type) this.arguments.get(HSP.Argument.HEURISTIC_TYPE);
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(type, problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristic(), problem);
         // Get the initial state from the planning problem
         final BitState init = new BitState(problem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
         final Map<BitState, Node> closeSet = new HashMap<>();
         final Map<BitState, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
-        final double weight = (Double) this.arguments.get(HSP.Argument.WEIGHT);
-        // The list stores the node ordered according to the A* (f = g + h) function
+        final double weight = this.weight;
+        // The list stores the node ordered according to the A* (getFValue = g + h) function
         final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(weight));
         // Creates the root node of the tree search
         final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
@@ -274,14 +152,15 @@ public final class HSP {
         openSet.put(init, root);
         SequentialPlan plan = null;
 
-        final int cpuTime = (Integer) this.arguments.get(HSP.Argument.CPU_TIME);
+        final int timeout = this.getTimeout();
+        long time = 0;
         // Start of the search
-        while (!open.isEmpty() && plan == null && this.searchingTime < cpuTime) {
+        while (!open.isEmpty() && plan == null && time < timeout) {
             // Pop the first node in the pending list open
             final Node current = open.poll();
             openSet.remove(current);
             closeSet.put(current, current);
-            // If the goal is satisfy in the current node then extract the plan and return it
+            // If the goal is satisfy in the current node then extract the search and return it
             if (current.satisfy(problem.getGoal())) {
                 plan = this.extract(current, problem);
             } else {
@@ -329,35 +208,29 @@ public final class HSP {
                     index++;
                 }
             }
-            // Take time to compute the searching time
-            long end = System.currentTimeMillis();
             // Compute the searching time
-            this.searchingTime = end - begin;
+            time = System.currentTimeMillis() - begin;
         }
-        // Compute the memory used by the search
-        this.searchingMemory += MemoryAgent.deepSizeOf(closeSet) + MemoryAgent.deepSizeOf(openSet)
-            + MemoryAgent.deepSizeOf(open);
-        this.searchingMemory += MemoryAgent.deepSizeOf(heuristic);
-        this.nbOfExploredNodes = closeSet.size();
-        // return the plan computed or null if no plan was found
+
+        this.getStatistics().setTimeToSearch(time);
+        this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet) + MemoryAgent.deepSizeOf(openSet));
+        // return the search computed or null if no search was found
         return plan;
     }
 
     /**
-     * Extracts a plan from a specified node.
+     * Extracts a search from a specified node.
      *
      * @param node the node.
      * @param problem the problem.
-     * @return the plan extracted from the specified node.
+     * @return the search extracted from the specified node.
      */
     private SequentialPlan extract(final Node node, final CodedProblem problem) {
         Node n = node;
         final SequentialPlan plan = new SequentialPlan();
         while (n.getOperator() != -1) {
             final BitOp op = problem.getOperators().get(n.getOperator());
-            if (!op.isDummy()) {
-                plan.add(0, op);
-            }
+            plan.add(0, op);
             n = n.getParent();
         }
         return plan;
@@ -372,7 +245,7 @@ public final class HSP {
      * OPTIONS   DESCRIPTIONS
      *
      * -o <i>str</i>   operator file name
-     * -f <i>str</i>   fact file name
+     * -getFValue <i>str</i>   fact file name
      * -w <i>num</i>   the weight used in the a star search (preset: 1)
      * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 300)
      * -u <i>num</i>   specifies the heuristic to used (preset: 0)
@@ -387,7 +260,7 @@ public final class HSP {
      *      8      set-level heuristic
      * -i <i>num</i>   run-time information level (preset: 1)
      *      0      nothing
-     *      1      info on action number, search and plan
+     *      1      info on action number, search and search
      *      2      1 + info on problem constants, types and predicates
      *      3      1 + 2 + loaded operators, initial and goal state
      *      4      1 + predicates and their inertia status
@@ -398,15 +271,14 @@ public final class HSP {
      *                - problem name
      *                - number of operators
      *                - number of facts
+     *                - parsing time in seconds
      *                - encoding time in seconds
-     *                - memory used for problem representation in MBytes
-     *                - number of states explored
      *                - searching time in seconds
      *                - total time in seconds
+     *                - memory used for problem representation in MBytes
      *                - memory used for searching in MBytes
-     *                - global memory used in MBytes
-     *                - solution plan length
-     *      > 100  1 + various debugging information
+     *                - total memory used in MBytes
+     *                - length of the solution plan
      * -h          print this message
      *
      * </pre>
@@ -414,23 +286,172 @@ public final class HSP {
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
-        try {
-            // Parse the command line
-            final Properties arguments = HSP.parseArguments(args);
-            // Create the planner
-            HSP planner = new HSP(arguments);
-            // Parse and encode the PDDL file into compact representation
-            final CodedProblem problem = planner.parseAndEncode();
 
-            if (problem != null) {
-                // Search for a solution and print the result
-                planner.search(problem);
+        // Parse the command line
+        final Properties arguments = HSP.parseArguments(args);
+        final File domain = (File) arguments.get(HSP.Argument.DOMAIN);
+        final File problem = (File) arguments.get(HSP.Argument.PROBLEM);
+        final int traceLevel = (Integer) arguments.get(HSP.Argument.TRACE_LEVEL);
+        final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
+        final Heuristic.Type heuristic = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
+        final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
+
+        try {
+
+            // Creates the planner
+            final HSP planner = new HSP();
+            planner.setHeuristic(heuristic);
+            planner.setWeight(weight);
+            planner.setTimeOut(timeout);
+            planner.setTraceLevel(traceLevel);
+
+            // Creates the problem factory
+            final ProblemFactory factory = new ProblemFactory();
+            final int factoryTraceLevel = (traceLevel == 8) ? 0 : Math.max(0, traceLevel - 1);
+            factory.setTraceLevel(factoryTraceLevel);
+
+            // Parses the PDDL domain and problem description
+            long begin = System.currentTimeMillis();
+            ErrorManager errorManager = factory.parse(domain, problem);
+            planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+            if (!errorManager.isEmpty()) {
+                errorManager.printAll();
+                System.exit(0);
+            } else if (traceLevel > 0 && traceLevel != 8) {
+                StringBuilder strb = new StringBuilder();
+                strb.append("\nparsing domain file \"").append(domain.getName()).append("\" done successfully")
+                    .append("\nparsing problem file \"").append(problem.getName()).append("\" done successfully")
+                    .append("\n");
+                LOGGER.trace(strb);
             }
-        } catch (FileNotFoundException | ParseException exp) {
-            System.out.println(exp.getMessage());
-        } catch (UsageException uex) {
-            HSP.printUsage();
+
+            // Encodes and instantiates the problem in a compact representation
+            begin = System.currentTimeMillis();
+            final CodedProblem pb = factory.encode();
+            planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+            planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+            planner.getStatistics().setNumberOfActions(pb.getOperators().size());
+            planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
+            if (traceLevel > 0 && traceLevel != 8) {
+                StringBuilder strb = new StringBuilder();
+                strb.append("\nencoding problem done successfully (")
+                    .append(planner.getStatistics().getNumberOfActions() + " ops, ")
+                    .append(planner.getStatistics().getNumberOfRelevantFluents() + " facts)\n");
+                LOGGER.trace(strb);
+            }
+
+            if (traceLevel > 0 && traceLevel != 8 && !pb.isSolvable()) {
+                StringBuilder strb = new StringBuilder();
+                strb.append(String.format("goal can be simplified to FALSE. no search will solve it%n%n"));
+                LOGGER.trace(strb);
+                System.exit(0);
+            }
+
+            // Searches for a solution plan
+            final Plan plan = planner.search(pb);
+
+            // Print the results
+            final String problemName = problem.getName().substring(0, problem.getName().indexOf('.'));
+            final int numberOfActions = planner.getStatistics().getNumberOfActions();
+            final int numberOfFluents = planner.getStatistics().getNumberOfRelevantFluents();
+            final double timeToParseInSeconds =
+                Statistics.millisecondToSecond(planner.getStatistics().getTimeToParse());
+            final double timeToEncodeInSeconds =
+                Statistics.millisecondToSecond(planner.getStatistics().getTimeToEncode());
+            final double timeToSearchInSeconds =
+                Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
+            final double totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
+            final double memoryForProblemInMBytes =
+                Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
+            final double memoryUsedToSearchInMBytes =
+                Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
+            final double totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
+
+
+            if (traceLevel > 0 && traceLevel != 8) {
+                final StringBuilder strb = new StringBuilder();
+                if (plan != null) {
+                    strb.append(String.format("%nfound plan as follows:%n%n"));
+                    strb.append(pb.toString(plan));
+
+                } else {
+                    strb.append(String.format("%nno plan found%n%n"));
+                }
+                strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
+                strb.append(String.format("              %8.2f seconds encoding %n", timeToEncodeInSeconds));
+                strb.append(String.format("              %8.2f seconds searching%n", timeToSearchInSeconds));
+                strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
+                strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
+                    memoryForProblemInMBytes));
+                strb.append(String.format("              %8.2f MBytes for searching%n", memoryUsedToSearchInMBytes));
+                strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
+                LOGGER.trace(strb);
+            } else if (traceLevel == 8) {
+                final StringBuilder strb = new StringBuilder();
+                if (plan != null) {
+                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %5d\n",
+                        problemName,
+                        numberOfActions,
+                        numberOfFluents,
+                        timeToParseInSeconds,
+                        timeToEncodeInSeconds,
+                        timeToSearchInSeconds,
+                        totalTimeInSeconds,
+                        memoryForProblemInMBytes,
+                        memoryUsedToSearchInMBytes,
+                        totalMemoryInMBytes,
+                        plan.size()));
+                } else {
+                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8s %8s %8.2f %8s %8s %5s\n",
+                        problem.getName(),
+                        numberOfActions,
+                        numberOfFluents,
+                        timeToParseInSeconds,
+                        timeToEncodeInSeconds,
+                        "--",
+                        "--",
+                        memoryForProblemInMBytes,
+                        "--",
+                        "--",
+                        "--"));
+                }
+                LOGGER.trace(strb);
+            }
+        } catch (FileNotFoundException exp) {
+            LOGGER.trace("Domain or problem files not found;" + exp.getMessage());
+        } catch (IOException exp) {
+            LOGGER.trace("Error when reading input files: " + exp.getMessage());
         }
+    }
+
+    /**
+     * The enumeration of the arguments of the planner.
+     */
+    private enum Argument {
+        /**
+         * The planning domain.
+         */
+        DOMAIN,
+        /**
+         * The planning problem.
+         */
+        PROBLEM,
+        /**
+         * The heuristic to use.
+         */
+        HEURISTIC,
+        /**
+         * The weight of the heuristic.
+         */
+        WEIGHT,
+        /**
+         * The global time slot allocated to the search.
+         */
+        TIMEOUT,
+        /**
+         * The trace level.
+         */
+        TRACE_LEVEL
     }
 
     /**
@@ -439,74 +460,94 @@ public final class HSP {
      * @param args the arguments from the command line.
      * @return The arguments of the planner.
      */
-    private static Properties parseArguments(String[] args)
-        throws FileNotFoundException, UsageException, ParseException {
+    private static Properties parseArguments(String[] args) {
         final Properties arguments = HSP.getDefaultArguments();
         try {
             for (int i = 0; i < args.length; i += 2) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        throw new FileNotFoundException("operators file does not exist: " + args[i + 1]);
+                        LOGGER.trace("operators file does not exist: " + args[i + 1]);
                     }
-                    arguments.put(HSP.Argument.DOMAIN, args[i + 1]);
+                    arguments.put(Argument.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        throw new FileNotFoundException("facts file does not exist: " + args[i + 1]);
+                        LOGGER.trace("facts file does not exist: " + args[i + 1]);
                     }
-                    arguments.put(HSP.Argument.PROBLEM, args[i + 1]);
+                    arguments.put(Argument.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         HSP.printUsage();
                     }
-                    arguments.put(HSP.Argument.CPU_TIME, cpu);
+                    arguments.put(Argument.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
                         HSP.printUsage();
                     }
                     if (heuristic == 0) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.FAST_FORWARD);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.FAST_FORWARD);
                     } else if (heuristic == 1) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.SUM);
                     } else if (heuristic == 2) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM_MUTEX);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.SUM_MUTEX);
                     } else if (heuristic == 3) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM);
                     } else if (heuristic == 4) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2);
                     } else if (heuristic == 5) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2M);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2M);
                     } else if (heuristic == 6) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.COMBO);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.COMBO);
                     } else if (heuristic == 7) {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.MAX);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.MAX);
                     } else {
-                        arguments.put(HSP.Argument.HEURISTIC_TYPE, Heuristic.Type.SET_LEVEL);
+                        arguments.put(Argument.HEURISTIC, Heuristic.Type.SET_LEVEL);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
                         HSP.printUsage();
                     }
-                    arguments.put(HSP.Argument.WEIGHT, weight);
+                    arguments.put(Argument.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         HSP.printUsage();
                     }
-                    arguments.put(HSP.Argument.TRACE_LEVEL, level);
+                    arguments.put(Argument.TRACE_LEVEL, level);
                 } else {
-                    throw new UsageException("Unknown argument: " + args[i] + "or missing value");
+                    LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
+                    HSP.printUsage();
+                    System.exit(0);
                 }
             }
-            if (arguments.get(HSP.Argument.DOMAIN) == null || arguments.get(HSP.Argument.PROBLEM) == null) {
-                throw new UsageException("Missing DOMAIN or PROBLEM");
+            if (arguments.get(Argument.DOMAIN) == null || arguments.get(Argument.PROBLEM) == null) {
+                LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
+                HSP.printUsage();
+                System.exit(0);
             }
         } catch (RuntimeException runExp) {
-            throw new ParseException("Error when parsing arguments", runExp);
+            LOGGER.trace("\nError when parsing arguments\n");
+            HSP.printUsage();
+            System.exit(0);
         }
         return arguments;
+    }
+
+
+    /**
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
+     */
+    private static Properties getDefaultArguments() {
+        final Properties options = new Properties();
+        options.put(HSP.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
+        options.put(HSP.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
+        options.put(HSP.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT);
+        options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
+        return options;
     }
 
     /**
@@ -514,12 +555,12 @@ public final class HSP {
      */
     private static void printUsage() {
 
-        StringBuilder strb = new StringBuilder();
+        final StringBuilder strb = new StringBuilder();
 
         strb.append("\nusage of hsp:\n")
             .append("OPTIONS   DESCRIPTIONS\n")
             .append("-o <str>    operator file name\n")
-            .append("-f <str>    fact file name\n")
+            .append("-getFValue <str>    fact file name\n")
             .append("-w <num>    the weight used in the a star seach (preset: 1)\n")
             .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
@@ -534,7 +575,7 @@ public final class HSP {
             .append("     8      set-level heuristic\n")
             .append("-i <num>    run-time information level (preset: 1)\n")
             .append("     0      nothing\n")
-            .append("     1      info on action number, search and plan\n")
+            .append("     1      info on action number, search and search\n")
             .append("     2      1 + info on problem constants, types and predicates\n")
             .append("     3      1 + 2 + loaded operators, initial and goal state\n")
             .append("     4      1 + predicates and their inertia status\n")
@@ -545,41 +586,23 @@ public final class HSP {
             .append("               - problem name\n")
             .append("               - number of operators\n")
             .append("               - number of facts\n")
+            .append("               - parsing time in seconds\n")
             .append("               - encoding time in seconds\n")
-            .append("               - memory used for problem representation in MBytes\n")
-            .append("               - number of states explored\n")
             .append("               - searching time in seconds\n")
             .append("               - total time in seconds\n")
+            .append("               - memory used for problem representation in MBytes\n")
             .append("               - memory used for searching in MBytes\n")
-            .append("               - global memory used in MBytes\n")
-            .append("               - solution plan length\n")
-            .append("     > 100  1 + various debugging information\n")
+            .append("               - total memory used in MBytes\n")
+            .append("               - lenght of the solution plan\n")
             .append("-h          print this message\n\n");
 
         LOGGER.trace(strb);
     }
 
     /**
-     * This method return the default arguments of the planner.
-     *
-     * @return the default arguments of the planner.
-     */
-    private static Properties getDefaultArguments() {
-        final Properties options = new Properties();
-        options.put(HSP.Argument.HEURISTIC_TYPE, HSP.DEFAULT_HEURISTIC);
-        options.put(HSP.Argument.WEIGHT, HSP.DEFAULT_WHEIGHT);
-        options.put(HSP.Argument.CPU_TIME, HSP.DEFAULT_CPU_TIME * 1000);
-        options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
-        return options;
-    }
-
-    /**
      * Node comparator class for HSP planner.
      */
     private static class NodeComparator implements Comparator<Node>, Serializable {
-
-        private static final long serialVersionUID = 1L;
-
         /**
          * The weight of the heuristic use for the comparison.
          */
@@ -593,9 +616,14 @@ public final class HSP {
             this.weight = weight;
         }
 
-        @Override
+        /*
+         * TO DO
+         * @param n1
+         * @param n2
+         * @return
+         */
         public int compare(final Node n1, final Node n2) {
-            return Double.compare(n1.getValueF(weight), n2.getValueF(weight));
+            return Double.compare(n1.getFValue(weight), n2.getFValue(weight));
         }
     }
 }

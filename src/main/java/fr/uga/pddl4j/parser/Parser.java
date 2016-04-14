@@ -70,7 +70,7 @@ import java.util.Set;
  *      System.out.println(&quot;OPTIONS   DESCRIPTIONS\n&quot;);
  *      System.out.println(&quot;-p &lt;str&gt;    path for operator and fact file&quot;);
  *      System.out.println(&quot;-o &lt;str&gt;    operator file name&quot;);
- *      System.out.println(&quot;-f &lt;str&gt;    fact file name\n&quot;);
+ *      System.out.println(&quot;-getFValue &lt;str&gt;    fact file name\n&quot;);
  *    }
  * }
  * </pre>
@@ -82,6 +82,9 @@ import java.util.Set;
  */
 public final class Parser {
 
+    /**
+     * Logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
     /**
@@ -255,7 +258,7 @@ public final class Parser {
      * @param problem the file that contains the planning problem.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    private void parse(File domain, File problem) throws FileNotFoundException {
+    public void parse(File domain, File problem) throws FileNotFoundException {
         if (!domain.exists()) {
             throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.");
         }
@@ -1101,7 +1104,7 @@ public final class Parser {
      *
      * -p <str> path for operator and fact file </str>
      * -o <str> operator file name </str>
-     * -f <str> fact file name </str>
+     * -getFValue <str> fact file name </str>
      * </pre>
      *
      * @param args the arguments of the command line.
@@ -1124,7 +1127,7 @@ public final class Parser {
                 strb.append(System.lineSeparator());
                 parser.mgr.printAll();
             }
-        } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
+        } else if (args.length == 4 && "-o".equals(args[0]) && "-getFValue".equals(args[2])) {
             strb.append("parse files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
                 .append("\": ");
             Parser parser = new Parser();
@@ -1143,7 +1146,7 @@ public final class Parser {
             strb.append("\nusage of parser:\n").append("OPTIONS   DESCRIPTIONS\n")
                 .append("-p <str>    path for operator and fact file\n")
                 .append("-o <str>    operator file name\n")
-                .append("-f <str>    fact file name\n");
+                .append("-getFValue <str>    fact file name\n");
         }
 
         LOGGER.trace(strb);

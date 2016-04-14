@@ -460,10 +460,10 @@ public class CodedProblem {
     }
 
     /**
-     * Return a string representation of a plan.
+     * Return a string representation of a search.
      *
-     * @param plan the plan.
-     * @return a string representation of the specified plan.
+     * @param plan the search.
+     * @return a string representation of the specified search.
      */
     public final String toString(final Plan plan) {
         int max = Integer.MIN_VALUE;
@@ -478,11 +478,11 @@ public class CodedProblem {
         final int actionSize = max;
         final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
 
-        StringBuilder str = new StringBuilder();
+        final StringBuilder str = new StringBuilder();
         plan.timeSpecifiers().forEach(time ->
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: %" + actionSize + "s [%4.2f]%n",
-                        time, this.toShortString(a), a.getDuration()))));
+                    time, this.toShortString(a), a.getDuration()))));
         return str.toString();
     }
 }
