@@ -82,7 +82,7 @@ public final class HSP extends AbstractPlanner {
     /**
      * Creates a new HSP planner with the default parameters.
      */
-    private HSP() {
+    public HSP() {
         super();
         this.setHeuristic(HSP.DEFAULT_HEURISTIC);
         this.setWeight(HSP.DEFAULT_WEIGHT);
@@ -335,8 +335,8 @@ public final class HSP extends AbstractPlanner {
             if (traceLevel > 0 && traceLevel != 8) {
                 StringBuilder strb = new StringBuilder();
                 strb.append("\nencoding problem done successfully (")
-                    .append(planner.getStatistics().getNumberOfActions() + " ops, ")
-                    .append(planner.getStatistics().getNumberOfRelevantFluents() + " facts)\n");
+                    .append(planner.getStatistics().getNumberOfActions()).append(" ops, ")
+                    .append(planner.getStatistics().getNumberOfRelevantFluents()).append(" facts)\n");
                 LOGGER.trace(strb);
             }
 
@@ -389,7 +389,7 @@ public final class HSP extends AbstractPlanner {
             } else if (traceLevel == 8) {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
-                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %5d\n",
+                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %5d%n",
                         problemName,
                         numberOfActions,
                         numberOfFluents,
@@ -402,7 +402,7 @@ public final class HSP extends AbstractPlanner {
                         totalMemoryInMBytes,
                         plan.size()));
                 } else {
-                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8s %8s %8.2f %8s %8s %5s\n",
+                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8s %8s %8.2f %8s %8s %5s%n",
                         problem.getName(),
                         numberOfActions,
                         numberOfFluents,
@@ -545,7 +545,7 @@ public final class HSP extends AbstractPlanner {
         final Properties options = new Properties();
         options.put(HSP.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
         options.put(HSP.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
-        options.put(HSP.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT);
+        options.put(HSP.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
         options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
         return options;
     }
@@ -603,6 +603,9 @@ public final class HSP extends AbstractPlanner {
      * Node comparator class for HSP planner.
      */
     private static class NodeComparator implements Comparator<Node>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
         /**
          * The weight of the heuristic use for the comparison.
          */

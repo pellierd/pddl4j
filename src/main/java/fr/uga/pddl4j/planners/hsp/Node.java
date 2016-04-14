@@ -21,8 +21,6 @@ package fr.uga.pddl4j.planners.hsp;
 
 import fr.uga.pddl4j.util.BitState;
 
-import java.util.Comparator;
-
 /**
  * This class implements a node of the tree search.
  *
@@ -30,6 +28,8 @@ import java.util.Comparator;
  * @version 1.0 - 14.06.2010
  */
 public final class Node extends BitState {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The parent node of this node.

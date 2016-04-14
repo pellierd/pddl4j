@@ -15,9 +15,6 @@
 
 package fr.uga.pddl4j.planner;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.parser.Parser;
-
 /**
  * This abstract class defines the main methods of to access a planner.
  *
@@ -46,14 +43,14 @@ public abstract class AbstractPlanner implements Planner {
     /**
      * The parser of the planner.
      */
-    private Parser parser;
+    //private Parser parser; useless ?
 
     /**
      * Creates a new planner.
      */
     public AbstractPlanner() {
         super();
-        this.parser = new Parser();
+        //this.parser = new Parser();
         this.timeout = Planner.DEFAULT_TIMEOUT;
         this.traceLevel = Planner.DEFAULT_TRACE_LEVEL;
         this.statistics = new Statistics();

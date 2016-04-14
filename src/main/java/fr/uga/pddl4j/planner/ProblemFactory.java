@@ -50,7 +50,7 @@ public class ProblemFactory {
     /**
      * The default trace level.
      */
-    public static int DEFAULT_TRACE_LEVEL = 0;
+    public static final int DEFAULT_TRACE_LEVEL = 0;
 
     /**
      * Creates a new problem factory.
@@ -70,7 +70,7 @@ public class ProblemFactory {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
-    public ErrorManager parse(final File domain, final File problem) throws FileNotFoundException, IOException {
+    public ErrorManager parse(final File domain, final File problem) throws IOException {
         parser.parse(domain, problem);
         return parser.getErrorManager();
     }
