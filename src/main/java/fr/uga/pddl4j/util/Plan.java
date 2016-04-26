@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.util;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ import java.util.Set;
  *
  * @since 3.0
  */
-public interface Plan {
+public interface Plan extends Serializable {
 
     /**
      * Returns the size of the search. The size of the search is its number of actions.
