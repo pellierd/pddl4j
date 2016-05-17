@@ -64,6 +64,7 @@ public class NamedTypedList implements Serializable {
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
         this.arguments.addAll(list.getArguments().stream().map(TypedSymbol::new).collect(Collectors.toList()));
+        this.types.addAll(list.types.stream().map(Symbol::new).collect(Collectors.toList()));
     }
 
     /**
