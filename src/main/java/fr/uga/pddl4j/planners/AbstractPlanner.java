@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planner;
+package fr.uga.pddl4j.planners;
 
 /**
  * This abstract class defines the main methods of to access a planner.

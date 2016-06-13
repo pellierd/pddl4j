@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planner;
+package fr.uga.pddl4j.planners;
 
 /**
  * The class implements the statistics of the planner, search time, memory used, etc.

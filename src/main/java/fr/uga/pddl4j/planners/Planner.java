@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planner;
+package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.Plan;
