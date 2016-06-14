@@ -287,16 +287,15 @@ public final class HSP extends AbstractPlanner {
      */
     public static void main(String[] args) {
 
-        // Parse the command line
-        final Properties arguments = HSP.parseArguments(args);
-        final File domain = (File) arguments.get(HSP.Argument.DOMAIN);
-        final File problem = (File) arguments.get(HSP.Argument.PROBLEM);
-        final int traceLevel = (Integer) arguments.get(HSP.Argument.TRACE_LEVEL);
-        final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
-        final Heuristic.Type heuristic = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
-        final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
-
         try {
+            // Parse the command line
+            final Properties arguments = HSP.parseArguments(args);
+            final File domain = (File) arguments.get(HSP.Argument.DOMAIN);
+            final File problem = (File) arguments.get(HSP.Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(HSP.Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
+            final Heuristic.Type heuristic = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
+            final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
 
             // Creates the planner
             final HSP planner = new HSP();
@@ -421,6 +420,9 @@ public final class HSP extends AbstractPlanner {
             LOGGER.trace("Domain or problem files not found;" + exp.getMessage());
         } catch (IOException exp) {
             LOGGER.trace("Error when reading input files: " + exp.getMessage());
+        } catch (RuntimeException runEx) {
+            LOGGER.error(runEx.getMessage());
+            System.exit(1);
         }
     }
 
@@ -519,18 +521,18 @@ public final class HSP extends AbstractPlanner {
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     HSP.printUsage();
-                    System.exit(0);
+                    throw new RuntimeException("Unknown arguments: " + args[i]);
                 }
             }
             if (arguments.get(Argument.DOMAIN) == null || arguments.get(Argument.PROBLEM) == null) {
                 LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
                 HSP.printUsage();
-                System.exit(0);
+                throw new RuntimeException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
             LOGGER.trace("\nError when parsing arguments\n");
             HSP.printUsage();
-            System.exit(0);
+            throw runExp;
         }
         return arguments;
     }
