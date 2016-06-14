@@ -33,6 +33,8 @@ import java.util.TreeMap;
  */
 public class TemporalPlan extends AbstractPlan {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The list used to store the actions contained in the plan.
      */
