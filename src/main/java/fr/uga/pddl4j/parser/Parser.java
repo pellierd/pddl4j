@@ -1127,7 +1127,7 @@ public final class Parser {
                 strb.append(System.lineSeparator());
                 parser.mgr.printAll();
             }
-        } else if (args.length == 4 && "-o".equals(args[0]) && "-getFValue".equals(args[2])) {
+        } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
             strb.append("parse files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
                 .append("\": ");
             Parser parser = new Parser();
@@ -1146,7 +1146,7 @@ public final class Parser {
             strb.append("\nusage of parser:\n").append("OPTIONS   DESCRIPTIONS\n")
                 .append("-p <str>    path for operator and fact file\n")
                 .append("-o <str>    operator file name\n")
-                .append("-getFValue <str>    fact file name\n");
+                .append("-f <str>    fact file name\n");
         }
 
         LOGGER.trace(strb);
