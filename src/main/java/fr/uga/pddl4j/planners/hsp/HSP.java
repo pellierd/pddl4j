@@ -562,7 +562,7 @@ public final class HSP extends AbstractPlanner {
         strb.append("\nusage of hsp:\n")
             .append("OPTIONS   DESCRIPTIONS\n")
             .append("-o <str>    operator file name\n")
-            .append("-getFValue <str>    fact file name\n")
+            .append("-f <str>    fact file name\n")
             .append("-w <num>    the weight used in the a star seach (preset: 1)\n")
             .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
