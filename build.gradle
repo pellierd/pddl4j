@@ -116,6 +116,12 @@ checkstyleTest.doLast(){
     printCheckstyleVersion()
 }
 
+test {
+    // set heap size for the test JVM(s)
+    minHeapSize = "512m"
+    maxHeapSize = "2048m"
+}
+
 defaultTasks 'clean', 'build', 'test'
 
 // Exclude lexer source form task
