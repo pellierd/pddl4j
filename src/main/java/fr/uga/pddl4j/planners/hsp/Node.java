@@ -169,6 +169,7 @@ public final class Node extends BitState {
      * @return <code>true</code> if the node is equal to the other specified object; <code>false</code> otherwise.
      * @see BitState#equals(Object)
      */
+    @Override
     public boolean equals(final Object obj) {
         return super.equals(obj);
     }
@@ -180,6 +181,7 @@ public final class Node extends BitState {
      * @return the hashcode value for this node.
      * @see BitState#hashCode()
      */
+    @Override
     public int hashCode() {
         return super.hashCode();
     }

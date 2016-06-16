@@ -61,7 +61,7 @@ public final class HSP extends AbstractPlanner {
     private static final Logger LOGGER = LogManager.getLogger(HSP.class);
 
     /**
-     * The default heuristic.
+     * The default heuristicType.
      */
     public static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
 
@@ -73,7 +73,7 @@ public final class HSP extends AbstractPlanner {
     /**
      * The type of heuristics that must use to solve the problem.
      */
-    private Heuristic.Type heuristic;
+    private Heuristic.Type heuristicType;
 
     /**
      * The weight set to the heuristic.
@@ -85,28 +85,28 @@ public final class HSP extends AbstractPlanner {
      */
     public HSP() {
         super();
-        this.setHeuristic(HSP.DEFAULT_HEURISTIC);
+        this.setHeuristicType(HSP.DEFAULT_HEURISTIC);
         this.setWeight(HSP.DEFAULT_WEIGHT);
     }
 
     /**
-     * Returns the heuristic to use to solve the planning problem.
+     * Returns the heuristicType to use to solve the planning problem.
      *
-     * @return the heuristic to use to solve the planning problem.
+     * @return the heuristicType to use to solve the planning problem.
      * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
      */
-    public final Heuristic.Type getHeuristic() {
-        return this.heuristic;
+    public final Heuristic.Type getHeuristicType() {
+        return this.heuristicType;
     }
 
     /**
-     * Sets the heuristic to use to solved the problem.
+     * Sets the heuristicType to use to solved the problem.
      *
-     * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
+     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
      */
-    public final void setHeuristic(final Heuristic.Type heuristic) {
-        Objects.requireNonNull(heuristic);
-        this.heuristic = heuristic;
+    public final void setHeuristicType(final Heuristic.Type heuristicType) {
+        Objects.requireNonNull(heuristicType);
+        this.heuristicType = heuristicType;
     }
 
     /**
@@ -133,19 +133,20 @@ public final class HSP extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
      */
+    @Override
     public SequentialPlan search(final CodedProblem problem) {
         Objects.requireNonNull(problem);
         final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristic(), problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         // Get the initial state from the planning problem
         final BitState init = new BitState(problem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
         final Map<BitState, Node> closeSet = new HashMap<>();
         final Map<BitState, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
-        final double weight = this.weight;
+        final double currWeight = this.weight;
         // The list stores the node ordered according to the A* (getFValue = g + h) function
-        final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(weight));
+        final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(currWeight));
         // Creates the root node of the tree search
         final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
         // Adds the root to the list of pending nodes
@@ -295,12 +296,12 @@ public final class HSP extends AbstractPlanner {
             final File problem = (File) arguments.get(HSP.Argument.PROBLEM);
             final int traceLevel = (Integer) arguments.get(HSP.Argument.TRACE_LEVEL);
             final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
-            final Heuristic.Type heuristic = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
             final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
 
             // Creates the planner
             final HSP planner = new HSP();
-            planner.setHeuristic(heuristic);
+            planner.setHeuristicType(heuristicType);
             planner.setWeight(weight);
             planner.setTimeOut(timeout);
             planner.setTraceLevel(traceLevel);
@@ -628,6 +629,7 @@ public final class HSP extends AbstractPlanner {
          * @param n2
          * @return
          */
+        @Override
         public int compare(final Node n1, final Node n2) {
             return Double.compare(n1.getFValue(weight), n2.getFValue(weight));
         }
