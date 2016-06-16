@@ -419,11 +419,13 @@ public final class HSP extends AbstractPlanner {
                 LOGGER.trace(strb);
             }
         } catch (FileNotFoundException exp) {
-            LOGGER.trace("Domain or problem files not found;" + exp.getMessage());
+            LOGGER.trace("Domain or problem files not found\n");
+            LOGGER.error(exp);
         } catch (IOException exp) {
-            LOGGER.trace("Error when reading input files: " + exp.getMessage());
+            LOGGER.trace("Error when reading input files\n");
+            LOGGER.error(exp.getMessage());
         } catch (FileException fileEx) {
-            LOGGER.error(fileEx.getMessage());
+            LOGGER.error(fileEx);
             System.exit(1);
         }
     }
@@ -470,12 +472,12 @@ public final class HSP extends AbstractPlanner {
             for (int i = 0; i < args.length; i += 2) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        LOGGER.trace("operators file does not exist: " + args[i + 1]);
+                        LOGGER.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
                     arguments.put(Argument.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        LOGGER.trace("facts file does not exist: " + args[i + 1]);
+                        LOGGER.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
                     arguments.put(Argument.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
