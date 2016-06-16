@@ -418,12 +418,10 @@ public final class HSP extends AbstractPlanner {
                 }
                 LOGGER.trace(strb);
             }
-        } catch (FileNotFoundException exp) {
-            LOGGER.trace("Domain or problem files not found\n");
-            LOGGER.error(exp);
-        } catch (IOException exp) {
-            LOGGER.trace("Error when reading input files\n");
-            LOGGER.error(exp.getMessage());
+        } catch (FileNotFoundException fnfExp) {
+            LOGGER.error(fnfExp);
+        } catch (IOException ioExp) {
+            LOGGER.error(ioExp);
         } catch (FileException fileEx) {
             LOGGER.error(fileEx);
             System.exit(1);
