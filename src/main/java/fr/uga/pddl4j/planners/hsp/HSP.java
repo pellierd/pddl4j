@@ -36,7 +36,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
@@ -418,8 +417,6 @@ public final class HSP extends AbstractPlanner {
                 }
                 LOGGER.trace(strb);
             }
-        } catch (FileNotFoundException fnfExp) {
-            LOGGER.error(fnfExp);
         } catch (IOException ioExp) {
             LOGGER.error(ioExp);
         } catch (FileException fileEx) {
