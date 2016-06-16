@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +38,7 @@ public class ParallelPlan extends AbstractPlan {
     /**
      * The list of set of unordered actions contained in the plan.
      */
-    private List<Set<BitOp>> actions;
+    private List<HashSet<BitOp>> actions;
 
     /**
      * Creates a new empty parallel plan.
