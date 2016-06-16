@@ -84,7 +84,7 @@ public class Statistics {
     /**
      * Returns the path to the file containing the description of the solved problem.
      *
-     * @returns the path to the file containing the description of the solved problem.
+     * @return the path to the file containing the description of the solved problem.
      */
     public final String getProblem() {
         return this.problem;
@@ -234,15 +234,16 @@ public class Statistics {
      *
      * @return a string representation of this statistics.
      */
+    @Override
     public String toString() {
         StringBuilder strb = new StringBuilder();
 
-        final double timeToParseInSeconds = this.millisecondToSecond(this.timeToParse);
-        final double timeToEncodeInSeconds = this.millisecondToSecond(this.timeToEncode);
-        final double timeToSearchInSeconds = this.millisecondToSecond(this.timeToSearch);
+        final double timeToParseInSeconds = Statistics.millisecondToSecond(this.timeToParse);
+        final double timeToEncodeInSeconds = Statistics.millisecondToSecond(this.timeToEncode);
+        final double timeToSearchInSeconds = Statistics.millisecondToSecond(this.timeToSearch);
         final double totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
-        final double memoryForProblemInMBytes = this.byteToMByte(this.memoryForProblem);
-        final double memoryUsedToSearchInMBytes = this.byteToMByte(this.memoryUsedToSearch);
+        final double memoryForProblemInMBytes = Statistics.byteToMByte(this.memoryForProblem);
+        final double memoryUsedToSearchInMBytes = Statistics.byteToMByte(this.memoryUsedToSearch);
         final double totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
 
         strb.append(String.format("* Problem features:%n"));
@@ -277,7 +278,7 @@ public class Statistics {
      * @param size the size in bytes
      * @return the siez in mega bytes.
      */
-    public static final  double byteToMByte(final long size) {
+    public static final double byteToMByte(final long size) {
         return size / (1024.0 * 1024.0);
     }
 }
