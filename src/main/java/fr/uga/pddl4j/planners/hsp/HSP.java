@@ -245,7 +245,7 @@ public final class HSP extends AbstractPlanner {
      * OPTIONS   DESCRIPTIONS
      *
      * -o <i>str</i>   operator file name
-     * -getFValue <i>str</i>   fact file name
+     * -f <i>str</i>   fact file name
      * -w <i>num</i>   the weight used in the a star search (preset: 1)
      * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 300)
      * -u <i>num</i>   specifies the heuristic to used (preset: 0)
