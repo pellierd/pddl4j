@@ -41,16 +41,10 @@ public abstract class AbstractPlanner implements Planner {
     private Statistics statistics;
 
     /**
-     * The parser of the planner.
-     */
-    //private Parser parser; useless ?
-
-    /**
      * Creates a new planner.
      */
     public AbstractPlanner() {
         super();
-        //this.parser = new Parser();
         this.timeout = Planner.DEFAULT_TIMEOUT;
         this.traceLevel = Planner.DEFAULT_TRACE_LEVEL;
         this.statistics = new Statistics();
