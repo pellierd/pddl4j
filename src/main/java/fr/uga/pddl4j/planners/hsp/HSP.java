@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.planners.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.parser.ErrorManager;
@@ -420,8 +421,8 @@ public final class HSP extends AbstractPlanner {
             LOGGER.trace("Domain or problem files not found;" + exp.getMessage());
         } catch (IOException exp) {
             LOGGER.trace("Error when reading input files: " + exp.getMessage());
-        } catch (RuntimeException runEx) {
-            LOGGER.error(runEx.getMessage());
+        } catch (FileException fileEx) {
+            LOGGER.error(fileEx.getMessage());
             System.exit(1);
         }
     }
@@ -462,7 +463,7 @@ public final class HSP extends AbstractPlanner {
      * @param args the arguments from the command line.
      * @return The arguments of the planner.
      */
-    private static Properties parseArguments(String[] args) {
+    private static Properties parseArguments(String[] args) throws FileException {
         final Properties arguments = HSP.getDefaultArguments();
         try {
             for (int i = 0; i < args.length; i += 2) {
@@ -521,13 +522,13 @@ public final class HSP extends AbstractPlanner {
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     HSP.printUsage();
-                    throw new RuntimeException("Unknown arguments: " + args[i]);
+                    throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
             if (arguments.get(Argument.DOMAIN) == null || arguments.get(Argument.PROBLEM) == null) {
                 LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
                 HSP.printUsage();
-                throw new RuntimeException("Missing domain or problem");
+                throw new FileException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
             LOGGER.trace("\nError when parsing arguments\n");
