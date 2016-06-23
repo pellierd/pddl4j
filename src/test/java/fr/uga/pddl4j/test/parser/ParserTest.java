@@ -17,8 +17,12 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.parser;
+package fr.uga.pddl4j.test.parser;
 
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.test.Tools;
 import org.junit.Test;
 
 import java.io.File;
@@ -73,7 +77,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc1" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC1 test skipped !");
             return;
         }
@@ -101,7 +105,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc2" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC2 test skipped !");
             return;
         }
@@ -129,7 +133,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc3" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC3 test skipped !");
             return;
         }
@@ -157,7 +161,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc4" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC4 test skipped !");
             return;
         }
@@ -185,7 +189,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc5" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC5 test skipped !");
             return;
         }
@@ -213,7 +217,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc6" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC6 test skipped !");
             return;
         }
@@ -241,7 +245,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc7" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC7 test skipped !");
             return;
         }
@@ -269,7 +273,7 @@ public class ParserTest {
 
         String localTestPath = BENCH_DIR + "ipc8" + File.separator;
 
-        if (!isBenchmarkExist(localTestPath)) {
+        if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC8 test skipped !");
             return;
         }
@@ -377,15 +381,6 @@ public class ParserTest {
         }
 
         return errors;
-    }
-
-    /**
-     * Check if benchmark are already here.
-     * @param path the benchmark directory path
-     * @return true if the benchmark file exist
-     */
-    private boolean isBenchmarkExist(String path) {
-        return new File(path).exists();
     }
 
 }
