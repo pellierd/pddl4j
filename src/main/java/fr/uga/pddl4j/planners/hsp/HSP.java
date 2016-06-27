@@ -80,12 +80,18 @@ public final class HSP extends AbstractPlanner {
     private double weight;
 
     /**
+     * Whether statistics are computed or not
+     */
+    private boolean saveState;
+
+    /**
      * Creates a new HSP planner with the default parameters.
      */
     public HSP() {
         super();
         this.setHeuristicType(HSP.DEFAULT_HEURISTIC);
         this.setWeight(HSP.DEFAULT_WEIGHT);
+        this.setSaveState(HSP.DEFAULT_STATISTICS);
     }
 
     /**
@@ -124,6 +130,22 @@ public final class HSP extends AbstractPlanner {
      */
     public final void setWeight(final double weight) {
         this.weight = weight;
+    }
+
+    /**
+     * Set the statistics generation value.
+     * @param saveState the new statistics computation value
+     */
+    public void setSaveState(boolean saveState) {
+        this.saveState = saveState;
+    }
+
+    /**
+     * Is statistics generate or not.
+     * @return true if statistics are compute and save, false otherwise
+     */
+    public boolean isSaveState() {
+        return saveState;
     }
 
     /**
@@ -210,11 +232,16 @@ public final class HSP extends AbstractPlanner {
                 }
             }
             // Compute the searching time
-            time = System.currentTimeMillis() - begin;
+            if (isSaveState()) {
+                time = System.currentTimeMillis() - begin;
+            }
         }
 
-        this.getStatistics().setTimeToSearch(time);
-        this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet) + MemoryAgent.deepSizeOf(openSet));
+        if (isSaveState()) {
+            this.getStatistics().setTimeToSearch(time);
+            this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                + MemoryAgent.deepSizeOf(openSet));
+        }
         // return the search computed or null if no search was found
         return plan;
     }
@@ -280,10 +307,12 @@ public final class HSP extends AbstractPlanner {
      *                - memory used for searching in MBytes
      *                - total memory used in MBytes
      *                - length of the solution plan
+     * -s          no statistics
      * -h          print this message
      *
      * </pre>
-     *</p>
+     * </p>
+     *
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
@@ -297,6 +326,7 @@ public final class HSP extends AbstractPlanner {
             final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
             final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
             final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(Argument.STATISTICS);
 
             // Creates the planner
             final HSP planner = new HSP();
@@ -304,6 +334,8 @@ public final class HSP extends AbstractPlanner {
             planner.setWeight(weight);
             planner.setTimeOut(timeout);
             planner.setTraceLevel(traceLevel);
+            planner.setSaveState(saveStats);
+
 
             // Creates the problem factory
             final ProblemFactory factory = new ProblemFactory();
@@ -311,9 +343,12 @@ public final class HSP extends AbstractPlanner {
             factory.setTraceLevel(factoryTraceLevel);
 
             // Parses the PDDL domain and problem description
+
             long begin = System.currentTimeMillis();
             ErrorManager errorManager = factory.parse(domain, problem);
-            planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+            if (saveStats) {
+                planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+            }
             if (!errorManager.isEmpty()) {
                 errorManager.printAll();
                 System.exit(0);
@@ -328,10 +363,13 @@ public final class HSP extends AbstractPlanner {
             // Encodes and instantiates the problem in a compact representation
             begin = System.currentTimeMillis();
             final CodedProblem pb = factory.encode();
-            planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
-            planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+            if (saveStats) {
+                planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
+                planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+            }
             planner.getStatistics().setNumberOfActions(pb.getOperators().size());
             planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
+
             if (traceLevel > 0 && traceLevel != 8) {
                 StringBuilder strb = new StringBuilder();
                 strb.append("\nencoding problem done successfully (")
@@ -354,18 +392,24 @@ public final class HSP extends AbstractPlanner {
             final String problemName = problem.getName().substring(0, problem.getName().indexOf('.'));
             final int numberOfActions = planner.getStatistics().getNumberOfActions();
             final int numberOfFluents = planner.getStatistics().getNumberOfRelevantFluents();
-            final double timeToParseInSeconds =
-                Statistics.millisecondToSecond(planner.getStatistics().getTimeToParse());
-            final double timeToEncodeInSeconds =
-                Statistics.millisecondToSecond(planner.getStatistics().getTimeToEncode());
-            final double timeToSearchInSeconds =
-                Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
-            final double totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
-            final double memoryForProblemInMBytes =
-                Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
-            final double memoryUsedToSearchInMBytes =
-                Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
-            final double totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
+            double timeToParseInSeconds = 0.0;
+            double timeToEncodeInSeconds = 0.0;
+            double timeToSearchInSeconds = 0.0;
+            double totalTimeInSeconds = 0.0;
+            double memoryForProblemInMBytes = 0.0;
+            double memoryUsedToSearchInMBytes = 0.0;
+            double totalMemoryInMBytes = 0.0;
+
+            if (saveStats) {
+                timeToParseInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToParse());
+                timeToEncodeInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToEncode());
+                timeToSearchInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
+                totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
+                memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
+                memoryForProblemInMBytes =
+                    Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
+                totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
+            }
 
 
             if (traceLevel > 0 && traceLevel != 8) {
@@ -377,14 +421,17 @@ public final class HSP extends AbstractPlanner {
                 } else {
                     strb.append(String.format("%nno plan found%n%n"));
                 }
-                strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
-                strb.append(String.format("              %8.2f seconds encoding %n", timeToEncodeInSeconds));
-                strb.append(String.format("              %8.2f seconds searching%n", timeToSearchInSeconds));
-                strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
-                strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
-                    memoryForProblemInMBytes));
-                strb.append(String.format("              %8.2f MBytes for searching%n", memoryUsedToSearchInMBytes));
-                strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
+                if (saveStats) {
+                    strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
+                    strb.append(String.format("              %8.2f seconds encoding %n", timeToEncodeInSeconds));
+                    strb.append(String.format("              %8.2f seconds searching%n", timeToSearchInSeconds));
+                    strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
+                    strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
+                        memoryForProblemInMBytes));
+                    strb.append(String.format("              %8.2f MBytes for searching%n",
+                        memoryUsedToSearchInMBytes));
+                    strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
+                }
                 LOGGER.trace(strb);
             } else if (traceLevel == 8) {
                 final StringBuilder strb = new StringBuilder();
@@ -452,7 +499,11 @@ public final class HSP extends AbstractPlanner {
         /**
          * The trace level.
          */
-        TRACE_LEVEL
+        TRACE_LEVEL,
+        /**
+         * Generate statistics or not.
+         */
+        STATISTICS
     }
 
     /**
@@ -517,6 +568,9 @@ public final class HSP extends AbstractPlanner {
                         HSP.printUsage();
                     }
                     arguments.put(Argument.TRACE_LEVEL, level);
+                } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
+                    arguments.put(Argument.STATISTICS, isStatUsed);
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     HSP.printUsage();
@@ -548,6 +602,7 @@ public final class HSP extends AbstractPlanner {
         options.put(HSP.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
         options.put(HSP.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
         options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
+        options.put(Argument.STATISTICS, HSP.DEFAULT_STATISTICS);
         return options;
     }
 
@@ -594,7 +649,8 @@ public final class HSP extends AbstractPlanner {
             .append("               - memory used for problem representation in MBytes\n")
             .append("               - memory used for searching in MBytes\n")
             .append("               - total memory used in MBytes\n")
-            .append("               - lenght of the solution plan\n")
+            .append("               - length of the solution plan\n")
+            .append("-s <bool>   generate statistics or not (preset: true)\n")
             .append("-h          print this message\n\n");
 
         LOGGER.trace(strb);
