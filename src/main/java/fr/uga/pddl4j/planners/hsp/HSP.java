@@ -232,9 +232,7 @@ public final class HSP extends AbstractPlanner {
                 }
             }
             // Compute the searching time
-            if (isSaveState()) {
-                time = System.currentTimeMillis() - begin;
-            }
+            time = System.currentTimeMillis() - begin;
         }
 
         if (isSaveState()) {
