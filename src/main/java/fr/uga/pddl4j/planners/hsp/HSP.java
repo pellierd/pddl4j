@@ -80,7 +80,7 @@ public final class HSP extends AbstractPlanner {
     private double weight;
 
     /**
-     * Whether statistics are computed or not
+     * Whether statistics are computed or not.
      */
     private boolean saveState;
 
