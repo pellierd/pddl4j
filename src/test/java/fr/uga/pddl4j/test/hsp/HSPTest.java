@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -64,7 +62,7 @@ public class HSPTest {
     /**
      * Computation timeout.
      */
-    private static final int TIMEOUT = 3;
+    private static final int TIMEOUT = 10;
 
     /**
      * Default Trace level.
@@ -96,58 +94,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly adl tests
+     * IPC1 gripper tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_assembly_adl() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "assembly"
-            + File.separator + "adl"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly grid strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_grid_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "grid"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly gripper adl tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_gripper_adl() throws Exception {
+    public void testHSP_IPC1_gripper() throws Exception {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "gripper"
-            + File.separator + "adl"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -160,37 +114,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly gripper strips untyped tests
+     * IPC1 logistics tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_gripper_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "gripper"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly logistics adl tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics_adl() throws Exception {
+    public void testHSP_IPC1_logistics() throws Exception {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "logistics"
-            + File.separator + "adl"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -203,60 +134,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly logistics strips untyped tests
+     * IPC1 movie tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_logistics_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "logistics"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly logistics strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics_strips_untyped_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "logistics"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly movie adl tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_movie_adl() throws Exception {
+    public void testHSP_IPC1_movie() throws Exception {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "movie"
-            + File.separator + "adl"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -269,37 +154,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly movie strips untyped tests
+     * IPC1 mprime tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_movie_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "movie"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly mprime adl tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_mprime_adl() throws Exception {
+    public void testHSP_ICP1_mprime() throws Exception {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "mprime"
-            + File.separator + "adl"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -312,60 +174,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly mprime strips untyped tests
+     * IPC1 mystery tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_mprime_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "mprime"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly mprime strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_mprime_strips_untyped_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "mprime"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly mystery adl tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_mystery_adl() throws Exception {
+    public void testHSP_IPC1_mystery() throws Exception {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "mystery"
-            + File.separator + "adl"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -378,39 +194,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC1 assembly mystery strips typed tests
+     * IPC2 blocksworld tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_mystery_strips_typed() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
-            + File.separator + "mystery"
-            + File.separator + "strips"
-            + File.separator + "typed"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 blocksworld track1 strips typed tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_blocksworld_track1_strips_typed() throws Exception {
+    public void testHSP_IPC2_blocksworld() throws Exception {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "typed"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -423,134 +214,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 blocksworld track1 strips typed tests
+     * IPC2 elevator tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_blocksworld_track1_strips_typed_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "blocksworld"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "typed"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 blocksworld track1 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_blocksworld_track1_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "blocksworld"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 blocksworld track1 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_blocksworld_track1_strips_untyped_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "blocksworld"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 blocksworld track2 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_blocksworld_track2_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "blocksworld"
-            + File.separator + "track2"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 blocksworld track2 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_blocksworld_track2_strips_untyped_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "blocksworld"
-            + File.separator + "track2"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 elevator adl full tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_elevator_adl_full() throws Exception {
+    public void testHSP_IPC2_elevator() throws Exception {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "elevator"
-            + File.separator + "adl"
-            + File.separator + "full"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -563,38 +234,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 elevator adl simple tests
+     * IPC2 freecell tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_elevator_adl_simple() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "elevator"
-            + File.separator + "adl"
-            + File.separator + "simple"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 freecell strips typed tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_freecell_strips_typed() throws Exception {
+    public void testHSP_IPC2_freecell() throws Exception {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "freecell"
-            + File.separator + "strips"
-            + File.separator + "typed"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -607,179 +254,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 freecell strips untyped tests
+     * IPC2 schedule tests
      *
      * @throws Exception if something went wrong
      */
-    @Test
-    public void testHSP_freecell_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "freecell"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 logistics track1 strips typed tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics2_track1_strips_typed() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "logistics"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "typed"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 logistics track1 strips typed tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics2_track1_strips_typed_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "logistics"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "typed"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 logistics track1 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics2_track1_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "logistics"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 logistics track1 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics2_track1_strips_untyped_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "logistics"
-            + File.separator + "track1"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 logistics track2 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics2_track2_strips_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "logistics"
-            + File.separator + "track2"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 logistics track2 strips untyped tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_logistics2_track2_strips_untyped_additional() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "logistics"
-            + File.separator + "track2"
-            + File.separator + "strips"
-            + File.separator + "untyped"
-            + File.separator + "additional"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 schedule adl typed tests
-     *
-     * @throws Exception if something went wrong
-     */
-    @Test
-    public void testHSP_schedule_adl_typed() throws Exception {
+    //@Test
+    public void testHSP_IPC2_schedule() throws Exception {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "schedule"
-            + File.separator + "adl"
-            + File.separator + "typed"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -792,16 +274,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 schedule adl untyped tests
+     * IPC3 depots tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_schedule_adl_untyped() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "schedule"
-            + File.separator + "adl"
-            + File.separator + "untyped"
+    public void testHSP_IPC3_depots() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc3"
+            + File.separator + "depot"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -814,15 +294,14 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * IPC2 schedule strips tests
+     * IPC3 driverlog tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_schedule_strips() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
-            + File.separator + "schedule"
-            + File.separator + "strips"
+    public void testHSP_IPC3_driverlog() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc3"
+            + File.separator + "driverlog"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -835,116 +314,563 @@ public class HSPTest {
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * All IPC3 problem are run
+     * IPC3 rover tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC3() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3" + File.separator;
+    public void testHSP_IPC3_rover() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc3"
+            + File.separator + "rover"
+            + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark directory: IPC3 test skipped !");
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        ArrayList<String> directories = findSubDir(localTestPath).collect(Collectors.toCollection(ArrayList::new));
-        directories.forEach(this::generateValOutputPlans);
+        generateValOutputPlans(localTestPath);
+    }
+
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC3 satellite tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC3_satellite() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc3"
+            + File.separator + "satellite"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
     }
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * All IPC4 problem are run
+     * IPC3 zenotravel tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC4() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4" + File.separator;
+    public void testHSP_IPC3_zenotravel() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc3"
+            + File.separator + "zenotravel"
+            + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark directory: IPC3 test skipped !");
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        ArrayList<String> directories = findSubDir(localTestPath).collect(Collectors.toCollection(ArrayList::new));
-        directories.forEach(this::generateValOutputPlans);
+        generateValOutputPlans(localTestPath);
     }
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * All IPC5 problem are run
+     * IPC4 airport tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC5() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5" + File.separator;
+    public void testHSP_IPC4_airport() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc4"
+            + File.separator + "airport"
+            + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark directory: IPC3 test skipped !");
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        ArrayList<String> directories = findSubDir(localTestPath).collect(Collectors.toCollection(ArrayList::new));
-        directories.forEach(this::generateValOutputPlans);
+        generateValOutputPlans(localTestPath);
     }
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * All IPC6 problem are run
+     * IPC4 optical-telegraph tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC6() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6" + File.separator;
+    public void testHSP_IPC4_optical_telegraph() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc4"
+            + File.separator + "optical-telegraph"
+            + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark directory: IPC3 test skipped !");
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        ArrayList<String> directories = findSubDir(localTestPath).collect(Collectors.toCollection(ArrayList::new));
-        directories.forEach(this::generateValOutputPlans);
+        generateValOutputPlans(localTestPath);
     }
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * All IPC7 problem are run
+     * IPC4 philosophers tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC7() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7" + File.separator;
+    public void testHSP_IPC4_philosophers() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc4"
+            + File.separator + "philosophers"
+            + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark directory: IPC3 test skipped !");
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        ArrayList<String> directories = findSubDir(localTestPath).collect(Collectors.toCollection(ArrayList::new));
-        directories.forEach(this::generateValOutputPlans);
+        generateValOutputPlans(localTestPath);
     }
 
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
-     * All IPC8 problem are run
+     * IPC4 pipeworld tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC8() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8" + File.separator;
+    public void testHSP_IPC4_pipeworld() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc5"
+            + File.separator + "pipeworld"
+            + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark directory: IPC3 test skipped !");
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        ArrayList<String> directories = findSubDir(localTestPath).collect(Collectors.toCollection(ArrayList::new));
-        directories.forEach(this::generateValOutputPlans);
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC4 psr tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC4_psr() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc4"
+            + File.separator + "psr"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC5 openstacks tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC5_openstacks() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc5"
+            + File.separator + "openstacks"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC5 pathways tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC5_pathways() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc5"
+            + File.separator + "pathways"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC5 storage tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC5_storage() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc5"
+            + File.separator + "storage"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC5 tpp tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC5_tpp() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc5"
+            + File.separator + "tpp"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC5 truck tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC5_truck() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc5"
+            + File.separator + "truck"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC6 pegsol tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC6_pegsol() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc6"
+            + File.separator + "pegsol"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC6 sokoban tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC6_sokoban() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc6"
+            + File.separator + "sokoban"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC6 transport tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC6_transport() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc6"
+            + File.separator + "transport"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC7 barman tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC7_barman() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc7"
+            + File.separator + "barman"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC7 nomystery tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC7_nomystery() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc7"
+            + File.separator + "nomystery"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC7 parking tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC7_parking() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc7"
+            + File.separator + "parking"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC8 childsnack tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC8_childsnack() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc8"
+            + File.separator + "childsnack"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC8 hiking tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC8_hiking() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc8"
+            + File.separator + "hiking"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * IPC8 thoughtful tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_IPC8_thoughtful() throws Exception {
+        String localTestPath = BENCH_DIR + "ipc8"
+            + File.separator + "thoughtful"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Other Depots tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_newTests_Depots() throws Exception {
+        String localTestPath = BENCH_DIR + "newTests"
+            + File.separator + "Depots"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Other DriverLog tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_newTests_DriverLog() throws Exception {
+        String localTestPath = BENCH_DIR + "newTests"
+            + File.separator + "DriverLog"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Other Freecell tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_newTests_Freecell() throws Exception {
+        String localTestPath = BENCH_DIR + "newTests"
+            + File.separator + "Freecell"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Other Rover tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_newTests_Rover() throws Exception {
+        String localTestPath = BENCH_DIR + "newTests"
+            + File.separator + "Rover"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Other Satellite tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_newTests_Satellite() throws Exception {
+        String localTestPath = BENCH_DIR + "newTests"
+            + File.separator + "Satellite"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Other Zenotravel tests
+     *
+     * @throws Exception if something went wrong
+     */
+    @Test
+    public void testHSP_newTests_Zenotravel() throws Exception {
+        String localTestPath = BENCH_DIR + "newTests"
+            + File.separator + "Zenotravel"
+            + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
+            return;
+        }
+
+        generateValOutputPlans(localTestPath);
     }
 
     /**
@@ -994,19 +920,28 @@ public class HSPTest {
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
                 Assert.assertTrue(errorManager.isEmpty());
 
-                final CodedProblem pb;
-                Plan plan;
+                CodedProblem pb = null;
+                Plan plan = null;
                 try {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println("encoding [" + currentProblem + "]" + "...");
                     pb = factory.encode();
-                    Assert.assertTrue(pb.isSolvable());
-                    // Searches for a solution plan
-                    System.out.println("trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
-                    plan = planner.search(pb);
+                    if (pb.isSolvable()) {
+                        // Searches for a solution plan
+                        System.out.println("trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
+                        plan = planner.search(pb);
+                    } else {
+                        System.err.println("Problem [" + currentProblem + "]" + " not solvable.");
+                    }
                 } catch (OutOfMemoryError err) {
                     System.out.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
+                } catch (IllegalArgumentException iaex) {
+                    if(iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
+                        System.err.println("Not ADL problem in benchmark list ! Remove it if it is a mistake.");
+                    } else {
+                        throw iaex;
+                    }
                 }
 
                 if (plan == null) { // no solution in TIMEOUT computation time
@@ -1025,24 +960,6 @@ public class HSPTest {
                 ioEx.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Find sub directories from a specific path.
-     *
-     * @param localTestPath the local path where to start discovering sub directories
-     * @return all sub directories path as a stream of String
-     */
-    private Stream<String> findSubDir(String localTestPath) {
-
-        // Go into subdirectories
-        Stream<String> results =
-            Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-                .map((subDir) -> localTestPath + subDir + File.separator)
-                .flatMap(this::findSubDir);
-
-        // Validate current tests if any and returns errors from all tests that failed
-        return Stream.concat(Stream.of(localTestPath), results);
     }
 
     /**
