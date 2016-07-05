@@ -56,7 +56,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -76,7 +76,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -96,7 +96,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -116,7 +116,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -136,7 +136,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
 
@@ -158,7 +158,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -178,7 +178,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -198,7 +198,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -218,7 +218,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -238,7 +238,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -258,7 +258,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -278,7 +278,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -298,7 +298,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -318,7 +318,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -338,7 +338,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -358,7 +358,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -378,7 +378,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -398,7 +398,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -418,7 +418,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -438,7 +438,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -458,7 +458,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -478,7 +478,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -498,7 +498,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -518,7 +518,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -538,7 +538,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -558,7 +558,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -578,7 +578,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -598,7 +598,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -618,7 +618,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -638,7 +638,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -658,7 +658,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -678,7 +678,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -698,7 +698,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -718,7 +718,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -738,7 +738,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -758,7 +758,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -778,7 +778,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -798,7 +798,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
     /**
@@ -818,7 +818,7 @@ public class EncoderTest {
             return;
         }
 
-        EncodeProblems(localTestPath);
+        encodeProblems(localTestPath);
     }
 
 
@@ -827,7 +827,7 @@ public class EncoderTest {
      *
      * @param currentTestPath the current directory to test
      */
-    private void EncodeProblems(String currentTestPath) {
+    private void encodeProblems(String currentTestPath) {
         final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + DOMAIN;
         boolean oneDomainPerProblem = false;
