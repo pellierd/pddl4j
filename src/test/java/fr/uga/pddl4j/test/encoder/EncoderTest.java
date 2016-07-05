@@ -882,6 +882,12 @@ public class EncoderTest {
                 } catch (OutOfMemoryError err) {
                     System.out.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
+                } catch (IllegalArgumentException iaex) {
+                    if(iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
+                        System.err.println("Not ADL problem in benchmark list ! Remove it if it is a mistake.");
+                    } else {
+                        throw iaex;
+                    }
                 }
 
             } catch (IOException ioEx) {
