@@ -3,22 +3,12 @@ package fr.uga.pddl4j.test.encoder;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Implements the <tt>EncoderTest</tt> of the PDD4L library.
@@ -39,47 +29,15 @@ public class EncoderTest {
     private static final String PDDL_EXT = ".pddl";
 
     /**
-     * PDDL4J output plan extension for KCL validator format.
-     */
-    private static final String PLAN_EXT = ".val";
-
-    /**
      * The domain file name.
      */
     private static final String DOMAIN = "domain" + PDDL_EXT;
-
-    /**
-     * Computation timeout.
-     */
-    private static final int TIMEOUT = 3;
 
     /**
      * Default Trace level.
      */
     private static final int TRACE_LEVEL = 0;
 
-    /**
-     * Default statistics computation.
-     */
-    private static final boolean STATISTICS = false;
-
-    /**
-     * The HSP planner reference.
-     */
-    private HSP planner = null;
-
-
-    /**
-     * Test initialization.
-     */
-    @Before
-    public void initTest() {
-        // Creates the planner
-        planner = new HSP();
-        planner.setTimeOut(TIMEOUT);
-        planner.setTraceLevel(TRACE_LEVEL);
-        planner.setSaveState(STATISTICS);
-    }
 
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
@@ -98,7 +56,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -118,7 +76,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -138,7 +96,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -158,7 +116,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -178,7 +136,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
 
@@ -200,7 +158,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -220,7 +178,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -240,7 +198,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -260,7 +218,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -280,7 +238,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -300,7 +258,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -320,7 +278,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -340,7 +298,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -360,7 +318,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -380,7 +338,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -400,7 +358,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -420,7 +378,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -440,7 +398,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -460,7 +418,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -480,7 +438,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -500,7 +458,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -520,7 +478,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -540,7 +498,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -560,7 +518,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -580,7 +538,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -600,7 +558,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -620,7 +578,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -640,7 +598,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -660,7 +618,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -680,7 +638,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -700,7 +658,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -720,7 +678,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -740,7 +698,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -760,7 +718,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -780,7 +738,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -800,7 +758,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -820,7 +778,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -840,7 +798,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
     /**
@@ -860,7 +818,7 @@ public class EncoderTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath);
+        EncodeProblems(localTestPath);
     }
 
 
@@ -869,7 +827,7 @@ public class EncoderTest {
      *
      * @param currentTestPath the current directory to test
      */
-    private void generateValOutputPlans(String currentTestPath) {
+    private void EncodeProblems(String currentTestPath) {
         final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + DOMAIN;
         boolean oneDomainPerProblem = false;
