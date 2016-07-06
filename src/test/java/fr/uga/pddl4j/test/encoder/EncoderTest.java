@@ -204,7 +204,7 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC2 schedule tests
-     *
+     * TODO test running with GC overhead errors
      * @throws Exception if something went wrong
      */
     //@Test
