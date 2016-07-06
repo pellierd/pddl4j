@@ -31,12 +31,17 @@ interface Planner {
     /**
      * The default CPU time allocated to the search in seconds.
      */
-    static final int DEFAULT_TIMEOUT = 600;
+    int DEFAULT_TIMEOUT = 600;
 
     /**
      * The default trace level.
      */
-    static final int DEFAULT_TRACE_LEVEL = 1;
+    int DEFAULT_TRACE_LEVEL = 1;
+
+    /**
+     * The default statistics value.
+     */
+    boolean DEFAULT_STATISTICS = true;
 
     /**
      * Search a plan for the specified planning problem.
