@@ -3,6 +3,7 @@ VERSION=3.3.6
 FILES=""
 TOTAL_FILES=0
 TOTAL_VALIDATED_PLANS=0
+VALIDATE_BIN=validate
 
 #Tests path definitions for IPC1
 TEST[0]="../../../benchmarks/ipc1/gripper/"
@@ -80,9 +81,9 @@ for test in ${TEST[@]} ;do
         name=$(echo ${f} | cut -d \/ -f 7)
         name=$(echo ${name} | cut -d . -f 1)
         if [ ${ONE_DOMAIN_FILE} -eq 1 ] ;then
-            ./validate.exe -s ${test}/domain.pddl ${test}/${name}.pddl ${f}
+            ./${VALIDATE_BIN} -s ${test}/domain.pddl ${test}/${name}.pddl ${f}
         else
-            ./validate.exe -s ${test}/${name}-domain.pddl ${test}/${name}.pddl ${f}
+            ./${VALIDATE_BIN} -s ${test}/${name}-domain.pddl ${test}/${name}.pddl ${f}
         fi
         if [ $? -eq 0 ] ;then
             ((NB_VALIDATED_FILE+=1))
