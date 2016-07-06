@@ -230,7 +230,7 @@ public class EncoderTest {
     @Test
     public void testEncode_IPC3_depots() throws Exception {
         String localTestPath = BENCH_DIR + "ipc3"
-            + File.separator + "depot"
+            + File.separator + "depots"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -368,9 +368,9 @@ public class EncoderTest {
      * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_philosopher() throws Exception {
+    public void testEncode_IPC4_philosophers() throws Exception {
         String localTestPath = BENCH_DIR + "ipc4"
-            + File.separator + "philosopher"
+            + File.separator + "philosophers"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -383,14 +383,14 @@ public class EncoderTest {
 
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
-     * IPC4 pipeworld tests
+     * IPC4 pipesworld tests
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_pipeworld() throws Exception {
+    public void testEncode_IPC4_pipesworld() throws Exception {
         String localTestPath = BENCH_DIR + "ipc4"
-            + File.separator + "pipeworld"
+            + File.separator + "pipesworld"
             + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
@@ -880,7 +880,7 @@ public class EncoderTest {
                         System.out.println("Problem encoded and is  not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
-                    System.out.println("ERR: " + err.getMessage() + " - test aborted");
+                    System.err.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
                 } catch (IllegalArgumentException iaex) {
                     if(iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
