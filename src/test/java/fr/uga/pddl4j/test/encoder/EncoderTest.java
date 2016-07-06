@@ -883,7 +883,7 @@ public class EncoderTest {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
                 } catch (IllegalArgumentException iaex) {
-                    if(iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
+                    if (iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
                         System.err.println("Not ADL problem in benchmark list ! Remove it if it is a mistake.");
                     } else {
                         throw iaex;
