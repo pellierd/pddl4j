@@ -102,7 +102,7 @@ public interface CodedOp extends Serializable {
     /**
      * Returns the duration of the operator.
      *
-     * @retun the duration of the operator.
+     * @return the duration of the operator.
      */
     double getDuration();
 

@@ -53,7 +53,7 @@ public abstract class AbstractPlan implements Plan {
     /**
      * Returns the cost of the search. The cost of a search is the sum of the cost of its actions.
      *
-     * @retun the cost of the search.
+     * @return the cost of the search.
      */
     @Override
     public double cost() {

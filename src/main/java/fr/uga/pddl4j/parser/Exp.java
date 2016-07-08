@@ -318,7 +318,7 @@ public class Exp implements Serializable {
      *
      * @param context the images of the renamed variable.
      * @exception MalformedExpException if this expression is malformed.
-     * @see this#isMalformedExpression()
+     * @see this#isMalformedExpression
      */
     public void renameVariables(final Map<String, String> context) {
         if (this.isMalformedExpression()) {
@@ -408,7 +408,7 @@ public class Exp implements Serializable {
     /**
      * Moves the negation inward the expression.
      *
-     * @see this#isMalformedExpression()
+     * @see this#isMalformedExpression
      */
     public void moveNegationInward() throws FatalException {
         if (this.isMalformedExpression()) {
@@ -637,8 +637,8 @@ public class Exp implements Serializable {
      * Returns a string representation of this node.
      *
      * @return a string representation of this node.
-     * @see java.lang.Object#toString()
-     * @see this#isMalformedExpression()
+     * @see java.lang.Object#toString
+     * @see this#isMalformedExpression
      */
     @Override
     public String toString() {
@@ -651,7 +651,7 @@ public class Exp implements Serializable {
      * @param baseOffset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
      * @exception MalformedExpException if the expression is malformed.
-     * @see this#isMalformedExpression()
+     * @see this#isMalformedExpression
      */
     private String toString(String baseOffset) {
         if (this.isMalformedExpression()) {

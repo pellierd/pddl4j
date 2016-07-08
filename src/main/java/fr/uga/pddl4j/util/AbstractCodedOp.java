@@ -249,7 +249,7 @@ public abstract class AbstractCodedOp implements CodedOp {
     /**
      * Returns the duration of the operator.
      *
-     * @returns the duration of the operator.
+     * @return the duration of the operator.
      */
     @Override
     public final double getDuration() {
