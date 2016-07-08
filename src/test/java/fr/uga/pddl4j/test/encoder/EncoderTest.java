@@ -884,7 +884,7 @@ public class EncoderTest {
                     return;
                 } catch (IllegalArgumentException iaex) {
                     if (iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
-                        System.err.println("Not ADL problem in benchmark list ! Remove it if it is a mistake.");
+                        System.err.println("[" + currentProblem + "]: Not ADL problem!");
                     } else {
                         throw iaex;
                     }
