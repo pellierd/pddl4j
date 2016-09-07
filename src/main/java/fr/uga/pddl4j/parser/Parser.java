@@ -29,7 +29,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -308,18 +310,19 @@ public final class Parser {
      * @param problemString the string that contains the planning problem.
      */
     public void parseString(String domainString, String problemString)  {
-
         try {
             // Create temp files for domain and problem
             File domain = File.createTempFile("domain", ".pddl");
-            File problem = File.createTempFile("domain", ".pddl");
+            File problem = File.createTempFile("problem", ".pddl");
 
             // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(domain))) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(domain), "UTF-8"))) {
                 writer.write(domainString);
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(problem))) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(problem), "UTF-8"))) {
                 writer.write(problemString);
             }
 
@@ -351,7 +354,7 @@ public final class Parser {
             this.checkGoal();
             this.checkProblemConstraints();
             this.checkMetric();
-        } catch (Exception exception) {
+        } catch (ParseException | IOException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
