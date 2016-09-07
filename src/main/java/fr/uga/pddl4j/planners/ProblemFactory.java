@@ -76,6 +76,19 @@ public class ProblemFactory {
     }
 
     /**
+     * Parses the domain and the problem description.
+     *
+     * @param domain the domain string description
+     * @param problem the problem string description
+     * @return the error manager of the parser used to parse
+     * @throws IOException if an error occur during parsing
+     */
+    public ErrorManager parse(final String domain, final String problem) throws IOException {
+        parser.parseString(domain, problem);
+        return parser.getErrorManager();
+    }
+
+    /**
      * Encodes and instantiates the planning problem.
      *
      * @return the encoded planning problem or null if the problem cannot be encoded.

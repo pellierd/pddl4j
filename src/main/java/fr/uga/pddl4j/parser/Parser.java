@@ -25,9 +25,11 @@ import fr.uga.pddl4j.parser.lexer.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -266,6 +268,61 @@ public final class Parser {
             throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.");
         }
         try {
+            // Parse and check the domain
+            this.lexer = new Lexer(new FileInputStream(domain));
+            lexer.setErrorManager(this.mgr);
+            lexer.setFile(domain);
+            this.lexer.domain();
+            this.domain = this.lexer.getDomain();
+            this.checkTypesDeclaration();
+            this.checkConstantsDeclaration();
+            this.checkPredicatesDeclaration();
+            this.checkFunctionsDeclaration();
+            this.checkDomainConstraints();
+            this.checkOperatorsDeclaration();
+            this.checkDerivedPredicatesDeclaration();
+            // Parse and check the problem
+            if (this.lexer == null) {
+                this.lexer = new Lexer(new FileInputStream(problem));
+            } else {
+                this.lexer.ReInit(new FileInputStream(problem));
+            }
+            this.lexer.setFile(problem);
+            this.lexer.problem();
+            this.problem = this.lexer.getProblem();
+            this.checkDomainName();
+            this.checkObjectsDeclaration();
+            this.checkInitialFacts();
+            this.checkGoal();
+            this.checkProblemConstraints();
+            this.checkMetric();
+        } catch (Exception exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from their respective string description.
+     *
+     * @param domainString  the string that contains the planning domains.
+     * @param problemString the string that contains the planning problem.
+     */
+    public void parseString(String domainString, String problemString)  {
+
+        try {
+            // Create temp files for domain and problem
+            File domain = File.createTempFile("domain", ".pddl");
+            File problem = File.createTempFile("domain", ".pddl");
+
+            // Fill files with string content
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(domain))) {
+                writer.write(domainString);
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(problem))) {
+                writer.write(problemString);
+            }
+
             // Parse and check the domain
             this.lexer = new Lexer(new FileInputStream(domain));
             lexer.setErrorManager(this.mgr);
