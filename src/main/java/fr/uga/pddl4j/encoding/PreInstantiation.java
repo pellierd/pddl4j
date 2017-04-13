@@ -198,7 +198,10 @@ final class PreInstantiation {
             if (Encoder.tableOfTypedPredicates.get(i).size() == 1
                 && Encoder.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
-                for (final IntExp fact : init) {
+                for (IntExp fact : init) {
+                    if (fact.getConnective().equals(Connective.NOT)) {
+                        fact = fact.getChildren().get(0);
+                    }
                     if (fact.getPredicate() == i) {
                         newTypeDomain.add(fact.getArguments()[0]);
                     }
@@ -230,7 +233,10 @@ final class PreInstantiation {
             Encoder.predicatesTables.add(pTables);
         }
 
-        for (final IntExp fact : init) {
+        for (IntExp fact : init) {
+            if (fact.getConnective().equals(Connective.NOT)) {
+                fact = fact.getChildren().get(0);
+            }
             final int arity = Encoder.tableOfTypedPredicates.get(fact.getPredicate()).size();
             final List<IntMatrix> pTables = Encoder.predicatesTables.get(fact.getPredicate());
             final int[] set = new int[arity];
