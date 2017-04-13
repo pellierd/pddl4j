@@ -486,6 +486,7 @@ final class PostInstantiation {
      */
     static void simplifyGoalWithGroundInertia(final IntExp goal, final Set<IntExp> init) {
         PostInstantiation.simplifyWithGroundInertia(goal, false, init);
+        PostInstantiation.simplify(goal);
     }
 
     /**
