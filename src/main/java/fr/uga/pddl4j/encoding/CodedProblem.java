@@ -169,7 +169,8 @@ public class CodedProblem {
     }
 
     /**
-     * TODO to remove: never used.
+     * Returns the type inferred. Types are inferred when the key work either is used.
+     *
      * @return the inferredDomains
      */
     final List<Set<Integer>> getInferredDomains() {
@@ -186,7 +187,7 @@ public class CodedProblem {
 
     /**
      * Returns the table of domains for each type of the problem.
-     * TODO to remove: never used.
+     *
      * @return the table of domains for each type of the problem.
      */
     public final List<Set<Integer>> getDomains() {
@@ -240,7 +241,7 @@ public class CodedProblem {
 
     /**
      * Returns the signatures of the predicates defined in the problem.
-     * TODO to remove: never used.
+     *
      * @return the signatures of the predicates defined in the problem.
      */
     public final List<List<Integer>> getPredicatesSignatures() {
@@ -276,7 +277,7 @@ public class CodedProblem {
 
     /**
      * Returns the signatures of the functions defined in the problem.
-     * TODO to remove: never used.
+     *
      * @return the signatures of the functions defined in the problem.
      */
     public final List<List<Integer>> getFunctionsSignatures() {
