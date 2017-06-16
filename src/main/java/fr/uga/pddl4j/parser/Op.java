@@ -355,7 +355,12 @@ public class Op implements Serializable {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        str.append("(:action ").append(this.name.toString()).append("\n").append(":parameters (");
+        if (this.duration == null) {
+            str.append("(:action ");
+        } else {
+            str.append("(:durative-action ");
+        }
+        str.append(this.name.toString()).append("\n").append(":parameters (");
         for (int i = 0; i < this.parameters.size() - 1; i++) {
             str.append(this.parameters.get(i)).append(" ");
         }
@@ -364,7 +369,7 @@ public class Op implements Serializable {
         }
         str.append(")");
         if (this.duration != null) {
-            str.append("\n:duration ").append("\n  ").append(this.duration.toString()).append("\n:conditions ");
+            str.append("\n:duration ").append("\n  ").append(this.duration.toString()).append("\n:condition ");
         } else {
             str.append("\n:precondition ");
         }
