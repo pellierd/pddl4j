@@ -71,7 +71,7 @@ public class ProblemFactory {
      * @throws IOException if an error occur during parsing.
      */
     public ErrorManager parse(final File domain, final File problem) throws IOException {
-        parser.parse(domain, problem);
+        this.parser.parse(domain, problem);
         return parser.getErrorManager();
     }
 
@@ -84,7 +84,7 @@ public class ProblemFactory {
      * @throws IOException if an error occur during parsing
      */
     public ErrorManager parse(final String domain, final String problem) throws IOException {
-        parser.parseString(domain, problem);
+        this.parser.parseString(domain, problem);
         return parser.getErrorManager();
     }
 
