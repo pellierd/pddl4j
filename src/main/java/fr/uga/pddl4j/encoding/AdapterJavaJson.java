@@ -54,7 +54,7 @@ public class AdapterJavaJson {
         // Creation of the json files
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(name), "UTF-8")) {
             // Editing the first json file
-            writer.write(jsonPlan.toJSONString());
+            writer.write(this.jsonPlan.toJSONString());
         } catch (IOException exception) {
             exception.printStackTrace();
         }
@@ -84,7 +84,7 @@ public class AdapterJavaJson {
                 for (int j = 0; j < action.getArity(); j++) {
                     final int index = action.getValueOfParameter(j);
                     if (index != -1) {
-                        parameters.add(codedProblem.getConstants().get(index));
+                        parameters.add(this.codedProblem.getConstants().get(index));
                     }
                 }
 
@@ -154,7 +154,7 @@ public class AdapterJavaJson {
             }
         }
 
-        jsonPlan = planJson;
+        this.jsonPlan = planJson;
         return planJson.toJSONString();
     }
 
@@ -164,9 +164,9 @@ public class AdapterJavaJson {
      * @param exp the BitExp instance to convert
      * @return an 2D collection of Strings
      */
-    private ArrayList<ArrayList<String>> toJsonString(BitExp exp) {
-        return AdapterJavaJson.toJsonString(exp, codedProblem.getConstants(), codedProblem.getTypes(),
-            codedProblem.getPredicates(), codedProblem.getFunctions(), codedProblem.getRelevantFacts());
+    private ArrayList<ArrayList<String>> toJsonString(final BitExp exp) {
+        return AdapterJavaJson.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
+            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFacts());
     }
 
     /**
@@ -180,7 +180,7 @@ public class AdapterJavaJson {
      * @param relevants the facts of the problem
      * @return an 2D collection of Strings
      */
-    private static ArrayList<ArrayList<String>> toJsonString(BitExp exp, final List<String> constants,
+    private static ArrayList<ArrayList<String>> toJsonString(final BitExp exp, final List<String> constants,
                                                              final List<String> types, final List<String> predicates,
                                                              final List<String> functions, final List<IntExp> relevants) {
         ArrayList<String> fluentsPos = new ArrayList<>();
