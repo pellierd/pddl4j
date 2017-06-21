@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.planners.hsp;
 
-import fr.uga.pddl4j.encoding.AdapterPlanJavaJson;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
@@ -45,7 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Properties;
-
 
 /**
  * This class implements a simple forward planner based on A* algorithm.
@@ -263,75 +261,6 @@ public final class HSP extends AbstractPlanner {
         return plan;
     }
 
-
-    /**
-     * resolve a problem and get the output plan as a JSON string
-     * @param args the arguments of the command line.
-     * @return the plan in a JSON format
-     */
-    public static String resolveAsJsonPlan(String[] args) {
-        String jsonPlan = "";
-        try {
-            // Parse the command line
-            final Properties arguments = HSP.parseArguments(args);
-            final File domain = (File) arguments.get(HSP.Argument.DOMAIN);
-            final File problem = (File) arguments.get(HSP.Argument.PROBLEM);
-            final int traceLevel = 0;
-            final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
-            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
-            final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
-
-            // Creates the planner
-            final HSP planner = new HSP();
-            planner.setHeuristicType(heuristicType);
-            planner.setWeight(weight);
-            planner.setTimeOut(timeout);
-            planner.setTraceLevel(traceLevel);
-            planner.setSaveState(false);
-
-
-            // Creates the problem factory
-            final ProblemFactory factory = new ProblemFactory();
-            factory.setTraceLevel(traceLevel);
-
-            // Parses the PDDL domain and problem description
-            ErrorManager errorManager = factory.parse(domain, problem);
-            if (!errorManager.isEmpty()) {
-                errorManager.printAll();
-                throw new RuntimeException("Parsing error");
-            }
-
-            // Encodes and instantiates the problem in a compact representation
-            final CodedProblem pb = factory.encode();
-            planner.getStatistics().setNumberOfActions(pb.getOperators().size());
-            planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
-
-            if (!pb.isSolvable()) {
-                StringBuilder strb = new StringBuilder();
-                strb.append(String.format("goal can be simplified to FALSE. no search will solve it%n%n"));
-                LOGGER.trace(strb);
-                throw new RuntimeException("Problem not solvable");
-            }
-
-            // Searches for a solution plan
-            final Plan plan = planner.search(pb);
-
-            if (plan != null) {
-                AdapterPlanJavaJson javaToJson = new AdapterPlanJavaJson(pb);
-                jsonPlan = javaToJson.toStringJ(plan);
-            }
-
-        } catch (IOException ioExp) {
-            LOGGER.error(ioExp);
-        } catch (FileException fileEx) {
-            LOGGER.error(fileEx);
-            throw new RuntimeException("domain or problem files error");
-        }
-
-        return jsonPlan;
-
-    }
-
     /**
      * The main method of the <code>HSP</code> example. The command line syntax is as follow:
      * <p>
@@ -406,7 +335,7 @@ public final class HSP extends AbstractPlanner {
 
 
             // Creates the problem factory
-            final ProblemFactory factory = new ProblemFactory();
+            final ProblemFactory factory = ProblemFactory.getInstance();
             final int factoryTraceLevel = (traceLevel == 8) ? 0 : Math.max(0, traceLevel - 1);
             factory.setTraceLevel(factoryTraceLevel);
 

@@ -38,6 +38,11 @@ import java.io.IOException;
 public class ProblemFactory {
 
     /**
+     * An instance of the ProblemFactory.
+     */
+    private static ProblemFactory instance = new ProblemFactory();
+
+    /**
      * The parser used to parser domain and problem description in PDDL.
      */
     private Parser parser;
@@ -55,10 +60,19 @@ public class ProblemFactory {
     /**
      * Creates a new problem factory.
      */
-    public ProblemFactory() {
+    private ProblemFactory() {
         super();
         this.parser = new Parser();
         this.traceLevel = ProblemFactory.DEFAULT_TRACE_LEVEL;
+    }
+
+    /**
+     * Returns an instance of this class.
+     *
+     * @return an instance of this class.
+     */
+    public static ProblemFactory getInstance() {
+        return ProblemFactory.instance;
     }
 
     /**

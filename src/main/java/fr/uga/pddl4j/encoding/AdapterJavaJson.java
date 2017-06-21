@@ -1,11 +1,6 @@
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
-import fr.uga.pddl4j.util.Plan;
-
+import fr.uga.pddl4j.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -27,7 +22,7 @@ import java.util.stream.Collectors;
  * @author Cedric Gerard
  * @version 1.0 - 07.19.2016
  */
-public class AdapterPlanJavaJson {
+public class AdapterJavaJson {
 
     /**
      * The current coded problem the plan is based on.
@@ -43,7 +38,7 @@ public class AdapterPlanJavaJson {
      * Adapter constructor.
      * @param codedProblem the pddl4j problem representation
      */
-    public AdapterPlanJavaJson(CodedProblem codedProblem) {
+    public AdapterJavaJson(CodedProblem codedProblem) {
         this.codedProblem = new CodedProblem(codedProblem);
     }
 
@@ -72,7 +67,7 @@ public class AdapterPlanJavaJson {
      * @return the plan in a json string format
      */
     @SuppressWarnings("unchecked")
-    public final String toStringJ(final Plan plan) {
+    public final String toJsonString(final Plan plan) {
 
         JSONObject planJson = new JSONObject();
 
@@ -94,7 +89,7 @@ public class AdapterPlanJavaJson {
                 }
 
                 // Preconditions
-                ArrayList<ArrayList<String>> preconds = this.toStringJ(action.getPreconditions());
+                ArrayList<ArrayList<String>> preconds = this.toJsonString(action.getPreconditions());
                 JSONObject precondJson = new JSONObject();
 
                 ArrayList<String> positives = preconds.get(0);
@@ -119,7 +114,7 @@ public class AdapterPlanJavaJson {
                     JSONObject expJsonEffects = new JSONObject();
 
                     ArrayList<ArrayList<String>> condExpElementsCondition =
-                        this.toStringJ(condExp.get(k).getCondition());
+                        this.toJsonString(condExp.get(k).getCondition());
 
                     JSONArray positivesConditionJson = listToJson(condExpElementsCondition.get(0));
                     JSONArray negativesConditionJson = listToJson(condExpElementsCondition.get(1));
@@ -128,7 +123,7 @@ public class AdapterPlanJavaJson {
                     expJsonCondition.put("Positives", positivesConditionJson);
                     expJsonCondition.put("Negatives", negativesConditionJson);
 
-                    ArrayList<ArrayList<String>> condExpElementsEffect = this.toStringJ(condExp.get(k).getEffects());
+                    ArrayList<ArrayList<String>> condExpElementsEffect = this.toJsonString(condExp.get(k).getEffects());
 
                     JSONArray positivesEffectJson = listToJson(condExpElementsEffect.get(0));
                     JSONArray negativesEffectJson = listToJson(condExpElementsEffect.get(1));
@@ -169,8 +164,8 @@ public class AdapterPlanJavaJson {
      * @param exp the BitExp instance to convert
      * @return an 2D collection of Strings
      */
-    private ArrayList<ArrayList<String>> toStringJ(BitExp exp) {
-        return AdapterPlanJavaJson.toStringJ(exp, codedProblem.getConstants(), codedProblem.getTypes(),
+    private ArrayList<ArrayList<String>> toJsonString(BitExp exp) {
+        return AdapterJavaJson.toJsonString(exp, codedProblem.getConstants(), codedProblem.getTypes(),
             codedProblem.getPredicates(), codedProblem.getFunctions(), codedProblem.getRelevantFacts());
     }
 
@@ -185,9 +180,9 @@ public class AdapterPlanJavaJson {
      * @param relevants the facts of the problem
      * @return an 2D collection of Strings
      */
-    private static ArrayList<ArrayList<String>> toStringJ(BitExp exp, final List<String> constants,
-                                                          final List<String> types, final List<String> predicates,
-                                                          final List<String> functions, final List<IntExp> relevants) {
+    private static ArrayList<ArrayList<String>> toJsonString(BitExp exp, final List<String> constants,
+                                                             final List<String> types, final List<String> predicates,
+                                                             final List<String> functions, final List<IntExp> relevants) {
         ArrayList<String> fluentsPos = new ArrayList<>();
         ArrayList<String> fluentsNeg = new ArrayList<>();
         ArrayList<ArrayList<String>> fluents = new ArrayList<>();
