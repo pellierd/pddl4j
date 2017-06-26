@@ -1,8 +1,13 @@
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import fr.uga.pddl4j.util.BitExp;
+import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.util.CondBitExp;
+import fr.uga.pddl4j.util.IntExp;
+import fr.uga.pddl4j.util.Plan;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
