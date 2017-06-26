@@ -1,6 +1,6 @@
 package fr.uga.pddl4j.test.encoder;
 
-import fr.uga.pddl4j.encoding.AdapterJavaJson;
+import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -92,7 +92,7 @@ public class JsonAdapterTest {
         Plan plan = getPlan(problem);
         Assert.assertFalse(plan == null);
 
-        AdapterJavaJson converter = new AdapterJavaJson(problem);
+        JsonAdapter converter = new JsonAdapter(problem);
         String jsonPlan = converter.toJsonString(plan);
 
         Assert.assertTrue(jsonPlan.contentEquals(validGripperP01JSON));
@@ -117,7 +117,7 @@ public class JsonAdapterTest {
         Plan plan = getPlan(problem);
         Assert.assertFalse(plan == null);
 
-        AdapterJavaJson converter = new AdapterJavaJson(problem);
+        JsonAdapter converter = new JsonAdapter(problem);
         String outputJson = converter.toJsonString(plan);
         String outputFile = "p01.json";
         converter.saveInFile(outputFile);

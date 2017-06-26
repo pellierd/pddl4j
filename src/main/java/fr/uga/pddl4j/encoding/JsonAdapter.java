@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @author Cedric Gerard
  * @version 1.0 - 07.19.2016
  */
-public class AdapterJavaJson {
+public class JsonAdapter {
 
     /**
      * The current coded problem the plan is based on.
@@ -43,7 +43,7 @@ public class AdapterJavaJson {
      * Adapter constructor.
      * @param codedProblem the pddl4j problem representation
      */
-    public AdapterJavaJson(CodedProblem codedProblem) {
+    public JsonAdapter(CodedProblem codedProblem) {
         this.codedProblem = new CodedProblem(codedProblem);
     }
 
@@ -170,7 +170,7 @@ public class AdapterJavaJson {
      * @return an 2D collection of Strings
      */
     private ArrayList<ArrayList<String>> toJsonString(final BitExp exp) {
-        return AdapterJavaJson.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
+        return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
             this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFacts());
     }
 
