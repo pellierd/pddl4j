@@ -59,8 +59,9 @@ public class JsonAdapter {
     private JSONObject jsonPlan;
 
     /**
-     * Adapter constructor.
-     * @param codedProblem the pddl4j problem representation
+     * Create a new adapter.
+     *
+     * @param codedProblem the pddl4j problem representation.
      */
     public JsonAdapter(CodedProblem codedProblem) {
         this.codedProblem = new CodedProblem(codedProblem);
@@ -69,7 +70,7 @@ public class JsonAdapter {
     /**
      * Save the current jsonPlan into a file.
      *
-     * @param name the name of the saved file
+     * @param name the name of the saved file.
      */
     public void saveInFile(String name) {
         if (jsonPlan == null) {
@@ -87,8 +88,8 @@ public class JsonAdapter {
     /**
      * Return a string of the plan in a json format.
      *
-     * @param plan to convert into json string
-     * @return the plan in a json string format
+     * @param plan to convert into json string.
+     * @return the plan in a json string format.
      */
     @SuppressWarnings("unchecked")
     public final String toJsonString(final Plan plan) {
@@ -185,8 +186,8 @@ public class JsonAdapter {
     /**
      * Convert a BitExp into a String collection.
      *
-     * @param exp the BitExp instance to convert
-     * @return an 2D collection of Strings
+     * @param exp the BitExp instance to convert.
+     * @return an 2D collection of Strings.
      */
     private ArrayList<ArrayList<String>> toJsonString(final BitExp exp) {
         return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
@@ -196,13 +197,13 @@ public class JsonAdapter {
     /**
      * Convert a BitExp into a String collection.
      *
-     * @param exp the BitExp instance to convert
-     * @param constants the constants of the problem
-     * @param types the types of the problem
-     * @param predicates the predicates of the problem
-     * @param functions the functions of the problem
-     * @param relevants the facts of the problem
-     * @return an 2D collection of Strings
+     * @param exp the BitExp instance to convert.
+     * @param constants the constants of the problem.
+     * @param types the types of the problem.
+     * @param predicates the predicates of the problem.
+     * @param functions the functions of the problem.
+     * @param relevants the facts of the problem.
+     * @return an 2D collection of Strings.
      */
     private static ArrayList<ArrayList<String>> toJsonString(final BitExp exp, final List<String> constants,
                                                              final List<String> types, final List<String> predicates,
@@ -227,10 +228,10 @@ public class JsonAdapter {
     }
 
     /**
-     * Method that transform an ArrayList into a JSONArray.
+     * Transform an ArrayList into a JSONArray.
      *
      * @param list an ArrayList that we want to convert into a List.
-     * @return list the list parameter
+     * @return list the list parameter.
      */
     private static JSONArray listToJson(List<String> list) {
         return list.stream().collect(Collectors.toCollection(JSONArray::new));
