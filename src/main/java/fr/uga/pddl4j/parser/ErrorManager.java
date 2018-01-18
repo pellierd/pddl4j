@@ -102,6 +102,15 @@ public class ErrorManager implements Serializable {
     }
 
     /**
+     * Returns the list of all messages from the error manager.
+     *
+     * @return The list of messages.
+     */
+    public Set<Message> getMessages() {
+        return this.msg;
+    }
+
+    /**
      * Returns the list of messages that concerns a specific file.
      *
      * @param file The file.
