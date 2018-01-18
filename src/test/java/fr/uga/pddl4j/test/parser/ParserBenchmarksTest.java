@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  * @author C Gerard
  * @version 0.1 - 16.02.16
  */
-public class ParserTest {
+public class ParserBenchmarksTest {
 
     /**
      * The path of the benchmarks files.
@@ -303,8 +303,8 @@ public class ParserTest {
         // Go into subdirectories
         Stream<String> results =
             Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-            .map((subDir) -> localTestPath + subDir + File.separator)
-            .flatMap(this::executeTests);
+                .map((subDir) -> localTestPath + subDir + File.separator)
+                .flatMap(this::executeTests);
 
         // Validate current tests if any and returns errors from all tests that failed
         return Stream.concat(validate(localTestPath).stream(), results);
@@ -382,5 +382,4 @@ public class ParserTest {
 
         return errors;
     }
-
 }
