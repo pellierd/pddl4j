@@ -20,14 +20,10 @@
 package fr.uga.pddl4j.planners.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.CommonPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -37,7 +33,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -65,36 +60,6 @@ public final class FF extends AbstractPlanner {
      */
     private static final double DEFAULT_WEIGHT = 1.00;
 
-
-
-
-
-
-    /**
-     * The time needed to search a solution plan.
-     */
-    private long searchingTime;
-    /**
-     * The time needed to encode the planning problem.
-     */
-    private long preprocessingTime;
-    /**
-     * The memory used in bytes to search a solution plan.
-     */
-    private long searchingMemory;
-    /**
-     * The memory used in bytes to encode problem.
-     */
-    private long problemMemory;
-    /**
-     * The number of node explored.
-     */
-    private int nbOfExploredNodes;
-
-
-    private int nb_states;
-    private int max_depth;
-
     /**
      * The type of heuristics that must use to solve the problem.
      */
@@ -109,6 +74,18 @@ public final class FF extends AbstractPlanner {
      * Whether statistics are computed or not.
      */
     private boolean saveState;
+
+    /**
+     * Creates a new planner.
+     *
+     */
+    public FF() {
+        super();
+        this.setHeuristicType(FF.DEFAULT_HEURISTIC);
+        this.setWeight(FF.DEFAULT_WEIGHT);
+        this.setTimeOut(FF.DEFAULT_TIMEOUT);
+        this.setSaveState(FF.DEFAULT_STATISTICS);
+    }
 
     /**
      * Returns the heuristicType to use to solve the planning problem.
@@ -165,15 +142,41 @@ public final class FF extends AbstractPlanner {
     }
 
     /**
-     * Creates a new planner.
+     * Search a solution plan to a specified domain and problem.
      *
+     * @param pb the problem to solve.
      */
-    public FF() {
-        super();
-        this.setHeuristicType(FF.DEFAULT_HEURISTIC);
-        this.setWeight(FF.DEFAULT_WEIGHT);
-        this.setTimeOut(FF.DEFAULT_TIMEOUT);
-        this.setSaveState(FF.DEFAULT_STATISTICS);
+    @Override
+    public SequentialPlan search(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        Node plan = this.enforced_hill_climbing(pb);
+        if (plan == null) {
+            LOGGER.trace("Enforced Hill Climb Failed");
+        }
+        plan = this.greedy_best_first_search(pb);
+        if (plan == null) {
+            LOGGER.trace("Greedy Best First Search Failed");
+
+        }
+        return this.extract(plan, pb);
+    }
+
+    /**
+     * Extracts a search from a specified node.
+     *
+     * @param node the node.
+     * @param problem the problem.
+     * @return the search extracted from the specified node.
+     */
+    private SequentialPlan extract(final Node node, final CodedProblem problem) {
+        Node n = node;
+        final SequentialPlan plan = new SequentialPlan();
+        while (n.getParent() != null) {
+            final BitOp op = problem.getOperators().get(n.getOperator());
+            plan.add(0, op);
+            n = n.getParent();
+        }
+        return plan;
     }
 
     /**
@@ -254,7 +257,6 @@ public final class FF extends AbstractPlanner {
             factory.setTraceLevel(factoryTraceLevel);
 
             // Parses the PDDL domain and problem description
-
             long begin = System.currentTimeMillis();
             ErrorManager errorManager = factory.parse(domain, problem);
             if (saveStats) {
@@ -298,7 +300,6 @@ public final class FF extends AbstractPlanner {
 
             // Searches for a solution plan
             final Plan plan = planner.search(pb);
-            System.out.println(pb.toString(plan));
 
             // Print the results
             final String problemName = problem.getName().substring(0, problem.getName().indexOf('.'));
@@ -469,24 +470,51 @@ public final class FF extends AbstractPlanner {
     }
 
     /**
-     * Search a solution plan to a specified domain and problem.
+     * This method return the default arguments of the planner.
      *
-     * @param pb the problem to solve.
+     * @return the default arguments of the planner.
      */
-    @Override
-    public SequentialPlan search(final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        Node plan = this.enforced_hill_climbing(pb);
-        if (plan == null) {
-            LOGGER.trace("Enforced Hill Climb Failed");
-        }
-        plan = this.greedy_best_first_search(pb);
-        if (plan == null) {
-            LOGGER.trace("Greedy Best First Search Failed");
-
-        }
-        return this.extract(plan, pb);
+    private static Properties getDefaultArguments() {
+        final Properties options = new Properties();
+        options.put(CommonPlanner.Argument.HEURISTIC, FF.DEFAULT_HEURISTIC);
+        options.put(CommonPlanner.Argument.WEIGHT, FF.DEFAULT_WEIGHT);
+        options.put(CommonPlanner.Argument.TIMEOUT, FF.DEFAULT_TIMEOUT * 1000);
+        options.put(CommonPlanner.Argument.TRACE_LEVEL, FF.DEFAULT_TRACE_LEVEL);
+        options.put(CommonPlanner.Argument.STATISTICS, FF.DEFAULT_STATISTICS);
+        return options;
     }
+
+
+
+
+
+
+
+    /**
+     * The time needed to search a solution plan.
+     */
+    private long searchingTime;
+    /**
+     * The time needed to encode the planning problem.
+     */
+    private long preprocessingTime;
+    /**
+     * The memory used in bytes to search a solution plan.
+     */
+    private long searchingMemory;
+    /**
+     * The memory used in bytes to encode problem.
+     */
+    private long problemMemory;
+    /**
+     * The number of node explored.
+     */
+    private int nbOfExploredNodes;
+
+    private int nb_states;
+    private int max_depth;
+
+
 
     private Node enforced_hill_climbing(CodedProblem problem) {
         final long begin = System.currentTimeMillis();
@@ -585,30 +613,12 @@ public final class FF extends AbstractPlanner {
                 next_state.apply(goal);
                 state.addSuccessor(next_state);
                 successors.add(next_state);
-
             }
         }
-
         return successors;
     }
 
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        Node n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getParent() != null) {
-            final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.add(0, op);
-            n = n.getParent();
-        }
-        return plan;
-    }
+
 
     /**
      * Solves the planning problem and returns the first solution plan found. This method must be
@@ -659,10 +669,7 @@ public final class FF extends AbstractPlanner {
                             stateAfter.setOperator(index);
                             current.addSuccessor(stateAfter);
                             openSet.add(stateAfter);
-
-
                         }
-
                     }
                     index++;
                 }
@@ -696,20 +703,5 @@ public final class FF extends AbstractPlanner {
             states.remove(state);
         }
         return state;
-    }
-
-    /**
-     * This method return the default arguments of the planner.
-     *
-     * @return the default arguments of the planner.
-     */
-    private static Properties getDefaultArguments() {
-        final Properties options = new Properties();
-        options.put(CommonPlanner.Argument.HEURISTIC, FF.DEFAULT_HEURISTIC);
-        options.put(CommonPlanner.Argument.WEIGHT, FF.DEFAULT_WEIGHT);
-        options.put(CommonPlanner.Argument.TIMEOUT, FF.DEFAULT_TIMEOUT * 1000);
-        options.put(CommonPlanner.Argument.TRACE_LEVEL, FF.DEFAULT_TRACE_LEVEL);
-        options.put(CommonPlanner.Argument.STATISTICS, FF.DEFAULT_STATISTICS);
-        return options;
     }
 }
