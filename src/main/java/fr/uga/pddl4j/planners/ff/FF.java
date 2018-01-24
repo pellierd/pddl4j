@@ -21,28 +21,39 @@ package fr.uga.pddl4j.planners.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.Encoder;
+import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.parser.Domain;
+import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.BitVector;
-import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.CommonPlanner;
+import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.Statistics;
+import fr.uga.pddl4j.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
  * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm.
  *
- * @author D. Pellier
- * @version 1.0 - 14.06.2010
+ * @author Samuel Aaron Boyd
+ * @author E. Hermellin
+ * @version 2.0 - 24.01.2018
  */
-public final class FF {
+public final class FF extends AbstractPlanner {
+
+    /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(FF.class);
 
     /**
      * The default heuristic.
@@ -50,19 +61,15 @@ public final class FF {
     private static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
 
     /**
-     * The default CPU time allocated to the search in seconds.
-     */
-    private static final int DEFAULT_CPU_TIME = 1000;
-
-    /**
      * The default weight of the heuristic.
      */
-    private static final double DEFAULT_WHEIGHT = 1.00;
+    private static final double DEFAULT_WEIGHT = 1.00;
 
-    /**
-     * The default trace level.
-     */
-    private static final int DEFAULT_TRACE_LEVEL = 1;
+
+
+
+
+
     /**
      * The time needed to search a solution plan.
      */
@@ -83,27 +90,97 @@ public final class FF {
      * The number of node explored.
      */
     private int nbOfExploredNodes;
-    /**
-     * The arguments of the planner.
-     */
-    private Properties arguments;
+
+
     private int nb_states;
     private int max_depth;
 
     /**
-     * Creates a new planner.
-     *
-     * @param arguments the arguments of the planner.
+     * The type of heuristics that must use to solve the problem.
      */
-    private FF(final Properties arguments) {
-        this.arguments = arguments;
+    private Heuristic.Type heuristicType;
+
+    /**
+     * The weight set to the heuristic.
+     */
+    private double weight;
+
+    /**
+     * Whether statistics are computed or not.
+     */
+    private boolean saveState;
+
+    /**
+     * Returns the heuristicType to use to solve the planning problem.
+     *
+     * @return the heuristicType to use to solve the planning problem.
+     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
+     */
+    public final Heuristic.Type getHeuristicType() {
+        return this.heuristicType;
     }
 
     /**
-     * The main method of the <code>FF</code> example. The command line syntax is as follow:
+     * Sets the heuristicType to use to solved the problem.
+     *
+     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
+     */
+    public final void setHeuristicType(final Heuristic.Type heuristicType) {
+        Objects.requireNonNull(heuristicType);
+        this.heuristicType = heuristicType;
+    }
+
+    /**
+     * Returns the weight set to the heuristic.
+     *
+     * @return the weight set to the heuristic.
+     */
+    public final double getHeuristicWeight() {
+        return this.weight;
+    }
+
+    /**
+     * Sets the wight of the heuristic.
+     *
+     * @param weight the weight of the heuristic. The weight must be positive.
+     */
+    public final void setWeight(final double weight) {
+        this.weight = weight;
+    }
+
+    /**
+     * Set the statistics generation value.
+     * @param saveState the new statistics computation value
+     */
+    public void setSaveState(boolean saveState) {
+        this.saveState = saveState;
+    }
+
+    /**
+     * Is statistics generate or not.
+     * @return true if statistics are compute and save, false otherwise
+     */
+    public boolean isSaveState() {
+        return saveState;
+    }
+
+    /**
+     * Creates a new planner.
+     *
+     */
+    public FF() {
+        super();
+        this.setHeuristicType(FF.DEFAULT_HEURISTIC);
+        this.setWeight(FF.DEFAULT_WEIGHT);
+        this.setTimeOut(FF.DEFAULT_TIMEOUT);
+        this.setSaveState(FF.DEFAULT_STATISTICS);
+    }
+
+    /**
+     * The main method of the <code>HSP</code> example. The command line syntax is as follow:
      * <p>
      * <pre>
-     * usage of FF:
+     * usage of HSP:
      *
      * OPTIONS   DESCRIPTIONS
      *
@@ -123,7 +200,7 @@ public final class FF {
      *      8      set-level heuristic
      * -i <i>num</i>   run-time information level (preset: 1)
      *      0      nothing
-     *      1      info on action number, search and plan
+     *      1      info on action number, search and search
      *      2      1 + info on problem constants, types and predicates
      *      3      1 + 2 + loaded operators, initial and goal state
      *      4      1 + predicates and their inertia status
@@ -134,14 +211,15 @@ public final class FF {
      *                - problem name
      *                - number of operators
      *                - number of facts
+     *                - parsing time in seconds
      *                - encoding time in seconds
-     *                - memory used for problem representation in MBytes
-     *                - number of states explored
      *                - searching time in seconds
+     *                - total time in seconds
+     *                - memory used for problem representation in MBytes
      *                - memory used for searching in MBytes
-     *                - global memory used in MBytes
-     *                - solution plan length
-     *      > 100  1 + various debugging information
+     *                - total memory used in MBytes
+     *                - length of the solution plan
+     * -s          no statistics
      * -h          print this message
      *
      * </pre>
@@ -150,16 +228,159 @@ public final class FF {
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
-        // Parse the command line
-        final Properties arguments = FF.parseArguments(args);
-        // Create the planner
-        FF planner = new FF(arguments);
-        // Parse and encode the PDDL file into compact representation
-        final CodedProblem problem = planner.parseAndEncode();
 
-        if (problem != null) {
-            // Search for a solution and print the result
-            planner.search(problem);
+        try {
+            // Parse the command line
+            final Properties arguments = FF.parseArguments(args);
+            final File domain = (File) arguments.get(CommonPlanner.Argument.DOMAIN);
+            final File problem = (File) arguments.get(CommonPlanner.Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(CommonPlanner.Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(CommonPlanner.Argument.TIMEOUT);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(CommonPlanner.Argument.HEURISTIC);
+            final double weight = (Double) arguments.get(CommonPlanner.Argument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(CommonPlanner.Argument.STATISTICS);
+
+            // Creates the planner
+            final FF planner = new FF();
+            planner.setHeuristicType(heuristicType);
+            planner.setWeight(weight);
+            planner.setTimeOut(timeout);
+            planner.setTraceLevel(traceLevel);
+            planner.setSaveState(saveStats);
+
+            // Creates the problem factory
+            final ProblemFactory factory = ProblemFactory.getInstance();
+            final int factoryTraceLevel = (traceLevel == 8) ? 0 : Math.max(0, traceLevel - 1);
+            factory.setTraceLevel(factoryTraceLevel);
+
+            // Parses the PDDL domain and problem description
+
+            long begin = System.currentTimeMillis();
+            ErrorManager errorManager = factory.parse(domain, problem);
+            if (saveStats) {
+                planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+            }
+            if (!errorManager.isEmpty()) {
+                errorManager.printAll();
+                System.exit(0);
+            } else if (traceLevel > 0 && traceLevel != 8) {
+                StringBuilder strb = new StringBuilder();
+                strb.append("\nparsing domain file \"").append(domain.getName()).append("\" done successfully")
+                    .append("\nparsing problem file \"").append(problem.getName()).append("\" done successfully")
+                    .append("\n");
+                LOGGER.trace(strb);
+            }
+
+            // Encodes and instantiates the problem in a compact representation
+            begin = System.currentTimeMillis();
+            CodedProblem pb = factory.encode();
+            if (saveStats) {
+                planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
+                planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+            }
+            planner.getStatistics().setNumberOfActions(pb.getOperators().size());
+            planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
+
+            if (traceLevel > 0 && traceLevel != 8) {
+                StringBuilder strb = new StringBuilder();
+                strb.append("\nencoding problem done successfully (")
+                    .append(planner.getStatistics().getNumberOfActions()).append(" ops, ")
+                    .append(planner.getStatistics().getNumberOfRelevantFluents()).append(" facts)\n");
+                LOGGER.trace(strb);
+            }
+
+            if (traceLevel > 0 && traceLevel != 8 && !pb.isSolvable()) {
+                StringBuilder strb = new StringBuilder();
+                strb.append(String.format("goal can be simplified to FALSE. no search will solve it%n%n"));
+                LOGGER.trace(strb);
+                System.exit(0);
+            }
+
+            // Searches for a solution plan
+            final Plan plan = planner.search(pb);
+            System.out.println(pb.toString(plan));
+
+            // Print the results
+            final String problemName = problem.getName().substring(0, problem.getName().indexOf('.'));
+            final int numberOfActions = planner.getStatistics().getNumberOfActions();
+            final int numberOfFluents = planner.getStatistics().getNumberOfRelevantFluents();
+            double timeToParseInSeconds = 0.0;
+            double timeToEncodeInSeconds = 0.0;
+            double timeToSearchInSeconds = 0.0;
+            double totalTimeInSeconds = 0.0;
+            double memoryForProblemInMBytes = 0.0;
+            double memoryUsedToSearchInMBytes = 0.0;
+            double totalMemoryInMBytes = 0.0;
+
+            if (saveStats) {
+                timeToParseInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToParse());
+                timeToEncodeInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToEncode());
+                timeToSearchInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
+                totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
+                memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
+                memoryForProblemInMBytes =
+                    Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
+                totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
+            }
+
+
+            if (traceLevel > 0 && traceLevel != 8) {
+                final StringBuilder strb = new StringBuilder();
+                if (plan != null) {
+                    strb.append(String.format("%nfound plan as follows:%n%n"));
+                    strb.append(pb.toString(plan));
+
+                } else {
+                    strb.append(String.format("%nno plan found%n%n"));
+                }
+                if (saveStats) {
+                    strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
+                    strb.append(String.format("              %8.2f seconds encoding %n", timeToEncodeInSeconds));
+                    strb.append(String.format("              %8.2f seconds searching%n", timeToSearchInSeconds));
+                    strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
+                    strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
+                        memoryForProblemInMBytes));
+                    strb.append(String.format("              %8.2f MBytes for searching%n",
+                        memoryUsedToSearchInMBytes));
+                    strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
+                }
+                LOGGER.trace(strb);
+            } else if (traceLevel == 8) {
+                final StringBuilder strb = new StringBuilder();
+                if (plan != null) {
+                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %5d%n",
+                        problemName,
+                        numberOfActions,
+                        numberOfFluents,
+                        timeToParseInSeconds,
+                        timeToEncodeInSeconds,
+                        timeToSearchInSeconds,
+                        totalTimeInSeconds,
+                        memoryForProblemInMBytes,
+                        memoryUsedToSearchInMBytes,
+                        totalMemoryInMBytes,
+                        plan.size()));
+                } else {
+                    strb.append(String.format("%5s %8d %8d %8.2f %8.2f %8s %8s %8.2f %8s %8s %5s%n",
+                        problem.getName(),
+                        numberOfActions,
+                        numberOfFluents,
+                        timeToParseInSeconds,
+                        timeToEncodeInSeconds,
+                        "--",
+                        "--",
+                        memoryForProblemInMBytes,
+                        "--",
+                        "--",
+                        "--"));
+                }
+                LOGGER.trace(strb);
+            }
+        } catch (IOException ioExp) {
+            LOGGER.error(ioExp);
+        } catch (FileException fileEx) {
+            LOGGER.error(fileEx);
+            System.exit(1);
         }
     }
 
@@ -169,181 +390,82 @@ public final class FF {
      * @param args the arguments from the command line.
      * @return The arguments of the planner.
      */
-    private static Properties parseArguments(String[] args) {
+    private static Properties parseArguments(String[] args) throws FileException {
         final Properties arguments = FF.getDefaultArguments();
         try {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("-o") && ((i + 1) < args.length)) {
-                    arguments.put(FF.Argument.DOMAIN, args[i + 1]);
+            for (int i = 0; i < args.length; i += 2) {
+                if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        System.out.println("operators file does not exist");
-                        throw new RuntimeException("operators file does not exist: " + args[i + 1]);
+                        LOGGER.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
-                    i++;
-                } else if (args[i].equalsIgnoreCase("-f") && ((i + 1) < args.length)) {
-                    arguments.put(FF.Argument.PROBLEM, args[i + 1]);
+                    arguments.put(CommonPlanner.Argument.DOMAIN, new File(args[i + 1]));
+                } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        System.out.println("facts file does not exist");
-                        throw new RuntimeException("facts file does not exist: " + args[i + 1]);
+                        LOGGER.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
-                    i++;
-                } else if (args[i].equalsIgnoreCase("-t") && ((i + 1) < args.length)) {
+                    arguments.put(CommonPlanner.Argument.PROBLEM, new File(args[i + 1]));
+                } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
-                        FF.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
-                    i++;
-                    arguments.put(FF.Argument.CPU_TIME, cpu);
-                } else if (args[i].equalsIgnoreCase("-u") && ((i + 1) < args.length)) {
+                    arguments.put(CommonPlanner.Argument.TIMEOUT, cpu);
+                } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
-                        FF.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
                     if (heuristic == 0) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.FAST_FORWARD);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.FAST_FORWARD);
                     } else if (heuristic == 1) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.SUM);
                     } else if (heuristic == 2) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.SUM_MUTEX);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.SUM_MUTEX);
                     } else if (heuristic == 3) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM);
                     } else if (heuristic == 4) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2);
                     } else if (heuristic == 5) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.AJUSTED_SUM2M);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2M);
                     } else if (heuristic == 6) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.COMBO);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.COMBO);
                     } else if (heuristic == 7) {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.MAX);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.MAX);
                     } else {
-                        arguments.put(FF.Argument.HEURISTIC_TYPE, Heuristic.Type.SET_LEVEL);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.SET_LEVEL);
                     }
-                    i++;
-                } else if (args[i].equalsIgnoreCase("-w") && ((i + 1) < args.length)) {
-                    final double weight = Double.valueOf(args[i + 1]);
+                } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
-                        FF.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
-                    arguments.put(FF.Argument.WEIGHT, weight);
-                    i++;
-                } else if (args[i].equalsIgnoreCase("-i") && ((i + 1) < args.length)) {
+                    arguments.put(CommonPlanner.Argument.WEIGHT, weight);
+                } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
-                        FF.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
-                    arguments.put(FF.Argument.TRACE_LEVEL, level);
-                    i++;
+                    arguments.put(CommonPlanner.Argument.TRACE_LEVEL, level);
+                } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
+                    arguments.put(CommonPlanner.Argument.STATISTICS, isStatUsed);
                 } else {
-                    FF.printUsage();
+                    LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
+                    LOGGER.trace(CommonPlanner.printUsage());
+                    throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
-            if (arguments.get(FF.Argument.DOMAIN) == null
-                || arguments.get(FF.Argument.PROBLEM) == null) {
-                FF.printUsage();
+            if (arguments.get(CommonPlanner.Argument.DOMAIN) == null || arguments.get(CommonPlanner.Argument.PROBLEM) == null) {
+                LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
+                LOGGER.trace(CommonPlanner.printUsage());
+                throw new FileException("Missing domain or problem");
             }
-        } catch (Throwable throwable) {
-            FF.printUsage();
+        } catch (RuntimeException runExp) {
+            LOGGER.trace("\nError when parsing arguments\n");
+            LOGGER.trace(CommonPlanner.printUsage());
+            throw runExp;
         }
         return arguments;
-    }
-
-    /**
-     * This method print the usage of the command-line planner.
-     */
-    private static void printUsage() {
-        System.out.println("\nusage of FF:\n");
-        System.out.println("OPTIONS   DESCRIPTIONS\n");
-        System.out.println("-o <str>    operator file name");
-        System.out.println("-f <str>    fact file name");
-        System.out.println("-w <num>    the weight used in the a star seach (preset: 1)");
-        System.out.println("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)");
-        System.out.println("-u <num>    specifies the heuristic to used (preset: 0)");
-        System.out.println("     0      ff heuristic");
-        System.out.println("     1      sum heuristic");
-        System.out.println("     2      sum mutex heuristic");
-        System.out.println("     3      adjusted sum heuristic");
-        System.out.println("     4      adjusted sum 2 heuristic");
-        System.out.println("     5      adjusted sum 2M heuristic");
-        System.out.println("     6      combo heuristic");
-        System.out.println("     7      max heuristic");
-        System.out.println("     8      set-level heuristic");
-        System.out.println("-i <num>    run-time information level (preset: 1)");
-        System.out.println("     0      nothing");
-        System.out.println("     1      info on action number, search and plan");
-        System.out.println("     2      1 + info on problem constants, types and predicates");
-        System.out.println("     3      1 + 2 + loaded operators, initial and goal state");
-        System.out.println("     4      1 + predicates and their inertia status");
-        System.out.println("     5      1 + 4 + goal state and operators with unary inertia encoded");
-        System.out.println("     6      1 + actions, initial and goal state after expansion of variables");
-        System.out.println("     7      1 + final domain representation");
-        System.out.println("     8      line representation:");
-        System.out.println("               - problem name");
-        System.out.println("               - number of operators");
-        System.out.println("               - number of facts");
-        System.out.println("               - encoding time in seconds");
-        System.out.println("               - memory used for problem representation in MBytes");
-        System.out.println("               - number of states explored");
-        System.out.println("               - searching time in seconds");
-        System.out.println("               - memory used for searching in MBytes");
-        System.out.println("               - global memory used in MBytes");
-        System.out.println("               - solution plan length");
-        System.out.println("     > 100  1 + various debugging information");
-        System.out.println("-h          print this message\n\n");
-    }
-
-    /**
-     * This method return the default arguments of the planner.
-     *
-     * @return the default arguments of the planner.
-     */
-    private static Properties getDefaultArguments() {
-        final Properties options = new Properties();
-        options.put(FF.Argument.HEURISTIC_TYPE, FF.DEFAULT_HEURISTIC);
-        options.put(FF.Argument.WEIGHT, FF.DEFAULT_WHEIGHT);
-        options.put(FF.Argument.CPU_TIME, FF.DEFAULT_CPU_TIME * 1000);
-        options.put(FF.Argument.TRACE_LEVEL, FF.DEFAULT_TRACE_LEVEL);
-        return options;
-    }
-
-    /**
-     * This method parses the PDDL files and encodes the corresponding planning problem into a
-     * compact representation.
-     *
-     * @return the encoded problem.
-     */
-    public CodedProblem parseAndEncode() {
-        final Parser parser = new Parser();
-        final String ops = (String) this.arguments.get(FF.Argument.DOMAIN);
-        final String facts = (String) this.arguments.get(FF.Argument.PROBLEM);
-        try {
-            parser.parse(ops, facts);
-        } catch (FileNotFoundException fnfException) {
-        }
-        if (!parser.getErrorManager().isEmpty()) {
-            parser.getErrorManager().printAll();
-            return null;
-        }
-        final Domain domain = parser.getDomain();
-        final Problem problem = parser.getProblem();
-        final int traceLevel = (Integer) this.arguments.get(FF.Argument.TRACE_LEVEL);
-        if (traceLevel > 0 && traceLevel != 8) {
-            System.out.println();
-            System.out.println("Parsing domain file \"" + new File(ops).getName()
-                + "\" done successfully");
-            System.out.println("Parsing problem file \"" + new File(facts).getName()
-                + "\" done successfully\n");
-        }
-        if (traceLevel == 8) {
-            Encoder.setLogLevel(0);
-        } else {
-            Encoder.setLogLevel(Math.max(0, traceLevel - 1));
-        }
-        long begin = System.currentTimeMillis();
-        final CodedProblem pb = Encoder.encode(domain, problem);
-        long end = System.currentTimeMillis();
-        this.preprocessingTime = end - begin;
-        this.problemMemory = MemoryAgent.deepSizeOf(pb);
-        return pb;
     }
 
     /**
@@ -351,74 +473,24 @@ public final class FF {
      *
      * @param pb the problem to solve.
      */
-    public void search(final CodedProblem pb) {
-        //final BitExp goal = new BitExp(pb.getGoal());
+    @Override
+    public SequentialPlan search(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
         Node plan = this.enforced_hill_climbing(pb);
         if (plan == null) {
-            System.out.println("Enforced Hill Climb Failed");
+            LOGGER.trace("Enforced Hill Climb Failed");
         }
         plan = this.greedy_best_first_search(pb);
         if (plan == null) {
-            System.out.println("Greedy Best First Search Failed");
+            LOGGER.trace("Greedy Best First Search Failed");
 
         }
-        List<String> planz = this.extract(plan, pb);
-        // The rest it is just to print the result
-        final int traceLevel = (Integer) this.arguments.get(FF.Argument.TRACE_LEVEL);
-        if (traceLevel > 0 && traceLevel != 8) {
-
-            if (pb.isSolvable()) {
-                if (planz != null) {
-                    System.out.printf("%nfound plan as follows:%n%n");
-                    for (int i = 0; i < planz.size(); i++) {
-                        System.out.printf("time step %4d: %s%n", i, planz.get(i));
-                    }
-                } else {
-                    System.out.printf("%nno plan found%n%n");
-                }
-            } else {
-                System.out.printf("goal can be simplified to FALSE. no plan will solve it%n%n");
-            }
-            System.out.printf("%ntime spent: %8.2f seconds encoding ("
-                + pb.getOperators().size() + " ops, " + pb.getRelevantFacts().size()
-                + " facts)%n", (this.preprocessingTime / 1000.0));
-            System.out.printf("            %8.2f seconds searching%n",
-                (this.searchingTime / 1000.0));
-            System.out.printf("            %8.2f seconds total time%n",
-                ((this.preprocessingTime + searchingTime) / 1000.0));
-            System.out.printf("%n");
-            System.out.printf("memory used: %8.2f MBytes for problem representation%n",
-                +(this.problemMemory / (1024.0 * 1024.0)));
-            System.out.printf("             %8.2f MBytes for searching%n",
-                +(this.searchingMemory / (1024.0 * 1024.0)));
-            System.out.printf("             %8.2f MBytes total%n",
-                +((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0)));
-            System.out.printf("%n%n");
-        }
-        if (traceLevel == 8) {
-            String problem = (String) this.arguments.get(FF.Argument.PROBLEM);
-            String[] strArray = problem.split("/");
-            String pbFile = strArray[strArray.length - 1];
-            String pbName = pbFile.substring(0, pbFile.indexOf("."));
-            System.out.printf("%5s %8d %8d %8.2f %8.2f %10d", pbName, pb.getOperators().size(),
-                pb.getRelevantFacts().size(), (this.preprocessingTime / 1000.0),
-                (this.problemMemory / (1024.0 * 1024.0)), this.nbOfExploredNodes);
-            if (planz != null) {
-                System.out.printf("%8.2f %8.2f %8.2f %8.2f %5d%n", (this.searchingTime / 1000.0),
-                    ((this.preprocessingTime + searchingTime) / 1000.0),
-                    (this.searchingMemory / (1024.0 * 1024.0)),
-                    ((this.problemMemory + this.searchingMemory) / (1024.0 * 1024.0)),
-                    planz.size());
-            } else {
-                System.out.printf("%8s %8s %8s %8s %5s%n", "-", "-", "-", "-", "-");
-            }
-        }
+        return this.extract(plan, pb);
     }
 
     private Node enforced_hill_climbing(CodedProblem problem) {
         final long begin = System.currentTimeMillis();
-        final Heuristic.Type type = (Heuristic.Type) this.arguments.get(FF.Argument.HEURISTIC_TYPE);
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(type, problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         this.nb_states = 0;
         this.max_depth = 0;
         BitState init = new BitState(problem.getInit());
@@ -520,12 +592,19 @@ public final class FF {
         return successors;
     }
 
-    private LinkedList<String> extract(final Node initialState, final CodedProblem problem) {
-        Node n = initialState;
-        final LinkedList<String> plan = new LinkedList<>();
+    /**
+     * Extracts a search from a specified node.
+     *
+     * @param node the node.
+     * @param problem the problem.
+     * @return the search extracted from the specified node.
+     */
+    private SequentialPlan extract(final Node node, final CodedProblem problem) {
+        Node n = node;
+        final SequentialPlan plan = new SequentialPlan();
         while (n.getParent() != null) {
             final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.addFirst(problem.toShortString(op));
+            plan.add(0, op);
             n = n.getParent();
         }
         return plan;
@@ -540,8 +619,7 @@ public final class FF {
      */
     private Node greedy_best_first_search(final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
-        final Heuristic.Type type = (Heuristic.Type) this.arguments.get(FF.Argument.HEURISTIC_TYPE);
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(type, problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         // Get the initial state from the planning problem
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
@@ -556,7 +634,7 @@ public final class FF {
         s0.setHeuristicValue(root.getOperator());
         openSet.add(s0);
         Node solution = null;
-        final int CPUTime = (Integer) this.arguments.get(FF.Argument.CPU_TIME);
+        final int CPUTime = this.getTimeout();
         // Start of the search
         while (!openSet.isEmpty() && solution == null && this.searchingTime < CPUTime) {
             // Pop the first node in the pending list open
@@ -621,34 +699,17 @@ public final class FF {
     }
 
     /**
-     * The enumeration of the arguments of the planner.
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
      */
-    private enum Argument {
-        /**
-         * The planning domain.
-         */
-        DOMAIN,
-        /**
-         * The planning problem.
-         */
-        PROBLEM,
-        /**
-         * The heuristic to use.
-         */
-        HEURISTIC_TYPE,
-        /**
-         * The weight of the heuristic.
-         */
-        WEIGHT,
-        /**
-         * The global time slot allocated to the search.
-         */
-        CPU_TIME,
-        /**
-         * The trace level.
-         */
-        TRACE_LEVEL
+    private static Properties getDefaultArguments() {
+        final Properties options = new Properties();
+        options.put(CommonPlanner.Argument.HEURISTIC, FF.DEFAULT_HEURISTIC);
+        options.put(CommonPlanner.Argument.WEIGHT, FF.DEFAULT_WEIGHT);
+        options.put(CommonPlanner.Argument.TIMEOUT, FF.DEFAULT_TIMEOUT * 1000);
+        options.put(CommonPlanner.Argument.TRACE_LEVEL, FF.DEFAULT_TRACE_LEVEL);
+        options.put(CommonPlanner.Argument.STATISTICS, FF.DEFAULT_STATISTICS);
+        return options;
     }
-
-
 }
