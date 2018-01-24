@@ -1,6 +1,40 @@
-package fr.uga.pddl4j.planners.common;
+package fr.uga.pddl4j.planners;
 
-public final class Common {
+public final class CommonPlanner {
+
+    /**
+     * The enumeration of the arguments of the planner.
+     */
+    public enum Argument {
+        /**
+         * The planning domain.
+         */
+        DOMAIN,
+        /**
+         * The planning problem.
+         */
+        PROBLEM,
+        /**
+         * The heuristic to use.
+         */
+        HEURISTIC,
+        /**
+         * The weight of the heuristic.
+         */
+        WEIGHT,
+        /**
+         * The global time slot allocated to the search.
+         */
+        TIMEOUT,
+        /**
+         * The trace level.
+         */
+        TRACE_LEVEL,
+        /**
+         * Generate statistics or not.
+         */
+        STATISTICS
+    }
 
     /**
      * This method print the usage of the command-line planner.

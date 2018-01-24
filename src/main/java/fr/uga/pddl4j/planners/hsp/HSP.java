@@ -27,6 +27,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
+import fr.uga.pddl4j.planners.CommonPlanner;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -37,8 +38,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -317,13 +316,13 @@ public final class HSP extends AbstractPlanner {
         try {
             // Parse the command line
             final Properties arguments = HSP.parseArguments(args);
-            final File domain = (File) arguments.get(HSP.Argument.DOMAIN);
-            final File problem = (File) arguments.get(HSP.Argument.PROBLEM);
-            final int traceLevel = (Integer) arguments.get(HSP.Argument.TRACE_LEVEL);
-            final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
-            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
-            final double weight = (Double) arguments.get(HSP.Argument.WEIGHT);
-            final boolean saveStats = (Boolean) arguments.get(Argument.STATISTICS);
+            final File domain = (File) arguments.get(CommonPlanner.Argument.DOMAIN);
+            final File problem = (File) arguments.get(CommonPlanner.Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(CommonPlanner.Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(CommonPlanner.Argument.TIMEOUT);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(CommonPlanner.Argument.HEURISTIC);
+            final double weight = (Double) arguments.get(CommonPlanner.Argument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(CommonPlanner.Argument.STATISTICS);
 
             // Creates the planner
             final HSP planner = new HSP();
@@ -470,40 +469,6 @@ public final class HSP extends AbstractPlanner {
     }
 
     /**
-     * The enumeration of the arguments of the planner.
-     */
-    private enum Argument {
-        /**
-         * The planning domain.
-         */
-        DOMAIN,
-        /**
-         * The planning problem.
-         */
-        PROBLEM,
-        /**
-         * The heuristic to use.
-         */
-        HEURISTIC,
-        /**
-         * The weight of the heuristic.
-         */
-        WEIGHT,
-        /**
-         * The global time slot allocated to the search.
-         */
-        TIMEOUT,
-        /**
-         * The trace level.
-         */
-        TRACE_LEVEL,
-        /**
-         * Generate statistics or not.
-         */
-        STATISTICS
-    }
-
-    /**
      * This method parse the command line and return the arguments.
      *
      * @param args the arguments from the command line.
@@ -517,71 +482,71 @@ public final class HSP extends AbstractPlanner {
                     if (!new File(args[i + 1]).exists()) {
                         LOGGER.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
-                    arguments.put(Argument.DOMAIN, new File(args[i + 1]));
+                    arguments.put(CommonPlanner.Argument.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
                         LOGGER.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
-                    arguments.put(Argument.PROBLEM, new File(args[i + 1]));
+                    arguments.put(CommonPlanner.Argument.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
-                        HSP.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
-                    arguments.put(Argument.TIMEOUT, cpu);
+                    arguments.put(CommonPlanner.Argument.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
-                        HSP.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
                     if (heuristic == 0) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.FAST_FORWARD);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.FAST_FORWARD);
                     } else if (heuristic == 1) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.SUM);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.SUM);
                     } else if (heuristic == 2) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.SUM_MUTEX);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.SUM_MUTEX);
                     } else if (heuristic == 3) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM);
                     } else if (heuristic == 4) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2);
                     } else if (heuristic == 5) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2M);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.AJUSTED_SUM2M);
                     } else if (heuristic == 6) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.COMBO);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.COMBO);
                     } else if (heuristic == 7) {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.MAX);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.MAX);
                     } else {
-                        arguments.put(Argument.HEURISTIC, Heuristic.Type.SET_LEVEL);
+                        arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.SET_LEVEL);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
-                        HSP.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
-                    arguments.put(Argument.WEIGHT, weight);
+                    arguments.put(CommonPlanner.Argument.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
-                        HSP.printUsage();
+                        LOGGER.trace(CommonPlanner.printUsage());
                     }
-                    arguments.put(Argument.TRACE_LEVEL, level);
+                    arguments.put(CommonPlanner.Argument.TRACE_LEVEL, level);
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
-                    arguments.put(Argument.STATISTICS, isStatUsed);
+                    arguments.put(CommonPlanner.Argument.STATISTICS, isStatUsed);
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
-                    HSP.printUsage();
+                    LOGGER.trace(CommonPlanner.printUsage());
                     throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
-            if (arguments.get(Argument.DOMAIN) == null || arguments.get(Argument.PROBLEM) == null) {
+            if (arguments.get(CommonPlanner.Argument.DOMAIN) == null || arguments.get(CommonPlanner.Argument.PROBLEM) == null) {
                 LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
-                HSP.printUsage();
+                LOGGER.trace(CommonPlanner.printUsage());
                 throw new FileException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
             LOGGER.trace("\nError when parsing arguments\n");
-            HSP.printUsage();
+            LOGGER.trace(CommonPlanner.printUsage());
             throw runExp;
         }
         return arguments;
@@ -595,93 +560,11 @@ public final class HSP extends AbstractPlanner {
      */
     private static Properties getDefaultArguments() {
         final Properties options = new Properties();
-        options.put(HSP.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
-        options.put(HSP.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
-        options.put(HSP.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
-        options.put(HSP.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
-        options.put(Argument.STATISTICS, HSP.DEFAULT_STATISTICS);
+        options.put(CommonPlanner.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
+        options.put(CommonPlanner.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
+        options.put(CommonPlanner.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
+        options.put(CommonPlanner.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
+        options.put(CommonPlanner.Argument.STATISTICS, HSP.DEFAULT_STATISTICS);
         return options;
-    }
-
-    /**
-     * This method print the usage of the command-line planner.
-     */
-    private static void printUsage() {
-
-        final StringBuilder strb = new StringBuilder();
-
-        strb.append("\nusage of hsp:\n")
-            .append("OPTIONS   DESCRIPTIONS\n")
-            .append("-o <str>    operator file name\n")
-            .append("-f <str>    fact file name\n")
-            .append("-w <num>    the weight used in the a star seach (preset: 1)\n")
-            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
-            .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
-            .append("     0      ff heuristic\n")
-            .append("     1      sum heuristic\n")
-            .append("     2      sum mutex heuristic\n")
-            .append("     3      adjusted sum heuristic\n")
-            .append("     4      adjusted sum 2 heuristic\n")
-            .append("     5      adjusted sum 2M heuristic\n")
-            .append("     6      combo heuristic\n")
-            .append("     7      max heuristic\n")
-            .append("     8      set-level heuristic\n")
-            .append("-i <num>    run-time information level (preset: 1)\n")
-            .append("     0      nothing\n")
-            .append("     1      info on action number, search and search\n")
-            .append("     2      1 + info on problem constants, types and predicates\n")
-            .append("     3      1 + 2 + loaded operators, initial and goal state\n")
-            .append("     4      1 + predicates and their inertia status\n")
-            .append("     5      1 + 4 + goal state and operators with unary inertia encoded\n")
-            .append("     6      1 + actions, initial and goal state after expansion of variables\n")
-            .append("     7      1 + final domain representation\n")
-            .append("     8      line representation:\n")
-            .append("               - problem name\n")
-            .append("               - number of operators\n")
-            .append("               - number of facts\n")
-            .append("               - parsing time in seconds\n")
-            .append("               - encoding time in seconds\n")
-            .append("               - searching time in seconds\n")
-            .append("               - total time in seconds\n")
-            .append("               - memory used for problem representation in MBytes\n")
-            .append("               - memory used for searching in MBytes\n")
-            .append("               - total memory used in MBytes\n")
-            .append("               - length of the solution plan\n")
-            .append("-s <bool>   generate statistics or not (preset: true)\n")
-            .append("-h          print this message\n\n");
-
-        LOGGER.trace(strb);
-    }
-
-    /**
-     * Node comparator class for HSP planner.
-     */
-    private static class NodeComparator implements Comparator<Node>, Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * The weight of the heuristic use for the comparison.
-         */
-        private double weight;
-
-        /**
-         * Build the Node comparator object base on heuristic weight.
-         * @param weight the heuristic weight
-         */
-        public NodeComparator(double weight) {
-            this.weight = weight;
-        }
-
-        /*
-         * TO DO
-         * @param n1
-         * @param n2
-         * @return
-         */
-        @Override
-        public int compare(final Node n1, final Node n2) {
-            return Double.compare(n1.getFValue(weight), n2.getFValue(weight));
-        }
     }
 }
