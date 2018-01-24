@@ -332,14 +332,12 @@ public final class HSP extends AbstractPlanner {
             planner.setTraceLevel(traceLevel);
             planner.setSaveState(saveStats);
 
-
             // Creates the problem factory
             final ProblemFactory factory = ProblemFactory.getInstance();
             final int factoryTraceLevel = (traceLevel == 8) ? 0 : Math.max(0, traceLevel - 1);
             factory.setTraceLevel(factoryTraceLevel);
 
             // Parses the PDDL domain and problem description
-
             long begin = System.currentTimeMillis();
             ErrorManager errorManager = factory.parse(domain, problem);
             if (saveStats) {

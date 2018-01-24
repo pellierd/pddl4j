@@ -3,7 +3,6 @@ package fr.uga.pddl4j.planners;
 import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
