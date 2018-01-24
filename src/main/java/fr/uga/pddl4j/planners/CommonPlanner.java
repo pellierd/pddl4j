@@ -43,7 +43,7 @@ public final class CommonPlanner {
 
         final StringBuilder strb = new StringBuilder();
 
-        strb.append("\nusage of hsp:\n")
+        strb.append("\nusage of planner:\n")
             .append("OPTIONS   DESCRIPTIONS\n")
             .append("-o <str>    operator file name\n")
             .append("-f <str>    fact file name\n")

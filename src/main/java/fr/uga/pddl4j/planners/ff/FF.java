@@ -76,8 +76,17 @@ public final class FF extends AbstractPlanner {
     private boolean saveState;
 
     /**
+     * The number of nodes explored with EHC
+     */
+    private int nbStates;
+
+    /**
+     * The max depth reached with EHC
+     */
+    private int maxDepth;
+
+    /**
      * Creates a new planner.
-     *
      */
     public FF() {
         super();
@@ -88,102 +97,10 @@ public final class FF extends AbstractPlanner {
     }
 
     /**
-     * Returns the heuristicType to use to solve the planning problem.
-     *
-     * @return the heuristicType to use to solve the planning problem.
-     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
-     */
-    public final Heuristic.Type getHeuristicType() {
-        return this.heuristicType;
-    }
-
-    /**
-     * Sets the heuristicType to use to solved the problem.
-     *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
-     */
-    public final void setHeuristicType(final Heuristic.Type heuristicType) {
-        Objects.requireNonNull(heuristicType);
-        this.heuristicType = heuristicType;
-    }
-
-    /**
-     * Returns the weight set to the heuristic.
-     *
-     * @return the weight set to the heuristic.
-     */
-    public final double getHeuristicWeight() {
-        return this.weight;
-    }
-
-    /**
-     * Sets the wight of the heuristic.
-     *
-     * @param weight the weight of the heuristic. The weight must be positive.
-     */
-    public final void setWeight(final double weight) {
-        this.weight = weight;
-    }
-
-    /**
-     * Set the statistics generation value.
-     * @param saveState the new statistics computation value
-     */
-    public void setSaveState(boolean saveState) {
-        this.saveState = saveState;
-    }
-
-    /**
-     * Is statistics generate or not.
-     * @return true if statistics are compute and save, false otherwise
-     */
-    public boolean isSaveState() {
-        return saveState;
-    }
-
-    /**
-     * Search a solution plan to a specified domain and problem.
-     *
-     * @param pb the problem to solve.
-     */
-    @Override
-    public SequentialPlan search(final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        Node plan = this.enforced_hill_climbing(pb);
-        if (plan == null) {
-            LOGGER.trace("Enforced Hill Climb Failed");
-        }
-        plan = this.greedy_best_first_search(pb);
-        if (plan == null) {
-            LOGGER.trace("Greedy Best First Search Failed");
-
-        }
-        return this.extract(plan, pb);
-    }
-
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        Node n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getParent() != null) {
-            final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.add(0, op);
-            n = n.getParent();
-        }
-        return plan;
-    }
-
-    /**
-     * The main method of the <code>HSP</code> example. The command line syntax is as follow:
+     * The main method of the <code>FF</code> example. The command line syntax is as follow:
      * <p>
      * <pre>
-     * usage of HSP:
+     * usage of FF:
      *
      * OPTIONS   DESCRIPTIONS
      *
@@ -323,7 +240,6 @@ public final class FF extends AbstractPlanner {
                     Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
                 totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
             }
-
 
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();
@@ -484,43 +400,138 @@ public final class FF extends AbstractPlanner {
         return options;
     }
 
-
-
-
-
-
+    /**
+     * Returns the heuristicType to use to solve the planning problem.
+     *
+     * @return the heuristicType to use to solve the planning problem.
+     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
+     */
+    public final Heuristic.Type getHeuristicType() {
+        return this.heuristicType;
+    }
 
     /**
-     * The time needed to search a solution plan.
+     * Sets the heuristicType to use to solved the problem.
+     *
+     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
      */
-    private long searchingTime;
-    /**
-     * The time needed to encode the planning problem.
-     */
-    private long preprocessingTime;
-    /**
-     * The memory used in bytes to search a solution plan.
-     */
-    private long searchingMemory;
-    /**
-     * The memory used in bytes to encode problem.
-     */
-    private long problemMemory;
-    /**
-     * The number of node explored.
-     */
-    private int nbOfExploredNodes;
+    public final void setHeuristicType(final Heuristic.Type heuristicType) {
+        Objects.requireNonNull(heuristicType);
+        this.heuristicType = heuristicType;
+    }
 
-    private int nb_states;
-    private int max_depth;
+    /**
+     * Returns the weight set to the heuristic.
+     *
+     * @return the weight set to the heuristic.
+     */
+    public final double getHeuristicWeight() {
+        return this.weight;
+    }
 
+    /**
+     * Sets the wight of the heuristic.
+     *
+     * @param weight the weight of the heuristic. The weight must be positive.
+     */
+    public final void setWeight(final double weight) {
+        this.weight = weight;
+    }
 
+    /**
+     * Is statistics generate or not.
+     *
+     * @return true if statistics are compute and save, false otherwise
+     */
+    public boolean isSaveState() {
+        return saveState;
+    }
 
+    /**
+     * Set the statistics generation value.
+     *
+     * @param saveState the new statistics computation value
+     */
+    public void setSaveState(boolean saveState) {
+        this.saveState = saveState;
+    }
+
+    /**
+     * Returns the number of nodes explored with EHC.
+     *
+     * @return the number of nodes explored with EHC.
+     */
+    public int getNbStates() {
+        return nbStates;
+    }
+
+    /**
+     * Returns the max depth reached with EHC.
+     *
+     * @return the max depth reached with EHC.
+     */
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    /**
+     * Search a solution plan to a specified domain and problem.
+     *
+     * @param pb the problem to solve.
+     */
+    @Override
+    public SequentialPlan search(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+
+        Node plan = this.enforced_hill_climbing(pb);
+        if (plan == null) {
+            LOGGER.trace("Enforced Hill Climb Failed");
+        }
+        plan = this.greedy_best_first_search(pb);
+        if (plan == null) {
+            LOGGER.trace("Greedy Best First Search Failed");
+        }
+        SequentialPlan planz = extract(plan, pb);
+
+        if (isSaveState()) {
+            final StringBuilder strb = new StringBuilder();
+            strb.append(String.format("Number of nodes explored  %d %n", this.getNbStates()));
+            strb.append(String.format("Max depth reached         %d %n", this.getMaxDepth()));
+            LOGGER.trace(strb);
+        }
+
+        return planz;
+    }
+
+    /**
+     * Extracts a search from a specified node.
+     *
+     * @param node    the node.
+     * @param problem the problem.
+     * @return the search extracted from the specified node.
+     */
+    private SequentialPlan extract(final Node node, final CodedProblem problem) {
+        Node n = node;
+        final SequentialPlan plan = new SequentialPlan();
+        while (n.getParent() != null) {
+            final BitOp op = problem.getOperators().get(n.getOperator());
+            plan.add(0, op);
+            n = n.getParent();
+        }
+        return plan;
+    }
+
+    /**
+     * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
+     *
+     * @param problem the coded problem to solve.
+     * @return the solution node or null.
+     */
     private Node enforced_hill_climbing(CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        this.nb_states = 0;
-        this.max_depth = 0;
+        this.nbStates = 0;
+        this.maxDepth = 0;
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         // Creates the initial state
@@ -560,25 +571,35 @@ public final class FF extends AbstractPlanner {
                     successors.clear();
                     open_list.clear();
                     best_heuristic = heuristic1;
-                    this.max_depth++;
+                    this.maxDepth++;
                 }
                 // Finally we add the successor to the open list to pursue the
                 // bread first search
                 open_list.addLast(successor);
-                this.nb_states++;
+                this.nbStates++;
             }
         }
 
         // Take time to compute the searching time
         long end = System.currentTimeMillis();
-        // Compute the searching time
-        this.searchingTime = end - begin;
+
+        if (isSaveState()) {
+            // Compute the searching time
+            this.getStatistics().setTimeToSearch(end - begin);
+        }
 
         // Return the solution state of null if no solution was found
         return solution;
-
     }
 
+    /**
+     * Get the successors from a node.
+     *
+     * @param state   the parent node.
+     * @param problem the coded problem to solve.
+     * @param goal    the goal to reach.
+     * @return the list of successors from the parent node.
+     */
     private LinkedList<Node> getSuccessors(Node state, CodedProblem problem, BitExp goal) {
         // Creates an empty list of neighbors
 
@@ -618,10 +639,8 @@ public final class FF extends AbstractPlanner {
         return successors;
     }
 
-
-
     /**
-     * Solves the planning problem and returns the first solution plan found. This method must be
+     * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found. This method must be
      * completed.
      *
      * @param problem the coded planning problem to solve.
@@ -644,9 +663,11 @@ public final class FF extends AbstractPlanner {
         s0.setHeuristicValue(root.getOperator());
         openSet.add(s0);
         Node solution = null;
+
         final int CPUTime = this.getTimeout();
+        long time = 0;
         // Start of the search
-        while (!openSet.isEmpty() && solution == null && this.searchingTime < CPUTime) {
+        while (!openSet.isEmpty() && solution == null && time < CPUTime) {
             // Pop the first node in the pending list open
             final Node current = this.pop(openSet);
             if (current.satisfy(problem.getGoal())) {
@@ -676,19 +697,26 @@ public final class FF extends AbstractPlanner {
             }
         }
         // Take time to compute the searching time
-        long end = System.currentTimeMillis();
-        // Compute the searching time
-        this.searchingTime = end - begin;
+        time = System.currentTimeMillis() - begin;
 
-        // Compute the memory used by the search
-        this.searchingMemory += MemoryAgent.deepSizeOf(closeSet) + MemoryAgent.deepSizeOf(openSet)
-            + MemoryAgent.deepSizeOf(openSet);
-        this.searchingMemory += MemoryAgent.deepSizeOf(heuristic);
-        this.nbOfExploredNodes = closeSet.size();
+        if (isSaveState()) {
+            // Compute the searching time
+            this.getStatistics().setTimeToSearch(time);
+            // Compute the memory used by the search
+            this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
+        }
+
         // return the plan computed or null if no plan was found
         return solution;
     }
 
+    /**
+     * Get a node from a list of nodes.
+     *
+     * @param states the goal to reach.
+     * @return the node from the list.
+     */
     private Node pop(Collection<Node> states) {
         Node state = null;
         if (!states.isEmpty()) {
