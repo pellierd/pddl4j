@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.planners.ff;
 
 import fr.uga.pddl4j.util.BitState;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class Node extends BitState{
+public final class Node extends BitState {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,8 +38,7 @@ public final class Node extends BitState{
      * The parent node of this node.
      */
     private Node parent;
-    private Set<Node> successors;
-        private double heuristic_value;
+
     /**
      * The operator apply to reach this node.
      */
@@ -54,7 +54,12 @@ public final class Node extends BitState{
      */
     private int heuristic;
 
+    private Set<Node> successors;
+
+    private double heuristicValue;
+
     private int depth;
+
     /**
      * Creates a new node from a specified state.
      *
@@ -91,15 +96,6 @@ public final class Node extends BitState{
     public final int getOperator() {
         return operator;
     }
-        /**
-     * Adds a successor to this state.
-     *
-     * @param successor the successor to added.
-     * @return <code>true</code> if the node was added; <code>false</code>otherwise.
-     */
-        public boolean addSuccessor(final Node successor) {
-        return this.successors.add(successor);
-    }
 
     /**
      * Sets the operator applied to reach the node.
@@ -110,6 +106,7 @@ public final class Node extends BitState{
         this.operator = operator;
     }
 
+
     /**
      * Returns the parent node of the node.
      *
@@ -118,9 +115,7 @@ public final class Node extends BitState{
     public final Node getParent() {
         return parent;
     }
-        public void setHeuristicValue(final double value) {
-        this.heuristic_value = value;
-    }
+
 
     /**
      * Sets the parent node of the node.
@@ -158,6 +153,7 @@ public final class Node extends BitState{
         return heuristic;
     }
 
+
     /**
      * Sets the estimated distance to the goal from the node.
      *
@@ -166,30 +162,32 @@ public final class Node extends BitState{
     public final void setHeuristic(int estimates) {
         this.heuristic = estimates;
     }
-        public double getHeuristicValue() {
-        return this.heuristic_value;
+
+    /**
+     * Returns the best heuristic value.
+     *
+     * @return the best heuristic value.
+     */
+    public double getHeuristicValue() {
+        return this.heuristicValue;
     }
 
-        /**
+    /**
+     * Set the best heuristic value.
+     *
+     * @param value the best heuristic value.
+     */
+    public void setHeuristicValue(final double value) {
+        this.heuristicValue = value;
+    }
+
+    /**
      * Returns the depth of this state.
      *
      * @return the depth of this state.
      */
     public int getDepth() {
-    	return this.depth;
-    }
-
-        public boolean contains(final Node other) {
-        return this.intersect(other).equals(other);
-    }
-    public Node intersect(final Node other) {
-        final Node clone = this.clone();
-        clone.and(other);
-        return clone;
-    }
-    @Override
-        public Node clone() {
-        return (Node) super.clone();
+        return this.depth;
     }
 
     /**
@@ -198,17 +196,8 @@ public final class Node extends BitState{
      * @param depth
      */
     public void setDepth(final int depth) {
-    	this.depth = depth;
+        this.depth = depth;
     }
-        /**
-     * Returns <code>true</code> if a specified state is include in an
-     * other state.
-     *
-     * @param other the other state.
-     * @return <code>true</code> if a specified state is include in this
-     *         state; <code>false</code>otherwise.
-     */
-
 
     /**
      * Returns the value of the heuristic function, i.e.,
@@ -222,11 +211,72 @@ public final class Node extends BitState{
         return weight * this.heuristic + this.cost;
     }
 
+    /**
+     * Adds a successor to this state.
+     *
+     * @param successor the successor to added.
+     * @return <code>true</code> if the node was added; <code>false</code>otherwise.
+     */
+    public boolean addSuccessor(final Node successor) {
+        return this.successors.add(successor);
+    }
+
+    /**
+     * Returns <code>true</code> if a specified state is include in an
+     * other state.
+     *
+     * @param other the other state.
+     * @return <code>true</code> if a specified state is include in this
+     * state; <code>false</code>otherwise.
+     */
+    public boolean contains(final Node other) {
+        return this.intersect(other).equals(other);
+    }
+
+    /**
+     * Returns the node which intersect an other node.
+     *
+     * @param other the other node.
+     * @return a cloned node which intersect the other node.
+     */
+    public Node intersect(final Node other) {
+        final Node clone = this.clone();
+        clone.and(other);
+        return clone;
+    }
+
+    /**
+     * Returns a cloned node. The clone method has the same behaviour as the equals method of
+     * the class BitState.
+     *
+     * @return the cloned node.
+     * @see BitState#clone()
+     */
+    @Override
+    public Node clone() {
+        return (Node) super.clone();
+    }
+
+    /**
+     * Returns if a node is equal to an other object. The equals method has the same behaviour as the equals method of
+     * the class BitState.
+     *
+     * @param obj the other oject.
+     * @return <code>true</code> if the node is equal to the other specified object; <code>false</code> otherwise.
+     * @see BitState#equals(Object)
+     */
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
+    /**
+     * Returns the hash code value of the node. The hashcode method has the same behaviour as the hashcode method of
+     * the class BitState.
+     *
+     * @return the hashcode value for this node.
+     * @see BitState#hashCode()
+     */
     @Override
     public int hashCode() {
         return super.hashCode();
