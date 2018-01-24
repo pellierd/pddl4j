@@ -86,6 +86,11 @@ public final class FF extends AbstractPlanner {
     private int maxDepth;
 
     /**
+     * The time needed to search a solution plan.
+     */
+    private long searchingTime;
+
+    /**
      * Creates a new planner.
      */
     public FF() {
@@ -501,9 +506,11 @@ public final class FF extends AbstractPlanner {
         // Take time to compute the searching time
         long end = System.currentTimeMillis();
 
+        searchingTime = end - begin;
+
         if (isSaveState()) {
             // Compute the searching time
-            this.getStatistics().setTimeToSearch(end - begin);
+            this.getStatistics().setTimeToSearch(searchingTime);
         }
 
         // Return the solution state of null if no solution was found
@@ -582,10 +589,10 @@ public final class FF extends AbstractPlanner {
         openSet.add(s0);
         Node solution = null;
 
-        final int CPUTime = this.getTimeout();
-        long time = 0;
+        final int CPUTime = this.getTimeout() * 1000;
+
         // Start of the search
-        while (!openSet.isEmpty() && solution == null && time < CPUTime) {
+        while (!openSet.isEmpty() && solution == null && searchingTime < CPUTime) {
             // Pop the first node in the pending list open
             final Node current = this.pop(openSet);
             if (current.satisfy(problem.getGoal())) {
@@ -615,11 +622,12 @@ public final class FF extends AbstractPlanner {
             }
         }
         // Take time to compute the searching time
-        time = System.currentTimeMillis() - begin;
+        long end = System.currentTimeMillis();
+        searchingTime = end - begin;
 
         if (isSaveState()) {
             // Compute the searching time
-            this.getStatistics().setTimeToSearch(time);
+            this.getStatistics().setTimeToSearch(searchingTime);
             // Compute the memory used by the search
             this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
                 + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));

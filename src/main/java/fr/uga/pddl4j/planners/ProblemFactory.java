@@ -60,7 +60,7 @@ public class ProblemFactory {
     /**
      * Creates a new problem factory.
      */
-    private ProblemFactory() {
+    public ProblemFactory() {
         super();
         this.parser = new Parser();
         this.traceLevel = ProblemFactory.DEFAULT_TRACE_LEVEL;
