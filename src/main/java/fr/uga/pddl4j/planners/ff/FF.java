@@ -156,7 +156,7 @@ public final class FF extends AbstractPlanner {
 
         try {
             // Parse the command line
-            final Properties arguments = CommonPlanner.parseArguments(args,LOGGER, FF.getDefaultArguments());
+            final Properties arguments = CommonPlanner.parseArguments(args, LOGGER, FF.getDefaultArguments());
             final File domain = (File) arguments.get(CommonPlanner.Argument.DOMAIN);
             final File problem = (File) arguments.get(CommonPlanner.Argument.PROBLEM);
             final int traceLevel = (Integer) arguments.get(CommonPlanner.Argument.TRACE_LEVEL);
@@ -307,7 +307,6 @@ public final class FF extends AbstractPlanner {
     }
 
 
-
     /**
      * This method return the default arguments of the planner.
      *
@@ -406,24 +405,25 @@ public final class FF extends AbstractPlanner {
     public SequentialPlan search(final CodedProblem pb) {
         Objects.requireNonNull(pb);
 
-        Node plan = this.enforced_hill_climbing(pb);
-        if (plan == null) {
+        Node solutionNode = this.enforcedHillClimbing(pb);
+
+        if (solutionNode != null){
+            if(isSaveState()) {
+                final StringBuilder strb = new StringBuilder();
+                strb.append(String.format("Number of nodes explored  %d %n", this.getNbStates()));
+                strb.append(String.format("Max depth reached         %d %n", this.getMaxDepth()));
+                LOGGER.trace(strb);
+            }
+        }
+        else{
             LOGGER.trace("Enforced Hill Climb Failed");
-        }
-        plan = this.greedy_best_first_search(pb);
-        if (plan == null) {
-            LOGGER.trace("Greedy Best First Search Failed");
-        }
-        SequentialPlan planz = extract(plan, pb);
+            solutionNode = this.greedyBestFirstSearch(pb);
 
-        if (isSaveState()) {
-            final StringBuilder strb = new StringBuilder();
-            strb.append(String.format("Number of nodes explored  %d %n", this.getNbStates()));
-            strb.append(String.format("Max depth reached         %d %n", this.getMaxDepth()));
-            LOGGER.trace(strb);
+            if (solutionNode == null) {
+                LOGGER.trace("Greedy Best First Search Failed");
+            }
         }
-
-        return planz;
+        return extract(solutionNode, pb);
     }
 
     /**
@@ -450,54 +450,39 @@ public final class FF extends AbstractPlanner {
      * @param problem the coded problem to solve.
      * @return the solution node or null.
      */
-    private Node enforced_hill_climbing(CodedProblem problem) {
+    private Node enforcedHillClimbing(CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        final LinkedList<Node> open_list = new LinkedList<>();
+
+        Node solution = null;
+        boolean dead_end_free = true;
         this.nbStates = 0;
         this.maxDepth = 0;
+
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        // Creates the initial state
-        final Node s0 = root.clone();
-        // Compute the heuristic value of the initial state
-        s0.setHeuristic(heuristic.estimate(s0, problem.getGoal()));
-        //s0.setHeuristic(heuristic.estimate(initialState, goal));
-        // Create the open list of the enforced hill-climbing algorithm
-        final LinkedList<Node> open_list = new LinkedList<>();
-        // Add the initial state to the open list
-        open_list.add(s0);
+        open_list.add(root);
 
-        // Initialize the best heuristic value to the heuristic value of the initial state
-        double best_heuristic = s0.getHeuristicValue();
-        // Declare the solution state wit null value
-        Node solution = null;
-        // The boolean used to indicate that a dead end occurs
-        boolean dead_end_free = true;
-        BitExp goal = new BitExp(problem.getGoal());
-        // The main loop of the enforced hill-climbing algorithm that implements
-        // the breadth first search
-        while (!open_list.isEmpty() && solution == null && dead_end_free) {
+        int best_heuristic = root.getHeuristic();
+
+        while (!open_list.isEmpty() && solution == null && dead_end_free){
             final Node current_state = open_list.pop();
-            //solution_state = this.extract(state, problem);
-            final LinkedList<Node> successors = this.getSuccessors(current_state, problem, goal);
-            // Update the boolean used to indicate if a dead end is detected
-
+            final LinkedList<Node> successors = this.getSuccessors(current_state, problem, heuristic);
             dead_end_free = !successors.isEmpty();
-            // The hill-climbing loop to try to go deeper
-            while (!successors.isEmpty() && solution == null) {
-                // Pop the first successor state from the list of successors
+
+            while (!successors.isEmpty() && solution == null){
                 final Node successor = successors.pop();
-                // Get the heuristic value of this state
-                final double heuristic1 = successor.getHeuristicValue();
-                if (heuristic1 == 0.0) solution = successor;
-                if (heuristic1 < best_heuristic) {
+                final int heuristicSuccessor = successor.getHeuristic();
+                if (heuristicSuccessor == 0.0) {
+                    solution = successor;
+                }
+                if (heuristicSuccessor < best_heuristic) {
                     successors.clear();
                     open_list.clear();
-                    best_heuristic = heuristic1;
+                    best_heuristic = heuristicSuccessor;
                     this.maxDepth++;
                 }
-                // Finally we add the successor to the open list to pursue the
-                // bread first search
                 open_list.addLast(successor);
                 this.nbStates++;
             }
@@ -513,54 +498,38 @@ public final class FF extends AbstractPlanner {
             this.getStatistics().setTimeToSearch(searchingTime);
         }
 
-        // Return the solution state of null if no solution was found
         return solution;
     }
 
     /**
      * Get the successors from a node.
      *
-     * @param state   the parent node.
-     * @param problem the coded problem to solve.
-     * @param goal    the goal to reach.
+     * @param state     the parent node.
+     * @param problem   the coded problem to solve.
+     * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node state, CodedProblem problem, BitExp goal) {
-        // Creates an empty list of neighbors
-
+    private LinkedList<Node> getSuccessors(Node state, CodedProblem problem, Heuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
-        if (state.getHeuristicValue() == Double.POSITIVE_INFINITY) return successors;
-        BitState goalz = new BitState(problem.getGoal());
-        final Node previous_goals_reached = state.clone();
-        previous_goals_reached.and(goalz);
-        // For each helpful actions creates the next states
-        final BitVector helpful_actions = new BitVector(state);
 
-        for (int i = helpful_actions.nextSetBit(0); i >= 0; i = helpful_actions.nextSetBit(i + 1)) {
-            helpful_actions.get(i);
-            BitOp op = problem.getOperators().get(i);
-            // Creates the next state
-            final Node next_state = new Node(state);
+        int index = 0;
+        for (BitOp op : problem.getOperators()) {
+            // Test if a specified operator is applicable in the current state
+            if (op.isApplicable(state)) {
+                final Node nextState = state.clone();
+                nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
+                nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 
-            // Adds the positive effects
-            next_state.or(op.getCondEffects().get(0).getEffects().getPositive());
-            // Deletes the negative effects
-            next_state.andNot(op.getCondEffects().get(0).getEffects().getNegative());
-
-            // Computes the goals reached by applying the current helpful action
-            final Node new_goals_reached = next_state.clone();
-            new_goals_reached.and(goalz);
-            new_goals_reached.andNot(previous_goals_reached);
-            double heuristic_value = next_state.getHeuristicValue();
-            if (!goalz.intersects(new_goals_reached)) {
-                next_state.setHeuristicValue(heuristic_value);
-                next_state.setParent(state);
-                next_state.setOperator(op.getArity());
-                next_state.apply(goal);
-                state.addSuccessor(next_state);
-                successors.add(next_state);
+                // Apply the effect of the applicable operator
+                nextState.setDepth(state.getDepth() + 1);
+                nextState.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
+                nextState.setParent(state);
+                nextState.setOperator(index);
+                successors.add(nextState);
             }
+            index++;
         }
+
         return successors;
     }
 
@@ -571,42 +540,36 @@ public final class FF extends AbstractPlanner {
      * @param problem the coded planning problem to solve.
      * @return a solution plan or null if it does not exist.
      */
-    private Node greedy_best_first_search(final CodedProblem problem) {
+    private Node greedyBestFirstSearch(final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        // Get the initial state from the planning problem
-        BitState init = new BitState(problem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        // Creates the initial state
-        final Node s0 = root.clone();
-
-        // Initialize the closed list of nodes (store the nodes explored)
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
-        // Creates the root node of the tree search
-        s0.setDepth(0);
-        s0.setHeuristicValue(root.getOperator());
-        openSet.add(s0);
+        final int timeout = this.getTimeout() * 1000;
         Node solution = null;
 
-        final int CPUTime = this.getTimeout() * 1000;
+        BitState init = new BitState(problem.getInit());
+        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
+        root.setDepth(0);
+        openSet.add(root);
 
-        // Start of the search
-        while (!openSet.isEmpty() && solution == null && searchingTime < CPUTime) {
+        while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
             // Pop the first node in the pending list open
-            final Node current = this.pop(openSet);
+            final Node current = this.popPriorityNode(openSet);
+
             if (current.satisfy(problem.getGoal())) {
                 solution = current;
             } else {
                 closeSet.add(current);
                 int index = 0;
                 for (BitOp op : problem.getOperators()) {
+
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-
                         Node stateAfter = current.clone();
                         stateAfter.or(op.getCondEffects().get(0).getEffects().getPositive());
                         stateAfter.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+
                         // Apply the effect of the applicable operator
                         if (!closeSet.contains(stateAfter)) {
                             stateAfter.setDepth(current.getDepth() + 1);
@@ -620,10 +583,10 @@ public final class FF extends AbstractPlanner {
                     index++;
                 }
             }
+            // Take time to compute the searching time
+            long end = System.currentTimeMillis();
+            searchingTime = end - begin;
         }
-        // Take time to compute the searching time
-        long end = System.currentTimeMillis();
-        searchingTime = end - begin;
 
         if (isSaveState()) {
             // Compute the searching time
@@ -633,24 +596,23 @@ public final class FF extends AbstractPlanner {
                 + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
         }
 
-        // return the plan computed or null if no plan was found
         return solution;
     }
 
     /**
      * Get a node from a list of nodes.
      *
-     * @param states the goal to reach.
+     * @param states the list of nodes (successors).
      * @return the node from the list.
      */
-    private Node pop(Collection<Node> states) {
+    private Node popPriorityNode(Collection<Node> states) {
         Node state = null;
         if (!states.isEmpty()) {
             final Iterator<Node> i = states.iterator();
             state = i.next();
             while (i.hasNext()) {
                 final Node next = i.next();
-                if (next.getHeuristicValue() < state.getHeuristicValue()) {
+                if (next.getHeuristic() < state.getHeuristic()) {
                     state = next;
                 }
             }

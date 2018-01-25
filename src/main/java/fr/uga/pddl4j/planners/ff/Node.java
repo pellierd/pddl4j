@@ -153,7 +153,6 @@ public final class Node extends BitState {
         return heuristic;
     }
 
-
     /**
      * Sets the estimated distance to the goal from the node.
      *
@@ -161,24 +160,6 @@ public final class Node extends BitState {
      */
     public final void setHeuristic(int estimates) {
         this.heuristic = estimates;
-    }
-
-    /**
-     * Returns the best heuristic value.
-     *
-     * @return the best heuristic value.
-     */
-    public double getHeuristicValue() {
-        return this.heuristicValue;
-    }
-
-    /**
-     * Set the best heuristic value.
-     *
-     * @param value the best heuristic value.
-     */
-    public void setHeuristicValue(final double value) {
-        this.heuristicValue = value;
     }
 
     /**
