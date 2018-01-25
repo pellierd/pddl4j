@@ -404,6 +404,7 @@ public final class FF extends AbstractPlanner {
     @Override
     public SequentialPlan search(final CodedProblem pb) {
         Objects.requireNonNull(pb);
+        searchingTime = 0;
 
         Node solutionNode = this.enforcedHillClimbing(pb);
 
@@ -414,16 +415,22 @@ public final class FF extends AbstractPlanner {
                 strb.append(String.format("Max depth reached         %d %n", this.getMaxDepth()));
                 LOGGER.trace(strb);
             }
+            return extract(solutionNode, pb);
         }
         else{
-            LOGGER.trace("Enforced Hill Climb Failed");
+            LOGGER.trace("Enforced Hill Climb Failed\n");
+            searchingTime = 0;
             solutionNode = this.greedyBestFirstSearch(pb);
 
             if (solutionNode == null) {
-                LOGGER.trace("Greedy Best First Search Failed");
+                LOGGER.trace("Greedy Best First Search Failed\n");
+            }
+            else {
+                return extract(solutionNode, pb);
             }
         }
-        return extract(solutionNode, pb);
+
+        return null;
     }
 
     /**
@@ -454,6 +461,7 @@ public final class FF extends AbstractPlanner {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         final LinkedList<Node> open_list = new LinkedList<>();
+        final int timeout = this.getTimeout() * 1000;
 
         Node solution = null;
         boolean dead_end_free = true;
@@ -466,7 +474,7 @@ public final class FF extends AbstractPlanner {
 
         int best_heuristic = root.getHeuristic();
 
-        while (!open_list.isEmpty() && solution == null && dead_end_free){
+        while (!open_list.isEmpty() && solution == null && dead_end_free && searchingTime < timeout) {
             final Node current_state = open_list.pop();
             final LinkedList<Node> successors = this.getSuccessors(current_state, problem, heuristic);
             dead_end_free = !successors.isEmpty();
@@ -486,12 +494,11 @@ public final class FF extends AbstractPlanner {
                 open_list.addLast(successor);
                 this.nbStates++;
             }
+
+            // Take time to compute the searching time
+            long end = System.currentTimeMillis();
+            searchingTime = end - begin;
         }
-
-        // Take time to compute the searching time
-        long end = System.currentTimeMillis();
-
-        searchingTime = end - begin;
 
         if (isSaveState()) {
             // Compute the searching time
