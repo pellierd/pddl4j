@@ -28,13 +28,24 @@ import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.CommonPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
-import fr.uga.pddl4j.util.*;
+import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.util.SequentialPlan;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm.
@@ -76,12 +87,12 @@ public final class FF extends AbstractPlanner {
     private boolean saveState;
 
     /**
-     * The number of nodes explored with EHC
+     * The number of nodes explored with EHC.
      */
     private int nbStates;
 
     /**
-     * The max depth reached with EHC
+     * The max depth reached with EHC.
      */
     private int maxDepth;
 
@@ -408,24 +419,22 @@ public final class FF extends AbstractPlanner {
 
         Node solutionNode = this.enforcedHillClimbing(pb);
 
-        if (solutionNode != null){
-            if(isSaveState()) {
+        if (solutionNode != null) {
+            if (isSaveState()) {
                 final StringBuilder strb = new StringBuilder();
                 strb.append(String.format("Number of nodes explored  %d %n", this.getNbStates()));
                 strb.append(String.format("Max depth reached         %d %n", this.getMaxDepth()));
                 LOGGER.trace(strb);
             }
             return extract(solutionNode, pb);
-        }
-        else{
+        } else {
             LOGGER.trace("Enforced Hill Climb Failed\n");
             searchingTime = 0;
             solutionNode = this.greedyBestFirstSearch(pb);
 
             if (solutionNode == null) {
                 LOGGER.trace("Greedy Best First Search Failed\n");
-            }
-            else {
+            } else {
                 return extract(solutionNode, pb);
             }
         }
@@ -463,8 +472,6 @@ public final class FF extends AbstractPlanner {
         final LinkedList<Node> open_list = new LinkedList<>();
         final int timeout = this.getTimeout() * 1000;
 
-        Node solution = null;
-        boolean dead_end_free = true;
         this.nbStates = 0;
         this.maxDepth = 0;
 
@@ -472,23 +479,26 @@ public final class FF extends AbstractPlanner {
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         open_list.add(root);
 
-        int best_heuristic = root.getHeuristic();
+        int bestHeuristic = root.getHeuristic();
 
-        while (!open_list.isEmpty() && solution == null && dead_end_free && searchingTime < timeout) {
+        Node solution = null;
+        boolean deadEndFree = true;
+
+        while (!open_list.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
             final Node current_state = open_list.pop();
             final LinkedList<Node> successors = this.getSuccessors(current_state, problem, heuristic);
-            dead_end_free = !successors.isEmpty();
+            deadEndFree = !successors.isEmpty();
 
-            while (!successors.isEmpty() && solution == null){
+            while (!successors.isEmpty() && solution == null) {
                 final Node successor = successors.pop();
                 final int heuristicSuccessor = successor.getHeuristic();
                 if (heuristicSuccessor == 0.0) {
                     solution = successor;
                 }
-                if (heuristicSuccessor < best_heuristic) {
+                if (heuristicSuccessor < bestHeuristic) {
                     successors.clear();
                     open_list.clear();
-                    best_heuristic = heuristicSuccessor;
+                    bestHeuristic = heuristicSuccessor;
                     this.maxDepth++;
                 }
                 open_list.addLast(successor);
@@ -541,8 +551,8 @@ public final class FF extends AbstractPlanner {
     }
 
     /**
-     * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found. This method must be
-     * completed.
+     * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found.
+     * This method must be completed.
      *
      * @param problem the coded planning problem to solve.
      * @return a solution plan or null if it does not exist.

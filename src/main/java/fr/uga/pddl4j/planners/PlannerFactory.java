@@ -1,5 +1,6 @@
 package fr.uga.pddl4j.planners;
 
+import fr.uga.pddl4j.planners.ff.FF;
 import fr.uga.pddl4j.planners.hsp.HSP;
 
 /**
@@ -36,8 +37,14 @@ public class PlannerFactory {
     public Planner getPlanner(final Planner.Name name) {
         Planner planner = null;
         switch (name) {
-            case HSP:
-                planner = new HSP();
+            case HSP: planner = new HSP();
+            break;
+
+            case FF: planner = new FF();
+            break;
+
+            default: planner = new HSP();
+            break;
         }
         return planner;
     }

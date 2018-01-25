@@ -174,7 +174,7 @@ public final class Node extends BitState {
     /**
      * Set the depth of this state.
      *
-     * @param depth
+     * @param depth the depth of the state.
      */
     public void setDepth(final int depth) {
         this.depth = depth;
@@ -207,8 +207,7 @@ public final class Node extends BitState {
      * other state.
      *
      * @param other the other state.
-     * @return <code>true</code> if a specified state is include in this
-     * state; <code>false</code>otherwise.
+     * @return <code>true</code> if a specified state is include in this state; <code>false</code>otherwise.
      */
     public boolean contains(final Node other) {
         return this.intersect(other).equals(other);

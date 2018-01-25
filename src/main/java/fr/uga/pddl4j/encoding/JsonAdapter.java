@@ -19,14 +19,14 @@
 
 package fr.uga.pddl4j.encoding;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 import fr.uga.pddl4j.util.Plan;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -205,9 +205,12 @@ public class JsonAdapter {
      * @param relevants the facts of the problem.
      * @return an 2D collection of Strings.
      */
-    private static ArrayList<ArrayList<String>> toJsonString(final BitExp exp, final List<String> constants,
-                                                             final List<String> types, final List<String> predicates,
-                                                             final List<String> functions, final List<IntExp> relevants) {
+    private static ArrayList<ArrayList<String>> toJsonString(final BitExp exp,
+                                                             final List<String> constants,
+                                                             final List<String> types,
+                                                             final List<String> predicates,
+                                                             final List<String> functions,
+                                                             final List<IntExp> relevants) {
         ArrayList<String> fluentsPos = new ArrayList<>();
         ArrayList<String> fluentsNeg = new ArrayList<>();
         ArrayList<ArrayList<String>> fluents = new ArrayList<>();

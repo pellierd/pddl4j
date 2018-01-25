@@ -144,7 +144,7 @@ final class BitEncoding {
      * <code>BitExp</code>.
      */
     static BitExp encodeGoal(IntExp goal, final Map<IntExp, Integer> map) throws UnexpectedExpressionException {
-       if (goal.getConnective().equals(Connective.FALSE)) {
+        if (goal.getConnective().equals(Connective.FALSE)) {
             return null;
         }
 

@@ -47,7 +47,7 @@ public final class CommonPlanner {
     /**
      * This method print the usage of the command-line planner.
      */
-    public static StringBuilder printUsage() {
+    private static StringBuilder printUsage() {
 
         final StringBuilder strb = new StringBuilder();
 
@@ -100,30 +100,32 @@ public final class CommonPlanner {
      * @param args the arguments from the command line.
      * @return The arguments of the planner.
      */
-    public static Properties parseArguments(String[] args, Logger LOGGER, Properties defaultArguments) throws FileException {
+    public static Properties parseArguments(String[] args, Logger log, Properties defaultArguments)
+        throws FileException {
+
         final Properties arguments = defaultArguments;
         try {
             for (int i = 0; i < args.length; i += 2) {
                 if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        LOGGER.trace("operators file does not exist: " + args[i + 1] + "\n");
+                        log.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
                     arguments.put(CommonPlanner.Argument.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        LOGGER.trace("facts file does not exist: " + args[i + 1] + "\n");
+                        log.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
                     arguments.put(CommonPlanner.Argument.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
-                        LOGGER.trace(CommonPlanner.printUsage());
+                        log.trace(CommonPlanner.printUsage());
                     }
                     arguments.put(CommonPlanner.Argument.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
-                        LOGGER.trace(CommonPlanner.printUsage());
+                        log.trace(CommonPlanner.printUsage());
                     }
                     if (heuristic == 0) {
                         arguments.put(CommonPlanner.Argument.HEURISTIC, Heuristic.Type.FAST_FORWARD);
@@ -147,32 +149,34 @@ public final class CommonPlanner {
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
-                        LOGGER.trace(CommonPlanner.printUsage());
+                        log.trace(CommonPlanner.printUsage());
                     }
                     arguments.put(CommonPlanner.Argument.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
-                        LOGGER.trace(CommonPlanner.printUsage());
+                        log.trace(CommonPlanner.printUsage());
                     }
                     arguments.put(CommonPlanner.Argument.TRACE_LEVEL, level);
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
                     arguments.put(CommonPlanner.Argument.STATISTICS, isStatUsed);
                 } else {
-                    LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
-                    LOGGER.trace(CommonPlanner.printUsage());
+                    log.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
+                    log.trace(CommonPlanner.printUsage());
                     throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
-            if (arguments.get(CommonPlanner.Argument.DOMAIN) == null || arguments.get(CommonPlanner.Argument.PROBLEM) == null) {
-                LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
-                LOGGER.trace(CommonPlanner.printUsage());
+            if (arguments.get(CommonPlanner.Argument.DOMAIN) == null
+                || arguments.get(CommonPlanner.Argument.PROBLEM) == null) {
+
+                log.trace("\nMissing DOMAIN or PROBLEM\n");
+                log.trace(CommonPlanner.printUsage());
                 throw new FileException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
-            LOGGER.trace("\nError when parsing arguments\n");
-            LOGGER.trace(CommonPlanner.printUsage());
+            log.trace("\nError when parsing arguments\n");
+            log.trace(CommonPlanner.printUsage());
             throw runExp;
         }
         return arguments;
