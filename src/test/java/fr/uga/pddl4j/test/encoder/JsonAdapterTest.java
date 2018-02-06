@@ -1,7 +1,7 @@
 package fr.uga.pddl4j.test.encoder;
 
-import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.hsp.HSP;

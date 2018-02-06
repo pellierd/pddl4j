@@ -1,6 +1,7 @@
-package fr.uga.pddl4j.test.hsp;
+package fr.uga.pddl4j.test.planner.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.hsp.HSP;
@@ -880,15 +881,22 @@ public class HSPTest {
      */
     @Test
     public void testHSP_json_output_plan() throws Exception {
-        String[] args = new String[6];
-        args[0] = "-o";
-        args[1] = "pddl/gripper/domain.pddl";
-        args[2] = "-f";
-        args[3] = "pddl/gripper/p01.pddl";
-        args[4] = "-t";
-        args[5] = "10";
 
-        String jsonPlan = HSP.resolveAsJsonPlan(args);
+        final ProblemFactory factory = new ProblemFactory();
+        String domainFile = "pddl/gripper/domain.pddl";
+        String problemFile = "pddl/gripper/p01.pddl";
+        String jsonPlan = "";
+
+        ErrorManager errorManager = factory.parse(new File(domainFile), new File(problemFile));
+        Assert.assertTrue(errorManager.isEmpty());
+
+        CodedProblem pb = factory.encode();
+        if (pb.isSolvable()) {
+            Plan plan = planner.search(pb);
+            JsonAdapter toJson = new JsonAdapter(pb);
+            jsonPlan = toJson.toJsonString(plan);
+        }
+
         Assert.assertFalse(jsonPlan == null);
         Assert.assertFalse(jsonPlan.contentEquals(""));
         Assert.assertTrue(jsonPlan.contentEquals(validGripperP01JSON));
@@ -934,10 +942,11 @@ public class HSPTest {
             if (oneDomainPerProblem) {
                 currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
             }
-
+            System.out.println("--");
             // Parses the PDDL domain and problem description
             try {
                 factory.setTraceLevel(TRACE_LEVEL);
+
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
                 Assert.assertTrue(errorManager.isEmpty());
 
@@ -945,11 +954,11 @@ public class HSPTest {
                 Plan plan = null;
                 try {
                     // Encodes and instantiates the problem in a compact representation
-                    System.out.println("encoding [" + currentProblem + "]" + "...");
+                    System.out.println("Encoding [" + currentProblem + "]" + "...");
                     pb = factory.encode();
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
-                        System.out.println("trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
+                        System.out.println("Trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
                         plan = planner.search(pb);
                     } else {
                         System.err.println("Problem [" + currentProblem + "]" + " not solvable.");
@@ -980,6 +989,7 @@ public class HSPTest {
             } catch (IOException ioEx) {
                 ioEx.printStackTrace();
             }
+            System.out.println("--");
         }
     }
 

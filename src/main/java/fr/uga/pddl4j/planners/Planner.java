@@ -16,7 +16,6 @@
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.Plan;
 
 /**
@@ -52,6 +51,10 @@ public interface Planner {
          * The HSP (Heuristic Search Planner).
          */
         HSP,
+        /**
+         * The FF (Fast Forward Planner).
+         */
+        FF,
     }
 
     /**

@@ -60,7 +60,7 @@ public class ProblemFactory {
     /**
      * Creates a new problem factory.
      */
-    private ProblemFactory() {
+    public ProblemFactory() {
         super();
         this.parser = new Parser();
         this.traceLevel = ProblemFactory.DEFAULT_TRACE_LEVEL;
@@ -92,13 +92,27 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
+     * @param domain the domain file path.
+     * @param problem the problem file path.
+     * @return the error manager of the parser used to parse.
+     * @throws FileNotFoundException if the domain or the problem file was not found.
+     * @throws IOException if an error occur during parsing.
+     */
+    public ErrorManager parse(final String domain, final String problem) throws IOException {
+        this.parser.parse(domain, problem);
+        return parser.getErrorManager();
+    }
+
+    /**
+     * Parses the domain and the problem description.
+     *
      * @param domain the domain string description
      * @param problem the problem string description
      * @return the error manager of the parser used to parse
      * @throws IOException if an error occur during parsing
      */
-    public ErrorManager parse(final String domain, final String problem) throws IOException {
-        this.parser.parseString(domain, problem);
+    public ErrorManager parseFromString(final String domain, final String problem) throws IOException {
+        this.parser.parseFromString(domain, problem);
         return parser.getErrorManager();
     }
 
