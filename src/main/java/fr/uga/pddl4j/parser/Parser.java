@@ -309,7 +309,7 @@ public final class Parser {
      * @param domainString  the string that contains the planning domains.
      * @param problemString the string that contains the planning problem.
      */
-    public void parseString(String domainString, String problemString)  {
+    public void parseFromString(String domainString, String problemString)  {
         try {
             // Create temp files for domain and problem
             File domain = File.createTempFile("domain", ".pddl");

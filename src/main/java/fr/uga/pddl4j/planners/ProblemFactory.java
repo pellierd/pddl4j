@@ -111,8 +111,8 @@ public class ProblemFactory {
      * @return the error manager of the parser used to parse
      * @throws IOException if an error occur during parsing
      */
-    public ErrorManager parseString(final String domain, final String problem) throws IOException {
-        this.parser.parseString(domain, problem);
+    public ErrorManager parseFromString(final String domain, final String problem) throws IOException {
+        this.parser.parseFromString(domain, problem);
         return parser.getErrorManager();
     }
 

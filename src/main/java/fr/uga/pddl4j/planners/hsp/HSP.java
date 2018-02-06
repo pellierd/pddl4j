@@ -25,7 +25,6 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.CommonPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.util.BitOp;
@@ -315,14 +314,14 @@ public final class HSP extends AbstractPlanner {
 
         try {
             // Parse the command line
-            final Properties arguments = CommonPlanner.parseArguments(args,LOGGER,HSP.getDefaultArguments());
-            final File domain = (File) arguments.get(CommonPlanner.Argument.DOMAIN);
-            final File problem = (File) arguments.get(CommonPlanner.Argument.PROBLEM);
-            final int traceLevel = (Integer) arguments.get(CommonPlanner.Argument.TRACE_LEVEL);
-            final int timeout = (Integer) arguments.get(CommonPlanner.Argument.TIMEOUT);
-            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(CommonPlanner.Argument.HEURISTIC);
-            final double weight = (Double) arguments.get(CommonPlanner.Argument.WEIGHT);
-            final boolean saveStats = (Boolean) arguments.get(CommonPlanner.Argument.STATISTICS);
+            final Properties arguments = AbstractPlanner.parseArguments(args,LOGGER,HSP.getDefaultArguments());
+            final File domain = (File) arguments.get(AbstractPlanner.Argument.DOMAIN);
+            final File problem = (File) arguments.get(AbstractPlanner.Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(AbstractPlanner.Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(AbstractPlanner.Argument.TIMEOUT);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(AbstractPlanner.Argument.HEURISTIC);
+            final double weight = (Double) arguments.get(AbstractPlanner.Argument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(AbstractPlanner.Argument.STATISTICS);
 
             // Creates the planner
             final HSP planner = new HSP();
@@ -473,11 +472,11 @@ public final class HSP extends AbstractPlanner {
      */
     private static Properties getDefaultArguments() {
         final Properties options = new Properties();
-        options.put(CommonPlanner.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
-        options.put(CommonPlanner.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
-        options.put(CommonPlanner.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
-        options.put(CommonPlanner.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
-        options.put(CommonPlanner.Argument.STATISTICS, HSP.DEFAULT_STATISTICS);
+        options.put(AbstractPlanner.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
+        options.put(AbstractPlanner.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
+        options.put(AbstractPlanner.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
+        options.put(AbstractPlanner.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
+        options.put(AbstractPlanner.Argument.STATISTICS, HSP.DEFAULT_STATISTICS);
         return options;
     }
 }
