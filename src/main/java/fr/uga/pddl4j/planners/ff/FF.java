@@ -86,16 +86,6 @@ public final class FF extends AbstractPlanner {
     private boolean saveState;
 
     /**
-     * The number of nodes explored with EHC.
-     */
-    private int nbStates;
-
-    /**
-     * The max depth reached with EHC.
-     */
-    private int maxDepth;
-
-    /**
      * The time needed to search a solution plan.
      */
     private long searchingTime;
@@ -389,24 +379,6 @@ public final class FF extends AbstractPlanner {
     }
 
     /**
-     * Returns the number of nodes explored with EHC.
-     *
-     * @return the number of nodes explored with EHC.
-     */
-    public int getNbStates() {
-        return nbStates;
-    }
-
-    /**
-     * Returns the max depth reached with EHC.
-     *
-     * @return the max depth reached with EHC.
-     */
-    public int getMaxDepth() {
-        return maxDepth;
-    }
-
-    /**
      * Search a solution plan to a specified domain and problem.
      *
      * @param pb the problem to solve.
@@ -421,8 +393,7 @@ public final class FF extends AbstractPlanner {
         if (solutionNode != null) {
             if (isSaveState()) {
                 final StringBuilder strb = new StringBuilder();
-                strb.append(String.format("Number of nodes explored  %d %n", this.getNbStates()));
-                strb.append(String.format("Max depth reached         %d %n", this.getMaxDepth()));
+                strb.append(String.format("Max depth reached         %d %n", solutionNode.getDepth()));
                 LOGGER.trace(strb);
             }
             return extract(solutionNode, pb);
@@ -471,14 +442,11 @@ public final class FF extends AbstractPlanner {
         final LinkedList<Node> open_list = new LinkedList<>();
         final int timeout = this.getTimeout() * 1000;
 
-        this.nbStates = 0;
-        this.maxDepth = 0;
-
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         open_list.add(root);
 
-        int bestHeuristic = root.getHeuristic();
+        double bestHeuristic = root.getHeuristic();
 
         Node solution = null;
         boolean deadEndFree = true;
@@ -490,7 +458,7 @@ public final class FF extends AbstractPlanner {
 
             while (!successors.isEmpty() && solution == null) {
                 final Node successor = successors.pop();
-                final int heuristicSuccessor = successor.getHeuristic();
+                final double heuristicSuccessor = successor.getHeuristic();
                 if (heuristicSuccessor == 0.0) {
                     solution = successor;
                 }
@@ -498,10 +466,8 @@ public final class FF extends AbstractPlanner {
                     successors.clear();
                     open_list.clear();
                     bestHeuristic = heuristicSuccessor;
-                    this.maxDepth++;
                 }
                 open_list.addLast(successor);
-                this.nbStates++;
             }
 
             // Take time to compute the searching time
@@ -592,7 +558,6 @@ public final class FF extends AbstractPlanner {
                             stateAfter.setHeuristic(heuristic.estimate(stateAfter, problem.getGoal()));
                             stateAfter.setParent(current);
                             stateAfter.setOperator(index);
-                            current.addSuccessor(stateAfter);
                             openSet.add(stateAfter);
                         }
                     }
