@@ -439,21 +439,21 @@ public final class FF extends AbstractPlanner {
     private Node enforcedHillClimbing(CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        final LinkedList<Node> open_list = new LinkedList<>();
+        final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = this.getTimeout() * 1000;
 
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        open_list.add(root);
+        openList.add(root);
 
         double bestHeuristic = root.getHeuristic();
 
         Node solution = null;
         boolean deadEndFree = true;
 
-        while (!open_list.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
-            final Node current_state = open_list.pop();
-            final LinkedList<Node> successors = this.getSuccessors(current_state, problem, heuristic);
+        while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
+            final Node currentState = openList.pop();
+            final LinkedList<Node> successors = this.getSuccessors(currentState, problem, heuristic);
             deadEndFree = !successors.isEmpty();
 
             while (!successors.isEmpty() && solution == null) {
@@ -464,10 +464,10 @@ public final class FF extends AbstractPlanner {
                 }
                 if (heuristicSuccessor < bestHeuristic) {
                     successors.clear();
-                    open_list.clear();
+                    openList.clear();
                     bestHeuristic = heuristicSuccessor;
                 }
-                open_list.addLast(successor);
+                openList.addLast(successor);
             }
 
             // Take time to compute the searching time
@@ -486,28 +486,30 @@ public final class FF extends AbstractPlanner {
     /**
      * Get the successors from a node.
      *
-     * @param state     the parent node.
+     * @param parent     the parent node.
      * @param problem   the coded problem to solve.
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node state, CodedProblem problem, Heuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
         for (BitOp op : problem.getOperators()) {
             // Test if a specified operator is applicable in the current state
-            if (op.isApplicable(state)) {
-                final Node nextState = state.clone();
+            if (op.isApplicable(parent)) {
+                final BitState nextState = new BitState(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                 nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 
                 // Apply the effect of the applicable operator
-                nextState.setDepth(state.getDepth() + 1);
-                nextState.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
-                nextState.setParent(state);
-                nextState.setOperator(index);
-                successors.add(nextState);
+                final Node successor = new Node(nextState);
+                successor.setCost(parent.getCost() + op.getCost());
+                successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
+                successor.setParent(parent);
+                successor.setOperator(index);
+                successor.setDepth(parent.getDepth() + 1);
+                successors.add(successor);
             }
             index++;
         }
@@ -548,18 +550,18 @@ public final class FF extends AbstractPlanner {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        Node stateAfter = current.clone();
-                        stateAfter.or(op.getCondEffects().get(0).getEffects().getPositive());
-                        stateAfter.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+                        final BitState nextState = new BitState(current);
+                        nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
+                        nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 
                         // Apply the effect of the applicable operator
-                        if (!closeSet.contains(stateAfter)) {
-                            stateAfter.setDepth(current.getDepth() + 1);
-                            stateAfter.setHeuristic(heuristic.estimate(stateAfter, problem.getGoal()));
-                            stateAfter.setParent(current);
-                            stateAfter.setOperator(index);
-                            openSet.add(stateAfter);
-                        }
+                        final Node successor = new Node(nextState);
+                        successor.setCost(current.getCost() + op.getCost());
+                        successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
+                        successor.setParent(current);
+                        successor.setOperator(index);
+                        successor.setDepth(current.getDepth() + 1);
+                        openSet.add(successor);
                     }
                     index++;
                 }
