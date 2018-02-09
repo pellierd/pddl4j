@@ -63,12 +63,12 @@ public final class FF extends AbstractPlanner {
     /**
      * The default heuristic.
      */
-    private static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
+    public static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
 
     /**
      * The default weight of the heuristic.
      */
-    private static final double DEFAULT_WEIGHT = 1.00;
+    public static final double DEFAULT_WEIGHT = 1.00;
 
     /**
      * The type of heuristics that must use to solve the problem.

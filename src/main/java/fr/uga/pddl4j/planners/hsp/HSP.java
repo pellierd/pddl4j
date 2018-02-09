@@ -61,7 +61,7 @@ public final class HSP extends AbstractPlanner {
      */
     public static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
 
-    /*
+    /**
      * The default weight of the heuristic.
      */
     public static final double DEFAULT_WEIGHT = 1.0;
