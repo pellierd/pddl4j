@@ -392,13 +392,13 @@ public final class FF extends AbstractPlanner {
 
         if (solutionNode != null) {
             if (isSaveState()) {
-                final StringBuilder strb = new StringBuilder();
-                strb.append(String.format("Max depth reached         %d %n", solutionNode.getDepth()));
-                LOGGER.trace(strb);
+                LOGGER.trace("Starting Enforced Hill Climb\n");
+                LOGGER.trace("Max depth reached " + solutionNode.getDepth() + "\n");
             }
             return extract(solutionNode, pb);
         } else {
             LOGGER.trace("Enforced Hill Climb Failed\n");
+            LOGGER.trace("Starting Greedy Best First Search\n");
             searchingTime = 0;
             solutionNode = this.greedyBestFirstSearch(pb);
 
