@@ -401,7 +401,7 @@ public final class EHC extends AbstractPlanner {
         Objects.requireNonNull(pb);
         searchingTime = 0;
 
-        Node solutionNode = this.enforcedHillClimbing(pb);
+        final Node solutionNode = searchSolutionNode(pb);
 
         if (solutionNode != null) {
             return extract(solutionNode, pb);
@@ -409,6 +409,25 @@ public final class EHC extends AbstractPlanner {
             return null;
         }
     }
+
+    /**
+     * Search a solution node to a specified domain and problem.
+     *
+     * @param pb the problem to solve.
+     */
+    public Node searchSolutionNode(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        searchingTime = 0;
+
+        final Node solutionNode = this.enforcedHillClimbing(pb);
+
+        if (solutionNode != null) {
+            return solutionNode;
+        } else {
+            return null;
+        }
+    }
+
 
     /**
      * Extracts a search from a specified node.
