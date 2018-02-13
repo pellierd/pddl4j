@@ -47,17 +47,16 @@ public final class Node extends BitState {
     /**
      * The cost to reach this node from the root node.
      */
-    private int cost;
+    private double cost;
 
     /**
      * The estimated distance to the goal from this node.
      */
-    private int heuristic;
+    private double heuristic;
 
-    private Set<Node> successors;
-
-    private double heuristicValue;
-
+    /**
+     * The depth of the node.
+     */
     private int depth;
 
     /**
@@ -78,14 +77,31 @@ public final class Node extends BitState {
      * @param cost      the cost to reach the node from the root node.
      * @param heuristic the estimated distance to reach the goal from the node.
      */
-    public Node(BitState state, Node parent, int operator, int cost, int heuristic) {
+    public Node(BitState state, Node parent, int operator, double cost, double heuristic) {
         super(state);
         this.parent = parent;
         this.operator = operator;
         this.cost = cost;
         this.heuristic = heuristic;
         this.depth = -1;
-        this.successors = new LinkedHashSet<Node>();
+    }
+
+    /**
+     * Creates a new node with a specified state, parent node, operator, cost, depth and heuristic value.
+     *
+     * @param state     the logical state of the node.
+     * @param parent    the parent node of the node.
+     * @param operator  the operator applied to reached the node from its parent.
+     * @param cost      the cost to reach the node from the root node.
+     * @param heuristic the estimated distance to reach the goal from the node.
+     */
+    public Node(BitState state, Node parent, int operator, double cost, int depth, double heuristic) {
+        super(state);
+        this.parent = parent;
+        this.operator = operator;
+        this.cost = cost;
+        this.depth = depth;
+        this.heuristic = heuristic;
     }
 
     /**
@@ -131,7 +147,7 @@ public final class Node extends BitState {
      *
      * @return the cost to reach the node from the root node.
      */
-    public final int getCost() {
+    public final double getCost() {
         return cost;
     }
 
@@ -140,7 +156,7 @@ public final class Node extends BitState {
      *
      * @param cost the cost needed to reach the node from the root nod to set.
      */
-    public final void setCost(int cost) {
+    public final void setCost(double cost) {
         this.cost = cost;
     }
 
@@ -149,7 +165,7 @@ public final class Node extends BitState {
      *
      * @return the estimated distance to the goal from the node.
      */
-    public final int getHeuristic() {
+    public final double getHeuristic() {
         return heuristic;
     }
 
@@ -158,23 +174,23 @@ public final class Node extends BitState {
      *
      * @param estimates the estimated distance to the goal from the node to set.
      */
-    public final void setHeuristic(int estimates) {
+    public final void setHeuristic(double estimates) {
         this.heuristic = estimates;
     }
 
     /**
-     * Returns the depth of this state.
+     * Returns the depth of this node.
      *
-     * @return the depth of this state.
+     * @return the depth of this node.
      */
     public int getDepth() {
         return this.depth;
     }
 
     /**
-     * Set the depth of this state.
+     * Set the depth of this node.
      *
-     * @param depth the depth of the state.
+     * @param depth the depth of this node.
      */
     public void setDepth(final int depth) {
         this.depth = depth;
@@ -190,51 +206,6 @@ public final class Node extends BitState {
      */
     public final double getValueF(double weight) {
         return weight * this.heuristic + this.cost;
-    }
-
-    /**
-     * Adds a successor to this state.
-     *
-     * @param successor the successor to added.
-     * @return <code>true</code> if the node was added; <code>false</code>otherwise.
-     */
-    public boolean addSuccessor(final Node successor) {
-        return this.successors.add(successor);
-    }
-
-    /**
-     * Returns <code>true</code> if a specified state is include in an
-     * other state.
-     *
-     * @param other the other state.
-     * @return <code>true</code> if a specified state is include in this state; <code>false</code>otherwise.
-     */
-    public boolean contains(final Node other) {
-        return this.intersect(other).equals(other);
-    }
-
-    /**
-     * Returns the node which intersect an other node.
-     *
-     * @param other the other node.
-     * @return a cloned node which intersect the other node.
-     */
-    public Node intersect(final Node other) {
-        final Node clone = this.clone();
-        clone.and(other);
-        return clone;
-    }
-
-    /**
-     * Returns a cloned node. The clone method has the same behaviour as the equals method of
-     * the class BitState.
-     *
-     * @return the cloned node.
-     * @see BitState#clone()
-     */
-    @Override
-    public Node clone() {
-        return (Node) super.clone();
     }
 
     /**

@@ -52,6 +52,10 @@ public interface Planner {
          */
         HSP,
         /**
+         * The EHC (Enforced Hill Climbing Planner).
+         */
+        EHC,
+        /**
          * The FF (Fast Forward Planner).
          */
         FF,

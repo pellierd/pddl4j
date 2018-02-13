@@ -312,24 +312,24 @@ public final class Parser {
     public void parseFromString(String domainString, String problemString)  {
         try {
             // Create temp files for domain and problem
-            File domain = File.createTempFile("domain", ".pddl");
-            File problem = File.createTempFile("problem", ".pddl");
+            File domainTempFile = File.createTempFile("domain", ".pddl");
+            File problemTempFile = File.createTempFile("problem", ".pddl");
 
             // Fill files with string content
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(domain), "UTF-8"))) {
+                new FileOutputStream(domainTempFile), "UTF-8"))) {
                 writer.write(domainString);
             }
 
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(problem), "UTF-8"))) {
+                new FileOutputStream(problemTempFile), "UTF-8"))) {
                 writer.write(problemString);
             }
 
             // Parse and check the domain
-            this.lexer = new Lexer(new FileInputStream(domain));
+            this.lexer = new Lexer(new FileInputStream(domainTempFile));
             lexer.setErrorManager(this.mgr);
-            lexer.setFile(domain);
+            lexer.setFile(domainTempFile);
             this.lexer.domain();
             this.domain = this.lexer.getDomain();
             this.checkTypesDeclaration();
@@ -341,11 +341,11 @@ public final class Parser {
             this.checkDerivedPredicatesDeclaration();
             // Parse and check the problem
             if (this.lexer == null) {
-                this.lexer = new Lexer(new FileInputStream(problem));
+                this.lexer = new Lexer(new FileInputStream(problemTempFile));
             } else {
-                this.lexer.ReInit(new FileInputStream(problem));
+                this.lexer.ReInit(new FileInputStream(problemTempFile));
             }
-            this.lexer.setFile(problem);
+            this.lexer.setFile(problemTempFile);
             this.lexer.problem();
             this.problem = this.lexer.getProblem();
             this.checkDomainName();

@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.ff;
+package fr.uga.pddl4j.planners.ehc;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.exceptions.FileException;
@@ -27,40 +27,34 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
-import fr.uga.pddl4j.planners.ehc.EHC;
+import fr.uga.pddl4j.planners.ff.Node;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 
 /**
- * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm and
- * Gready Best First Search.
+ * This class implements Enforced Hill Climbing planner.
  *
  * @author Samuel Aaron Boyd
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
-public final class FF extends AbstractPlanner {
+public final class EHC extends AbstractPlanner {
 
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(FF.class);
+    private static final Logger LOGGER = LogManager.getLogger(EHC.class);
 
     /**
      * The default heuristic.
@@ -95,19 +89,34 @@ public final class FF extends AbstractPlanner {
     /**
      * Creates a new planner.
      */
-    public FF() {
+    public EHC() {
         super();
-        this.setHeuristicType(FF.DEFAULT_HEURISTIC);
-        this.setWeight(FF.DEFAULT_WEIGHT);
-        this.setTimeOut(FF.DEFAULT_TIMEOUT);
-        this.setSaveState(FF.DEFAULT_STATISTICS);
+        this.setHeuristicType(EHC.DEFAULT_HEURISTIC);
+        this.setWeight(EHC.DEFAULT_WEIGHT);
+        this.setTimeOut(EHC.DEFAULT_TIMEOUT);
+        this.setSaveState(EHC.DEFAULT_STATISTICS);
     }
 
     /**
-     * The main method of the <code>FF</code> example. The command line syntax is as follow:
+     * Creates a new planner.
+     *
+     * @param heuristicType the heuristic used to search a solution.
+     * @param weight the weight set to the heuristic.
+     * @param searchingTime the time needed to search a solution plan.
+     * @param saveState if statistics are computed or not.
+     */
+    public EHC(Heuristic.Type heuristicType, double weight, long searchingTime, boolean saveState) {
+        this.heuristicType = heuristicType;
+        this.weight = weight;
+        this.searchingTime = searchingTime;
+        this.saveState = saveState;
+    }
+
+    /**
+     * The main method of the <code>EHC</code> example. The command line syntax is as follow:
      * <p>
      * <pre>
-     * usage of FF:
+     * usage of EHC:
      *
      * OPTIONS   DESCRIPTIONS
      *
@@ -158,17 +167,17 @@ public final class FF extends AbstractPlanner {
 
         try {
             // Parse the command line
-            final Properties arguments = AbstractPlanner.parseArguments(args, LOGGER, FF.getDefaultArguments());
-            final File domain = (File) arguments.get(AbstractPlanner.Argument.DOMAIN);
-            final File problem = (File) arguments.get(AbstractPlanner.Argument.PROBLEM);
-            final int traceLevel = (Integer) arguments.get(AbstractPlanner.Argument.TRACE_LEVEL);
-            final int timeout = (Integer) arguments.get(AbstractPlanner.Argument.TIMEOUT);
-            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(AbstractPlanner.Argument.HEURISTIC);
-            final double weight = (Double) arguments.get(AbstractPlanner.Argument.WEIGHT);
-            final boolean saveStats = (Boolean) arguments.get(AbstractPlanner.Argument.STATISTICS);
+            final Properties arguments = AbstractPlanner.parseArguments(args, LOGGER, EHC.getDefaultArguments());
+            final File domain = (File) arguments.get(Argument.DOMAIN);
+            final File problem = (File) arguments.get(Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
+            final double weight = (Double) arguments.get(Argument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(Argument.STATISTICS);
 
             // Creates the planner
-            final FF planner = new FF();
+            final EHC planner = new EHC();
             planner.setHeuristicType(heuristicType);
             planner.setWeight(weight);
             planner.setTimeOut(timeout);
@@ -251,11 +260,14 @@ public final class FF extends AbstractPlanner {
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
+                    strb.append(String.format("%nstarting enforced hill climb"));
+                    strb.append(String.format("%nmax depth reached %d", plan.size()));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));
+                    strb.append(String.format("enforced hill climb failed%n%n"));
                 }
                 if (saveStats) {
                     strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
@@ -316,11 +328,11 @@ public final class FF extends AbstractPlanner {
      */
     private static Properties getDefaultArguments() {
         final Properties options = new Properties();
-        options.put(AbstractPlanner.Argument.HEURISTIC, FF.DEFAULT_HEURISTIC);
-        options.put(AbstractPlanner.Argument.WEIGHT, FF.DEFAULT_WEIGHT);
-        options.put(AbstractPlanner.Argument.TIMEOUT, FF.DEFAULT_TIMEOUT * 1000);
-        options.put(AbstractPlanner.Argument.TRACE_LEVEL, FF.DEFAULT_TRACE_LEVEL);
-        options.put(AbstractPlanner.Argument.STATISTICS, FF.DEFAULT_STATISTICS);
+        options.put(Argument.HEURISTIC, EHC.DEFAULT_HEURISTIC);
+        options.put(Argument.WEIGHT, EHC.DEFAULT_WEIGHT);
+        options.put(Argument.TIMEOUT, EHC.DEFAULT_TIMEOUT * 1000);
+        options.put(Argument.TRACE_LEVEL, EHC.DEFAULT_TRACE_LEVEL);
+        options.put(Argument.STATISTICS, EHC.DEFAULT_STATISTICS);
         return options;
     }
 
@@ -328,7 +340,7 @@ public final class FF extends AbstractPlanner {
      * Returns the heuristicType to use to solve the planning problem.
      *
      * @return the heuristicType to use to solve the planning problem.
-     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
+     * @see Heuristic.Type
      */
     public final Heuristic.Type getHeuristicType() {
         return this.heuristicType;
@@ -390,26 +402,33 @@ public final class FF extends AbstractPlanner {
         Objects.requireNonNull(pb);
         searchingTime = 0;
 
-        final EHC ehc = new EHC(this.heuristicType, this.weight, this.searchingTime, this.saveState);
+        final Node solutionNode = searchSolutionNode(pb);
 
-        SequentialPlan solutionPlan = ehc.search(pb);
-
-        if (solutionPlan != null) {
-            LOGGER.trace("\nstarting enforced hill climbing");
-            return solutionPlan;
+        if (solutionNode != null) {
+            return extract(solutionNode, pb);
         } else {
-            LOGGER.trace("\nenforced hill climbing failed\n");
-            LOGGER.trace("starting greedy best first search\n");
-            final Node solutionNode = this.greedyBestFirstSearch(pb);
-
-            if (solutionNode == null) {
-                LOGGER.trace("\ngreedy best first search failed\n");
-                return null;
-            } else {
-                return extract(solutionNode, pb);
-            }
+            return null;
         }
     }
+
+    /**
+     * Search a solution node to a specified domain and problem.
+     *
+     * @param pb the problem to solve.
+     */
+    public Node searchSolutionNode(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        searchingTime = 0;
+
+        final Node solutionNode = this.enforcedHillClimbing(pb);
+
+        if (solutionNode != null) {
+            return solutionNode;
+        } else {
+            return null;
+        }
+    }
+
 
     /**
      * Extracts a search from a specified node.
@@ -430,54 +449,45 @@ public final class FF extends AbstractPlanner {
     }
 
     /**
-     * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found.
-     * This method must be completed.
+     * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
      *
-     * @param problem the coded planning problem to solve.
-     * @return a solution plan or null if it does not exist.
+     * @param problem the coded problem to solve.
+     * @return the solution node or null.
      */
-    private Node greedyBestFirstSearch(final CodedProblem problem) {
+    private Node enforcedHillClimbing(CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        final Set<Node> closeSet = new HashSet<>();
-        final Set<Node> openSet = new HashSet<>();
+        final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = this.getTimeout() * 1000;
-        Node solution = null;
 
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        root.setDepth(0);
-        openSet.add(root);
+        openList.add(root);
 
-        while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
-            // Pop the first node in the pending list open
-            final Node current = this.popPriorityNode(openSet);
+        double bestHeuristic = root.getHeuristic();
 
-            if (current.satisfy(problem.getGoal())) {
-                solution = current;
-            } else {
-                closeSet.add(current);
-                int index = 0;
-                for (BitOp op : problem.getOperators()) {
+        Node solution = null;
+        boolean deadEndFree = true;
 
-                    // Test if a specified operator is applicable in the current state
-                    if (op.isApplicable(current)) {
-                        final BitState nextState = new BitState(current);
-                        nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                        nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+        while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
+            final Node currentState = openList.pop();
+            final LinkedList<Node> successors = this.getSuccessors(currentState, problem, heuristic);
+            deadEndFree = !successors.isEmpty();
 
-                        // Apply the effect of the applicable operator
-                        final Node successor = new Node(nextState);
-                        successor.setCost(current.getCost() + op.getCost());
-                        successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
-                        successor.setParent(current);
-                        successor.setOperator(index);
-                        successor.setDepth(current.getDepth() + 1);
-                        openSet.add(successor);
-                    }
-                    index++;
+            while (!successors.isEmpty() && solution == null) {
+                final Node successor = successors.pop();
+                final double heuristicSuccessor = successor.getHeuristic();
+                if (heuristicSuccessor == 0.0) {
+                    solution = successor;
                 }
+                if (heuristicSuccessor < bestHeuristic) {
+                    successors.clear();
+                    openList.clear();
+                    bestHeuristic = heuristicSuccessor;
+                }
+                openList.addLast(successor);
             }
+
             // Take time to compute the searching time
             long end = System.currentTimeMillis();
             searchingTime = end - begin;
@@ -486,33 +496,42 @@ public final class FF extends AbstractPlanner {
         if (isSaveState()) {
             // Compute the searching time
             this.getStatistics().setTimeToSearch(searchingTime);
-            // Compute the memory used by the search
-            this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
         }
 
         return solution;
     }
 
     /**
-     * Get a node from a list of nodes.
+     * Get the successors from a node.
      *
-     * @param states the list of nodes (successors).
-     * @return the node from the list.
+     * @param parent    the parent node.
+     * @param problem   the coded problem to solve.
+     * @param heuristic the heuristic used.
+     * @return the list of successors from the parent node.
      */
-    private Node popPriorityNode(Collection<Node> states) {
-        Node state = null;
-        if (!states.isEmpty()) {
-            final Iterator<Node> i = states.iterator();
-            state = i.next();
-            while (i.hasNext()) {
-                final Node next = i.next();
-                if (next.getHeuristic() < state.getHeuristic()) {
-                    state = next;
-                }
+    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
+        final LinkedList<Node> successors = new LinkedList<>();
+
+        int index = 0;
+        for (BitOp op : problem.getOperators()) {
+            // Test if a specified operator is applicable in the current state
+            if (op.isApplicable(parent)) {
+                final BitState nextState = new BitState(parent);
+                nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
+                nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+
+                // Apply the effect of the applicable operator
+                final Node successor = new Node(nextState);
+                successor.setCost(parent.getCost() + op.getCost());
+                successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
+                successor.setParent(parent);
+                successor.setOperator(index);
+                successor.setDepth(parent.getDepth() + 1);
+                successors.add(successor);
             }
-            states.remove(state);
+            index++;
         }
-        return state;
+
+        return successors;
     }
 }
