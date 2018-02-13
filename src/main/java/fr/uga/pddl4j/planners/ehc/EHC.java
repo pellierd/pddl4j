@@ -27,6 +27,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
+import fr.uga.pddl4j.planners.ff.Node;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
