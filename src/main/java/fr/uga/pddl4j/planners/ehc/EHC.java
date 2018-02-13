@@ -37,13 +37,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * This class implements Enforced Hill Climbing planner.
@@ -98,6 +94,21 @@ public final class EHC extends AbstractPlanner {
         this.setWeight(EHC.DEFAULT_WEIGHT);
         this.setTimeOut(EHC.DEFAULT_TIMEOUT);
         this.setSaveState(EHC.DEFAULT_STATISTICS);
+    }
+
+    /**
+     * Creates a new planner.
+     *
+     * @param heuristicType the heuristic used to search a solution.
+     * @param weight the weight set to the heuristic.
+     * @param searchingTime the time needed to search a solution plan.
+     * @param saveState if statistics are computed or not.
+     */
+    public EHC(Heuristic.Type heuristicType, double weight, long searchingTime, boolean saveState) {
+        this.heuristicType = heuristicType;
+        this.weight = weight;
+        this.searchingTime = searchingTime;
+        this.saveState = saveState;
     }
 
     /**
@@ -249,13 +260,13 @@ public final class EHC extends AbstractPlanner {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
                     strb.append(String.format("%nStarting Enforced Hill Climb%n"));
-                    strb.append(String.format("%nmax depth reached %d%n", plan.size()));
+                    strb.append(String.format("%nmax depth reached %d", plan.size()));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));
-                    strb.append(String.format("%nEnforced Hill Climb failed%n%n%n"));
+                    strb.append(String.format("Enforced Hill Climb failed%n%n"));
                 }
                 if (saveStats) {
                     strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));

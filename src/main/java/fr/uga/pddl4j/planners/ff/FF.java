@@ -27,6 +27,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
+import fr.uga.pddl4j.planners.ehc.EHC;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -250,11 +251,13 @@ public final class FF extends AbstractPlanner {
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
+                    strb.append(String.format("%nStarting Greedy Best First Search%n"));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
 
                 } else {
-                    strb.append(String.format("%nno plan found%n%n"));
+                    strb.append(String.format("%nno plan found%n"));
+                    strb.append(String.format("Greedy Best First Search failed%n%n"));
                 }
                 if (saveStats) {
                     strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
@@ -389,28 +392,21 @@ public final class FF extends AbstractPlanner {
         Objects.requireNonNull(pb);
         searchingTime = 0;
 
-        Node solutionNode = this.enforcedHillClimbing(pb);
+        final EHC ehc = new EHC(this.heuristicType, this.weight, this.searchingTime, this.saveState);
 
-        if (solutionNode != null) {
-            if (isSaveState()) {
-                LOGGER.trace("Starting Enforced Hill Climb\n");
-                LOGGER.trace("Max depth reached " + solutionNode.getDepth() + "\n");
-            }
-            return extract(solutionNode, pb);
+        SequentialPlan solutionPlan = ehc.search(pb);
+
+        if (solutionPlan != null) {
+            return solutionPlan;
         } else {
-            LOGGER.trace("Enforced Hill Climb Failed\n");
-            LOGGER.trace("Starting Greedy Best First Search\n");
-            searchingTime = 0;
-            solutionNode = this.greedyBestFirstSearch(pb);
+            final Node solutionNode = this.greedyBestFirstSearch(pb);
 
             if (solutionNode == null) {
-                LOGGER.trace("Greedy Best First Search Failed\n");
+                return null;
             } else {
                 return extract(solutionNode, pb);
             }
         }
-
-        return null;
     }
 
     /**
@@ -429,93 +425,6 @@ public final class FF extends AbstractPlanner {
             n = n.getParent();
         }
         return plan;
-    }
-
-    /**
-     * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
-     *
-     * @param problem the coded problem to solve.
-     * @return the solution node or null.
-     */
-    private Node enforcedHillClimbing(CodedProblem problem) {
-        final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        final LinkedList<Node> openList = new LinkedList<>();
-        final int timeout = this.getTimeout() * 1000;
-
-        BitState init = new BitState(problem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        openList.add(root);
-
-        double bestHeuristic = root.getHeuristic();
-
-        Node solution = null;
-        boolean deadEndFree = true;
-
-        while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
-            final Node currentState = openList.pop();
-            final LinkedList<Node> successors = this.getSuccessors(currentState, problem, heuristic);
-            deadEndFree = !successors.isEmpty();
-
-            while (!successors.isEmpty() && solution == null) {
-                final Node successor = successors.pop();
-                final double heuristicSuccessor = successor.getHeuristic();
-                if (heuristicSuccessor == 0.0) {
-                    solution = successor;
-                }
-                if (heuristicSuccessor < bestHeuristic) {
-                    successors.clear();
-                    openList.clear();
-                    bestHeuristic = heuristicSuccessor;
-                }
-                openList.addLast(successor);
-            }
-
-            // Take time to compute the searching time
-            long end = System.currentTimeMillis();
-            searchingTime = end - begin;
-        }
-
-        if (isSaveState()) {
-            // Compute the searching time
-            this.getStatistics().setTimeToSearch(searchingTime);
-        }
-
-        return solution;
-    }
-
-    /**
-     * Get the successors from a node.
-     *
-     * @param parent     the parent node.
-     * @param problem   the coded problem to solve.
-     * @param heuristic the heuristic used.
-     * @return the list of successors from the parent node.
-     */
-    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
-        final LinkedList<Node> successors = new LinkedList<>();
-
-        int index = 0;
-        for (BitOp op : problem.getOperators()) {
-            // Test if a specified operator is applicable in the current state
-            if (op.isApplicable(parent)) {
-                final BitState nextState = new BitState(parent);
-                nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
-
-                // Apply the effect of the applicable operator
-                final Node successor = new Node(nextState);
-                successor.setCost(parent.getCost() + op.getCost());
-                successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
-                successor.setParent(parent);
-                successor.setOperator(index);
-                successor.setDepth(parent.getDepth() + 1);
-                successors.add(successor);
-            }
-            index++;
-        }
-
-        return successors;
     }
 
     /**
