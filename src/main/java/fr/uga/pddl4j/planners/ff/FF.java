@@ -251,13 +251,11 @@ public final class FF extends AbstractPlanner {
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
-                    strb.append(String.format("%nStarting Greedy Best First Search%n"));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));
-                    strb.append(String.format("Greedy Best First Search failed%n%n"));
                 }
                 if (saveStats) {
                     strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
@@ -397,11 +395,15 @@ public final class FF extends AbstractPlanner {
         SequentialPlan solutionPlan = ehc.search(pb);
 
         if (solutionPlan != null) {
+            LOGGER.trace("\nstarting enforced hill climbing");
             return solutionPlan;
         } else {
+            LOGGER.trace("\nenforced hill climbing failed\n");
+            LOGGER.trace("starting greedy best first search\n");
             final Node solutionNode = this.greedyBestFirstSearch(pb);
 
             if (solutionNode == null) {
+                LOGGER.trace("\ngreedy best first search failed\n");
                 return null;
             } else {
                 return extract(solutionNode, pb);

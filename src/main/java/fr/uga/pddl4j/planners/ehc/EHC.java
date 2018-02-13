@@ -259,14 +259,14 @@ public final class EHC extends AbstractPlanner {
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
-                    strb.append(String.format("%nStarting Enforced Hill Climb%n"));
+                    strb.append(String.format("%nstarting enforced hill climb"));
                     strb.append(String.format("%nmax depth reached %d", plan.size()));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));
-                    strb.append(String.format("Enforced Hill Climb failed%n%n"));
+                    strb.append(String.format("enforced hill climb failed%n%n"));
                 }
                 if (saveStats) {
                     strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
