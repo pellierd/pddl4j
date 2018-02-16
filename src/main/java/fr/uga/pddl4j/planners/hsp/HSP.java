@@ -410,6 +410,7 @@ public final class HSP extends AbstractPlanner {
                 if (plan != null) {
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
+                    strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                 } else {
                     strb.append(String.format("%nno plan found%n%n"));

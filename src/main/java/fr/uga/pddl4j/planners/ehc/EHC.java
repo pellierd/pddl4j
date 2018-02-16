@@ -264,6 +264,7 @@ public final class EHC extends AbstractPlanner {
                     strb.append(String.format("%nmax depth reached %d", plan.size()));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
+                    strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));
