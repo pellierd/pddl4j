@@ -420,14 +420,7 @@ public final class EHC extends AbstractPlanner {
     public Node searchSolutionNode(final CodedProblem pb) {
         Objects.requireNonNull(pb);
         searchingTime = 0;
-
-        final Node solutionNode = this.enforcedHillClimbing(pb);
-
-        if (solutionNode != null) {
-            return solutionNode;
-        } else {
-            return null;
-        }
+        return this.enforcedHillClimbing(pb);
     }
 
 
