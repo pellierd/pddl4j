@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.ehc;
+package fr.uga.pddl4j.planners.hc;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.exceptions.FileException;

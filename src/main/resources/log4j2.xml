@@ -12,7 +12,7 @@
         <logger name="fr.uga.pddl4j.planners.hsp.HSP" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
-        <logger name="fr.uga.pddl4j.planners.ehc.EHC" level="trace" additivity="false">
+        <logger name="fr.uga.pddl4j.planners.hc.EHC" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
         <logger name="fr.uga.pddl4j.planners.ff.FF" level="trace" additivity="false">
