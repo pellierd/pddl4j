@@ -1,6 +1,7 @@
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.planners.ff.FF;
+import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.planners.hsp.HSP;
 
 /**
@@ -41,6 +42,9 @@ public class PlannerFactory {
             break;
 
             case FF: planner = new FF();
+            break;
+
+            case EHC: planner = new EHC();
             break;
 
             default: planner = new HSP();
