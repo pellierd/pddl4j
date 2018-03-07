@@ -5,7 +5,7 @@ import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.planners.hsp.HSP;
 
 /**
- * This class defines the main methods of to create planner.
+ * This class defines the main methods to create planner.
  *
  * @author D. Pellier
  * @version 1.0 - 20.06.2017
@@ -15,10 +15,10 @@ import fr.uga.pddl4j.planners.hsp.HSP;
  */
 public class PlannerFactory {
 
-    /**
-     * An instanve of the class.
-     */
-    private static PlannerFactory instance;
+    ///**
+    // * An instance of the class.
+    // */
+    //private static PlannerFactory instance;
 
     /**
      * Creates a new PlannerFactory.
@@ -46,19 +46,16 @@ public class PlannerFactory {
 
             case EHC: planner = new EHC();
             break;
-
-            default: planner = new HSP();
-            break;
         }
         return planner;
     }
 
-    /**
-     * Returns an instance of this class.
-     *
-     * @return an instance of this class.
-     */
-    public static PlannerFactory getInstance() {
-        return PlannerFactory.instance;
-    }
+    ///**
+    // * Returns an instance of this class.
+    // *
+    // * @return an instance of this class.
+    // */
+    //public static PlannerFactory getInstance() {
+    //    return PlannerFactory.instance;
+    //}
 }
