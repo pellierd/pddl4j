@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.ehc;
+package fr.uga.pddl4j.planners.hc;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.exceptions.FileException;
@@ -264,6 +264,7 @@ public final class EHC extends AbstractPlanner {
                     strb.append(String.format("%nmax depth reached %d", plan.size()));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
+                    strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));
@@ -419,14 +420,7 @@ public final class EHC extends AbstractPlanner {
     public Node searchSolutionNode(final CodedProblem pb) {
         Objects.requireNonNull(pb);
         searchingTime = 0;
-
-        final Node solutionNode = this.enforcedHillClimbing(pb);
-
-        if (solutionNode != null) {
-            return solutionNode;
-        } else {
-            return null;
-        }
+        return this.enforcedHillClimbing(pb);
     }
 
 

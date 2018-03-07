@@ -33,6 +33,40 @@ import java.util.Properties;
 public abstract class AbstractPlanner implements Planner {
 
     /**
+     * The enumeration of the arguments of the planner.
+     */
+    public enum Argument {
+        /**
+         * The planning domain.
+         */
+        DOMAIN,
+        /**
+         * The planning problem.
+         */
+        PROBLEM,
+        /**
+         * The heuristic to use.
+         */
+        HEURISTIC,
+        /**
+         * The weight of the heuristic.
+         */
+        WEIGHT,
+        /**
+         * The global time slot allocated to the search.
+         */
+        TIMEOUT,
+        /**
+         * The trace level.
+         */
+        TRACE_LEVEL,
+        /**
+         * Generate statistics or not.
+         */
+        STATISTICS
+    }
+
+    /**
      * The timeout for the search in second.
      */
     private int timeout;
@@ -106,40 +140,6 @@ public abstract class AbstractPlanner implements Planner {
     @Override
     public final int getTraceLevel() {
         return this.traceLevel;
-    }
-
-    /**
-     * The enumeration of the arguments of the planner.
-     */
-    public enum Argument {
-        /**
-         * The planning domain.
-         */
-        DOMAIN,
-        /**
-         * The planning problem.
-         */
-        PROBLEM,
-        /**
-         * The heuristic to use.
-         */
-        HEURISTIC,
-        /**
-         * The weight of the heuristic.
-         */
-        WEIGHT,
-        /**
-         * The global time slot allocated to the search.
-         */
-        TIMEOUT,
-        /**
-         * The trace level.
-         */
-        TRACE_LEVEL,
-        /**
-         * Generate statistics or not.
-         */
-        STATISTICS
     }
 
     /**

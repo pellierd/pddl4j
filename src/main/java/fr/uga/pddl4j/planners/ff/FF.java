@@ -27,7 +27,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
-import fr.uga.pddl4j.planners.ehc.EHC;
+import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -253,6 +252,7 @@ public final class FF extends AbstractPlanner {
                 if (plan != null) {
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
+                    strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                 } else {
                     strb.append(String.format("%nno plan found%n"));

@@ -316,14 +316,36 @@ public final class Parser {
             File problemTempFile = File.createTempFile("problem", ".pddl");
 
             // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(domainTempFile), "UTF-8"))) {
-                writer.write(domainString);
+            try {
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(domainTempFile), "UTF-8"));
+                try {
+                    writer.write(domainString);
+                } finally {
+                    try {
+                        writer.close();
+                    } catch (IOException ie) {
+                        LOGGER.error(UNEXP_ERROR_MESSAGE, ie);
+                    }
+                }
+            } catch (IOException ex) {
+                LOGGER.error(UNEXP_ERROR_MESSAGE, ex);
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(problemTempFile), "UTF-8"))) {
-                writer.write(problemString);
+            try {
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(problemTempFile), "UTF-8"));
+                try {
+                    writer.write(problemString);
+                } finally {
+                    try {
+                        writer.close();
+                    } catch (IOException ie) {
+                        LOGGER.error(UNEXP_ERROR_MESSAGE, ie);
+                    }
+                }
+            } catch (IOException ex) {
+                LOGGER.error(UNEXP_ERROR_MESSAGE, ex);
             }
 
             // Parse and check the domain
@@ -343,7 +365,20 @@ public final class Parser {
             if (this.lexer == null) {
                 this.lexer = new Lexer(new FileInputStream(problemTempFile));
             } else {
-                this.lexer.ReInit(new FileInputStream(problemTempFile));
+                try {
+                    FileInputStream inputStream = new FileInputStream(problemTempFile);
+                    try {
+                        this.lexer.ReInit(inputStream);
+                    } finally {
+                        try {
+                            inputStream.close();
+                        } catch (IOException ie) {
+                            LOGGER.error(UNEXP_ERROR_MESSAGE, ie);
+                        }
+                    }
+                } catch (IOException ex) {
+                    LOGGER.error(UNEXP_ERROR_MESSAGE, ex);
+                }
             }
             this.lexer.setFile(problemTempFile);
             this.lexer.problem();
