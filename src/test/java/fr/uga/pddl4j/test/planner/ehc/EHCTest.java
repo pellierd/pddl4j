@@ -25,7 +25,6 @@ import java.util.stream.Stream;
  * <p>This class will test the planner on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 plan using all the file used in the competition and
  * KCL-Planning validator: https://github.com/KCL-Planning/VAL</p>
- * <p>
  * <p>Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
  * It suppose benchmark directory is a the root of your project.
  * If no test files are provided all test will pass the validation.</p>

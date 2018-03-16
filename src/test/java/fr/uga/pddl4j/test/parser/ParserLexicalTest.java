@@ -19,16 +19,16 @@
 
 package fr.uga.pddl4j.test.parser;
 
+import static fr.uga.pddl4j.parser.Message.Type.LEXICAL_ERROR;
+
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
-import static fr.uga.pddl4j.parser.Message.Type.LEXICAL_ERROR;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Implements the <tt>ParserLexicalTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
@@ -102,7 +102,7 @@ public class ParserLexicalTest {
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
             for (Message message : errManager.getMessages()) {
-                assertTrue(message.getType().equals(errorType));
+                Assert.assertTrue(message.getType().equals(errorType));
             }
         }
     }
@@ -120,7 +120,7 @@ public class ParserLexicalTest {
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
             for (Message message : errManager.getMessages()) {
-                assertTrue(message.getType().equals(errorType));
+                Assert.assertTrue(message.getType().equals(errorType));
             }
         }
     }

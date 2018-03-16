@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Implements the <tt>CodedProblemTest</tt> of the PDD4L library.
+ * Domain and problem used: Blocksworld domain and p01 problem.
  *
  * @author E. Hermellin
  * @version 0.1 - 16.03.18
@@ -46,8 +47,8 @@ public class CodedProblemTest {
     /**
      * The String containing the encoded init expression (String version).
      */
-    private static String init = "(and (clear d)\n (ontable d)\n (handempty)\n (clear b)\n (ontable b)\n " +
-        "(clear a)\n (ontable a)\n (clear c)\n (ontable c)\n)";
+    private static String init = "(and (clear d)\n (ontable d)\n (handempty)\n (clear b)\n (ontable b)\n "
+        + "(clear a)\n (ontable a)\n (clear c)\n (ontable c)\n)";
 
     /**
      * Parse domain and problem files and return the associated coded problem.
@@ -75,8 +76,9 @@ public class CodedProblemTest {
     @Test
     public void testCodedProblem_OperatorsListSize() {
         final CodedProblem codedProblem = generateCodedProblem();
-        if (codedProblem != null)
+        if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getOperators().size() == opList.size());
+        }
     }
 
     /**
@@ -99,8 +101,9 @@ public class CodedProblemTest {
     @Test
     public void testCodedProblem_RelevantFactsSize() {
         final CodedProblem codedProblem = generateCodedProblem();
-        if (codedProblem != null)
+        if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getRelevantFacts().size() == factList.size());
+        }
     }
 
     /**
@@ -123,8 +126,9 @@ public class CodedProblemTest {
     @Test
     public void testEncoded_Goal() {
         final CodedProblem codedProblem = generateCodedProblem();
-        if (codedProblem != null)
+        if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getGoal()).equals(goal));
+        }
     }
 
     /**
@@ -133,7 +137,8 @@ public class CodedProblemTest {
     @Test
     public void testEncoded_Init() {
         final CodedProblem codedProblem = generateCodedProblem();
-        if (codedProblem != null)
+        if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getInit()).equals(init));
+        }
     }
 }
