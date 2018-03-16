@@ -1,4 +1,4 @@
-package fr.uga.pddl4j.test.encoder;
+package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
@@ -79,7 +79,7 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_toStringJ_gripper() {
-        String localTestPath =  BENCH_DIR + File.separator + "gripper" + File.separator;
+        String localTestPath = BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
@@ -104,7 +104,7 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_saveInFile_gripper() {
-        String localTestPath =  BENCH_DIR + File.separator + "gripper" + File.separator;
+        String localTestPath = BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
@@ -136,6 +136,7 @@ public class JsonAdapterTest {
 
     /**
      * Get the plan from the first problem of specified path.
+     *
      * @param currentTestPath the path where to find the problem
      * @return the plan
      */
@@ -189,6 +190,7 @@ public class JsonAdapterTest {
 
     /**
      * Get a plan from a CodedProblem.
+     *
      * @param pb the codedProblem to solve
      * @return the Plan object
      */

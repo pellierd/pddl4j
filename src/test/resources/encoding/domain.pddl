@@ -1,4 +1,8 @@
-(define (domain blocks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 4 Op-blocks world
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (domain BLOCKS)
   (:requirements :strips :typing)
   (:types block)
   (:predicates (on ?x - block ?y - block)
@@ -42,5 +46,4 @@
 		   (clear ?y)
 		   (not (clear ?x))
 		   (not (handempty))
-		   (not (on ?x ?y))))
-)
+		   (not (on ?x ?y)))))

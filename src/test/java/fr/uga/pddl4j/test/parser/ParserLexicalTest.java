@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Implements the <tt>ParserLexicalTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
- *
  * <p>
  * This class will test the parser on lexical issues in domain and problem files.
  * </p>
@@ -65,25 +64,23 @@ public class ParserLexicalTest {
     /**
      * Instantiate the Parser and parse domain file specified in the given path.
      *
-     * @param path the path to the pddl file to test
+     * @param path        the path to the pddl file to test
      * @param errorToTest the type of issue to test
-     * @param fileType the type of file to test (DOMAIN or PROBLEM)
-     * @throws FileNotFoundException if file is not found
+     * @param fileType    the type of file to test (DOMAIN or PROBLEM)
      * @return an ErrorManager from the parsing file
      */
-    private ErrorManager generateErrorMessagesInDomain(String path, String errorToTest, FileType fileType){
+    private ErrorManager generateErrorMessagesInDomain(String path, String errorToTest, FileType fileType) {
         final Parser parser = new Parser();
         ErrorManager errManager = new ErrorManager();
         File file = new File(path);
-        try { //TODO à uniformiser les appels de parseDomain et parseProblem
-            if(fileType == FileType.DOMAIN_FILE){
-                parser.parseDomain(file.getAbsolutePath());
+        try {
+            if (fileType == FileType.DOMAIN_FILE) {
+                parser.parseDomain(file);
                 errManager = parser.getErrorManager();
-                System.out.println("Domain");
             } else if (fileType == FileType.PROBLEM_FILE) {
-                parser.parseProblem(file);
+                File domain = new File("src/test/resources/encoding/domain.pddl");
+                parser.parse(domain, file);
                 errManager = parser.getErrorManager();
-                System.out.println("Problem");
             }
         } catch (FileNotFoundException fnfExcepion) {
             System.err.println(errorToTest + " test file not found !");

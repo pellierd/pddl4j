@@ -35,12 +35,10 @@ import java.util.stream.Stream;
 /**
  * Implements the <tt>ParserTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
- *
  * <p>
  * This class will test the parser on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 language coverage using all the file used in the competition.
  * </p>
- *
  * <p>
  * Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
  * It suppose benchmark directory is a the root of your project.

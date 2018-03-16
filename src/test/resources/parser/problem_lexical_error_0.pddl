@@ -1,6 +1,6 @@
 (define (problem blocks_0)
   (:domain blocks)
-  (:objects D B A C
+  (:objects D B A C - block)
   (:init (clear C)
          (clear A)
          (clear B)

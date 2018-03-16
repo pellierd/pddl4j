@@ -22,13 +22,11 @@ import java.util.stream.Stream;
 /**
  * Implements the <tt>HSPTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
- *
  * <p>
  * This class will test the planner on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 plan using all the file used in the competition and
  * KCL-Planning validator: https://github.com/KCL-Planning/VAL
  * </p>
- *
  * <p>
  * Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
  * It suppose benchmark directory is a the root of your project.
@@ -96,11 +94,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC1 gripper tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC1_gripper() throws Exception {
+    public void testHSP_IPC1_gripper()  {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
@@ -116,11 +112,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC1 logistics tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC1_logistics() throws Exception {
+    public void testHSP_IPC1_logistics()  {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
@@ -136,11 +130,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC1 movie tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC1_movie() throws Exception {
+    public void testHSP_IPC1_movie()  {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
@@ -156,11 +148,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC1 mprime tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_ICP1_mprime() throws Exception {
+    public void testHSP_ICP1_mprime()  {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
@@ -176,11 +166,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC1 mystery tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC1_mystery() throws Exception {
+    public void testHSP_IPC1_mystery()  {
         String localTestPath = BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
@@ -196,11 +184,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC2 blocksworld tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC2_blocksworld() throws Exception {
+    public void testHSP_IPC2_blocksworld()  {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
@@ -216,11 +202,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC2 elevator tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC2_elevator() throws Exception {
+    public void testHSP_IPC2_elevator()  {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
@@ -236,11 +220,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC2 freecell tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC2_freecell() throws Exception {
+    public void testHSP_IPC2_freecell()  {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
@@ -256,11 +238,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC2 schedule tests
-     *
-     * @throws Exception if something went wrong
      */
     //@Test
-    public void testHSP_IPC2_schedule() throws Exception {
+    public void testHSP_IPC2_schedule()  {
         String localTestPath = BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
@@ -276,11 +256,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC3 depots tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC3_depots() throws Exception {
+    public void testHSP_IPC3_depots()  {
         String localTestPath = BENCH_DIR + "ipc3"
             + File.separator + "depot"
             + File.separator;
@@ -296,11 +274,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC3 driverlog tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC3_driverlog() throws Exception {
+    public void testHSP_IPC3_driverlog()  {
         String localTestPath = BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
@@ -316,11 +292,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC3 rover tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC3_rover() throws Exception {
+    public void testHSP_IPC3_rover()  {
         String localTestPath = BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
@@ -337,11 +311,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC3 satellite tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC3_satellite() throws Exception {
+    public void testHSP_IPC3_satellite()  {
         String localTestPath = BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
@@ -357,11 +329,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC3 zenotravel tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC3_zenotravel() throws Exception {
+    public void testHSP_IPC3_zenotravel()  {
         String localTestPath = BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
@@ -377,11 +347,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC4 airport tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC4_airport() throws Exception {
+    public void testHSP_IPC4_airport()  {
         String localTestPath = BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
@@ -397,11 +365,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC4 optical-telegraph tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC4_optical_telegraph() throws Exception {
+    public void testHSP_IPC4_optical_telegraph()  {
         String localTestPath = BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
@@ -417,11 +383,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC4 philosophers tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC4_philosophers() throws Exception {
+    public void testHSP_IPC4_philosophers()  {
         String localTestPath = BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
@@ -437,11 +401,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC4 pipeworld tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC4_pipeworld() throws Exception {
+    public void testHSP_IPC4_pipeworld()  {
         String localTestPath = BENCH_DIR + "ipc5"
             + File.separator + "pipeworld"
             + File.separator;
@@ -457,11 +419,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC4 psr tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC4_psr() throws Exception {
+    public void testHSP_IPC4_psr()  {
         String localTestPath = BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
@@ -477,11 +437,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC5 openstacks tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC5_openstacks() throws Exception {
+    public void testHSP_IPC5_openstacks()  {
         String localTestPath = BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
@@ -497,11 +455,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC5 pathways tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC5_pathways() throws Exception {
+    public void testHSP_IPC5_pathways()  {
         String localTestPath = BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
@@ -517,11 +473,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC5 storage tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC5_storage() throws Exception {
+    public void testHSP_IPC5_storage()  {
         String localTestPath = BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
@@ -537,11 +491,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC5 tpp tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC5_tpp() throws Exception {
+    public void testHSP_IPC5_tpp()  {
         String localTestPath = BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
@@ -557,11 +509,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC5 truck tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC5_truck() throws Exception {
+    public void testHSP_IPC5_truck()  {
         String localTestPath = BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
@@ -577,11 +527,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC6 pegsol tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC6_pegsol() throws Exception {
+    public void testHSP_IPC6_pegsol()  {
         String localTestPath = BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
@@ -597,11 +545,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC6 sokoban tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC6_sokoban() throws Exception {
+    public void testHSP_IPC6_sokoban()  {
         String localTestPath = BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
@@ -617,11 +563,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC6 transport tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC6_transport() throws Exception {
+    public void testHSP_IPC6_transport()  {
         String localTestPath = BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
@@ -637,11 +581,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC7 barman tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC7_barman() throws Exception {
+    public void testHSP_IPC7_barman()  {
         String localTestPath = BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
@@ -657,11 +599,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC7 nomystery tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC7_nomystery() throws Exception {
+    public void testHSP_IPC7_nomystery()  {
         String localTestPath = BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
@@ -677,11 +617,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC7 parking tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC7_parking() throws Exception {
+    public void testHSP_IPC7_parking()  {
         String localTestPath = BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
@@ -697,11 +635,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC8 childsnack tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC8_childsnack() throws Exception {
+    public void testHSP_IPC8_childsnack()  {
         String localTestPath = BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
@@ -717,11 +653,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC8 hiking tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC8_hiking() throws Exception {
+    public void testHSP_IPC8_hiking()  {
         String localTestPath = BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
@@ -737,11 +671,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * IPC8 thoughtful tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_IPC8_thoughtful() throws Exception {
+    public void testHSP_IPC8_thoughtful()  {
         String localTestPath = BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
@@ -757,11 +689,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * Other Depots tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_newTests_Depots() throws Exception {
+    public void testHSP_newTests_Depots()  {
         String localTestPath = BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
@@ -777,11 +707,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * Other DriverLog tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_newTests_DriverLog() throws Exception {
+    public void testHSP_newTests_DriverLog()  {
         String localTestPath = BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
@@ -797,11 +725,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * Other Freecell tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_newTests_Freecell() throws Exception {
+    public void testHSP_newTests_Freecell()  {
         String localTestPath = BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
@@ -817,11 +743,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * Other Rover tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_newTests_Rover() throws Exception {
+    public void testHSP_newTests_Rover()  {
         String localTestPath = BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
@@ -837,11 +761,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * Other Satellite tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_newTests_Satellite() throws Exception {
+    public void testHSP_newTests_Satellite()  {
         String localTestPath = BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
@@ -857,11 +779,9 @@ public class HSPTest {
     /**
      * Method that executes benchmarks using files on the hsp planner to test its output plan.
      * Other Zenotravel tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_newTests_Zenotravel() throws Exception {
+    public void testHSP_newTests_Zenotravel()  {
         String localTestPath = BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
@@ -1029,9 +949,6 @@ public class HSPTest {
         }
     }
 
-
-    // define valid JSON output on problem to check
-
     /**
      * Valid JSON output for gripper p01 problem.
      */
@@ -1079,5 +996,4 @@ public class HSPTest {
             + "[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(free right)\","
             + "\"(at ball1 rooma)\"],\"Positives\":[\"(carry ball1 right)\"]}}]},\"timeSpecifiers\""
             + ":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}";
-
 }
