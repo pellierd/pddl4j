@@ -165,7 +165,12 @@ public final class Parser {
         }
         try {
             // Parse and check the domain
-            this.lexer = new Lexer(new FileInputStream(domain));
+            FileInputStream inputStream = new FileInputStream(domain);
+            if (this.lexer == null) {
+                this.lexer = new Lexer(inputStream);
+            } else {
+                this.lexer.ReInit(inputStream);
+            }
             lexer.setErrorManager(this.mgr);
             lexer.setFile(domain);
             this.lexer.domain();
@@ -181,6 +186,8 @@ public final class Parser {
             } catch (NullPointerException exception) {
                 LOGGER.error("Domain file is not valid", exception);
                 this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
+            } finally {
+                inputStream.close();
             }
         } catch (IOException | RuntimeException exception) {
             LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
@@ -211,10 +218,11 @@ public final class Parser {
         }
         try {
             // Parse and check the domain
+            FileInputStream inputStream = new FileInputStream(problem);
             if (this.lexer == null) {
-                this.lexer = new Lexer(new FileInputStream(problem));
+                this.lexer = new Lexer(inputStream);
             } else {
-                this.lexer.ReInit(new FileInputStream(problem));
+                this.lexer.ReInit(inputStream);
             }
             this.lexer.setFile(problem);
             this.lexer.problem();
@@ -228,6 +236,8 @@ public final class Parser {
                 this.checkMetric();
             } catch (NullPointerException exception) {
                 LOGGER.error("Problem file is not valid", exception);
+            } finally {
+                inputStream.close();
             }
         } catch (IOException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
