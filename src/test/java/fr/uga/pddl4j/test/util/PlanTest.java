@@ -147,7 +147,7 @@ public class PlanTest {
         for (String problemFile : problemList) {
             final Plan plan = planner.search(generateCodedProblem(problemFile));
             if (plan != null) {
-                Assert.assertTrue(plan.cost() == plansCost.get(i));
+                Assert.assertTrue(Math.abs(plan.cost() - plansCost.get(i)) < 0.0000001);
             }
             i++;
         }
