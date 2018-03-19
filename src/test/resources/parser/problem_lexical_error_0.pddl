@@ -1,4 +1,4 @@
-(define (problem blocks_0)
+(define (problem blocks_0
   (:domain blocks)
   (:objects D B A C - block)
   (:init (clear C)

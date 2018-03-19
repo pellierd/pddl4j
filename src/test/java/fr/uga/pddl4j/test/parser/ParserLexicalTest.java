@@ -105,10 +105,12 @@ public class ParserLexicalTest {
                 Assert.assertTrue(message.getType().equals(errorType));
             }
         }
+
+        Assert.assertTrue(errManager.getMessages().size() == 1);
     }
 
     /**
-     * Method that tests brackets parsing error in domain file.
+     * Method that tests brackets parsing error in problem file.
      */
     @Test
     public void testBracketsErrorProblemFile() {
@@ -123,5 +125,7 @@ public class ParserLexicalTest {
                 Assert.assertTrue(message.getType().equals(errorType));
             }
         }
+
+        Assert.assertTrue(errManager.getMessages().size() == 1);
     }
 }

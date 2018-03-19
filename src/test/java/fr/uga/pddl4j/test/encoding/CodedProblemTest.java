@@ -58,7 +58,7 @@ public class CodedProblemTest {
     private CodedProblem generateCodedProblem() {
         try {
             final File domain = new File("src/test/resources/encoding/domain.pddl");
-            final File problem = new File("src/test/resources/encoding/problem.pddl");
+            final File problem = new File("src/test/resources/encoding/p01.pddl");
             final ProblemFactory factory = ProblemFactory.getInstance();
             final ErrorManager errorManager = factory.parse(domain, problem);
             if (errorManager.isEmpty()) {
@@ -74,7 +74,7 @@ public class CodedProblemTest {
      * Method that test the size of the operator list from a specified coded problem.
      */
     @Test
-    public void testCodedProblem_OperatorsListSize() {
+    public void testCodedProblemOperatorsListSize() {
         final CodedProblem codedProblem = generateCodedProblem();
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getOperators().size() == opList.size());
@@ -85,7 +85,7 @@ public class CodedProblemTest {
      * Method that test each operator from a specified coded problem.
      */
     @Test
-    public void testCodedProblem_OperatorsList() {
+    public void testCodedProblemOperatorsList() {
         final CodedProblem codedProblem = generateCodedProblem();
         if (codedProblem != null) {
             final List<BitOp> opListCodedProblem = codedProblem.getOperators();
@@ -99,7 +99,7 @@ public class CodedProblemTest {
      * Method that test the size of the fact list from a specified coded problem.
      */
     @Test
-    public void testCodedProblem_RelevantFactsSize() {
+    public void testCodedProblemRelevantFactsSize() {
         final CodedProblem codedProblem = generateCodedProblem();
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getRelevantFacts().size() == factList.size());
@@ -110,7 +110,7 @@ public class CodedProblemTest {
      * Method that test each fact from a specified coded problem.
      */
     @Test
-    public void testEncoded_RelevantFacts() {
+    public void testEncodedRelevantFacts() {
         final CodedProblem codedProblem = generateCodedProblem();
         if (codedProblem != null) {
             final List<IntExp> factListCodedProblem = codedProblem.getRelevantFacts();
@@ -124,7 +124,7 @@ public class CodedProblemTest {
      * Method that test the goal expression from a specified coded problem.
      */
     @Test
-    public void testEncoded_Goal() {
+    public void testEncodedGoal() {
         final CodedProblem codedProblem = generateCodedProblem();
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getGoal()).equals(goal));
@@ -135,7 +135,7 @@ public class CodedProblemTest {
      * Method that test the init expression from a specified coded problem.
      */
     @Test
-    public void testEncoded_Init() {
+    public void testEncodedInit() {
         final CodedProblem codedProblem = generateCodedProblem();
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getInit()).equals(init));
