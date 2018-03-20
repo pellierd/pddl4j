@@ -24,6 +24,7 @@ import static fr.uga.pddl4j.parser.Message.Type.LEXICAL_ERROR;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.test.Tools;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,20 +44,6 @@ import java.io.FileNotFoundException;
 public class ParserLexicalTest {
 
     /**
-     * This enumeration defines the type of file: Domain or Problem.
-     */
-    public enum FileType {
-        /**
-         * The DOMAIN file.
-         */
-        DOMAIN_FILE,
-        /**
-         * The PROBLEM file.
-         */
-        PROBLEM_FILE,
-    }
-
-    /**
      * The path of the benchmarks files.
      */
     private Message.Type errorType = LEXICAL_ERROR;
@@ -69,15 +56,15 @@ public class ParserLexicalTest {
      * @param fileType    the type of file to test (DOMAIN or PROBLEM)
      * @return an ErrorManager from the parsing file
      */
-    private ErrorManager generateErrorMessagesInDomain(String path, String errorToTest, FileType fileType) {
+    private ErrorManager generateErrorMessagesInDomain(String path, String errorToTest, Tools.FileType fileType) {
         final Parser parser = new Parser();
         ErrorManager errManager = new ErrorManager();
         File file = new File(path);
         try {
-            if (fileType == FileType.DOMAIN_FILE) {
+            if (fileType == Tools.FileType.DOMAIN_FILE) {
                 parser.parseDomain(file);
                 errManager = parser.getErrorManager();
-            } else if (fileType == FileType.PROBLEM_FILE) {
+            } else if (fileType == Tools.FileType.PROBLEM_FILE) {
                 File domain = new File("src/test/resources/encoding/domain.pddl");
                 parser.parse(domain, file);
                 errManager = parser.getErrorManager();
@@ -95,8 +82,28 @@ public class ParserLexicalTest {
     @Test
     public void testBracketsErrorDomainFile() {
         String pathFileTest = "src/test/resources/parser/domain_lexical_error_0.pddl";
-        String errorToTest = "Brackets";
-        FileType fileType = FileType.DOMAIN_FILE;
+        String errorToTest = "Bracket issue";
+        Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
+
+        ErrorManager errManager = generateErrorMessagesInDomain(pathFileTest, errorToTest, fileType);
+        errManager.printAll();
+        if (!errManager.getMessages().isEmpty()) {
+            for (Message message : errManager.getMessages()) {
+                Assert.assertTrue(message.getType().equals(errorType));
+            }
+        }
+
+        Assert.assertTrue(errManager.getMessages().size() == 1);
+    }
+
+    /**
+     * Method that tests keyword parsing error in domain file.
+     */
+    @Test
+    public void testKeywordErrorDomainFile() {
+        String pathFileTest = "src/test/resources/parser/domain_lexical_error_1.pddl";
+        String errorToTest = "Keyword lexical issue";
+        Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
 
         ErrorManager errManager = generateErrorMessagesInDomain(pathFileTest, errorToTest, fileType);
         errManager.printAll();
@@ -115,8 +122,28 @@ public class ParserLexicalTest {
     @Test
     public void testBracketsErrorProblemFile() {
         String pathFileTest = "src/test/resources/parser/problem_lexical_error_0.pddl";
-        String errorToTest = "Brackets";
-        FileType fileType = FileType.PROBLEM_FILE;
+        String errorToTest = "Bracket issue";
+        Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        ErrorManager errManager = generateErrorMessagesInDomain(pathFileTest, errorToTest, fileType);
+        errManager.printAll();
+        if (!errManager.getMessages().isEmpty()) {
+            for (Message message : errManager.getMessages()) {
+                Assert.assertTrue(message.getType().equals(errorType));
+            }
+        }
+
+        Assert.assertTrue(errManager.getMessages().size() == 1);
+    }
+
+    /**
+     * Method that tests keyword parsing error in problem file.
+     */
+    @Test
+    public void testKeywordErrorProblemFile() {
+        String pathFileTest = "src/test/resources/parser/problem_lexical_error_1.pddl";
+        String errorToTest = "Keyword lexical issue";
+        Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
 
         ErrorManager errManager = generateErrorMessagesInDomain(pathFileTest, errorToTest, fileType);
         errManager.printAll();

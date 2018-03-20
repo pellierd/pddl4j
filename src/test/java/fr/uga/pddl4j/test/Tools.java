@@ -12,6 +12,20 @@ import java.io.File;
 public abstract class Tools {
 
     /**
+     * This enumeration defines the type of file: Domain or Problem.
+     */
+    public enum FileType {
+        /**
+         * The DOMAIN file.
+         */
+        DOMAIN_FILE,
+        /**
+         * The PROBLEM file.
+         */
+        PROBLEM_FILE,
+    }
+
+    /**
      * Check if benchmark are already here.
      *
      * @param path the benchmark directory path
