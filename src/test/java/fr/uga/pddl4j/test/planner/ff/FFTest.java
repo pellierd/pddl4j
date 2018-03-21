@@ -25,7 +25,6 @@ import java.util.stream.Stream;
  * <p>This class will test the planner on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 plan using all the file used in the competition and
  * KCL-Planning validator: https://github.com/KCL-Planning/VAL</p>
- *
  * <p>Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
  * It suppose benchmark directory is a the root of your project.
  * If no test files are provided all test will pass the validation.</p>
@@ -35,26 +34,6 @@ import java.util.stream.Stream;
  * @version 0.1 - 24.01.18
  */
 public class FFTest {
-
-    /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "benchmarks" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String PDDL_EXT = ".pddl";
-
-    /**
-     * PDDL4J output plan extension for KCL validator format.
-     */
-    private static final String PLAN_EXT = ".val";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + PDDL_EXT;
 
     /**
      * Computation timeout.
@@ -92,12 +71,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC1 gripper tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC1_gripper() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testFF_IPC1_gripper()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
 
@@ -112,12 +89,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC1 logistics tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC1_logistics() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testFF_IPC1_logistics()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
 
@@ -132,12 +107,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC1 movie tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC1_movie() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testFF_IPC1_movie()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
 
@@ -152,12 +125,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC1 mprime tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_ICP1_mprime() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testFF_ICP1_mprime()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
 
@@ -172,12 +143,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC1 mystery tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC1_mystery() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testFF_IPC1_mystery()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
 
@@ -192,12 +161,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC2 blocksworld tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC2_blocksworld() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testFF_IPC2_blocksworld()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
 
@@ -212,12 +179,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC2 elevator tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC2_elevator() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testFF_IPC2_elevator()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
 
@@ -232,12 +197,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC2 freecell tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC2_freecell() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testFF_IPC2_freecell()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
 
@@ -252,12 +215,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC2 schedule tests
-     *
-     * @throws Exception if something went wrong
      */
     //@Test
-    public void testFF_IPC2_schedule() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testFF_IPC2_schedule()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
 
@@ -272,12 +233,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC3 depots tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC3_depots() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testFF_IPC3_depots()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depot"
             + File.separator;
 
@@ -292,12 +251,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC3 driverlog tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC3_driverlog() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testFF_IPC3_driverlog()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
 
@@ -312,12 +269,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC3 rover tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC3_rover() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testFF_IPC3_rover()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
 
@@ -333,12 +288,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC3 satellite tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC3_satellite() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testFF_IPC3_satellite()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
 
@@ -353,12 +306,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC3 zenotravel tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC3_zenotravel() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testFF_IPC3_zenotravel()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
 
@@ -373,12 +324,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC4 airport tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC4_airport() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testFF_IPC4_airport()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
 
@@ -393,12 +342,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC4 optical-telegraph tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC4_optical_telegraph() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testFF_IPC4_optical_telegraph()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
 
@@ -413,12 +360,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC4 philosophers tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC4_philosophers() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testFF_IPC4_philosophers()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
 
@@ -433,12 +378,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC4 pipeworld tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC4_pipeworld() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testFF_IPC4_pipeworld()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pipeworld"
             + File.separator;
 
@@ -453,12 +396,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC4 psr tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC4_psr() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testFF_IPC4_psr()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
 
@@ -473,12 +414,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC5 openstacks tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC5_openstacks() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testFF_IPC5_openstacks()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
 
@@ -493,12 +432,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC5 pathways tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC5_pathways() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testFF_IPC5_pathways()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
 
@@ -513,12 +450,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC5 storage tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC5_storage() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testFF_IPC5_storage()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
 
@@ -533,12 +468,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC5 tpp tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC5_tpp() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testFF_IPC5_tpp()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
 
@@ -553,12 +486,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC5 truck tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC5_truck() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testFF_IPC5_truck()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
 
@@ -573,12 +504,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC6 pegsol tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC6_pegsol() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6"
+    public void testFF_IPC6_pegsol()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
 
@@ -593,12 +522,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC6 sokoban tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC6_sokoban() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6"
+    public void testFF_IPC6_sokoban()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
 
@@ -613,12 +540,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC6 transport tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC6_transport() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6"
+    public void testFF_IPC6_transport()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
 
@@ -633,12 +558,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC7 barman tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC7_barman() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7"
+    public void testFF_IPC7_barman()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
 
@@ -653,12 +576,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC7 nomystery tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC7_nomystery() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7"
+    public void testFF_IPC7_nomystery()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
 
@@ -673,12 +594,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC7 parking tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC7_parking() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7"
+    public void testFF_IPC7_parking()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
 
@@ -693,12 +612,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC8 childsnack tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC8_childsnack() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8"
+    public void testFF_IPC8_childsnack()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
 
@@ -713,12 +630,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC8 hiking tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC8_hiking() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8"
+    public void testFF_IPC8_hiking()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
 
@@ -733,12 +648,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * IPC8 thoughtful tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_IPC8_thoughtful() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8"
+    public void testFF_IPC8_thoughtful()  {
+        String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
 
@@ -753,12 +666,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * Other Depots tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_newTests_Depots() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testFF_newTests_Depots()  {
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
 
@@ -773,12 +684,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * Other DriverLog tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_newTests_DriverLog() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testFF_newTests_DriverLog()  {
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
 
@@ -793,12 +702,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * Other Freecell tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_newTests_Freecell() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testFF_newTests_Freecell()  {
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
 
@@ -813,12 +720,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * Other Rover tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_newTests_Rover() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testFF_newTests_Rover()  {
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
 
@@ -833,12 +738,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * Other Satellite tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_newTests_Satellite() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testFF_newTests_Satellite()  {
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
 
@@ -853,12 +756,10 @@ public class FFTest {
     /**
      * Method that executes benchmarks using files on the FF planner to test its output plan.
      * Other Zenotravel tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_newTests_Zenotravel() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testFF_newTests_Zenotravel()  {
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
 
@@ -904,9 +805,9 @@ public class FFTest {
      * @param currentTestPath the current sub dir to test
      */
     private void generateValOutputPlans(String currentTestPath) {
-        cleanValPlan(currentTestPath);
+        Tools.cleanValPlan(currentTestPath);
         final ProblemFactory factory = new ProblemFactory();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -928,15 +829,15 @@ public class FFTest {
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
-                problemFile = "p0" + i + PDDL_EXT;
+                problemFile = "p0" + i + Tools.PDDL_EXT;
             } else {
-                problemFile = "p" + i + PDDL_EXT;
+                problemFile = "p" + i + Tools.PDDL_EXT;
             }
 
             currentProblem = currentTestPath + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
             }
             System.out.println("--");
             // Parses the PDDL domain and problem description
@@ -976,7 +877,7 @@ public class FFTest {
                     System.out.println("Empty solution for " + currentProblem);
                 } else { // Save output plan
                     try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(currentProblem.substring(0,
-                        currentProblem.length() - PDDL_EXT.length()) + PLAN_EXT))) {
+                        currentProblem.length() - Tools.PDDL_EXT.length()) + Tools.PLAN_EXT))) {
                         bw.write(pb.toString(plan));
                     }
                     System.out.println("\nSolution found for " + currentProblem);
@@ -988,46 +889,6 @@ public class FFTest {
             System.out.println("--");
         }
     }
-
-    /**
-     * Clean all val formatted plan from the current directory and all its subdirectories.
-     *
-     * @param localTestPath the current path to clean up
-     */
-    private void cleanValPlan(String localTestPath) {
-
-        // Go into subdirectories
-        Stream<String> results =
-            Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-                .map((subDir) -> localTestPath + subDir + File.separator);
-
-        results.forEach(this::cleanValPlan);
-
-        // Counting the number of val files
-        File[] valFileList = new File(localTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".val") && !name.contains("dom"));
-
-        if (valFileList != null) {
-            String valFile;
-            // Loop around problems in one category
-            for (int i = 1; i < valFileList.length + 1; i++) {
-                if (i < 10) {
-                    valFile = "p0" + i + PLAN_EXT;
-                } else {
-                    valFile = "p" + i + PLAN_EXT;
-                }
-                try {
-                    Files.deleteIfExists(FileSystems.getDefault().getPath(localTestPath, valFile));
-                    System.out.println("Deleting " + localTestPath + valFile);
-                } catch (IOException ioEx) {
-                    ioEx.printStackTrace();
-                }
-            }
-        }
-    }
-
-
-    // define valid JSON output on problem to check
 
     /**
      * Valid JSON output for gripper p01 problem.
@@ -1082,5 +943,4 @@ public class FFTest {
             + "ssions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball3"
             + " left)\"],\"Positives\":[\"(free left)\",\"(at ball3 roomb)\"]}}]},\"timeSpecifiers\":[0, 1, 2, 3, 4, "
             + "5, 6, 7, 8, 9, 10, 11, 12]}";
-
 }

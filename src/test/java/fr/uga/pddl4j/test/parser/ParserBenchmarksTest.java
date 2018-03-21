@@ -35,12 +35,10 @@ import java.util.stream.Stream;
 /**
  * Implements the <tt>ParserTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
- *
  * <p>
  * This class will test the parser on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 language coverage using all the file used in the competition.
  * </p>
- *
  * <p>
  * Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
  * It suppose benchmark directory is a the root of your project.
@@ -50,22 +48,7 @@ import java.util.stream.Stream;
  * @author C Gerard
  * @version 0.1 - 16.02.16
  */
-public class ParserTest {
-
-    /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "benchmarks" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String EXT = ".pddl";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + EXT;
+public class ParserBenchmarksTest {
 
     /**
      * Method that executes benchmarks using IPC1 files on the parser to test if its coverage is OK.
@@ -75,7 +58,7 @@ public class ParserTest {
     @Test
     public void testParserIPC1() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc1" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc1" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC1 test skipped !");
@@ -103,7 +86,7 @@ public class ParserTest {
     @Test
     public void testParserIPC2() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc2" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc2" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC2 test skipped !");
@@ -131,7 +114,7 @@ public class ParserTest {
     @Test
     public void testParserIPC3() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc3" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc3" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC3 test skipped !");
@@ -159,7 +142,7 @@ public class ParserTest {
     @Test
     public void testParserIPC4() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc4" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc4" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC4 test skipped !");
@@ -187,7 +170,7 @@ public class ParserTest {
     @Test
     public void testParserIPC5() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc5" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc5" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC5 test skipped !");
@@ -215,7 +198,7 @@ public class ParserTest {
     @Test
     public void testParserIPC6() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc6" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc6" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC6 test skipped !");
@@ -243,7 +226,7 @@ public class ParserTest {
     @Test
     public void testParserIPC7() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc7" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc7" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC7 test skipped !");
@@ -271,7 +254,7 @@ public class ParserTest {
     @Test
     public void testParserIPC8() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc8" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc8" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC8 test skipped !");
@@ -303,8 +286,8 @@ public class ParserTest {
         // Go into subdirectories
         Stream<String> results =
             Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-            .map((subDir) -> localTestPath + subDir + File.separator)
-            .flatMap(this::executeTests);
+                .map((subDir) -> localTestPath + subDir + File.separator)
+                .flatMap(this::executeTests);
 
         // Validate current tests if any and returns errors from all tests that failed
         return Stream.concat(validate(localTestPath).stream(), results);
@@ -319,7 +302,7 @@ public class ParserTest {
     private ArrayList<String> validate(String currentTestPath) {
         final Parser parser = new Parser();
         final ArrayList<String> errors = new ArrayList<>();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -341,15 +324,15 @@ public class ParserTest {
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
-                problemFile = "p0" + i + EXT;
+                problemFile = "p0" + i + Tools.PDDL_EXT;
             } else {
-                problemFile = "p" + i + EXT;
+                problemFile = "p" + i + Tools.PDDL_EXT;
             }
 
             currentProblem = currentTestPath + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
             }
 
             try {
@@ -382,5 +365,4 @@ public class ParserTest {
 
         return errors;
     }
-
 }

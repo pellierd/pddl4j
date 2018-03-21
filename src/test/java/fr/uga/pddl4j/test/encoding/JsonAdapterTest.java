@@ -1,4 +1,4 @@
-package fr.uga.pddl4j.test.encoder;
+package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
@@ -25,21 +25,6 @@ import java.nio.file.Paths;
  * @version 0.1 - 20.07.16
  */
 public class JsonAdapterTest {
-
-    /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "pddl" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String PDDL_EXT = ".pddl";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + PDDL_EXT;
 
     /**
      * Computation timeout.
@@ -79,7 +64,7 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_toStringJ_gripper() {
-        String localTestPath =  BENCH_DIR + File.separator + "gripper" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
@@ -104,7 +89,7 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_saveInFile_gripper() {
-        String localTestPath =  BENCH_DIR + File.separator + "gripper" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
@@ -136,12 +121,13 @@ public class JsonAdapterTest {
 
     /**
      * Get the plan from the first problem of specified path.
+     *
      * @param currentTestPath the path where to find the problem
      * @return the plan
      */
     private CodedProblem get01Problem(String currentTestPath) {
         final ProblemFactory factory = new ProblemFactory();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -152,11 +138,11 @@ public class JsonAdapterTest {
             oneDomainPerProblem = true;
         }
 
-        problemFile = "p01" + PDDL_EXT;
+        problemFile = "p01" + Tools.PDDL_EXT;
         currentProblem = currentTestPath + problemFile;
 
         if (oneDomainPerProblem) {
-            currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+            currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
         }
 
         // Parses the PDDL domain and problem description
@@ -189,6 +175,7 @@ public class JsonAdapterTest {
 
     /**
      * Get a plan from a CodedProblem.
+     *
      * @param pb the codedProblem to solve
      * @return the Plan object
      */
@@ -208,9 +195,6 @@ public class JsonAdapterTest {
 
         return plan;
     }
-
-
-    // define valid JSON output on problem to check
 
     /**
      * Valid JSON output for gripper p01 problem.
