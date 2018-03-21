@@ -1197,7 +1197,7 @@ public final class Parser {
                 parser.mgr.printAll();
             }
         } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
-            strb.append("parse files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
+            strb.append("Parsed files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
                 .append("\": ");
             Parser parser = new Parser();
             try {
@@ -1208,7 +1208,7 @@ public final class Parser {
             if (parser.mgr.isEmpty()) {
                 strb.append("ok");
             } else {
-                strb.append("no ok");
+                strb.append("not ok");
                 parser.mgr.printAll();
             }
         } else {
