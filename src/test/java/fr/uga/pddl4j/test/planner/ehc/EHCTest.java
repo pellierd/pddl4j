@@ -7,6 +7,7 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.Plan;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,26 +35,6 @@ import java.util.stream.Stream;
  * @version 0.1 - 13.02.18
  */
 public class EHCTest {
-
-    /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "benchmarks" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String PDDL_EXT = ".pddl";
-
-    /**
-     * PDDL4J output plan extension for KCL validator format.
-     */
-    private static final String PLAN_EXT = ".val";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + PDDL_EXT;
 
     /**
      * Computation timeout.
@@ -94,7 +75,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC1_gripper()  {
-        String localTestPath = BENCH_DIR + "ipc1"
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
 
@@ -112,7 +93,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC1_logistics()  {
-        String localTestPath = BENCH_DIR + "ipc1"
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
 
@@ -130,7 +111,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC1_movie()  {
-        String localTestPath = BENCH_DIR + "ipc1"
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
 
@@ -148,7 +129,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_ICP1_mprime()  {
-        String localTestPath = BENCH_DIR + "ipc1"
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
 
@@ -166,7 +147,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC1_mystery()  {
-        String localTestPath = BENCH_DIR + "ipc1"
+        String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
 
@@ -184,7 +165,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC2_blocksworld()  {
-        String localTestPath = BENCH_DIR + "ipc2"
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
 
@@ -202,7 +183,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC2_elevator()  {
-        String localTestPath = BENCH_DIR + "ipc2"
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
 
@@ -220,7 +201,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC2_freecell()  {
-        String localTestPath = BENCH_DIR + "ipc2"
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
 
@@ -238,7 +219,7 @@ public class EHCTest {
      */
     //@Test
     public void testFF_IPC2_schedule()  {
-        String localTestPath = BENCH_DIR + "ipc2"
+        String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
 
@@ -256,7 +237,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC3_depots()  {
-        String localTestPath = BENCH_DIR + "ipc3"
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depot"
             + File.separator;
 
@@ -274,7 +255,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC3_driverlog()  {
-        String localTestPath = BENCH_DIR + "ipc3"
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
 
@@ -292,7 +273,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC3_rover()  {
-        String localTestPath = BENCH_DIR + "ipc3"
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
 
@@ -311,7 +292,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC3_satellite()  {
-        String localTestPath = BENCH_DIR + "ipc3"
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
 
@@ -329,7 +310,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC3_zenotravel()  {
-        String localTestPath = BENCH_DIR + "ipc3"
+        String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
 
@@ -347,7 +328,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC4_airport()  {
-        String localTestPath = BENCH_DIR + "ipc4"
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
 
@@ -365,7 +346,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC4_optical_telegraph()  {
-        String localTestPath = BENCH_DIR + "ipc4"
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
 
@@ -383,7 +364,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC4_philosophers()  {
-        String localTestPath = BENCH_DIR + "ipc4"
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
 
@@ -401,7 +382,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC4_pipeworld()  {
-        String localTestPath = BENCH_DIR + "ipc5"
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pipeworld"
             + File.separator;
 
@@ -419,7 +400,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC4_psr()  {
-        String localTestPath = BENCH_DIR + "ipc4"
+        String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
 
@@ -437,7 +418,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC5_openstacks()  {
-        String localTestPath = BENCH_DIR + "ipc5"
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
 
@@ -455,7 +436,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC5_pathways()  {
-        String localTestPath = BENCH_DIR + "ipc5"
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
 
@@ -473,7 +454,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC5_storage()  {
-        String localTestPath = BENCH_DIR + "ipc5"
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
 
@@ -491,7 +472,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC5_tpp()  {
-        String localTestPath = BENCH_DIR + "ipc5"
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
 
@@ -509,7 +490,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC5_truck()  {
-        String localTestPath = BENCH_DIR + "ipc5"
+        String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
 
@@ -527,7 +508,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC6_pegsol()  {
-        String localTestPath = BENCH_DIR + "ipc6"
+        String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
 
@@ -545,7 +526,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC6_sokoban()  {
-        String localTestPath = BENCH_DIR + "ipc6"
+        String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
 
@@ -563,7 +544,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC6_transport()  {
-        String localTestPath = BENCH_DIR + "ipc6"
+        String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
 
@@ -581,7 +562,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC7_barman()  {
-        String localTestPath = BENCH_DIR + "ipc7"
+        String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
 
@@ -599,7 +580,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC7_nomystery()  {
-        String localTestPath = BENCH_DIR + "ipc7"
+        String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
 
@@ -617,7 +598,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC7_parking()  {
-        String localTestPath = BENCH_DIR + "ipc7"
+        String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
 
@@ -635,7 +616,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC8_childsnack()  {
-        String localTestPath = BENCH_DIR + "ipc8"
+        String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
 
@@ -655,7 +636,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC8_hiking()  {
-        String localTestPath = BENCH_DIR + "ipc8"
+        String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
 
@@ -673,7 +654,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_IPC8_thoughtful()  {
-        String localTestPath = BENCH_DIR + "ipc8"
+        String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
 
@@ -691,7 +672,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_newTests_Depots()  {
-        String localTestPath = BENCH_DIR + "newTests"
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
 
@@ -709,7 +690,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_newTests_DriverLog()  {
-        String localTestPath = BENCH_DIR + "newTests"
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
 
@@ -727,7 +708,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_newTests_Freecell()  {
-        String localTestPath = BENCH_DIR + "newTests"
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
 
@@ -745,7 +726,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_newTests_Rover()  {
-        String localTestPath = BENCH_DIR + "newTests"
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
 
@@ -763,7 +744,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_newTests_Satellite()  {
-        String localTestPath = BENCH_DIR + "newTests"
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
 
@@ -781,7 +762,7 @@ public class EHCTest {
      */
     @Test
     public void testFF_newTests_Zenotravel()  {
-        String localTestPath = BENCH_DIR + "newTests"
+        String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
 
@@ -827,9 +808,9 @@ public class EHCTest {
      * @param currentTestPath the current sub dir to test
      */
     private void generateValOutputPlans(String currentTestPath) {
-        cleanValPlan(currentTestPath);
+        Tools.cleanValPlan(currentTestPath);
         final ProblemFactory factory = new ProblemFactory();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -851,15 +832,15 @@ public class EHCTest {
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
-                problemFile = "p0" + i + PDDL_EXT;
+                problemFile = "p0" + i + Tools.PDDL_EXT;
             } else {
-                problemFile = "p" + i + PDDL_EXT;
+                problemFile = "p" + i + Tools.PDDL_EXT;
             }
 
             currentProblem = currentTestPath + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
             }
             System.out.println("--");
             // Parses the PDDL domain and problem description
@@ -899,7 +880,7 @@ public class EHCTest {
                     System.out.println("Empty solution for " + currentProblem);
                 } else { // Save output plan
                     try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(currentProblem.substring(0,
-                        currentProblem.length() - PDDL_EXT.length()) + PLAN_EXT))) {
+                        currentProblem.length() - Tools.PDDL_EXT.length()) + Tools.PLAN_EXT))) {
                         bw.write(pb.toString(plan));
                     }
                     System.out.println("Solution found for " + currentProblem);
@@ -911,46 +892,6 @@ public class EHCTest {
             System.out.println("--");
         }
     }
-
-    /**
-     * Clean all val formatted plan from the current directory and all its subdirectories.
-     *
-     * @param localTestPath the current path to clean up
-     */
-    private void cleanValPlan(String localTestPath) {
-
-        // Go into subdirectories
-        Stream<String> results =
-            Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-                .map((subDir) -> localTestPath + subDir + File.separator);
-
-        results.forEach(this::cleanValPlan);
-
-        // Counting the number of val files
-        File[] valFileList = new File(localTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".val") && !name.contains("dom"));
-
-        if (valFileList != null) {
-            String valFile;
-            // Loop around problems in one category
-            for (int i = 1; i < valFileList.length + 1; i++) {
-                if (i < 10) {
-                    valFile = "p0" + i + PLAN_EXT;
-                } else {
-                    valFile = "p" + i + PLAN_EXT;
-                }
-                try {
-                    Files.deleteIfExists(FileSystems.getDefault().getPath(localTestPath, valFile));
-                    System.out.println("Deleting " + localTestPath + valFile);
-                } catch (IOException ioEx) {
-                    ioEx.printStackTrace();
-                }
-            }
-        }
-    }
-
-
-    // define valid JSON output on problem to check
 
     /**
      * Valid JSON output for gripper p01 problem.

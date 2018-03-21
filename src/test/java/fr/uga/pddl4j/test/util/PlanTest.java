@@ -4,6 +4,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.hsp.HSP;
+import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
@@ -43,6 +44,11 @@ public class PlanTest {
      * The HSP planner reference.
      */
     private HSP planner = null;
+
+    /**
+     * The path to the domain file.
+     */
+    private String domainFile = "src/test/resources/encoding/domain.pddl";
 
     /**
      * The list of problem files.
@@ -103,25 +109,7 @@ public class PlanTest {
         planner.setSaveState(STATISTICS);
     }
 
-    /**
-     * Parse domain and problem files and return the associated coded problem.
-     *
-     * @return a coded problem from the parsing file
-     */
-    private CodedProblem generateCodedProblem(String problemFile) {
-        try {
-            final File domain = new File("src/test/resources/encoding/domain.pddl");
-            final File problem = new File(problemFile);
-            final ProblemFactory factory = ProblemFactory.getInstance();
-            final ErrorManager errorManager = factory.parse(domain, problem);
-            if (errorManager.isEmpty()) {
-                return factory.encode();
-            }
-        } catch (IOException ioExcepion) {
-            System.err.println(ioExcepion + " test files not found !");
-        }
-        return null;
-    }
+
 
     /**
      * Method that test the size of the plans.
@@ -130,7 +118,7 @@ public class PlanTest {
     public void testPlanSize() {
         int i = 0;
         for (String problemFile : problemList) {
-            final Plan plan = planner.search(generateCodedProblem(problemFile));
+            final Plan plan = planner.search(Tools.generateCodedProblem(domainFile, problemFile));
             if (plan != null) {
                 Assert.assertTrue(plan.size() == plansSize.get(i));
             }
@@ -145,7 +133,7 @@ public class PlanTest {
     public void testPlanCost() {
         int i = 0;
         for (String problemFile : problemList) {
-            final Plan plan = planner.search(generateCodedProblem(problemFile));
+            final Plan plan = planner.search(Tools.generateCodedProblem(domainFile, problemFile));
             if (plan != null) {
                 Assert.assertTrue(Math.abs(plan.cost() - plansCost.get(i)) < 0.0000001);
             }
@@ -160,7 +148,7 @@ public class PlanTest {
     public void testPlans() {
         int i = 0;
         for (String problemFile : problemList) {
-            final CodedProblem pb = generateCodedProblem(problemFile);
+            final CodedProblem pb = Tools.generateCodedProblem(domainFile, problemFile);
             if (pb != null) {
                 final Plan plan = planner.search(pb);
                 int j = 0;

@@ -51,21 +51,6 @@ import java.util.stream.Stream;
 public class ParserBenchmarksTest {
 
     /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "benchmarks" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String EXT = ".pddl";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + EXT;
-
-    /**
      * Method that executes benchmarks using IPC1 files on the parser to test if its coverage is OK.
      *
      * @throws Exception if something went wrong
@@ -73,7 +58,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC1() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc1" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc1" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC1 test skipped !");
@@ -101,7 +86,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC2() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc2" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc2" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC2 test skipped !");
@@ -129,7 +114,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC3() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc3" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc3" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC3 test skipped !");
@@ -157,7 +142,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC4() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc4" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc4" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC4 test skipped !");
@@ -185,7 +170,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC5() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc5" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc5" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC5 test skipped !");
@@ -213,7 +198,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC6() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc6" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc6" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC6 test skipped !");
@@ -241,7 +226,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC7() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc7" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc7" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC7 test skipped !");
@@ -269,7 +254,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC8() throws Exception {
 
-        String localTestPath = BENCH_DIR + "ipc8" + File.separator;
+        String localTestPath = Tools.BENCH_DIR + "ipc8" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC8 test skipped !");
@@ -317,7 +302,7 @@ public class ParserBenchmarksTest {
     private ArrayList<String> validate(String currentTestPath) {
         final Parser parser = new Parser();
         final ArrayList<String> errors = new ArrayList<>();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -339,15 +324,15 @@ public class ParserBenchmarksTest {
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
-                problemFile = "p0" + i + EXT;
+                problemFile = "p0" + i + Tools.PDDL_EXT;
             } else {
-                problemFile = "p" + i + EXT;
+                problemFile = "p" + i + Tools.PDDL_EXT;
             }
 
             currentProblem = currentTestPath + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
             }
 
             try {

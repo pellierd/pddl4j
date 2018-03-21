@@ -3,6 +3,7 @@ package fr.uga.pddl4j.test.encoding;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.IntExp;
 import org.junit.Assert;
@@ -21,6 +22,16 @@ import java.util.List;
  * @version 0.1 - 16.03.18
  */
 public class CodedProblemTest {
+
+    /**
+     * The path to the domain file.
+     */
+    private String domainFile = "src/test/resources/encoding/domain.pddl";
+
+    /**
+     * The path to the problem file.
+     */
+    private String problemFile = "src/test/resources/encoding/p01.pddl";
 
     /**
      * The list containing the encoded operators (operator String version).
@@ -51,31 +62,11 @@ public class CodedProblemTest {
         + "(clear a)\n (ontable a)\n (clear c)\n (ontable c)\n)";
 
     /**
-     * Parse domain and problem files and return the associated coded problem.
-     *
-     * @return a coded problem from the parsing file
-     */
-    private CodedProblem generateCodedProblem() {
-        try {
-            final File domain = new File("src/test/resources/encoding/domain.pddl");
-            final File problem = new File("src/test/resources/encoding/p01.pddl");
-            final ProblemFactory factory = ProblemFactory.getInstance();
-            final ErrorManager errorManager = factory.parse(domain, problem);
-            if (errorManager.isEmpty()) {
-                return factory.encode();
-            }
-        } catch (IOException ioExcepion) {
-            System.err.println(ioExcepion + " test files not found !");
-        }
-        return null;
-    }
-
-    /**
      * Method that test the size of the operator list from a specified coded problem.
      */
     @Test
     public void testCodedProblemOperatorsListSize() {
-        final CodedProblem codedProblem = generateCodedProblem();
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getOperators().size() == opList.size());
         }
@@ -86,7 +77,7 @@ public class CodedProblemTest {
      */
     @Test
     public void testCodedProblemOperatorsList() {
-        final CodedProblem codedProblem = generateCodedProblem();
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             final List<BitOp> opListCodedProblem = codedProblem.getOperators();
             for (int i = 0; i < opList.size(); i++) {
@@ -100,7 +91,7 @@ public class CodedProblemTest {
      */
     @Test
     public void testCodedProblemRelevantFactsSize() {
-        final CodedProblem codedProblem = generateCodedProblem();
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getRelevantFacts().size() == factList.size());
         }
@@ -111,7 +102,7 @@ public class CodedProblemTest {
      */
     @Test
     public void testEncodedRelevantFacts() {
-        final CodedProblem codedProblem = generateCodedProblem();
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             final List<IntExp> factListCodedProblem = codedProblem.getRelevantFacts();
             for (int i = 0; i < factList.size(); i++) {
@@ -125,7 +116,7 @@ public class CodedProblemTest {
      */
     @Test
     public void testEncodedGoal() {
-        final CodedProblem codedProblem = generateCodedProblem();
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getGoal()).equals(goal));
         }
@@ -136,7 +127,7 @@ public class CodedProblemTest {
      */
     @Test
     public void testEncodedInit() {
-        final CodedProblem codedProblem = generateCodedProblem();
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getInit()).equals(init));
         }

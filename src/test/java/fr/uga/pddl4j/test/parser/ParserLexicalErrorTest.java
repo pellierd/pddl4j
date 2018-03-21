@@ -32,7 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
- * Implements the <tt>ParserLexicalTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
+ * Implements the <tt>ParserLexicalErrorTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
  * <p>
  * This class will test the parser on lexical issues in domain and problem files.
@@ -41,7 +41,7 @@ import java.io.FileNotFoundException;
  * @author E Hermellin
  * @version 0.1 - 18.12.2017
  */
-public class ParserLexicalTest {
+public class ParserLexicalErrorTest {
 
     /**
      * The path of the benchmarks files.
