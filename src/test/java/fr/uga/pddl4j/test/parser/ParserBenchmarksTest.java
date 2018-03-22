@@ -58,7 +58,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC1() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc1" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc1" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC1 test skipped !");
@@ -68,7 +68,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -86,7 +86,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC2() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc2" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc2" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC2 test skipped !");
@@ -96,7 +96,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -114,7 +114,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC3() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc3" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc3" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC3 test skipped !");
@@ -124,7 +124,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -142,7 +142,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC4() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc4" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc4" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC4 test skipped !");
@@ -152,7 +152,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -170,7 +170,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC5() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc5" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc5" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC5 test skipped !");
@@ -180,7 +180,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -198,7 +198,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC6() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc6" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc6" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC6 test skipped !");
@@ -208,7 +208,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -226,7 +226,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC7() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc7" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc7" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC7 test skipped !");
@@ -236,7 +236,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -254,7 +254,7 @@ public class ParserBenchmarksTest {
     @Test
     public void testParserIPC8() throws Exception {
 
-        String localTestPath = Tools.BENCH_DIR + "ipc8" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "ipc8" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: IPC8 test skipped !");
@@ -264,7 +264,7 @@ public class ParserBenchmarksTest {
         final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
 
         if (!errors.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Some parsing errors occurred !\n");
             errors.forEach(err -> {
                 builder.append(err);
@@ -344,7 +344,7 @@ public class ParserBenchmarksTest {
                     Set<Message> domainMessages = errManager.getMessages(new File(currentDomain));
                     Set<Message> problemMessages = errManager.getMessages(new File(currentProblem));
 
-                    StringBuilder builder = new StringBuilder();
+                    final StringBuilder builder = new StringBuilder();
 
                     domainMessages.forEach(dMsg -> builder.append(dMsg.toString()));
                     problemMessages.forEach(pMsg -> builder.append(pMsg.toString()));

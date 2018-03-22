@@ -64,20 +64,20 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_toStringJ_gripper() {
-        String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        CodedProblem problem = get01Problem(localTestPath);
+        final CodedProblem problem = get01Problem(localTestPath);
         Assert.assertFalse(problem == null);
 
-        Plan plan = getPlan(problem);
+        final Plan plan = getPlan(problem);
         Assert.assertFalse(plan == null);
 
-        JsonAdapter converter = new JsonAdapter(problem);
+        final JsonAdapter converter = new JsonAdapter(problem);
         String jsonPlan = converter.toJsonString(plan);
 
         Assert.assertTrue(jsonPlan.contentEquals(validGripperP01JSON));
@@ -89,27 +89,27 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_saveInFile_gripper() {
-        String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        CodedProblem problem = get01Problem(localTestPath);
+        final CodedProblem problem = get01Problem(localTestPath);
         Assert.assertFalse(problem == null);
 
-        Plan plan = getPlan(problem);
+        final Plan plan = getPlan(problem);
         Assert.assertFalse(plan == null);
 
-        JsonAdapter converter = new JsonAdapter(problem);
-        String outputJson = converter.toJsonString(plan);
-        String outputFile = "p01.json";
+        final JsonAdapter converter = new JsonAdapter(problem);
+        final String outputJson = converter.toJsonString(plan);
+        final String outputFile = "p01.json";
         converter.saveInFile(outputFile);
 
         try {
-            Path outputFilePath = Paths.get(outputFile);
-            String fileContent = new String(Files.readAllBytes(outputFilePath), StandardCharsets.UTF_8);
+            final Path outputFilePath = Paths.get(outputFile);
+            final String fileContent = new String(Files.readAllBytes(outputFilePath), StandardCharsets.UTF_8);
             Assert.assertTrue(fileContent.contentEquals(validGripperP01JSON));
             Assert.assertTrue(fileContent.contentEquals(outputJson));
 
