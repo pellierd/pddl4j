@@ -103,6 +103,7 @@ planning competition: http://ipc.icaps-conference.org.
 * Refactor and fix bugs
 
 *Global*
+* Change AdaptatorJavaJson to JsonAdapter
 * Fix logger and standard outputs
 * Throws uncatched exceptions
 * Fix bugs
