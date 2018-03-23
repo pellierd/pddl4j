@@ -2,9 +2,11 @@ package fr.uga.pddl4j.test;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.planners.ProblemFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -18,6 +20,20 @@ import java.util.stream.Stream;
  * @version 0.1 - 23.06.16
  */
 public abstract class Tools {
+
+    /**
+     * This enumeration defines the type of file: Domain or Problem.
+     */
+    public enum FileType {
+        /**
+         * The DOMAIN file.
+         */
+        DOMAIN_FILE,
+        /**
+         * The PROBLEM file.
+         */
+        PROBLEM_FILE,
+    }
 
     /**
      * The path of the benchmarks files.
@@ -38,20 +54,6 @@ public abstract class Tools {
      * The domain file name.
      */
     public static final String DOMAIN = "domain" + PDDL_EXT;
-
-    /**
-     * This enumeration defines the type of file: Domain or Problem.
-     */
-    public enum FileType {
-        /**
-         * The DOMAIN file.
-         */
-        DOMAIN_FILE,
-        /**
-         * The PROBLEM file.
-         */
-        PROBLEM_FILE,
-    }
 
     /**
      * Check if benchmark are already here.
@@ -78,7 +80,7 @@ public abstract class Tools {
         results.forEach(Tools::cleanValPlan);
 
         // Counting the number of val files
-        File[] valFileList = new File(localTestPath)
+        final File[] valFileList = new File(localTestPath)
             .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".val") && !name.contains("dom"));
 
         if (valFileList != null) {
@@ -118,6 +120,34 @@ public abstract class Tools {
             System.err.println(ioExcepion + " test files not found !");
         }
         return null;
+    }
+
+    /**
+     * Instantiate the Parser and parse domain file specified in the given path.
+     *
+     * @param path        the path to the pddl file to test
+     * @param errorToTest the type of issue to test
+     * @param fileType    the type of file to test (DOMAIN or PROBLEM)
+     * @return an ErrorManager from the parsing file
+     */
+    public static ErrorManager generateErrorMessages(String path, String errorToTest, Tools.FileType fileType) {
+        final Parser parser = new Parser();
+        ErrorManager errManager = new ErrorManager();
+        final File file = new File(path);
+        try {
+            if (fileType == Tools.FileType.DOMAIN_FILE) {
+                parser.parseDomain(file);
+                errManager = parser.getErrorManager();
+            } else if (fileType == Tools.FileType.PROBLEM_FILE) {
+                final File domain = new File("src/test/resources/encoding/domain.pddl");
+                parser.parse(domain, file);
+                errManager = parser.getErrorManager();
+            }
+        } catch (FileNotFoundException fnfExcepion) {
+            System.err.println(errorToTest + " test file not found !");
+            System.err.println("  -- " + file);
+        }
+        return errManager;
     }
 
 }

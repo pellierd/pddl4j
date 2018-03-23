@@ -29,7 +29,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC1_gripper() {
-        String localTestPath = Tools.BENCH_DIR + "ipc1"
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
 
@@ -47,7 +47,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC1_logistics() {
-        String localTestPath = Tools.BENCH_DIR + "ipc1"
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
 
@@ -65,7 +65,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC1_movie() {
-        String localTestPath = Tools.BENCH_DIR + "ipc1"
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
 
@@ -83,7 +83,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_ICP1_mprime() {
-        String localTestPath = Tools.BENCH_DIR + "ipc1"
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
 
@@ -101,7 +101,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC1_mystery() {
-        String localTestPath = Tools.BENCH_DIR + "ipc1"
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
 
@@ -120,7 +120,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC2_blocksworld() {
-        String localTestPath = Tools.BENCH_DIR + "ipc2"
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
 
@@ -138,7 +138,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC2_elevator() {
-        String localTestPath = Tools.BENCH_DIR + "ipc2"
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
 
@@ -156,7 +156,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC2_freecell() {
-        String localTestPath = Tools.BENCH_DIR + "ipc2"
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
 
@@ -177,7 +177,7 @@ public class EncoderTest {
      */
     //@Test
     public void testEncode_IPC2_schedule() {
-        String localTestPath = Tools.BENCH_DIR + "ipc2"
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
 
@@ -195,7 +195,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC3_depots() {
-        String localTestPath = Tools.BENCH_DIR + "ipc3"
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depots"
             + File.separator;
 
@@ -213,7 +213,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC3_driverlog() {
-        String localTestPath = Tools.BENCH_DIR + "ipc3"
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
 
@@ -231,7 +231,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC3_rover() {
-        String localTestPath = Tools.BENCH_DIR + "ipc3"
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
 
@@ -249,7 +249,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC3_satellite() {
-        String localTestPath = Tools.BENCH_DIR + "ipc3"
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
 
@@ -267,7 +267,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC3_zenotravel() {
-        String localTestPath = Tools.BENCH_DIR + "ipc3"
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
 
@@ -285,7 +285,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC4_airport() {
-        String localTestPath = Tools.BENCH_DIR + "ipc4"
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
 
@@ -303,7 +303,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC4_optical_telegraph() {
-        String localTestPath = Tools.BENCH_DIR + "ipc4"
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
 
@@ -321,7 +321,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC4_philosophers() {
-        String localTestPath = Tools.BENCH_DIR + "ipc4"
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
 
@@ -339,7 +339,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC4_pipesworld() {
-        String localTestPath = Tools.BENCH_DIR + "ipc4"
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "pipesworld"
             + File.separator;
 
@@ -357,7 +357,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC4_psr() {
-        String localTestPath = Tools.BENCH_DIR + "ipc4"
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
 
@@ -375,7 +375,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC5_openstacks() {
-        String localTestPath = Tools.BENCH_DIR + "ipc5"
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
 
@@ -393,7 +393,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC5_pathways() {
-        String localTestPath = Tools.BENCH_DIR + "ipc5"
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
 
@@ -411,7 +411,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC5_storage() {
-        String localTestPath = Tools.BENCH_DIR + "ipc5"
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
 
@@ -429,7 +429,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC5_tpp() {
-        String localTestPath = Tools.BENCH_DIR + "ipc5"
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
 
@@ -447,7 +447,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC5_truck() {
-        String localTestPath = Tools.BENCH_DIR + "ipc5"
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
 
@@ -465,7 +465,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC6_pegsol() {
-        String localTestPath = Tools.BENCH_DIR + "ipc6"
+        final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
 
@@ -483,7 +483,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC6_sokoban() {
-        String localTestPath = Tools.BENCH_DIR + "ipc6"
+        final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
 
@@ -501,7 +501,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC6_transport() {
-        String localTestPath = Tools.BENCH_DIR + "ipc6"
+        final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
 
@@ -519,7 +519,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC7_barman() {
-        String localTestPath = Tools.BENCH_DIR + "ipc7"
+        final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
 
@@ -537,7 +537,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC7_nomystery() {
-        String localTestPath = Tools.BENCH_DIR + "ipc7"
+        final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
 
@@ -555,7 +555,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC7_parking() {
-        String localTestPath = Tools.BENCH_DIR + "ipc7"
+        final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
 
@@ -573,7 +573,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC8_childsnack() {
-        String localTestPath = Tools.BENCH_DIR + "ipc8"
+        final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
 
@@ -591,7 +591,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_IPC8_hiking() {
-        String localTestPath = Tools.BENCH_DIR + "ipc8"
+        final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
 
@@ -609,7 +609,7 @@ public class EncoderTest {
      */
     //@Test TODO to long: 19hours on Jenkins to be completed with Java heap space error
     public void testEncode_IPC8_thoughtful() {
-        String localTestPath = Tools.BENCH_DIR + "ipc8"
+        final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
 
@@ -627,7 +627,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_newTests_Depots() {
-        String localTestPath = Tools.BENCH_DIR + "newTests"
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
 
@@ -645,7 +645,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_newTests_DriverLog() {
-        String localTestPath = Tools.BENCH_DIR + "newTests"
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
 
@@ -663,7 +663,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_newTests_Freecell() {
-        String localTestPath = Tools.BENCH_DIR + "newTests"
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
 
@@ -681,7 +681,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_newTests_Rover() {
-        String localTestPath = Tools.BENCH_DIR + "newTests"
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
 
@@ -699,7 +699,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_newTests_Satellite() {
-        String localTestPath = Tools.BENCH_DIR + "newTests"
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
 
@@ -717,7 +717,7 @@ public class EncoderTest {
      */
     @Test
     public void testEncode_newTests_Zenotravel() {
-        String localTestPath = Tools.BENCH_DIR + "newTests"
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
 
