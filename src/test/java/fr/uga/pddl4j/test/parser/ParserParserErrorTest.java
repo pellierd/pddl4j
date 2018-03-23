@@ -21,15 +21,15 @@ public class ParserParserErrorTest {
     /**
      * The path of the benchmarks files.
      */
-    //private Message.Type errorType = Message.Type.PARSER_ERROR;
+    private Message.Type errorType = Message.Type.PARSER_ERROR;
 
     /**
-     * Method that tests brackets parsing error in domain file.
+     * Method that tests undefined object type in domain file.
      */
-    /*@Test
-    public void testBracketsErrorDomainFile() {
-        final String pathFileTest = "src/test/resources/parser/domain_lexical_error_0.pddl";
-        final String errorToTest = "Bracket issue";
+    @Test
+    public void testUndefinedTypeDomainFile() {
+        final String pathFileTest = "src/test/resources/parser/domain_parser_error_0.pddl";
+        final String errorToTest = "Undefined object type";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
@@ -41,5 +41,65 @@ public class ParserParserErrorTest {
         }
 
         Assert.assertTrue(errManager.getMessages().size() == 1);
-    }*/
+    }
+
+    /**
+     * Method that tests undefined predicate in domain file.
+     */
+    @Test
+    public void testUndefinedPredicateErrorDomainFile() {
+        final String pathFileTest = "src/test/resources/parser/domain_parser_error_1.pddl";
+        final String errorToTest = "Undefined predicate";
+        Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
+
+        final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
+        errManager.printAll();
+        if (!errManager.getMessages().isEmpty()) {
+            for (Message message : errManager.getMessages()) {
+                Assert.assertTrue(message.getType().equals(errorType));
+            }
+        }
+
+        Assert.assertTrue(errManager.getMessages().size() == 1);
+    }
+
+    /**
+     * Method that tests undefined object in problem file.
+     */
+    @Test
+    public void testUndefinedObjectErrorProblemFile() {
+        final String pathFileTest = "src/test/resources/parser/problem_parser_error_0.pddl";
+        final String errorToTest = "Undefined object";
+        Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
+        errManager.printAll();
+        if (!errManager.getMessages().isEmpty()) {
+            for (Message message : errManager.getMessages()) {
+                Assert.assertTrue(message.getType().equals(errorType));
+            }
+        }
+
+        Assert.assertTrue(errManager.getMessages().size() == 4);
+    }
+
+    /**
+     * Method that tests undefined object in problem file.
+     */
+    @Test
+    public void testUndefinedPredicateErrorProblemFile() {
+        final String pathFileTest = "src/test/resources/parser/problem_parser_error_1.pddl";
+        final String errorToTest = "Undefined object";
+        Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
+        errManager.printAll();
+        if (!errManager.getMessages().isEmpty()) {
+            for (Message message : errManager.getMessages()) {
+                Assert.assertTrue(message.getType().equals(errorType));
+            }
+        }
+
+        Assert.assertTrue(errManager.getMessages().size() == 1);
+    }
 }

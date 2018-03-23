@@ -1,6 +1,10 @@
 package fr.uga.pddl4j.test.parser;
 
+import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.test.Tools;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Implements the <tt>ParserParserWarningTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
@@ -17,16 +21,16 @@ public class ParserParserWarningTest {
     /**
      * The path of the benchmarks files.
      */
-    //private Message.Type errorType = Message.Type.PARSER_WARNING;
+    private Message.Type errorType = Message.Type.PARSER_WARNING;
 
     /**
-     * Method that tests brackets parsing error in domain file.
+     * Method that tests warning message on domain name.
      */
-    /*@Test
-    public void testBracketsErrorDomainFile() {
-        final String pathFileTest = "src/test/resources/parser/domain_lexical_error_0.pddl";
-        final String errorToTest = "Bracket issue";
-        Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
+    @Test
+    public void testDomainNameWarning() {
+        final String pathFileTest = "src/test/resources/parser/problem_parser_warning.pddl";
+        final String errorToTest = "Domain name";
+        Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
@@ -37,6 +41,6 @@ public class ParserParserWarningTest {
         }
 
         Assert.assertTrue(errManager.getMessages().size() == 1);
-    }*/
+    }
 
 }

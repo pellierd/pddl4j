@@ -649,7 +649,7 @@ public final class Parser {
      */
     private boolean checkDomainName() {
         boolean checked = true;
-        if (this.domain.getName() != null && !this.problem.getDomain().equals(this.problem.getDomain())) {
+        if (this.domain.getName() != null && !this.domain.getName().equals(this.problem.getDomain())) {
             this.mgr.logParserWarning("domain name \"" + this.problem.getDomain()
                 + "\" used in problem doest not match.", this.lexer.getFile(), this.problem
                 .getDomain().getBeginLine(), this.problem.getDomain().getBeginColumn());
