@@ -274,7 +274,7 @@ public class Message implements Serializable, Comparable<Message> {
         }
         str.append(" at line ").append(this.line).append(", column ").append(this.column)
             .append(", file (").append(this.file).append(")")
-            .append(" : ").append(this.content);
+            .append(" : ").append(this.content).append('\n');
         return str.toString();
 
 

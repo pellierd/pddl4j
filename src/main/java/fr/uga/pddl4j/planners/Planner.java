@@ -26,7 +26,7 @@ import fr.uga.pddl4j.util.Plan;
  *
  * @since 3.0
  */
-interface Planner {
+public interface Planner {
 
     /**
      * The default CPU time allocated to the search in seconds.
@@ -42,6 +42,24 @@ interface Planner {
      * The default statistics value.
      */
     boolean DEFAULT_STATISTICS = true;
+
+    /**
+     * This enumeration used to specified the name of the planner implemented in the library.
+     */
+    static enum Name {
+        /**
+         * The HSP (Heuristic Search Planner).
+         */
+        HSP,
+        /**
+         * The EHC (Enforced Hill Climbing Planner).
+         */
+        EHC,
+        /**
+         * The FF (Fast Forward Planner).
+         */
+        FF,
+    }
 
     /**
      * Search a plan for the specified planning problem.

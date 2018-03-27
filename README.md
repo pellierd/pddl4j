@@ -1,12 +1,13 @@
-##PDDL4J library
+## PDDL4J library
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45971.svg)](http://dx.doi.org/10.5281/zenodo.45971)
+[![Build Status](http://pddl4j.imag.fr/jenkins/job/pddl4j-base/badge/icon)](http://pddl4j.imag.fr/jenkins/job/pddl4j-base)
 
-###1. Contact
+### 1. Contact
 
 - Damien Pellier (damien.pellier@imag.fr)
 - http://lig-membres.imag.fr/pellier/
 
-###2. Description
+### 2. Description
 
 PDDL4J is an open source library under LGPL license.
 
@@ -31,20 +32,20 @@ standard will have an impact on the entire field, influencing what is seen as
 central and what peripheral in the development of planning systems.
 
 The library contains:
-  * a PDDL 3.1 parser and all the classes need to manipulate its
+  * A PDDL 3.1 parser and all the classes need to manipulate its
 concepts. The parser can be configured to accept only specified requirements of
 PDDL language.
-  * a set of useful pre-processing mechanisms in order to instantiate and
+  * A set of useful pre-processing mechanisms in order to instantiate and
 simply operators into ground actions based on inertia properties.
-  * a set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
-  * several examples of planners using PDDL4J.
+  * A set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
+  * Several examples of planners using PDDL4J.
 
-###3. How to use the PDDL4J library?
+### 3. How to use the PDDL4J library?
 
 The pddl4j library is package with "gradle". If ant is not installed on your computer,
 go to https://gradle.org/ and install it.
 
-####3.1 How to build PDDL4J?
+#### 3.1 How to build PDDL4J?
 
 Type at the root of the PDDL4J distribution:
 > ./gradlew build
@@ -54,13 +55,13 @@ if you want to build the project with findbug:
 
 The jar "pddl4j-VERSION.jar" is available in the build/libs directory.
 
-####3.3 How to use binary distribution?
+#### 3.3 How to use binary distribution?
 
 The pddl4j library can be used as a jar file called "pddl4j-VERSION.jar" in the "libs"
 directory of the release. Therefore, include the jar in our classpath and enjoy
 it.
 
-####3.4 How to access the documentation?
+#### 3.4 How to access the documentation?
 
 All the documentations are contained in the doc directory.
 
@@ -68,7 +69,7 @@ To generate the javadoc just type:
 > ./gradlew javadoc
 
 
-####3.5 How to run existing planner?
+#### 3.5 How to run existing planner?
 
 Planners are available in the "planners" package of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy
@@ -81,3 +82,28 @@ Or use the gradle run command:
 
 Note: A set of planning problems is available in the web site of the international
 planning competition: http://ipc.icaps-conference.org.
+
+### 4. Changelog
+
+**PDDL4J v3.6.0**
+
+*Planner*
+* Adding Fast Forward planner
+* Adding Enforced Hill Climbing planner
+* Adding depth attibute in Node class
+* Converting cost and heuristic in double
+* Fix bugs
+
+*Parser*
+* Adding parseFromString method (it's is now possible to parse a string containing a pddl domain and/or problem)
+* Refactor Parser class and fix bugs
+
+*JUnit tests*
+* Adding tests for all the planners, CodedProblem, Encoder, Parser, Plan, etc.
+* Refactor and fix bugs
+
+*Global*
+* Change AdaptatorJavaJson to JsonAdapter
+* Fix logger and standard outputs
+* Throws uncatched exceptions
+* Fix bugs

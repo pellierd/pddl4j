@@ -21,7 +21,6 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +28,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,7 +73,7 @@ import java.util.Set;
  *      System.out.println(&quot;OPTIONS   DESCRIPTIONS\n&quot;);
  *      System.out.println(&quot;-p &lt;str&gt;    path for operator and fact file&quot;);
  *      System.out.println(&quot;-o &lt;str&gt;    operator file name&quot;);
- *      System.out.println(&quot;-getFValue &lt;str&gt;    fact file name\n&quot;);
+ *      System.out.println(&quot;-f &lt;str&gt;    fact file name\n&quot;);
  *    }
  * }
  * </pre>
@@ -143,31 +144,52 @@ public final class Parser {
     }
 
     /**
-     * Parses a planning domain from a specific files.
+     * Parses a planning domain from a specific file path.
      *
-     * @param domain the file that contains the planning domains.
-     * @throws FileNotFoundException if the specified domain or problem file does not exist.
+     * @param domain the path to the domain file.
+     * @throws FileNotFoundException if the specified domain does not exist.
      */
     public void parseDomain(String domain) throws FileNotFoundException {
-        File d = new File(domain);
-        if (!d.exists()) {
-            throw new FileNotFoundException("File  \"" + d.getName() + "\" does not exist.");
+        this.parseDomain(new File(domain));
+    }
+
+    /**
+     * Parses a planning domain from a specific file.
+     *
+     * @param domain the file that contains the planning domain.
+     * @throws FileNotFoundException if the specified domain file does not exist.
+     */
+    public void parseDomain(File domain) throws FileNotFoundException {
+        if (!domain.exists()) {
+            throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.");
         }
         try {
             // Parse and check the domain
-            this.lexer = new Lexer(new FileInputStream(d));
+            FileInputStream inputStream = new FileInputStream(domain);
+            if (this.lexer == null) {
+                this.lexer = new Lexer(inputStream);
+            } else {
+                this.lexer.ReInit(inputStream);
+            }
             lexer.setErrorManager(this.mgr);
-            lexer.setFile(d);
+            lexer.setFile(domain);
             this.lexer.domain();
             this.domain = this.lexer.getDomain();
-            this.checkTypesDeclaration();
-            this.checkConstantsDeclaration();
-            this.checkPredicatesDeclaration();
-            this.checkFunctionsDeclaration();
-            this.checkDomainConstraints();
-            this.checkOperatorsDeclaration();
-            this.checkDerivedPredicatesDeclaration();
-        } catch (RuntimeException exception) {
+            try {
+                this.checkTypesDeclaration();
+                this.checkConstantsDeclaration();
+                this.checkPredicatesDeclaration();
+                this.checkFunctionsDeclaration();
+                this.checkDomainConstraints();
+                this.checkOperatorsDeclaration();
+                this.checkDerivedPredicatesDeclaration();
+            } catch (NullPointerException exception) {
+                LOGGER.error("Domain file is not valid", exception);
+                this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
+            } finally {
+                inputStream.close();
+            }
+        } catch (IOException | RuntimeException exception) {
             LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
         } catch (ParseException pe) {
             LOGGER.error("Parse error in domain() call", pe);
@@ -175,10 +197,20 @@ public final class Parser {
     }
 
     /**
+     * Parses a planning problem from a specific file path.
+     *
+     * @param problem the path to the planning problem.
+     * @throws FileNotFoundException if the specified problem file does not exist.
+     */
+    public void parseProblem(String problem) throws FileNotFoundException {
+        this.parseProblem(new File(problem));
+    }
+
+    /**
      * Parses a planning problem from a specific file.
      *
      * @param problem the file that contains the planning problem.
-     * @throws FileNotFoundException if the specified domain or problem file does not exist.
+     * @throws FileNotFoundException if the specified problem file does not exist.
      */
     public void parseProblem(File problem) throws FileNotFoundException {
         if (!problem.exists()) {
@@ -186,18 +218,28 @@ public final class Parser {
         }
         try {
             // Parse and check the domain
-            this.lexer = new Lexer(new FileInputStream(problem));
-            lexer.setErrorManager(this.mgr);
+            FileInputStream inputStream = new FileInputStream(problem);
+            if (this.lexer == null) {
+                this.lexer = new Lexer(inputStream);
+            } else {
+                this.lexer.ReInit(inputStream);
+            }
             this.lexer.setFile(problem);
             this.lexer.problem();
             this.problem = this.lexer.getProblem();
-            this.checkDomainName();
-            this.checkObjectsDeclaration();
-            this.checkInitialFacts();
-            this.checkGoal();
-            this.checkProblemConstraints();
-            this.checkMetric();
-        } catch (RuntimeException exception) {
+            try {
+                this.checkDomainName();
+                this.checkObjectsDeclaration();
+                this.checkInitialFacts();
+                this.checkGoal();
+                this.checkProblemConstraints();
+                this.checkMetric();
+            } catch (NullPointerException exception) {
+                LOGGER.error("Problem file is not valid", exception);
+            } finally {
+                inputStream.close();
+            }
+        } catch (IOException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         } catch (ParseException pe) {
             LOGGER.error("Parse error in problem() call", pe);
@@ -205,29 +247,29 @@ public final class Parser {
     }
 
     /**
-     * Parses a planning domain and a planning problem from the specified file.
+     * Parses a planning domain and a planning problem from the specified file path.
      *
-     * @param problem the path of the file that contains the planning domains and problem.
-     * @throws FileNotFoundException if the specified problem file does not exist.
+     * @param domainAndProblem the path to the file that contains the planning domain and problem.
+     * @throws FileNotFoundException if the specified file does not exist.
      */
-    public void parse(String problem) throws FileNotFoundException {
-        this.parse(new File(problem));
+    public void parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
+        this.parseDomainAndProblem(new File(domainAndProblem));
     }
 
     /**
      * Parses a planning domain and a planning problem from the specified file.
      *
-     * @param problem the file that contains the planning domains and problem.
-     * @throws FileNotFoundException if the specified problem file does not exist.
+     * @param domainAndProblem the file that contains the planning domain and problem.
+     * @throws FileNotFoundException if the specified file does not exist.
      */
-    public void parse(File problem) throws FileNotFoundException {
-        if (!problem.exists()) {
-            throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.");
+    public void parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
+        if (!domainAndProblem.exists()) {
+            throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.");
         }
         try {
-            this.lexer = new Lexer(new FileInputStream(problem));
+            this.lexer = new Lexer(new FileInputStream(domainAndProblem));
             lexer.setErrorManager(this.mgr);
-            lexer.setFile(problem);
+            lexer.setFile(domainAndProblem);
             this.lexer.domain_and_problem();
             this.domain = this.lexer.getDomain();
             this.problem = this.lexer.getProblem();
@@ -237,9 +279,29 @@ public final class Parser {
             this.checkFunctionsDeclaration();
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
-        } catch (Exception exception) {
+        } catch (ParseException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from a file path.
+     *
+     * @param domainAndProblem the path of the file that contains the planning domain an problem.
+     * @throws FileNotFoundException if the specified domain or problem file does not exist.
+     */
+    public void parse(String domainAndProblem) throws FileNotFoundException {
+        this.parseDomainAndProblem(new File(domainAndProblem));
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from a file.
+     *
+     * @param domainAndProblem the file that contains the planning domain an problem.
+     * @throws FileNotFoundException if the specified domain or problem file does not exist.
+     */
+    public void parse(File domainAndProblem) throws FileNotFoundException {
+        this.parseDomainAndProblem(domainAndProblem);
     }
 
     /**
@@ -269,34 +331,10 @@ public final class Parser {
         }
         try {
             // Parse and check the domain
-            this.lexer = new Lexer(new FileInputStream(domain));
-            lexer.setErrorManager(this.mgr);
-            lexer.setFile(domain);
-            this.lexer.domain();
-            this.domain = this.lexer.getDomain();
-            this.checkTypesDeclaration();
-            this.checkConstantsDeclaration();
-            this.checkPredicatesDeclaration();
-            this.checkFunctionsDeclaration();
-            this.checkDomainConstraints();
-            this.checkOperatorsDeclaration();
-            this.checkDerivedPredicatesDeclaration();
+            parseDomain(domain);
             // Parse and check the problem
-            if (this.lexer == null) {
-                this.lexer = new Lexer(new FileInputStream(problem));
-            } else {
-                this.lexer.ReInit(new FileInputStream(problem));
-            }
-            this.lexer.setFile(problem);
-            this.lexer.problem();
-            this.problem = this.lexer.getProblem();
-            this.checkDomainName();
-            this.checkObjectsDeclaration();
-            this.checkInitialFacts();
-            this.checkGoal();
-            this.checkProblemConstraints();
-            this.checkMetric();
-        } catch (Exception exception) {
+            parseProblem(problem);
+        } catch (RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
@@ -307,51 +345,28 @@ public final class Parser {
      * @param domainString  the string that contains the planning domains.
      * @param problemString the string that contains the planning problem.
      */
-    public void parseString(String domainString, String problemString)  {
-
+    public void parseFromString(String domainString, String problemString) {
         try {
             // Create temp files for domain and problem
-            File domain = File.createTempFile("domain", ".pddl");
-            File problem = File.createTempFile("domain", ".pddl");
+            File domainTempFile = File.createTempFile("domain", ".pddl");
+            File problemTempFile = File.createTempFile("problem", ".pddl");
 
             // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(domain))) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(domainTempFile), "UTF-8"))) {
                 writer.write(domainString);
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(problem))) {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(problemTempFile), "UTF-8"))) {
                 writer.write(problemString);
             }
 
             // Parse and check the domain
-            this.lexer = new Lexer(new FileInputStream(domain));
-            lexer.setErrorManager(this.mgr);
-            lexer.setFile(domain);
-            this.lexer.domain();
-            this.domain = this.lexer.getDomain();
-            this.checkTypesDeclaration();
-            this.checkConstantsDeclaration();
-            this.checkPredicatesDeclaration();
-            this.checkFunctionsDeclaration();
-            this.checkDomainConstraints();
-            this.checkOperatorsDeclaration();
-            this.checkDerivedPredicatesDeclaration();
+            parseDomain(domainTempFile);
             // Parse and check the problem
-            if (this.lexer == null) {
-                this.lexer = new Lexer(new FileInputStream(problem));
-            } else {
-                this.lexer.ReInit(new FileInputStream(problem));
-            }
-            this.lexer.setFile(problem);
-            this.lexer.problem();
-            this.problem = this.lexer.getProblem();
-            this.checkDomainName();
-            this.checkObjectsDeclaration();
-            this.checkInitialFacts();
-            this.checkGoal();
-            this.checkProblemConstraints();
-            this.checkMetric();
-        } catch (Exception exception) {
+            parseProblem(problemTempFile);
+        } catch (RuntimeException | IOException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
@@ -378,7 +393,7 @@ public final class Parser {
      * Check if the metric declared in the domain is well formed.
      *
      * @return <code>true</code> if the metric declared in the domain is well formed;
-     *     <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
     private boolean checkMetric() {
         return (this.problem.getMetric() == null) || this.checkParserNode(this.problem.getMetric(), new LinkedList<>());
@@ -388,7 +403,7 @@ public final class Parser {
      * Check if the constraints declared in the domain are well formed.
      *
      * @return <code>true</code> if the constraints declared in the domain are well formed;
-     *     <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
     private boolean checkDomainConstraints() {
         return (this.domain.getConstraints() == null)
@@ -399,7 +414,7 @@ public final class Parser {
      * Check if the constraints declared in the domain are well formed.
      *
      * @return <code>true</code> if the constraints declared in the domain are well formed;
-     *     <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
     private boolean checkProblemConstraints() {
         return (this.problem.getConstraints() == null) || this.checkGroundedParserNode(this.problem.getConstraints());
@@ -628,14 +643,13 @@ public final class Parser {
     }
 
     /**
-     * Check if the domain name specified in the problem is the same use in the domain.
+     * Check if the domain name specified in the problem is the same used in the domain.
      *
-     * @return <code>true</code> if the domain name specified in the problem is the same use in
-     *     the domain; <code>false</code> otherwise.
+     * @return <code>true</code> if the domain name is the same, <code>false</code> otherwise.
      */
     private boolean checkDomainName() {
         boolean checked = true;
-        if (this.domain.getName() != null && !this.problem.getDomain().equals(this.problem.getDomain())) {
+        if (this.domain.getName() != null && !this.domain.getName().equals(this.problem.getDomain())) {
             this.mgr.logParserWarning("domain name \"" + this.problem.getDomain()
                 + "\" used in problem doest not match.", this.lexer.getFile(), this.problem
                 .getDomain().getBeginLine(), this.problem.getDomain().getBeginColumn());
@@ -662,7 +676,7 @@ public final class Parser {
             // Special cas for the type object
             if ((type.equals(Parser.OBJECT) || type.equals(Parser.NUMBER)) && !type.getTypes().isEmpty()) {
                 this.mgr.logParserError("type \"" + type.getImage() + "\" cannot be used as derived type",
-                    this.lexer.getFile(),type.getBeginLine(), type.getBeginColumn());
+                    this.lexer.getFile(), type.getBeginLine(), type.getBeginColumn());
             } else { // General case
                 // check if all super types are defined otherwise create a new type inherited from object
                 type.getTypes().stream().filter(superType -> !types.contains(superType)).forEach(superType -> {
@@ -696,7 +710,7 @@ public final class Parser {
                 final TypedSymbol current = open.poll();
                 for (Symbol st : current.getTypes()) {
                     final TypedSymbol c = map.get(st.getImage());
-                    consistent  = !c.equals(type);
+                    consistent = !c.equals(type);
                     open.add(c);
                 }
             }
@@ -881,7 +895,7 @@ public final class Parser {
         for (Op op : this.domain.getOperators()) {
             if (this.checkOperatorsParameters(op)) {
                 checked &= this.checkParserNode(op.getPreconditions(), op.getParameters());
-                checked &=  this.checkParserNode(op.getEffects(), op.getParameters());
+                checked &= this.checkParserNode(op.getEffects(), op.getParameters());
                 if (op.getDuration() != null) {
                     checked &= this.checkParserNode(op.getDuration(), op.getParameters());
                 }
@@ -948,10 +962,9 @@ public final class Parser {
      * Check if an atom used is well typed and if it was previously declared in the predicates of
      * the domain.
      *
-     * @param gd         The atom goal description.
-     * @param context    The symbolEncoding, i.e., the quantified variables if any.
-     * @return <code>true</code> if an atom used in is well typed and if it was previously
-     *     declared in the predicates of the domain; <code>false</code> otherwise.
+     * @param gd      The atom goal description.
+     * @param context The symbolEncoding, i.e., the quantified variables if any.
+     * @return <code>true</code> if an atom used is well typed and declared, <code>false</code> otherwise.
      */
     private boolean checkAtom(Exp gd, List<TypedSymbol> context) {
         boolean checked = true;
@@ -1070,8 +1083,7 @@ public final class Parser {
      *
      * @param s1 the first typed symbol.
      * @param s2 the second typed symbol.
-     * @return <code>true</code> if the types of the first typed symbol can be viewed as a subtype
-     *     of the seconds. <code>false</code> otherwise.
+     * @return <code>true</code> if the types can be viewed as a subtype, <code>false</code> otherwise.
      */
     private boolean matchTypes(TypedSymbol s1, TypedSymbol s2) {
         List<Symbol> copy = new LinkedList<>(s1.getTypes());
@@ -1161,7 +1173,7 @@ public final class Parser {
      *
      * -p <str> path for operator and fact file </str>
      * -o <str> operator file name </str>
-     * -getFValue <str> fact file name </str>
+     * -f <str> fact file name </str>
      * </pre>
      *
      * @param args the arguments of the command line.
@@ -1185,7 +1197,7 @@ public final class Parser {
                 parser.mgr.printAll();
             }
         } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
-            strb.append("parse files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
+            strb.append("Parsed files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
                 .append("\": ");
             Parser parser = new Parser();
             try {
@@ -1196,7 +1208,7 @@ public final class Parser {
             if (parser.mgr.isEmpty()) {
                 strb.append("ok");
             } else {
-                strb.append("no ok");
+                strb.append("not ok");
                 parser.mgr.printAll();
             }
         } else {

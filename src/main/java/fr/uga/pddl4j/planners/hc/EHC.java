@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.hsp;
+package fr.uga.pddl4j.planners.hc;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.exceptions.FileException;
@@ -27,6 +27,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
+import fr.uga.pddl4j.planners.ff.Node;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -37,34 +38,33 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.PriorityQueue;
 import java.util.Properties;
 
 /**
- * This class implements a simple forward planner based on A* algorithm.
+ * This class implements Enforced Hill Climbing planner.
  *
- * @author D. Pellier
- * @version 1.0 - 14.06.2010
+ * @author Samuel Aaron Boyd
+ * @author E. Hermellin
+ * @version 2.0 - 24.01.2018
  */
-public final class HSP extends AbstractPlanner {
+public final class EHC extends AbstractPlanner {
 
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(HSP.class);
+    private static final Logger LOGGER = LogManager.getLogger(EHC.class);
 
     /**
-     * The default heuristicType.
+     * The default heuristic.
      */
     public static final Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
 
     /**
      * The default weight of the heuristic.
      */
-    public static final double DEFAULT_WEIGHT = 1.0;
+    public static final double DEFAULT_WEIGHT = 1.00;
 
     /**
      * The type of heuristics that must use to solve the problem.
@@ -82,188 +82,41 @@ public final class HSP extends AbstractPlanner {
     private boolean saveState;
 
     /**
-     * Creates a new HSP planner with the default parameters.
+     * The time needed to search a solution plan.
      */
-    public HSP() {
+    private long searchingTime;
+
+    /**
+     * Creates a new planner.
+     */
+    public EHC() {
         super();
-        this.setHeuristicType(HSP.DEFAULT_HEURISTIC);
-        this.setWeight(HSP.DEFAULT_WEIGHT);
-        this.setSaveState(HSP.DEFAULT_STATISTICS);
+        this.setHeuristicType(EHC.DEFAULT_HEURISTIC);
+        this.setWeight(EHC.DEFAULT_WEIGHT);
+        this.setTimeOut(EHC.DEFAULT_TIMEOUT);
+        this.setSaveState(EHC.DEFAULT_STATISTICS);
     }
 
     /**
-     * Returns the heuristicType to use to solve the planning problem.
+     * Creates a new planner.
      *
-     * @return the heuristicType to use to solve the planning problem.
-     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
+     * @param heuristicType the heuristic used to search a solution.
+     * @param weight the weight set to the heuristic.
+     * @param searchingTime the time needed to search a solution plan.
+     * @param saveState if statistics are computed or not.
      */
-    public final Heuristic.Type getHeuristicType() {
-        return this.heuristicType;
-    }
-
-    /**
-     * Sets the heuristicType to use to solved the problem.
-     *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
-     */
-    public final void setHeuristicType(final Heuristic.Type heuristicType) {
-        Objects.requireNonNull(heuristicType);
+    public EHC(Heuristic.Type heuristicType, double weight, long searchingTime, boolean saveState) {
         this.heuristicType = heuristicType;
-    }
-
-    /**
-     * Returns the weight set to the heuristic.
-     *
-     * @return the weight set to the heuristic.
-     */
-    public final double getHeuristicWeight() {
-        return this.weight;
-    }
-
-    /**
-     * Sets the wight of the heuristic.
-     *
-     * @param weight the weight of the heuristic. The weight must be positive.
-     */
-    public final void setWeight(final double weight) {
         this.weight = weight;
-    }
-
-    /**
-     * Set the statistics generation value.
-     * @param saveState the new statistics computation value
-     */
-    public void setSaveState(boolean saveState) {
+        this.searchingTime = searchingTime;
         this.saveState = saveState;
     }
 
     /**
-     * Is statistics generate or not.
-     * @return true if statistics are compute and save, false otherwise
-     */
-    public boolean isSaveState() {
-        return saveState;
-    }
-
-    /**
-     * Solves the planning problem and returns the first solution search found.
-     *
-     * @param problem the problem to be solved.
-     * @return a solution search or null if it does not exist.
-     */
-    @Override
-    public SequentialPlan search(final CodedProblem problem) {
-        Objects.requireNonNull(problem);
-        final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        // Get the initial state from the planning problem
-        final BitState init = new BitState(problem.getInit());
-        // Initialize the closed list of nodes (store the nodes explored)
-        final Map<BitState, Node> closeSet = new HashMap<>();
-        final Map<BitState, Node> openSet = new HashMap<>();
-        // Initialize the opened list (store the pending node)
-        final double currWeight = this.weight;
-        // The list stores the node ordered according to the A* (getFValue = g + h) function
-        final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(currWeight));
-        // Creates the root node of the tree search
-        final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
-        // Adds the root to the list of pending nodes
-        open.add(root);
-        openSet.put(init, root);
-        SequentialPlan plan = null;
-
-        final int timeout = this.getTimeout() * 1000;
-        long time = 0;
-        // Start of the search
-        while (!open.isEmpty() && plan == null && time < timeout) {
-            // Pop the first node in the pending list open
-            final Node current = open.poll();
-            openSet.remove(current);
-            closeSet.put(current, current);
-            // If the goal is satisfy in the current node then extract the search and return it
-            if (current.satisfy(problem.getGoal())) {
-                plan = this.extract(current, problem);
-            } else {
-                // Try to apply the operators of the problem to this node
-                int index = 0;
-                for (BitOp op : problem.getOperators()) {
-                    // Test if a specified operator is applicable in the current state
-                    if (op.isApplicable(current)) {
-                        Node state = new Node(current);
-                        // Apply the effect of the applicable operator
-                        // Test if the condition of the effect is satisfied in the current state
-                        // Apply the effect to the successor node
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
-                            // Apply the effect to the successor node
-                            state.apply(ce.getEffects())
-                        );
-                        final int g = current.getCost() + 1;
-                        Node result = openSet.get(state);
-                        if (result == null) {
-                            result = closeSet.get(state);
-                            if (result != null) {
-                                if (g < result.getCost()) {
-                                    result.setCost(g);
-                                    result.setParent(current);
-                                    result.setOperator(index);
-                                    open.add(result);
-                                    openSet.put(result, result);
-                                    closeSet.remove(result);
-                                }
-                            } else {
-                                state.setCost(g);
-                                state.setParent(current);
-                                state.setOperator(index);
-                                state.setHeuristic(heuristic.estimate(state, problem.getGoal()));
-                                open.add(state);
-                                openSet.put(state, state);
-                            }
-                        } else if (g < result.getCost()) {
-                            result.setCost(g);
-                            result.setParent(current);
-                            result.setOperator(index);
-                        }
-
-                    }
-                    index++;
-                }
-            }
-            // Compute the searching time
-            time = System.currentTimeMillis() - begin;
-        }
-
-        if (isSaveState()) {
-            this.getStatistics().setTimeToSearch(time);
-            this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                + MemoryAgent.deepSizeOf(openSet));
-        }
-        // return the search computed or null if no search was found
-        return plan;
-    }
-
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        Node n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getOperator() != -1) {
-            final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.add(0, op);
-            n = n.getParent();
-        }
-        return plan;
-    }
-
-    /**
-     * The main method of the <code>HSP</code> example. The command line syntax is as follow:
+     * The main method of the <code>EHC</code> example. The command line syntax is as follow:
      * <p>
      * <pre>
-     * usage of HSP:
+     * usage of EHC:
      *
      * OPTIONS   DESCRIPTIONS
      *
@@ -314,17 +167,17 @@ public final class HSP extends AbstractPlanner {
 
         try {
             // Parse the command line
-            final Properties arguments = AbstractPlanner.parseArguments(args,LOGGER,HSP.getDefaultArguments());
-            final File domain = (File) arguments.get(AbstractPlanner.Argument.DOMAIN);
-            final File problem = (File) arguments.get(AbstractPlanner.Argument.PROBLEM);
-            final int traceLevel = (Integer) arguments.get(AbstractPlanner.Argument.TRACE_LEVEL);
-            final int timeout = (Integer) arguments.get(AbstractPlanner.Argument.TIMEOUT);
-            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(AbstractPlanner.Argument.HEURISTIC);
-            final double weight = (Double) arguments.get(AbstractPlanner.Argument.WEIGHT);
-            final boolean saveStats = (Boolean) arguments.get(AbstractPlanner.Argument.STATISTICS);
+            final Properties arguments = AbstractPlanner.parseArguments(args, LOGGER, EHC.getDefaultArguments());
+            final File domain = (File) arguments.get(Argument.DOMAIN);
+            final File problem = (File) arguments.get(Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(Argument.TIMEOUT);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(Argument.HEURISTIC);
+            final double weight = (Double) arguments.get(Argument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(Argument.STATISTICS);
 
             // Creates the planner
-            final HSP planner = new HSP();
+            final EHC planner = new EHC();
             planner.setHeuristicType(heuristicType);
             planner.setWeight(weight);
             planner.setTimeOut(timeout);
@@ -355,7 +208,7 @@ public final class HSP extends AbstractPlanner {
 
             // Encodes and instantiates the problem in a compact representation
             begin = System.currentTimeMillis();
-            final CodedProblem pb = factory.encode();
+            CodedProblem pb = factory.encode();
             if (saveStats) {
                 planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
                 planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
@@ -404,16 +257,18 @@ public final class HSP extends AbstractPlanner {
                 totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
             }
 
-
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();
                 if (plan != null) {
+                    strb.append(String.format("%nstarting enforced hill climb"));
+                    strb.append(String.format("%nmax depth reached %d", plan.size()));
                     strb.append(String.format("%nfound plan as follows:%n%n"));
                     strb.append(pb.toString(plan));
                     strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                 } else {
-                    strb.append(String.format("%nno plan found%n%n"));
+                    strb.append(String.format("%nno plan found%n"));
+                    strb.append(String.format("enforced hill climb failed%n%n"));
                 }
                 if (saveStats) {
                     strb.append(String.format("%ntime spent:   %8.2f seconds parsing %n", timeToParseInSeconds));
@@ -466,6 +321,7 @@ public final class HSP extends AbstractPlanner {
         }
     }
 
+
     /**
      * This method return the default arguments of the planner.
      *
@@ -473,11 +329,203 @@ public final class HSP extends AbstractPlanner {
      */
     private static Properties getDefaultArguments() {
         final Properties options = new Properties();
-        options.put(AbstractPlanner.Argument.HEURISTIC, HSP.DEFAULT_HEURISTIC);
-        options.put(AbstractPlanner.Argument.WEIGHT, HSP.DEFAULT_WEIGHT);
-        options.put(AbstractPlanner.Argument.TIMEOUT, HSP.DEFAULT_TIMEOUT * 1000);
-        options.put(AbstractPlanner.Argument.TRACE_LEVEL, HSP.DEFAULT_TRACE_LEVEL);
-        options.put(AbstractPlanner.Argument.STATISTICS, HSP.DEFAULT_STATISTICS);
+        options.put(Argument.HEURISTIC, EHC.DEFAULT_HEURISTIC);
+        options.put(Argument.WEIGHT, EHC.DEFAULT_WEIGHT);
+        options.put(Argument.TIMEOUT, EHC.DEFAULT_TIMEOUT * 1000);
+        options.put(Argument.TRACE_LEVEL, EHC.DEFAULT_TRACE_LEVEL);
+        options.put(Argument.STATISTICS, EHC.DEFAULT_STATISTICS);
         return options;
+    }
+
+    /**
+     * Returns the heuristicType to use to solve the planning problem.
+     *
+     * @return the heuristicType to use to solve the planning problem.
+     * @see Heuristic.Type
+     */
+    public final Heuristic.Type getHeuristicType() {
+        return this.heuristicType;
+    }
+
+    /**
+     * Sets the heuristicType to use to solved the problem.
+     *
+     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
+     */
+    public final void setHeuristicType(final Heuristic.Type heuristicType) {
+        Objects.requireNonNull(heuristicType);
+        this.heuristicType = heuristicType;
+    }
+
+    /**
+     * Returns the weight set to the heuristic.
+     *
+     * @return the weight set to the heuristic.
+     */
+    public final double getHeuristicWeight() {
+        return this.weight;
+    }
+
+    /**
+     * Sets the wight of the heuristic.
+     *
+     * @param weight the weight of the heuristic. The weight must be positive.
+     */
+    public final void setWeight(final double weight) {
+        this.weight = weight;
+    }
+
+    /**
+     * Is statistics generate or not.
+     *
+     * @return true if statistics are compute and save, false otherwise
+     */
+    public boolean isSaveState() {
+        return saveState;
+    }
+
+    /**
+     * Set the statistics generation value.
+     *
+     * @param saveState the new statistics computation value
+     */
+    public void setSaveState(boolean saveState) {
+        this.saveState = saveState;
+    }
+
+    /**
+     * Search a solution plan to a specified domain and problem.
+     *
+     * @param pb the problem to solve.
+     */
+    @Override
+    public SequentialPlan search(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        searchingTime = 0;
+
+        final Node solutionNode = searchSolutionNode(pb);
+
+        if (solutionNode != null) {
+            return extract(solutionNode, pb);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Search a solution node to a specified domain and problem.
+     *
+     * @param pb the problem to solve.
+     */
+    public Node searchSolutionNode(final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        searchingTime = 0;
+        return this.enforcedHillClimbing(pb);
+    }
+
+
+    /**
+     * Extracts a search from a specified node.
+     *
+     * @param node    the node.
+     * @param problem the problem.
+     * @return the search extracted from the specified node.
+     */
+    private SequentialPlan extract(final Node node, final CodedProblem problem) {
+        Node n = node;
+        final SequentialPlan plan = new SequentialPlan();
+        while (n.getParent() != null) {
+            final BitOp op = problem.getOperators().get(n.getOperator());
+            plan.add(0, op);
+            n = n.getParent();
+        }
+        return plan;
+    }
+
+    /**
+     * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
+     *
+     * @param problem the coded problem to solve.
+     * @return the solution node or null.
+     */
+    private Node enforcedHillClimbing(CodedProblem problem) {
+        final long begin = System.currentTimeMillis();
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        final LinkedList<Node> openList = new LinkedList<>();
+        final int timeout = this.getTimeout() * 1000;
+
+        BitState init = new BitState(problem.getInit());
+        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
+        openList.add(root);
+
+        double bestHeuristic = root.getHeuristic();
+
+        Node solution = null;
+        boolean deadEndFree = true;
+
+        while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
+            final Node currentState = openList.pop();
+            final LinkedList<Node> successors = this.getSuccessors(currentState, problem, heuristic);
+            deadEndFree = !successors.isEmpty();
+
+            while (!successors.isEmpty() && solution == null) {
+                final Node successor = successors.pop();
+                final double heuristicSuccessor = successor.getHeuristic();
+                if (heuristicSuccessor == 0.0) {
+                    solution = successor;
+                }
+                if (heuristicSuccessor < bestHeuristic) {
+                    successors.clear();
+                    openList.clear();
+                    bestHeuristic = heuristicSuccessor;
+                }
+                openList.addLast(successor);
+            }
+
+            // Take time to compute the searching time
+            long end = System.currentTimeMillis();
+            searchingTime = end - begin;
+        }
+
+        if (isSaveState()) {
+            // Compute the searching time
+            this.getStatistics().setTimeToSearch(searchingTime);
+        }
+
+        return solution;
+    }
+
+    /**
+     * Get the successors from a node.
+     *
+     * @param parent    the parent node.
+     * @param problem   the coded problem to solve.
+     * @param heuristic the heuristic used.
+     * @return the list of successors from the parent node.
+     */
+    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
+        final LinkedList<Node> successors = new LinkedList<>();
+
+        int index = 0;
+        for (BitOp op : problem.getOperators()) {
+            // Test if a specified operator is applicable in the current state
+            if (op.isApplicable(parent)) {
+                final BitState nextState = new BitState(parent);
+                nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
+                nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+
+                // Apply the effect of the applicable operator
+                final Node successor = new Node(nextState);
+                successor.setCost(parent.getCost() + op.getCost());
+                successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
+                successor.setParent(parent);
+                successor.setOperator(index);
+                successor.setDepth(parent.getDepth() + 1);
+                successors.add(successor);
+            }
+            index++;
+        }
+
+        return successors;
     }
 }
