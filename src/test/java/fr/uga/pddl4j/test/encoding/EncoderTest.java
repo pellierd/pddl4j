@@ -1,4 +1,4 @@
-package fr.uga.pddl4j.test.encoder;
+package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
@@ -19,35 +19,17 @@ import java.io.IOException;
 public class EncoderTest {
 
     /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "benchmarks" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String PDDL_EXT = ".pddl";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + PDDL_EXT;
-
-    /**
      * Default Trace level.
      */
     private static final int TRACE_LEVEL = 0;
 
-
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC1 gripper tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC1_gripper() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testEncode_IPC1_gripper() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
 
@@ -62,12 +44,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC1 logistics tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC1_logistics() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testEncode_IPC1_logistics() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
 
@@ -82,12 +62,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC1 movie tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC1_movie() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testEncode_IPC1_movie() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
 
@@ -102,12 +80,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC1 mprime tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_ICP1_mprime() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testEncode_ICP1_mprime() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
 
@@ -122,12 +98,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC1 mystery tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC1_mystery() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc1"
+    public void testEncode_IPC1_mystery() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
 
@@ -140,16 +114,13 @@ public class EncoderTest {
     }
 
 
-
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC2 blocksworld tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC2_blocksworld() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testEncode_IPC2_blocksworld() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
 
@@ -164,12 +135,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC2 elevator tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC2_elevator() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testEncode_IPC2_elevator() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
 
@@ -184,12 +153,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC2 freecell tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC2_freecell() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testEncode_IPC2_freecell() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
 
@@ -205,11 +172,12 @@ public class EncoderTest {
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC2 schedule tests
      * TODO test running with GC overhead errors
-     * @throws Exception if something went wrong
+     *
+     * @if something went wrong
      */
     //@Test
-    public void testEncode_IPC2_schedule() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc2"
+    public void testEncode_IPC2_schedule() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
 
@@ -224,12 +192,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC3 depots tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC3_depots() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testEncode_IPC3_depots() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depots"
             + File.separator;
 
@@ -244,12 +210,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC3 driverlog tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC3_driverlog() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testEncode_IPC3_driverlog() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
 
@@ -264,12 +228,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC3 rover tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC3_rover() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testEncode_IPC3_rover() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
 
@@ -284,12 +246,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC3 satellite tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC3_satellite() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testEncode_IPC3_satellite() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
 
@@ -304,12 +264,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC3 zenotravel tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC3_zenotravel() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc3"
+    public void testEncode_IPC3_zenotravel() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
 
@@ -324,12 +282,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC4 airport tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_airport() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testEncode_IPC4_airport() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
 
@@ -344,12 +300,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC4 optical-telegraph tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_optical_telegraph() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testEncode_IPC4_optical_telegraph() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
 
@@ -364,12 +318,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC4 philosophers tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_philosophers() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testEncode_IPC4_philosophers() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
 
@@ -384,12 +336,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC4 pipesworld tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_pipesworld() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testEncode_IPC4_pipesworld() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "pipesworld"
             + File.separator;
 
@@ -404,12 +354,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC4 psr tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC4_psr() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc4"
+    public void testEncode_IPC4_psr() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
 
@@ -424,12 +372,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC5 openstacks tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC5_openstacks() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testEncode_IPC5_openstacks() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
 
@@ -444,12 +390,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC5 pathways tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC5_pathways() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testEncode_IPC5_pathways() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
 
@@ -464,12 +408,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC5 storage tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC5_storage() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testEncode_IPC5_storage() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
 
@@ -484,12 +426,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC5 tpp tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC5_tpp() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testEncode_IPC5_tpp() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
 
@@ -504,12 +444,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC5 truck tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC5_truck() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc5"
+    public void testEncode_IPC5_truck() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
 
@@ -524,12 +462,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC6 pegsol tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC6_pegsol() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6"
+    public void testEncode_IPC6_pegsol() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
 
@@ -544,12 +480,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC6 sokoban tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC6_sokoban() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6"
+    public void testEncode_IPC6_sokoban() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
 
@@ -564,12 +498,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC6 transport tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC6_transport() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc6"
+    public void testEncode_IPC6_transport() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
 
@@ -584,12 +516,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC7 barman tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC7_barman() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7"
+    public void testEncode_IPC7_barman() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
 
@@ -604,12 +534,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC7 nomystery tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC7_nomystery() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7"
+    public void testEncode_IPC7_nomystery() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
 
@@ -624,12 +552,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC7 parking tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC7_parking() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc7"
+    public void testEncode_IPC7_parking() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
 
@@ -644,12 +570,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC8 childsnack tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC8_childsnack() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8"
+    public void testEncode_IPC8_childsnack() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
 
@@ -664,12 +588,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC8 hiking tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_IPC8_hiking() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8"
+    public void testEncode_IPC8_hiking() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
 
@@ -684,12 +606,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * IPC8 thoughtful tests
-     *
-     * @throws Exception if something went wrong
      */
     //@Test TODO to long: 19hours on Jenkins to be completed with Java heap space error
-    public void testEncode_IPC8_thoughtful() throws Exception {
-        String localTestPath = BENCH_DIR + "ipc8"
+    public void testEncode_IPC8_thoughtful() {
+        final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
 
@@ -704,12 +624,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * newTests Depots tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_newTests_Depots() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testEncode_newTests_Depots() {
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
 
@@ -724,12 +642,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * newTests DriverLog tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_newTests_DriverLog() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testEncode_newTests_DriverLog() {
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
 
@@ -744,12 +660,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * newTests Freecell tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_newTests_Freecell() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testEncode_newTests_Freecell() {
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
 
@@ -764,12 +678,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * newTests Rover tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_newTests_Rover() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testEncode_newTests_Rover() {
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
 
@@ -784,12 +696,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * newTests Satellite tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_newTests_Satellite() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testEncode_newTests_Satellite() {
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
 
@@ -804,12 +714,10 @@ public class EncoderTest {
     /**
      * Method that executes benchmarks on ADL IPC problem to test encoding.
      * newTests Zenotravel tests
-     *
-     * @throws Exception if something went wrong
      */
     @Test
-    public void testEncode_newTests_Zenotravel() throws Exception {
-        String localTestPath = BENCH_DIR + "newTests"
+    public void testEncode_newTests_Zenotravel() {
+        final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
 
@@ -829,7 +737,7 @@ public class EncoderTest {
      */
     private void encodeProblems(String currentTestPath) {
         final ProblemFactory factory = new ProblemFactory();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -851,15 +759,15 @@ public class EncoderTest {
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
-                problemFile = "p0" + i + PDDL_EXT;
+                problemFile = "p0" + i + Tools.PDDL_EXT;
             } else {
-                problemFile = "p" + i + PDDL_EXT;
+                problemFile = "p" + i + Tools.PDDL_EXT;
             }
 
             currentProblem = currentTestPath + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
             }
 
             // Parses the PDDL domain and problem description

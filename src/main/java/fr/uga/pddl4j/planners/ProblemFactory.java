@@ -38,6 +38,11 @@ import java.io.IOException;
 public class ProblemFactory {
 
     /**
+     * An instance of the ProblemFactory.
+     */
+    private static ProblemFactory instance = new ProblemFactory();
+
+    /**
      * The parser used to parser domain and problem description in PDDL.
      */
     private Parser parser;
@@ -62,6 +67,15 @@ public class ProblemFactory {
     }
 
     /**
+     * Returns an instance of this class.
+     *
+     * @return an instance of this class.
+     */
+    public static ProblemFactory getInstance() {
+        return ProblemFactory.instance;
+    }
+
+    /**
      * Parses the domain and the problem description.
      *
      * @param domain the domain file.
@@ -71,7 +85,21 @@ public class ProblemFactory {
      * @throws IOException if an error occur during parsing.
      */
     public ErrorManager parse(final File domain, final File problem) throws IOException {
-        parser.parse(domain, problem);
+        this.parser.parse(domain, problem);
+        return parser.getErrorManager();
+    }
+
+    /**
+     * Parses the domain and the problem description.
+     *
+     * @param domain the domain file path.
+     * @param problem the problem file path.
+     * @return the error manager of the parser used to parse.
+     * @throws FileNotFoundException if the domain or the problem file was not found.
+     * @throws IOException if an error occur during parsing.
+     */
+    public ErrorManager parse(final String domain, final String problem) throws IOException {
+        this.parser.parse(domain, problem);
         return parser.getErrorManager();
     }
 
@@ -83,8 +111,8 @@ public class ProblemFactory {
      * @return the error manager of the parser used to parse
      * @throws IOException if an error occur during parsing
      */
-    public ErrorManager parse(final String domain, final String problem) throws IOException {
-        parser.parseString(domain, problem);
+    public ErrorManager parseFromString(final String domain, final String problem) throws IOException {
+        this.parser.parseFromString(domain, problem);
         return parser.getErrorManager();
     }
 

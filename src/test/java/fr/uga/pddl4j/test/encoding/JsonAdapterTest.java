@@ -1,7 +1,7 @@
-package fr.uga.pddl4j.test.encoder;
+package fr.uga.pddl4j.test.encoding;
 
-import fr.uga.pddl4j.encoding.AdapterPlanJavaJson;
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.hsp.HSP;
@@ -25,21 +25,6 @@ import java.nio.file.Paths;
  * @version 0.1 - 20.07.16
  */
 public class JsonAdapterTest {
-
-    /**
-     * The path of the benchmarks files.
-     */
-    private static final String BENCH_DIR = "pddl" + File.separator;
-
-    /**
-     * PDDL files extension.
-     */
-    private static final String PDDL_EXT = ".pddl";
-
-    /**
-     * The domain file name.
-     */
-    private static final String DOMAIN = "domain" + PDDL_EXT;
 
     /**
      * Computation timeout.
@@ -79,21 +64,21 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_toStringJ_gripper() {
-        String localTestPath =  BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        CodedProblem problem = get01Problem(localTestPath);
+        final CodedProblem problem = get01Problem(localTestPath);
         Assert.assertFalse(problem == null);
 
-        Plan plan = getPlan(problem);
+        final Plan plan = getPlan(problem);
         Assert.assertFalse(plan == null);
 
-        AdapterPlanJavaJson converter = new AdapterPlanJavaJson(problem);
-        String jsonPlan = converter.toStringJ(plan);
+        final JsonAdapter converter = new JsonAdapter(problem);
+        String jsonPlan = converter.toJsonString(plan);
 
         Assert.assertTrue(jsonPlan.contentEquals(validGripperP01JSON));
 
@@ -104,27 +89,27 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_saveInFile_gripper() {
-        String localTestPath =  BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
             return;
         }
 
-        CodedProblem problem = get01Problem(localTestPath);
+        final CodedProblem problem = get01Problem(localTestPath);
         Assert.assertFalse(problem == null);
 
-        Plan plan = getPlan(problem);
+        final Plan plan = getPlan(problem);
         Assert.assertFalse(plan == null);
 
-        AdapterPlanJavaJson converter = new AdapterPlanJavaJson(problem);
-        String outputJson = converter.toStringJ(plan);
-        String outputFile = "p01.json";
+        final JsonAdapter converter = new JsonAdapter(problem);
+        final String outputJson = converter.toJsonString(plan);
+        final String outputFile = "p01.json";
         converter.saveInFile(outputFile);
 
         try {
-            Path outputFilePath = Paths.get(outputFile);
-            String fileContent = new String(Files.readAllBytes(outputFilePath), StandardCharsets.UTF_8);
+            final Path outputFilePath = Paths.get(outputFile);
+            final String fileContent = new String(Files.readAllBytes(outputFilePath), StandardCharsets.UTF_8);
             Assert.assertTrue(fileContent.contentEquals(validGripperP01JSON));
             Assert.assertTrue(fileContent.contentEquals(outputJson));
 
@@ -136,12 +121,13 @@ public class JsonAdapterTest {
 
     /**
      * Get the plan from the first problem of specified path.
+     *
      * @param currentTestPath the path where to find the problem
      * @return the plan
      */
     private CodedProblem get01Problem(String currentTestPath) {
         final ProblemFactory factory = new ProblemFactory();
-        String currentDomain = currentTestPath + DOMAIN;
+        String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
@@ -152,11 +138,11 @@ public class JsonAdapterTest {
             oneDomainPerProblem = true;
         }
 
-        problemFile = "p01" + PDDL_EXT;
+        problemFile = "p01" + Tools.PDDL_EXT;
         currentProblem = currentTestPath + problemFile;
 
         if (oneDomainPerProblem) {
-            currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + DOMAIN;
+            currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
         }
 
         // Parses the PDDL domain and problem description
@@ -189,6 +175,7 @@ public class JsonAdapterTest {
 
     /**
      * Get a plan from a CodedProblem.
+     *
      * @param pb the codedProblem to solve
      * @return the Plan object
      */
@@ -208,9 +195,6 @@ public class JsonAdapterTest {
 
         return plan;
     }
-
-
-    // define valid JSON output on problem to check
 
     /**
      * Valid JSON output for gripper p01 problem.

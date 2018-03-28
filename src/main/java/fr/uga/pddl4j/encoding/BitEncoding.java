@@ -147,6 +147,7 @@ final class BitEncoding {
         if (goal.getConnective().equals(Connective.FALSE)) {
             return null;
         }
+
         BitExp newGoal;
         BitEncoding.toDNF(goal);
         Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());

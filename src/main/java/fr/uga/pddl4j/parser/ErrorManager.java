@@ -90,7 +90,7 @@ public class ErrorManager implements Serializable {
      */
     private void print(Collection<Message> messages) {
         if (messages != null) {
-            messages.forEach(LOGGER::trace);
+            messages.forEach((message)->LOGGER.trace(message + "\n"));
         }
     }
 
@@ -99,6 +99,15 @@ public class ErrorManager implements Serializable {
      */
     public void printAll() {
         this.print(this.msg);
+    }
+
+    /**
+     * Returns the list of all messages from the error manager.
+     *
+     * @return The list of messages.
+     */
+    public Set<Message> getMessages() {
+        return this.msg;
     }
 
     /**
