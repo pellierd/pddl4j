@@ -102,14 +102,14 @@ public final class EHC extends AbstractPlanner {
      *
      * @param heuristicType the heuristic used to search a solution.
      * @param weight the weight set to the heuristic.
-     * @param searchingTime the time needed to search a solution plan.
+     * @param timeOut the time needed to search a solution plan.
      * @param saveState if statistics are computed or not.
      */
-    public EHC(Heuristic.Type heuristicType, double weight, long searchingTime, boolean saveState) {
-        this.heuristicType = heuristicType;
-        this.weight = weight;
-        this.searchingTime = searchingTime;
-        this.saveState = saveState;
+    public EHC(Heuristic.Type heuristicType, double weight, int timeOut, boolean saveState) {
+        this.setHeuristicType(heuristicType);
+        this.setWeight(weight);
+        this.setTimeOut(timeOut);
+        this.setSaveState(saveState);
     }
 
     /**
