@@ -74,7 +74,7 @@ public class EHCTest {
      * IPC1 gripper tests
      */
     @Test
-    public void testFF_IPC1_gripper()  {
+    public void testEHC_IPC1_gripper()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
@@ -92,7 +92,7 @@ public class EHCTest {
      * IPC1 logistics tests
      */
     @Test
-    public void testFF_IPC1_logistics()  {
+    public void testEHC_IPC1_logistics()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
@@ -110,7 +110,7 @@ public class EHCTest {
      * IPC1 movie tests
      */
     @Test
-    public void testFF_IPC1_movie()  {
+    public void testEHC_IPC1_movie()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
@@ -128,7 +128,7 @@ public class EHCTest {
      * IPC1 mprime tests
      */
     @Test
-    public void testFF_ICP1_mprime()  {
+    public void testEHC_ICP1_mprime()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
@@ -146,7 +146,7 @@ public class EHCTest {
      * IPC1 mystery tests
      */
     @Test
-    public void testFF_IPC1_mystery()  {
+    public void testEHC_IPC1_mystery()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
@@ -164,7 +164,7 @@ public class EHCTest {
      * IPC2 blocksworld tests
      */
     @Test
-    public void testFF_IPC2_blocksworld()  {
+    public void testEHC_IPC2_blocksworld()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
@@ -182,7 +182,7 @@ public class EHCTest {
      * IPC2 elevator tests
      */
     @Test
-    public void testFF_IPC2_elevator()  {
+    public void testEHC_IPC2_elevator()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
@@ -200,7 +200,7 @@ public class EHCTest {
      * IPC2 freecell tests
      */
     @Test
-    public void testFF_IPC2_freecell()  {
+    public void testEHC_IPC2_freecell()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
@@ -218,7 +218,7 @@ public class EHCTest {
      * IPC2 schedule tests
      */
     //@Test
-    public void testFF_IPC2_schedule()  {
+    public void testEHC_IPC2_schedule()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
@@ -236,7 +236,7 @@ public class EHCTest {
      * IPC3 depots tests
      */
     @Test
-    public void testFF_IPC3_depots()  {
+    public void testEHC_IPC3_depots()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depot"
             + File.separator;
@@ -254,7 +254,7 @@ public class EHCTest {
      * IPC3 driverlog tests
      */
     @Test
-    public void testFF_IPC3_driverlog()  {
+    public void testEHC_IPC3_driverlog()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
@@ -272,7 +272,7 @@ public class EHCTest {
      * IPC3 rover tests
      */
     @Test
-    public void testFF_IPC3_rover()  {
+    public void testEHC_IPC3_rover()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
@@ -291,7 +291,7 @@ public class EHCTest {
      * IPC3 satellite tests
      */
     @Test
-    public void testFF_IPC3_satellite()  {
+    public void testEHC_IPC3_satellite()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
@@ -309,7 +309,7 @@ public class EHCTest {
      * IPC3 zenotravel tests
      */
     @Test
-    public void testFF_IPC3_zenotravel()  {
+    public void testEHC_IPC3_zenotravel()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
@@ -327,7 +327,7 @@ public class EHCTest {
      * IPC4 airport tests
      */
     @Test
-    public void testFF_IPC4_airport()  {
+    public void testEHC_IPC4_airport()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
@@ -345,7 +345,7 @@ public class EHCTest {
      * IPC4 optical-telegraph tests
      */
     @Test
-    public void testFF_IPC4_optical_telegraph()  {
+    public void testEHC_IPC4_optical_telegraph()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
@@ -363,7 +363,7 @@ public class EHCTest {
      * IPC4 philosophers tests
      */
     @Test
-    public void testFF_IPC4_philosophers()  {
+    public void testEHC_IPC4_philosophers()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
@@ -381,7 +381,7 @@ public class EHCTest {
      * IPC4 pipeworld tests
      */
     @Test
-    public void testFF_IPC4_pipeworld()  {
+    public void testEHC_IPC4_pipeworld()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pipeworld"
             + File.separator;
@@ -399,7 +399,7 @@ public class EHCTest {
      * IPC4 psr tests
      */
     @Test
-    public void testFF_IPC4_psr()  {
+    public void testEHC_IPC4_psr()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
@@ -417,7 +417,7 @@ public class EHCTest {
      * IPC5 openstacks tests
      */
     @Test
-    public void testFF_IPC5_openstacks()  {
+    public void testEHC_IPC5_openstacks()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
@@ -435,7 +435,7 @@ public class EHCTest {
      * IPC5 pathways tests
      */
     @Test
-    public void testFF_IPC5_pathways()  {
+    public void testEHC_IPC5_pathways()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
@@ -453,7 +453,7 @@ public class EHCTest {
      * IPC5 storage tests
      */
     @Test
-    public void testFF_IPC5_storage()  {
+    public void testEHC_IPC5_storage()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
@@ -471,7 +471,7 @@ public class EHCTest {
      * IPC5 tpp tests
      */
     @Test
-    public void testFF_IPC5_tpp()  {
+    public void testEHC_IPC5_tpp()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
@@ -489,7 +489,7 @@ public class EHCTest {
      * IPC5 truck tests
      */
     @Test
-    public void testFF_IPC5_truck()  {
+    public void testEHC_IPC5_truck()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
@@ -507,7 +507,7 @@ public class EHCTest {
      * IPC6 pegsol tests
      */
     @Test
-    public void testFF_IPC6_pegsol()  {
+    public void testEHC_IPC6_pegsol()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
@@ -525,7 +525,7 @@ public class EHCTest {
      * IPC6 sokoban tests
      */
     @Test
-    public void testFF_IPC6_sokoban()  {
+    public void testEHC_IPC6_sokoban()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
@@ -543,7 +543,7 @@ public class EHCTest {
      * IPC6 transport tests
      */
     @Test
-    public void testFF_IPC6_transport()  {
+    public void testEHC_IPC6_transport()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
@@ -561,7 +561,7 @@ public class EHCTest {
      * IPC7 barman tests
      */
     @Test
-    public void testFF_IPC7_barman()  {
+    public void testEHC_IPC7_barman()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
@@ -579,7 +579,7 @@ public class EHCTest {
      * IPC7 nomystery tests
      */
     @Test
-    public void testFF_IPC7_nomystery()  {
+    public void testEHC_IPC7_nomystery()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
@@ -597,7 +597,7 @@ public class EHCTest {
      * IPC7 parking tests
      */
     @Test
-    public void testFF_IPC7_parking()  {
+    public void testEHC_IPC7_parking()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
@@ -615,7 +615,7 @@ public class EHCTest {
      * IPC8 childsnack tests
      */
     @Test
-    public void testFF_IPC8_childsnack()  {
+    public void testEHC_IPC8_childsnack()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
@@ -635,7 +635,7 @@ public class EHCTest {
 
      */
     @Test
-    public void testFF_IPC8_hiking()  {
+    public void testEHC_IPC8_hiking()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
@@ -653,7 +653,7 @@ public class EHCTest {
      * IPC8 thoughtful tests
      */
     @Test
-    public void testFF_IPC8_thoughtful()  {
+    public void testEHC_IPC8_thoughtful()  {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
@@ -671,7 +671,7 @@ public class EHCTest {
      * Other Depots tests
      */
     @Test
-    public void testFF_newTests_Depots()  {
+    public void testEHC_newTests_Depots()  {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
@@ -689,7 +689,7 @@ public class EHCTest {
      * Other DriverLog tests
      */
     @Test
-    public void testFF_newTests_DriverLog()  {
+    public void testEHC_newTests_DriverLog()  {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
@@ -707,7 +707,7 @@ public class EHCTest {
      * Other Freecell tests
      */
     @Test
-    public void testFF_newTests_Freecell()  {
+    public void testEHC_newTests_Freecell()  {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
@@ -725,7 +725,7 @@ public class EHCTest {
      * Other Rover tests
      */
     @Test
-    public void testFF_newTests_Rover()  {
+    public void testEHC_newTests_Rover()  {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
@@ -743,7 +743,7 @@ public class EHCTest {
      * Other Satellite tests
      */
     @Test
-    public void testFF_newTests_Satellite()  {
+    public void testEHC_newTests_Satellite()  {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
@@ -761,7 +761,7 @@ public class EHCTest {
      * Other Zenotravel tests
      */
     @Test
-    public void testFF_newTests_Zenotravel()  {
+    public void testEHC_newTests_Zenotravel()  {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
@@ -780,7 +780,7 @@ public class EHCTest {
      * @throws Exception if something went wrong
      */
     @Test
-    public void testFF_json_output_plan() throws Exception {
+    public void testEHC_json_output_plan() throws Exception {
 
         final ProblemFactory factory = new ProblemFactory();
         final String domainFile = "pddl/gripper/domain.pddl";

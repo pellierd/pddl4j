@@ -390,7 +390,8 @@ public final class FF extends AbstractPlanner {
         Objects.requireNonNull(pb);
         searchingTime = 0;
 
-        final EHC ehc = new EHC(this.heuristicType, this.weight, this.searchingTime, this.saveState);
+        final EHC ehc = new EHC(this.getHeuristicType(), this.getHeuristicWeight(),
+            this.getTimeout(), this.isSaveState());
 
         SequentialPlan solutionPlan = ehc.search(pb);
 

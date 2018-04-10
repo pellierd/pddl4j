@@ -64,7 +64,7 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_toStringJ_gripper() {
-        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "ipc1/gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
@@ -89,7 +89,7 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_saveInFile_gripper() {
-        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "ipc1/gripper" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
