@@ -10,6 +10,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -56,6 +61,11 @@ public abstract class Tools {
     public static final String DOMAIN = "domain" + PDDL_EXT;
 
     /**
+     * The path to VAL.
+     */
+    public static final String VAL = "src/test/resources/validate";
+
+    /**
      * Check if benchmark are already here.
      *
      * @param path the benchmark directory path
@@ -99,6 +109,7 @@ public abstract class Tools {
                     ioEx.printStackTrace();
                 }
             }
+            System.out.println("");
         }
     }
 
@@ -148,6 +159,49 @@ public abstract class Tools {
             System.err.println("  -- " + file);
         }
         return errManager;
+    }
+
+    /**
+     * Change the permissions for VAL file (add read, write and execute).
+     */
+    public static void changeVALPerm() {
+        final File val = new File(Tools.VAL);
+        Set<PosixFilePermission> perms = new HashSet<>();
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        try {
+            Files.setPosixFilePermissions(val.toPath(), perms);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    /**
+     * Remove the extension of a filename.
+     *
+     * @param fileName the name of the file
+     * @return the filename of the file without extension
+     */
+    public static String removeExtension(String fileName) {
+        final Pattern ext = Pattern.compile("(?<=.)\\.[^.]+$");
+        return ext.matcher(fileName).replaceAll("");
+    }
+
+    /**
+     * Count the number of validated plans.
+     *
+     * @param outputVal the output of VAL
+     * @return the number of validated plans
+     */
+    public static int numberValidatedPlans(String outputVal) {
+        int i = 0;
+        final Pattern p = Pattern.compile("Plan valid");
+        final Matcher m = p.matcher(outputVal);
+        while (m.find()) {
+            i++;
+        }
+        return i;
     }
 
 }

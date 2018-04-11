@@ -11,13 +11,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.FileSystems;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
 
 /**
  * Implements the <tt>HSPTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
@@ -69,6 +71,7 @@ public class HSPTest {
         planner.setTimeOut(TIMEOUT);
         planner.setTraceLevel(TRACE_LEVEL);
         planner.setSaveState(STATISTICS);
+        Tools.changeVALPerm();
     }
 
     /**
@@ -76,7 +79,7 @@ public class HSPTest {
      * IPC1 gripper tests
      */
     @Test
-    public void testHSP_IPC1_gripper()  {
+    public void testHSP_IPC1_gripper() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
@@ -87,6 +90,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -94,7 +98,7 @@ public class HSPTest {
      * IPC1 logistics tests
      */
     @Test
-    public void testHSP_IPC1_logistics()  {
+    public void testHSP_IPC1_logistics() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
@@ -105,6 +109,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -112,7 +117,7 @@ public class HSPTest {
      * IPC1 movie tests
      */
     @Test
-    public void testHSP_IPC1_movie()  {
+    public void testHSP_IPC1_movie() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
@@ -123,6 +128,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -130,7 +136,7 @@ public class HSPTest {
      * IPC1 mprime tests
      */
     @Test
-    public void testHSP_ICP1_mprime()  {
+    public void testHSP_ICP1_mprime() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
@@ -141,6 +147,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -148,7 +155,7 @@ public class HSPTest {
      * IPC1 mystery tests
      */
     @Test
-    public void testHSP_IPC1_mystery()  {
+    public void testHSP_IPC1_mystery() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
@@ -159,6 +166,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -166,7 +174,7 @@ public class HSPTest {
      * IPC2 blocksworld tests
      */
     @Test
-    public void testHSP_IPC2_blocksworld()  {
+    public void testHSP_IPC2_blocksworld() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
@@ -177,6 +185,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -184,7 +193,7 @@ public class HSPTest {
      * IPC2 elevator tests
      */
     @Test
-    public void testHSP_IPC2_elevator()  {
+    public void testHSP_IPC2_elevator() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
@@ -195,6 +204,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -202,7 +212,7 @@ public class HSPTest {
      * IPC2 freecell tests
      */
     @Test
-    public void testHSP_IPC2_freecell()  {
+    public void testHSP_IPC2_freecell() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
@@ -213,6 +223,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -220,7 +231,7 @@ public class HSPTest {
      * IPC2 schedule tests
      */
     //@Test
-    public void testHSP_IPC2_schedule()  {
+    public void testHSP_IPC2_schedule() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
@@ -231,6 +242,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -238,7 +250,7 @@ public class HSPTest {
      * IPC3 depots tests
      */
     @Test
-    public void testHSP_IPC3_depots()  {
+    public void testHSP_IPC3_depots() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depot"
             + File.separator;
@@ -249,6 +261,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -256,7 +269,7 @@ public class HSPTest {
      * IPC3 driverlog tests
      */
     @Test
-    public void testHSP_IPC3_driverlog()  {
+    public void testHSP_IPC3_driverlog() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
@@ -267,6 +280,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -274,7 +288,7 @@ public class HSPTest {
      * IPC3 rover tests
      */
     @Test
-    public void testHSP_IPC3_rover()  {
+    public void testHSP_IPC3_rover() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
@@ -285,6 +299,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
 
@@ -293,7 +308,7 @@ public class HSPTest {
      * IPC3 satellite tests
      */
     @Test
-    public void testHSP_IPC3_satellite()  {
+    public void testHSP_IPC3_satellite() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
@@ -304,6 +319,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -311,7 +327,7 @@ public class HSPTest {
      * IPC3 zenotravel tests
      */
     @Test
-    public void testHSP_IPC3_zenotravel()  {
+    public void testHSP_IPC3_zenotravel() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
@@ -322,6 +338,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -329,7 +346,7 @@ public class HSPTest {
      * IPC4 airport tests
      */
     @Test
-    public void testHSP_IPC4_airport()  {
+    public void testHSP_IPC4_airport() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
@@ -340,6 +357,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -347,7 +365,7 @@ public class HSPTest {
      * IPC4 optical-telegraph tests
      */
     @Test
-    public void testHSP_IPC4_optical_telegraph()  {
+    public void testHSP_IPC4_optical_telegraph() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
@@ -358,6 +376,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -365,7 +384,7 @@ public class HSPTest {
      * IPC4 philosophers tests
      */
     @Test
-    public void testHSP_IPC4_philosophers()  {
+    public void testHSP_IPC4_philosophers() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
@@ -376,6 +395,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -383,7 +403,7 @@ public class HSPTest {
      * IPC4 pipeworld tests
      */
     @Test
-    public void testHSP_IPC4_pipeworld()  {
+    public void testHSP_IPC4_pipeworld() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pipeworld"
             + File.separator;
@@ -394,6 +414,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -401,7 +422,7 @@ public class HSPTest {
      * IPC4 psr tests
      */
     @Test
-    public void testHSP_IPC4_psr()  {
+    public void testHSP_IPC4_psr() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
@@ -412,6 +433,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -419,7 +441,7 @@ public class HSPTest {
      * IPC5 openstacks tests
      */
     @Test
-    public void testHSP_IPC5_openstacks()  {
+    public void testHSP_IPC5_openstacks() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
@@ -430,6 +452,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -437,7 +460,7 @@ public class HSPTest {
      * IPC5 pathways tests
      */
     @Test
-    public void testHSP_IPC5_pathways()  {
+    public void testHSP_IPC5_pathways() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
@@ -448,6 +471,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -455,7 +479,7 @@ public class HSPTest {
      * IPC5 storage tests
      */
     @Test
-    public void testHSP_IPC5_storage()  {
+    public void testHSP_IPC5_storage() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
@@ -466,6 +490,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -473,7 +498,7 @@ public class HSPTest {
      * IPC5 tpp tests
      */
     @Test
-    public void testHSP_IPC5_tpp()  {
+    public void testHSP_IPC5_tpp() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
@@ -484,6 +509,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -491,7 +517,7 @@ public class HSPTest {
      * IPC5 truck tests
      */
     @Test
-    public void testHSP_IPC5_truck()  {
+    public void testHSP_IPC5_truck() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
@@ -502,6 +528,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -509,7 +536,7 @@ public class HSPTest {
      * IPC6 pegsol tests
      */
     @Test
-    public void testHSP_IPC6_pegsol()  {
+    public void testHSP_IPC6_pegsol() {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
@@ -520,6 +547,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -527,7 +555,7 @@ public class HSPTest {
      * IPC6 sokoban tests
      */
     @Test
-    public void testHSP_IPC6_sokoban()  {
+    public void testHSP_IPC6_sokoban() {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
@@ -538,6 +566,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -545,7 +574,7 @@ public class HSPTest {
      * IPC6 transport tests
      */
     @Test
-    public void testHSP_IPC6_transport()  {
+    public void testHSP_IPC6_transport() {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
@@ -556,6 +585,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -563,7 +593,7 @@ public class HSPTest {
      * IPC7 barman tests
      */
     @Test
-    public void testHSP_IPC7_barman()  {
+    public void testHSP_IPC7_barman() {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
@@ -574,6 +604,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -581,7 +612,7 @@ public class HSPTest {
      * IPC7 nomystery tests
      */
     @Test
-    public void testHSP_IPC7_nomystery()  {
+    public void testHSP_IPC7_nomystery() {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
@@ -592,6 +623,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -599,7 +631,7 @@ public class HSPTest {
      * IPC7 parking tests
      */
     @Test
-    public void testHSP_IPC7_parking()  {
+    public void testHSP_IPC7_parking() {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
@@ -610,6 +642,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -617,7 +650,7 @@ public class HSPTest {
      * IPC8 childsnack tests
      */
     @Test
-    public void testHSP_IPC8_childsnack()  {
+    public void testHSP_IPC8_childsnack() {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
@@ -628,6 +661,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -635,7 +669,7 @@ public class HSPTest {
      * IPC8 hiking tests
      */
     @Test
-    public void testHSP_IPC8_hiking()  {
+    public void testHSP_IPC8_hiking() {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
@@ -646,6 +680,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -653,7 +688,7 @@ public class HSPTest {
      * IPC8 thoughtful tests
      */
     @Test
-    public void testHSP_IPC8_thoughtful()  {
+    public void testHSP_IPC8_thoughtful() {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
@@ -664,6 +699,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -671,7 +707,7 @@ public class HSPTest {
      * Other Depots tests
      */
     @Test
-    public void testHSP_newTests_Depots()  {
+    public void testHSP_newTests_Depots() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
@@ -682,6 +718,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -689,7 +726,7 @@ public class HSPTest {
      * Other DriverLog tests
      */
     @Test
-    public void testHSP_newTests_DriverLog()  {
+    public void testHSP_newTests_DriverLog() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
@@ -700,6 +737,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -707,7 +745,7 @@ public class HSPTest {
      * Other Freecell tests
      */
     @Test
-    public void testHSP_newTests_Freecell()  {
+    public void testHSP_newTests_Freecell() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
@@ -718,6 +756,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -725,7 +764,7 @@ public class HSPTest {
      * Other Rover tests
      */
     @Test
-    public void testHSP_newTests_Rover()  {
+    public void testHSP_newTests_Rover() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
@@ -736,6 +775,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -743,7 +783,7 @@ public class HSPTest {
      * Other Satellite tests
      */
     @Test
-    public void testHSP_newTests_Satellite()  {
+    public void testHSP_newTests_Satellite() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
@@ -754,6 +794,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -761,7 +802,7 @@ public class HSPTest {
      * Other Zenotravel tests
      */
     @Test
-    public void testHSP_newTests_Zenotravel()  {
+    public void testHSP_newTests_Zenotravel() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
@@ -772,6 +813,7 @@ public class HSPTest {
         }
 
         generateValOutputPlans(localTestPath);
+        validatePlans(localTestPath);
     }
 
     /**
@@ -842,7 +884,6 @@ public class HSPTest {
             if (oneDomainPerProblem) {
                 currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.DOMAIN;
             }
-            System.out.println("--");
             // Parses the PDDL domain and problem description
             try {
                 factory.setTraceLevel(TRACE_LEVEL);
@@ -889,7 +930,55 @@ public class HSPTest {
             } catch (IOException ioEx) {
                 ioEx.printStackTrace();
             }
-            System.out.println("--");
+            System.out.println("");
+        }
+    }
+
+    /**
+     * Validate output plans.
+     *
+     * @param currentTestPath the current sub dir to test
+     */
+    private void validatePlans(String currentTestPath) {
+        try {
+            final String domain = currentTestPath + "domain.pddl";
+            File dir = new File(currentTestPath);
+            File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
+
+            if (files != null) {
+                final StringBuilder output = new StringBuilder();
+
+                for (File valfile : files) {
+                    final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
+                    final Runtime rt = Runtime.getRuntime();
+                    final Process proc = rt.exec(Tools.VAL + " " + domain + " " + problem + " " + valfile);
+                    proc.waitFor();
+
+                    String line;
+                    final InputStreamReader inputStreamReader = new InputStreamReader(proc.getInputStream(),
+                        StandardCharsets.UTF_8);
+                    final BufferedReader reader = new BufferedReader(inputStreamReader);
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            output.append(line + "\n");
+                        }
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    } finally {
+                        reader.close();
+                        inputStreamReader.close();
+                        proc.getInputStream().close();
+                    }
+                }
+
+                final int number = Tools.numberValidatedPlans(output.toString());
+                System.out.println("-- VAL on " + currentTestPath);
+                System.out.println("   Plans found: " + files.length);
+                System.out.println("   Plans validated: " + number);
+                System.out.println("--");
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
     }
 
