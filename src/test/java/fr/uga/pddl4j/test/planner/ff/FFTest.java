@@ -974,6 +974,8 @@ public class FFTest {
                 System.out.println("   Plans validated: " + number);
                 System.out.println("--");
             }
+
+            Tools.cleanValPlan(currentTestPath);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
