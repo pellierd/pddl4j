@@ -81,35 +81,19 @@ public abstract class Tools {
      * @param localTestPath the current path to clean up
      */
     public static void cleanValPlan(String localTestPath) {
+        File dir = new File(localTestPath);
+        File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
 
-        // Go into subdirectories
-        Stream<String> results =
-            Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-                .map((subDir) -> localTestPath + subDir + File.separator);
-
-        results.forEach(Tools::cleanValPlan);
-
-        // Counting the number of val files
-        final File[] valFileList = new File(localTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".val") && !name.contains("dom"));
-
-        if (valFileList != null) {
-            String valFile;
-            // Loop around problems in one category
-            for (int i = 1; i < valFileList.length + 1; i++) {
-                if (i < 10) {
-                    valFile = "p0" + i + PLAN_EXT;
-                } else {
-                    valFile = "p" + i + PLAN_EXT;
-                }
+        if (files != null) {
+            for (File file : files) {
                 try {
-                    Files.deleteIfExists(FileSystems.getDefault().getPath(localTestPath, valFile));
-                    System.out.println("Deleting " + localTestPath + valFile);
+                    Files.deleteIfExists(FileSystems.getDefault().getPath(localTestPath, file.getName()));
+                    System.out.println("Deleting " + localTestPath + file.getName());
                 } catch (IOException ioEx) {
                     ioEx.printStackTrace();
                 }
             }
-            System.out.println("");
+            System.out.println();
         }
     }
 

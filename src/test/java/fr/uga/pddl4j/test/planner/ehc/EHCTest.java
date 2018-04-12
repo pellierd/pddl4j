@@ -927,7 +927,7 @@ public class EHCTest {
             } catch (IOException ioEx) {
                 ioEx.printStackTrace();
             }
-            System.out.println("");
+            System.out.println();
         }
     }
 
