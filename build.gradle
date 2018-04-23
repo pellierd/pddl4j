@@ -5,15 +5,15 @@ buildscript {
 }
 
 plugins {
-    id "ca.coglinc.javacc" version "2.3.1"
+    id "ca.coglinc.javacc" version "2.4.0"
 }
+
 plugins {
-    id "org.sonarqube" version "1.2"
+    id "org.sonarqube" version "2.6.1"
 }
 apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
-
 
 group 'fr.uga'
 version '3.6.0'
@@ -37,14 +37,14 @@ compileJavacc {
 }
 
 checkstyle {
-    toolVersion = "6.15"
+    toolVersion = "8.9"
 }
 
 jar {
     manifest {
         attributes 'Implementation-Title': 'Gradle Quickstart',
                 'Implementation-Version': version,
-                'Gradle-Version':'Gradle 2.10',
+                'Gradle-Version':'Gradle 4.7',
                 'Built-By': 'Damien Pellier',
                 'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
                 'Main-Class': 'fr.uga.pddl4j.planners.hsp.HSP'
@@ -55,7 +55,7 @@ jar {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+    gradleVersion = '4.7'
 }
 
 task run (type: JavaExec, dependsOn: build){
