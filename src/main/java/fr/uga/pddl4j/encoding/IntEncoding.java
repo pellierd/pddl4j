@@ -29,7 +29,6 @@ import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
 import fr.uga.pddl4j.util.IntExp;
 
-
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;

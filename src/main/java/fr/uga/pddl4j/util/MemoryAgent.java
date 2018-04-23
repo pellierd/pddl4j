@@ -158,8 +158,8 @@ public class MemoryAgent {
     }
 
     /**
-     * Compute an implementation-specific approximation of the amount of storage consumed by
-     * object and by all the objects reachable from it
+     * Compute an implementation-specific approximation of the amount of storage consumed by object
+     * and by all the objects reachable from it.
      *
      * @param object the object to size.
      * @return an implementation-specific approximation of the amount of storage consumed by

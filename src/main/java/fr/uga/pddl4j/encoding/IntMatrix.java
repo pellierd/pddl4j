@@ -108,7 +108,7 @@ final class IntMatrix implements Serializable {
     }
 
     /**
-     * Return the dimension of the matrix
+     * Return the dimension of the matrix.
      *
      * @return the dimension of the matrix.
      */

@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.encoding;
 
-
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.IntExp;
 
@@ -27,9 +26,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-
-
 
 /**
  * This class contains the methods needed to instantiate the operators.
