@@ -879,12 +879,12 @@ public final class Parser {
     }
 
     /**
-     * Checks if the declared operators
+     * Checks if the declared operators are well formed.
      * <ul>
-     * <li> have a unique name</li>
-     * <li> the type of the variables or constants used in their precondition, condition and effects
+     * <li> Operators must have a unique name.</li>
+     * <li> The type of the variables or constants used in their precondition, condition and effects
      * are type previously declared.</li>
-     * <li> the variable used in their precondition, condition and effects are declared as
+     * <li> The variable used in their precondition, condition and effects are declared as
      * parameters of the operators.</li>
      * </ul>
      *

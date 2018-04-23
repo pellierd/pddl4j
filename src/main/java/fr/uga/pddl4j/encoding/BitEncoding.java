@@ -381,7 +381,7 @@ final class BitEncoding {
             case OR:
                 List<IntExp> children = exp.getChildren();
                 int index = 0;
-                while ( index < children.size()) {
+                while (index < children.size()) {
                     final IntExp ei = children.get(index);
                     BitEncoding.toDNF(ei);
                     if (ei.getConnective().equals(Connective.OR)) {

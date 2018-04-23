@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a planning operator parsed
+ * This class implements a planning operator parsed.
  * <p>
  * Modifications:
  * <ul>

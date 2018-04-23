@@ -80,7 +80,7 @@ public class TemporalPlan extends AbstractPlan {
     }
 
     /**
-     * Returns the list of actions contained in the plan ordered depending on their time specifier
+     * Returns the list of actions contained in the plan ordered depending on their time specifier.
      *
      * @return the ordered set of actions of the plan.
      * @see Plan#actions()

@@ -57,7 +57,7 @@ public class ParallelPlan extends AbstractPlan {
      * @see AbstractPlan#AbstractPlan(Plan)
      */
     public ParallelPlan(final Plan other) {
-          super(other);
+        super(other);
     }
 
     /**

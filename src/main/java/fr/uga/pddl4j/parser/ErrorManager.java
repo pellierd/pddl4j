@@ -90,7 +90,7 @@ public class ErrorManager implements Serializable {
      */
     private void print(Collection<Message> messages) {
         if (messages != null) {
-            messages.forEach((message)->LOGGER.trace(message + "\n"));
+            messages.forEach((message) -> LOGGER.trace(message + "\n"));
         }
     }
 
