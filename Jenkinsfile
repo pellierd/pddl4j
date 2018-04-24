@@ -9,20 +9,17 @@ pipeline {
 		}
         stage('Clean') {
             steps {
-                sh "echo 'Cleanning...'"
                 sh "./gradlew clean"
             }
         }
         stage('Build') {
             steps {
-                sh "echo 'Building...'"
                 sh "./gradlew jar"
                 sh "./gradlew javadoc"
             }
         }
         stage('Analyze') {
             steps {
-                sh "echo 'Analyzing...'"
                 sh "./gradlew checkstyleMain"
                 sh "./gradlew checkstyleTest"
                 sh "./gradlew findbugsMain -Pfindbug"
@@ -31,7 +28,6 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh "echo 'Testing...'"
                 sh "./gradlew test"
             }
         }
