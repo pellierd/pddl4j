@@ -2,37 +2,42 @@ pipeline {
     agent any
 
     stages {
+    	stage('Checkout') {
+    		steps {
+				checkout scm
+			}
+		}
         stage('Clean') {
             steps {
-                echo 'Cleanning...'
-                ./gradlew clean
+                sh "echo 'Cleanning...'"
+                sh "./gradlew clean"
             }
         }
         stage('Build') {
             steps {
-                echo 'Building...'
-                ./gradlew jar
-                ./gradlew javadoc
+                sh "echo 'Building...'"
+                sh "./gradlew jar"
+                sh "./gradlew javadoc"
             }
         }
         stage('Analyze') {
             steps {
-                echo 'Analyzing...'
-                ./gradlew checkstyleMain
-                ./gradlew checkstyleTest
-                ./gradlew findbugsMain -Pfindbug
-                ./gradlew findbugsTest -Pfindbug
+                sh "echo 'Analyzing...'"
+                sh "./gradlew checkstyleMain"
+                sh "./gradlew checkstyleTest"
+                sh "./gradlew findbugsMain -Pfindbug"
+                sh "./gradlew findbugsTest -Pfindbug"
             }
         }
         stage('Test') {
             steps {
-                echo 'Testing...'
-                ./gradlew test
+                sh "echo 'Testing...'"
+                sh "./gradlew test"
             }
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying...'
+                sh "echo 'Deploying...'"
             }
         }
     }
