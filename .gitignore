@@ -21,7 +21,7 @@ doc/api
 
 #       Test files        #
 ###########################
-benchmarks
+#benchmarks
 
 # OS generated files #
 ######################
