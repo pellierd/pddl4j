@@ -1,5 +1,12 @@
+#!groovy
+# Jenkinsfile
+
 pipeline {
     agent any
+
+    options {
+        timestamps()
+    }
 
     stages {
     	stage('Checkout') {
@@ -35,6 +42,19 @@ pipeline {
             steps {
                 sh "echo 'Deploying...'"
             }
+        }
+    }
+
+    post {
+        success {
+            sh "echo 'Everything run fine :)'
+        }
+        failure {
+            sh "echo 'Build failed :('
+        }
+        always {
+            archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+            junit 'build/test-results/test/*.xml'
         }
     }
 }
