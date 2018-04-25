@@ -1,5 +1,4 @@
 #!groovy
-# Jenkinsfile
 
 pipeline {
     agent any
