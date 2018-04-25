@@ -46,10 +46,10 @@ pipeline {
 
     post {
         success {
-            sh "echo 'Everything run fine :)'
+            sh "echo 'Everything run fine :)'"
         }
         failure {
-            sh "echo 'Build failed :('
+            sh "echo 'Build failed :('"
         }
         always {
             archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
