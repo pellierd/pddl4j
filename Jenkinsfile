@@ -8,11 +8,6 @@ pipeline {
     }
 
     stages {
-    	stage('Checkout') {
-    		steps {
-				checkout scm
-			}
-		}
         stage('Clean') {
             steps {
                 sh "./gradlew clean"
@@ -37,22 +32,14 @@ pipeline {
                 sh "./gradlew test"
             }
         }
-        stage('Deploy') {
-            steps {
-                sh "echo 'Deploying...'"
-            }
-        }
     }
 
     post {
         success {
-            sh "echo 'Everything run fine :)'"
-        }
-        failure {
-            sh "echo 'Build failed :('"
+            archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
         }
         always {
-            archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+            archiveArtifacts artifacts: 'build/test-results/test/binary/output.bin'
             junit 'build/test-results/test/*.xml'
         }
     }
