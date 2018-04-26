@@ -23,6 +23,7 @@ pipeline {
             steps {
                 sh "./gradlew checkstyleMain"
                 sh "./gradlew checkstyleTest"
+                checkstyle canComputeNew: false, defaultEncoding: '', healthy: '', pattern: 'build/reports/checkstyle/*.xml', unHealthy: ''
                 sh "./gradlew findbugsMain -Pfindbug"
                 sh "./gradlew findbugsTest -Pfindbug"
             }
@@ -40,6 +41,7 @@ pipeline {
         }
         always {
             archiveArtifacts artifacts: 'build/test-results/test/binary/output.bin'
+
             junit 'build/test-results/test/*.xml'
         }
     }
