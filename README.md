@@ -83,7 +83,14 @@ Or use the gradle run command:
 Note: A set of planning problems is available in the web site of the international
 planning competition: http://ipc.icaps-conference.org.
 
-### 4. Changelog
+### 4. How to cite
+
+PDDL4J: a planning domain description library for java
+https://doi.org/10.1080/0952813X.2017.1409278
+
+> D. Pellier & H. Fiorino (2017) PDDL4J: a planning domain description library for java, Journal of Experimental & Theoretical Artificial Intelligence, 30:1, 143-176, DOI: 10.1080/0952813X.2017.1409278
+
+### 5. Changelog
 
 **PDDL4J v3.6.0**
 
