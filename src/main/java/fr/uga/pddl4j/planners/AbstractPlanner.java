@@ -27,7 +27,6 @@ import java.util.Properties;
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- *
  * @since 3.0
  */
 public abstract class AbstractPlanner implements Planner {
@@ -213,6 +212,7 @@ public abstract class AbstractPlanner implements Planner {
 
     /**
      * Set the statistics generation value.
+     *
      * @param saveState the new statistics computation value
      */
     @Override
@@ -222,6 +222,7 @@ public abstract class AbstractPlanner implements Planner {
 
     /**
      * Is statistics generate or not.
+     *
      * @return true if statistics are compute and save, false otherwise
      */
     @Override

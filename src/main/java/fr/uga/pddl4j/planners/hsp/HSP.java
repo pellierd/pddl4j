@@ -23,6 +23,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.PlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -141,8 +142,11 @@ public final class HSP extends AbstractPlanner {
 
         if (isSaveState()) {
             this.getStatistics().setTimeToSearch(time);
-            this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                + MemoryAgent.deepSizeOf(openSet));
+            if (PlannerFactory.isMemoryAgent()) {
+                // Compute the memory used by the search
+                this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                    + MemoryAgent.deepSizeOf(openSet));
+            }
         }
         // return the search computed or null if no search was found
         return plan;
@@ -151,7 +155,7 @@ public final class HSP extends AbstractPlanner {
     /**
      * Extracts a search from a specified node.
      *
-     * @param node the node.
+     * @param node    the node.
      * @param problem the problem.
      * @return the search extracted from the specified node.
      */

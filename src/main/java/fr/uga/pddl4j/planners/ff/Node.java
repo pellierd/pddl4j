@@ -21,9 +21,6 @@ package fr.uga.pddl4j.planners.ff;
 
 import fr.uga.pddl4j.util.BitState;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 /**
  * This class implements a node of the tree search.
  *

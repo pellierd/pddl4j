@@ -20,9 +20,8 @@ import java.util.Properties;
  *
  * @author D. Pellier
  * @version 1.0 - 20.06.2017
- *
- * @since 3.0
  * @see Planner
+ * @since 3.0
  */
 public class PlannerFactory {
 
@@ -32,11 +31,44 @@ public class PlannerFactory {
     private static PlannerFactory instance = new PlannerFactory();
 
     /**
+     * Returns an instance of this class.
+     *
+     * @return an instance of this class.
+     */
+    public static PlannerFactory getInstance() {
+        return PlannerFactory.instance;
+    }
+
+    /**
+     * The state to use Memory agent or not.
+     */
+    private static boolean memoryAgent;
+
+    /**
+     * Returns if Memory Agent is used to inspect memory.
+     *
+     * @return the state of the memory agent.
+     */
+    public static boolean isMemoryAgent() {
+        return memoryAgent;
+    }
+
+    /**
+     * Sets if Memory Agent is used to inspect memory.
+     *
+     * @param memoryAgent the state of the memory agent.
+     */
+    public static void setMemoryAgent(boolean memoryAgent) {
+        PlannerFactory.memoryAgent = memoryAgent;
+    }
+
+    /**
      * Creates a new PlannerFactory.
      * The constructor is override to
      */
     private PlannerFactory() {
         super();
+        PlannerFactory.setMemoryAgent(false);
     }
 
     /**
@@ -49,25 +81,19 @@ public class PlannerFactory {
     public Planner getPlanner(final Planner.Name name) {
         Planner planner = null;
         switch (name) {
-            case HSP: planner = new HSP();
-            break;
+            case HSP:
+                planner = new HSP();
+                break;
 
-            case FF: planner = new FF();
-            break;
+            case FF:
+                planner = new FF();
+                break;
 
-            case EHC: planner = new EHC();
-            break;
+            case EHC:
+                planner = new EHC();
+                break;
         }
         return planner;
-    }
-
-    /**
-     * Returns an instance of this class.
-     *
-     * @return an instance of this class.
-     */
-    public static PlannerFactory getInstance() {
-        return PlannerFactory.instance;
     }
 
     /**
@@ -119,6 +145,7 @@ public class PlannerFactory {
             .append("               - total memory used in MBytes\n")
             .append("               - length of the solution plan\n")
             .append("-s <bool>   generate statistics or not (preset: true)\n")
+            .append("-m <bool>   use memory agent (preset: false)\n")
             .append("-h          print this message\n\n");
 
         return strb;
@@ -199,6 +226,8 @@ public class PlannerFactory {
                         log.trace(PlannerFactory.printUsage());
                     }
                     arguments.put(AbstractPlanner.Argument.TRACE_LEVEL, level);
+                } else if ("-m".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    PlannerFactory.setMemoryAgent(Boolean.parseBoolean(args[i + 1]));
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
                     arguments.put(AbstractPlanner.Argument.STATISTICS, isStatUsed);
@@ -270,7 +299,8 @@ public class PlannerFactory {
      *                - memory used for searching in MBytes
      *                - total memory used in MBytes
      *                - length of the solution plan
-     * -s          no statistics
+     * -m <i>bool</i>   use memory agent (preset: false)
+     * -s <i>bool</i>   no statistics (preset: true)
      * -h          print this message
      *
      * </pre>
@@ -286,9 +316,8 @@ public class PlannerFactory {
 
             // Parse the command line
             final Properties arguments = PlannerFactory.parseArguments(args,
-                logger,AbstractPlanner.getDefaultArguments());
-            final Planner planner = plannerFactory.getPlanner((Planner.Name)
-                arguments.get(AbstractPlanner.Argument.PLANNER));
+                logger, AbstractPlanner.getDefaultArguments());
+
             final File domain = (File) arguments.get(AbstractPlanner.Argument.DOMAIN);
             final File problem = (File) arguments.get(AbstractPlanner.Argument.PROBLEM);
             final int traceLevel = (Integer) arguments.get(AbstractPlanner.Argument.TRACE_LEVEL);
@@ -298,7 +327,8 @@ public class PlannerFactory {
             final boolean saveStats = (Boolean) arguments.get(AbstractPlanner.Argument.STATISTICS);
 
             // Creates the planner
-
+            final Planner planner = plannerFactory.getPlanner((Planner.Name)
+                arguments.get(AbstractPlanner.Argument.PLANNER));
             planner.setHeuristicType(heuristicType);
             planner.setWeight(weight);
             planner.setTimeOut(timeout);
@@ -332,7 +362,9 @@ public class PlannerFactory {
             final CodedProblem pb = factory.encode();
             if (saveStats) {
                 planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
-                planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+                if (isMemoryAgent()) {
+                    planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+                }
             }
             planner.getStatistics().setNumberOfActions(pb.getOperators().size());
             planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
@@ -394,11 +426,13 @@ public class PlannerFactory {
                     strb.append(String.format("              %8.2f seconds encoding %n", timeToEncodeInSeconds));
                     strb.append(String.format("              %8.2f seconds searching%n", timeToSearchInSeconds));
                     strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
-                    strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
-                        memoryForProblemInMBytes));
-                    strb.append(String.format("              %8.2f MBytes for searching%n",
-                        memoryUsedToSearchInMBytes));
-                    strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
+                    if (isMemoryAgent()) {
+                        strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
+                            memoryForProblemInMBytes));
+                        strb.append(String.format("              %8.2f MBytes for searching%n",
+                            memoryUsedToSearchInMBytes));
+                        strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
+                    }
                 }
                 logger.trace(strb);
             } else if (traceLevel == 8) {

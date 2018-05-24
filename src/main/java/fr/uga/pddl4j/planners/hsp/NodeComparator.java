@@ -20,6 +20,7 @@ public class NodeComparator implements Comparator<Node>, Serializable {
 
     /**
      * Build the Node comparator object base on heuristic weight.
+     *
      * @param weight the heuristic weight
      */
     public NodeComparator(double weight) {
@@ -28,6 +29,7 @@ public class NodeComparator implements Comparator<Node>, Serializable {
 
     /**
      * Compare two nodes' weight.
+     *
      * @param n1 node number 1
      * @param n2 node number 2
      */

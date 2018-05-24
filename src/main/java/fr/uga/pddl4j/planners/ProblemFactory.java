@@ -31,9 +31,8 @@ import java.io.IOException;
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- *
- * @since 3.0
  * @see CodedProblem
+ * @since 3.0
  */
 public class ProblemFactory {
 
@@ -78,11 +77,11 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
-     * @param domain the domain file.
+     * @param domain  the domain file.
      * @param problem the problem file
      * @return the error manager of the parser used to parse.
      * @throws FileNotFoundException if the domain or the problem file was not found.
-     * @throws IOException if an error occur during parsing.
+     * @throws IOException           if an error occur during parsing.
      */
     public ErrorManager parse(final File domain, final File problem) throws IOException {
         this.parser.parse(domain, problem);
@@ -92,11 +91,11 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
-     * @param domain the domain file path.
+     * @param domain  the domain file path.
      * @param problem the problem file path.
      * @return the error manager of the parser used to parse.
      * @throws FileNotFoundException if the domain or the problem file was not found.
-     * @throws IOException if an error occur during parsing.
+     * @throws IOException           if an error occur during parsing.
      */
     public ErrorManager parse(final String domain, final String problem) throws IOException {
         this.parser.parse(domain, problem);
@@ -106,7 +105,7 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
-     * @param domain the domain string description
+     * @param domain  the domain string description
      * @param problem the problem string description
      * @return the error manager of the parser used to parse
      * @throws IOException if an error occur during parsing
@@ -141,7 +140,7 @@ public class ProblemFactory {
      * <ol>1 + 3 + goal state and operators with unary inertia encoded</ol>
      * <ol>1 + actions, initial and goal state after expansion of variables</ol>
      * <ol>1 + final domain representation</ol>
-     *</ul>
+     * </ul>
      *
      * @param level the trace level.
      */

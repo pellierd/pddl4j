@@ -23,12 +23,12 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.PlannerFactory;
 import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SequentialPlan;
-
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
@@ -171,9 +171,11 @@ public final class FF extends AbstractPlanner {
         if (isSaveState()) {
             // Compute the searching time
             this.getStatistics().setTimeToSearch(searchingTime);
-            // Compute the memory used by the search
-            this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
+            if (PlannerFactory.isMemoryAgent()) {
+                // Compute the memory used by the search
+                this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                    + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
+            }
         }
 
         return solution;

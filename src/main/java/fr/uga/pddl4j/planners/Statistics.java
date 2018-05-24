@@ -20,7 +20,6 @@ package fr.uga.pddl4j.planners;
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- *
  * @since 3.0
  */
 public class Statistics {
@@ -68,7 +67,6 @@ public class Statistics {
     /**
      * Creates a new statistics object to store statistical information about  planner performances.
      * The default statistic values are set to 0.
-     *
      */
     public Statistics() {
         this.timeToEncode = 0;

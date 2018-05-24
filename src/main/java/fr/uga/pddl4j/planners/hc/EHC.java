@@ -20,27 +20,16 @@
 package fr.uga.pddl4j.planners.hc;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.planners.ff.Node;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * This class implements Enforced Hill Climbing planner.
@@ -71,9 +60,9 @@ public final class EHC extends AbstractPlanner {
      * Creates a new planner.
      *
      * @param heuristicType the heuristic used to search a solution.
-     * @param weight the weight set to the heuristic.
-     * @param timeOut the time needed to search a solution plan.
-     * @param saveState if statistics are computed or not.
+     * @param weight        the weight set to the heuristic.
+     * @param timeOut       the time needed to search a solution plan.
+     * @param saveState     if statistics are computed or not.
      */
     public EHC(Heuristic.Type heuristicType, double weight, int timeOut, boolean saveState) {
         this.setHeuristicType(heuristicType);
