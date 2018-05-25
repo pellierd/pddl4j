@@ -65,7 +65,7 @@ public class EHCTest {
     public void initTest() {
         // Creates the planner
         planner = new EHC();
-        planner.setTimeOut(TIMEOUT);
+        planner.setTimeOut(TIMEOUT * 1000);
         planner.setTraceLevel(TRACE_LEVEL);
         planner.setSaveState(STATISTICS);
         Tools.changeVALPerm();

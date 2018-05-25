@@ -329,11 +329,7 @@ public class PlannerFactory {
             // Creates the planner
             final Planner planner = plannerFactory.getPlanner((Planner.Name)
                 arguments.get(AbstractPlanner.Argument.PLANNER));
-            planner.setHeuristicType(heuristicType);
-            planner.setWeight(weight);
-            planner.setTimeOut(timeout);
-            planner.setTraceLevel(traceLevel);
-            planner.setSaveState(saveStats);
+            planner.setupPlanner(heuristicType, timeout, weight, saveStats, traceLevel);
 
             // Creates the problem factory
             final ProblemFactory factory = ProblemFactory.getInstance();
@@ -405,13 +401,13 @@ public class PlannerFactory {
                 timeToSearchInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
                 totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
                 if (isMemoryAgent()) {
-                    memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
+                    memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics()
+                        .getMemoryUsedToSearch());
                     memoryForProblemInMBytes =
                         Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
                     totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
                 }
             }
-
 
             if (traceLevel > 0 && traceLevel != 8) {
                 final StringBuilder strb = new StringBuilder();

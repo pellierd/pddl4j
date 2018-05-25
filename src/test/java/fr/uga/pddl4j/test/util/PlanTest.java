@@ -104,7 +104,7 @@ public class PlanTest {
     public void initTest() {
         // Creates the planner
         planner = new HSP();
-        planner.setTimeOut(TIMEOUT);
+        planner.setTimeOut(TIMEOUT * 1000);
         planner.setTraceLevel(TRACE_LEVEL);
         planner.setSaveState(STATISTICS);
     }
