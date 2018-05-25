@@ -50,10 +50,18 @@ public final class EHC extends AbstractPlanner {
      */
     public EHC() {
         super();
-        this.setHeuristicType(EHC.DEFAULT_HEURISTIC);
-        this.setWeight(EHC.DEFAULT_WEIGHT);
-        this.setTimeOut(EHC.DEFAULT_TIMEOUT);
-        this.setSaveState(EHC.DEFAULT_STATISTICS);
+    }
+
+    /**
+     * Setup planner.
+     */
+    public void setupPlanner(Heuristic.Type heuristic, int timeout,
+                             double weight, boolean statisticState, int traceLevel) {
+        this.setHeuristicType(heuristic);
+        this.setTimeOut(timeout);
+        this.setWeight(weight);
+        this.setSaveState(statisticState);
+        this.setTraceLevel(traceLevel);
     }
 
     /**
@@ -130,7 +138,7 @@ public final class EHC extends AbstractPlanner {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final int timeout = this.getTimeout() * 1000;
+        final int timeout = this.getTimeout();
 
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));

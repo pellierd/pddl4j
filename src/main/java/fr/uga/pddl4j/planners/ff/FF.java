@@ -57,10 +57,18 @@ public final class FF extends AbstractPlanner {
      */
     public FF() {
         super();
-        this.setHeuristicType(FF.DEFAULT_HEURISTIC);
-        this.setWeight(FF.DEFAULT_WEIGHT);
-        this.setTimeOut(FF.DEFAULT_TIMEOUT);
-        this.setSaveState(FF.DEFAULT_STATISTICS);
+    }
+
+    /**
+     * Setup planner.
+     */
+    public void setupPlanner(Heuristic.Type heuristic, int timeout,
+                             double weight, boolean statisticState, int traceLevel) {
+        this.setHeuristicType(heuristic);
+        this.setTimeOut(timeout);
+        this.setWeight(weight);
+        this.setSaveState(statisticState);
+        this.setTraceLevel(traceLevel);
     }
 
     /**
@@ -126,7 +134,7 @@ public final class FF extends AbstractPlanner {
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
-        final int timeout = this.getTimeout() * 1000;
+        final int timeout = this.getTimeout();
         Node solution = null;
 
         BitState init = new BitState(problem.getInit());

@@ -47,10 +47,18 @@ public final class HSP extends AbstractPlanner {
      */
     public HSP() {
         super();
-        this.setHeuristicType(HSP.DEFAULT_HEURISTIC);
-        this.setWeight(HSP.DEFAULT_WEIGHT);
-        this.setTimeOut(HSP.DEFAULT_TIMEOUT);
-        this.setSaveState(HSP.DEFAULT_STATISTICS);
+    }
+
+    /**
+     * Setup planner.
+     */
+    public void setupPlanner(Heuristic.Type heuristic, int timeout,
+                             double weight, boolean statisticState, int traceLevel) {
+        this.setHeuristicType(heuristic);
+        this.setTimeOut(timeout);
+        this.setWeight(weight);
+        this.setSaveState(statisticState);
+        this.setTraceLevel(traceLevel);
     }
 
     /**
@@ -80,7 +88,7 @@ public final class HSP extends AbstractPlanner {
         openSet.put(init, root);
         SequentialPlan plan = null;
 
-        final int timeout = this.getTimeout() * 1000;
+        final int timeout = this.getTimeout();
         long time = 0;
         // Start of the search
         while (!open.isEmpty() && plan == null && time < timeout) {
