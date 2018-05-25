@@ -175,7 +175,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter.
      * @param type  the type to set.
-     * @throws IllegalArgumentException       if type < 0.
+     * @throws IllegalArgumentException       if type &#60; 0.
      */
     @Override
     public final void setTypeOfParameter(final int index, final int type) {
@@ -208,7 +208,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter to instantiate.
      * @param value the value of instantiation.
-     * @throws IllegalArgumentException       if value < 0.
+     * @throws IllegalArgumentException       if value &#60; 0.
      */
     @Override
     public final void setValueOfParameter(final int index, final int value) {

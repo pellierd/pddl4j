@@ -289,7 +289,7 @@ public class Symbol implements Serializable {
      *
      * @param index the index of the symbol.
      * @return the old image of the symbol or null if the symbol was not renamed.
-     * @throws IllegalArgumentException if index is < 0.
+     * @throws IllegalArgumentException if index is &#60; 0.
      */
     public final String renameVariables(final int index) {
         if (index < 0) {

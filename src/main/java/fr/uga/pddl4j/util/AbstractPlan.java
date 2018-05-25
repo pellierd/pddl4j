@@ -33,7 +33,9 @@ public abstract class AbstractPlan implements Plan {
     }
 
     /**
-     * Creates a new search from a an other one. The new search is a deep copy of the specified search in parameter.
+     * Creates a new search from an other one. The new search is a deep copy of the specified search in parameter.
+     *
+     * @param other the plan on which a deep copy is done.
      */
     protected AbstractPlan(final Plan other) {
         this();

@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
  * This class implements a parser node used in PDDL expressions.
  * <p>
  * Modifications:
+ * </p>
  * <ul>
  * <li>Add method <code>isLiteral()</code> 11.12.2012.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
@@ -64,8 +64,8 @@ public class Exp implements Serializable {
     private List<TypedSymbol> variables;
 
     /**
-     * AND, OR, NOT, WHEN => NULL ALL, EX => the quantified variable with its type ATOM => the atom
-     * as predicate->param1->param2->...
+     * AND, OR, NOT, WHEN &#61;&#62; NULL ALL, EX &#61;&#62; the quantified variable with its type ATOM &#61;&#62;
+     * the atom as predicate&#45;&#62;param1&#45;&#62;param2&#45;&#62;...
      */
     private List<Symbol> atom;
 
@@ -202,7 +202,7 @@ public class Exp implements Serializable {
      * Set the connective of this node.
      *
      * @param connective the connective.
-     * @throws RuntimeException if the specified connective is null.
+     * @throws NullParameterException if the specified connective is null.
      */
     public void setConnective(final Connective connective) throws NullParameterException {
         if (connective == null) {
@@ -318,7 +318,7 @@ public class Exp implements Serializable {
      *
      * @param context the images of the renamed variable.
      * @exception MalformedExpException if this expression is malformed.
-     * @see this#isMalformedExpression
+     * @see Exp#isMalformedExpression()
      */
     public void renameVariables(final Map<String, String> context) {
         if (this.isMalformedExpression()) {
@@ -408,7 +408,7 @@ public class Exp implements Serializable {
     /**
      * Moves the negation inward the expression.
      *
-     * @see this#isMalformedExpression
+     * @see Exp#isMalformedExpression
      */
     public void moveNegationInward() throws FatalException {
         if (this.isMalformedExpression()) {
@@ -638,7 +638,7 @@ public class Exp implements Serializable {
      *
      * @return a string representation of this node.
      * @see java.lang.Object#toString
-     * @see this#isMalformedExpression
+     * @see Exp#isMalformedExpression
      */
     @Override
     public String toString() {
@@ -807,6 +807,7 @@ public class Exp implements Serializable {
 
     /**
      * Return if this expression is malformed. An expression is considered as well in the following cases:
+     * <ul>
      * <li>Empty OR and AND expressions, i.e., without any children, are considered as well formed.</li>
      * <li>Quantified expressions (EXISTS, FORALL) is well formed if it has at least one quantified variable and one
      * child expression.</li>
@@ -819,6 +820,7 @@ public class Exp implements Serializable {
      * must have at least two children expressions to be considered as well formed.</li>
      * <li>ALWAYS_WITHIN and HOLD_DURING must have at least three children expressions to be considered as well formed.
      * </li>
+     * </ul>
      *
      * @return <code>true</code> if the expression is malformed; <code>false</code> otherwise.
      */

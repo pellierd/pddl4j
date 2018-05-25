@@ -34,7 +34,7 @@ import fr.uga.pddl4j.util.BitState;
  * heuristic. Note that it is simple to embed the sum heuristic value into the planning graph. We
  * maintain a cost value for each new proposition. We are now interested in estimating the cost
  * <code>cost(S)</code> for achieving a set <code>S = {p1, p2, ..., pn}</code>. Suppose
- * <code>lev(p1) <= lev(p2) <= ... <= lev(pn)</code> where <code>lev(p)</code> is the level
+ * <code>lev(p1) &#60;= lev(p2) &#60;= ... &#60;= lev(pn)</code> where <code>lev(p)</code> is the level
  * where the proposition <code>p</code> appears for the first time the planning graph. Under the
  * assumption that all propositions are independent, we have
  * </p>
@@ -42,7 +42,7 @@ import fr.uga.pddl4j.util.BitState;
  * code(S) := cost(S - p1) + cost(p1)
  * </pre>
  * <p>
- * Since <code>lev(p1) <= lev(S - p1)</code>, proposition is possibly achieved before the set
+ * Since <code>lev(p1) &#60;= lev(S - p1)</code>, proposition is possibly achieved before the set
  * <code>S - p1</code>. Now, we assume that there are no positive interactions among the
  * propositions, but there may be negative interactions. Therefore, upon achieving
  * <code>S - p1</code> subgoal <code>p1</code> may have been deleted and needs to be achieved
@@ -57,13 +57,10 @@ import fr.uga.pddl4j.util.BitState;
  * <pre>
  * cost(S) := cost(S - p1) + cost(p1) + (lev(S) - lev(S - p1))
  * </pre>
- * </p>
  * Applying this formula to <code>S - p1, S - p1 - p2</code> and so one, we derive:
- * <p>
  * <pre>
  * cost(S) := sum(cost(pi) + lev(S) - lev(pn) for all pi in S.
  * </pre>
- * </p>
  * Note that <code>lev(pn) = max(lev(pi))</code> for all <code>pi</code> in <code>S</code> as
  * per our setup. Thus the estimate above is composed of the sum heuristic function
  * <code>hsum = sum(cost(pi))</code> for all <code>pi</code> in <code>S</code> and an
@@ -72,20 +69,20 @@ import fr.uga.pddl4j.util.BitState;
  * <code>S</code>.
  * <p>
  * <i>Definition (Interaction degree).</i> The interaction degree among propositions in a set
+ * </p>
  * <code>S</code> is
  * <pre>
  * delta(S) := lev(S) - max(lev(p)) for all p in S.
  * </pre>
- * </p>
+ * <p>
  * It should be noted that the notion of binary interaction degree is only a special case of the
  * above definition for a set of two propositions. In addition, when there is no negative
  * interaction among subgoals, <code>delta(S) = 0</code>, as expected. We have the following
  * heuristic:
- * <p>
+ * </p>
  * <pre>
  * hadjsum(S) := sum(cost(pi)) + delta(S) or all pi in S.
  * </pre>
- * </p>
  * <b>Warning:</b> The adjusted sum heuristic is not admissible.
  *
  * @author D. Pellier

@@ -32,11 +32,11 @@ import java.util.stream.Collectors;
  * This class implements a planning operator parsed.
  * <p>
  * Modifications:
+ * </p>
  * <ul>
  * <li> Add method normalize(int i) - 11.12.2012.</li>
  * <li> Add constructor of copy - 11.12.2012.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.1 - 28.01.2010

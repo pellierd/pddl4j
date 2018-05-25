@@ -73,7 +73,7 @@ public final class FastForward extends RelaxedGraphHeuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
-     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
     public int estimate(final BitState state, final BitExp goal) {

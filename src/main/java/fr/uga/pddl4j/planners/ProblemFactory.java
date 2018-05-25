@@ -132,15 +132,15 @@ public class ProblemFactory {
 
     /**
      * Sets the trace level. The levels are defined as follows:
-     * <ul>
-     * <ol>nothing</ol>
-     * <ol>info on problem constants, types and predicates</ol>
-     * <ol>1 + loaded operators, initial and goal state</ol>
-     * <ol>1 + predicates and their inertia status</ol>
-     * <ol>1 + 3 + goal state and operators with unary inertia encoded</ol>
-     * <ol>1 + actions, initial and goal state after expansion of variables</ol>
-     * <ol>1 + final domain representation</ol>
-     * </ul>
+     * <ol>
+     * <li>nothing</li>
+     * <li>info on problem constants, types and predicates</li>
+     * <li>1 + loaded operators, initial and goal state</li>
+     * <li>1 + predicates and their inertia status</li>
+     * <li>1 + 3 + goal state and operators with unary inertia encoded</li>
+     * <li>1 + actions, initial and goal state after expansion of variables</li>
+     * <li>1 + final domain representation</li>
+     * </ol>
      *
      * @param level the trace level.
      */

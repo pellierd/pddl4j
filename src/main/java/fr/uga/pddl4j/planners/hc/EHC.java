@@ -102,6 +102,7 @@ public final class EHC extends AbstractPlanner {
      * Search a solution node to a specified domain and problem.
      *
      * @param pb the problem to solve.
+     * @return the solution node.
      */
     public Node searchSolutionNode(final CodedProblem pb) {
         Objects.requireNonNull(pb);

@@ -155,7 +155,10 @@ public class PlannerFactory {
      * This method parse the command line and return the arguments.
      *
      * @param args the arguments from the command line.
+     * @param log  the logger to display informations.
+     * @param defaultArguments the default arguments to use.
      * @return The arguments of the planner.
+     * @throws FileException if files not found
      */
     public static Properties parseArguments(String[] args, Logger log, Properties defaultArguments)
         throws FileException {
@@ -254,7 +257,6 @@ public class PlannerFactory {
 
     /**
      * The main method of the <code>PDDL4J</code> example. The command line syntax is as follow:
-     * <p>
      * <pre>
      * usage of PDDL4J:
      *
@@ -304,7 +306,6 @@ public class PlannerFactory {
      * -h          print this message
      *
      * </pre>
-     * </p>
      *
      * @param args the arguments of the command line.
      */

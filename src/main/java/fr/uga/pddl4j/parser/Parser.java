@@ -78,8 +78,6 @@ import java.util.Set;
  *    }
  * }
  * </pre>
- * <p>
- * </p>
  *
  * @author D Pellier
  * @version 1.0 - 28.01.10
@@ -1172,9 +1170,9 @@ public final class Parser {
      *
      * OPTIONS   DESCRIPTIONS
      *
-     * -p <str> path for operator and fact file </str>
-     * -o <str> operator file name </str>
-     * -f <str> fact file name </str>
+     * -p   path for operator and fact file
+     * -o   operator file name
+     * -f   fact file name
      * </pre>
      *
      * @param args the arguments of the command line.

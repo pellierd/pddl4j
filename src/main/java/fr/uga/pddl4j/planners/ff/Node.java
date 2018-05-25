@@ -90,6 +90,7 @@ public final class Node extends BitState {
      * @param parent    the parent node of the node.
      * @param operator  the operator applied to reached the node from its parent.
      * @param cost      the cost to reach the node from the root node.
+     * @param depth     the depth of the node.
      * @param heuristic the estimated distance to reach the goal from the node.
      */
     public Node(BitState state, Node parent, int operator, double cost, int depth, double heuristic) {
