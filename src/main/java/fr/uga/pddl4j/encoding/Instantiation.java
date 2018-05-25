@@ -309,7 +309,8 @@ final class Instantiation {
      * <li> phi v not phi eqv true </li>
      * <li> x = x eqv true </li>
      * <li> x = y eqv false </li>
-     *</ul>
+     * </ul>
+     *
      * @param exp the expression to simplify.
      */
     private static void simplify(final IntExp exp) {

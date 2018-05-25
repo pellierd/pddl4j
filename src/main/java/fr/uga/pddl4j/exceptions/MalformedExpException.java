@@ -24,9 +24,8 @@ import fr.uga.pddl4j.parser.Exp;
 /**
  * Thrown to indicate that a malformed expression has occurred.
  *
- * @see Exp
  * @author Damien Pellier
- *
+ * @see Exp
  */
 public class MalformedExpException extends RuntimeException {
 

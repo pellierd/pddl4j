@@ -243,7 +243,7 @@ public class Symbol implements Serializable {
      * indicates that the attribute was not initialized.
      *
      * @return the begin line of the file where this symbol appear or <code>-1</code> if it was
-     *     not initialized.
+     *          not initialized.
      */
     public final int getBeginLine() {
         return this.beginLine;
@@ -254,7 +254,7 @@ public class Symbol implements Serializable {
      * indicates that the attribute was not initialized.
      *
      * @return the begin column of the file where this symbol appear or <code>-1</code> if it was
-     *     not initialized.
+     *          not initialized.
      */
     public final int getBeginColumn() {
         return this.beginColumn;
@@ -265,7 +265,7 @@ public class Symbol implements Serializable {
      * indicates that the attribute was not initialized.
      *
      * @return the end line of the file where this symbol appear or <code>-1</code> if it was
-     *     not initialized.
+     *          not initialized.
      */
     public final int getEndLine() {
         return this.endLine;
@@ -276,7 +276,7 @@ public class Symbol implements Serializable {
      * indicates that the attribute was not initialized.
      *
      * @return the end column of the file where this symbol appear or <code>-1</code> if it was
-     *     not initialized.
+     *          not initialized.
      */
     public final int getEndColumn() {
         return this.endColumn;
@@ -331,7 +331,7 @@ public class Symbol implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this symbol is equal to <tt>object</tt>, i.e., <tt>other</tt>
-     *     is not null and of kind <tt>Symbol</tt> and it has the same image; otherwise return <tt>false</tt>.
+     *          is not null and of kind <tt>Symbol</tt> and it has the same image; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

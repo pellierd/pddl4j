@@ -87,7 +87,7 @@ public class Message implements Serializable, Comparable<Message> {
      * @param file    the file concerned by this message.
      * @param content the content of the message.
      */
-    public Message(final Type type, final int line, final int column, final File file, final String content)  {
+    public Message(final Type type, final int line, final int column, final File file, final String content) {
         if (type == null || file == null) {
             throw new NullPointerException();
         }
@@ -112,7 +112,7 @@ public class Message implements Serializable, Comparable<Message> {
      *
      * @param type the type of message to set.
      */
-    public final void setType(final Type type)  {
+    public final void setType(final Type type) {
         if (type == null) {
             throw new NullPointerException();
         }
@@ -237,8 +237,8 @@ public class Message implements Serializable, Comparable<Message> {
      *
      * @param other the other message.
      * @return a negative number if this message comes before the other message, 0 is the message
-     *     are equals or a positive number if this message comes after the other one according
-     *     to the defined order.
+     *          are equals or a positive number if this message comes after the other one according
+     *          to the defined order.
      * @see java.lang.Comparable#compareTo(Object)
      */
     @Override

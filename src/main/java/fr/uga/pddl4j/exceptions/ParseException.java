@@ -8,6 +8,7 @@ public class ParseException extends Exception {
 
     /**
      * Default constructor with only string message.
+     *
      * @param message the error description
      */
     public ParseException(String message) {
@@ -16,8 +17,9 @@ public class ParseException extends Exception {
 
     /**
      * Default constructor with string message and the Java Throwable cause.
+     *
      * @param message the error description
-     * @param cause the cause this trigger the exception
+     * @param cause   the cause this trigger the exception
      */
     public ParseException(String message, Throwable cause) {
         super(message, cause);

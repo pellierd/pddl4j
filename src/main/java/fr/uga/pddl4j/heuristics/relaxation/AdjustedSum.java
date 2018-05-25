@@ -113,7 +113,7 @@ public final class AdjustedSum extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal)  {
+    public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         final int level = super.expandRelaxedPlanningGraph(state);
         return super.isGoalReachable() ? super.getSumValue() + (level - super.getMaxValue()) : Integer.MAX_VALUE;

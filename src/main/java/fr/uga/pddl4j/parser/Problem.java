@@ -137,7 +137,7 @@ public class Problem implements Serializable {
      *
      * @param domain the domain to set.
      */
-    public final void setDomain(final Symbol domain)  {
+    public final void setDomain(final Symbol domain) {
         if (domain == null) {
             throw new NullPointerException();
         }

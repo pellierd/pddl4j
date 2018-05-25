@@ -8,6 +8,7 @@ public class FatalException extends RuntimeException {
 
     /**
      * Default constructor with only string message.
+     *
      * @param message the error description
      */
     public FatalException(String message) {
@@ -16,8 +17,9 @@ public class FatalException extends RuntimeException {
 
     /**
      * Default constructor with string message and the Java Throwable cause.
+     *
      * @param message the error description
-     * @param cause the cause this trigger the exception
+     * @param cause   the cause this trigger the exception
      */
     public FatalException(String message, Throwable cause) {
         super(message, cause);

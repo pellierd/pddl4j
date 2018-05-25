@@ -20,7 +20,6 @@ package fr.uga.pddl4j.util;
  *
  * @author D. Pellier
  * @version 1.0 - 14.03.2016
- *
  * @since 3.0
  */
 public abstract class AbstractPlan implements Plan {

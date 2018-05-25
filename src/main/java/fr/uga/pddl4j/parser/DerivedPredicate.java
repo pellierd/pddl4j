@@ -134,8 +134,8 @@ public class DerivedPredicate implements Serializable {
      *
      * @param obj the other object.
      * @return <code>true</code> if <code>obj</code> is not <code>null</code>, is an instance
-     *     of the class <code>DerivedPredicate</code> and has the same head and body;
-     *     otherwise it returns <code>false</code>.
+     *          of the class <code>DerivedPredicate</code> and has the same head and body;
+     *          otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

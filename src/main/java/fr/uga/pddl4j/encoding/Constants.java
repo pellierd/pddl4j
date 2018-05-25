@@ -55,7 +55,8 @@ public final class Constants {
     /**
      * default private constructor to prevent form class instantiation.
      */
-    private Constants() {}
+    private Constants() {
+    }
 
 
 }

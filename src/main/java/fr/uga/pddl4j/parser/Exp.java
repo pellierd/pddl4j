@@ -317,7 +317,7 @@ public class Exp implements Serializable {
      * already renamed. The variable renames have the form ?X1, ..., ?Xn.
      *
      * @param context the images of the renamed variable.
-     * @exception MalformedExpException if this expression is malformed.
+     * @throws MalformedExpException if this expression is malformed.
      * @see Exp#isMalformedExpression()
      */
     public void renameVariables(final Map<String, String> context) {
@@ -548,8 +548,8 @@ public class Exp implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
-     *     not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     *     atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
+     *          not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
+     *          atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -558,14 +558,14 @@ public class Exp implements Serializable {
             Exp other = (Exp) object;
             return this.connective.equals(other.connective)
                 && ((this.atom == null && other.atom == null)
-                    || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
+                || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
                 && this.children.equals(other.children)
                 && ((this.prefName == null && other.prefName == null)
-                    || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
+                || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
                 && ((this.variables == null && other.variables == null)
-                    || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
+                || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
                 && ((this.value == null && other.value == null)
-                    || (this.value != null && other.value != null && this.value.equals(other.value)));
+                || (this.value != null && other.value != null && this.value.equals(other.value)));
         }
         return false;
     }
@@ -599,7 +599,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to test.
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
-     *     this expression; <code>false</code> otherwise.
+     *          this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Exp exp) {
         for (Exp s : this.getChildren()) {
@@ -616,7 +616,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to remove.
      * @return <code>true</code> if the specified expression <code>exp</code> was removed;
-     * <code>false</code> otherwise.
+     *          <code>false</code> otherwise.
      */
     public final boolean remove(final Exp exp) {
         boolean removed = false;
@@ -650,7 +650,7 @@ public class Exp implements Serializable {
      *
      * @param baseOffset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
-     * @exception MalformedExpException if the expression is malformed.
+     * @throws MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression
      */
     private String toString(String baseOffset) {
@@ -681,7 +681,7 @@ public class Exp implements Serializable {
                 break;
             case AND:
             case OR:
-                String offset =  baseOffset + "  ";
+                String offset = baseOffset + "  ";
                 str.append("(").append(this.getConnective().getImage());
                 if (!this.children.isEmpty()) {
                     str.append(" ");

@@ -71,7 +71,7 @@ final class StringEncoder {
         str.append("Preconditions:\n").append(toString(op.getPreconditions(), constants, types, predicates, functions))
             .append("\n")
             .append("Effects:\n")
-            .append(toString(op.getEffects(),constants, types, predicates, functions))
+            .append(toString(op.getEffects(), constants, types, predicates, functions))
             .append("\n");
         return str.toString();
     }
@@ -115,7 +115,7 @@ final class StringEncoder {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param baseOffset     the offset white space from the left used for indentation.
+     * @param baseOffset the offset white space from the left used for indentation.
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.
      */
@@ -338,9 +338,9 @@ final class StringEncoder {
                            final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringEncoder.toString(exp.getEffects(),constants, types, predicates, functions, relevants));
+            str.append(StringEncoder.toString(exp.getEffects(), constants, types, predicates, functions, relevants));
         } else {
-            str.append("(when ").append(StringEncoder.toString(exp.getCondition(),constants, types, predicates,
+            str.append("(when ").append(StringEncoder.toString(exp.getCondition(), constants, types, predicates,
                 functions, relevants)).append("\n").append(StringEncoder.toString(exp.getEffects(), constants, types,
                 predicates, functions, relevants)).append(")");
         }

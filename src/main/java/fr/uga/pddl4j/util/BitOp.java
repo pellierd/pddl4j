@@ -76,10 +76,10 @@ public class BitOp extends AbstractCodedOp {
     /**
      * Creates a new operator.
      *
-     * @param name the name of the operator.
-     * @param arity the arity of the operator.
+     * @param name          the name of the operator.
+     * @param arity         the arity of the operator.
      * @param preconditions the precondition of the operator.
-     * @param effects the effects of the operator.
+     * @param effects       the effects of the operator.
      */
     public BitOp(final String name, final int arity, final BitExp preconditions, final BitExp effects) {
         this(name, arity);

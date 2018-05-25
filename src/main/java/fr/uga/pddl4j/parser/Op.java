@@ -90,7 +90,7 @@ public class Op implements Serializable {
      *
      * @param other the other operator.
      */
-    public Op(final Op other)  {
+    public Op(final Op other) {
         if (other == null) {
             throw new NullPointerException();
         }
@@ -176,7 +176,7 @@ public class Op implements Serializable {
      *
      * @param symbol The symbol.
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
-     *     operator has no such parameter.
+     *          operator has no such parameter.
      */
     public final TypedSymbol getParameter(final Symbol symbol) {
         final int index = this.parameters.indexOf(symbol);
@@ -324,7 +324,7 @@ public class Op implements Serializable {
      *
      * @param object the other object.
      * @return <code>true</code> if <code>object</code> is not <code>null</code>, is an instance of
-     *     the class <code>Op</code>, and has the same name; otherwise it returns <code>false</code>.
+     *          the class <code>Op</code>, and has the same name; otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

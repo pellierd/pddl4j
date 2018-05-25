@@ -23,13 +23,9 @@ import static fr.uga.pddl4j.parser.Message.Type.LEXICAL_ERROR;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.test.Tools;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * Implements the <tt>ParserLexicalErrorTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.

@@ -33,7 +33,8 @@ public final class HeuristicToolKit {
     /**
      * Private constructor just for prevent user to instantiate this class.
      */
-    private HeuristicToolKit(){}
+    private HeuristicToolKit() {
+    }
 
     /**
      * Create an heuristic of a specified type.

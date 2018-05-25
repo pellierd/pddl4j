@@ -371,6 +371,7 @@ final class PreInstantiation {
 
     /**
      * .
+     *
      * @return the list of simplified operators.
      */
     static List<IntOp> simplifyOperatorsWithInferedTypes(final List<IntOp> operators) {

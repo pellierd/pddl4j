@@ -82,10 +82,10 @@ public abstract class AbstractCodedOp implements CodedOp {
     /**
      * Creates a new operator with a default cost and duration set to 1.0.
      *
-     * @param name  the name of the operator.
-     * @param arity the arity of the operator.
+     * @param name     the name of the operator.
+     * @param arity    the arity of the operator.
      * @param duration the duration ot the operator.
-     * @param cost the cost of the operator.
+     * @param cost     the cost of the operator.
      * @throws NullPointerException if <code>name == null</code>.
      */
     protected AbstractCodedOp(final String name, final int arity, final double duration, final double cost) {
@@ -175,7 +175,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter.
      * @param type  the type to set.
-     * @throws IllegalArgumentException       if type &#60; 0.
+     * @throws IllegalArgumentException if type &#60; 0.
      */
     @Override
     public final void setTypeOfParameter(final int index, final int type) {
@@ -208,7 +208,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      *
      * @param index the index of the parameter to instantiate.
      * @param value the value of instantiation.
-     * @throws IllegalArgumentException       if value &#60; 0.
+     * @throws IllegalArgumentException if value &#60; 0.
      */
     @Override
     public final void setValueOfParameter(final int index, final int value) {

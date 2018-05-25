@@ -108,7 +108,8 @@ public class CodedProblem {
     /**
      * The default constructor with a private package access to prevent instance creation.
      */
-    CodedProblem() {}
+    CodedProblem() {
+    }
 
     /**
      * Create a new <code>CodedProblem</code> copy of another.
@@ -179,6 +180,7 @@ public class CodedProblem {
 
     /**
      * .
+     *
      * @param inferredDomains the inferredDomains to set
      */
     final void setInferredDomains(final List<Set<Integer>> inferredDomains) {

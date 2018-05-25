@@ -144,7 +144,7 @@ public class MemoryAgent {
      *
      * @param object the object to size
      * @return an implementation-specific approximation of the amount of storage consumed by the
-     *     specified object in bytes.
+     *          specified object in bytes.
      * @see java.lang.instrument.Instrumentation#getObjectSize(Object)
      */
     public static long sizeOf(Object object) {
@@ -163,7 +163,7 @@ public class MemoryAgent {
      *
      * @param object the object to size.
      * @return an implementation-specific approximation of the amount of storage consumed by
-     *     objectToSize and by all the objects reachable from it
+     *          objectToSize and by all the objects reachable from it
      */
     public static long deepSizeOf(Object object) {
         final Map<Object, Object> doneObj = new IdentityHashMap<>();

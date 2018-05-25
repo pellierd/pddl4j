@@ -337,7 +337,7 @@ final class IntEncoding {
     /**
      * Encode an operator into its integer representation.
      *
-     * @param op      the operator to encode.
+     * @param op the operator to encode.
      * @return encoded operator.
      */
     private static IntOp encodeOperator(final Op op) {
@@ -363,7 +363,7 @@ final class IntEncoding {
     /**
      * Encodes an specified expression into its integer representation.
      *
-     * @param exp     the expression to encode.
+     * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
     private static IntExp encodeExp(final Exp exp) {

@@ -78,7 +78,7 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal)  {
+    public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         // First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
         super.expandRelaxedPlanningGraph(state);

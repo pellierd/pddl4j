@@ -55,7 +55,7 @@ public class BitExp implements Serializable {
      *
      * @param other the other one.
      */
-    public BitExp(final BitExp other)  {
+    public BitExp(final BitExp other) {
         this();
         if (other == null) {
             throw new NullPointerException("other == null");

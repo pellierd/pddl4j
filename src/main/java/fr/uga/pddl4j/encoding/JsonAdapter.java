@@ -24,7 +24,6 @@ import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 import fr.uga.pddl4j.util.Plan;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -170,8 +169,8 @@ public class JsonAdapter {
                 actionJson.put("Condition_Expressions", condExpJsonArray);
                 planJson.put("Action " + i, actionJson);
                 planJson.put("Type_de_plan", 1);
-                planJson.put("Size",plan.size());
-                planJson.put("Makespan",plan.makespan());
+                planJson.put("Size", plan.size());
+                planJson.put("Makespan", plan.makespan());
                 planJson.put("Cost", plan.cost());
                 planJson.put("timeSpecifiers", plan.timeSpecifiers());
 
@@ -197,12 +196,12 @@ public class JsonAdapter {
     /**
      * Convert a BitExp into a String collection.
      *
-     * @param exp the BitExp instance to convert.
-     * @param constants the constants of the problem.
-     * @param types the types of the problem.
+     * @param exp        the BitExp instance to convert.
+     * @param constants  the constants of the problem.
+     * @param types      the types of the problem.
      * @param predicates the predicates of the problem.
-     * @param functions the functions of the problem.
-     * @param relevants the facts of the problem.
+     * @param functions  the functions of the problem.
+     * @param relevants  the facts of the problem.
      * @return an 2D collection of Strings.
      */
     private static ArrayList<ArrayList<String>> toJsonString(final BitExp exp,

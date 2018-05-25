@@ -154,8 +154,8 @@ public class PlannerFactory {
     /**
      * This method parse the command line and return the arguments.
      *
-     * @param args the arguments from the command line.
-     * @param log  the logger to display informations.
+     * @param args             the arguments from the command line.
+     * @param log              the logger to display informations.
      * @param defaultArguments the default arguments to use.
      * @return The arguments of the planner.
      * @throws FileException if files not found

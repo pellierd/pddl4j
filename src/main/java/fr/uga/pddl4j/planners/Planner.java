@@ -161,11 +161,11 @@ public interface Planner {
     /**
      * Setup the planner caracteristics.
      *
-     * @param heuristic the heuristicType to use to solve the planning problem.
-     * @param timeout the time out of the planner.
-     * @param weight the weight set to the heuristic.
+     * @param heuristic      the heuristicType to use to solve the planning problem.
+     * @param timeout        the time out of the planner.
+     * @param weight         the weight set to the heuristic.
      * @param statisticState the statistics generation value.
-     * @param traceLevel the trace level of the planner.
+     * @param traceLevel     the trace level of the planner.
      */
     void setupPlanner(Heuristic.Type heuristic, int timeout,
                       double weight, boolean statisticState, int traceLevel);

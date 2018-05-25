@@ -1,8 +1,6 @@
 package fr.uga.pddl4j.test.util;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
@@ -11,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -108,7 +104,6 @@ public class PlanTest {
         planner.setTraceLevel(TRACE_LEVEL);
         planner.setSaveState(STATISTICS);
     }
-
 
 
     /**

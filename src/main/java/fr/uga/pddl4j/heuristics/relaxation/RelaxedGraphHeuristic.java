@@ -585,7 +585,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
      * others.
      *
      * @param resolvers the list of resolver of p.
-     * @param lev         the level.
+     * @param lev       the level.
      * @return the easier resolver for the proposition <code>p</code> at level <code>lev</code> or
      * <code>null</code> if a NOOP operator is available.
      */

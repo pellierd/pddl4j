@@ -67,7 +67,7 @@ final class IntMatrix implements Serializable {
      *
      * @param index the index.
      * @return the integer contained in the matrix at the specified index or null if no element is
-     *     at the specified index.
+     *          at the specified index.
      * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
      *                                        index[i] < size does not hold.
      */
@@ -145,7 +145,7 @@ final class IntMatrix implements Serializable {
         // conversion E(i * t^r)
         int acces = 0;
         for (int i = index.length; i > 0; i--) {
-            acces += index[i - 1] * (int) Math.pow(size, (double)dimension - i);
+            acces += index[i - 1] * (int) Math.pow(size, (double) dimension - i);
         }
         return acces;
     }
