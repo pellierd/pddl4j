@@ -404,10 +404,12 @@ public class PlannerFactory {
                 timeToEncodeInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToEncode());
                 timeToSearchInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
                 totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
-                memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
-                memoryForProblemInMBytes =
-                    Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
-                totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
+                if (isMemoryAgent()) {
+                    memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics().getMemoryUsedToSearch());
+                    memoryForProblemInMBytes =
+                        Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
+                    totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
+                }
             }
 
 
