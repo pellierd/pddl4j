@@ -8,8 +8,10 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
@@ -187,4 +189,15 @@ public abstract class Tools {
         return i;
     }
 
+    /**
+     * Read the content of a file.
+     *
+     * @param path     the path to the file
+     * @param encoding encoding of the file
+     * @return the content of the file encoded
+     */
+    public static String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
 }

@@ -284,6 +284,61 @@ public final class Parser {
     }
 
     /**
+     * Parses a planning domain and a planning problem from their respective string description.
+     *
+     * @param domainString  the string that contains the planning domains.
+     * @param problemString the string that contains the planning problem.
+     */
+    public void parseFromString(String domainString, String problemString) {
+        try {
+            // Create temp files for domain and problem
+            File domainTempFile = File.createTempFile("domain", ".pddl");
+            File problemTempFile = File.createTempFile("problem", ".pddl");
+
+            // Fill files with string content
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(domainTempFile), "UTF-8"))) {
+                writer.write(domainString);
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(problemTempFile), "UTF-8"))) {
+                writer.write(problemString);
+            }
+
+            // Parse and check the domain
+            parseDomain(domainTempFile);
+            // Parse and check the problem
+            parseProblem(problemTempFile);
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from their respective string description.
+     *
+     * @param domainAndProblemString the string that contains the domain and planning problem.
+     */
+    public void parseFromString(String domainAndProblemString) {
+        try {
+            // Create temp files for domain and problem
+            File domainAndProblemTempFile = File.createTempFile("domainAndProblemString", ".pddl");
+
+            // Fill files with string content
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(domainAndProblemTempFile), "UTF-8"))) {
+                writer.write(domainAndProblemString);
+            }
+
+            // Parse and check the domain and problem
+            parse(domainAndProblemTempFile);
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
      * Parses a planning domain and a planning problem from a file path.
      *
      * @param domainAndProblem the path of the file that contains the planning domain an problem.
@@ -334,38 +389,6 @@ public final class Parser {
             // Parse and check the problem
             parseProblem(problem);
         } catch (RuntimeException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-        }
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from their respective string description.
-     *
-     * @param domainString  the string that contains the planning domains.
-     * @param problemString the string that contains the planning problem.
-     */
-    public void parseFromString(String domainString, String problemString) {
-        try {
-            // Create temp files for domain and problem
-            File domainTempFile = File.createTempFile("domain", ".pddl");
-            File problemTempFile = File.createTempFile("problem", ".pddl");
-
-            // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(domainTempFile), "UTF-8"))) {
-                writer.write(domainString);
-            }
-
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(problemTempFile), "UTF-8"))) {
-                writer.write(problemString);
-            }
-
-            // Parse and check the domain
-            parseDomain(domainTempFile);
-            // Parse and check the problem
-            parseProblem(problemTempFile);
-        } catch (RuntimeException | IOException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
