@@ -920,7 +920,7 @@ public class FFTest {
                         currentProblem.length() - Tools.PDDL_EXT.length()) + Tools.PLAN_EXT))) {
                         bw.write(pb.toString(plan));
                     }
-                    System.out.println("\nSolution found for " + currentProblem);
+                    System.out.println("Solution found for " + currentProblem);
                 }
 
             } catch (IOException ioEx) {

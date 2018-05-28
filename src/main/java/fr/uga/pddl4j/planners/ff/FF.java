@@ -21,36 +21,25 @@ package fr.uga.pddl4j.planners.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.PlannerFactory;
-import fr.uga.pddl4j.planners.hc.EHC;
+import fr.uga.pddl4j.planners.search.strategy.EnforcedHillClimbing;
+import fr.uga.pddl4j.planners.search.strategy.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.search.strategy.Node;
 import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm and
- * Gready Best First Search.
+ * Greedy Best First Search.
  *
  * @author Samuel Aaron Boyd
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
 public final class FF extends AbstractPlanner {
-
-    /**
-     * The time needed to search a solution plan.
-     */
-    private long searchingTime;
 
     /**
      * Creates a new planner.
@@ -80,23 +69,19 @@ public final class FF extends AbstractPlanner {
     public SequentialPlan search(final CodedProblem pb) {
         final Logger logger = AbstractPlanner.getLogger();
         Objects.requireNonNull(pb);
-        searchingTime = 0;
 
-        final EHC ehc = new EHC(this.getHeuristicType(), this.getWeight(),
-            this.getTimeout(), this.isSaveState());
+        logger.trace("* starting enforced hill climbing\n");
+        Node solutionNode = EnforcedHillClimbing.searchSolutionNode(this, pb);
 
-        SequentialPlan solutionPlan = ehc.search(pb);
-
-        if (solutionPlan != null) {
-            logger.trace("\nstarting enforced hill climbing");
-            return solutionPlan;
+        if (solutionNode != null) {
+            return extract(solutionNode, pb);
         } else {
-            logger.trace("\nenforced hill climbing failed\n");
-            logger.trace("starting greedy best first search\n");
-            final Node solutionNode = this.greedyBestFirstSearch(pb);
+            logger.trace("* enforced hill climbing failed\n");
+            logger.trace("* starting greedy best first search\n");
+            solutionNode = GreedyBestFirstSearch.searchSolutionNode(this, pb);
 
             if (solutionNode == null) {
-                logger.trace("\ngreedy best first search failed\n");
+                logger.trace("* greedy best first search failed\n");
                 return null;
             } else {
                 return extract(solutionNode, pb);
@@ -120,94 +105,5 @@ public final class FF extends AbstractPlanner {
             n = n.getParent();
         }
         return plan;
-    }
-
-    /**
-     * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found.
-     * This method must be completed.
-     *
-     * @param problem the coded planning problem to solve.
-     * @return a solution plan or null if it does not exist.
-     */
-    private Node greedyBestFirstSearch(final CodedProblem problem) {
-        final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        final Set<Node> closeSet = new HashSet<>();
-        final Set<Node> openSet = new HashSet<>();
-        final int timeout = this.getTimeout();
-        Node solution = null;
-
-        BitState init = new BitState(problem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        root.setDepth(0);
-        openSet.add(root);
-
-        while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
-            // Pop the first node in the pending list open
-            final Node current = this.popPriorityNode(openSet);
-
-            if (current.satisfy(problem.getGoal())) {
-                solution = current;
-            } else {
-                closeSet.add(current);
-                int index = 0;
-                for (BitOp op : problem.getOperators()) {
-
-                    // Test if a specified operator is applicable in the current state
-                    if (op.isApplicable(current)) {
-                        final BitState nextState = new BitState(current);
-                        nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                        nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
-
-                        // Apply the effect of the applicable operator
-                        final Node successor = new Node(nextState);
-                        successor.setCost(current.getCost() + op.getCost());
-                        successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
-                        successor.setParent(current);
-                        successor.setOperator(index);
-                        successor.setDepth(current.getDepth() + 1);
-                        openSet.add(successor);
-                    }
-                    index++;
-                }
-            }
-            // Take time to compute the searching time
-            long end = System.currentTimeMillis();
-            searchingTime = end - begin;
-        }
-
-        if (isSaveState()) {
-            // Compute the searching time
-            this.getStatistics().setTimeToSearch(searchingTime);
-            if (PlannerFactory.isMemoryAgent()) {
-                // Compute the memory used by the search
-                this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                    + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
-            }
-        }
-
-        return solution;
-    }
-
-    /**
-     * Get a node from a list of nodes.
-     *
-     * @param states the list of nodes (successors).
-     * @return the node from the list.
-     */
-    private Node popPriorityNode(Collection<Node> states) {
-        Node state = null;
-        if (!states.isEmpty()) {
-            final Iterator<Node> i = states.iterator();
-            state = i.next();
-            while (i.hasNext()) {
-                final Node next = i.next();
-                if (next.getHeuristic() < state.getHeuristic()) {
-                    state = next;
-                }
-            }
-            states.remove(state);
-        }
-        return state;
     }
 }

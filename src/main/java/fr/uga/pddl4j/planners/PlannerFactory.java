@@ -5,7 +5,6 @@ import fr.uga.pddl4j.exceptions.FileException;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ff.FF;
-import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.planners.hsp.HSP;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
@@ -89,8 +88,8 @@ public class PlannerFactory {
                 planner = new FF();
                 break;
 
-            case EHC:
-                planner = new EHC();
+            default:
+                PlannerFactory.printUsage();
                 break;
         }
         return planner;
@@ -112,7 +111,6 @@ public class PlannerFactory {
             .append("-p <num>    specifies the planner to used (preset: 0)\n")
             .append("     0      HSP planner\n")
             .append("     1      FF planner\n")
-            .append("     2      EHC planner\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
             .append("     0      ff heuristic\n")
             .append("     1      sum heuristic\n")
@@ -172,8 +170,6 @@ public class PlannerFactory {
                         arguments.put(AbstractPlanner.Argument.PLANNER, Planner.Name.HSP);
                     } else if (planner == 1) {
                         arguments.put(AbstractPlanner.Argument.PLANNER, Planner.Name.FF);
-                    } else if (planner == 2) {
-                        arguments.put(AbstractPlanner.Argument.PLANNER, Planner.Name.EHC);
                     } else {
                         throw (new RuntimeException("Wrong planner argument"));
                     }
@@ -269,7 +265,6 @@ public class PlannerFactory {
      * -u <i>num</i>   specifies the planner to used (preset: 0)
      *      0      HSP planner
      *      1      FF planner
-     *      2      EHC planner
      * -u <i>num</i>   specifies the heuristic to used (preset: 0)
      *      0      ff heuristic
      *      1      sum heuristic

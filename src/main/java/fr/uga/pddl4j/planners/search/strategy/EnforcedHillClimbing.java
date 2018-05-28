@@ -17,16 +17,14 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.hc;
+package fr.uga.pddl4j.planners.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.ff.Node;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.SequentialPlan;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -38,108 +36,44 @@ import java.util.Objects;
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
-public final class EHC extends AbstractPlanner {
+public class EnforcedHillClimbing {
 
     /**
-     * The time needed to search a solution plan.
+     * The time needed to search a solution node.
      */
-    private long searchingTime;
-
-    /**
-     * Creates a new planner.
-     */
-    public EHC() {
-        super();
-    }
-
-    /**
-     * Setup planner.
-     */
-    public void setupPlanner(Heuristic.Type heuristic, int timeout,
-                             double weight, boolean statisticState, int traceLevel) {
-        this.setHeuristicType(heuristic);
-        this.setTimeOut(timeout);
-        this.setWeight(weight);
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
-    }
+    private static long searchingTime;
 
     /**
      * Creates a new planner.
-     *
-     * @param heuristicType the heuristic used to search a solution.
-     * @param weight        the weight set to the heuristic.
-     * @param timeOut       the time needed to search a solution plan.
-     * @param saveState     if statistics are computed or not.
      */
-    public EHC(Heuristic.Type heuristicType, double weight, int timeOut, boolean saveState) {
-        this.setHeuristicType(heuristicType);
-        this.setWeight(weight);
-        this.setTimeOut(timeOut);
-        this.setSaveState(saveState);
-    }
-
-    /**
-     * Search a solution plan to a specified domain and problem.
-     *
-     * @param pb the problem to solve.
-     */
-    @Override
-    public SequentialPlan search(final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        searchingTime = 0;
-
-        final Node solutionNode = searchSolutionNode(pb);
-
-        if (solutionNode != null) {
-            return extract(solutionNode, pb);
-        } else {
-            return null;
-        }
+    private EnforcedHillClimbing() {
     }
 
     /**
      * Search a solution node to a specified domain and problem.
      *
-     * @param pb the problem to solve.
+     * @param planner the planner used to solve the problem
+     * @param pb      the problem to solve.
      * @return the solution node.
      */
-    public Node searchSolutionNode(final CodedProblem pb) {
+    public static Node searchSolutionNode(final Planner planner, final CodedProblem pb) {
         Objects.requireNonNull(pb);
         searchingTime = 0;
-        return this.enforcedHillClimbing(pb);
-    }
-
-
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node    the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        Node n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getParent() != null) {
-            final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.add(0, op);
-            n = n.getParent();
-        }
-        return plan;
+        return EnforcedHillClimbing.enforcedHillClimbing(planner, pb);
     }
 
     /**
      * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
      *
+     * @param planner the planner used to solve the problem
      * @param problem the coded problem to solve.
      * @return the solution node or null.
      */
-    private Node enforcedHillClimbing(CodedProblem problem) {
+    private static Node enforcedHillClimbing(final Planner planner, final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final int timeout = this.getTimeout();
+        final int timeout = planner.getTimeout();
 
         BitState init = new BitState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
@@ -152,7 +86,7 @@ public final class EHC extends AbstractPlanner {
 
         while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
             final Node currentState = openList.pop();
-            final LinkedList<Node> successors = this.getSuccessors(currentState, problem, heuristic);
+            final LinkedList<Node> successors = EnforcedHillClimbing.getSuccessors(currentState, problem, heuristic);
             deadEndFree = !successors.isEmpty();
 
             while (!successors.isEmpty() && solution == null) {
@@ -174,9 +108,9 @@ public final class EHC extends AbstractPlanner {
             searchingTime = end - begin;
         }
 
-        if (isSaveState()) {
+        if (planner.isSaveState()) {
             // Compute the searching time
-            this.getStatistics().setTimeToSearch(searchingTime);
+            planner.getStatistics().setTimeToSearch(searchingTime);
         }
 
         return solution;
@@ -190,7 +124,7 @@ public final class EHC extends AbstractPlanner {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
+    private static LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

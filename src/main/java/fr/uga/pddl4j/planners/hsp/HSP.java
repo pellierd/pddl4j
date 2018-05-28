@@ -21,18 +21,14 @@ package fr.uga.pddl4j.planners.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.PlannerFactory;
+import fr.uga.pddl4j.planners.search.strategy.AStar;
+import fr.uga.pddl4j.planners.search.strategy.Node;
 import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SequentialPlan;
+import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.PriorityQueue;
 
 /**
  * This class implements a simple forward planner based on A* algorithm.
@@ -69,95 +65,17 @@ public final class HSP extends AbstractPlanner {
      */
     @Override
     public SequentialPlan search(final CodedProblem problem) {
+        final Logger logger = AbstractPlanner.getLogger();
         Objects.requireNonNull(problem);
-        final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
-        // Get the initial state from the planning problem
-        final BitState init = new BitState(problem.getInit());
-        // Initialize the closed list of nodes (store the nodes explored)
-        final Map<BitState, Node> closeSet = new HashMap<>();
-        final Map<BitState, Node> openSet = new HashMap<>();
-        // Initialize the opened list (store the pending node)
-        final double currWeight = this.getWeight();
-        // The list stores the node ordered according to the A* (getFValue = g + h) function
-        final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(currWeight));
-        // Creates the root node of the tree search
-        final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
-        // Adds the root to the list of pending nodes
-        open.add(root);
-        openSet.put(init, root);
-        SequentialPlan plan = null;
 
-        final int timeout = this.getTimeout();
-        long time = 0;
-        // Start of the search
-        while (!open.isEmpty() && plan == null && time < timeout) {
-            // Pop the first node in the pending list open
-            final Node current = open.poll();
-            openSet.remove(current);
-            closeSet.put(current, current);
-            // If the goal is satisfy in the current node then extract the search and return it
-            if (current.satisfy(problem.getGoal())) {
-                plan = this.extract(current, problem);
-            } else {
-                // Try to apply the operators of the problem to this node
-                int index = 0;
-                for (BitOp op : problem.getOperators()) {
-                    // Test if a specified operator is applicable in the current state
-                    if (op.isApplicable(current)) {
-                        Node state = new Node(current);
-                        // Apply the effect of the applicable operator
-                        // Test if the condition of the effect is satisfied in the current state
-                        // Apply the effect to the successor node
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
-                            // Apply the effect to the successor node
-                            state.apply(ce.getEffects())
-                        );
-                        final int g = current.getCost() + 1;
-                        Node result = openSet.get(state);
-                        if (result == null) {
-                            result = closeSet.get(state);
-                            if (result != null) {
-                                if (g < result.getCost()) {
-                                    result.setCost(g);
-                                    result.setParent(current);
-                                    result.setOperator(index);
-                                    open.add(result);
-                                    openSet.put(result, result);
-                                    closeSet.remove(result);
-                                }
-                            } else {
-                                state.setCost(g);
-                                state.setParent(current);
-                                state.setOperator(index);
-                                state.setHeuristic(heuristic.estimate(state, problem.getGoal()));
-                                open.add(state);
-                                openSet.put(state, state);
-                            }
-                        } else if (g < result.getCost()) {
-                            result.setCost(g);
-                            result.setParent(current);
-                            result.setOperator(index);
-                        }
+        logger.trace("* starting A*\n");
+        final Node solutionNode = AStar.searchSolutionNode(this, problem);
 
-                    }
-                    index++;
-                }
-            }
-            // Compute the searching time
-            time = System.currentTimeMillis() - begin;
+        if (solutionNode != null) {
+            return extract(solutionNode, problem);
+        } else {
+            return null;
         }
-
-        if (isSaveState()) {
-            this.getStatistics().setTimeToSearch(time);
-            if (PlannerFactory.isMemoryAgent()) {
-                // Compute the memory used by the search
-                this.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                    + MemoryAgent.deepSizeOf(openSet));
-            }
-        }
-        // return the search computed or null if no search was found
-        return plan;
     }
 
     /**

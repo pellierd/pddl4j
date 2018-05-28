@@ -1,4 +1,4 @@
-package fr.uga.pddl4j.planners.hsp;
+package fr.uga.pddl4j.planners.search.strategy;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -35,6 +35,6 @@ public class NodeComparator implements Comparator<Node>, Serializable {
      */
     @Override
     public int compare(final Node n1, final Node n2) {
-        return Double.compare(n1.getFValue(weight), n2.getFValue(weight));
+        return Double.compare(n1.getValueF(weight), n2.getValueF(weight));
     }
 }
