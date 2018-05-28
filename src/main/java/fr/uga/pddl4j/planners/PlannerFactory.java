@@ -355,7 +355,11 @@ public class PlannerFactory {
             if (saveStats) {
                 planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
                 if (isMemoryAgent()) {
-                    planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+                    try {
+                        planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
+                    } catch (IllegalStateException ilException) {
+                        logger.error(ilException);
+                    }
                 }
             }
             planner.getStatistics().setNumberOfActions(pb.getOperators().size());

@@ -3,6 +3,7 @@ package fr.uga.pddl4j.planners.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
+import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
@@ -125,8 +126,12 @@ public class AStar {
             planner.getStatistics().setTimeToSearch(time);
             if (PlannerFactory.isMemoryAgent()) {
                 // Compute the memory used by the search
-                planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                    + MemoryAgent.deepSizeOf(openSet));
+                try {
+                    planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                        + MemoryAgent.deepSizeOf(openSet));
+                } catch (IllegalStateException ilException) {
+                    AbstractPlanner.getLogger().error(ilException);
+                }
             }
         }
         // return the search computed or null if no search was found
