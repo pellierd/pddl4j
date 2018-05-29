@@ -21,6 +21,7 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
+import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -184,15 +185,15 @@ public final class Parser {
                 this.checkOperatorsDeclaration();
                 this.checkDerivedPredicatesDeclaration();
             } catch (NullPointerException exception) {
-                LOGGER.error("Domain file is not valid", exception);
+                LOGGER.error("Domain file is not valid\n");
                 this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
             } finally {
                 inputStream.close();
             }
         } catch (IOException | RuntimeException exception) {
             LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
-        } catch (ParseException pe) {
-            LOGGER.error("Parse error in domain() call", pe);
+        } catch (TokenMgrError | ParseException pe) {
+            LOGGER.error("Parse error in domain() call\n");
         }
     }
 
@@ -235,14 +236,14 @@ public final class Parser {
                 this.checkProblemConstraints();
                 this.checkMetric();
             } catch (NullPointerException exception) {
-                LOGGER.error("Problem file is not valid", exception);
+                LOGGER.error("Problem file is not valid\n");
             } finally {
                 inputStream.close();
             }
         } catch (IOException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-        } catch (ParseException pe) {
-            LOGGER.error("Parse error in problem() call", pe);
+        } catch (TokenMgrError | ParseException pe) {
+            LOGGER.error("Parse error in problem() call\n");
         }
     }
 
@@ -279,7 +280,7 @@ public final class Parser {
             this.checkFunctionsDeclaration();
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
-        } catch (ParseException | RuntimeException exception) {
+        } catch (TokenMgrError | ParseException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
