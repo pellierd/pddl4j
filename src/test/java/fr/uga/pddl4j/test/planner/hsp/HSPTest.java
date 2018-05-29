@@ -899,7 +899,8 @@ public class HSPTest {
                     pb = factory.encode();
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
-                        System.out.println("* Trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
+                        System.out.println("* Trying to solve [" + currentProblem + "]"
+                            + " in " + TIMEOUT + " seconds");
                         plan = planner.search(pb);
                     } else {
                         System.err.println("* Problem [" + currentProblem + "]" + " not solvable.");
