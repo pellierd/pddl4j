@@ -28,6 +28,7 @@ public class ParserTest {
     @Test
     public void parseFromFileTest() {
         try {
+            System.out.println("Parser: Test parsing from files.");
             final File domain = new File("src/test/resources/encoding/domain.pddl");
             final File problem = new File("src/test/resources/encoding/p01.pddl");
 
@@ -48,6 +49,7 @@ public class ParserTest {
     @Test
     public void parseFromStringFileTest() {
         try {
+            System.out.println("Parser: Test parsing from path files.");
             final String domain = "src/test/resources/encoding/domain.pddl";
             final String problem = "src/test/resources/encoding/p01.pddl";
 
@@ -68,6 +70,7 @@ public class ParserTest {
     @Test
     public void parseFromStringTest() {
         try {
+            System.out.println("Parser: Test parsing from string.");
             final String domain = Tools.readFile("src/test/resources/encoding/domain.pddl",
                 StandardCharsets.UTF_8);
             final String problem = Tools.readFile("src/test/resources/encoding/p01.pddl",
@@ -90,6 +93,7 @@ public class ParserTest {
     @Test
     public void parseFromSingleFileTest() {
         try {
+            System.out.println("Parser: Test parsing from one file.");
             final File domainAndProblem = new File("src/test/resources/encoding/domainAndProblem.pddl");
 
             final Parser parser = new Parser();
@@ -109,6 +113,7 @@ public class ParserTest {
     @Test
     public void parseFromStringSingleFileTest() {
         try {
+            System.out.println("Parser: Test parsing from one path file.");
             final String domainAndProblem = "src/test/resources/encoding/domainAndProblem.pddl";
 
             final Parser parser = new Parser();
@@ -128,6 +133,7 @@ public class ParserTest {
     @Test
     public void parseFromStringSingleTest() {
         try {
+            System.out.println("Parser: Test parsing from one string.");
             final String domainAndProblem = "src/test/resources/encoding/domainAndProblem.pddl";
             final String domainAndProblemString = Tools.readFile(domainAndProblem,
                 StandardCharsets.UTF_8);

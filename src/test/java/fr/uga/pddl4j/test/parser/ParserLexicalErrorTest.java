@@ -53,6 +53,8 @@ public class ParserLexicalErrorTest {
         final String errorToTest = "Bracket issue";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
 
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in domain file.");
+
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
@@ -72,6 +74,8 @@ public class ParserLexicalErrorTest {
         final String pathFileTest = "src/test/resources/parser/domain_lexical_error_1.pddl";
         final String errorToTest = "Keyword lexical issue";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
+
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in domain file.");
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
@@ -93,6 +97,8 @@ public class ParserLexicalErrorTest {
         final String errorToTest = "Bracket issue";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
 
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in problem file.");
+
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
@@ -112,6 +118,8 @@ public class ParserLexicalErrorTest {
         final String pathFileTest = "src/test/resources/parser/problem_lexical_error_1.pddl";
         final String errorToTest = "Keyword lexical issue";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in problem file.");
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();

@@ -74,6 +74,7 @@ public final class FF extends AbstractPlanner {
         Node solutionNode = EnforcedHillClimbing.searchSolutionNode(this, pb);
 
         if (solutionNode != null) {
+            logger.trace("* enforced hill climbing succeeded\n");
             return extract(solutionNode, pb);
         } else {
             logger.trace("* enforced hill climbing failed\n");
@@ -84,6 +85,7 @@ public final class FF extends AbstractPlanner {
                 logger.trace("* greedy best first search failed\n");
                 return null;
             } else {
+                logger.trace("* greedy best first search succeeded\n");
                 return extract(solutionNode, pb);
             }
         }

@@ -32,6 +32,8 @@ public class ParserParserErrorTest {
         final String errorToTest = "Undefined object type";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
 
+        System.out.println("ParserParserErrorTest: Test " + errorToTest + " in domain file.");
+
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
@@ -51,6 +53,8 @@ public class ParserParserErrorTest {
         final String pathFileTest = "src/test/resources/parser/domain_parser_error_1.pddl";
         final String errorToTest = "Undefined predicate";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
+
+        System.out.println("ParserParserErrorTest: Test " + errorToTest + " in domain file.");
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
@@ -72,6 +76,8 @@ public class ParserParserErrorTest {
         final String errorToTest = "Undefined object";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
 
+        System.out.println("ParserParserErrorTest: Test " + errorToTest + " in problem file.");
+
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
@@ -91,6 +97,8 @@ public class ParserParserErrorTest {
         final String pathFileTest = "src/test/resources/parser/problem_parser_error_1.pddl";
         final String errorToTest = "Undefined object";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        System.out.println("ParserParserErrorTest: Test " + errorToTest + " in problem file.");
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();

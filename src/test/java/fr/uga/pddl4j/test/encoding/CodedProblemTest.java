@@ -58,10 +58,11 @@ public class CodedProblemTest {
         + "(clear a)\n (ontable a)\n (clear c)\n (ontable c)\n)";
 
     /**
-     * Method that test the size of the operator list from a specified coded problem.
+     * Method that tests the size of the operator list from a specified coded problem.
      */
     @Test
     public void testCodedProblemOperatorsListSize() {
+        System.out.println("CodedProblem: Test the size of the operator list from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getOperators().size() == opList.size());
@@ -69,10 +70,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test each operator from a specified coded problem.
+     * Method that tests each operator from a specified coded problem.
      */
     @Test
     public void testCodedProblemOperatorsList() {
+        System.out.println("CodedProblem: Test each operator from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             final List<BitOp> opListCodedProblem = codedProblem.getOperators();
@@ -83,10 +85,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test the size of the fact list from a specified coded problem.
+     * Method that tests the size of the fact list from a specified coded problem.
      */
     @Test
     public void testCodedProblemRelevantFactsSize() {
+        System.out.println("CodedProblem: Test the size of the fact list from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getRelevantFacts().size() == factList.size());
@@ -94,10 +97,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test each fact from a specified coded problem.
+     * Method that tests each fact from a specified coded problem.
      */
     @Test
     public void testEncodedRelevantFacts() {
+        System.out.println("CodedProblem: Test each fact from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             final List<IntExp> factListCodedProblem = codedProblem.getRelevantFacts();
@@ -108,10 +112,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test the goal expression from a specified coded problem.
+     * Method that tests the goal expression from a specified coded problem.
      */
     @Test
     public void testEncodedGoal() {
+        System.out.println("CodedProblem: Test the goal expression from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getGoal()).equals(goal));
@@ -119,10 +124,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test the init expression from a specified coded problem.
+     * Method that tests the init expression from a specified coded problem.
      */
     @Test
     public void testEncodedInit() {
+        System.out.println("CodedProblem: Test the init expression from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getInit()).equals(init));

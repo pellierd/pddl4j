@@ -321,6 +321,7 @@ public class ParserBenchmarksTest {
             oneDomainPerProblem = true;
         }
 
+        System.out.println("ParserBenchmarksTest: Test parser on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {

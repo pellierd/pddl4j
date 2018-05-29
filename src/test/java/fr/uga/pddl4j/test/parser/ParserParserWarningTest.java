@@ -29,8 +29,10 @@ public class ParserParserWarningTest {
     @Test
     public void testDomainNameWarning() {
         final String pathFileTest = "src/test/resources/parser/problem_parser_warning.pddl";
-        final String errorToTest = "Domain name";
+        final String errorToTest = "Domain name warning";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        System.out.println("ParserParserWarningTest: Test " + errorToTest);
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();

@@ -72,8 +72,10 @@ public final class HSP extends AbstractPlanner {
         final Node solutionNode = AStar.searchSolutionNode(this, problem);
 
         if (solutionNode != null) {
+            logger.trace("* A* succeeded\n");
             return extract(solutionNode, problem);
         } else {
+            logger.trace("* A* failed\n");
             return null;
         }
     }

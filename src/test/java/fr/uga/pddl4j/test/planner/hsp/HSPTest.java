@@ -870,6 +870,7 @@ public class HSPTest {
             oneDomainPerProblem = true;
         }
 
+        System.out.println("HSPTest: Test HSP planner on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
@@ -894,14 +895,14 @@ public class HSPTest {
                 Plan plan = null;
                 try {
                     // Encodes and instantiates the problem in a compact representation
-                    System.out.println("Encoding [" + currentProblem + "]" + "...");
+                    System.out.println("* Encoding [" + currentProblem + "]" + "...");
                     pb = factory.encode();
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
-                        System.out.println("Trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
+                        System.out.println("* Trying to solve [" + currentProblem + "]" + " in " + TIMEOUT + " seconds");
                         plan = planner.search(pb);
                     } else {
-                        System.err.println("Problem [" + currentProblem + "]" + " not solvable.");
+                        System.err.println("* Problem [" + currentProblem + "]" + " not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.out.println("ERR: " + err.getMessage() + " - test aborted");
@@ -915,15 +916,15 @@ public class HSPTest {
                 }
 
                 if (plan == null) { // no solution in TIMEOUT computation time
-                    System.out.println("No solution found in " + TIMEOUT + " seconds for " + currentProblem);
+                    System.out.println("* No solution found in " + TIMEOUT + " seconds for " + currentProblem);
                 } else if (plan.isEmpty()) { // Empty solution
-                    System.out.println("Empty solution for " + currentProblem);
+                    System.out.println("* Empty solution for " + currentProblem);
                 } else { // Save output plan
                     try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(currentProblem.substring(0,
                         currentProblem.length() - Tools.PDDL_EXT.length()) + Tools.PLAN_EXT))) {
                         bw.write(pb.toString(plan));
                     }
-                    System.out.println("Solution found for " + currentProblem);
+                    System.out.println("* Solution found for " + currentProblem);
                 }
 
             } catch (IOException ioEx) {

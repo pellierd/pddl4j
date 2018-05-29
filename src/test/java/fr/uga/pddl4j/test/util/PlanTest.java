@@ -111,6 +111,7 @@ public class PlanTest {
      */
     @Test
     public void testPlanSize() {
+        System.out.println("PlanTest: Test the size of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
             final Plan plan = planner.search(Tools.generateCodedProblem(domainFile, problemFile));
@@ -126,6 +127,7 @@ public class PlanTest {
      */
     @Test
     public void testPlanCost() {
+        System.out.println("PlanTest: Test the cost of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
             final Plan plan = planner.search(Tools.generateCodedProblem(domainFile, problemFile));
@@ -141,6 +143,7 @@ public class PlanTest {
      */
     @Test
     public void testPlans() {
+        System.out.println("PlanTest: Test the operators of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
             final CodedProblem pb = Tools.generateCodedProblem(domainFile, problemFile);

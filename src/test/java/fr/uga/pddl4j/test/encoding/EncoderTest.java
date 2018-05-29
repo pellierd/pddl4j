@@ -756,6 +756,7 @@ public class EncoderTest {
             oneDomainPerProblem = true;
         }
 
+        System.out.println("EncoderTest: Test encoding on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
@@ -779,13 +780,13 @@ public class EncoderTest {
                 final CodedProblem pb;
                 try {
                     // Encodes and instantiates the problem in a compact representation
-                    System.out.println("encoding [" + currentProblem + "]" + "...");
+                    System.out.println(" * Encoding [" + currentProblem + "]" + "...");
                     pb = factory.encode();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println("Problem encoded and is solvable.");
+                        System.out.println(" * Problem encoded and is solvable.");
                     } else {
-                        System.out.println("Problem encoded and is  not solvable.");
+                        System.out.println(" * Problem encoded and is  not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
