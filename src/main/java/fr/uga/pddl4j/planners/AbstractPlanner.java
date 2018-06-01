@@ -237,6 +237,16 @@ public abstract class AbstractPlanner implements Planner {
     }
 
     /**
+     * Set the anytime state value.
+     *
+     * @param anytimeState the anytime state value
+     */
+    @Override
+    public void setAnytimeState(boolean anytimeState) {
+        this.anytime = anytimeState;
+    }
+
+    /**
      * Is planner anytime or not.
      *
      * @return true if planner is anytime, false otherwise

@@ -160,6 +160,13 @@ public interface Planner {
     boolean isSaveState();
 
     /**
+     * Set the anytime state value.
+     *
+     * @param anytimeState the anytime state value
+     */
+    void setAnytimeState(boolean anytimeState);
+
+    /**
      * Is planner anytime or not.
      *
      * @return true if planner is anytime, false otherwise
