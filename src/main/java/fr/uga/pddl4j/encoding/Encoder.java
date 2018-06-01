@@ -128,6 +128,9 @@ import java.util.Set;
  */
 public final class Encoder {
 
+    /**
+     * The logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**

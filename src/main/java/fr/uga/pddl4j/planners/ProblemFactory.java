@@ -21,6 +21,8 @@ import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Problem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +37,11 @@ import java.io.IOException;
  * @since 3.0
  */
 public class ProblemFactory {
+
+    /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
      * An instance of the ProblemFactory.
@@ -127,7 +134,12 @@ public class ProblemFactory {
         final Domain domain = this.parser.getDomain();
         final Problem problem = this.parser.getProblem();
         Encoder.setLogLevel(this.getTraceLevel());
-        return Encoder.encode(domain, problem);
+        try {
+            return Encoder.encode(domain, problem);
+        } catch (IllegalArgumentException ilException) {
+            LOGGER.error("the problem to encode is not ADL.\n");
+            return null;
+        }
     }
 
     /**
