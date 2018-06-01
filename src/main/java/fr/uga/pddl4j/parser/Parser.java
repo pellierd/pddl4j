@@ -112,7 +112,7 @@ public final class Parser {
     /**
      * Message for unhandled error.
      */
-    private static final String UNEXP_ERROR_MESSAGE = "\nUnexpected error";
+    private static final String UNEXP_ERROR_MESSAGE = "\nunexpected error";
 
     /**
      * The error manager of the parser.
@@ -183,7 +183,7 @@ public final class Parser {
                 this.checkOperatorsDeclaration();
                 this.checkDerivedPredicatesDeclaration();
             } catch (NullPointerException exception) {
-                LOGGER.error("Domain file is not valid\n");
+                LOGGER.error("domain file is not valid\n");
                 this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
             } finally {
                 inputStream.close();
@@ -191,7 +191,7 @@ public final class Parser {
         } catch (IOException | RuntimeException exception) {
             LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
         } catch (TokenMgrError | ParseException pe) {
-            LOGGER.error("Parse error in domain() call\n");
+            LOGGER.error("parse error in domain() call\n");
         }
     }
 
@@ -234,14 +234,14 @@ public final class Parser {
                 this.checkProblemConstraints();
                 this.checkMetric();
             } catch (NullPointerException exception) {
-                LOGGER.error("Problem file is not valid\n");
+                LOGGER.error("problem file is not valid\n");
             } finally {
                 inputStream.close();
             }
         } catch (IOException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         } catch (TokenMgrError | ParseException pe) {
-            LOGGER.error("Parse error in problem() call\n");
+            LOGGER.error("parse error in problem() call\n");
         }
     }
 
@@ -1210,7 +1210,7 @@ public final class Parser {
             try {
                 parser.parse(args[1]);
             } catch (FileNotFoundException fnfException) {
-                LOGGER.error("Parsing problem error", fnfException);
+                LOGGER.error("parsing problem error", fnfException);
             }
             if (parser.mgr.isEmpty()) {
                 strb.append("ok");

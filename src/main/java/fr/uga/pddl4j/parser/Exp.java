@@ -538,7 +538,7 @@ public class Exp implements Serializable {
                     // do nothing
             }
         } catch (NullParameterException npe) {
-            LOGGER.error("A null parameter has been pass to a non null method call", npe);
+            LOGGER.error("a null parameter has been pass to a non null method call", npe);
             throw new FatalException("Null parameter", npe);
         }
     }

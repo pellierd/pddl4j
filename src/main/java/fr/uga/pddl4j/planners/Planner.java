@@ -44,6 +44,11 @@ public interface Planner {
     boolean DEFAULT_STATISTICS = true;
 
     /**
+     * The default anytime value.
+     */
+    boolean DEFAULT_ANYTIME = false;
+
+    /**
      * The default heuristicType.
      */
     Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
@@ -153,6 +158,13 @@ public interface Planner {
      * @return true if statistics are compute and save, false otherwise
      */
     boolean isSaveState();
+
+    /**
+     * Is planner anytime or not.
+     *
+     * @return true if planner is anytime, false otherwise
+     */
+    boolean isAnytime();
 
     /**
      * Setup the planner caracteristics.

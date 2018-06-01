@@ -100,6 +100,11 @@ public abstract class AbstractPlanner implements Planner {
     private boolean saveState;
 
     /**
+     * The anytime state of the planner.
+     */
+    private boolean anytime;
+
+    /**
      * The logger of the class.
      */
     private static final Logger LOGGER = LogManager.getLogger(AbstractPlanner.class);
@@ -114,6 +119,7 @@ public abstract class AbstractPlanner implements Planner {
         this.heuristic = Planner.DEFAULT_HEURISTIC;
         this.weight = Planner.DEFAULT_WEIGHT;
         this.saveState = Planner.DEFAULT_STATISTICS;
+        this.anytime = Planner.DEFAULT_ANYTIME;
         this.statistics = new Statistics();
     }
 
@@ -228,6 +234,16 @@ public abstract class AbstractPlanner implements Planner {
     @Override
     public boolean isSaveState() {
         return saveState;
+    }
+
+    /**
+     * Is planner anytime or not.
+     *
+     * @return true if planner is anytime, false otherwise
+     */
+    @Override
+    public boolean isAnytime() {
+        return anytime;
     }
 
     /**

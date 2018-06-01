@@ -302,7 +302,7 @@ final class PreInstantiation {
      * @param tables predicates tables.
      */
     void printPredicatesTables(final List<List<IntMatrix>> tables) {
-        LOGGER.trace("Tables of predicates:");
+        LOGGER.trace("tables of predicates:");
         for (int predicate = 0; predicate < tables.size(); predicate++) {
             final List<IntMatrix> pTables = tables.get(predicate);
             final int arity = Encoder.tableOfTypedPredicates.get(predicate).size();
