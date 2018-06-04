@@ -11,6 +11,8 @@ plugins {
 plugins {
     id "org.sonarqube" version "2.6.1"
 }
+
+apply plugin: 'base'
 apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
@@ -36,6 +38,17 @@ compileJavacc {
     outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
 }
 
+// The following annotation processors were detected on the compile classpath:
+// 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor'.
+// Remove warning about log4j ProcessPlugin raised with --warning-mode=all
+compileJava {
+    options.compilerArgs += '-proc:none'
+}
+
+compileTestJava {
+    options.compilerArgs += '-proc:none'
+}
+
 checkstyle {
     toolVersion = "8.9"
 }
@@ -54,10 +67,6 @@ jar {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
-}
-
 task run (type: JavaExec, dependsOn: build){
     if (project.hasProperty("Args")) {
         println("arguments list : " + Args)
@@ -71,12 +80,8 @@ task run (type: JavaExec, dependsOn: build){
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task cleanGenerated(type:Delete) {
-    delete fileTree(dir: "src/main/java/fr/uga/pddl4j/parser/lexer", exclude:"Lexer.jj")
-}
-
-clean.doLast() {
-    cleanGenerated.execute()
+clean{
+    delete 'build', 'out', fileTree(dir: "src/main/java/fr/uga/pddl4j/parser/lexer", exclude:"Lexer.jj")
 }
 
 findbugsMain.onlyIf() { project.hasProperty('findbug') }
@@ -116,6 +121,8 @@ checkstyleTest.doFirst(){
 checkstyleTest.doLast(){
     printCheckstyleVersion()
 }
+
+test.onlyIf() { !project.hasProperty('noTest') }
 
 test {
     // set heap size for the test JVM(s)
