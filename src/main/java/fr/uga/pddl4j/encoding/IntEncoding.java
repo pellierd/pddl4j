@@ -31,9 +31,11 @@ import fr.uga.pddl4j.util.IntExp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -330,6 +332,41 @@ final class IntEncoding implements Serializable {
     }
 
     /**
+     * Encodes functions and costs from initial state into its integer representation.
+     *
+     * @param init the initial state encoded.
+     * @return the encoded functions and costs from initial state.
+     */
+    static Map<IntExp, Double> encodeFunctionCostInit(final Set<IntExp> init) {
+        Map<IntExp, Double> intFunctionCost = new HashMap<>();
+        for (IntExp intExp : init) {
+            if (intExp.getConnective().getImage().equals("=")) {
+                intFunctionCost.put(intExp.getChildren().get(0),
+                    Double.parseDouble(StringEncoder.toString(intExp.getChildren().get(1),
+                        Encoder.tableOfConstants,
+                        Encoder.tableOfTypes,
+                        Encoder.tableOfPredicates,
+                        Encoder.tableOfFunctions, "")));
+            }
+        }
+        return intFunctionCost;
+    }
+    //TODO make more clean method:
+    //init.stream().filter(x -> x.getConnective().getImage().equals("="))
+    // .collect(Collectors.toMap(x.getChildren().get(0)));
+
+    /**
+     * Removes functions and costs from initial state integer representation.
+     *
+     * @param init the initial state to encode.
+     * @return the initial state encoded without functions and costs.
+     */
+    static Set<IntExp> removeFunctionCost(final Set<IntExp> init) {
+        return init.stream().filter(x -> !x.getConnective().getImage().equals("="))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /**
      * Encodes a specified goal into its integer representation.
      *
      * @param goal the goal to encode.
@@ -379,8 +416,7 @@ final class IntEncoding implements Serializable {
     /**
      * Encodes an specified expression into its integer representation.
      *
-     * <p>
-     * Notes:
+     * <p>Notes:
      * <ul>
      * <li>equal predicate used specified value of -1.</li>
      * <li>variables used negative values in [-1,-infinity[.</li>
