@@ -127,4 +127,18 @@ public interface CodedOp extends Serializable {
      */
     void setCost(final double cost);
 
+    /**
+     * Returns the list of parameters of the operator.
+     *
+     * @return the list of parameters of the operator.
+     */
+    int[] getParameters();
+
+    /**
+     * Returns the values that represents the instantiated parameters of the operator.
+     *
+     * @return the values that represents the instantiated parameters of the operator.
+     */
+    int[] getInstantiations();
+
 }
