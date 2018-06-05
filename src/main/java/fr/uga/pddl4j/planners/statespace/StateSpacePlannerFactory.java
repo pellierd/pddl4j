@@ -23,6 +23,7 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.planners.statespace.ff.FF;
+import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
@@ -153,6 +154,10 @@ public class StateSpacePlannerFactory implements Serializable {
                 planner = new FF(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
+            case FFAnytime:
+                planner = new FFAnytime();
+                break;
+
             default:
                 LOGGER.trace(StateSpacePlannerFactory.printUsage());
                 break;
@@ -176,6 +181,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("-p <num>    specifies the state based planner to use (preset: 0)\n")
             .append("     0      HSP planner\n")
             .append("     1      FF planner\n")
+            .append("     2      FF Anytime planner\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
             .append("     0      ff heuristic\n")
             .append("     1      sum heuristic\n")
@@ -233,6 +239,8 @@ public class StateSpacePlannerFactory implements Serializable {
                         arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.HSP);
                     } else if (planner == 1) {
                         arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FF);
+                    } else if (planner == 2) {
+                        arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FFAnytime);
                     } else {
                         throw (new RuntimeException("Wrong planner argument"));
                     }
@@ -335,6 +343,7 @@ public class StateSpacePlannerFactory implements Serializable {
      * -u <i>num</i>   specifies the state based planner to use (preset: 0)
      *      0      HSP planner
      *      1      FF planner
+     *      2      FF Anytime planner
      * -u <i>num</i>   specifies the heuristic to use (preset: 0)
      *      0      ff heuristic
      *      1      sum heuristic

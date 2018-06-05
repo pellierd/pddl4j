@@ -37,6 +37,24 @@ public class NodeComparator implements Comparator<Node>, Serializable {
     private double weight;
 
     /**
+     * Returns the weight of the heuristic use for the comparison.
+     *
+     * @return the weight of the heuristic use for the comparison.
+     */
+    public double getWeight() {
+        return weight;
+    }
+
+    /**
+     * Sets the weight of the heuristic use for the comparison.
+     *
+     * @param weight the weight of the heuristic use for the comparison.
+     */
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    /**
      * Build the Node comparator object base on heuristic weight.
      *
      * @param weight the heuristic weight

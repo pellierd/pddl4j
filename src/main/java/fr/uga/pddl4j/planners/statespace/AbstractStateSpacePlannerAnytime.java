@@ -4,7 +4,7 @@ import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 
 import java.util.Vector;
 
-public abstract class AbstractStateBasedPlannerAnytime extends AbstractStateBasedPlanner {
+public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpacePlanner {
 
     /**
      * The list containing all the solutions found during anytime process.
@@ -14,7 +14,7 @@ public abstract class AbstractStateBasedPlannerAnytime extends AbstractStateBase
     /**
      * Creates a new planner.
      */
-    public AbstractStateBasedPlannerAnytime() {
+    public AbstractStateSpacePlannerAnytime() {
         super();
         this.setAnytimeState(true);
         solutionNodes = new Vector<>();

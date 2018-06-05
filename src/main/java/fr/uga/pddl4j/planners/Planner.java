@@ -99,6 +99,10 @@ public interface Planner extends Serializable {
          * The FF (Fast Forward Planner).
          */
         FF,
+        /**
+         * The FF Anytime (Fast Forward Anytime Planner).
+         */
+        FFAnytime,
     }
 
     /**
