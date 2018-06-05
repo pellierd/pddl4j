@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitState;
 
@@ -39,6 +40,8 @@ import java.io.Serializable;
  */
 public interface Heuristic extends Serializable {
 
+    //TODO work on that part to make more generic the addition of MIN_COST
+
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is
      * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
@@ -49,6 +52,17 @@ public interface Heuristic extends Serializable {
      * @return the distance to the goal state from the specified state.
      */
     int estimate(final BitState state, final BitExp goal);
+
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param node the ndoe from which the distance to the goal must be estimated.
+     * @param goal the goal expression.
+     * @return the distance to the goal state from the specified state.
+     */
+    double estimate(final Node node, final BitExp goal);
 
     /**
      * Returns <code>true</code> if this heuristic is admissible.
@@ -85,6 +99,10 @@ public interface Heuristic extends Serializable {
          * The type for the <code>Max</code> heuristic.
          */
         MAX,
+        /**
+         * The type for the <code>Min Cost</code> heuristic.
+         */
+        MIN_COST,
         /**
          * The type for the <code>FastForward</code> heuristic.
          */

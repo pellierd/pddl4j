@@ -197,6 +197,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("     6      combo heuristic\n")
             .append("     7      max heuristic\n")
             .append("     8      set-level heuristic\n")
+            .append("     9      min cost heuristic\n")
             .append("-i <num>    run-time information level (preset: 1)\n")
             .append("     0      nothing\n")
             .append("     1      info on action number, search and search\n")
@@ -269,7 +270,7 @@ public class StateSpacePlannerFactory implements Serializable {
                     arguments.put(AbstractStateSpacePlanner.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
-                    if (heuristic < 0 || heuristic > 8) {
+                    if (heuristic < 0 || heuristic > 9) {
                         LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     }
                     if (heuristic == 0) {
@@ -296,9 +297,12 @@ public class StateSpacePlannerFactory implements Serializable {
                     } else if (heuristic == 7) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.MAX);
-                    } else {
+                    } else if (heuristic == 8) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.SET_LEVEL);
+                    } else {
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
+                            Heuristic.Type.MIN_COST);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
@@ -361,6 +365,7 @@ public class StateSpacePlannerFactory implements Serializable {
      *      6      combo heuristic
      *      7      max heuristic
      *      8      set-level heuristic
+     *      9      min cost heuristic
      * -i <i>num</i>   run-time information level (preset: 1)
      *      0      nothing
      *      1      info on action number, search and search

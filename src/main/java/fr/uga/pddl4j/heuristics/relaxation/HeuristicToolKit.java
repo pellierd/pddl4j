@@ -69,6 +69,8 @@ public final class HeuristicToolKit implements Serializable {
             heuristic = new Combo(problem);
         } else if (type.equals(Heuristic.Type.MAX)) {
             heuristic = new Max(problem);
+        } else if (type.equals(Heuristic.Type.MIN_COST)) {
+            heuristic = new MinCost(problem);
         } else if (type.equals(Heuristic.Type.SET_LEVEL)) {
             heuristic = new SetLevel(problem);
         }
