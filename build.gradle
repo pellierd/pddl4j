@@ -60,7 +60,7 @@ jar {
                 'Gradle-Version':'Gradle 4.7',
                 'Built-By': 'Damien Pellier',
                 'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
-                'Main-Class': 'fr.uga.pddl4j.planners.hsp.HSP'
+                'Main-Class': 'fr.uga.pddl4j.planners.statespace.PlannerFactory'
     }
     doFirst {
         from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -76,7 +76,7 @@ task run (type: JavaExec, dependsOn: build){
     jvmArgs = ["-javaagent:"+project.buildDir.name+"/libs/"+project.name+"-"+project.version+".jar", "-server", "-Xms2048m", "-Xmx2048m"]
 
     description = "Run HSP plannin algorithm"
-    main = "fr.uga.pddl4j.planners.hsp.HSP"
+    main = "fr.uga.pddl4j.planners.statespace.PlannerFactory"
     classpath = sourceSets.main.runtimeClasspath
 }
 

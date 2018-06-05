@@ -4,7 +4,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.ff.FF;
+import fr.uga.pddl4j.planners.statespace.ff.FF;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;

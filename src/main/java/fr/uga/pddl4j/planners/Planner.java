@@ -16,7 +16,6 @@
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.util.Plan;
 
 /**
@@ -42,21 +41,6 @@ public interface Planner {
      * The default statistics value.
      */
     boolean DEFAULT_STATISTICS = true;
-
-    /**
-     * The default anytime value.
-     */
-    boolean DEFAULT_ANYTIME = false;
-
-    /**
-     * The default heuristicType.
-     */
-    Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
-
-    /**
-     * The default weight of the heuristic.
-     */
-    double DEFAULT_WEIGHT = 1.0;
 
     /**
      * This enumeration used to specified the name of the planner implemented in the library.
@@ -117,35 +101,6 @@ public interface Planner {
     int getTraceLevel();
 
     /**
-     * Sets the heuristicType to use to solved the problem.
-     *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
-     */
-    void setHeuristicType(final Heuristic.Type heuristicType);
-
-    /**
-     * Returns the heuristicType to use to solve the planning problem.
-     *
-     * @return the heuristicType to use to solve the planning problem.
-     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
-     */
-    Heuristic.Type getHeuristicType();
-
-    /**
-     * Sets the wight of the heuristic.
-     *
-     * @param weight the weight of the heuristic. The weight must be positive.
-     */
-    void setWeight(final double weight);
-
-    /**
-     * Returns the weight set to the heuristic.
-     *
-     * @return the weight set to the heuristic.
-     */
-    double getWeight();
-
-    /**
      * Set the statistics generation value.
      *
      * @param saveState the new statistics computation value
@@ -158,30 +113,4 @@ public interface Planner {
      * @return true if statistics are compute and save, false otherwise
      */
     boolean isSaveState();
-
-    /**
-     * Set the anytime state value.
-     *
-     * @param anytimeState the anytime state value
-     */
-    void setAnytimeState(boolean anytimeState);
-
-    /**
-     * Is planner anytime or not.
-     *
-     * @return true if planner is anytime, false otherwise
-     */
-    boolean isAnytime();
-
-    /**
-     * Setup the planner caracteristics.
-     *
-     * @param heuristic      the heuristicType to use to solve the planning problem.
-     * @param timeout        the time out of the planner.
-     * @param weight         the weight set to the heuristic.
-     * @param statisticState the statistics generation value.
-     * @param traceLevel     the trace level of the planner.
-     */
-    void setupPlanner(Heuristic.Type heuristic, int timeout,
-                      double weight, boolean statisticState, int traceLevel);
 }

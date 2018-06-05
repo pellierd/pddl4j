@@ -17,14 +17,14 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.PlannerFactory;
+import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.PlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -59,7 +59,7 @@ public class EnforcedHillClimbing {
      * @param pb      the problem to solve.
      * @return the solution node.
      */
-    public static Node searchSolutionNode(final Planner planner, final CodedProblem pb) {
+    public static Node searchSolutionNode(final AbstractStateBasedPlanner planner, final CodedProblem pb) {
         Objects.requireNonNull(pb);
         searchingTime = 0;
         return EnforcedHillClimbing.enforcedHillClimbing(planner, pb);
@@ -72,7 +72,7 @@ public class EnforcedHillClimbing {
      * @param problem the coded problem to solve.
      * @return the solution node or null.
      */
-    private static Node enforcedHillClimbing(final Planner planner, final CodedProblem problem) {
+    private static Node enforcedHillClimbing(final AbstractStateBasedPlanner planner, final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
         final LinkedList<Node> openList = new LinkedList<>();

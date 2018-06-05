@@ -1,11 +1,11 @@
-package fr.uga.pddl4j.planners.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.PlannerFactory;
+import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.PlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -30,7 +30,7 @@ public class HillClimbing {
      * @param pb      the problem to solve.
      * @return the solution node.
      */
-    public static Node searchSolutionNode(final Planner planner, final CodedProblem pb) {
+    public static Node searchSolutionNode(final AbstractStateBasedPlanner planner, final CodedProblem pb) {
         Objects.requireNonNull(pb);
         return HillClimbing.hillClimbing(planner, pb);
     }
@@ -42,7 +42,7 @@ public class HillClimbing {
      * @param pb      the problem to solve.
      * @return the solution node.
      */
-    private static Node hillClimbing(final Planner planner, final CodedProblem pb) {
+    private static Node hillClimbing(final AbstractStateBasedPlanner planner, final CodedProblem pb) {
         final LinkedList<Node> openList = new LinkedList<>();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), pb);
         long searchingTime = 0;

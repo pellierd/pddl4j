@@ -17,14 +17,14 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.ff;
+package fr.uga.pddl4j.planners.statespace.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.search.strategy.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.search.strategy.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
@@ -39,25 +39,13 @@ import java.util.Objects;
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
-public final class FF extends AbstractPlanner {
+public final class FF extends AbstractStateBasedPlanner {
 
     /**
      * Creates a new planner.
      */
     public FF() {
         super();
-    }
-
-    /**
-     * Setup planner.
-     */
-    public void setupPlanner(Heuristic.Type heuristic, int timeout,
-                             double weight, boolean statisticState, int traceLevel) {
-        this.setHeuristicType(heuristic);
-        this.setTimeOut(timeout);
-        this.setWeight(weight);
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
     }
 
     /**

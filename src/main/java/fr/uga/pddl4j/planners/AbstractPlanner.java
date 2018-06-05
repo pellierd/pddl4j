@@ -15,15 +15,13 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
 import java.util.Properties;
 
 /**
- * This abstract class defines the main methods of to access a planner.
+ * This abstract class defines the main methods to access a planner.
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
@@ -47,14 +45,6 @@ public abstract class AbstractPlanner implements Planner {
          * The planning problem.
          */
         PROBLEM,
-        /**
-         * The heuristic to use.
-         */
-        HEURISTIC,
-        /**
-         * The weight of the heuristic.
-         */
-        WEIGHT,
         /**
          * The global time slot allocated to the search.
          */
@@ -85,24 +75,9 @@ public abstract class AbstractPlanner implements Planner {
     private Statistics statistics;
 
     /**
-     * The heuristic of the planner.
-     */
-    private Heuristic.Type heuristic;
-
-    /**
-     * The heuristic weight.
-     */
-    private double weight;
-
-    /**
      * The state to save the statistics of the planner.
      */
     private boolean saveState;
-
-    /**
-     * The anytime state of the planner.
-     */
-    private boolean anytime;
 
     /**
      * The logger of the class.
@@ -116,10 +91,7 @@ public abstract class AbstractPlanner implements Planner {
         super();
         this.timeout = Planner.DEFAULT_TIMEOUT;
         this.traceLevel = Planner.DEFAULT_TRACE_LEVEL;
-        this.heuristic = Planner.DEFAULT_HEURISTIC;
-        this.weight = Planner.DEFAULT_WEIGHT;
         this.saveState = Planner.DEFAULT_STATISTICS;
-        this.anytime = Planner.DEFAULT_ANYTIME;
         this.statistics = new Statistics();
     }
 
@@ -175,48 +147,6 @@ public abstract class AbstractPlanner implements Planner {
     }
 
     /**
-     * Returns the heuristicType to use to solve the planning problem.
-     *
-     * @return the heuristicType to use to solve the planning problem.
-     * @see fr.uga.pddl4j.heuristics.relaxation.Heuristic.Type
-     */
-    @Override
-    public final Heuristic.Type getHeuristicType() {
-        return this.heuristic;
-    }
-
-    /**
-     * Sets the heuristicType to use to solved the problem.
-     *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
-     */
-    @Override
-    public final void setHeuristicType(final Heuristic.Type heuristicType) {
-        Objects.requireNonNull(heuristicType);
-        this.heuristic = heuristicType;
-    }
-
-    /**
-     * Returns the weight set to the heuristic.
-     *
-     * @return the weight set to the heuristic.
-     */
-    @Override
-    public final double getWeight() {
-        return this.weight;
-    }
-
-    /**
-     * Sets the wight of the heuristic.
-     *
-     * @param weight the weight of the heuristic. The weight must be positive.
-     */
-    @Override
-    public final void setWeight(final double weight) {
-        this.weight = weight;
-    }
-
-    /**
      * Set the statistics generation value.
      *
      * @param saveState the new statistics computation value
@@ -237,26 +167,6 @@ public abstract class AbstractPlanner implements Planner {
     }
 
     /**
-     * Set the anytime state value.
-     *
-     * @param anytimeState the anytime state value
-     */
-    @Override
-    public void setAnytimeState(boolean anytimeState) {
-        this.anytime = anytimeState;
-    }
-
-    /**
-     * Is planner anytime or not.
-     *
-     * @return true if planner is anytime, false otherwise
-     */
-    @Override
-    public boolean isAnytime() {
-        return anytime;
-    }
-
-    /**
      * Returns the LOGGER of the AbstractPlanner class.
      *
      * @return the AbstractPlanner class.
@@ -270,11 +180,8 @@ public abstract class AbstractPlanner implements Planner {
      *
      * @return the default arguments of the planner.
      */
-    static Properties getDefaultArguments() {
+    public static Properties getDefaultArguments() {
         final Properties options = new Properties();
-        options.put(AbstractPlanner.Argument.PLANNER, Name.HSP);
-        options.put(AbstractPlanner.Argument.HEURISTIC, AbstractPlanner.DEFAULT_HEURISTIC);
-        options.put(AbstractPlanner.Argument.WEIGHT, AbstractPlanner.DEFAULT_WEIGHT);
         options.put(AbstractPlanner.Argument.TIMEOUT, AbstractPlanner.DEFAULT_TIMEOUT * 1000);
         options.put(AbstractPlanner.Argument.TRACE_LEVEL, AbstractPlanner.DEFAULT_TRACE_LEVEL);
         options.put(AbstractPlanner.Argument.STATISTICS, AbstractPlanner.DEFAULT_STATISTICS);

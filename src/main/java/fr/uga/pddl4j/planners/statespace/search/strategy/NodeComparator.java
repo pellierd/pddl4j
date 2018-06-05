@@ -1,4 +1,4 @@
-package fr.uga.pddl4j.planners.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import java.io.Serializable;
 import java.util.Comparator;

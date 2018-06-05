@@ -75,7 +75,9 @@ Planners are available in the "planners" package of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy
 called HSP. To launch this planner use the following command line:
 
-> java -javaagent:build/libs/pddl4j-VERSION.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+> java -javaagent:build/libs/pddl4j-3.6.0.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.PlannerFactory -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+
+> java -jar build/libs/pddl4j-3.6.0.jar -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
 Or use the gradle run command:
 > gradle run -PArgs=-o,pddl/blocksworld/domain.pddl,-f,pddl/blocksworld/p15.pddl

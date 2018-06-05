@@ -17,13 +17,13 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.hsp;
+package fr.uga.pddl4j.planners.statespace.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.search.strategy.AStar;
-import fr.uga.pddl4j.planners.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
@@ -36,25 +36,13 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class HSP extends AbstractPlanner {
+public final class HSP extends AbstractStateBasedPlanner {
 
     /**
      * Creates a new HSP planner with the default parameters.
      */
     public HSP() {
         super();
-    }
-
-    /**
-     * Setup planner.
-     */
-    public void setupPlanner(Heuristic.Type heuristic, int timeout,
-                             double weight, boolean statisticState, int traceLevel) {
-        this.setHeuristicType(heuristic);
-        this.setTimeOut(timeout);
-        this.setWeight(weight);
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
     }
 
     /**

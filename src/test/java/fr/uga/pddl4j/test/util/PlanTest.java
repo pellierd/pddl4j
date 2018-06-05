@@ -1,7 +1,7 @@
 package fr.uga.pddl4j.test.util;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.planners.hsp.HSP;
+import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.Plan;

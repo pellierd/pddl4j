@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.util.BitState;
 

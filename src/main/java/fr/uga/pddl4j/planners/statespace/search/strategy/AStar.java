@@ -1,11 +1,11 @@
-package fr.uga.pddl4j.planners.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.PlannerFactory;
+import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.PlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -30,7 +30,7 @@ public class AStar {
      * @param pb      the problem to solve.
      * @return the solution node.
      */
-    public static Node searchSolutionNode(final Planner planner, final CodedProblem pb) {
+    public static Node searchSolutionNode(final AbstractStateBasedPlanner planner, final CodedProblem pb) {
         Objects.requireNonNull(pb);
         return AStar.astar(planner, pb);
     }
@@ -42,7 +42,7 @@ public class AStar {
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
      */
-    private static Node astar(final Planner planner, final CodedProblem problem) {
+    private static Node astar(final AbstractStateBasedPlanner planner, final CodedProblem problem) {
         Objects.requireNonNull(problem);
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
