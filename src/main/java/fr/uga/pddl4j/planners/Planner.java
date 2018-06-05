@@ -103,6 +103,10 @@ public interface Planner extends Serializable {
          * The FF Anytime (Fast Forward Anytime Planner).
          */
         FFAnytime,
+        /**
+         * The HC Anytime (Hill Climbing Anytime Planner).
+         */
+        HCAnytime
     }
 
     /**

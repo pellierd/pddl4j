@@ -24,6 +24,7 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.planners.statespace.ff.FF;
 import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
+import fr.uga.pddl4j.planners.statespace.hc.HCAnytime;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
@@ -158,6 +159,10 @@ public class StateSpacePlannerFactory implements Serializable {
                 planner = new FFAnytime();
                 break;
 
+            case HCAnytime:
+                planner = new HCAnytime();
+                break;
+
             default:
                 LOGGER.trace(StateSpacePlannerFactory.printUsage());
                 break;
@@ -241,6 +246,8 @@ public class StateSpacePlannerFactory implements Serializable {
                         arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FF);
                     } else if (planner == 2) {
                         arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FFAnytime);
+                    } else if (planner == 3) {
+                        arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.HCAnytime);
                     } else {
                         throw (new RuntimeException("Wrong planner argument"));
                     }
