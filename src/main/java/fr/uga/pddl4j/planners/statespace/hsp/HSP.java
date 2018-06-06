@@ -21,7 +21,7 @@ package fr.uga.pddl4j.planners.statespace.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.util.BitOp;
@@ -36,7 +36,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class HSP extends AbstractStateBasedPlanner {
+public final class HSP extends AbstractStateSpacePlanner {
 
     /**
      * Creates a new HSP planner with the default parameters.

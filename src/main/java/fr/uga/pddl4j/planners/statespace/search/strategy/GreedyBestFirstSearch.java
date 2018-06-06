@@ -19,7 +19,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.statespace.AbstractStateBasedPlanner;
+import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.PlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
@@ -51,7 +51,7 @@ public class GreedyBestFirstSearch {
      * @param pb      the problem to solve.
      * @return the solution node.
      */
-    public static Node searchSolutionNode(final AbstractStateBasedPlanner planner, final CodedProblem pb) {
+    public static Node searchSolutionNode(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
         Objects.requireNonNull(pb);
         searchingTime = 0;
         return GreedyBestFirstSearch.greedyBestFirstSearch(planner, pb);
@@ -65,7 +65,7 @@ public class GreedyBestFirstSearch {
      * @param problem the coded planning problem to solve.
      * @return a solution plan or null if it does not exist.
      */
-    private static Node greedyBestFirstSearch(final AbstractStateBasedPlanner planner, final CodedProblem problem) {
+    private static Node greedyBestFirstSearch(final AbstractStateSpacePlanner planner, final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
         final Set<Node> closeSet = new HashSet<>();

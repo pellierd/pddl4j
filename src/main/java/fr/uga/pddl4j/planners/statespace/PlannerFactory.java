@@ -95,8 +95,8 @@ public class PlannerFactory {
      * @return an instance of the specified planner.
      * @see fr.uga.pddl4j.planners.Planner.Name
      */
-    public AbstractStateBasedPlanner getPlanner(final Planner.Name name) {
-        AbstractStateBasedPlanner planner = null;
+    public AbstractStateSpacePlanner getPlanner(final Planner.Name name) {
+        AbstractStateSpacePlanner planner = null;
         switch (name) {
             case HSP:
                 planner = new HSP();
@@ -185,9 +185,9 @@ public class PlannerFactory {
                 if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int planner = Integer.parseInt(args[i + 1]);
                     if (planner == 0) {
-                        arguments.put(AbstractStateBasedPlanner.Argument.PLANNER, Planner.Name.HSP);
+                        arguments.put(AbstractStateSpacePlanner.Argument.PLANNER, Planner.Name.HSP);
                     } else if (planner == 1) {
-                        arguments.put(AbstractStateBasedPlanner.Argument.PLANNER, Planner.Name.FF);
+                        arguments.put(AbstractStateSpacePlanner.Argument.PLANNER, Planner.Name.FF);
                     } else {
                         throw (new RuntimeException("Wrong planner argument"));
                     }
@@ -195,49 +195,49 @@ public class PlannerFactory {
                     if (!new File(args[i + 1]).exists()) {
                         log.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
-                    arguments.put(AbstractStateBasedPlanner.Argument.DOMAIN, new File(args[i + 1]));
+                    arguments.put(AbstractStateSpacePlanner.Argument.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
                         log.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
-                    arguments.put(AbstractStateBasedPlanner.Argument.PROBLEM, new File(args[i + 1]));
+                    arguments.put(AbstractStateSpacePlanner.Argument.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         log.trace(PlannerFactory.printUsage());
                     }
-                    arguments.put(AbstractStateBasedPlanner.Argument.TIMEOUT, cpu);
+                    arguments.put(AbstractStateSpacePlanner.Argument.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
                         log.trace(PlannerFactory.printUsage());
                     }
                     if (heuristic == 0) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.FAST_FORWARD);
                     } else if (heuristic == 1) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.SUM);
                     } else if (heuristic == 2) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.SUM_MUTEX);
                     } else if (heuristic == 3) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.AJUSTED_SUM);
                     } else if (heuristic == 4) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.AJUSTED_SUM2);
                     } else if (heuristic == 5) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.AJUSTED_SUM2M);
                     } else if (heuristic == 6) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.COMBO);
                     } else if (heuristic == 7) {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.MAX);
                     } else {
-                        arguments.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
                             Heuristic.Type.SET_LEVEL);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
@@ -245,26 +245,26 @@ public class PlannerFactory {
                     if (weight < 0) {
                         log.trace(PlannerFactory.printUsage());
                     }
-                    arguments.put(AbstractStateBasedPlanner.StateBasedArgument.WEIGHT, weight);
+                    arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         log.trace(PlannerFactory.printUsage());
                     }
-                    arguments.put(AbstractStateBasedPlanner.Argument.TRACE_LEVEL, level);
+                    arguments.put(AbstractStateSpacePlanner.Argument.TRACE_LEVEL, level);
                 } else if ("-m".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     PlannerFactory.setMemoryAgent(Boolean.parseBoolean(args[i + 1]));
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
-                    arguments.put(AbstractStateBasedPlanner.Argument.STATISTICS, isStatUsed);
+                    arguments.put(AbstractStateSpacePlanner.Argument.STATISTICS, isStatUsed);
                 } else {
                     log.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     log.trace(PlannerFactory.printUsage());
                     throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
-            if (arguments.get(AbstractStateBasedPlanner.Argument.DOMAIN) == null
-                || arguments.get(AbstractStateBasedPlanner.Argument.PROBLEM) == null) {
+            if (arguments.get(AbstractStateSpacePlanner.Argument.DOMAIN) == null
+                || arguments.get(AbstractStateSpacePlanner.Argument.PROBLEM) == null) {
 
                 log.trace("\nMissing DOMAIN or PROBLEM\n");
                 log.trace(PlannerFactory.printUsage());
@@ -332,27 +332,27 @@ public class PlannerFactory {
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
-        final Logger logger = AbstractStateBasedPlanner.getLogger();
+        final Logger logger = AbstractStateSpacePlanner.getLogger();
 
         try {
             final PlannerFactory plannerFactory = PlannerFactory.getInstance();
 
             // Parse the command line
             final Properties arguments = PlannerFactory.parseArguments(args,
-                logger, AbstractStateBasedPlanner.getDefaultArguments());
+                logger, AbstractStateSpacePlanner.getDefaultArguments());
 
-            final File domain = (File) arguments.get(AbstractStateBasedPlanner.Argument.DOMAIN);
-            final File problem = (File) arguments.get(AbstractStateBasedPlanner.Argument.PROBLEM);
-            final int traceLevel = (Integer) arguments.get(AbstractStateBasedPlanner.Argument.TRACE_LEVEL);
-            final int timeout = (Integer) arguments.get(AbstractStateBasedPlanner.Argument.TIMEOUT);
+            final File domain = (File) arguments.get(AbstractStateSpacePlanner.Argument.DOMAIN);
+            final File problem = (File) arguments.get(AbstractStateSpacePlanner.Argument.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(AbstractStateSpacePlanner.Argument.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(AbstractStateSpacePlanner.Argument.TIMEOUT);
             final Heuristic.Type heuristicType =
-                (Heuristic.Type) arguments.get(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC);
-            final double weight = (Double) arguments.get(AbstractStateBasedPlanner.StateBasedArgument.WEIGHT);
-            final boolean saveStats = (Boolean) arguments.get(AbstractStateBasedPlanner.Argument.STATISTICS);
+                (Heuristic.Type) arguments.get(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC);
+            final double weight = (Double) arguments.get(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.Argument.STATISTICS);
 
             // Creates the planner
-            final AbstractStateBasedPlanner planner = plannerFactory.getPlanner((Planner.Name)
-                arguments.get(AbstractStateBasedPlanner.Argument.PLANNER));
+            final AbstractStateSpacePlanner planner = plannerFactory.getPlanner((Planner.Name)
+                arguments.get(AbstractStateSpacePlanner.Argument.PLANNER));
             planner.setupPlanner(heuristicType, timeout, weight, saveStats, traceLevel);
 
             // Creates the problem factory

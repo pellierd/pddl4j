@@ -29,12 +29,12 @@ import java.util.Properties;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public abstract class AbstractStateBasedPlanner extends AbstractPlanner {
+public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
 
     /**
      * The enumeration of the arguments of the planner.
      */
-    public enum StateBasedArgument {
+    public enum StateSpaceArgument {
         /**
          * The heuristic to use.
          */
@@ -78,11 +78,11 @@ public abstract class AbstractStateBasedPlanner extends AbstractPlanner {
     /**
      * Creates a new planner.
      */
-    public AbstractStateBasedPlanner() {
+    public AbstractStateSpacePlanner() {
         super();
-        this.heuristic = AbstractStateBasedPlanner.DEFAULT_HEURISTIC;
-        this.weight = AbstractStateBasedPlanner.DEFAULT_WEIGHT;
-        this.anytime = AbstractStateBasedPlanner.DEFAULT_ANYTIME;
+        this.heuristic = AbstractStateSpacePlanner.DEFAULT_HEURISTIC;
+        this.weight = AbstractStateSpacePlanner.DEFAULT_WEIGHT;
+        this.anytime = AbstractStateSpacePlanner.DEFAULT_ANYTIME;
     }
 
     /**
@@ -156,11 +156,11 @@ public abstract class AbstractStateBasedPlanner extends AbstractPlanner {
      */
     public static Properties getDefaultArguments() {
         final Properties options = AbstractPlanner.getDefaultArguments();
-        options.put(AbstractStateBasedPlanner.Argument.PLANNER, Name.HSP);
-        options.put(AbstractStateBasedPlanner.StateBasedArgument.HEURISTIC,
-            AbstractStateBasedPlanner.DEFAULT_HEURISTIC);
-        options.put(AbstractStateBasedPlanner.StateBasedArgument.WEIGHT,
-            AbstractStateBasedPlanner.DEFAULT_WEIGHT);
+        options.put(AbstractStateSpacePlanner.Argument.PLANNER, Name.HSP);
+        options.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+            AbstractStateSpacePlanner.DEFAULT_HEURISTIC);
+        options.put(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT,
+            AbstractStateSpacePlanner.DEFAULT_WEIGHT);
         return options;
     }
 
