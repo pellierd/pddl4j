@@ -141,15 +141,6 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
     }
 
     /**
-     * Returns the LOGGER of the AbstractPlanner class.
-     *
-     * @return the AbstractPlanner class.
-     */
-    public static Logger getLogger() {
-        return AbstractPlanner.getLogger();
-    }
-
-    /**
      * This method return the default arguments of the planner.
      *
      * @return the default arguments of the planner.

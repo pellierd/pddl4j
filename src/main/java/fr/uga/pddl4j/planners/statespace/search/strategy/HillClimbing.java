@@ -104,7 +104,7 @@ public class HillClimbing {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(openList)
                         + MemoryAgent.deepSizeOf(heuristic));
                 } catch (IllegalStateException ilException) {
-                    AbstractPlanner.getLogger().error(ilException);
+                    planner.getLogger().error(ilException);
                 }
             }
         }

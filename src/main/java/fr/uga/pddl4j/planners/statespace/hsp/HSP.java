@@ -53,7 +53,7 @@ public final class HSP extends AbstractStateSpacePlanner {
      */
     @Override
     public SequentialPlan search(final CodedProblem problem) {
-        final Logger logger = AbstractPlanner.getLogger();
+        final Logger logger = this.getLogger();
         Objects.requireNonNull(problem);
 
         logger.trace("* starting A*\n");

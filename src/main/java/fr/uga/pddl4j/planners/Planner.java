@@ -17,6 +17,8 @@ package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.Plan;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This interface defines the main methods of to access a planner.
@@ -26,6 +28,11 @@ import fr.uga.pddl4j.util.Plan;
  * @since 3.0
  */
 public interface Planner {
+
+    /**
+     * The logger of the class.
+     */
+    Logger LOGGER = LogManager.getLogger(Planner.class);
 
     /**
      * The default CPU time allocated to the search in seconds.
@@ -54,6 +61,15 @@ public interface Planner {
          * The FF (Fast Forward Planner).
          */
         FF,
+    }
+
+    /**
+     * Returns the LOGGER of the AbstractPlanner class.
+     *
+     * @return the AbstractPlanner class.
+     */
+    static Logger getLogger() {
+        return LOGGER;
     }
 
     /**

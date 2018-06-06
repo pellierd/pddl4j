@@ -121,7 +121,7 @@ public class GreedyBestFirstSearch {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
                         + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
                 } catch (IllegalStateException ilException) {
-                    AbstractPlanner.getLogger().error(ilException);
+                    planner.getLogger().error(ilException);
                 }
             }
         }

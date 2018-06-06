@@ -332,7 +332,7 @@ public class StateSpacePlannerFactory {
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
-        final Logger logger = AbstractStateSpacePlanner.getLogger();
+        final Logger logger = Planner.getLogger();
 
         try {
             final StateSpacePlannerFactory stateSpacePlannerFactory = StateSpacePlannerFactory.getInstance();

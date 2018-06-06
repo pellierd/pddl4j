@@ -80,11 +80,6 @@ public abstract class AbstractPlanner implements Planner {
     private boolean saveState;
 
     /**
-     * The logger of the class.
-     */
-    private static final Logger LOGGER = LogManager.getLogger(AbstractPlanner.class);
-
-    /**
      * Creates a new planner.
      */
     public AbstractPlanner() {
@@ -171,8 +166,8 @@ public abstract class AbstractPlanner implements Planner {
      *
      * @return the AbstractPlanner class.
      */
-    public static Logger getLogger() {
-        return LOGGER;
+    public Logger getLogger() {
+        return Planner.getLogger();
     }
 
     /**

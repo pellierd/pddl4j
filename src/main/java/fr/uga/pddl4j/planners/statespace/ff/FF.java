@@ -55,7 +55,7 @@ public final class FF extends AbstractStateSpacePlanner {
      */
     @Override
     public SequentialPlan search(final CodedProblem pb) {
-        final Logger logger = AbstractPlanner.getLogger();
+        final Logger logger = this.getLogger();
         Objects.requireNonNull(pb);
 
         logger.trace("* starting enforced hill climbing\n");

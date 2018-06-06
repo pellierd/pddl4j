@@ -22,7 +22,7 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
@@ -120,7 +120,7 @@ public class EnforcedHillClimbing {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(openList)
                         + MemoryAgent.deepSizeOf(heuristic));
                 } catch (IllegalStateException ilException) {
-                    AbstractPlanner.getLogger().error(ilException);
+                    planner.getLogger().error(ilException);
                 }
             }
         }
