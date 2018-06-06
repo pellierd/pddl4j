@@ -20,7 +20,7 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.PlannerFactory;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -139,7 +139,7 @@ public class AStar {
 
         if (planner.isSaveState()) {
             planner.getStatistics().setTimeToSearch(time);
-            if (PlannerFactory.isMemoryAgent()) {
+            if (StateSpacePlannerFactory.isMemoryAgent()) {
                 // Compute the memory used by the search
                 try {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)

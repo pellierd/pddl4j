@@ -1,6 +1,6 @@
 ## PDDL4J library
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45971.svg)](http://dx.doi.org/10.5281/zenodo.45971)
-[![Build Status](http://pddl4j.imag.fr/jenkins/job/pddl4j-base/badge/icon)](http://pddl4j.imag.fr/jenkins/job/pddl4j-base)
+[![Build Status](http://pddl4j.imag.fr/jenkins/job/PDDL4J%20devel/badge/icon)](http://pddl4j.imag.fr/jenkins/job/PDDL4J%20devel/)
 
 ### 1. Contact
 
@@ -75,7 +75,7 @@ Planners are available in the "planners" package of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy
 called HSP. To launch this planner use the following command line:
 
-> java -javaagent:build/libs/pddl4j-3.6.0.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.PlannerFactory -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+> java -javaagent:build/libs/pddl4j-3.6.0.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
 > java -jar build/libs/pddl4j-3.6.0.jar -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 

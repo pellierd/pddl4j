@@ -40,20 +40,20 @@ import java.util.Properties;
  * @see Planner
  * @since 3.0
  */
-public class PlannerFactory {
+public class StateSpacePlannerFactory {
 
     /**
      * An instance of the class.
      */
-    private static PlannerFactory instance = new PlannerFactory();
+    private static StateSpacePlannerFactory instance = new StateSpacePlannerFactory();
 
     /**
      * Returns an instance of this class.
      *
      * @return an instance of this class.
      */
-    public static PlannerFactory getInstance() {
-        return PlannerFactory.instance;
+    public static StateSpacePlannerFactory getInstance() {
+        return StateSpacePlannerFactory.instance;
     }
 
     /**
@@ -76,16 +76,16 @@ public class PlannerFactory {
      * @param memoryAgent the state of the memory agent.
      */
     public static void setMemoryAgent(boolean memoryAgent) {
-        PlannerFactory.memoryAgent = memoryAgent;
+        StateSpacePlannerFactory.memoryAgent = memoryAgent;
     }
 
     /**
-     * Creates a new PlannerFactory.
+     * Creates a new StateSpacePlannerFactory.
      * The constructor is override to
      */
-    private PlannerFactory() {
+    private StateSpacePlannerFactory() {
         super();
-        PlannerFactory.setMemoryAgent(false);
+        StateSpacePlannerFactory.setMemoryAgent(false);
     }
 
     /**
@@ -107,7 +107,7 @@ public class PlannerFactory {
                 break;
 
             default:
-                PlannerFactory.printUsage();
+                StateSpacePlannerFactory.printUsage();
                 break;
         }
         return planner;
@@ -204,13 +204,13 @@ public class PlannerFactory {
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
-                        log.trace(PlannerFactory.printUsage());
+                        log.trace(StateSpacePlannerFactory.printUsage());
                     }
                     arguments.put(AbstractStateSpacePlanner.Argument.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
-                        log.trace(PlannerFactory.printUsage());
+                        log.trace(StateSpacePlannerFactory.printUsage());
                     }
                     if (heuristic == 0) {
                         arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
@@ -243,23 +243,23 @@ public class PlannerFactory {
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
-                        log.trace(PlannerFactory.printUsage());
+                        log.trace(StateSpacePlannerFactory.printUsage());
                     }
                     arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
-                        log.trace(PlannerFactory.printUsage());
+                        log.trace(StateSpacePlannerFactory.printUsage());
                     }
                     arguments.put(AbstractStateSpacePlanner.Argument.TRACE_LEVEL, level);
                 } else if ("-m".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    PlannerFactory.setMemoryAgent(Boolean.parseBoolean(args[i + 1]));
+                    StateSpacePlannerFactory.setMemoryAgent(Boolean.parseBoolean(args[i + 1]));
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
                     arguments.put(AbstractStateSpacePlanner.Argument.STATISTICS, isStatUsed);
                 } else {
                     log.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
-                    log.trace(PlannerFactory.printUsage());
+                    log.trace(StateSpacePlannerFactory.printUsage());
                     throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
@@ -267,12 +267,12 @@ public class PlannerFactory {
                 || arguments.get(AbstractStateSpacePlanner.Argument.PROBLEM) == null) {
 
                 log.trace("\nMissing DOMAIN or PROBLEM\n");
-                log.trace(PlannerFactory.printUsage());
+                log.trace(StateSpacePlannerFactory.printUsage());
                 throw new FileException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
             log.trace("\nError when parsing arguments\n");
-            log.trace(PlannerFactory.printUsage());
+            log.trace(StateSpacePlannerFactory.printUsage());
             throw runExp;
         }
         return arguments;
@@ -335,10 +335,10 @@ public class PlannerFactory {
         final Logger logger = AbstractStateSpacePlanner.getLogger();
 
         try {
-            final PlannerFactory plannerFactory = PlannerFactory.getInstance();
+            final StateSpacePlannerFactory stateSpacePlannerFactory = StateSpacePlannerFactory.getInstance();
 
             // Parse the command line
-            final Properties arguments = PlannerFactory.parseArguments(args,
+            final Properties arguments = StateSpacePlannerFactory.parseArguments(args,
                 logger, AbstractStateSpacePlanner.getDefaultArguments());
 
             final File domain = (File) arguments.get(AbstractStateSpacePlanner.Argument.DOMAIN);
@@ -351,7 +351,7 @@ public class PlannerFactory {
             final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.Argument.STATISTICS);
 
             // Creates the planner
-            final AbstractStateSpacePlanner planner = plannerFactory.getPlanner((Planner.Name)
+            final AbstractStateSpacePlanner planner = stateSpacePlannerFactory.getPlanner((Planner.Name)
                 arguments.get(AbstractStateSpacePlanner.Argument.PLANNER));
             planner.setupPlanner(heuristicType, timeout, weight, saveStats, traceLevel);
 
