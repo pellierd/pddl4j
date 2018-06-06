@@ -3,10 +3,6 @@
 pipeline {
     agent any
 
-    options {
-        timestamps()
-    }
-
     stages {
         stage('Clean') {
             steps {
@@ -26,6 +22,7 @@ pipeline {
                 checkstyle canComputeNew: false, defaultEncoding: '', healthy: '', pattern: 'build/reports/checkstyle/*.xml', unHealthy: ''
                 sh "./gradlew findbugsMain -Pfindbug"
                 sh "./gradlew findbugsTest -Pfindbug"
+                findbugs canComputeNew: false, defaultEncoding: '', healthy: '', pattern: 'build/reports/findbugs/*.xml', unHealthy: ''
             }
         }
         stage('Test') {
@@ -37,12 +34,11 @@ pipeline {
 
     post {
         success {
+            junit 'build/test-results/test/*.xml'
             archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
         }
         always {
             archiveArtifacts artifacts: 'build/test-results/test/binary/output.bin'
-
-            junit 'build/test-results/test/*.xml'
         }
     }
 }
