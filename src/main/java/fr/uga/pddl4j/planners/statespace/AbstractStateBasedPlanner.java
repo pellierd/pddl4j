@@ -89,7 +89,6 @@ public abstract class AbstractStateBasedPlanner extends AbstractPlanner {
      * Returns the heuristicType to use to solve the planning problem.
      *
      * @return the heuristicType to use to solve the planning problem.
-     * @see Heuristic.Type
      */
     public final Heuristic.Type getHeuristicType() {
         return this.heuristic;
