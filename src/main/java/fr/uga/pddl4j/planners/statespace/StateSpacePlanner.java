@@ -66,7 +66,7 @@ public interface StateSpacePlanner extends Planner {
      * Extract a plan from a solution node for the specified planning problem.
      *
      * @param solutionNode the solution node.
-     * @param problem the problem to be solved. The problem cannot be null.
+     * @param problem      the problem to be solved. The problem cannot be null.
      * @return the solution plan or null is no solution was found.
      */
     Plan extract(final Node solutionNode, final CodedProblem problem);

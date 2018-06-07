@@ -34,6 +34,11 @@ import java.util.Objects;
 public abstract class AbstractStateSpacePlanner extends AbstractPlanner implements StateSpacePlanner {
 
     /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The heuristic of the planner.
      */
     private Heuristic.Type heuristic;
@@ -148,7 +153,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
      * @param traceLevel     the trace level of the planner.
      */
     public void init(Heuristic.Type heuristic, int timeout,
-                             double weight, boolean statisticState, int traceLevel) {
+                     double weight, boolean statisticState, int traceLevel) {
         this.setHeuristicType(heuristic);
         this.setTimeOut(timeout);
         this.setWeight(weight);
