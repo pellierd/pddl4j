@@ -38,6 +38,11 @@ import fr.uga.pddl4j.util.BitState;
 public final class SetLevel extends GraphHeuristic {
 
     /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Creates a new <code>SET_LEVEL</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.

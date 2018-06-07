@@ -17,8 +17,6 @@ package fr.uga.pddl4j.planners;
 
 import org.apache.logging.log4j.Logger;
 
-import java.util.Properties;
-
 /**
  * This abstract class defines the main methods to access a planner.
  *
@@ -138,18 +136,4 @@ public abstract class AbstractPlanner implements Planner {
     public Logger getLogger() {
         return Planner.getLogger();
     }
-
-    /**
-     * This method return the default arguments of the planner.
-     *
-     * @return the default arguments of the planner.
-     */
-    public static Properties getDefaultArguments() {
-        final Properties options = new Properties();
-        options.put(AbstractPlanner.TIMEOUT, AbstractPlanner.DEFAULT_TIMEOUT * 1000);
-        options.put(AbstractPlanner.TRACE_LEVEL, AbstractPlanner.DEFAULT_TRACE_LEVEL);
-        options.put(AbstractPlanner.STATISTICS, AbstractPlanner.DEFAULT_STATISTICS);
-        return options;
-    }
-
 }

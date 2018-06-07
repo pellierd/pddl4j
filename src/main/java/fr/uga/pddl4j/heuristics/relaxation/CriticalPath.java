@@ -38,6 +38,12 @@ import java.util.List;
  * @version 1.0 20.08.2010
  */
 public final class CriticalPath extends RelaxedGraphHeuristic {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
     private BitExp[] precond;
     private BitExp[] effect;
     private BitExp[] neffect;

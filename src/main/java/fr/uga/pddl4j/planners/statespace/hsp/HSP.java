@@ -20,11 +20,9 @@
 package fr.uga.pddl4j.planners.statespace.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +35,11 @@ import java.util.Objects;
  * @version 1.0 - 14.06.2010
  */
 public final class HSP extends AbstractStateSpacePlanner {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new HSP planner with the default parameters.
@@ -66,23 +69,5 @@ public final class HSP extends AbstractStateSpacePlanner {
             logger.trace("* A* failed\n");
             return null;
         }
-    }
-
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node    the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        Node n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getOperator() != -1) {
-            final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.add(0, op);
-            n = n.getParent();
-        }
-        return plan;
     }
 }

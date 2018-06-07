@@ -22,6 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.IntExp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -56,7 +57,12 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 10.04.2010
  */
-final class PostInstantiation {
+final class PostInstantiation implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The default constructor with a private access to prevent instance creation.

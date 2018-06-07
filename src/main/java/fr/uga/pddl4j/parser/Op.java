@@ -44,9 +44,9 @@ import java.util.stream.Collectors;
 public class Op implements Serializable {
 
     /**
-     * The serial version id of the class.
+     * The serial id of the class.
      */
-    private static final long serialVersionUID = 5032998357442574073L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The name of the operator.

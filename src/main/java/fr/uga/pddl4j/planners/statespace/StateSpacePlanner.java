@@ -15,8 +15,13 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.util.Plan;
+
+import java.util.Properties;
 
 /**
  * This interface defines the main methods to access a state space planner.
@@ -56,6 +61,15 @@ public interface StateSpacePlanner extends Planner {
      * The default anytime value.
      */
     boolean DEFAULT_ANYTIME = false;
+
+    /**
+     * Extract a plan from a solution node for the specified planning problem.
+     *
+     * @param solutionNode the solution node.
+     * @param problem the problem to be solved. The problem cannot be null.
+     * @return the solution plan or null is no solution was found.
+     */
+    Plan extract(final Node solutionNode, final CodedProblem problem);
 
     /**
      * Returns the heuristicType to use to solve the planning problem.
@@ -98,6 +112,19 @@ public interface StateSpacePlanner extends Planner {
      * @param anytimeState the anytime state value
      */
     void setAnytimeState(final boolean anytimeState);
+
+    /**
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
+     */
+    static Properties getDefaultArguments() {
+        final Properties options = Planner.getDefaultArguments();
+        options.put(StateSpacePlanner.PLANNER, StateSpacePlanner.DEFAULT_STATE_SPACE_PLANNER);
+        options.put(StateSpacePlanner.HEURISTIC, StateSpacePlanner.DEFAULT_HEURISTIC);
+        options.put(StateSpacePlanner.WEIGHT, StateSpacePlanner.DEFAULT_WEIGHT);
+        return options;
+    }
 
 
 }

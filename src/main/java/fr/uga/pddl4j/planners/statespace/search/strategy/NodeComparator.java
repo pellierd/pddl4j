@@ -26,6 +26,9 @@ import java.util.Comparator;
  */
 public class NodeComparator implements Comparator<Node>, Serializable {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

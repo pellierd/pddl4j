@@ -18,20 +18,26 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.Plan;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
-public class GreedyBestFirstSearch {
+public class GreedyBestFirstSearch implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The time needed to search a solution node.
@@ -55,6 +61,23 @@ public class GreedyBestFirstSearch {
         Objects.requireNonNull(pb);
         searchingTime = 0;
         return GreedyBestFirstSearch.greedyBestFirstSearch(planner, pb);
+    }
+
+    /**
+     * Search a solution plan to a specified domain and problem.
+     *
+     * @param planner the planner used to solve the problem
+     * @param pb      the problem to solve.
+     * @return the solution plan or null.
+     */
+    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        final Node solutionNode = GreedyBestFirstSearch.greedyBestFirstSearch(planner, pb);
+        if (solutionNode != null) {
+            return planner.extract(solutionNode, pb);
+        } else {
+            return null;
+        }
     }
 
     /**

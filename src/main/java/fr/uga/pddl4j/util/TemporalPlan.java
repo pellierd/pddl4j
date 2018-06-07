@@ -32,6 +32,9 @@ import java.util.TreeMap;
  */
 public class TemporalPlan extends AbstractPlan {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

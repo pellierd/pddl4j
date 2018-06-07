@@ -29,6 +29,7 @@ import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
 import fr.uga.pddl4j.util.IntExp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -43,7 +44,12 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 08.06.2010
  */
-final class IntEncoding {
+final class IntEncoding implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The default constructor with a private access to prevent instance creation.

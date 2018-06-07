@@ -32,6 +32,9 @@ import java.util.stream.Collectors;
  */
 public final class TypedSymbol extends Symbol {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

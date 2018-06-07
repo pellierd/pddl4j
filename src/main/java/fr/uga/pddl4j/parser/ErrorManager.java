@@ -39,8 +39,14 @@ import java.util.stream.Collectors;
  */
 public class ErrorManager implements Serializable {
 
+    /**
+     * The serial version id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(ErrorManager.class);
 
     /**

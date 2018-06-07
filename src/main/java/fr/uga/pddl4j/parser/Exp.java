@@ -51,6 +51,9 @@ public class Exp implements Serializable {
      */
     private static final long serialVersionUID = 1943664302879209785L;
 
+    /**
+     * The logger of the class.
+     */
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(Exp.class);
 
     /**

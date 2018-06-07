@@ -29,8 +29,10 @@ import java.util.BitSet;
  */
 public class BitVector extends BitSet {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
-
 
     /**
      * Creates a new <code>BitVector</code> with a specific size.

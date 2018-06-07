@@ -22,13 +22,14 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.Plan;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -39,7 +40,12 @@ import java.util.Objects;
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
-public class EnforcedHillClimbing {
+public class EnforcedHillClimbing implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The time needed to search a solution node.
@@ -63,6 +69,23 @@ public class EnforcedHillClimbing {
         Objects.requireNonNull(pb);
         searchingTime = 0;
         return EnforcedHillClimbing.enforcedHillClimbing(planner, pb);
+    }
+
+    /**
+     * Search a solution plan to a specified domain and problem.
+     *
+     * @param planner the planner used to solve the problem
+     * @param pb      the problem to solve.
+     * @return the solution plan or null.
+     */
+    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        final Node solutionNode = EnforcedHillClimbing.enforcedHillClimbing(planner, pb);
+        if (solutionNode != null) {
+            return planner.extract(solutionNode, pb);
+        } else {
+            return null;
+        }
     }
 
     /**

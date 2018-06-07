@@ -34,6 +34,9 @@ import java.util.Arrays;
  */
 final class IntOp extends AbstractCodedOp {
 
+    /**
+     * The serial version id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

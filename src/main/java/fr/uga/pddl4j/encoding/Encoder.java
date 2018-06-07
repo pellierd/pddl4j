@@ -32,6 +32,7 @@ import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -126,7 +127,12 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 08.06.2010
  */
-public final class Encoder {
+public final class Encoder implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The logger of the class.

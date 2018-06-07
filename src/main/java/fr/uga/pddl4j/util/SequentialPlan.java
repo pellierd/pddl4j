@@ -31,6 +31,9 @@ import java.util.Set;
  */
 public class SequentialPlan extends AbstractPlan {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

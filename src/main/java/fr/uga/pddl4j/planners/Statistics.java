@@ -15,6 +15,8 @@
 
 package fr.uga.pddl4j.planners;
 
+import java.io.Serializable;
+
 /**
  * The class implements the statistics of the planner, search time, memory used, etc.
  *
@@ -22,7 +24,12 @@ package fr.uga.pddl4j.planners;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public class Statistics {
+public class Statistics implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The encoding time in ms.

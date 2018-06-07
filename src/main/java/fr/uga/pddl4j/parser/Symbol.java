@@ -36,9 +36,9 @@ import java.util.Map;
 public class Symbol implements Serializable {
 
     /**
-     * The serial version id of the class.
+     * The serial id of the class.
      */
-    private static final long serialVersionUID = -4707714084871593022L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The name of rename variable.

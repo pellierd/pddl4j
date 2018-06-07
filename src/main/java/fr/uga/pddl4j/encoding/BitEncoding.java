@@ -28,6 +28,7 @@ import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,19 +47,27 @@ import java.util.Set;
  * </p>
  * <p>
  * <b>Notes:</b>
+ * </p>
  * <ul>
  * <li> the problem of converting a well form formula of the first order-logic into DNF of CNF is
  * exponential. </li>
  * <li>The method does not compute the shorter DNF or CNF formula. If you want it have a look to
  * the Quine and McCluskey algorithm.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-final class BitEncoding {
+final class BitEncoding implements Serializable {
 
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(BitEncoding.class);
 
     /**

@@ -21,6 +21,7 @@ package fr.uga.pddl4j.util;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 
+import java.io.Serializable;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -48,7 +49,12 @@ import java.util.Map;
  * @version 1.0 - 14.06.2010
  * @see java.lang.instrument.Instrumentation
  */
-public class MemoryAgent {
+public class MemoryAgent implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * Instance of <code>java.lang.instrument.Instrument</code> injected by the Java VM.

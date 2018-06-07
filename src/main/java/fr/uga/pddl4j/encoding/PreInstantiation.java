@@ -24,6 +24,7 @@ import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -48,8 +49,16 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 10.04.2010
  */
-final class PreInstantiation {
+final class PreInstantiation implements Serializable {
 
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(PreInstantiation.class);
 
     /**

@@ -29,6 +29,9 @@ import java.io.Serializable;
  */
 public class CondBitExp implements Serializable {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

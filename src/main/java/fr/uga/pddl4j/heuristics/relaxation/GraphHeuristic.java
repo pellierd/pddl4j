@@ -28,6 +28,7 @@ import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -47,6 +48,11 @@ import java.util.List;
  * @version 1.0 20.08.2010
  */
 public abstract class GraphHeuristic extends AbstractHeuristic {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The array used to store the apparition level of the propositions.

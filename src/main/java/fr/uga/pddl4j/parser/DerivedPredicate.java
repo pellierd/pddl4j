@@ -32,6 +32,9 @@ import java.util.Map;
  */
 public class DerivedPredicate implements Serializable {
 
+    /**
+     * The serial version id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

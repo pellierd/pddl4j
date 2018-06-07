@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Properties;
 
 /**
@@ -40,7 +41,12 @@ import java.util.Properties;
  * @see Planner
  * @since 3.0
  */
-public class StateSpacePlannerFactory {
+public class StateSpacePlannerFactory implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * An instance of the class.
@@ -338,7 +344,7 @@ public class StateSpacePlannerFactory {
 
             // Parse the command line
             final Properties arguments = StateSpacePlannerFactory.parseArguments(args,
-                logger, AbstractStateSpacePlanner.getDefaultArguments());
+                logger, StateSpacePlanner.getDefaultArguments());
 
             final File domain = (File) arguments.get(AbstractStateSpacePlanner.DOMAIN);
             final File problem = (File) arguments.get(AbstractStateSpacePlanner.PROBLEM);
@@ -351,7 +357,7 @@ public class StateSpacePlannerFactory {
             // Creates the planner
             final AbstractStateSpacePlanner planner = stateSpacePlannerFactory.getPlanner((Planner.Name)
                 arguments.get(AbstractStateSpacePlanner.PLANNER));
-            planner.setupPlanner(heuristicType, timeout, weight, saveStats, traceLevel);
+            planner.init(heuristicType, timeout, weight, saveStats, traceLevel);
 
             // Creates the problem factory
             final ProblemFactory factory = ProblemFactory.getInstance();

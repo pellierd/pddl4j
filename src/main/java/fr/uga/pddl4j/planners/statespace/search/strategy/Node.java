@@ -29,6 +29,9 @@ import fr.uga.pddl4j.util.BitState;
  */
 public final class Node extends BitState {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

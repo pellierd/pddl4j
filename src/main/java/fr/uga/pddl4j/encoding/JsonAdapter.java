@@ -30,6 +30,7 @@ import org.json.simple.JSONObject;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -45,7 +46,12 @@ import java.util.stream.Collectors;
  * @author Damien Pellier
  * @version 1.0 - 07.19.2016
  */
-public class JsonAdapter {
+public class JsonAdapter implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The current coded problem the plan is based on.

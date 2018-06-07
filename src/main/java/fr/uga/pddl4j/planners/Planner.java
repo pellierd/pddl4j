@@ -20,6 +20,9 @@ import fr.uga.pddl4j.util.Plan;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
+import java.util.Properties;
+
 /**
  * This interface defines the main methods of to access a planner.
  *
@@ -27,7 +30,7 @@ import org.apache.logging.log4j.Logger;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public interface Planner {
+public interface Planner extends Serializable {
 
     /**
      * The logger of the class.
@@ -164,4 +167,17 @@ public interface Planner {
      * @return true if statistics are compute and save, false otherwise
      */
     boolean isSaveState();
+
+    /**
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
+     */
+    static Properties getDefaultArguments() {
+        final Properties options = new Properties();
+        options.put(Planner.TIMEOUT, Planner.DEFAULT_TIMEOUT * 1000);
+        options.put(Planner.TRACE_LEVEL, Planner.DEFAULT_TRACE_LEVEL);
+        options.put(Planner.STATISTICS, Planner.DEFAULT_STATISTICS);
+        return options;
+    }
 }

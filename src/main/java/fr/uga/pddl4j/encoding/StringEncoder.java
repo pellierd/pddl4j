@@ -25,6 +25,7 @@ import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.List;
 
@@ -35,7 +36,12 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 11.06.2010
  */
-final class StringEncoder {
+final class StringEncoder implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The default constructor with a private access to prevent instance creation.

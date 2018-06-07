@@ -43,6 +43,11 @@ import java.util.List;
 public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
 
     /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The array of unconditional operators of the problem.
      */
     private int[][] unconditionalOperators;

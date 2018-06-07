@@ -58,6 +58,11 @@ import fr.uga.pddl4j.util.BitState;
 public final class Max extends RelaxedGraphHeuristic {
 
     /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Creates a new <code>MAX</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.

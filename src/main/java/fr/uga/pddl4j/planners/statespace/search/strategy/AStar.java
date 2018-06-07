@@ -18,19 +18,25 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.Plan;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 
-public class AStar {
+public class AStar implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new planner.
@@ -43,11 +49,28 @@ public class AStar {
      *
      * @param planner the planner used to solve the problem
      * @param pb      the problem to solve.
-     * @return the solution node.
+     * @return the solution node or null.
      */
     public static Node searchSolutionNode(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
         Objects.requireNonNull(pb);
         return AStar.astar(planner, pb);
+    }
+
+    /**
+     * Search a solution plan to a specified domain and problem.
+     *
+     * @param planner the planner used to solve the problem
+     * @param pb      the problem to solve.
+     * @return the solution plan or null.
+     */
+    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
+        Objects.requireNonNull(pb);
+        final Node solutionNode = AStar.astar(planner, pb);
+        if (solutionNode != null) {
+            return planner.extract(solutionNode, pb);
+        } else {
+            return null;
+        }
     }
 
     /**
