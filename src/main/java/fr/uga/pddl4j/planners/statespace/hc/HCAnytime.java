@@ -39,6 +39,11 @@ import java.util.Objects;
 public class HCAnytime extends AbstractStateSpacePlannerAnytime {
 
     /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The list containing the nodes on which it is interesting to restart hill climbing.
      */
     private LinkedList<Node> restartList;
@@ -61,18 +66,6 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
         restartList = new LinkedList<>();
         openList = new LinkedList<>();
         this.searchingTime = 0;
-    }
-
-    /**
-     * Setup planner.
-     */
-    public void setupPlanner(Heuristic.Type heuristic, int timeout,
-                             double weight, boolean statisticState, int traceLevel) {
-        this.setHeuristicType(heuristic);
-        this.setTimeOut(timeout);
-        this.setWeight(weight);
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
     }
 
     /**
@@ -247,25 +240,5 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
             nodes.remove(node);
         }
         return node;
-    }
-
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node    the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        final SequentialPlan plan = new SequentialPlan();
-        if (node != null) {
-            Node n = node;
-            while (n.getParent() != null) {
-                final BitOp op = problem.getOperators().get(n.getOperator());
-                plan.add(0, op);
-                n = n.getParent();
-            }
-        }
-        return plan;
     }
 }

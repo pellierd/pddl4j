@@ -26,6 +26,11 @@ import java.util.Vector;
 public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpacePlanner {
 
     /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The list containing all the solutions found during anytime process.
      */
     private Vector<Node> solutionNodes;

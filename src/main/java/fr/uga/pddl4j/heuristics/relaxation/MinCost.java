@@ -36,6 +36,11 @@ import java.util.LinkedList;
 public class MinCost extends AbstractHeuristic {
 
     /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Creates a new <code>Min Cost</code> heuristic for a specified planning problem.
      *
      * @param problem the coded problem of the specified planning problem.

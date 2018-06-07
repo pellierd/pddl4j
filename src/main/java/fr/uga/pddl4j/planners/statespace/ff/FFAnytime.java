@@ -49,6 +49,11 @@ import java.util.PriorityQueue;
 public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
 
     /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The time needed to search a solution plan.
      */
     private long searchingTime;
@@ -106,26 +111,6 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
                 return null;
             }
         }
-    }
-
-    /**
-     * Extracts a search from a specified node.
-     *
-     * @param node    the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    private SequentialPlan extract(final Node node, final CodedProblem problem) {
-        final SequentialPlan plan = new SequentialPlan();
-        if (node != null) {
-            Node n = node;
-            while (n.getParent() != null) {
-                final BitOp op = problem.getOperators().get(n.getOperator());
-                plan.add(0, op);
-                n = n.getParent();
-            }
-        }
-        return plan;
     }
 
     /**
