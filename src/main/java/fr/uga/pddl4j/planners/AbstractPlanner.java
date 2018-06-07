@@ -15,7 +15,6 @@
 
 package fr.uga.pddl4j.planners;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
@@ -28,36 +27,6 @@ import java.util.Properties;
  * @since 3.0
  */
 public abstract class AbstractPlanner implements Planner {
-
-    /**
-     * The enumeration of the arguments of the planner.
-     */
-    public enum Argument {
-        /**
-         * The planner to use.
-         */
-        PLANNER,
-        /**
-         * The planning domain.
-         */
-        DOMAIN,
-        /**
-         * The planning problem.
-         */
-        PROBLEM,
-        /**
-         * The global time slot allocated to the search.
-         */
-        TIMEOUT,
-        /**
-         * The trace level.
-         */
-        TRACE_LEVEL,
-        /**
-         * Generate statistics or not.
-         */
-        STATISTICS
-    }
 
     /**
      * The timeout for the search in second.
@@ -177,9 +146,9 @@ public abstract class AbstractPlanner implements Planner {
      */
     public static Properties getDefaultArguments() {
         final Properties options = new Properties();
-        options.put(AbstractPlanner.Argument.TIMEOUT, AbstractPlanner.DEFAULT_TIMEOUT * 1000);
-        options.put(AbstractPlanner.Argument.TRACE_LEVEL, AbstractPlanner.DEFAULT_TRACE_LEVEL);
-        options.put(AbstractPlanner.Argument.STATISTICS, AbstractPlanner.DEFAULT_STATISTICS);
+        options.put(AbstractPlanner.TIMEOUT, AbstractPlanner.DEFAULT_TIMEOUT * 1000);
+        options.put(AbstractPlanner.TRACE_LEVEL, AbstractPlanner.DEFAULT_TRACE_LEVEL);
+        options.put(AbstractPlanner.STATISTICS, AbstractPlanner.DEFAULT_STATISTICS);
         return options;
     }
 

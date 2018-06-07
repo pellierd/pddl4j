@@ -29,36 +29,7 @@ import java.util.Properties;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
-
-    /**
-     * The enumeration of the arguments of the planner.
-     */
-    public enum StateSpaceArgument {
-        /**
-         * The heuristic to use.
-         */
-        HEURISTIC,
-        /**
-         * The weight of the heuristic.
-         */
-        WEIGHT
-    }
-
-    /**
-     * The default anytime value.
-     */
-    private static boolean DEFAULT_ANYTIME = false;
-
-    /**
-     * The default heuristicType.
-     */
-    private static Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
-
-    /**
-     * The default weight of the heuristic.
-     */
-    private static double DEFAULT_WEIGHT = 1.0;
+public abstract class AbstractStateSpacePlanner extends AbstractPlanner implements StateSpacePlanner {
 
     /**
      * The heuristic of the planner.
@@ -80,9 +51,9 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      */
     public AbstractStateSpacePlanner() {
         super();
-        this.heuristic = AbstractStateSpacePlanner.DEFAULT_HEURISTIC;
-        this.weight = AbstractStateSpacePlanner.DEFAULT_WEIGHT;
-        this.anytime = AbstractStateSpacePlanner.DEFAULT_ANYTIME;
+        this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
+        this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
+        this.anytime = StateSpacePlanner.DEFAULT_ANYTIME;
     }
 
     /**
@@ -90,6 +61,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      *
      * @return the heuristicType to use to solve the planning problem.
      */
+    @Override
     public final Heuristic.Type getHeuristicType() {
         return this.heuristic;
     }
@@ -99,6 +71,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      *
      * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
      */
+    @Override
     public final void setHeuristicType(final Heuristic.Type heuristicType) {
         Objects.requireNonNull(heuristicType);
         this.heuristic = heuristicType;
@@ -109,6 +82,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      *
      * @return the weight set to the heuristic.
      */
+    @Override
     public final double getWeight() {
         return this.weight;
     }
@@ -118,6 +92,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      *
      * @param weight the weight of the heuristic. The weight must be positive.
      */
+    @Override
     public final void setWeight(final double weight) {
         this.weight = weight;
     }
@@ -127,6 +102,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      *
      * @param anytimeState the anytime state value
      */
+    @Override
     public void setAnytimeState(boolean anytimeState) {
         this.anytime = anytimeState;
     }
@@ -136,6 +112,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      *
      * @return true if planner is anytime, false otherwise
      */
+    @Override
     public boolean isAnytime() {
         return anytime;
     }
@@ -147,14 +124,11 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
      */
     public static Properties getDefaultArguments() {
         final Properties options = AbstractPlanner.getDefaultArguments();
-        options.put(AbstractStateSpacePlanner.Argument.PLANNER, Name.HSP);
-        options.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
-            AbstractStateSpacePlanner.DEFAULT_HEURISTIC);
-        options.put(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT,
-            AbstractStateSpacePlanner.DEFAULT_WEIGHT);
+        options.put(AbstractStateSpacePlanner.PLANNER, AbstractStateSpacePlanner.DEFAULT_STATE_SPACE_PLANNER);
+        options.put(AbstractStateSpacePlanner.HEURISTIC, AbstractStateSpacePlanner.DEFAULT_HEURISTIC);
+        options.put(AbstractStateSpacePlanner.WEIGHT, AbstractStateSpacePlanner.DEFAULT_WEIGHT);
         return options;
     }
-
 
     /**
      * Setup the planner.
@@ -173,5 +147,4 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner {
         this.setSaveState(statisticState);
         this.setTraceLevel(traceLevel);
     }
-
 }

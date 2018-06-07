@@ -35,14 +35,49 @@ public interface Planner {
     Logger LOGGER = LogManager.getLogger(Planner.class);
 
     /**
+     * The planner key for properties.
+     */
+    String PLANNER = "PLANNER";
+
+    /**
+     * The default planner.
+     */
+    Name DEFAULT_PLANNER = Name.HSP;
+
+    /**
+     * The domain key for properties.
+     */
+    String DOMAIN = "DOMAIN";
+
+    /**
+     * The problem key for properties.
+     */
+    String PROBLEM = "PROBLEM";
+
+    /**
+     * The timeout key for properties.
+     */
+    String TIMEOUT = "TIMEOUT";
+
+    /**
      * The default CPU time allocated to the search in seconds.
      */
     int DEFAULT_TIMEOUT = 600;
 
     /**
+     * The trace level key for properties.
+     */
+    String TRACE_LEVEL = "TRACE_LEVEL";
+
+    /**
      * The default trace level.
      */
     int DEFAULT_TRACE_LEVEL = 1;
+
+    /**
+     * The statistics key for properties.
+     */
+    String STATISTICS = "STATISTICS";
 
     /**
      * The default statistics value.

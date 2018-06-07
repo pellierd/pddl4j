@@ -81,7 +81,6 @@ public class StateSpacePlannerFactory {
 
     /**
      * Creates a new StateSpacePlannerFactory.
-     * The constructor is override to
      */
     private StateSpacePlannerFactory() {
         super();
@@ -185,9 +184,9 @@ public class StateSpacePlannerFactory {
                 if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int planner = Integer.parseInt(args[i + 1]);
                     if (planner == 0) {
-                        arguments.put(AbstractStateSpacePlanner.Argument.PLANNER, Planner.Name.HSP);
+                        arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.HSP);
                     } else if (planner == 1) {
-                        arguments.put(AbstractStateSpacePlanner.Argument.PLANNER, Planner.Name.FF);
+                        arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FF);
                     } else {
                         throw (new RuntimeException("Wrong planner argument"));
                     }
@@ -195,49 +194,49 @@ public class StateSpacePlannerFactory {
                     if (!new File(args[i + 1]).exists()) {
                         log.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
-                    arguments.put(AbstractStateSpacePlanner.Argument.DOMAIN, new File(args[i + 1]));
+                    arguments.put(AbstractStateSpacePlanner.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
                         log.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
-                    arguments.put(AbstractStateSpacePlanner.Argument.PROBLEM, new File(args[i + 1]));
+                    arguments.put(AbstractStateSpacePlanner.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
                         log.trace(StateSpacePlannerFactory.printUsage());
                     }
-                    arguments.put(AbstractStateSpacePlanner.Argument.TIMEOUT, cpu);
+                    arguments.put(AbstractStateSpacePlanner.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
                         log.trace(StateSpacePlannerFactory.printUsage());
                     }
                     if (heuristic == 0) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.FAST_FORWARD);
                     } else if (heuristic == 1) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.SUM);
                     } else if (heuristic == 2) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.SUM_MUTEX);
                     } else if (heuristic == 3) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.AJUSTED_SUM);
                     } else if (heuristic == 4) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.AJUSTED_SUM2);
                     } else if (heuristic == 5) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.AJUSTED_SUM2M);
                     } else if (heuristic == 6) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.COMBO);
                     } else if (heuristic == 7) {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.MAX);
                     } else {
-                        arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC,
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.SET_LEVEL);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
@@ -245,26 +244,26 @@ public class StateSpacePlannerFactory {
                     if (weight < 0) {
                         log.trace(StateSpacePlannerFactory.printUsage());
                     }
-                    arguments.put(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT, weight);
+                    arguments.put(AbstractStateSpacePlanner.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
                         log.trace(StateSpacePlannerFactory.printUsage());
                     }
-                    arguments.put(AbstractStateSpacePlanner.Argument.TRACE_LEVEL, level);
+                    arguments.put(AbstractStateSpacePlanner.TRACE_LEVEL, level);
                 } else if ("-m".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     StateSpacePlannerFactory.setMemoryAgent(Boolean.parseBoolean(args[i + 1]));
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
-                    arguments.put(AbstractStateSpacePlanner.Argument.STATISTICS, isStatUsed);
+                    arguments.put(AbstractStateSpacePlanner.STATISTICS, isStatUsed);
                 } else {
                     log.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     log.trace(StateSpacePlannerFactory.printUsage());
                     throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
-            if (arguments.get(AbstractStateSpacePlanner.Argument.DOMAIN) == null
-                || arguments.get(AbstractStateSpacePlanner.Argument.PROBLEM) == null) {
+            if (arguments.get(AbstractStateSpacePlanner.DOMAIN) == null
+                || arguments.get(AbstractStateSpacePlanner.PROBLEM) == null) {
 
                 log.trace("\nMissing DOMAIN or PROBLEM\n");
                 log.trace(StateSpacePlannerFactory.printUsage());
@@ -341,18 +340,17 @@ public class StateSpacePlannerFactory {
             final Properties arguments = StateSpacePlannerFactory.parseArguments(args,
                 logger, AbstractStateSpacePlanner.getDefaultArguments());
 
-            final File domain = (File) arguments.get(AbstractStateSpacePlanner.Argument.DOMAIN);
-            final File problem = (File) arguments.get(AbstractStateSpacePlanner.Argument.PROBLEM);
-            final int traceLevel = (Integer) arguments.get(AbstractStateSpacePlanner.Argument.TRACE_LEVEL);
-            final int timeout = (Integer) arguments.get(AbstractStateSpacePlanner.Argument.TIMEOUT);
-            final Heuristic.Type heuristicType =
-                (Heuristic.Type) arguments.get(AbstractStateSpacePlanner.StateSpaceArgument.HEURISTIC);
-            final double weight = (Double) arguments.get(AbstractStateSpacePlanner.StateSpaceArgument.WEIGHT);
-            final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.Argument.STATISTICS);
+            final File domain = (File) arguments.get(AbstractStateSpacePlanner.DOMAIN);
+            final File problem = (File) arguments.get(AbstractStateSpacePlanner.PROBLEM);
+            final int traceLevel = (Integer) arguments.get(AbstractStateSpacePlanner.TRACE_LEVEL);
+            final int timeout = (Integer) arguments.get(AbstractStateSpacePlanner.TIMEOUT);
+            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(AbstractStateSpacePlanner.HEURISTIC);
+            final double weight = (Double) arguments.get(AbstractStateSpacePlanner.WEIGHT);
+            final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.STATISTICS);
 
             // Creates the planner
             final AbstractStateSpacePlanner planner = stateSpacePlannerFactory.getPlanner((Planner.Name)
-                arguments.get(AbstractStateSpacePlanner.Argument.PLANNER));
+                arguments.get(AbstractStateSpacePlanner.PLANNER));
             planner.setupPlanner(heuristicType, timeout, weight, saveStats, traceLevel);
 
             // Creates the problem factory
