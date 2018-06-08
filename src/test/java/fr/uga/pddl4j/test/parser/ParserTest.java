@@ -21,8 +21,10 @@ import fr.uga.pddl4j.test.Tools;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -155,6 +157,56 @@ public class ParserTest {
 
             final Parser parser = new Parser();
             parser.parseFromString(domainAndProblemString);
+            final ErrorManager errManager = parser.getErrorManager();
+
+            Assert.assertTrue(errManager.isEmpty());
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    /**
+     * Method that tests parsing from a stream.
+     */
+    @Test
+    public void parseFromStreamSingleTest() {
+        try {
+            System.out.println("Parser: Test parsing from one stream.");
+            final String domainAndProblem = "src/test/resources/encoding/domainAndProblem.pddl";
+            final String domainAndProblemString = Tools.readFile(domainAndProblem,
+                StandardCharsets.UTF_8);
+
+            InputStream is = new ByteArrayInputStream(domainAndProblemString.getBytes("UTF-8"));
+
+            final Parser parser = new Parser();
+            parser.parseFromStream(is);
+            final ErrorManager errManager = parser.getErrorManager();
+
+            Assert.assertTrue(errManager.isEmpty());
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    /**
+     * Method that tests parsing from two streams.
+     */
+    @Test
+    public void parseFromStreamTest() {
+        try {
+            System.out.println("Parser: Test parsing from two streams.");
+            final String domain = Tools.readFile("src/test/resources/encoding/domain.pddl",
+                StandardCharsets.UTF_8);
+            final String problem = Tools.readFile("src/test/resources/encoding/p01.pddl",
+                StandardCharsets.UTF_8);
+
+            InputStream isDomain = new ByteArrayInputStream(domain.getBytes("UTF-8"));
+            InputStream isProblem = new ByteArrayInputStream(problem.getBytes("UTF-8"));
+
+            final Parser parser = new Parser();
+            parser.parseFromStream(isDomain,isProblem);
             final ErrorManager errManager = parser.getErrorManager();
 
             Assert.assertTrue(errManager.isEmpty());

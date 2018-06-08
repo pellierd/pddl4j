@@ -25,12 +25,15 @@ import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implements the <tt>Parser</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
@@ -333,6 +337,36 @@ public final class Parser {
 
             // Parse and check the domain and problem
             parse(domainAndProblemTempFile);
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from an input stream.
+     *
+     * @param inputDomainAndProblem the stream that contains the domain and planning problem.
+     */
+    public void parseFromStream(InputStream inputDomainAndProblem) {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(inputDomainAndProblem, "UTF-8"))) {
+            parseFromString(buffer.lines().collect(Collectors.joining("\n")));
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from two input streams.
+     *
+     * @param inputDomain  the stream that contains the domain.
+     * @param inputProblem the stream that contains the planning problem.
+     */
+    public void parseFromStream(InputStream inputDomain, InputStream inputProblem) {
+        try {
+            BufferedReader bufferDomain = new BufferedReader(new InputStreamReader(inputDomain, "UTF-8"));
+            BufferedReader bufferProblem = new BufferedReader(new InputStreamReader(inputProblem, "UTF-8"));
+            parseFromString(bufferDomain.lines().collect(Collectors.joining("\n")),
+                bufferProblem.lines().collect(Collectors.joining("\n")));
         } catch (RuntimeException | IOException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
