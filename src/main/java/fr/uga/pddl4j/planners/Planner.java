@@ -102,9 +102,9 @@ public interface Planner extends Serializable {
     }
 
     /**
-     * Returns the LOGGER of the AbstractPlanner class.
+     * Returns the LOGGER of the Planner class.
      *
-     * @return the AbstractPlanner class.
+     * @return the Planner class.
      */
     static Logger getLogger() {
         return LOGGER;

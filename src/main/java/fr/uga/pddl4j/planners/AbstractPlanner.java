@@ -129,9 +129,9 @@ public abstract class AbstractPlanner implements Planner {
     }
 
     /**
-     * Returns the LOGGER of the AbstractPlanner class.
+     * Returns the LOGGER of the Planner class.
      *
-     * @return the AbstractPlanner class.
+     * @return the Planner class.
      */
     public Logger getLogger() {
         return Planner.getLogger();

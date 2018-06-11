@@ -62,9 +62,9 @@ public interface StateSpacePlanner extends Planner {
     boolean DEFAULT_ANYTIME = false;
 
     /**
-     * Returns the LOGGER of the AbstractPlanner class.
+     * Returns the LOGGER of the Planner class.
      *
-     * @return the AbstractPlanner class.
+     * @return the Planner class.
      */
     static Logger getLogger() {
         return Planner.getLogger();
