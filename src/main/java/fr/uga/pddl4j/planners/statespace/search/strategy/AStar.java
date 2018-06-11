@@ -18,11 +18,8 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +32,7 @@ import java.util.PriorityQueue;
  * @author D. Pellier
  * @version 1.0 - 01.06.2018
  */
-public final class AStar extends AbstractStrategy {
+public final class AStar extends AbstractStateSpaceStrategy {
 
     /**
      * The serial id of the class.
@@ -45,41 +42,45 @@ public final class AStar extends AbstractStrategy {
     /**
      * Creates a new AStar search strategy.
      *
-     * @param stateSpacePlanner the planner associated to the search strategy
-     * @param codedProblem      the coded problem on which the search strategy is applied.
+     * @param timeout   the time out of the planner.
+     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param weight    the weight set to the heuristic.
      */
-    public AStar(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
-        super(stateSpacePlanner, codedProblem);
+    public AStar(int timeout, Heuristic.Type heuristic, double weight) {
+        super();
+        this.setTimeOut(timeout);
+        this.setHeuristicType(heuristic);
+        this.setWeight(weight);
     }
 
     /**
      * Solves the planning problem and returns the first solution search found.
      *
-     * @param planner the planner used to solve the problem
-     * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
      */
-    public Node search(final StateSpacePlanner planner, final CodedProblem problem) {
-        Objects.requireNonNull(problem);
+    public Node search(final CodedProblem codedProblem) {
+        Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         // Get the initial state from the planning problem
-        final BitState init = new BitState(problem.getInit());
+        final BitState init = new BitState(codedProblem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
         final Map<BitState, Node> closeSet = new HashMap<>();
         final Map<BitState, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
-        final double currWeight = planner.getWeight();
+        final double currWeight = getWeight();
         // The list stores the node ordered according to the A* (getFValue = g + h) function
         final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(currWeight));
         // Creates the root node of the tree search
-        final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, problem.getGoal()));
+        final Node root = new Node(init, null, -1, 0,
+            heuristic.estimate(init, codedProblem.getGoal()));
+        this.setRootNode(root);
         // Adds the root to the list of pending nodes
         open.add(root);
         openSet.put(init, root);
         Node solutionNode = null;
 
-        final int timeout = planner.getTimeout();
+        final int timeout = getTimeout();
         long time = 0;
         // Start of the search
         while (!open.isEmpty() && solutionNode == null && time < timeout) {
@@ -88,12 +89,12 @@ public final class AStar extends AbstractStrategy {
             openSet.remove(current);
             closeSet.put(current, current);
             // If the goal is satisfy in the current node then extract the search and return it
-            if (current.satisfy(problem.getGoal())) {
+            if (current.satisfy(codedProblem.getGoal())) {
                 solutionNode = current;
             } else {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
-                for (BitOp op : problem.getOperators()) {
+                for (BitOp op : codedProblem.getOperators()) {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         Node state = new Node(current);
@@ -121,7 +122,7 @@ public final class AStar extends AbstractStrategy {
                                 state.setCost(g);
                                 state.setParent(current);
                                 state.setOperator(index);
-                                state.setHeuristic(heuristic.estimate(state, problem.getGoal()));
+                                state.setHeuristic(heuristic.estimate(state, codedProblem.getGoal()));
                                 open.add(state);
                                 openSet.put(state, state);
                             }
@@ -139,18 +140,8 @@ public final class AStar extends AbstractStrategy {
             time = System.currentTimeMillis() - begin;
         }
 
-        if (planner.isSaveState()) {
-            planner.getStatistics().setTimeToSearch(time);
-            if (StateSpacePlannerFactory.isMemoryAgent()) {
-                // Compute the memory used by the search
-                try {
-                    planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                        + MemoryAgent.deepSizeOf(openSet));
-                } catch (IllegalStateException ilException) {
-                    StateSpacePlanner.getLogger().error(ilException);
-                }
-            }
-        }
+        this.setSearchingTime(time);
+
         // return the search computed or null if no search was found
         return solutionNode;
     }

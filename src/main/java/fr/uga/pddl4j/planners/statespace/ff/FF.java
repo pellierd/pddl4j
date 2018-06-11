@@ -20,10 +20,12 @@
 package fr.uga.pddl4j.planners.statespace.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
@@ -45,10 +47,32 @@ public final class FF extends AbstractStateSpacePlanner {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new planner.
+     * The Enforced Hill Climbing strategy.
      */
-    public FF() {
+    private final StateSpaceStrategy enforcedHillClimbing;
+
+    /**
+     * The Greedy Best First Search strategy.
+     */
+    private final StateSpaceStrategy greedyBestFirstSearch;
+
+    /**
+     * Creates a new planner.
+     *
+     * @param timeout        the time out of the planner.
+     * @param heuristicType  the heuristicType to use to solve the planning problem.
+     * @param weight         the weight set to the heuristic.
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public FF(final int timeout, final Heuristic.Type heuristicType, final double weight,
+              final boolean statisticState, final int traceLevel) {
         super();
+        this.setSaveState(statisticState);
+        this.setTraceLevel(traceLevel);
+
+        enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
+        greedyBestFirstSearch = new GreedyBestFirstSearch(timeout, heuristicType, weight);
     }
 
     /**
@@ -62,24 +86,45 @@ public final class FF extends AbstractStateSpacePlanner {
         Objects.requireNonNull(pb);
 
         logger.trace("* starting enforced hill climbing\n");
-        final EnforcedHillClimbing enforcedHillClimbing = new EnforcedHillClimbing(this, pb);
-        Node solutionNode = enforcedHillClimbing.searchSolutionNode();
+        Node solutionNode = enforcedHillClimbing.searchSolutionNode(pb);
 
         if (solutionNode != null) {
             logger.trace("* enforced hill climbing succeeded\n");
-            return enforcedHillClimbing.extract(solutionNode, pb);
+            if (isSaveState()) {
+                this.getStatistics().setTimeToSearch(enforcedHillClimbing.getSearchingTime());
+                /*if (StateSpacePlannerFactory.isMemoryAgent()) {
+                    // Compute the memory used by the search
+                    try {
+                        //this().getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                        // + MemoryAgent.deepSizeOf(openSet));
+                    } catch (IllegalStateException ilException) {
+                        StateSpacePlanner.getLogger().error(ilException);
+                    }
+                }*/
+            }
+            return (SequentialPlan) enforcedHillClimbing.extractPlan(solutionNode, pb);
         } else {
             logger.trace("* enforced hill climbing failed\n");
             logger.trace("* starting greedy best first search\n");
-            final GreedyBestFirstSearch greedyBestFirstSearch = new GreedyBestFirstSearch(this, pb);
-            solutionNode = greedyBestFirstSearch.searchSolutionNode();
-
+            solutionNode = greedyBestFirstSearch.searchSolutionNode(pb);
+            if (isSaveState()) {
+                this.getStatistics().setTimeToSearch(greedyBestFirstSearch.getSearchingTime());
+                /*if (StateSpacePlannerFactory.isMemoryAgent()) {
+                    // Compute the memory used by the search
+                    try {
+                        //this().getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                        // + MemoryAgent.deepSizeOf(openSet));
+                    } catch (IllegalStateException ilException) {
+                        StateSpacePlanner.getLogger().error(ilException);
+                    }
+                }*/
+            }
             if (solutionNode == null) {
                 logger.trace("* greedy best first search failed\n");
                 return null;
             } else {
                 logger.trace("* greedy best first search succeeded\n");
-                return greedyBestFirstSearch.extract(solutionNode, pb);
+                return (SequentialPlan) greedyBestFirstSearch.extractPlan(solutionNode, pb);
             }
         }
     }

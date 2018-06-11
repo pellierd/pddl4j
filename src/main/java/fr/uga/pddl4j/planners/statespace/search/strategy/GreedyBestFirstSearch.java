@@ -18,15 +18,13 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,7 +33,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 01.06.2018
  */
-public final class GreedyBestFirstSearch extends AbstractStrategy {
+public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
 
     /**
      * The serial id of the class.
@@ -45,46 +43,48 @@ public final class GreedyBestFirstSearch extends AbstractStrategy {
     /**
      * Creates a new Greedy best First Search search strategy.
      *
-     * @param stateSpacePlanner the planner associated to the search strategy
-     * @param codedProblem      the coded problem on which the search strategy is applied.
+     * @param timeout   the time out of the planner.
+     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param weight    the weight set to the heuristic.
      */
-    public GreedyBestFirstSearch(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
-        super(stateSpacePlanner, codedProblem);
+    public GreedyBestFirstSearch(int timeout, Heuristic.Type heuristic, double weight) {
+        super();
+        this.setTimeOut(timeout);
+        this.setHeuristicType(heuristic);
+        this.setWeight(weight);
     }
 
     /**
      * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found.
      * This method must be completed.
      *
-     * @param planner the planner used to solve the problem
-     * @param problem the coded planning problem to solve.
      * @return a solution plan or null if it does not exist.
      */
-    public Node search(final StateSpacePlanner planner, final CodedProblem problem) {
+    public Node search(final CodedProblem codedProblem) {
+        Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        long searchingTime = 0;
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
-        final Set<Node> closeSet = new HashSet<>();
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         final Set<Node> openSet = new HashSet<>();
-        final int timeout = planner.getTimeout();
-        Node solution = null;
+        final int timeout = getTimeout();
 
-        BitState init = new BitState(problem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
+        BitState init = new BitState(codedProblem.getInit());
+        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         root.setDepth(0);
+        this.setRootNode(root);
         openSet.add(root);
 
+        Node solution = null;
+        long searchingTime = 0;
         while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
             // Pop the first node in the pending list open
             final Node current = GreedyBestFirstSearch.popPriorityNode(openSet);
 
-            if (current.satisfy(problem.getGoal())) {
+            if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
             } else {
-                closeSet.add(current);
                 int index = 0;
-                for (BitOp op : problem.getOperators()) {
+                for (BitOp op : codedProblem.getOperators()) {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
@@ -95,7 +95,7 @@ public final class GreedyBestFirstSearch extends AbstractStrategy {
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         successor.setCost(current.getCost() + op.getCost());
-                        successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
+                        successor.setHeuristic(heuristic.estimate(nextState, codedProblem.getGoal()));
                         successor.setParent(current);
                         successor.setOperator(index);
                         successor.setDepth(current.getDepth() + 1);
@@ -109,19 +109,7 @@ public final class GreedyBestFirstSearch extends AbstractStrategy {
             searchingTime = end - begin;
         }
 
-        if (planner.isSaveState()) {
-            // Compute the searching time
-            planner.getStatistics().setTimeToSearch(searchingTime);
-            if (StateSpacePlannerFactory.isMemoryAgent()) {
-                // Compute the memory used by the search
-                try {
-                    planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                        + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
-                } catch (IllegalStateException ilException) {
-                    StateSpacePlanner.getLogger().error(ilException);
-                }
-            }
-        }
+        this.setSearchingTime(searchingTime);
 
         return solution;
     }

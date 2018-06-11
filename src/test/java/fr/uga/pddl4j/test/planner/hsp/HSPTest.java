@@ -17,6 +17,7 @@ package fr.uga.pddl4j.test.planner.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
@@ -60,6 +61,16 @@ public class HSPTest {
     private static final int TIMEOUT = 10;
 
     /**
+     * Default Heuristic Type.
+     */
+    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+
+    /**
+     * Default Heuristic Weight.
+     */
+    private static final double HEURISTIC_WEIGHT = 1.0;
+
+    /**
      * Default Trace level.
      */
     private static final int TRACE_LEVEL = 0;
@@ -81,10 +92,7 @@ public class HSPTest {
     @Before
     public void initTest() {
         // Creates the planner
-        planner = new HSP();
-        planner.setTimeOut(TIMEOUT * 1000);
-        planner.setTraceLevel(TRACE_LEVEL);
-        planner.setSaveState(STATISTICS);
+        planner = new HSP(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT, STATISTICS, TRACE_LEVEL);
         Tools.changeVALPerm();
     }
 

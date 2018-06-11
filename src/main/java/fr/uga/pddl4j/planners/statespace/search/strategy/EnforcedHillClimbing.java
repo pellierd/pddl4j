@@ -22,13 +22,11 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * This class implements Enforced Hill Climbing search strategy.
@@ -37,7 +35,7 @@ import java.util.LinkedList;
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
-public final class EnforcedHillClimbing extends AbstractStrategy {
+public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
 
     /**
      * The serial id of the class.
@@ -47,30 +45,33 @@ public final class EnforcedHillClimbing extends AbstractStrategy {
     /**
      * Creates a new Enforced Hill Climbing search strategy.
      *
-     * @param stateSpacePlanner the planner associated to the search strategy
-     * @param codedProblem      the coded problem on which the search strategy is applied.
+     * @param timeout   the time out of the planner.
+     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param weight    the weight set to the heuristic.
      */
-    public EnforcedHillClimbing(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
-        super(stateSpacePlanner, codedProblem);
+    public EnforcedHillClimbing(int timeout, Heuristic.Type heuristic, double weight) {
+        super();
+        this.setTimeOut(timeout);
+        this.setHeuristicType(heuristic);
+        this.setWeight(weight);
     }
 
     /**
      * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
      *
-     * @param planner the planner used to solve the problem
-     * @param problem the coded problem to solve.
      * @return the solution node or null.
      */
-    public Node search(final StateSpacePlanner planner, final CodedProblem problem) {
+    public Node search(final CodedProblem codedProblem) {
+        Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        long searchingTime = 0;
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final int timeout = planner.getTimeout();
+        final int timeout = getTimeout();
 
-        BitState init = new BitState(problem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
+        BitState init = new BitState(codedProblem.getInit());
+        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
+        this.setRootNode(root);
         openList.add(root);
 
         double bestHeuristic = root.getHeuristic();
@@ -78,9 +79,11 @@ public final class EnforcedHillClimbing extends AbstractStrategy {
         Node solution = null;
         boolean deadEndFree = true;
 
+        long searchingTime = 0;
         while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
             final Node currentState = openList.pop();
-            final LinkedList<Node> successors = EnforcedHillClimbing.getSuccessors(currentState, problem, heuristic);
+            final LinkedList<Node> successors = EnforcedHillClimbing.getSuccessors(currentState,
+                codedProblem, heuristic);
             deadEndFree = !successors.isEmpty();
 
             while (!successors.isEmpty() && solution == null) {
@@ -102,19 +105,7 @@ public final class EnforcedHillClimbing extends AbstractStrategy {
             searchingTime = end - begin;
         }
 
-        if (planner.isSaveState()) {
-            // Compute the searching time
-            planner.getStatistics().setTimeToSearch(searchingTime);
-            if (StateSpacePlannerFactory.isMemoryAgent()) {
-                // Compute the memory used by the search
-                try {
-                    planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(openList)
-                        + MemoryAgent.deepSizeOf(heuristic));
-                } catch (IllegalStateException ilException) {
-                    StateSpacePlanner.getLogger().error(ilException);
-                }
-            }
-        }
+        this.setSearchingTime(searchingTime);
 
         return solution;
     }

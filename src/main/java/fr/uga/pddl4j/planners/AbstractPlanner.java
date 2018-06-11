@@ -27,11 +27,6 @@ import org.apache.logging.log4j.Logger;
 public abstract class AbstractPlanner implements Planner {
 
     /**
-     * The timeout for the search in second.
-     */
-    private int timeout;
-
-    /**
      * The trace level.
      */
     private int traceLevel;
@@ -51,7 +46,6 @@ public abstract class AbstractPlanner implements Planner {
      */
     public AbstractPlanner() {
         super();
-        this.timeout = Planner.DEFAULT_TIMEOUT;
         this.traceLevel = Planner.DEFAULT_TRACE_LEVEL;
         this.saveState = Planner.DEFAULT_STATISTICS;
         this.statistics = new Statistics();
@@ -66,26 +60,6 @@ public abstract class AbstractPlanner implements Planner {
     @Override
     public final Statistics getStatistics() {
         return this.statistics;
-    }
-
-    /**
-     * Sets the time out of the planner.
-     *
-     * @param timeout the time allocated to the search in second. Timeout mus be positive.
-     */
-    @Override
-    public final void setTimeOut(final int timeout) {
-        this.timeout = timeout;
-    }
-
-    /**
-     * Returns the time out of the planner.
-     *
-     * @return the time out of the planner, i.e., the time allocated to the search in second.
-     */
-    @Override
-    public int getTimeout() {
-        return this.timeout;
     }
 
     /**

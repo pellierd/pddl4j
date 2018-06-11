@@ -127,20 +127,6 @@ public interface Planner extends Serializable {
     Statistics getStatistics();
 
     /**
-     * Sets the time out of the planner.
-     *
-     * @param timeout the time allocated to the search in second.
-     */
-    void setTimeOut(final int timeout);
-
-    /**
-     * Returns the time out of the planner.
-     *
-     * @return the time out of the planner, i.e., the time allocated to the search in second.
-     */
-    int getTimeout();
-
-    /**
      * Sets the trace level of the planner.
      *
      * @param level the trace level of the planner.

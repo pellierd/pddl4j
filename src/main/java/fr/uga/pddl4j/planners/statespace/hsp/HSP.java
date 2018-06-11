@@ -20,9 +20,11 @@
 package fr.uga.pddl4j.planners.statespace.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
@@ -42,10 +44,26 @@ public final class HSP extends AbstractStateSpacePlanner {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new HSP planner with the default parameters.
+     * The A* strategy.
      */
-    public HSP() {
+    private final StateSpaceStrategy astar;
+
+    /**
+     * Creates a new planner.
+     *
+     * @param timeout        the time out of the planner.
+     * @param heuristicType  the heuristicType to use to solve the planning problem.
+     * @param weight         the weight set to the heuristic.
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public HSP(final int timeout, final Heuristic.Type heuristicType, final double weight,
+               final boolean statisticState, final int traceLevel) {
         super();
+        this.setSaveState(statisticState);
+        this.setTraceLevel(traceLevel);
+
+        astar = new AStar(timeout, heuristicType, weight);
     }
 
     /**
@@ -60,12 +78,22 @@ public final class HSP extends AbstractStateSpacePlanner {
         Objects.requireNonNull(problem);
 
         logger.trace("* starting A*\n");
-        final AStar astar = new AStar(this, problem);
-        final Node solutionNode = astar.searchSolutionNode();
-
+        final Node solutionNode = astar.searchSolutionNode(problem);
+        if (isSaveState()) {
+            this.getStatistics().setTimeToSearch(astar.getSearchingTime());
+            /*if (StateSpacePlannerFactory.isMemoryAgent()) {
+                // Compute the memory used by the search
+                try {
+                    //this().getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
+                    // + MemoryAgent.deepSizeOf(openSet));
+                } catch (IllegalStateException ilException) {
+                    StateSpacePlanner.getLogger().error(ilException);
+                }
+            }*/
+        }
         if (solutionNode != null) {
             logger.trace("* A* succeeded\n");
-            return astar.extract(solutionNode, problem);
+            return (SequentialPlan) astar.extractPlan(solutionNode, problem);
         } else {
             logger.trace("* A* failed\n");
             return null;

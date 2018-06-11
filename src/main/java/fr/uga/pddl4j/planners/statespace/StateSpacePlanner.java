@@ -17,7 +17,6 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.Planner;
-
 import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
@@ -69,34 +68,6 @@ public interface StateSpacePlanner extends Planner {
     static Logger getLogger() {
         return Planner.getLogger();
     }
-
-    /**
-     * Returns the heuristicType to use to solve the planning problem.
-     *
-     * @return the heuristicType to use to solve the planning problem.
-     */
-    Heuristic.Type getHeuristicType();
-
-    /**
-     * Sets the heuristicType to use to solved the problem.
-     *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
-     */
-    void setHeuristicType(final Heuristic.Type heuristicType);
-
-    /**
-     * Returns the weight set to the heuristic.
-     *
-     * @return the weight set to the heuristic.
-     */
-    double getWeight();
-
-    /**
-     * Sets the wight of the heuristic.
-     *
-     * @param weight the weight of the heuristic. The weight must be positive.
-     */
-    void setWeight(final double weight);
 
     /**
      * Is planner anytime or not.

@@ -96,19 +96,26 @@ public class StateSpacePlannerFactory implements Serializable {
     /**
      * Returns an instance of the specified state based planner.
      *
-     * @param name the name of the state based planner.
+     * @param name           the name of the state based planner.
+     * @param timeout        the time out of the planner.
+     * @param heuristicType  the heuristicType to use to solve the planning problem.
+     * @param weight         the weight set to the heuristic.
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
      * @return an instance of the specified planner.
      * @see fr.uga.pddl4j.planners.Planner.Name
      */
-    public AbstractStateSpacePlanner getPlanner(final Planner.Name name) {
+    public AbstractStateSpacePlanner getPlanner(final Planner.Name name, final int timeout,
+                                                final Heuristic.Type heuristicType, final double weight,
+                                                final boolean statisticState, final int traceLevel) {
         AbstractStateSpacePlanner planner = null;
         switch (name) {
             case HSP:
-                planner = new HSP();
+                planner = new HSP(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
             case FF:
-                planner = new FF();
+                planner = new FF(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
             default:
@@ -346,6 +353,7 @@ public class StateSpacePlannerFactory implements Serializable {
             final Properties arguments = StateSpacePlannerFactory.parseArguments(args,
                 logger, StateSpacePlanner.getDefaultArguments());
 
+            final Planner.Name plannerName = (Planner.Name) arguments.get(AbstractStateSpacePlanner.PLANNER);
             final File domain = (File) arguments.get(AbstractStateSpacePlanner.DOMAIN);
             final File problem = (File) arguments.get(AbstractStateSpacePlanner.PROBLEM);
             final int traceLevel = (Integer) arguments.get(AbstractStateSpacePlanner.TRACE_LEVEL);
@@ -355,9 +363,8 @@ public class StateSpacePlannerFactory implements Serializable {
             final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.STATISTICS);
 
             // Creates the planner
-            final AbstractStateSpacePlanner planner = stateSpacePlannerFactory.getPlanner((Planner.Name)
-                arguments.get(AbstractStateSpacePlanner.PLANNER));
-            planner.init(heuristicType, timeout, weight, saveStats, traceLevel);
+            final AbstractStateSpacePlanner planner = stateSpacePlannerFactory.getPlanner(plannerName, timeout,
+                heuristicType, weight, saveStats, traceLevel);
 
             // Creates the problem factory
             final ProblemFactory factory = ProblemFactory.getInstance();
