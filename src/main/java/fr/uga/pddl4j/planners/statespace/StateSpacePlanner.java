@@ -15,11 +15,10 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.Plan;
+
+import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
 
@@ -63,13 +62,13 @@ public interface StateSpacePlanner extends Planner {
     boolean DEFAULT_ANYTIME = false;
 
     /**
-     * Extract a plan from a solution node for the specified planning problem.
+     * Returns the LOGGER of the AbstractPlanner class.
      *
-     * @param solutionNode the solution node.
-     * @param problem      the problem to be solved. The problem cannot be null.
-     * @return the solution plan or null is no solution was found.
+     * @return the AbstractPlanner class.
      */
-    Plan extract(final Node solutionNode, final CodedProblem problem);
+    static Logger getLogger() {
+        return Planner.getLogger();
+    }
 
     /**
      * Returns the heuristicType to use to solve the planning problem.

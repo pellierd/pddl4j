@@ -15,12 +15,8 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.SequentialPlan;
 
 import java.util.Objects;
 
@@ -61,25 +57,6 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
         this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
         this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
         this.anytime = StateSpacePlanner.DEFAULT_ANYTIME;
-    }
-
-    /**
-     * Extracts a plan from a specified node.
-     *
-     * @param node    the node.
-     * @param problem the problem.
-     * @return the search extracted from the specified node.
-     */
-    @Override
-    public SequentialPlan extract(final Node node, final CodedProblem problem) {
-        Node n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getParent() != null) {
-            final BitOp op = problem.getOperators().get(n.getOperator());
-            plan.add(0, op);
-            n = n.getParent();
-        }
-        return plan;
     }
 
     /**

@@ -18,21 +18,24 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
 
-public class GreedyBestFirstSearch implements Serializable {
+/**
+ * This class implements Greedy Best First Search strategy.
+ *
+ * @author D. Pellier
+ * @version 1.0 - 01.06.2018
+ */
+public final class GreedyBestFirstSearch extends AbstractStrategy {
 
     /**
      * The serial id of the class.
@@ -40,44 +43,13 @@ public class GreedyBestFirstSearch implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The time needed to search a solution node.
-     */
-    private static long searchingTime;
-
-    /**
-     * Creates a new planner.
-     */
-    private GreedyBestFirstSearch() {
-    }
-
-    /**
-     * Search a solution node to a specified domain and problem.
+     * Creates a new Greedy best First Search search strategy.
      *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution node.
+     * @param stateSpacePlanner the planner associated to the search strategy
+     * @param codedProblem      the coded problem on which the search strategy is applied.
      */
-    public static Node searchSolutionNode(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        searchingTime = 0;
-        return GreedyBestFirstSearch.greedyBestFirstSearch(planner, pb);
-    }
-
-    /**
-     * Search a solution plan to a specified domain and problem.
-     *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution plan or null.
-     */
-    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        final Node solutionNode = GreedyBestFirstSearch.greedyBestFirstSearch(planner, pb);
-        if (solutionNode != null) {
-            return planner.extract(solutionNode, pb);
-        } else {
-            return null;
-        }
+    public GreedyBestFirstSearch(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
+        super(stateSpacePlanner, codedProblem);
     }
 
     /**
@@ -88,8 +60,10 @@ public class GreedyBestFirstSearch implements Serializable {
      * @param problem the coded planning problem to solve.
      * @return a solution plan or null if it does not exist.
      */
-    private static Node greedyBestFirstSearch(final AbstractStateSpacePlanner planner, final CodedProblem problem) {
+    public Node search(final StateSpacePlanner planner, final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
+        long searchingTime = 0;
+
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
@@ -144,7 +118,7 @@ public class GreedyBestFirstSearch implements Serializable {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
                         + MemoryAgent.deepSizeOf(openSet) + MemoryAgent.deepSizeOf(heuristic));
                 } catch (IllegalStateException ilException) {
-                    planner.getLogger().error(ilException);
+                    StateSpacePlanner.getLogger().error(ilException);
                 }
             }
         }

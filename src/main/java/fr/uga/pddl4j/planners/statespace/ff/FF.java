@@ -62,22 +62,24 @@ public final class FF extends AbstractStateSpacePlanner {
         Objects.requireNonNull(pb);
 
         logger.trace("* starting enforced hill climbing\n");
-        Node solutionNode = EnforcedHillClimbing.searchSolutionNode(this, pb);
+        final EnforcedHillClimbing enforcedHillClimbing = new EnforcedHillClimbing(this, pb);
+        Node solutionNode = enforcedHillClimbing.searchSolutionNode();
 
         if (solutionNode != null) {
             logger.trace("* enforced hill climbing succeeded\n");
-            return extract(solutionNode, pb);
+            return enforcedHillClimbing.extract(solutionNode, pb);
         } else {
             logger.trace("* enforced hill climbing failed\n");
             logger.trace("* starting greedy best first search\n");
-            solutionNode = GreedyBestFirstSearch.searchSolutionNode(this, pb);
+            final GreedyBestFirstSearch greedyBestFirstSearch = new GreedyBestFirstSearch(this, pb);
+            solutionNode = greedyBestFirstSearch.searchSolutionNode();
 
             if (solutionNode == null) {
                 logger.trace("* greedy best first search failed\n");
                 return null;
             } else {
                 logger.trace("* greedy best first search succeeded\n");
-                return extract(solutionNode, pb);
+                return greedyBestFirstSearch.extract(solutionNode, pb);
             }
         }
     }

@@ -18,20 +18,24 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 
-public class AStar implements Serializable {
+/**
+ * This class implements A* search strategy.
+ *
+ * @author D. Pellier
+ * @version 1.0 - 01.06.2018
+ */
+public final class AStar extends AbstractStrategy {
 
     /**
      * The serial id of the class.
@@ -39,38 +43,13 @@ public class AStar implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new planner.
-     */
-    private AStar() {
-    }
-
-    /**
-     * Search a solution node to a specified domain and problem.
+     * Creates a new AStar search strategy.
      *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution node or null.
+     * @param stateSpacePlanner the planner associated to the search strategy
+     * @param codedProblem      the coded problem on which the search strategy is applied.
      */
-    public static Node searchSolutionNode(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        return AStar.astar(planner, pb);
-    }
-
-    /**
-     * Search a solution plan to a specified domain and problem.
-     *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution plan or null.
-     */
-    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        final Node solutionNode = AStar.astar(planner, pb);
-        if (solutionNode != null) {
-            return planner.extract(solutionNode, pb);
-        } else {
-            return null;
-        }
+    public AStar(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
+        super(stateSpacePlanner, codedProblem);
     }
 
     /**
@@ -80,7 +59,7 @@ public class AStar implements Serializable {
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
      */
-    private static Node astar(final AbstractStateSpacePlanner planner, final CodedProblem problem) {
+    public Node search(final StateSpacePlanner planner, final CodedProblem problem) {
         Objects.requireNonNull(problem);
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
@@ -168,7 +147,7 @@ public class AStar implements Serializable {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
                         + MemoryAgent.deepSizeOf(openSet));
                 } catch (IllegalStateException ilException) {
-                    planner.getLogger().error(ilException);
+                    StateSpacePlanner.getLogger().error(ilException);
                 }
             }
         }

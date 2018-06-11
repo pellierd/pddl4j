@@ -22,25 +22,22 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
 
-import java.io.Serializable;
 import java.util.LinkedList;
-import java.util.Objects;
 
 /**
- * This class implements Enforced Hill Climbing planner.
+ * This class implements Enforced Hill Climbing search strategy.
  *
  * @author Samuel Aaron Boyd
  * @author E. Hermellin
  * @version 2.0 - 24.01.2018
  */
-public class EnforcedHillClimbing implements Serializable {
+public final class EnforcedHillClimbing extends AbstractStrategy {
 
     /**
      * The serial id of the class.
@@ -48,44 +45,13 @@ public class EnforcedHillClimbing implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The time needed to search a solution node.
-     */
-    private static long searchingTime;
-
-    /**
-     * Creates a new planner.
-     */
-    private EnforcedHillClimbing() {
-    }
-
-    /**
-     * Search a solution node to a specified domain and problem.
+     * Creates a new Enforced Hill Climbing search strategy.
      *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution node.
+     * @param stateSpacePlanner the planner associated to the search strategy
+     * @param codedProblem      the coded problem on which the search strategy is applied.
      */
-    public static Node searchSolutionNode(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        searchingTime = 0;
-        return EnforcedHillClimbing.enforcedHillClimbing(planner, pb);
-    }
-
-    /**
-     * Search a solution plan to a specified domain and problem.
-     *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution plan or null.
-     */
-    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        final Node solutionNode = EnforcedHillClimbing.enforcedHillClimbing(planner, pb);
-        if (solutionNode != null) {
-            return planner.extract(solutionNode, pb);
-        } else {
-            return null;
-        }
+    public EnforcedHillClimbing(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
+        super(stateSpacePlanner, codedProblem);
     }
 
     /**
@@ -95,8 +61,10 @@ public class EnforcedHillClimbing implements Serializable {
      * @param problem the coded problem to solve.
      * @return the solution node or null.
      */
-    private static Node enforcedHillClimbing(final AbstractStateSpacePlanner planner, final CodedProblem problem) {
+    public Node search(final StateSpacePlanner planner, final CodedProblem problem) {
         final long begin = System.currentTimeMillis();
+        long searchingTime = 0;
+
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), problem);
         final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = planner.getTimeout();
@@ -143,7 +111,7 @@ public class EnforcedHillClimbing implements Serializable {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(openList)
                         + MemoryAgent.deepSizeOf(heuristic));
                 } catch (IllegalStateException ilException) {
-                    planner.getLogger().error(ilException);
+                    StateSpacePlanner.getLogger().error(ilException);
                 }
             }
         }

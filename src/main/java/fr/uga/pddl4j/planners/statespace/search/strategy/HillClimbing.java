@@ -18,20 +18,23 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Objects;
 
-public class HillClimbing implements Serializable {
+/**
+ * This class implements Hill Climnbing search strategy.
+ *
+ * @author D. Pellier
+ * @version 1.0 - 01.06.2018
+ */
+public final class HillClimbing extends AbstractStrategy {
 
     /**
      * The serial id of the class.
@@ -39,38 +42,13 @@ public class HillClimbing implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new planner.
-     */
-    private HillClimbing() {
-    }
-
-    /**
-     * Search a solution node to a specified domain and problem.
+     * Creates a new Hill Climbing search strategy.
      *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution node.
+     * @param stateSpacePlanner the planner associated to the search strategy
+     * @param codedProblem      the coded problem on which the search strategy is applied.
      */
-    public static Node searchSolutionNode(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        return HillClimbing.hillClimbing(planner, pb);
-    }
-
-    /**
-     * Search a solution plan to a specified domain and problem.
-     *
-     * @param planner the planner used to solve the problem
-     * @param pb      the problem to solve.
-     * @return the solution plan or null.
-     */
-    public static Plan searchSolutionPlan(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
-        Objects.requireNonNull(pb);
-        final Node solutionNode = HillClimbing.hillClimbing(planner, pb);
-        if (solutionNode != null) {
-            return planner.extract(solutionNode, pb);
-        } else {
-            return null;
-        }
+    public HillClimbing(StateSpacePlanner stateSpacePlanner, CodedProblem codedProblem) {
+        super(stateSpacePlanner, codedProblem);
     }
 
     /**
@@ -80,7 +58,7 @@ public class HillClimbing implements Serializable {
      * @param pb      the problem to solve.
      * @return the solution node.
      */
-    private static Node hillClimbing(final AbstractStateSpacePlanner planner, final CodedProblem pb) {
+    public Node search(final StateSpacePlanner planner, final CodedProblem pb) {
         final LinkedList<Node> openList = new LinkedList<>();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(planner.getHeuristicType(), pb);
         long searchingTime = 0;
@@ -127,7 +105,7 @@ public class HillClimbing implements Serializable {
                     planner.getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(openList)
                         + MemoryAgent.deepSizeOf(heuristic));
                 } catch (IllegalStateException ilException) {
-                    planner.getLogger().error(ilException);
+                    StateSpacePlanner.getLogger().error(ilException);
                 }
             }
         }

@@ -60,11 +60,12 @@ public final class HSP extends AbstractStateSpacePlanner {
         Objects.requireNonNull(problem);
 
         logger.trace("* starting A*\n");
-        final Node solutionNode = AStar.searchSolutionNode(this, problem);
+        final AStar astar = new AStar(this, problem);
+        final Node solutionNode = astar.searchSolutionNode();
 
         if (solutionNode != null) {
             logger.trace("* A* succeeded\n");
-            return extract(solutionNode, problem);
+            return astar.extract(solutionNode, problem);
         } else {
             logger.trace("* A* failed\n");
             return null;
