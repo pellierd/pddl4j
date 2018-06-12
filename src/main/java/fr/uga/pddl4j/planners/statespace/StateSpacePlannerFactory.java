@@ -414,7 +414,7 @@ public class StateSpacePlannerFactory implements Serializable {
                     memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics()
                         .getMemoryUsedToSearch());
                     memoryForProblemInMBytes =
-                            Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
+                        Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
                     totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
                 }
 
@@ -435,9 +435,9 @@ public class StateSpacePlannerFactory implements Serializable {
                         strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
 
                         strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
-                                memoryForProblemInMBytes));
+                            memoryForProblemInMBytes));
                         strb.append(String.format("              %8.2f MBytes for searching%n",
-                                memoryUsedToSearchInMBytes));
+                            memoryUsedToSearchInMBytes));
                         strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
                     }
                     LOGGER.trace(strb);

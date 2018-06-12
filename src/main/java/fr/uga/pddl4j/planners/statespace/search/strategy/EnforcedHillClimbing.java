@@ -83,12 +83,12 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
         long searchingTime = 0;
         while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
             final Node currentState = openList.pop();
-            final LinkedList<Node> successors = EnforcedHillClimbing.getSuccessors(currentState,
-                codedProblem, heuristic);
+            final LinkedList<Node> successors = getSuccessors(currentState, codedProblem, heuristic);
             deadEndFree = !successors.isEmpty();
 
             while (!successors.isEmpty() && solution == null) {
                 final Node successor = successors.pop();
+                this.setExploredNodes(this.getExploredNodes() + 1);
                 final double heuristicSuccessor = successor.getHeuristic();
                 if (heuristicSuccessor == 0.0) {
                     solution = successor;
@@ -120,7 +120,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private static LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
@@ -133,6 +133,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
 
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);
+                this.setCreatedNodes(this.getCreatedNodes() + 1);
                 successor.setCost(parent.getCost() + op.getCost());
                 successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
                 successor.setParent(parent);

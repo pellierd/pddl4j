@@ -80,10 +80,11 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
             && deadEndFree && searchingTime < timeout) {
 
             final Node currentState = openList.pop();
-            final LinkedList<Node> successors = HillClimbing.getSuccessors(currentState, codedProblem, heuristic);
+            final LinkedList<Node> successors = getSuccessors(currentState, codedProblem, heuristic);
             deadEndFree = !successors.isEmpty();
 
-            final Node successor = HillClimbing.popBestNode(successors, bestHeuristic);
+            final Node successor = popBestNode(successors, bestHeuristic);
+            this.setExploredNodes(this.getExploredNodes() + 1);
             if (successor.satisfy(codedProblem.getGoal())) {
                 solution = successor;
             } else {
@@ -113,8 +114,8 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private static LinkedList<Node> getSuccessors(final Node parent, final CodedProblem problem,
-                                                  final Heuristic heuristic) {
+    private LinkedList<Node> getSuccessors(final Node parent, final CodedProblem problem,
+                                           final Heuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
@@ -126,6 +127,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
 
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);
+                this.setCreatedNodes(this.getCreatedNodes() + 1);
                 successor.setCost(parent.getCost() + op.getCost());
                 successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
                 successor.setParent(parent);
@@ -145,7 +147,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param nodes the list containing nodes.
      * @return the best node from the nodes' list.
      */
-    private static Node popBestNode(final Collection<Node> nodes, final double bestHeuristic) {
+    private Node popBestNode(final Collection<Node> nodes, final double bestHeuristic) {
         Node node = null;
         if (!nodes.isEmpty()) {
             final Iterator<Node> i = nodes.iterator();

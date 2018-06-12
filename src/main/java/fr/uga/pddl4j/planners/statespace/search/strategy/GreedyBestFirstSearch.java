@@ -80,7 +80,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
         long searchingTime = 0;
         while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
             // Pop the first node in the pending list open
-            final Node current = GreedyBestFirstSearch.popPriorityNode(openSet);
+            final Node current = popPriorityNode(openSet);
 
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
@@ -97,6 +97,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
 
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
+                        this.setCreatedNodes(this.getCreatedNodes() + 1);
                         successor.setCost(current.getCost() + op.getCost());
                         successor.setHeuristic(heuristic.estimate(nextState, codedProblem.getGoal()));
                         successor.setParent(current);
@@ -112,6 +113,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
             searchingTime = end - begin;
         }
 
+        this.setExploredNodes(closeSet.size());
+        this.setPendingNodes(openSet.size());
         this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet)
             + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
@@ -125,7 +128,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
      * @param states the list of nodes (successors).
      * @return the node from the list.
      */
-    private static Node popPriorityNode(Collection<Node> states) {
+    private Node popPriorityNode(Collection<Node> states) {
         Node state = null;
         if (!states.isEmpty()) {
             final Iterator<Node> i = states.iterator();

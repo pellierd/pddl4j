@@ -99,6 +99,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         Node state = new Node(current);
+                        this.setCreatedNodes(this.getCreatedNodes() + 1);
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
@@ -141,6 +142,8 @@ public final class AStar extends AbstractStateSpaceStrategy {
             time = System.currentTimeMillis() - begin;
         }
 
+        this.setExploredNodes(closeSet.size());
+        this.setPendingNodes(openSet.size());
         this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
         this.setSearchingTime(time);
 
