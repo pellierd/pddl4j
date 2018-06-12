@@ -26,6 +26,7 @@ import fr.uga.pddl4j.planners.statespace.ff.FF;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -49,6 +50,11 @@ public class StateSpacePlannerFactory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * The logger of the class.
+     */
+    private static Logger LOGGER = LogManager.getLogger(StateSpacePlannerFactory.class);
+
+    /**
      * An instance of the class.
      */
     private static StateSpacePlannerFactory instance = new StateSpacePlannerFactory();
@@ -63,34 +69,10 @@ public class StateSpacePlannerFactory implements Serializable {
     }
 
     /**
-     * The state to use Memory agent or not.
-     */
-    private static boolean memoryAgent;
-
-    /**
-     * Returns if Memory Agent is used to inspect memory.
-     *
-     * @return the state of the memory agent.
-     */
-    public static boolean isMemoryAgent() {
-        return memoryAgent;
-    }
-
-    /**
-     * Sets if Memory Agent is used to inspect memory.
-     *
-     * @param memoryAgent the state of the memory agent.
-     */
-    public static void setMemoryAgent(boolean memoryAgent) {
-        StateSpacePlannerFactory.memoryAgent = memoryAgent;
-    }
-
-    /**
      * Creates a new StateSpacePlannerFactory.
      */
     private StateSpacePlannerFactory() {
         super();
-        StateSpacePlannerFactory.setMemoryAgent(false);
     }
 
     /**
@@ -119,7 +101,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             default:
-                StateSpacePlannerFactory.printUsage();
+                LOGGER.trace(StateSpacePlannerFactory.printUsage());
                 break;
         }
         return planner;
@@ -173,7 +155,6 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("               - total memory used in MBytes\n")
             .append("               - length of the solution plan\n")
             .append("-s <bool>   generate statistics or not (preset: true)\n")
-            .append("-m <bool>   use memory agent (preset: false)\n")
             .append("-h          print this message\n\n");
 
         return strb;
@@ -183,12 +164,11 @@ public class StateSpacePlannerFactory implements Serializable {
      * This method parse the command line and return the arguments.
      *
      * @param args             the arguments from the command line.
-     * @param log              the logger to display informations.
      * @param defaultArguments the default arguments to use.
      * @return The arguments of the planner.
      * @throws FileException if files not found
      */
-    public static Properties parseArguments(String[] args, Logger log, Properties defaultArguments)
+    public static Properties parseArguments(String[] args, Properties defaultArguments)
         throws FileException {
 
         final Properties arguments = defaultArguments;
@@ -205,24 +185,24 @@ public class StateSpacePlannerFactory implements Serializable {
                     }
                 } else if ("-o".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        log.trace("operators file does not exist: " + args[i + 1] + "\n");
+                        LOGGER.trace("operators file does not exist: " + args[i + 1] + "\n");
                     }
                     arguments.put(AbstractStateSpacePlanner.DOMAIN, new File(args[i + 1]));
                 } else if ("-f".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     if (!new File(args[i + 1]).exists()) {
-                        log.trace("facts file does not exist: " + args[i + 1] + "\n");
+                        LOGGER.trace("facts file does not exist: " + args[i + 1] + "\n");
                     }
                     arguments.put(AbstractStateSpacePlanner.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int cpu = Integer.parseInt(args[i + 1]) * 1000;
                     if (cpu < 0) {
-                        log.trace(StateSpacePlannerFactory.printUsage());
+                        LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     }
                     arguments.put(AbstractStateSpacePlanner.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
                     if (heuristic < 0 || heuristic > 8) {
-                        log.trace(StateSpacePlannerFactory.printUsage());
+                        LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     }
                     if (heuristic == 0) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
@@ -255,36 +235,34 @@ public class StateSpacePlannerFactory implements Serializable {
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
                     if (weight < 0) {
-                        log.trace(StateSpacePlannerFactory.printUsage());
+                        LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     }
                     arguments.put(AbstractStateSpacePlanner.WEIGHT, weight);
                 } else if ("-i".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int level = Integer.parseInt(args[i + 1]);
                     if (level < 0) {
-                        log.trace(StateSpacePlannerFactory.printUsage());
+                        LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     }
                     arguments.put(AbstractStateSpacePlanner.TRACE_LEVEL, level);
-                } else if ("-m".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    StateSpacePlannerFactory.setMemoryAgent(Boolean.parseBoolean(args[i + 1]));
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
                     arguments.put(AbstractStateSpacePlanner.STATISTICS, isStatUsed);
                 } else {
-                    log.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
-                    log.trace(StateSpacePlannerFactory.printUsage());
+                    LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
+                    LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     throw new FileException("Unknown arguments: " + args[i]);
                 }
             }
             if (arguments.get(AbstractStateSpacePlanner.DOMAIN) == null
                 || arguments.get(AbstractStateSpacePlanner.PROBLEM) == null) {
 
-                log.trace("\nMissing DOMAIN or PROBLEM\n");
-                log.trace(StateSpacePlannerFactory.printUsage());
+                LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
+                LOGGER.trace(StateSpacePlannerFactory.printUsage());
                 throw new FileException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
-            log.trace("\nError when parsing arguments\n");
-            log.trace(StateSpacePlannerFactory.printUsage());
+            LOGGER.trace("\nError when parsing arguments\n");
+            LOGGER.trace(StateSpacePlannerFactory.printUsage());
             throw runExp;
         }
         return arguments;
@@ -335,7 +313,6 @@ public class StateSpacePlannerFactory implements Serializable {
      *                - memory used for searching in MBytes
      *                - total memory used in MBytes
      *                - length of the solution plan
-     * -m <i>bool</i>   use memory agent (preset: false)
      * -s <i>bool</i>   no statistics (preset: true)
      * -h          print this message
      *
@@ -344,14 +321,12 @@ public class StateSpacePlannerFactory implements Serializable {
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
-        final Logger logger = Planner.getLogger();
-
         try {
             final StateSpacePlannerFactory stateSpacePlannerFactory = StateSpacePlannerFactory.getInstance();
 
             // Parse the command line
             final Properties arguments = StateSpacePlannerFactory.parseArguments(args,
-                logger, StateSpacePlanner.getDefaultArguments());
+                StateSpacePlanner.getDefaultArguments());
 
             final Planner.Name plannerName = (Planner.Name) arguments.get(AbstractStateSpacePlanner.PLANNER);
             final File domain = (File) arguments.get(AbstractStateSpacePlanner.DOMAIN);
@@ -385,7 +360,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 strb.append("\nparsing domain file \"").append(domain.getName()).append("\" done successfully")
                     .append("\nparsing problem file \"").append(problem.getName()).append("\" done successfully")
                     .append("\n");
-                logger.trace(strb);
+                LOGGER.trace(strb);
             }
 
             // Encodes and instantiates the problem in a compact representation
@@ -393,13 +368,7 @@ public class StateSpacePlannerFactory implements Serializable {
             final CodedProblem pb = factory.encode();
             if (saveStats) {
                 planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
-                if (isMemoryAgent()) {
-                    try {
-                        planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.deepSizeOf(pb));
-                    } catch (IllegalStateException ilException) {
-                        logger.error(ilException);
-                    }
-                }
+                planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
             }
 
             if (pb != null) {
@@ -411,13 +380,13 @@ public class StateSpacePlannerFactory implements Serializable {
                     strb.append("\nencoding problem done successfully (")
                         .append(planner.getStatistics().getNumberOfActions()).append(" ops, ")
                         .append(planner.getStatistics().getNumberOfRelevantFluents()).append(" facts)\n");
-                    logger.trace(strb);
+                    LOGGER.trace(strb);
                 }
 
                 if (traceLevel > 0 && traceLevel != 8 && !pb.isSolvable()) {
                     StringBuilder strb = new StringBuilder();
                     strb.append(String.format("goal can be simplified to FALSE. no search will solve it%n%n"));
-                    logger.trace(strb);
+                    LOGGER.trace(strb);
                     System.exit(0);
                 }
 
@@ -441,13 +410,12 @@ public class StateSpacePlannerFactory implements Serializable {
                     timeToEncodeInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToEncode());
                     timeToSearchInSeconds = Statistics.millisecondToSecond(planner.getStatistics().getTimeToSearch());
                     totalTimeInSeconds = timeToParseInSeconds + timeToEncodeInSeconds + timeToSearchInSeconds;
-                    if (isMemoryAgent()) {
-                        memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics()
-                            .getMemoryUsedToSearch());
-                        memoryForProblemInMBytes =
+
+                    memoryUsedToSearchInMBytes = Statistics.byteToMByte(planner.getStatistics()
+                        .getMemoryUsedToSearch());
+                    memoryForProblemInMBytes =
                             Statistics.byteToMByte(planner.getStatistics().getMemoryUsedForProblemRepresentation());
-                        totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
-                    }
+                    totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
                 }
 
                 if (traceLevel > 0 && traceLevel != 8) {
@@ -465,15 +433,14 @@ public class StateSpacePlannerFactory implements Serializable {
                         strb.append(String.format("              %8.2f seconds encoding %n", timeToEncodeInSeconds));
                         strb.append(String.format("              %8.2f seconds searching%n", timeToSearchInSeconds));
                         strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
-                        if (isMemoryAgent()) {
-                            strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
+
+                        strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
                                 memoryForProblemInMBytes));
-                            strb.append(String.format("              %8.2f MBytes for searching%n",
+                        strb.append(String.format("              %8.2f MBytes for searching%n",
                                 memoryUsedToSearchInMBytes));
-                            strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
-                        }
+                        strb.append(String.format("              %8.2f MBytes total%n%n%n", totalMemoryInMBytes));
                     }
-                    logger.trace(strb);
+                    LOGGER.trace(strb);
                 } else if (traceLevel == 8) {
                     final StringBuilder strb = new StringBuilder();
                     if (plan != null) {
@@ -503,15 +470,15 @@ public class StateSpacePlannerFactory implements Serializable {
                             "--",
                             "--"));
                     }
-                    logger.trace(strb);
+                    LOGGER.trace(strb);
                 }
             } else {
-                logger.trace("encoding problem failed");
+                LOGGER.trace("encoding problem failed");
             }
         } catch (IOException ioExp) {
-            logger.error(ioExp);
+            LOGGER.error(ioExp);
         } catch (FileException fileEx) {
-            logger.error(fileEx);
+            LOGGER.error(fileEx);
             System.exit(1);
         }
     }

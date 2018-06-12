@@ -22,10 +22,13 @@ package fr.uga.pddl4j.planners.statespace.ff;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
@@ -92,15 +95,7 @@ public final class FF extends AbstractStateSpacePlanner {
             logger.trace("* enforced hill climbing succeeded\n");
             if (isSaveState()) {
                 this.getStatistics().setTimeToSearch(enforcedHillClimbing.getSearchingTime());
-                /*if (StateSpacePlannerFactory.isMemoryAgent()) {
-                    // Compute the memory used by the search
-                    try {
-                        //this().getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                        // + MemoryAgent.deepSizeOf(openSet));
-                    } catch (IllegalStateException ilException) {
-                        StateSpacePlanner.getLogger().error(ilException);
-                    }
-                }*/
+                this.getStatistics().setMemoryUsedToSearch(enforcedHillClimbing.getMemoryUsed());
             }
             return (SequentialPlan) enforcedHillClimbing.extractPlan(solutionNode, pb);
         } else {
@@ -109,15 +104,7 @@ public final class FF extends AbstractStateSpacePlanner {
             solutionNode = greedyBestFirstSearch.searchSolutionNode(pb);
             if (isSaveState()) {
                 this.getStatistics().setTimeToSearch(greedyBestFirstSearch.getSearchingTime());
-                /*if (StateSpacePlannerFactory.isMemoryAgent()) {
-                    // Compute the memory used by the search
-                    try {
-                        //this().getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                        // + MemoryAgent.deepSizeOf(openSet));
-                    } catch (IllegalStateException ilException) {
-                        StateSpacePlanner.getLogger().error(ilException);
-                    }
-                }*/
+                this.getStatistics().setMemoryUsedToSearch(greedyBestFirstSearch.getMemoryUsed());
             }
             if (solutionNode == null) {
                 logger.trace("* greedy best first search failed\n");

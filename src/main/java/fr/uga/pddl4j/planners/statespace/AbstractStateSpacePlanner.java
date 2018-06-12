@@ -50,7 +50,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
      * @param anytimeState the anytime state value
      */
     @Override
-    public void setAnytimeState(boolean anytimeState) {
+    public void setAnytime(boolean anytimeState) {
         this.anytime = anytimeState;
     }
 

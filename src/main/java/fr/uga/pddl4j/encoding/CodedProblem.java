@@ -21,6 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 import fr.uga.pddl4j.util.Plan;
@@ -454,6 +455,17 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(BitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
+            this.predicates, this.functions, this.relevantFacts);
+    }
+
+    /**
+     * Returns a string representation of a bit state.
+     *
+     * @param bitState the state.
+     * @return a string representation of the specified state.
+     */
+    public final String toString(BitState bitState) {
+        return StringEncoder.toString(bitState, this.constants, this.types,
             this.predicates, this.functions, this.relevantFacts);
     }
 

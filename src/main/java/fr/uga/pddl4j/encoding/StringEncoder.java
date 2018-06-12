@@ -22,6 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
@@ -323,6 +324,29 @@ final class StringEncoder implements Serializable {
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates,
                 functions)).append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a bit state.
+     *
+     * @param bitState   the state.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param relevants  the table of relevant facts.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(BitState bitState, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions,
+                           final List<IntExp> relevants) {
+        final StringBuilder str = new StringBuilder("(and");
+        for (int i = bitState.nextSetBit(0); i >= 0; i = bitState.nextSetBit(i + 1)) {
+            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions))
+                .append("\n");
         }
         str.append(")");
         return str.toString();

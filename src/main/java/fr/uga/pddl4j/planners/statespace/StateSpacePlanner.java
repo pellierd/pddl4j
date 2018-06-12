@@ -81,7 +81,7 @@ public interface StateSpacePlanner extends Planner {
      *
      * @param anytimeState the anytime state value
      */
-    void setAnytimeState(final boolean anytimeState);
+    void setAnytime(final boolean anytimeState);
 
     /**
      * This method return the default arguments of the planner.
@@ -95,6 +95,4 @@ public interface StateSpacePlanner extends Planner {
         options.put(StateSpacePlanner.WEIGHT, StateSpacePlanner.DEFAULT_WEIGHT);
         return options;
     }
-
-
 }

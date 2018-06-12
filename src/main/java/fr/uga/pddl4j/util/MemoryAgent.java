@@ -20,6 +20,9 @@
 package fr.uga.pddl4j.util;
 
 import fr.uga.pddl4j.exceptions.FatalException;
+import fr.uga.pddl4j.planners.Planner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.lang.instrument.Instrumentation;
@@ -27,6 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class implements memory agent enable to compute approximation of the size of java objects.
@@ -57,6 +61,11 @@ public class MemoryAgent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * The logger of the class.
+     */
+    private static Logger LOGGER = LogManager.getLogger(MemoryAgent.class);
+
+    /**
      * Instance of <code>java.lang.instrument.Instrument</code> injected by the Java VM.
      *
      * @see java.lang.instrument.Instrumentation
@@ -77,6 +86,11 @@ public class MemoryAgent implements Serializable {
      * The default value of the <code>skipFlyweightField</code> flag.
      */
     public static final boolean DEFAULT_SKIP_FLYWEIGHT_FIELD = false;
+
+    /**
+     * The default value of the memory used.
+     */
+    public static final long DEFAULT_MEMORY = -1;
 
     /**
      * The flag used to indicate if flyweight field must be skip during the computation process.
@@ -139,6 +153,37 @@ public class MemoryAgent implements Serializable {
      */
     public static void skipFlyweightObject(boolean flag) {
         MemoryAgent.skipFlyweightField = flag;
+    }
+
+    /**
+     * Returns the amount of storage consumed by the specified object in bytes.
+     *
+     * @param object the object to size.
+     * @return the amount of storage consumed by the specified object in bytes. -1 if JVM command line is incorrect.
+     */
+    public static long getSizeOf(Object object) {
+        try {
+            return MemoryAgent.sizeOf(object);
+        } catch (IllegalStateException ilException) {
+            LOGGER.error(ilException + "\n");
+            return MemoryAgent.DEFAULT_MEMORY;
+        }
+    }
+
+    /**
+     * Returns the amount of storage consumed by objectToSize and by all the objects reachable from it.
+     *
+     * @param object the object to size.
+     * @return the amount of storage consumed by objectToSize and by all the objects reachable from it. -1 if
+     *          JVM command line is incorrect.
+     */
+    public static long getDeepSizeOf(Object object) {
+        try {
+            return MemoryAgent.deepSizeOf(object);
+        } catch (IllegalStateException ilException) {
+            LOGGER.error(ilException + "\n");
+            return MemoryAgent.DEFAULT_MEMORY;
+        }
     }
 
     /**

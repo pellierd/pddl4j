@@ -20,6 +20,7 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -65,15 +66,16 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
         final long begin = System.currentTimeMillis();
 
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();
 
         BitState init = new BitState(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         root.setDepth(0);
-        this.setRootNode(root);
         openSet.add(root);
 
+        this.resetNodesStatistics();
         Node solution = null;
         long searchingTime = 0;
         while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
@@ -83,6 +85,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
             } else {
+                closeSet.add(current);
                 int index = 0;
                 for (BitOp op : codedProblem.getOperators()) {
 
@@ -109,6 +112,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
             searchingTime = end - begin;
         }
 
+        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet)
+            + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
         return solution;

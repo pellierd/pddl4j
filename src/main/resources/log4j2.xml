@@ -9,13 +9,19 @@
         </Console>
     </Appenders>
     <Loggers>
+        <logger name="fr.uga.pddl4j.util.MemoryAgent" level="trace" additivity="false">
+            <AppenderRef ref="traceConsole"/>
+        </logger>
+        <logger name="fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory" level="trace" additivity="false">
+            <AppenderRef ref="traceConsole"/>
+        </logger>
         <logger name="fr.uga.pddl4j.planners.Planner" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
-        <logger name="fr.uga.pddl4j.encoding.Encoder" level="trace" additivity="false">
+        <logger name="fr.uga.pddl4j.planners.ProblemFactory" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
-        <logger name="fr.uga.pddl4j.planners.ProblemFactory" level="trace" additivity="false">
+        <logger name="fr.uga.pddl4j.encoding.Encoder" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
         <logger name="fr.uga.pddl4j.encoding.PreInstantiation" level="trace" additivity="false">

@@ -22,9 +22,11 @@ package fr.uga.pddl4j.planners.statespace.hsp;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
@@ -81,15 +83,7 @@ public final class HSP extends AbstractStateSpacePlanner {
         final Node solutionNode = astar.searchSolutionNode(problem);
         if (isSaveState()) {
             this.getStatistics().setTimeToSearch(astar.getSearchingTime());
-            /*if (StateSpacePlannerFactory.isMemoryAgent()) {
-                // Compute the memory used by the search
-                try {
-                    //this().getStatistics().setMemoryUsedToSearch(MemoryAgent.deepSizeOf(closeSet)
-                    // + MemoryAgent.deepSizeOf(openSet));
-                } catch (IllegalStateException ilException) {
-                    StateSpacePlanner.getLogger().error(ilException);
-                }
-            }*/
+            this.getStatistics().setMemoryUsedToSearch(astar.getMemoryUsed());
         }
         if (solutionNode != null) {
             logger.trace("* A* succeeded\n");

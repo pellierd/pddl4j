@@ -20,6 +20,7 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -66,12 +67,12 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
 
         BitState init = new BitState(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
-        this.setRootNode(root);
         openList.add(root);
 
         Node solution = null;
         boolean deadEndFree = true;
 
+        this.resetNodesStatistics();
         final int timeout = getTimeout();
         final long begin = System.currentTimeMillis();
         long searchingTime = 0;
@@ -98,6 +99,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
             searchingTime = end - begin;
         }
 
+        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(openList) + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
         return solution;

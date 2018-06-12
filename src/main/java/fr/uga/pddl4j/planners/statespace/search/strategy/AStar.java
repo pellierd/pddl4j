@@ -20,6 +20,7 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,12 +75,12 @@ public final class AStar extends AbstractStateSpaceStrategy {
         // Creates the root node of the tree search
         final Node root = new Node(init, null, -1, 0,
             heuristic.estimate(init, codedProblem.getGoal()));
-        this.setRootNode(root);
         // Adds the root to the list of pending nodes
         open.add(root);
         openSet.put(init, root);
-        Node solutionNode = null;
 
+        this.resetNodesStatistics();
+        Node solutionNode = null;
         final int timeout = getTimeout();
         long time = 0;
         // Start of the search
@@ -140,6 +141,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
             time = System.currentTimeMillis() - begin;
         }
 
+        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
         this.setSearchingTime(time);
 
         // return the search computed or null if no search was found

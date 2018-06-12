@@ -59,9 +59,24 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
     private long searchingTime;
 
     /**
-     * The root node of the state space.
+     * The amount of memory used for the search.
      */
-    private Node rootNode;
+    private long memoryUsed;
+
+    /**
+     * The number of explored nodes.
+     */
+    private int exploredNodes;
+
+    /**
+     * The number of pending nodes.
+     */
+    private int pendingNodes;
+
+    /**
+     * The number of created nodes.
+     */
+    private int createdNodes;
 
     /**
      * Returns the heuristicType to use to solve the planning problem.
@@ -145,23 +160,83 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
     }
 
     /**
-     * Returns the root node of the state space.
+     * Returns the amount of memory used for the search.
      *
-     * @return the root node of the state space.
+     * @return the amount of memory used for the search.
      */
     @Override
-    public Node getRootNode() {
-        return this.rootNode;
+    public long getMemoryUsed() {
+        return this.memoryUsed;
     }
 
     /**
-     * Sets the root node of the state space.
+     * Sets the amount of memory used for the search.
      *
-     * @param rootNode the root node of the state space.
+     * @param memoryUsed the amount of memory used for the search.
      */
     @Override
-    public void setRootNode(final Node rootNode) {
-        this.rootNode = rootNode;
+    public void setMemoryUsed(final long memoryUsed) {
+        this.memoryUsed = memoryUsed;
+    }
+
+    /**
+     * Returns the number of explored nodes.
+     *
+     * @return the number of explored nodes.
+     */
+    @Override
+    public int getExploredNodes() {
+        return this.exploredNodes;
+    }
+
+    /**
+     * Sets the number of explored nodes.
+     *
+     * @param exploredNodes the number of explored nodes.
+     */
+    @Override
+    public void setExploredNodes(final int exploredNodes) {
+        this.exploredNodes = exploredNodes;
+    }
+
+    /**
+     * Returns the number of pending nodes.
+     *
+     * @return the number of pending nodes.
+     */
+    @Override
+    public int getPendingNodes() {
+        return this.pendingNodes;
+    }
+
+    /**
+     * Sets the number of pending nodes.
+     *
+     * @param pendingNodes the number of pending nodes.
+     */
+    @Override
+    public void setPendingNodes(final int pendingNodes) {
+        this.pendingNodes = pendingNodes;
+    }
+
+    /**
+     * Returns the number of created nodes.
+     *
+     * @return the number of created nodes.
+     */
+    @Override
+    public int getCreatedNodes() {
+        return this.createdNodes;
+    }
+
+    /**
+     * Sets the number of created nodes.
+     *
+     * @param createdNodes the number of created nodes.
+     */
+    @Override
+    public void setCreatedNodes(final int createdNodes) {
+        this.createdNodes = createdNodes;
     }
 
     /**
@@ -173,6 +248,8 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
         this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
         this.timeout = StateSpacePlanner.DEFAULT_TIMEOUT;
         this.searchingTime = 0;
+        this.memoryUsed = 0;
+        resetNodesStatistics();
     }
 
     /**
@@ -188,6 +265,8 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
         this.heuristic = heuristic;
         this.weight = weight;
         this.searchingTime = 0;
+        this.memoryUsed = 0;
+        resetNodesStatistics();
     }
 
     /**
@@ -240,5 +319,14 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Reset Nodes statistics.
+     */
+    protected void resetNodesStatistics() {
+        this.exploredNodes = 0;
+        this.pendingNodes = 0;
+        this.createdNodes = 0;
     }
 }

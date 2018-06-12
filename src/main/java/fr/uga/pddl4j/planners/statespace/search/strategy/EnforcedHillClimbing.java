@@ -24,6 +24,7 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -71,7 +72,6 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
 
         BitState init = new BitState(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
-        this.setRootNode(root);
         openList.add(root);
 
         double bestHeuristic = root.getHeuristic();
@@ -79,6 +79,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
         Node solution = null;
         boolean deadEndFree = true;
 
+        this.resetNodesStatistics();
         long searchingTime = 0;
         while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
             final Node currentState = openList.pop();
@@ -105,6 +106,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
             searchingTime = end - begin;
         }
 
+        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(openList) + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
         return solution;

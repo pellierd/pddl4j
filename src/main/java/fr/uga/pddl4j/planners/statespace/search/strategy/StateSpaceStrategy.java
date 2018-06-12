@@ -87,18 +87,60 @@ public interface StateSpaceStrategy extends Serializable {
     void setSearchingTime(final long searchingTime);
 
     /**
-     * Returns the root node of the state space.
+     * Returns the amount of memory used for the search.
      *
-     * @return the root node of the state space.
+     * @return the amount of memory used for the search.
      */
-    Node getRootNode();
+    long getMemoryUsed();
 
     /**
-     * Sets the root node of the state space.
+     * Sets the amount of memory used for the search.
      *
-     * @param rootNode the root node of the state space.
+     * @param memoryUsed the amount of memory used for the search.
      */
-    void setRootNode(final Node rootNode);
+    void setMemoryUsed(final long memoryUsed);
+
+    /**
+     * Returns the number of explored nodes.
+     *
+     * @return the number of explored nodes.
+     */
+    int getExploredNodes();
+
+    /**
+     * Sets the number of explored nodes.
+     *
+     * @param exploredNodes the number of explored nodes.
+     */
+    void setExploredNodes(final int exploredNodes);
+
+    /**
+     * Returns the number of pending nodes.
+     *
+     * @return the number of pending nodes.
+     */
+    int getPendingNodes();
+
+    /**
+     * Sets the number of pending nodes.
+     *
+     * @param pendingNodes the number of pending nodes.
+     */
+    void setPendingNodes(final int pendingNodes);
+
+    /**
+     * Returns the number of created nodes.
+     *
+     * @return the number of created nodes.
+     */
+    int getCreatedNodes();
+
+    /**
+     * Sets the number of created nodes.
+     *
+     * @param createdNodes the number of created nodes.
+     */
+    void setCreatedNodes(final int createdNodes);
 
     /**
      * Solves the planning problem and returns the first solution node found.
