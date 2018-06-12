@@ -57,6 +57,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
     /**
      * The hill climbing algorithm. Solves the planning problem and returns the solution's node.
      *
+     * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node.
      */
     public Node search(final CodedProblem codedProblem) {

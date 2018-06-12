@@ -59,6 +59,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
      * The greedy best first search algorithm. Solves the planning problem and returns the first solution plan found.
      * This method must be completed.
      *
+     * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return a solution plan or null if it does not exist.
      */
     public Node search(final CodedProblem codedProblem) {

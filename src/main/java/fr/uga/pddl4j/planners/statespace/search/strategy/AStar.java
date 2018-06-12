@@ -57,6 +57,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
     /**
      * Solves the planning problem and returns the first solution search found.
      *
+     * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return a solution search or null if it does not exist.
      */
     public Node search(final CodedProblem codedProblem) {

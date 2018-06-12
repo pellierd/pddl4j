@@ -60,6 +60,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
     /**
      * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
      *
+     * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node or null.
      */
     public Node search(final CodedProblem codedProblem) {
