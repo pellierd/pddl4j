@@ -73,6 +73,9 @@ public final class FF extends AbstractStateSpacePlanner {
 
         enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
         greedyBestFirstSearch = new GreedyBestFirstSearch(timeout, heuristicType, weight);
+
+        this.getStateSpaceStrategies().add(enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(greedyBestFirstSearch);
     }
 
     /**

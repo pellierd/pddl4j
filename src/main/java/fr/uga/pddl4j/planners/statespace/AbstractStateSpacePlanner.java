@@ -16,6 +16,10 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This abstract class defines the main methods to access a state based planner.
@@ -37,11 +41,27 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
     private boolean anytime;
 
     /**
+     * The liste of state space strategies used in the planner.
+     */
+    private List<StateSpaceStrategy> stateSpaceStrategiesList;
+
+    /**
      * Creates a new planner.
      */
     public AbstractStateSpacePlanner() {
         super();
+        this.stateSpaceStrategiesList = new ArrayList<>();
         this.anytime = StateSpacePlanner.DEFAULT_ANYTIME;
+    }
+
+    /**
+     * Returns the state space strategies used in the planner.
+     *
+     * @return the state space strategies used in the planner
+     */
+    @Override
+    public List<StateSpaceStrategy> getStateSpaceStrategies() {
+        return this.stateSpaceStrategiesList;
     }
 
     /**

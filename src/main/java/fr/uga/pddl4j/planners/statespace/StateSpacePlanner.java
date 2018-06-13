@@ -17,8 +17,10 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -63,11 +65,18 @@ public interface StateSpacePlanner extends Planner {
     /**
      * Returns the LOGGER of the Planner class.
      *
-     * @return the Planner class.
+     * @return the Planner class
      */
     static Logger getLogger() {
         return Planner.getLogger();
     }
+
+    /**
+     * Returns the state space strategies used in the planner.
+     *
+     * @return the state space strategies used in the planner
+     */
+    List<StateSpaceStrategy> getStateSpaceStrategies();
 
     /**
      * Is planner anytime or not.
@@ -86,7 +95,7 @@ public interface StateSpacePlanner extends Planner {
     /**
      * This method return the default arguments of the planner.
      *
-     * @return the default arguments of the planner.
+     * @return the default arguments of the planner
      */
     static Properties getDefaultArguments() {
         final Properties options = Planner.getDefaultArguments();

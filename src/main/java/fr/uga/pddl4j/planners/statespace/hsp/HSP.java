@@ -64,6 +64,7 @@ public final class HSP extends AbstractStateSpacePlanner {
         this.setTraceLevel(traceLevel);
 
         astar = new AStar(timeout, heuristicType, weight);
+        this.getStateSpaceStrategies().add(astar);
     }
 
     /**
