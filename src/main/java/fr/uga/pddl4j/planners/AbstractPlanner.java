@@ -52,6 +52,19 @@ public abstract class AbstractPlanner implements Planner {
     }
 
     /**
+     * Creates a new planner.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public AbstractPlanner(final boolean statisticState, final int traceLevel) {
+        super();
+        this.traceLevel = traceLevel;
+        this.saveState = statisticState;
+        this.statistics = new Statistics();
+    }
+
+    /**
      * Returns the statistics of the planner.
      *
      * @return the statistics of the planner or null if no problem was solved.

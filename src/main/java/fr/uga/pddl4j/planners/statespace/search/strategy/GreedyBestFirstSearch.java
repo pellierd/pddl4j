@@ -42,6 +42,14 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Creates a new Greedy best First Search search strategy with default parameters.
+     *
+     */
+    public GreedyBestFirstSearch() {
+        super();
+    }
+
+    /**
      * Creates a new Greedy best First Search search strategy.
      *
      * @param timeout   the time out of the planner.
@@ -49,10 +57,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
      * @param weight    the weight set to the heuristic.
      */
     public GreedyBestFirstSearch(int timeout, Heuristic.Type heuristic, double weight) {
-        super();
-        this.setTimeOut(timeout);
-        this.setHeuristicType(heuristic);
-        this.setWeight(weight);
+        super(timeout, heuristic, weight);
     }
 
     /**

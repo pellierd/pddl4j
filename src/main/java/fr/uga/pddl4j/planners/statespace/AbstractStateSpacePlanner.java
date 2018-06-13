@@ -55,6 +55,18 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
     }
 
     /**
+     * Creates a new planner.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public AbstractStateSpacePlanner(final boolean statisticState, final int traceLevel) {
+        super(statisticState, traceLevel);
+        this.stateSpaceStrategiesList = new ArrayList<>();
+        this.anytime = StateSpacePlanner.DEFAULT_ANYTIME;
+    }
+
+    /**
      * Returns the state space strategies used in the planner.
      *
      * @return the state space strategies used in the planner

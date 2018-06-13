@@ -41,6 +41,14 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Creates a new Hill Climbing search with default parameters.
+     *
+     */
+    public HillClimbing() {
+        super();
+    }
+
+    /**
      * Creates a new Hill Climbing search strategy.
      *
      * @param timeout   the time out of the planner.
@@ -48,10 +56,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param weight    the weight set to the heuristic.
      */
     public HillClimbing(int timeout, Heuristic.Type heuristic, double weight) {
-        super();
-        this.setTimeOut(timeout);
-        this.setHeuristicType(heuristic);
-        this.setWeight(weight);
+        super(timeout, heuristic, weight);
     }
 
     /**

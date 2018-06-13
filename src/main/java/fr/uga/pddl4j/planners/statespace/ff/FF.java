@@ -58,6 +58,35 @@ public final class FF extends AbstractStateSpacePlanner {
 
     /**
      * Creates a new planner.
+     */
+    public FF() {
+        super();
+
+        enforcedHillClimbing = new EnforcedHillClimbing();
+        greedyBestFirstSearch = new GreedyBestFirstSearch();
+
+        this.getStateSpaceStrategies().add(enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(greedyBestFirstSearch);
+    }
+
+    /**
+     * Creates a new planner.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public FF(final boolean statisticState, final int traceLevel) {
+        super(statisticState, traceLevel);
+
+        enforcedHillClimbing = new EnforcedHillClimbing();
+        greedyBestFirstSearch = new GreedyBestFirstSearch();
+
+        this.getStateSpaceStrategies().add(enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(greedyBestFirstSearch);
+    }
+
+    /**
+     * Creates a new planner.
      *
      * @param timeout        the time out of the planner.
      * @param heuristicType  the heuristicType to use to solve the planning problem.

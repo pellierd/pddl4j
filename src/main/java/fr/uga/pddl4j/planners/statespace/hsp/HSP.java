@@ -50,6 +50,27 @@ public final class HSP extends AbstractStateSpacePlanner {
 
     /**
      * Creates a new planner.
+     */
+    public HSP() {
+        astar = new AStar();
+        this.getStateSpaceStrategies().add(astar);
+    }
+
+    /**
+     * Creates a new planner.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public HSP(final boolean statisticState, final int traceLevel) {
+        super(statisticState, traceLevel);
+
+        astar = new AStar();
+        this.getStateSpaceStrategies().add(astar);
+    }
+
+    /**
+     * Creates a new planner.
      *
      * @param timeout        the time out of the planner.
      * @param heuristicType  the heuristicType to use to solve the planning problem.
@@ -59,9 +80,7 @@ public final class HSP extends AbstractStateSpacePlanner {
      */
     public HSP(final int timeout, final Heuristic.Type heuristicType, final double weight,
                final boolean statisticState, final int traceLevel) {
-        super();
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
+        super(statisticState, traceLevel);
 
         astar = new AStar(timeout, heuristicType, weight);
         this.getStateSpaceStrategies().add(astar);
