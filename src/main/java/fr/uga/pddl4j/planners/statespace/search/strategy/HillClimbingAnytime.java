@@ -53,6 +53,15 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
     private final LinkedList<Node> openList;
 
     /**
+     * Creates a new Hill Climbing anytime search strategy with default parameters.
+     */
+    public HillClimbingAnytime() {
+        super();
+        restartList = new LinkedList<>();
+        openList = new LinkedList<>();
+    }
+
+    /**
      * Creates a new Hill Climbing anytime search strategy.
      *
      * @param timeout   the time out of the planner.
@@ -60,10 +69,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param weight    the weight set to the heuristic.
      */
     public HillClimbingAnytime(int timeout, Heuristic.Type heuristic, double weight) {
-        super();
-        this.setTimeOut(timeout);
-        this.setHeuristicType(heuristic);
-        this.setWeight(weight);
+        super(timeout, heuristic, weight);
         restartList = new LinkedList<>();
         openList = new LinkedList<>();
     }

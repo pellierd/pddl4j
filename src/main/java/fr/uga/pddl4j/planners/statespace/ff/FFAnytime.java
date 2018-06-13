@@ -66,6 +66,36 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
     }
 
     /**
+     * Creates a new planner with default parameters.
+     *
+     */
+    public FFAnytime() {
+        super();
+
+        enforcedHillClimbing = new EnforcedHillClimbing();
+        greedyBestFirstSearchAnytime = new GreedyBestFirstSearchAnytime();
+
+        this.getStateSpaceStrategies().add(enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(greedyBestFirstSearchAnytime);
+    }
+
+    /**
+     * Creates a new planner with default parameters for search strategy.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public FFAnytime(final boolean statisticState, final int traceLevel) {
+        super(statisticState, traceLevel);
+
+        enforcedHillClimbing = new EnforcedHillClimbing();
+        greedyBestFirstSearchAnytime = new GreedyBestFirstSearchAnytime();
+
+        this.getStateSpaceStrategies().add(enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(greedyBestFirstSearchAnytime);
+    }
+
+    /**
      * Creates a new planner.
      *
      * @param timeout        the time out of the planner.
@@ -76,9 +106,7 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
      */
     public FFAnytime(final int timeout, final Heuristic.Type heuristicType, final double weight,
                      final boolean statisticState, final int traceLevel) {
-        super();
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
+        super(statisticState, traceLevel);
 
         enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
         greedyBestFirstSearchAnytime = new GreedyBestFirstSearchAnytime(timeout, heuristicType, weight);

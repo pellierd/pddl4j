@@ -36,10 +36,22 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
     private Vector<Node> solutionNodes;
 
     /**
-     * Creates a new planner.
+     * Creates a new planner with default parameters.
      */
     public AbstractStateSpacePlannerAnytime() {
         super();
+        this.setAnytime(true);
+        solutionNodes = new Vector<>();
+    }
+
+    /**
+     * Creates a new planner.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public AbstractStateSpacePlannerAnytime(final boolean statisticState, final int traceLevel) {
+        super(statisticState, traceLevel);
         this.setAnytime(true);
         solutionNodes = new Vector<>();
     }

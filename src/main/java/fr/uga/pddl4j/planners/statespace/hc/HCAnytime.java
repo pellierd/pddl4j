@@ -52,6 +52,31 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
     }
 
     /**
+     * Creates a new planner with default parameters.
+     */
+    public HCAnytime() {
+        super();
+
+        hillClimbingAnytime = new HillClimbingAnytime();
+
+        this.getStateSpaceStrategies().add(hillClimbingAnytime);
+    }
+
+    /**
+     * Creates a new planner with default parameters for search strategy.
+     *
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     */
+    public HCAnytime(final boolean statisticState, final int traceLevel) {
+        super(statisticState, traceLevel);
+
+        hillClimbingAnytime = new HillClimbingAnytime();
+
+        this.getStateSpaceStrategies().add(hillClimbingAnytime);
+    }
+
+    /**
      * Creates a new planner.
      *
      * @param timeout        the time out of the planner.
@@ -62,9 +87,7 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
      */
     public HCAnytime(final int timeout, final Heuristic.Type heuristicType, final double weight,
                      final boolean statisticState, final int traceLevel) {
-        super();
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
+        super(statisticState, traceLevel);
 
         hillClimbingAnytime = new HillClimbingAnytime(timeout, heuristicType, weight);
 

@@ -72,17 +72,23 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
     }
 
     /**
-     * Creates a new Greedy best First Search search strategy.
+     * Creates a new Greedy Best First Search search strategy with default parameters.
+     */
+    public GreedyBestFirstSearchAnytime() {
+        super();
+        boundCost = Double.MAX_VALUE;
+        boundDepth = Double.MAX_VALUE;
+    }
+
+    /**
+     * Creates a new Greedy Best First Search search strategy.
      *
      * @param timeout   the time out of the planner.
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
     public GreedyBestFirstSearchAnytime(int timeout, Heuristic.Type heuristic, double weight) {
-        super();
-        this.setTimeOut(timeout);
-        this.setHeuristicType(heuristic);
-        this.setWeight(weight);
+        super(timeout, heuristic, weight);
         boundCost = Double.MAX_VALUE;
         boundDepth = Double.MAX_VALUE;
     }
