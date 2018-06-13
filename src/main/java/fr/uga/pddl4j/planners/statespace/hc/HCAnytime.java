@@ -67,6 +67,8 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
         this.setTraceLevel(traceLevel);
 
         hillClimbingAnytime = new HillClimbingAnytime(timeout, heuristicType, weight);
+
+        this.getStateSpaceStrategies().add(hillClimbingAnytime);
     }
 
     /**

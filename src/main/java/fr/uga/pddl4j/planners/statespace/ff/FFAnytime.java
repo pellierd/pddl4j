@@ -82,6 +82,9 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
 
         enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
         greedyBestFirstSearchAnytime = new GreedyBestFirstSearchAnytime(timeout, heuristicType, weight);
+
+        this.getStateSpaceStrategies().add(enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(greedyBestFirstSearchAnytime);
     }
 
     /**
