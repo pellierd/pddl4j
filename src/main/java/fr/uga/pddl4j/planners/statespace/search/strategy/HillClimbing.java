@@ -64,7 +64,6 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
-        double bestHeuristic = Integer.MAX_VALUE;
 
         BitState init = new BitState(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
@@ -84,16 +83,15 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
             final LinkedList<Node> successors = getSuccessors(currentState, codedProblem, heuristic);
             deadEndFree = !successors.isEmpty();
 
-            final Node successor = popBestNode(successors, bestHeuristic);
-            this.setExploredNodes(this.getExploredNodes() + 1);
-            if (successor.satisfy(codedProblem.getGoal())) {
-                solution = successor;
-            } else {
-                successors.clear();
-                openList.clear();
-                openList.addLast(successor);
-                if (successor.getHeuristic() <= bestHeuristic) {
-                    bestHeuristic = successor.getHeuristic();
+            if (deadEndFree) {
+                final Node successor = popBestNode(successors);
+                this.setExploredNodes(this.getExploredNodes() + 1);
+                if (successor.satisfy(codedProblem.getGoal())) {
+                    solution = successor;
+                } else {
+                    successors.clear();
+                    openList.clear();
+                    openList.addLast(successor);
                 }
             }
 
@@ -148,14 +146,14 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param nodes the list containing nodes.
      * @return the best node from the nodes' list.
      */
-    private Node popBestNode(final Collection<Node> nodes, final double bestHeuristic) {
+    private Node popBestNode(Collection<Node> nodes) {
         Node node = null;
         if (!nodes.isEmpty()) {
             final Iterator<Node> i = nodes.iterator();
             node = i.next();
             while (i.hasNext()) {
                 final Node next = i.next();
-                if (next.getHeuristic() < bestHeuristic) {
+                if (next.getHeuristic() < node.getHeuristic()) {
                     node = next;
                 }
             }
