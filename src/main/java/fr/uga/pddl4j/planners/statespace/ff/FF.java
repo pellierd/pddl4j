@@ -57,7 +57,7 @@ public final class FF extends AbstractStateSpacePlanner {
     private final StateSpaceStrategy greedyBestFirstSearch;
 
     /**
-     * Creates a new planner.
+     * Creates a new planner with default parameters.
      */
     public FF() {
         super();
@@ -70,7 +70,7 @@ public final class FF extends AbstractStateSpacePlanner {
     }
 
     /**
-     * Creates a new planner.
+     * Creates a new planner with default parameters for search strategy.
      *
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.

@@ -49,7 +49,7 @@ public final class HSP extends AbstractStateSpacePlanner {
     private final StateSpaceStrategy astar;
 
     /**
-     * Creates a new planner.
+     * Creates a new planner with default parameters.
      */
     public HSP() {
         astar = new AStar();
@@ -57,7 +57,7 @@ public final class HSP extends AbstractStateSpacePlanner {
     }
 
     /**
-     * Creates a new planner.
+     * Creates a new planner with default parameters for search strategy.
      *
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
