@@ -156,11 +156,11 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FFAnytime:
-                planner = new FFAnytime();
+                planner = new FFAnytime(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
             case HCAnytime:
-                planner = new HCAnytime();
+                planner = new HCAnytime(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
             default:

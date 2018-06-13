@@ -17,13 +17,13 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace;
+package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 
 import java.util.Vector;
 
-public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpacePlanner {
+public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpaceStrategy {
 
     /**
      * The serial id of the class.
@@ -38,9 +38,20 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
     /**
      * Creates a new planner.
      */
-    public AbstractStateSpacePlannerAnytime() {
+    public AbstractStateSpaceStrategyAnytime() {
         super();
-        this.setAnytime(true);
+        solutionNodes = new Vector<>();
+    }
+
+    /**
+     * Creates a new planner.
+     *
+     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param timeout   the time out of the planner.
+     * @param weight    the weight set to the heuristic.
+     */
+    public AbstractStateSpaceStrategyAnytime(int timeout, Heuristic.Type heuristic, double weight) {
+        super(timeout, heuristic, weight);
         solutionNodes = new Vector<>();
     }
 
@@ -51,14 +62,5 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
      */
     public Vector<Node> getSolutionNodes() {
         return solutionNodes;
-    }
-
-    /**
-     * Returns the list containing all solution nodes found.
-     *
-     * @param solutionNodes the list containing all solution nodes found.
-     */
-    public void setSolutionNodes(Vector<Node> solutionNodes) {
-        this.solutionNodes = solutionNodes;
     }
 }
