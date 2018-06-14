@@ -79,6 +79,59 @@ public class StateSpacePlannerFactory implements Serializable {
      * Returns an instance of the specified state based planner.
      *
      * @param name           the name of the state based planner.
+     * @return an instance of the specified planner.
+     * @see fr.uga.pddl4j.planners.Planner.Name
+     */
+    public AbstractStateSpacePlanner getPlanner(final Planner.Name name) {
+        AbstractStateSpacePlanner planner = null;
+        switch (name) {
+            case HSP:
+                planner = new HSP();
+                break;
+
+            case FF:
+                planner = new FF();
+                break;
+
+            default:
+                LOGGER.trace(StateSpacePlannerFactory.printUsage());
+                break;
+        }
+        return planner;
+    }
+
+    /**
+     * Returns an instance of the specified state based planner.
+     *
+     * @param name           the name of the state based planner.
+     * @param statisticState the statistics generation value.
+     * @param traceLevel     the trace level of the planner.
+     * @return an instance of the specified planner.
+     * @see fr.uga.pddl4j.planners.Planner.Name
+     */
+    public AbstractStateSpacePlanner getPlanner(final Planner.Name name, final boolean statisticState,
+                                                final int traceLevel) {
+        AbstractStateSpacePlanner planner = null;
+        switch (name) {
+            case HSP:
+                planner = new HSP(statisticState, traceLevel);
+                break;
+
+            case FF:
+                planner = new FF(statisticState, traceLevel);
+                break;
+
+            default:
+                LOGGER.trace(StateSpacePlannerFactory.printUsage());
+                break;
+        }
+        return planner;
+    }
+
+    /**
+     * Returns an instance of the specified state based planner.
+     *
+     * @param name           the name of the state based planner.
      * @param timeout        the time out of the planner.
      * @param heuristicType  the heuristicType to use to solve the planning problem.
      * @param weight         the weight set to the heuristic.
