@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.test.planner.ff;
+package fr.uga.pddl4j.test.planners.statespace.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
