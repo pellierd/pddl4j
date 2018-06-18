@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.test.planner.hsp;
+package fr.uga.pddl4j.test.planners.statespace.hsp;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
@@ -84,7 +84,6 @@ public class HSPTest {
      * The HSP planner reference.
      */
     private HSP planner = null;
-
 
     /**
      * Test initialization.

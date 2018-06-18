@@ -122,6 +122,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                                     result.setCost(g);
                                     result.setParent(current);
                                     result.setOperator(index);
+                                    result.setDepth(current.getDepth() + 1);
                                     open.add(result);
                                     openSet.put(result, result);
                                     closeSet.remove(result);
@@ -131,6 +132,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                                 state.setParent(current);
                                 state.setOperator(index);
                                 state.setHeuristic(heuristic.estimate(state, codedProblem.getGoal()));
+                                state.setDepth(current.getDepth() + 1);
                                 open.add(state);
                                 openSet.put(state, state);
                             }
@@ -138,6 +140,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                             result.setCost(g);
                             result.setParent(current);
                             result.setOperator(index);
+                            result.setDepth(current.getDepth() + 1);
                         }
 
                     }
