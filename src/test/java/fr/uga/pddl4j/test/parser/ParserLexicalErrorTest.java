@@ -23,13 +23,9 @@ import static fr.uga.pddl4j.parser.Message.Type.LEXICAL_ERROR;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.test.Tools;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * Implements the <tt>ParserLexicalErrorTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
@@ -57,6 +53,8 @@ public class ParserLexicalErrorTest {
         final String errorToTest = "Bracket issue";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
 
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in domain file.");
+
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
@@ -76,6 +74,8 @@ public class ParserLexicalErrorTest {
         final String pathFileTest = "src/test/resources/parser/domain_lexical_error_1.pddl";
         final String errorToTest = "Keyword lexical issue";
         Tools.FileType fileType = Tools.FileType.DOMAIN_FILE;
+
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in domain file.");
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
@@ -97,6 +97,8 @@ public class ParserLexicalErrorTest {
         final String errorToTest = "Bracket issue";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
 
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in problem file.");
+
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();
         if (!errManager.getMessages().isEmpty()) {
@@ -116,6 +118,8 @@ public class ParserLexicalErrorTest {
         final String pathFileTest = "src/test/resources/parser/problem_lexical_error_1.pddl";
         final String errorToTest = "Keyword lexical issue";
         Tools.FileType fileType = Tools.FileType.PROBLEM_FILE;
+
+        System.out.println("ParserLexicalErrorTest: Test " + errorToTest + " in problem file.");
 
         final ErrorManager errManager = Tools.generateErrorMessages(pathFileTest, errorToTest, fileType);
         errManager.printAll();

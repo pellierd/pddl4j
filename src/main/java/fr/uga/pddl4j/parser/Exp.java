@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
  * This class implements a parser node used in PDDL expressions.
  * <p>
  * Modifications:
+ * </p>
  * <ul>
  * <li>Add method <code>isLiteral()</code> 11.12.2012.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
@@ -51,6 +51,9 @@ public class Exp implements Serializable {
      */
     private static final long serialVersionUID = 1943664302879209785L;
 
+    /**
+     * The logger of the class.
+     */
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(Exp.class);
 
     /**
@@ -64,8 +67,8 @@ public class Exp implements Serializable {
     private List<TypedSymbol> variables;
 
     /**
-     * AND, OR, NOT, WHEN => NULL ALL, EX => the quantified variable with its type ATOM => the atom
-     * as predicate->param1->param2->...
+     * AND, OR, NOT, WHEN &#61;&#62; NULL ALL, EX &#61;&#62; the quantified variable with its type ATOM &#61;&#62;
+     * the atom as predicate&#45;&#62;param1&#45;&#62;param2&#45;&#62;...
      */
     private List<Symbol> atom;
 
@@ -202,7 +205,7 @@ public class Exp implements Serializable {
      * Set the connective of this node.
      *
      * @param connective the connective.
-     * @throws RuntimeException if the specified connective is null.
+     * @throws NullParameterException if the specified connective is null.
      */
     public void setConnective(final Connective connective) throws NullParameterException {
         if (connective == null) {
@@ -317,8 +320,8 @@ public class Exp implements Serializable {
      * already renamed. The variable renames have the form ?X1, ..., ?Xn.
      *
      * @param context the images of the renamed variable.
-     * @exception MalformedExpException if this expression is malformed.
-     * @see this#isMalformedExpression
+     * @throws MalformedExpException if this expression is malformed.
+     * @see Exp#isMalformedExpression()
      */
     public void renameVariables(final Map<String, String> context) {
         if (this.isMalformedExpression()) {
@@ -408,7 +411,7 @@ public class Exp implements Serializable {
     /**
      * Moves the negation inward the expression.
      *
-     * @see this#isMalformedExpression
+     * @see Exp#isMalformedExpression
      */
     public void moveNegationInward() throws FatalException {
         if (this.isMalformedExpression()) {
@@ -538,7 +541,7 @@ public class Exp implements Serializable {
                     // do nothing
             }
         } catch (NullParameterException npe) {
-            LOGGER.error("A null parameter has been pass to a non null method call", npe);
+            LOGGER.error("a null parameter has been pass to a non null method call", npe);
             throw new FatalException("Null parameter", npe);
         }
     }
@@ -548,8 +551,8 @@ public class Exp implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
-     *     not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     *     atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
+     *          not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
+     *          atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -558,14 +561,14 @@ public class Exp implements Serializable {
             Exp other = (Exp) object;
             return this.connective.equals(other.connective)
                 && ((this.atom == null && other.atom == null)
-                    || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
+                || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
                 && this.children.equals(other.children)
                 && ((this.prefName == null && other.prefName == null)
-                    || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
+                || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
                 && ((this.variables == null && other.variables == null)
-                    || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
+                || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
                 && ((this.value == null && other.value == null)
-                    || (this.value != null && other.value != null && this.value.equals(other.value)));
+                || (this.value != null && other.value != null && this.value.equals(other.value)));
         }
         return false;
     }
@@ -599,7 +602,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to test.
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
-     *     this expression; <code>false</code> otherwise.
+     *          this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Exp exp) {
         for (Exp s : this.getChildren()) {
@@ -616,7 +619,7 @@ public class Exp implements Serializable {
      *
      * @param exp the expression to remove.
      * @return <code>true</code> if the specified expression <code>exp</code> was removed;
-     * <code>false</code> otherwise.
+     *          <code>false</code> otherwise.
      */
     public final boolean remove(final Exp exp) {
         boolean removed = false;
@@ -638,7 +641,7 @@ public class Exp implements Serializable {
      *
      * @return a string representation of this node.
      * @see java.lang.Object#toString
-     * @see this#isMalformedExpression
+     * @see Exp#isMalformedExpression
      */
     @Override
     public String toString() {
@@ -650,7 +653,7 @@ public class Exp implements Serializable {
      *
      * @param baseOffset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
-     * @exception MalformedExpException if the expression is malformed.
+     * @throws MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression
      */
     private String toString(String baseOffset) {
@@ -681,7 +684,7 @@ public class Exp implements Serializable {
                 break;
             case AND:
             case OR:
-                String offset =  baseOffset + "  ";
+                String offset = baseOffset + "  ";
                 str.append("(").append(this.getConnective().getImage());
                 if (!this.children.isEmpty()) {
                     str.append(" ");
@@ -807,6 +810,7 @@ public class Exp implements Serializable {
 
     /**
      * Return if this expression is malformed. An expression is considered as well in the following cases:
+     * <ul>
      * <li>Empty OR and AND expressions, i.e., without any children, are considered as well formed.</li>
      * <li>Quantified expressions (EXISTS, FORALL) is well formed if it has at least one quantified variable and one
      * child expression.</li>
@@ -819,6 +823,7 @@ public class Exp implements Serializable {
      * must have at least two children expressions to be considered as well formed.</li>
      * <li>ALWAYS_WITHIN and HOLD_DURING must have at least three children expressions to be considered as well formed.
      * </li>
+     * </ul>
      *
      * @return <code>true</code> if the expression is malformed; <code>false</code> otherwise.
      */

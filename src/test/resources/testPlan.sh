@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.6.0
+VERSION=3.7.0
 PROBLEM=""
 TYPE=""
 
@@ -13,7 +13,7 @@ for ((i=1 ; i<21 ; i++))
     else
         PROBLEM=p${i}.pddl
     fi
-    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
+    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
 done
 
 echo "### Execute 4 HSP planifications on depots problems"
@@ -25,7 +25,7 @@ for ((i=1 ; i<5 ; i++))
     else
         PROBLEM=p${i}.pddl
     fi
-    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
+    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
 done
 
 echo "### Execute 5 HSP planifications on gripper problems"
@@ -37,7 +37,7 @@ for ((i=1 ; i<6 ; i++))
     else
         PROBLEM=p${i}.pddl
     fi
-    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
+    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
 done
 
 echo "### Execute 11 HSP planifications on logistics problems"
@@ -49,7 +49,7 @@ for ((i=1 ; i<12 ; i++))
     else
         PROBLEM=p${i}.pddl
     fi
-    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.hsp.HSP -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
+    java -javaagent:build/libs/pddl4j-${VERSION}.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/${TYPE}/domain.pddl -f pddl/${TYPE}/${PROBLEM}
 done
 
 

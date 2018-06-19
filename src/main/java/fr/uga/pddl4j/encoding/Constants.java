@@ -19,13 +19,20 @@
 
 package fr.uga.pddl4j.encoding;
 
+import java.io.Serializable;
+
 /**
  * This interface defines the constants used during the encoding.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public final class Constants {
+public final class Constants implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The default logging level.
@@ -55,7 +62,8 @@ public final class Constants {
     /**
      * default private constructor to prevent form class instantiation.
      */
-    private Constants() {}
+    private Constants() {
+    }
 
 
 }

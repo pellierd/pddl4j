@@ -51,6 +51,11 @@ import fr.uga.pddl4j.util.BitState;
 public final class AjustedSum2M extends RelaxedGraphHeuristic {
 
     /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The set level heuristic used to compute the delta function, i.e., the interaction degree
      * among propositions of the goal.
      */
@@ -78,7 +83,7 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal)  {
+    public int estimate(final BitState state, final BitExp goal) {
         super.setGoal(goal);
         // First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
         super.expandRelaxedPlanningGraph(state);

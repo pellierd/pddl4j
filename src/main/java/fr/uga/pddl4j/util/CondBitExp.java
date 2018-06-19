@@ -29,6 +29,9 @@ import java.io.Serializable;
  */
 public class CondBitExp implements Serializable {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -66,7 +69,7 @@ public class CondBitExp implements Serializable {
      *
      * @param effects the effects.
      */
-    public CondBitExp(final BitExp effects)  {
+    public CondBitExp(final BitExp effects) {
         this(new BitExp(), effects);
     }
 

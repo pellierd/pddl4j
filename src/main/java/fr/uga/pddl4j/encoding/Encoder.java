@@ -32,6 +32,7 @@ import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -103,11 +104,11 @@ import java.util.Set;
  * </p>
  * <p>
  * <i>Definition:</i> A ground fact is relevant if and only if:
+ * </p>
  * <ol>
  * <li> it is an initial fact and not a negative ground inertia, or if</li>
  * <li> it is not an initial fact and not a positive ground inertia.</li>
  * </ol>
- * </p>
  * <p>
  * Finally, every operator is normalized, i.e, transform precondition and effects of the operators
  * in disjunctive and conjunctive normal form, before being encoding in a compact bit set
@@ -116,18 +117,26 @@ import java.util.Set;
  * <b>Warning:</b> the encoding is only implemented for ADL problems.
  * <p>
  * Revisions:
+ * </p>
  * <ul>
  * <li>23.01.2013: add of the case when the goal can be simplified to TRUE. The coded problem
  * returned contained in that case an empty goal expression (<code>BitExp.isEmpty()</code>).</li>
  * <li>25.03.2016: Fix bug when the goal contains only one atom.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 08.06.2010
  */
-public final class Encoder {
+public final class Encoder implements Serializable {
 
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The logger of the class.
+     */
     private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
@@ -243,11 +252,11 @@ public final class Encoder {
      * <li> 5 - 1 + actions, initial and goal state after expansion of variables</li>
      * <li> 6 - 1 + facts selected as relevant to the problem</li>
      * <li> 7 - 1 + final domain representation</li>
-     * <li> > 100 - 1 + various debugging information</li>
+     * <li> 8 - 1 + various debugging information</li>
      * </ul>
      *
      * @param level the log level of the planner.
-     * @throws IllegalArgumentException if <code>level < 0</code>.
+     * @throws IllegalArgumentException if <code>level &#60; 0</code>.
      */
     public static void setLogLevel(final int level) {
         if (level < 0) {

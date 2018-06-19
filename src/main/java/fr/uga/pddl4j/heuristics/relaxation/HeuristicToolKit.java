@@ -21,6 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 
+import java.io.Serializable;
+
 /**
  * This classes implements useful methods to manipulate the heuristics.
  *
@@ -28,12 +30,18 @@ import fr.uga.pddl4j.encoding.CodedProblem;
  * @version 1.0 - 09.02.2011
  * @see Heuristic
  */
-public final class HeuristicToolKit {
+public final class HeuristicToolKit implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * Private constructor just for prevent user to instantiate this class.
      */
-    private HeuristicToolKit(){}
+    private HeuristicToolKit() {
+    }
 
     /**
      * Create an heuristic of a specified type.

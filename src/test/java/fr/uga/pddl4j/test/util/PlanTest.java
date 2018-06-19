@@ -1,9 +1,23 @@
+/*
+ * Copyright (c) 2016 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.  If not, see
+ * <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.test.util;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.hsp.HSP;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.Plan;
@@ -11,8 +25,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,6 +41,16 @@ public class PlanTest {
      * Computation timeout.
      */
     private static final int TIMEOUT = 10;
+
+    /**
+     * Default Heuristic Type.
+     */
+    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+
+    /**
+     * Default Heuristic Weight.
+     */
+    private static final double HEURISTIC_WEIGHT = 1.0;
 
     /**
      * Default Trace level.
@@ -103,12 +125,8 @@ public class PlanTest {
     @Before
     public void initTest() {
         // Creates the planner
-        planner = new HSP();
-        planner.setTimeOut(TIMEOUT);
-        planner.setTraceLevel(TRACE_LEVEL);
-        planner.setSaveState(STATISTICS);
+        planner = new HSP(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT, STATISTICS, TRACE_LEVEL);
     }
-
 
 
     /**
@@ -116,6 +134,7 @@ public class PlanTest {
      */
     @Test
     public void testPlanSize() {
+        System.out.println("PlanTest: Test the size of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
             final Plan plan = planner.search(Tools.generateCodedProblem(domainFile, problemFile));
@@ -131,6 +150,7 @@ public class PlanTest {
      */
     @Test
     public void testPlanCost() {
+        System.out.println("PlanTest: Test the cost of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
             final Plan plan = planner.search(Tools.generateCodedProblem(domainFile, problemFile));
@@ -146,6 +166,7 @@ public class PlanTest {
      */
     @Test
     public void testPlans() {
+        System.out.println("PlanTest: Test the operators of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
             final CodedProblem pb = Tools.generateCodedProblem(domainFile, problemFile);

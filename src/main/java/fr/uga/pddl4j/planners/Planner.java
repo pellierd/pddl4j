@@ -17,16 +17,50 @@ package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.Plan;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.Serializable;
+import java.util.Properties;
 
 /**
  * This interface defines the main methods of to access a planner.
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- *
  * @since 3.0
  */
-public interface Planner {
+public interface Planner extends Serializable {
+
+    /**
+     * The logger of the class.
+     */
+    Logger LOGGER = LogManager.getLogger(Planner.class);
+
+    /**
+     * The planner key for properties.
+     */
+    String PLANNER = "PLANNER";
+
+    /**
+     * The default planner.
+     */
+    Name DEFAULT_PLANNER = Name.HSP;
+
+    /**
+     * The domain key for properties.
+     */
+    String DOMAIN = "DOMAIN";
+
+    /**
+     * The problem key for properties.
+     */
+    String PROBLEM = "PROBLEM";
+
+    /**
+     * The timeout key for properties.
+     */
+    String TIMEOUT = "TIMEOUT";
 
     /**
      * The default CPU time allocated to the search in seconds.
@@ -34,9 +68,19 @@ public interface Planner {
     int DEFAULT_TIMEOUT = 600;
 
     /**
+     * The trace level key for properties.
+     */
+    String TRACE_LEVEL = "TRACE_LEVEL";
+
+    /**
      * The default trace level.
      */
     int DEFAULT_TRACE_LEVEL = 1;
+
+    /**
+     * The statistics key for properties.
+     */
+    String STATISTICS = "STATISTICS";
 
     /**
      * The default statistics value.
@@ -46,19 +90,24 @@ public interface Planner {
     /**
      * This enumeration used to specified the name of the planner implemented in the library.
      */
-    static enum Name {
+    enum Name {
         /**
          * The HSP (Heuristic Search Planner).
          */
         HSP,
         /**
-         * The EHC (Enforced Hill Climbing Planner).
-         */
-        EHC,
-        /**
          * The FF (Fast Forward Planner).
          */
         FF,
+    }
+
+    /**
+     * Returns the LOGGER of the Planner class.
+     *
+     * @return the Planner class.
+     */
+    static Logger getLogger() {
+        return LOGGER;
     }
 
     /**
@@ -78,20 +127,6 @@ public interface Planner {
     Statistics getStatistics();
 
     /**
-     * Sets the time out of the planner.
-     *
-     * @param timeout the time allocated to the search in second.
-     */
-    void setTimeOut(final int timeout);
-
-    /**
-     * Returns the time out of the planner.
-     *
-     * @return the time out of the planner, i.e., the time allocated to the search in second.
-     */
-    int getTimeout();
-
-    /**
      * Sets the trace level of the planner.
      *
      * @param level the trace level of the planner.
@@ -104,4 +139,31 @@ public interface Planner {
      * @return the trace level of the planner.
      */
     int getTraceLevel();
+
+    /**
+     * Set the statistics generation value.
+     *
+     * @param saveState the new statistics computation value
+     */
+    void setSaveState(boolean saveState);
+
+    /**
+     * Is statistics generate or not.
+     *
+     * @return true if statistics are compute and save, false otherwise
+     */
+    boolean isSaveState();
+
+    /**
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
+     */
+    static Properties getDefaultArguments() {
+        final Properties options = new Properties();
+        options.put(Planner.TIMEOUT, Planner.DEFAULT_TIMEOUT * 1000);
+        options.put(Planner.TRACE_LEVEL, Planner.DEFAULT_TRACE_LEVEL);
+        options.put(Planner.STATISTICS, Planner.DEFAULT_STATISTICS);
+        return options;
+    }
 }

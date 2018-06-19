@@ -34,6 +34,9 @@ import java.util.Arrays;
  */
 final class IntOp extends AbstractCodedOp {
 
+    /**
+     * The serial version id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -88,7 +91,7 @@ final class IntOp extends AbstractCodedOp {
      *
      * @param value the value.
      * @return <code>true</code> if the operator is ready instantiate with the specified value; <code>false</code>
-     *     otherwise.
+     *          otherwise.
      */
     public final boolean isAlreadyInstantiatedWith(final int value) {
         int i = 0;
@@ -151,7 +154,7 @@ final class IntOp extends AbstractCodedOp {
      *
      * @param obj the other object.
      * @return <code>true</code> if the specified object is an instance of the class Op and
-     *     it has the same name and instantiated parameters; otherwise <code>false</code>.
+     *          it has the same name and instantiated parameters; otherwise <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

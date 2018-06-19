@@ -20,7 +20,6 @@ package fr.uga.pddl4j.util;
  *
  * @author D. Pellier
  * @version 1.0 - 14.03.2016
- *
  * @since 3.0
  */
 public abstract class AbstractPlan implements Plan {
@@ -33,7 +32,9 @@ public abstract class AbstractPlan implements Plan {
     }
 
     /**
-     * Creates a new search from a an other one. The new search is a deep copy of the specified search in parameter.
+     * Creates a new search from an other one. The new search is a deep copy of the specified search in parameter.
+     *
+     * @param other the plan on which a deep copy is done.
      */
     protected AbstractPlan(final Plan other) {
         this();

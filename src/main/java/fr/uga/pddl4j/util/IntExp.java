@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
  */
 public class IntExp implements Serializable {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -259,7 +262,7 @@ public class IntExp implements Serializable {
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
                 && Arrays.equals(this.arguments, other.arguments)
-                && Double.compare(this.value,other.value) == 0
+                && Double.compare(this.value, other.value) == 0
                 && this.variable == other.variable
                 && this.type == other.type
                 && this.children.equals(other.children);

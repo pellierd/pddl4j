@@ -35,6 +35,9 @@ import java.util.Set;
  */
 public class Problem implements Serializable {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -137,7 +140,7 @@ public class Problem implements Serializable {
      *
      * @param domain the domain to set.
      */
-    public final void setDomain(final Symbol domain)  {
+    public final void setDomain(final Symbol domain) {
         if (domain == null) {
             throw new NullPointerException();
         }

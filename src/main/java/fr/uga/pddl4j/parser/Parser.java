@@ -25,12 +25,15 @@ import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implements the <tt>Parser</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
@@ -78,8 +82,6 @@ import java.util.Set;
  *    }
  * }
  * </pre>
- * <p>
- * </p>
  *
  * @author D Pellier
  * @version 1.0 - 28.01.10
@@ -114,7 +116,7 @@ public final class Parser {
     /**
      * Message for unhandled error.
      */
-    private static final String UNEXP_ERROR_MESSAGE = "\nUnexpected error";
+    private static final String UNEXP_ERROR_MESSAGE = "\nunexpected error";
 
     /**
      * The error manager of the parser.
@@ -185,7 +187,7 @@ public final class Parser {
                 this.checkOperatorsDeclaration();
                 this.checkDerivedPredicatesDeclaration();
             } catch (NullPointerException exception) {
-                LOGGER.error("Domain file is not valid\n");
+                LOGGER.error("domain file is not valid\n");
                 this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
             } finally {
                 inputStream.close();
@@ -193,7 +195,7 @@ public final class Parser {
         } catch (IOException | RuntimeException exception) {
             LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
         } catch (TokenMgrError | ParseException pe) {
-            LOGGER.error("Parse error in domain() call\n");
+            LOGGER.error("parse error in domain() call\n");
         }
     }
 
@@ -236,14 +238,14 @@ public final class Parser {
                 this.checkProblemConstraints();
                 this.checkMetric();
             } catch (NullPointerException exception) {
-                LOGGER.error("Problem file is not valid\n");
+                LOGGER.error("problem file is not valid\n");
             } finally {
                 inputStream.close();
             }
         } catch (IOException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         } catch (TokenMgrError | ParseException pe) {
-            LOGGER.error("Parse error in problem() call\n");
+            LOGGER.error("parse error in problem() call\n");
         }
     }
 
@@ -281,6 +283,91 @@ public final class Parser {
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
         } catch (TokenMgrError | ParseException | RuntimeException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from their respective string description.
+     *
+     * @param domainString  the string that contains the planning domains.
+     * @param problemString the string that contains the planning problem.
+     */
+    public void parseFromString(String domainString, String problemString) {
+        try {
+            // Create temp files for domain and problem
+            File domainTempFile = File.createTempFile("domain", ".pddl");
+            File problemTempFile = File.createTempFile("problem", ".pddl");
+
+            // Fill files with string content
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(domainTempFile), "UTF-8"))) {
+                writer.write(domainString);
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(problemTempFile), "UTF-8"))) {
+                writer.write(problemString);
+            }
+
+            // Parse and check the domain
+            parseDomain(domainTempFile);
+            // Parse and check the problem
+            parseProblem(problemTempFile);
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from their respective string description.
+     *
+     * @param domainAndProblemString the string that contains the domain and planning problem.
+     */
+    public void parseFromString(String domainAndProblemString) {
+        try {
+            // Create temp files for domain and problem
+            File domainAndProblemTempFile = File.createTempFile("domainAndProblemString", ".pddl");
+
+            // Fill files with string content
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(domainAndProblemTempFile), "UTF-8"))) {
+                writer.write(domainAndProblemString);
+            }
+
+            // Parse and check the domain and problem
+            parse(domainAndProblemTempFile);
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from an input stream.
+     *
+     * @param inputDomainAndProblem the stream that contains the domain and planning problem.
+     */
+    public void parseFromStream(InputStream inputDomainAndProblem) {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(inputDomainAndProblem, "UTF-8"))) {
+            parseFromString(buffer.lines().collect(Collectors.joining("\n")));
+        } catch (RuntimeException | IOException exception) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        }
+    }
+
+    /**
+     * Parses a planning domain and a planning problem from two input streams.
+     *
+     * @param inputDomain  the stream that contains the domain.
+     * @param inputProblem the stream that contains the planning problem.
+     */
+    public void parseFromStream(InputStream inputDomain, InputStream inputProblem) {
+        try {
+            BufferedReader bufferDomain = new BufferedReader(new InputStreamReader(inputDomain, "UTF-8"));
+            BufferedReader bufferProblem = new BufferedReader(new InputStreamReader(inputProblem, "UTF-8"));
+            parseFromString(bufferDomain.lines().collect(Collectors.joining("\n")),
+                bufferProblem.lines().collect(Collectors.joining("\n")));
+        } catch (RuntimeException | IOException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
@@ -336,38 +423,6 @@ public final class Parser {
             // Parse and check the problem
             parseProblem(problem);
         } catch (RuntimeException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-        }
-    }
-
-    /**
-     * Parses a planning domain and a planning problem from their respective string description.
-     *
-     * @param domainString  the string that contains the planning domains.
-     * @param problemString the string that contains the planning problem.
-     */
-    public void parseFromString(String domainString, String problemString) {
-        try {
-            // Create temp files for domain and problem
-            File domainTempFile = File.createTempFile("domain", ".pddl");
-            File problemTempFile = File.createTempFile("problem", ".pddl");
-
-            // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(domainTempFile), "UTF-8"))) {
-                writer.write(domainString);
-            }
-
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(problemTempFile), "UTF-8"))) {
-                writer.write(problemString);
-            }
-
-            // Parse and check the domain
-            parseDomain(domainTempFile);
-            // Parse and check the problem
-            parseProblem(problemTempFile);
-        } catch (RuntimeException | IOException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
@@ -880,12 +935,12 @@ public final class Parser {
     }
 
     /**
-     * Checks if the declared operators
+     * Checks if the declared operators are well formed.
      * <ul>
-     * <li> have a unique name</li>
-     * <li> the type of the variables or constants used in their precondition, condition and effects
+     * <li> Operators must have a unique name.</li>
+     * <li> The type of the variables or constants used in their precondition, condition and effects
      * are type previously declared.</li>
-     * <li> the variable used in their precondition, condition and effects are declared as
+     * <li> The variable used in their precondition, condition and effects are declared as
      * parameters of the operators.</li>
      * </ul>
      *
@@ -994,7 +1049,9 @@ public final class Parser {
             } else {
                 TypedSymbol constant = this.domain.getConstant(s);
                 if (constant == null) {
-                    constant = this.problem.getObject(s);
+                    if (this.problem != null) {
+                        constant = this.problem.getObject(s);
+                    }
                 }
                 if (constant == null) {
                     this.mgr.logParserError("constant \"" + s.getImage() + "\" is undefined",
@@ -1172,9 +1229,9 @@ public final class Parser {
      *
      * OPTIONS   DESCRIPTIONS
      *
-     * -p <str> path for operator and fact file </str>
-     * -o <str> operator file name </str>
-     * -f <str> fact file name </str>
+     * -p   path for operator and fact file
+     * -o   operator file name
+     * -f   fact file name
      * </pre>
      *
      * @param args the arguments of the command line.
@@ -1189,7 +1246,7 @@ public final class Parser {
             try {
                 parser.parse(args[1]);
             } catch (FileNotFoundException fnfException) {
-                LOGGER.error("Parsing problem error", fnfException);
+                LOGGER.error("parsing problem error", fnfException);
             }
             if (parser.mgr.isEmpty()) {
                 strb.append("ok");

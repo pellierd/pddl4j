@@ -32,12 +32,12 @@ public interface CodedOp extends Serializable {
     /**
      * The default duration of an operator.
      */
-    static final double DEFAULT_DURATION =  1.0;
+    static final double DEFAULT_DURATION = 1.0;
 
     /**
      * The default cost of an operator.
      */
-    static double DEFAULT_COST =  1.0;
+    static double DEFAULT_COST = 1.0;
 
     /**
      * Return the name of this operator.

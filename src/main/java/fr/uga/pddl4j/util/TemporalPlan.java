@@ -28,11 +28,13 @@ import java.util.TreeMap;
  *
  * @author D. Pellier
  * @version 1.0 - 23.03.2016
- *
  * @since 3.0
  */
 public class TemporalPlan extends AbstractPlan {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -80,7 +82,7 @@ public class TemporalPlan extends AbstractPlan {
     }
 
     /**
-     * Returns the list of actions contained in the plan ordered depending on their time specifier
+     * Returns the list of actions contained in the plan ordered depending on their time specifier.
      *
      * @return the ordered set of actions of the plan.
      * @see Plan#actions()
@@ -108,7 +110,7 @@ public class TemporalPlan extends AbstractPlan {
      *
      * @param time the time specifier.
      * @return the set of actions at a specified time specifier or null if no actions are scheduled in the plan at the
-     *     the time specifier.
+     *          the time specifier.
      * @see Plan#getActionSet(int)
      */
     @Override
@@ -120,7 +122,7 @@ public class TemporalPlan extends AbstractPlan {
      * Adds an action at a specified time specifier in the plan.
      *
      * @param action the action to add.
-     * @param time the time specifier of the action in the plan.
+     * @param time   the time specifier of the action in the plan.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      * @see Plan#add(int, BitOp)
      */
@@ -138,7 +140,7 @@ public class TemporalPlan extends AbstractPlan {
      * Removes an action at a specified time specifier of the plan.
      *
      * @param action the action to remove.
-     * @param time the time specifier of the action in the plan to remove.
+     * @param time   the time specifier of the action in the plan to remove.
      * @see Plan#remove(int, BitOp)
      */
     @Override
@@ -160,10 +162,10 @@ public class TemporalPlan extends AbstractPlan {
     /**
      * Returns if an action is contained in the plan at a specified time specifier.
      *
-     * @param time the time specifier.
+     * @param time   the time specifier.
      * @param action the action.
      * @return <code>true</code> if the specified action is contained in the plan at the specified time specifier;
-     *     <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      * @see Plan#contains(int, BitOp)
      */
     @Override
@@ -188,7 +190,6 @@ public class TemporalPlan extends AbstractPlan {
      * the class BitOp to compare actions.
      *
      * @param obj the object to be compared.
-     *
      * @return <code>true</code> if this plan is equal to the specified object; <code>false</code> otherwise.
      * @see BitOp#equals(Object)
      * @see java.lang.Object#equals(Object)

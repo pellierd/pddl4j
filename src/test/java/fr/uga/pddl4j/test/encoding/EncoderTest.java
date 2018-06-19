@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2016 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.  If not, see
+ * <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
@@ -756,6 +771,7 @@ public class EncoderTest {
             oneDomainPerProblem = true;
         }
 
+        System.out.println("EncoderTest: Test encoding on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
@@ -779,13 +795,13 @@ public class EncoderTest {
                 final CodedProblem pb;
                 try {
                     // Encodes and instantiates the problem in a compact representation
-                    System.out.println("encoding [" + currentProblem + "]" + "...");
+                    System.out.println(" * Encoding [" + currentProblem + "]" + "...");
                     pb = factory.encode();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println("Problem encoded and is solvable.");
+                        System.out.println(" * Problem encoded and is solvable.");
                     } else {
-                        System.out.println("Problem encoded and is  not solvable.");
+                        System.out.println(" * Problem encoded and is  not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");

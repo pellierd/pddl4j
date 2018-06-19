@@ -1,16 +1,27 @@
+/*
+ * Copyright (c) 2016 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.  If not, see
+ * <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.IntExp;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,10 +73,11 @@ public class CodedProblemTest {
         + "(clear a)\n (ontable a)\n (clear c)\n (ontable c)\n)";
 
     /**
-     * Method that test the size of the operator list from a specified coded problem.
+     * Method that tests the size of the operator list from a specified coded problem.
      */
     @Test
     public void testCodedProblemOperatorsListSize() {
+        System.out.println("CodedProblem: Test the size of the operator list from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getOperators().size() == opList.size());
@@ -73,10 +85,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test each operator from a specified coded problem.
+     * Method that tests each operator from a specified coded problem.
      */
     @Test
     public void testCodedProblemOperatorsList() {
+        System.out.println("CodedProblem: Test each operator from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             final List<BitOp> opListCodedProblem = codedProblem.getOperators();
@@ -87,10 +100,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test the size of the fact list from a specified coded problem.
+     * Method that tests the size of the fact list from a specified coded problem.
      */
     @Test
     public void testCodedProblemRelevantFactsSize() {
+        System.out.println("CodedProblem: Test the size of the fact list from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.getRelevantFacts().size() == factList.size());
@@ -98,10 +112,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test each fact from a specified coded problem.
+     * Method that tests each fact from a specified coded problem.
      */
     @Test
     public void testEncodedRelevantFacts() {
+        System.out.println("CodedProblem: Test each fact from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             final List<IntExp> factListCodedProblem = codedProblem.getRelevantFacts();
@@ -112,10 +127,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test the goal expression from a specified coded problem.
+     * Method that tests the goal expression from a specified coded problem.
      */
     @Test
     public void testEncodedGoal() {
+        System.out.println("CodedProblem: Test the goal expression from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getGoal()).equals(goal));
@@ -123,10 +139,11 @@ public class CodedProblemTest {
     }
 
     /**
-     * Method that test the init expression from a specified coded problem.
+     * Method that tests the init expression from a specified coded problem.
      */
     @Test
     public void testEncodedInit() {
+        System.out.println("CodedProblem: Test the init expression from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
             Assert.assertTrue(codedProblem.toString(codedProblem.getInit()).equals(init));

@@ -21,10 +21,12 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 import fr.uga.pddl4j.util.Plan;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,7 +40,12 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public class CodedProblem {
+public class CodedProblem implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The table of types.
@@ -108,7 +115,8 @@ public class CodedProblem {
     /**
      * The default constructor with a private package access to prevent instance creation.
      */
-    CodedProblem() {}
+    CodedProblem() {
+    }
 
     /**
      * Create a new <code>CodedProblem</code> copy of another.
@@ -179,6 +187,7 @@ public class CodedProblem {
 
     /**
      * .
+     *
      * @param inferredDomains the inferredDomains to set
      */
     final void setInferredDomains(final List<Set<Integer>> inferredDomains) {
@@ -446,6 +455,17 @@ public class CodedProblem {
      */
     public final String toString(BitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
+            this.predicates, this.functions, this.relevantFacts);
+    }
+
+    /**
+     * Returns a string representation of a bit state.
+     *
+     * @param bitState the state.
+     * @return a string representation of the specified state.
+     */
+    public final String toString(BitState bitState) {
+        return StringEncoder.toString(bitState, this.constants, this.types,
             this.predicates, this.functions, this.relevantFacts);
     }
 

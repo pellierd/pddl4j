@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.util;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 
@@ -28,7 +29,12 @@ import java.util.BitSet;
  * @author D. Pellier
  * @version 1.0 - 30.08.2010
  */
-public final class BitMatrix {
+public final class BitMatrix implements Serializable {
+
+    /**
+     * The serial id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The number of rows.

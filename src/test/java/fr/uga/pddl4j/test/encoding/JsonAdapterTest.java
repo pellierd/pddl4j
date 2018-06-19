@@ -1,10 +1,26 @@
+/*
+ * Copyright (c) 2016 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.  If not, see
+ * <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
+import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.hsp.HSP;
+import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
@@ -32,6 +48,16 @@ public class JsonAdapterTest {
     private static final int TIMEOUT = 10;
 
     /**
+     * Default Heuristic Type.
+     */
+    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+
+    /**
+     * Default Heuristic Weight.
+     */
+    private static final double HEURISTIC_WEIGHT = 1.0;
+
+    /**
      * Default Trace level.
      */
     private static final int TRACE_LEVEL = 0;
@@ -52,11 +78,7 @@ public class JsonAdapterTest {
     @Before
     public void initTest() {
         // Creates the planner
-        planner = new HSP();
-        planner.setTimeOut(TIMEOUT);
-        planner.setTraceLevel(TRACE_LEVEL);
-        planner.setSaveState(STATISTICS);
-
+        planner = new HSP(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT, STATISTICS, TRACE_LEVEL);
     }
 
     /**
@@ -64,7 +86,9 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_toStringJ_gripper() {
-        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "ipc1/gripper" + File.separator;
+
+        System.out.println("JsonAdaptater: Test JSON output on " + localTestPath);
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
@@ -89,7 +113,9 @@ public class JsonAdapterTest {
      */
     @Test
     public void test_saveInFile_gripper() {
-        final String localTestPath = Tools.BENCH_DIR + File.separator + "gripper" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + File.separator + "ipc1/gripper" + File.separator;
+
+        System.out.println("JsonAdaptater: Test JSON output in file on " + localTestPath);
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.err.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");

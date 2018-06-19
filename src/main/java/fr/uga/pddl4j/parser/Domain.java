@@ -37,6 +37,9 @@ import java.util.Set;
  */
 public class Domain implements Serializable {
 
+    /**
+     * The serial version id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -349,7 +352,7 @@ public class Domain implements Serializable {
      *
      * @param symbol The symbol.
      * @return the constant from a specified symbol or <code>null</code> if no constant with this
-     *     symbol was declared.
+     *          symbol was declared.
      */
     public TypedSymbol getConstant(Symbol symbol) {
         int index = this.constants.indexOf(symbol);
@@ -361,7 +364,7 @@ public class Domain implements Serializable {
      *
      * @param object the other object.
      * @return <code>true</code> if the specified object is a non <code>null</code> instance of
-     *     the class <code>PlDomain</code> and has the same name; <code>false</code> otherwise.
+     *          the class <code>PlDomain</code> and has the same name; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(final Object object) {
@@ -389,7 +392,7 @@ public class Domain implements Serializable {
      * @param s1 the first typed symbol.
      * @param s2 the second typed symbol.
      * @return <code>true</code> if the types of the first typed symbol can be viewed as a subtype
-     *     of the seconds. <code>false</code> otherwise.
+     *          of the seconds. <code>false</code> otherwise.
      */
     public boolean isSubType(TypedSymbol s1, TypedSymbol s2) {
         List<Symbol> copy = new LinkedList<>(s1.getTypes());

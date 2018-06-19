@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * This class will display the critical path based on the Delta Algorithm from the Automated Planning book.
- * Automated Planning: Theory & Practice Book by Dana S. Nau, Malik Ghallab, and Paolo Traverso (Chapter 9).
+ * Automated Planning: Theory &#38; Practice Book by Dana S. Nau, Malik Ghallab, and Paolo Traverso (Chapter 9).
  * At the minute it has a variation of the sum heuristic and max heuristic and the final method will have
  * the critical path.
  *
@@ -38,6 +38,12 @@ import java.util.List;
  * @version 1.0 20.08.2010
  */
 public final class CriticalPath extends RelaxedGraphHeuristic {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
     private BitExp[] precond;
     private BitExp[] effect;
     private BitExp[] neffect;

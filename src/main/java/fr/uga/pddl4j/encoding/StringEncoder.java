@@ -22,9 +22,11 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.List;
 
@@ -35,7 +37,12 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 11.06.2010
  */
-final class StringEncoder {
+final class StringEncoder implements Serializable {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The default constructor with a private access to prevent instance creation.
@@ -71,7 +78,7 @@ final class StringEncoder {
         str.append("Preconditions:\n").append(toString(op.getPreconditions(), constants, types, predicates, functions))
             .append("\n")
             .append("Effects:\n")
-            .append(toString(op.getEffects(),constants, types, predicates, functions))
+            .append(toString(op.getEffects(), constants, types, predicates, functions))
             .append("\n");
         return str.toString();
     }
@@ -115,7 +122,7 @@ final class StringEncoder {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param baseOffset     the offset white space from the left used for indentation.
+     * @param baseOffset the offset white space from the left used for indentation.
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.
      */
@@ -323,6 +330,29 @@ final class StringEncoder {
     }
 
     /**
+     * Returns a string representation of a bit state.
+     *
+     * @param bitState   the state.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param relevants  the table of relevant facts.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(BitState bitState, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions,
+                           final List<IntExp> relevants) {
+        final StringBuilder str = new StringBuilder("(and");
+        for (int i = bitState.nextSetBit(0); i >= 0; i = bitState.nextSetBit(i + 1)) {
+            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions))
+                .append("\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
      * Returns a string representation of a conditional bit expression.
      *
      * @param exp        the conditional expression.
@@ -338,9 +368,9 @@ final class StringEncoder {
                            final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringEncoder.toString(exp.getEffects(),constants, types, predicates, functions, relevants));
+            str.append(StringEncoder.toString(exp.getEffects(), constants, types, predicates, functions, relevants));
         } else {
-            str.append("(when ").append(StringEncoder.toString(exp.getCondition(),constants, types, predicates,
+            str.append("(when ").append(StringEncoder.toString(exp.getCondition(), constants, types, predicates,
                 functions, relevants)).append("\n").append(StringEncoder.toString(exp.getEffects(), constants, types,
                 predicates, functions, relevants)).append(")");
         }

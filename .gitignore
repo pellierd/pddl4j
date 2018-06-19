@@ -10,6 +10,7 @@ build/
 ###################
 src/main/java/fr/uga/pddl4j/parser/lexer*
 !src/main/java/fr/uga/pddl4j/parser/lexer/Lexer.jj
+*.val
 
 # Logs and databases #
 ######################
@@ -21,7 +22,7 @@ doc/api
 
 #       Test files        #
 ###########################
-benchmarks
+#benchmarks
 
 # OS generated files #
 ######################

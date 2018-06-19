@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
  */
 public class NamedTypedList implements Serializable {
 
+    /**
+     * The serial id of the class.
+     */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -125,7 +128,7 @@ public class NamedTypedList implements Serializable {
      *
      * @param type the type to add.
      */
-    public void addType(final Symbol type)  {
+    public void addType(final Symbol type) {
         if (type == null) {
             throw new NullPointerException();
         }
@@ -142,8 +145,8 @@ public class NamedTypedList implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this named typed list is equal to <tt>obj</tt>, i.e.,
-     *     <tt>other</tt> is not null and of type <tt>NamedTypedList</tt> and it has the
-     *     same name and the same list of arguments and types; otherwise it returns <tt>false</tt>.
+     *          <tt>other</tt> is not null and of type <tt>NamedTypedList</tt> and it has the
+     *          same name and the same list of arguments and types; otherwise it returns <tt>false</tt>.
      * @see java.lang.Object#equals(Object)
      */
     @Override

@@ -28,6 +28,7 @@ import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.util.CondBitExp;
 import fr.uga.pddl4j.util.IntExp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -41,11 +42,17 @@ import java.util.List;
  * the STAN planner proposed D. Long and M. Fox. To have more information about this implementation
  * see D. Long, M. Fox (1999). Efficient Implementation of the Plan Graph in STAN. Journal of
  * Artificial Intelligence Research, 10(1):87-115.
- *</p>
+ * </p>
+ *
  * @author Damien Pellier
  * @version 1.0 20.08.2010
  */
 public abstract class GraphHeuristic extends AbstractHeuristic {
+
+    /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The array used to store the apparition level of the propositions.
@@ -484,9 +491,9 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * Returns <code>true</code> if two operator are mutex at a specified level. Two opsLayer are
      * mutex if the opsLayer are dependent or an operator has a mutex precondition at level lev;
      *
-     * @param oi the first fact.
-     * @param oj the second fact.
-     * @param lev  the level where the test must be done.
+     * @param oi  the first fact.
+     * @param oj  the second fact.
+     * @param lev the level where the test must be done.
      * @return <code>true</code> if two operator are mutex at a specified level;
      * <code>false</code> otherwise.
      */
@@ -513,11 +520,11 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * Returns <code>true</code> if two facts are mutex at a specified level. Two facts are mutex
      * if at least one operator that produce the facts are mutex in the previous level lev - 1.
      *
-     * @param pi the first fact.
-     * @param pj the second fact.
-     * @param lev  the level where the test must be done.
+     * @param pi  the first fact.
+     * @param pj  the second fact.
+     * @param lev the level where the test must be done.
      * @return <code>true</code> if two facts are mutex at a specified level; <code>false</code>
-     *     otherwise.
+     *          otherwise.
      */
     private boolean arePropositionsMutex(final int pi, final int pj, final int lev) {
         boolean mutex = pj == (pi + super.getRevelantFacts().size());
@@ -549,9 +556,9 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * of the planning graph.
      *
      * @param state the facts to be tested.
-     * @param level     the level of the graph at which the test is done.
+     * @param level the level of the graph at which the test is done.
      * @return <code>true</code> if a set of facts is mutex free in a specified proposition level
-     *     of the planning graph, <code>false</code> otherwise.
+     *          of the planning graph, <code>false</code> otherwise.
      */
     private boolean isMutexFree(final BitVector state, final int level) {
         boolean free = true;
@@ -607,7 +614,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * expanded planning graph.
      *
      * @return <code>true</code> if the goal is reached in the last proposition level of the
-     *     expanded planning graph; <code>false</code> otherwise.
+     *          expanded planning graph; <code>false</code> otherwise.
      */
     protected final boolean isGoalReachable() {
         return this.goalReached;

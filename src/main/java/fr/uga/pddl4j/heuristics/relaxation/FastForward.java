@@ -55,6 +55,11 @@ import fr.uga.pddl4j.util.BitState;
 public final class FastForward extends RelaxedGraphHeuristic {
 
     /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Creates a new <code>FastForward</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
@@ -73,7 +78,7 @@ public final class FastForward extends RelaxedGraphHeuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
-     * @throws NullPointerException if <code>state == null && goal == null</code>.
+     * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
     public int estimate(final BitState state, final BitExp goal) {

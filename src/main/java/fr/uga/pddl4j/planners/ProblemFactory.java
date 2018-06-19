@@ -21,6 +21,8 @@ import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Problem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,11 +33,15 @@ import java.io.IOException;
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- *
- * @since 3.0
  * @see CodedProblem
+ * @since 3.0
  */
 public class ProblemFactory {
+
+    /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
      * An instance of the ProblemFactory.
@@ -78,11 +84,11 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
-     * @param domain the domain file.
+     * @param domain  the domain file.
      * @param problem the problem file
      * @return the error manager of the parser used to parse.
      * @throws FileNotFoundException if the domain or the problem file was not found.
-     * @throws IOException if an error occur during parsing.
+     * @throws IOException           if an error occur during parsing.
      */
     public ErrorManager parse(final File domain, final File problem) throws IOException {
         this.parser.parse(domain, problem);
@@ -92,11 +98,11 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
-     * @param domain the domain file path.
+     * @param domain  the domain file path.
      * @param problem the problem file path.
      * @return the error manager of the parser used to parse.
      * @throws FileNotFoundException if the domain or the problem file was not found.
-     * @throws IOException if an error occur during parsing.
+     * @throws IOException           if an error occur during parsing.
      */
     public ErrorManager parse(final String domain, final String problem) throws IOException {
         this.parser.parse(domain, problem);
@@ -106,7 +112,7 @@ public class ProblemFactory {
     /**
      * Parses the domain and the problem description.
      *
-     * @param domain the domain string description
+     * @param domain  the domain string description
      * @param problem the problem string description
      * @return the error manager of the parser used to parse
      * @throws IOException if an error occur during parsing
@@ -128,20 +134,25 @@ public class ProblemFactory {
         final Domain domain = this.parser.getDomain();
         final Problem problem = this.parser.getProblem();
         Encoder.setLogLevel(this.getTraceLevel());
-        return Encoder.encode(domain, problem);
+        try {
+            return Encoder.encode(domain, problem);
+        } catch (IllegalArgumentException ilException) {
+            LOGGER.error("the problem to encode is not ADL, \":requirements\" not supported at this time\n");
+            return null;
+        }
     }
 
     /**
      * Sets the trace level. The levels are defined as follows:
-     * <ul>
-     * <ol>nothing</ol>
-     * <ol>info on problem constants, types and predicates</ol>
-     * <ol>1 + loaded operators, initial and goal state</ol>
-     * <ol>1 + predicates and their inertia status</ol>
-     * <ol>1 + 3 + goal state and operators with unary inertia encoded</ol>
-     * <ol>1 + actions, initial and goal state after expansion of variables</ol>
-     * <ol>1 + final domain representation</ol>
-     *</ul>
+     * <ol>
+     * <li>nothing</li>
+     * <li>info on problem constants, types and predicates</li>
+     * <li>1 + loaded operators, initial and goal state</li>
+     * <li>1 + predicates and their inertia status</li>
+     * <li>1 + 3 + goal state and operators with unary inertia encoded</li>
+     * <li>1 + actions, initial and goal state after expansion of variables</li>
+     * <li>1 + final domain representation</li>
+     * </ol>
      *
      * @param level the trace level.
      */

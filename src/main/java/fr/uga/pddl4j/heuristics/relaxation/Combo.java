@@ -46,6 +46,11 @@ import fr.uga.pddl4j.util.BitState;
 public final class Combo extends RelaxedGraphHeuristic {
 
     /**
+     * The serial version id of the class.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The set level heuristic used to compute the delta function, i.e., the interaction degree
      * among propositions of the goal.
      */
