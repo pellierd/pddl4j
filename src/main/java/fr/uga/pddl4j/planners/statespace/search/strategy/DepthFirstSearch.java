@@ -24,12 +24,12 @@ import java.util.LinkedList;
 import java.util.Objects;
 
 /**
- * This class implements Breadth First Search strategy.
+ * This class implements Depth First Search strategy.
  *
  * @author E. Hermellin
  * @version 1.0 - 22.06.2018
  */
-public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
+public final class DepthFirstSearch extends AbstractStateSpaceStrategy {
 
     /**
      * The serial id of the class.
@@ -39,7 +39,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
     /**
      * Creates a new Greedy best First Search search strategy with default parameters.
      */
-    public BreadthFirstSearch() {
+    public DepthFirstSearch() {
         super();
     }
 
@@ -48,7 +48,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
      *
      * @param timeout the time out of the planner.
      */
-    public BreadthFirstSearch(int timeout) {
+    public DepthFirstSearch(int timeout) {
         super(timeout);
     }
 
@@ -102,7 +102,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
                         successor.setDepth(current.getDepth() + 1);
 
                         if (!closeSet.contains(successor) && !openSet.contains(successor)) {
-                            openSet.addLast(successor);
+                            openSet.addFirst(successor);
                         }
                     }
                     index++;
