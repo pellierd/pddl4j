@@ -255,6 +255,21 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
     /**
      * Create a new search strategy.
      *
+     * @param timeout   the time out of the planner.
+     */
+    public AbstractStateSpaceStrategy(int timeout) {
+        super();
+        this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
+        this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
+        this.timeout = timeout;
+        this.searchingTime = 0;
+        this.memoryUsed = 0;
+        resetNodesStatistics();
+    }
+
+    /**
+     * Create a new search strategy.
+     *
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param timeout   the time out of the planner.
      * @param weight    the weight set to the heuristic.

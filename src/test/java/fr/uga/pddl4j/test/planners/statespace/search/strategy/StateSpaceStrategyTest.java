@@ -3,6 +3,7 @@ package fr.uga.pddl4j.test.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
+import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
@@ -73,6 +74,11 @@ public class StateSpaceStrategyTest {
     private static final double HILL_SOLUTION_COST = 13.0;
 
     /**
+     * The size of Breadth First Search solution.
+     */
+    private static final double BREADTH_SOLUTION_COST = 11.0;
+
+    /**
      * The size of AStar solution.
      */
     private static final int ASTAR_SOLUTION_SIZE = 11;
@@ -91,6 +97,11 @@ public class StateSpaceStrategyTest {
      * The size of Hill Climbing solution.
      */
     private static final int HILL_SOLUTION_SIZE = 13;
+
+    /**
+     * The size of Breadth First Search solution.
+     */
+    private static final int BREADTH_SOLUTION_SIZE = 11;
 
     /**
      * Method that tests solution node (cost and size) for AStar search strategy.
@@ -198,5 +209,32 @@ public class StateSpaceStrategyTest {
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == HILL_SOLUTION_COST);
         Assert.assertTrue(plan.size() == HILL_SOLUTION_SIZE);
+    }
+
+    /**
+     * Method that tests solution node (cost and size) for Breadth First Search search strategy.
+     */
+    @Test
+    public void testBreadthSolutionNode() {
+        System.out.println("StateSpaceStrategy: Test solution node from Breadth First Search.");
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
+        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
+        Assert.assertTrue(solutionNode.getCost() == BREADTH_SOLUTION_COST);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
+            codedProblem).size() == BREADTH_SOLUTION_COST);
+    }
+
+    /**
+     * Method that tests solution plan (cost and size) for Breadth First Search search strategy.
+     */
+    @Test
+    public void testBreadthPlan() {
+        System.out.println("StateSpaceStrategy: Test solution plan from Breadth First Search.");
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
+        final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
+        Assert.assertTrue(plan.cost() == BREADTH_SOLUTION_COST);
+        Assert.assertTrue(plan.size() == BREADTH_SOLUTION_SIZE);
     }
 }

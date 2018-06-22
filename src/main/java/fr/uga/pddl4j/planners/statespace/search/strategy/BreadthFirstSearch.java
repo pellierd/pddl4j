@@ -16,25 +16,20 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Set;
 
 /**
- * This class implements Greedy Best First Search strategy.
+ * This class implements Breadth First Search strategy.
  *
  * @author E. Hermellin
- * @version 1.0 - 01.06.2018
+ * @version 1.0 - 22.06.2018
  */
-public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
+public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
 
     /**
      * The serial id of the class.
@@ -43,21 +38,18 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
 
     /**
      * Creates a new Greedy best First Search search strategy with default parameters.
-     *
      */
-    public GreedyBestFirstSearch() {
+    public BreadthFirstSearch() {
         super();
     }
 
     /**
      * Creates a new Greedy best First Search search strategy.
      *
-     * @param timeout   the time out of the planner.
-     * @param heuristic the heuristicType to use to solve the planning problem.
-     * @param weight    the weight set to the heuristic.
+     * @param timeout the time out of the planner.
      */
-    public GreedyBestFirstSearch(int timeout, Heuristic.Type heuristic, double weight) {
-        super(timeout, heuristic, weight);
+    public BreadthFirstSearch(int timeout) {
+        super(timeout);
     }
 
     /**
@@ -71,13 +63,12 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
-        final Set<Node> closeSet = new HashSet<>();
-        final Set<Node> openSet = new HashSet<>();
+        final LinkedList<Node> closeSet = new LinkedList<>();
+        final LinkedList<Node> openSet = new LinkedList<>();
         final int timeout = getTimeout();
 
         BitState init = new BitState(codedProblem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
+        Node root = new Node(init, null, 0, 0, 0);
         root.setDepth(0);
         openSet.add(root);
 
@@ -86,7 +77,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
         long searchingTime = 0;
         while (!openSet.isEmpty() && solution == null && searchingTime < timeout) {
             // Pop the first node in the pending list open
-            final Node current = popPriorityNode(openSet);
+            final Node current = openSet.pollFirst();
 
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
@@ -105,11 +96,12 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
                         successor.setCost(current.getCost() + op.getCost());
-                        successor.setHeuristic(heuristic.estimate(nextState, codedProblem.getGoal()));
+                        successor.setHeuristic(0);
                         successor.setParent(current);
                         successor.setOperator(index);
                         successor.setDepth(current.getDepth() + 1);
-                        openSet.add(successor);
+
+                        openSet.addLast(successor);
                     }
                     index++;
                 }
@@ -121,32 +113,9 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet)
-            + MemoryAgent.getDeepSizeOf(heuristic));
+        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
         this.setSearchingTime(searchingTime);
 
         return solution;
-    }
-
-    /**
-     * Get a node from a list of nodes.
-     *
-     * @param states the list of nodes (successors).
-     * @return the node from the list.
-     */
-    private Node popPriorityNode(Collection<Node> states) {
-        Node state = null;
-        if (!states.isEmpty()) {
-            final Iterator<Node> i = states.iterator();
-            state = i.next();
-            while (i.hasNext()) {
-                final Node next = i.next();
-                if (next.getHeuristic() < state.getHeuristic()) {
-                    state = next;
-                }
-            }
-            states.remove(state);
-        }
-        return state;
     }
 }
