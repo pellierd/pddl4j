@@ -71,6 +71,11 @@ public class StateSpacePlannerFactory implements Serializable {
     }
 
     /**
+     * Print cost in solution plan
+     */
+    private static boolean ACTION_COST = false;
+
+    /**
      * Creates a new StateSpacePlannerFactory.
      */
     private StateSpacePlannerFactory() {
@@ -220,6 +225,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("               - total memory used in MBytes\n")
             .append("               - length of the solution plan\n")
             .append("-s <bool>   generate statistics or not (preset: true)\n")
+            .append("-d <bool>   print cost in solution plan (preset: false)\n")
             .append("-h          print this message\n\n");
 
         return strb;
@@ -319,6 +325,8 @@ public class StateSpacePlannerFactory implements Serializable {
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
                     arguments.put(AbstractStateSpacePlanner.STATISTICS, isStatUsed);
+                } else if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    ACTION_COST = Boolean.parseBoolean(args[i + 1]);
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     LOGGER.trace(StateSpacePlannerFactory.printUsage());
@@ -388,6 +396,7 @@ public class StateSpacePlannerFactory implements Serializable {
      *                - total memory used in MBytes
      *                - length of the solution plan
      * -s <i>bool</i>   no statistics (preset: true)
+     * -d <i>bool</i>   print cost in solution plan (preset: false)
      * -h          print this message
      *
      * </pre>
@@ -496,7 +505,12 @@ public class StateSpacePlannerFactory implements Serializable {
                     final StringBuilder strb = new StringBuilder();
                     if (plan != null) {
                         strb.append(String.format("%nfound plan as follows:%n%n"));
-                        strb.append(pb.toString(plan));
+                        if (ACTION_COST) {
+                            strb.append(pb.toStringCost(plan));
+                        } else {
+                            strb.append(pb.toString(plan));
+                        }
+
                         strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                     } else {

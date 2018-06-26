@@ -506,4 +506,31 @@ public class CodedProblem implements Serializable {
                     time, this.toShortString(a), ((int) a.getDuration())))));
         return str.toString();
     }
+
+    /**
+     * Return a detailed string representation of a search. Not compatible with VAL.
+     *
+     * @param plan the search.
+     * @return a string representation of the specified search.
+     */
+    public final String toStringCost(final Plan plan) {
+        int max = Integer.MIN_VALUE;
+        for (Integer t : plan.timeSpecifiers()) {
+            for (BitOp a : plan.getActionSet(t)) {
+                int length = this.toShortString(a).length();
+                if (max < length) {
+                    max = length;
+                }
+            }
+        }
+        final int actionSize = max;
+        final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
+
+        final StringBuilder str = new StringBuilder();
+        plan.timeSpecifiers().forEach(time ->
+            plan.getActionSet(time).forEach(a ->
+                str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%4.2f]%n",
+                    time, this.toShortString(a), ((float) a.getCost())))));
+        return str.toString();
+    }
 }
