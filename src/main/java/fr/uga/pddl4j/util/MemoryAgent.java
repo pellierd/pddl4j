@@ -246,7 +246,7 @@ public class MemoryAgent implements Serializable {
         } else {
             final Field[] fields = obj.getClass().getDeclaredFields();
             for (Field field : fields) {
-                field.setAccessible(true);
+                field.setAccessible(true); //TODO Not available with Java 10 and further, find another alternative
                 final Object o;
                 try {
                     o = field.get(obj);
