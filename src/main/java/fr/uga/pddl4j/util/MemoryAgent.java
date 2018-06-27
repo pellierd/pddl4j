@@ -75,7 +75,7 @@ public class MemoryAgent implements Serializable {
     /**
      * The default value of the <code>skipStaticField</code> flag.
      */
-    public static final boolean DEFAULT_SKIP_STATIC_FIELD = false;
+    public static final boolean DEFAULT_SKIP_STATIC_FIELD = true;
 
     /**
      * The default value of the <code>skipFinalField</code> flag.

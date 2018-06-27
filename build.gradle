@@ -57,7 +57,7 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'Gradle Quickstart',
                 'Implementation-Version': version,
-                'Gradle-Version':'Gradle 4.7',
+                'Gradle-Version':'Gradle 4.8',
                 'Built-By': 'Damien Pellier',
                 'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
                 'Main-Class': 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
@@ -75,7 +75,7 @@ task run (type: JavaExec, dependsOn: build){
 
     jvmArgs = ["-javaagent:"+project.buildDir.name+"/libs/"+project.name+"-"+project.version+".jar", "-server", "-Xms2048m", "-Xmx2048m"]
 
-    description = "Run HSP plannin algorithm"
+    description = "Run HSP planning algorithm"
     main = "fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory"
     classpath = sourceSets.main.runtimeClasspath
 }
