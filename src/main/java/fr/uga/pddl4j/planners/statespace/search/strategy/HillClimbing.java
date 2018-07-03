@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * This class implements Hill Climnbing search strategy.
  *
- * @author D. Pellier
+ * @author E. Hermellin
  * @version 1.0 - 01.06.2018
  */
 public final class HillClimbing extends AbstractStateSpaceStrategy {

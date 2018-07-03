@@ -35,7 +35,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class is used to convert Java plan into its JSON representation.
@@ -241,8 +240,10 @@ public class JsonAdapter implements Serializable {
      * @param list an ArrayList that we want to convert into a List.
      * @return list the list parameter.
      */
+    @SuppressWarnings("unchecked")
     private static JSONArray listToJson(List<String> list) {
-        return list.stream().collect(Collectors.toCollection(JSONArray::new));
+        final JSONArray array = new JSONArray();
+        array.addAll(list);
+        return array;
     }
-
 }

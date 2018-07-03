@@ -75,7 +75,7 @@ public class MemoryAgent implements Serializable {
     /**
      * The default value of the <code>skipStaticField</code> flag.
      */
-    public static final boolean DEFAULT_SKIP_STATIC_FIELD = false;
+    public static final boolean DEFAULT_SKIP_STATIC_FIELD = true;
 
     /**
      * The default value of the <code>skipFinalField</code> flag.
@@ -246,7 +246,7 @@ public class MemoryAgent implements Serializable {
         } else {
             final Field[] fields = obj.getClass().getDeclaredFields();
             for (Field field : fields) {
-                field.setAccessible(true);
+                field.setAccessible(true); //TODO Not available with Java 10 and further, find another alternative
                 final Object o;
                 try {
                     o = field.get(obj);
