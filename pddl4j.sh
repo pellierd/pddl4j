@@ -18,7 +18,7 @@ solveHSP(){
 
 	read -p "Choose heuristic [0 - 8]: " heuristic
 
-	java -javaagent:build/libs/pddl4j-3.7.0.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 0 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
+	java -javaagent:build/libs/pddl4j-3.7.1.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 0 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
 
     pause
 }
@@ -32,11 +32,11 @@ solveFF(){
 
 	read -p "Choose heuristic [0 - 8]: " heuristic
 
-	java -javaagent:build/libs/pddl4j-3.7.0.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 1 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
+	java -javaagent:build/libs/pddl4j-3.7.1.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 1 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
 
     pause
 }
- 
+
 about() {
 	show_title
 	echo ""
@@ -60,19 +60,19 @@ show_title() {
 	echo " _____ ____  ____  __    ___    __ "
 	echo "|  _  |    \|    \|  |  | | |__|  |"
 	echo "|   __|  |  |  |  |  |__|_  |  |  |"
-	echo "|__|  |____/|____/|_____| |_|_____|"                             
+	echo "|__|  |____/|____/|_____| |_|_____|"
 }
 
 show_status() {
-	echo "|" 
+	echo "|"
     echo "| PDDL4J `awk '/^version/' build.gradle`"
     if [ -d build/libs ]; then
 		echo -e "| PDDL4J status [\e[92mBuilt\e[39m]"
-		echo "|" 
+		echo "|"
 		echo " ----------"
 	else
 		echo -e "| PDDL4J status [\e[91mNot built\e[39m]"
-		echo "|" 
+		echo "|"
 		echo " ----------"
 	fi
 }
@@ -136,7 +136,7 @@ read_options(){
 # Trap CTRL+C, CTRL+Z and quit singles
 # ----------------------------------------------
 trap '' SIGINT SIGQUIT SIGTSTP
- 
+
 # -----------------------------------
 # Main logic - infinite loop
 # ------------------------------------
