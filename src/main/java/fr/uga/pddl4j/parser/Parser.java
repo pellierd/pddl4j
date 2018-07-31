@@ -282,6 +282,12 @@ public final class Parser {
             this.checkFunctionsDeclaration();
             this.checkOperatorsDeclaration();
             this.checkDerivedPredicatesDeclaration();
+            this.checkDomainName();
+            this.checkObjectsDeclaration();
+            this.checkInitialFacts();
+            this.checkGoal();
+            this.checkProblemConstraints();
+            this.checkMetric();
         } catch (TokenMgrError | ParseException | RuntimeException exception) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
