@@ -94,6 +94,17 @@ https://doi.org/10.1080/0952813X.2017.1409278
 
 ### 5. Changelog
 
+**PDDL4J v3.7.2**
+
+*State space strategy*
+* Add Generic planner structure
+
+*Parser*
+* Fix parser bug 
+
+*Global*
+* Add BNF
+
 **PDDL4J v3.7.1**
 
 *State space strategy*
