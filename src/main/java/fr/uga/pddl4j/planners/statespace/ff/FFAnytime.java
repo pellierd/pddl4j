@@ -25,6 +25,7 @@ import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
@@ -63,6 +64,17 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
     @Override
     public Vector<Node> getSolutionNodes() {
         return greedyBestFirstSearchAnytime.getSolutionNodes();
+    }
+
+    /**
+     * Returns the list containing all solution plans found.
+     *
+     * @return the list containing all solution plans found.
+     */
+    @Override
+    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+        Objects.requireNonNull(codedProblem);
+        return greedyBestFirstSearchAnytime.getSolutionPlans(codedProblem);
     }
 
     /**
@@ -128,7 +140,6 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
         logger.trace("* starting enforced hill climbing\n");
         final Node firstSolutionNode = enforcedHillClimbing.searchSolutionNode(pb);
 
-        this.getSolutionNodes().clear();
         greedyBestFirstSearchAnytime.getSolutionNodes().clear();
 
         if (firstSolutionNode != null) {

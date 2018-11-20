@@ -19,7 +19,9 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.util.Plan;
 
 import java.util.Vector;
 
@@ -31,17 +33,11 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
     private static final long serialVersionUID = 1L;
 
     /**
-     * The list containing all the solutions found during anytime process.
-     */
-    private Vector<Node> solutionNodes;
-
-    /**
      * Creates a new planner with default parameters.
      */
     public AbstractStateSpacePlannerAnytime() {
         super();
         this.setAnytime(true);
-        solutionNodes = new Vector<>();
     }
 
     /**
@@ -53,24 +49,19 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
     public AbstractStateSpacePlannerAnytime(final boolean statisticState, final int traceLevel) {
         super(statisticState, traceLevel);
         this.setAnytime(true);
-        solutionNodes = new Vector<>();
     }
+
+    /**
+     * Returns the list containing all solution plans found.
+     *
+     * @return the list containing all solution plans found.
+     */
+    public abstract Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
 
     /**
      * Returns the list containing all solution nodes found.
      *
      * @return the list containing all solution nodes found.
      */
-    public Vector<Node> getSolutionNodes() {
-        return solutionNodes;
-    }
-
-    /**
-     * Returns the list containing all solution nodes found.
-     *
-     * @param solutionNodes the list containing all solution nodes found.
-     */
-    public void setSolutionNodes(Vector<Node> solutionNodes) {
-        this.solutionNodes = solutionNodes;
-    }
+    public abstract Vector<Node> getSolutionNodes();
 }

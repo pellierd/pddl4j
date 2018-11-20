@@ -19,7 +19,9 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
+import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.util.Plan;
 
 import java.util.Vector;
 
@@ -62,5 +64,21 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
      */
     public Vector<Node> getSolutionNodes() {
         return solutionNodes;
+    }
+
+    /**
+     * Returns the list of solution plans.
+     *
+     * @param codedProblem the coded problem.
+     * @return a vector containing all the solutions plans or an empty vector.
+     */
+    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+        final Vector<Plan> plansVector = new Vector<>();
+        if (!this.solutionNodes.isEmpty()) {
+            for (Node node : this.solutionNodes) {
+                plansVector.add(this.extractPlan(node, codedProblem));
+            }
+        }
+        return plansVector;
     }
 }

@@ -71,7 +71,7 @@ public class StateSpacePlannerFactory implements Serializable {
     }
 
     /**
-     * Print cost in solution plan
+     * Print cost in solution plan.
      */
     private static boolean ACTION_COST = false;
 
@@ -100,6 +100,14 @@ public class StateSpacePlannerFactory implements Serializable {
                 planner = new FF();
                 break;
 
+            case FFAnytime:
+                planner = new FFAnytime();
+                break;
+
+            case HCAnytime:
+                planner = new HCAnytime();
+                break;
+
             default:
                 LOGGER.trace(StateSpacePlannerFactory.printUsage());
                 break;
@@ -126,6 +134,14 @@ public class StateSpacePlannerFactory implements Serializable {
 
             case FF:
                 planner = new FF(statisticState, traceLevel);
+                break;
+
+            case FFAnytime:
+                planner = new FFAnytime(statisticState, traceLevel);
+                break;
+
+            case HCAnytime:
+                planner = new HCAnytime(statisticState, traceLevel);
                 break;
 
             default:
