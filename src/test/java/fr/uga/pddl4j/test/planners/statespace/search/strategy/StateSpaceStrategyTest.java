@@ -3,6 +3,7 @@ package fr.uga.pddl4j.test.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
+import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.DepthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
@@ -86,6 +87,11 @@ public class StateSpaceStrategyTest {
     private static final double DEPTH_SOLUTION_COST = 41.0;
 
     /**
+     * The cost of AStar Search Anytime solution.
+     */
+    private static final double ASTAR_ANYTIME_SOLUTION_COST = 11.0;
+
+    /**
      * The cost of Greedy Best First Search Anytime solution.
      */
     private static final double GREEDY_ANYTIME_SOLUTION_COST = 11.0;
@@ -124,6 +130,11 @@ public class StateSpaceStrategyTest {
      * The size of Depth First Search solution.
      */
     private static final int DEPTH_SOLUTION_SIZE = 41;
+
+    /**
+     * The size of Astar Search Anytime solution.
+     */
+    private static final int ASTAR_ANYTIME_SOLUTION_SIZE = 11;
 
     /**
      * The size of Greedy Best First Search Anytime solution.
@@ -295,6 +306,33 @@ public class StateSpaceStrategyTest {
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == DEPTH_SOLUTION_COST);
         Assert.assertTrue(plan.size() == DEPTH_SOLUTION_SIZE);
+    }
+
+    /**
+     * Method that tests solution node (cost and size) for Astar Anytime search strategy.
+     */
+    @Test
+    public void testAstarAnytimeSolutionNode() {
+        System.out.println("StateSpaceStrategy: Test solution node from Astar Search Anytime.");
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
+        Assert.assertTrue(solutionNode.getCost() == ASTAR_ANYTIME_SOLUTION_COST);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
+            codedProblem).size() == ASTAR_ANYTIME_SOLUTION_COST);
+    }
+
+    /**
+     * Method that tests solution plan (cost and size) for Astar Anytime search strategy.
+     */
+    @Test
+    public void testAstarAnytimePlan() {
+        System.out.println("StateSpaceStrategy: Test solution plan from Astar Search Anytime.");
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+        final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
+        Assert.assertTrue(plan.cost() == ASTAR_ANYTIME_SOLUTION_COST);
+        Assert.assertTrue(plan.size() == ASTAR_ANYTIME_SOLUTION_SIZE);
     }
 
     /**

@@ -25,22 +25,18 @@ import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
- * This class implements Greedy Best First Anytime Search strategy.
+ * This class implements A* Anytime Search strategy.
  *
  * @author E. Hermellin
- * @version 1.0 - 23.11.2018
+ * @version 1.0 - 01.06.2018
  */
-public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrategyAnytime {
+public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
 
     /**
      * The serial id of the class.
@@ -78,7 +74,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
     /**
      * Creates a new Greedy Best First Search search strategy with default parameters.
      */
-    public GreedyBestFirstSearchAnytime() {
+    public AStarAnytime() {
         super();
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
@@ -91,7 +87,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public GreedyBestFirstSearchAnytime(int timeout, Heuristic.Type heuristic, double weight) {
+    public AStarAnytime(int timeout, Heuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
@@ -100,14 +96,14 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
     /**
      * Creates a new Greedy Best First Search search strategy.
      *
-     * @param timeout    the time out of the planner.
-     * @param heuristic  the heuristicType to use to solve the planning problem.
-     * @param weight     the weight set to the heuristic.
+     * @param timeout   the time out of the planner.
+     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param weight    the weight set to the heuristic.
      * @param boundCost  the cost bound for the search.
      * @param boundDepth the depth bound for the search.
      */
-    public GreedyBestFirstSearchAnytime(int timeout, Heuristic.Type heuristic, double weight,
-                                        double boundCost, double boundDepth) {
+    public AStarAnytime(int timeout, Heuristic.Type heuristic, double weight,
+                        double boundCost, double boundDepth) {
         super(timeout, heuristic, weight);
         this.boundCost = boundCost;
         this.boundDepth = boundDepth;
@@ -125,24 +121,36 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
         Objects.requireNonNull(problem);
 
         final long begin = System.currentTimeMillis();
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        // Get the initial state from the planning problem
+        final BitState init = new BitState(problem.getInit());
+        // Initialize the closed list of nodes (store the nodes explored)
+        final Map<BitState, Node> closeSet = new HashMap<>();
+        // Initialize the opened list (store the pending node)
+        final Map<BitState, Node> openSet = new HashMap<>();
+        // Initialize the weight to use
+        final double currWeight = this.getWeight();
+        // Initialize the node comparator
+        NodeComparator nodeComparator = new NodeComparator(currWeight);
+        // The list stores the node ordered according to the A* (getFValue = g + h) function
+        final PriorityQueue<Node> open = new PriorityQueue<>(100, nodeComparator);
+        // Creates the root node of the tree search
+        final Node root = new Node(init, null, -1, 0.0, 0, heuristic.estimate(init, problem.getGoal()));
+        // Adds the root to the list of pending nodes
+        open.add(root);
+        openSet.put(init, root);
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), problem);
-        final Set<Node> closeSet = new HashSet<>();
-        final Set<Node> openSet = new HashSet<>();
-        final int timeout = getTimeout();
-
-        BitState init = new BitState(problem.getInit());
-        Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
-        root.setDepth(0);
-        openSet.add(root);
-
-        this.resetNodesStatistics();
         Node solution = null;
-        long searchingTime = 0;
 
+        final int timeout = this.getTimeout();
+        long searchingTime = 0;
+        // Start of the search
         while (!openSet.isEmpty() && searchingTime < timeout) {
+
             // Pop the first node in the pending list open
-            final Node current = popPriorityNode(openSet);
+            final Node current = open.poll();
+            openSet.remove(current);
+            closeSet.put(current, current);
 
             if (current.satisfy(problem.getGoal())) {
                 this.getSolutionNodes().add(new Node(current, current.getParent(), 0,
@@ -150,6 +158,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
                 solution = current;
 
                 final Plan p = extractPlan(solution, problem);
+                nodeComparator.setWeight((p.cost() / boundCost) * this.getWeight());
                 this.setWeight((p.cost() / boundCost) * this.getWeight());
 
                 boundCost = solution.getCost();
@@ -157,34 +166,61 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
                 logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: "
                     + boundCost + "\n");
             } else {
-                closeSet.add(current);
+                // Try to apply the operators of the problem to this node
                 int index = 0;
                 for (BitOp op : problem.getOperators()) {
-
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        final BitState nextState = new BitState(current);
-                        nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                        nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
-
-                        // Apply the effect of the applicable operator
-                        final Node successor = new Node(nextState);
+                        Node state = new Node(current);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
-                        successor.setCost(current.getCost() + op.getCost());
-                        successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
-                        successor.setParent(current);
-                        successor.setOperator(index);
-                        successor.setDepth(current.getDepth() + 1);
-                        if (successor.getCost() < boundCost && successor.getDepth() <= boundDepth) {
-                            openSet.add(successor);
+                        // Apply the effect of the applicable operator
+                        // Test if the condition of the effect is satisfied in the current state
+                        // Apply the effect to the successor node
+                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                            // Apply the effect to the successor node
+                            state.apply(ce.getEffects())
+                        );
+                        final double g = current.getCost() + op.getCost();
+                        Node result = openSet.get(state);
+                        if (result == null) {
+                            result = closeSet.get(state);
+                            if (result != null) {
+                                if (g < result.getCost()) {
+                                    result.setCost(g);
+                                    result.setParent(current);
+                                    result.setOperator(index);
+                                    result.setDepth(current.getDepth() + 1);
+                                    if (result.getCost() < boundCost && result.getDepth() <= boundDepth) {
+                                        open.add(result);
+                                        openSet.put(result, result);
+                                        closeSet.remove(result);
+                                    }
+                                }
+                            } else {
+                                state.setCost(g);
+                                state.setParent(current);
+                                state.setOperator(index);
+                                state.setHeuristic(heuristic.estimate(state, problem.getGoal()));
+                                state.setDepth(current.getDepth() + 1);
+                                if (state.getCost() < boundCost && state.getDepth() <= boundDepth) {
+                                    open.add(state);
+                                    openSet.put(state, state);
+                                }
+                            }
+                        } else if (g < result.getCost()) {
+                            result.setCost(g);
+                            result.setParent(current);
+                            result.setOperator(index);
+                            result.setDepth(current.getDepth() + 1);
                         }
+
                     }
                     index++;
                 }
             }
+
             // Take time to compute the searching time
-            long end = System.currentTimeMillis();
-            searchingTime = end - begin;
+            searchingTime = System.currentTimeMillis() - begin;
         }
 
         this.setExploredNodes(closeSet.size());
@@ -194,27 +230,5 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
         this.setSearchingTime(searchingTime);
 
         return solution;
-    }
-
-    /**
-     * Get a node from a list of nodes.
-     *
-     * @param states the list of nodes (successors).
-     * @return the node from the list.
-     */
-    private Node popPriorityNode(Collection<Node> states) {
-        Node state = null;
-        if (!states.isEmpty()) {
-            final Iterator<Node> i = states.iterator();
-            state = i.next();
-            while (i.hasNext()) {
-                final Node next = i.next();
-                if (next.getHeuristic() < state.getHeuristic()) {
-                    state = next;
-                }
-            }
-            states.remove(state);
-        }
-        return state;
     }
 }
