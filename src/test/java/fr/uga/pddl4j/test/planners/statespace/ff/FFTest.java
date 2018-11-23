@@ -108,7 +108,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -127,7 +127,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -146,7 +146,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -165,7 +165,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -184,7 +184,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -203,7 +203,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -222,7 +222,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -241,7 +241,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -260,7 +260,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -279,7 +279,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -298,7 +298,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -317,7 +317,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
 
@@ -337,7 +337,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -356,7 +356,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -375,7 +375,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -394,7 +394,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -413,7 +413,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -432,7 +432,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -451,7 +451,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -470,7 +470,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -489,7 +489,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -508,7 +508,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -527,7 +527,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -546,7 +546,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -565,7 +565,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -584,7 +584,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -603,7 +603,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -622,7 +622,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -641,7 +641,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -660,7 +660,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -679,7 +679,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -698,7 +698,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -717,7 +717,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -736,7 +736,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -755,7 +755,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -774,7 +774,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -793,7 +793,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -812,7 +812,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -831,7 +831,7 @@ public class FFTest {
         }
 
         generateValOutputPlans(localTestPath);
-        validatePlans(localTestPath);
+        Tools.validatePlans(localTestPath);
     }
 
     /**
@@ -954,57 +954,6 @@ public class FFTest {
                 ioEx.printStackTrace();
             }
             System.out.println();
-        }
-    }
-
-    /**
-     * Validate output plans.
-     *
-     * @param currentTestPath the current sub dir to test
-     */
-    private void validatePlans(String currentTestPath) {
-        try {
-            final String domain = currentTestPath + "domain.pddl";
-            File dir = new File(currentTestPath);
-            File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
-
-            if (files != null) {
-                final StringBuilder output = new StringBuilder();
-
-                for (File valfile : files) {
-                    final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
-                    final Runtime rt = Runtime.getRuntime();
-                    final Process proc = rt.exec(Tools.VAL + " " + domain + " " + problem + " " + valfile);
-                    proc.waitFor();
-
-                    String line;
-                    final InputStreamReader inputStreamReader = new InputStreamReader(proc.getInputStream(),
-                        StandardCharsets.UTF_8);
-                    final BufferedReader reader = new BufferedReader(inputStreamReader);
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            output.append(line + "\n");
-                        }
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    } finally {
-                        reader.close();
-                        inputStreamReader.close();
-                        proc.getInputStream().close();
-                    }
-                }
-
-                final int number = Tools.numberValidatedPlans(output.toString());
-                System.out.println("-- VAL on " + currentTestPath);
-                System.out.println("   Plans found: " + files.length);
-                System.out.println("   Plans validated: " + number);
-                System.out.println("--");
-                Assert.assertEquals(files.length,number);
-            }
-
-            Tools.cleanValPlan(currentTestPath);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
         }
     }
 
