@@ -109,6 +109,7 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
         Objects.requireNonNull(problem);
 
         logger.trace("* starting anytime search strategy\n");
+
         final Node solutionNode = this.searchStrategy.searchSolutionNode(problem);
         if (isSaveState()) {
             this.getStatistics().setTimeToSearch(this.searchStrategy.getSearchingTime());
@@ -116,7 +117,7 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
         }
         if (solutionNode != null) {
             logger.trace("* anytime search strategy succeeded\n");
-            return (SequentialPlan) this.searchStrategy.extractPlan(solutionNode, problem);
+            return this.searchStrategy.extractPlan(solutionNode, problem);
         } else {
             logger.trace("* anytime search strategy failed\n");
             return null;

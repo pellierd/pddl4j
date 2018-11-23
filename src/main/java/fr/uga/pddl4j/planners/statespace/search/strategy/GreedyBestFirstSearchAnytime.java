@@ -137,6 +137,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
         openSet.add(root);
 
         this.resetNodesStatistics();
+        this.clearResults();
         Node solution = null;
         long searchingTime = 0;
 
@@ -150,10 +151,9 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
                 solution = current;
 
                 final Plan p = extractPlan(solution, problem);
-                this.setWeight((p.cost() / boundCost) * this.getWeight());
+                boundCost = p.cost();
+                boundDepth = p.size();
 
-                boundCost = solution.getCost();
-                boundDepth = solution.getDepth();
                 logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: "
                     + boundCost + "\n");
             } else {
@@ -193,7 +193,17 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
             + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
+        this.clearBounds();
+
         return solution;
+    }
+
+    /**
+     * Clear boundaries at the end of the computation.
+     */
+    private void clearBounds() {
+        this.boundCost = Double.MAX_VALUE;
+        this.boundDepth = Double.MAX_VALUE;
     }
 
     /**

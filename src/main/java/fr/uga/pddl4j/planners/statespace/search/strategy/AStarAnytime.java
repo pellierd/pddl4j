@@ -140,6 +140,8 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
         open.add(root);
         openSet.put(init, root);
 
+        this.resetNodesStatistics();
+        this.clearResults();
         Node solution = null;
 
         final int timeout = this.getTimeout();
@@ -161,8 +163,8 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
                 nodeComparator.setWeight((p.cost() / boundCost) * this.getWeight());
                 this.setWeight((p.cost() / boundCost) * this.getWeight());
 
-                boundCost = solution.getCost();
-                boundDepth = solution.getDepth();
+                boundCost = p.cost();
+                boundDepth = p.size();
                 logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: "
                     + boundCost + "\n");
             } else {
@@ -229,6 +231,16 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
             + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
+        this.clearBounds();
+
         return solution;
+    }
+
+    /**
+     * Clear boundaries at the end of the computation.
+     */
+    private void clearBounds() {
+        this.boundCost = Double.MAX_VALUE;
+        this.boundDepth = Double.MAX_VALUE;
     }
 }

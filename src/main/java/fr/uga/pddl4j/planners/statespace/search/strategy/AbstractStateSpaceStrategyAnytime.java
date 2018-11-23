@@ -58,6 +58,13 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
     }
 
     /**
+     * Cleans the list containing all the solutions found during anytime process.
+     */
+    public void clearResults() {
+        this.solutionNodes.clear();
+    }
+
+    /**
      * Returns the list containing all solution nodes found.
      *
      * @return the list containing all solution nodes found.
