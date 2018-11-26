@@ -16,23 +16,20 @@
 package fr.uga.pddl4j.test.planners.statespace.generic;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.statespace.ff.FF;
 import fr.uga.pddl4j.planners.statespace.generic.GenericPlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
+import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategy;
 import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.DepthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -95,7 +92,7 @@ public class GenericPlannerTest {
      */
     @Test
     public void testGenericPlanner_Astar_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new AStar(TIMEOUT * 1000,
+        final AbstractStateSpaceStrategy stateSpaceStrategy = new AStar(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
@@ -118,7 +115,7 @@ public class GenericPlannerTest {
      */
     @Test
     public void testGenericPlanner_BFS_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
+        final AbstractStateSpaceStrategy stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
@@ -140,7 +137,7 @@ public class GenericPlannerTest {
      */
     @Test
     public void testGenericPlanner_DFS_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
+        final AbstractStateSpaceStrategy stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
@@ -162,7 +159,7 @@ public class GenericPlannerTest {
      */
     @Test
     public void testGenericPlanner_EHC_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000,
+        final AbstractStateSpaceStrategy stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
@@ -185,7 +182,7 @@ public class GenericPlannerTest {
      */
     @Test
     public void testGenericPlanner_GBFS_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000,
+        final AbstractStateSpaceStrategy stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
@@ -208,7 +205,7 @@ public class GenericPlannerTest {
      */
     @Test
     public void testGenericPlanner_HC_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000,
+        final AbstractStateSpaceStrategy stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
