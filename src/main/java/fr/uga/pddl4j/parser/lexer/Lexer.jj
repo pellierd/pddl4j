@@ -35,6 +35,7 @@ import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.Op;
+import fr.uga.pddl4j.parser.Method;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
@@ -233,6 +234,7 @@ TOKEN : {
 |	< INIT : ":init" >
 |	< GOAL: ":goal" >
 |	< METRIC : ":metric" >
+|   < METHOD : ":method" >
 }
 
 TOKEN : {
@@ -258,6 +260,7 @@ TOKEN : {
 |	< CONSTRAINTS : ":constraints" >
 |	< CONTINUS_EFFECTS : ":continus-effects" >
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
+|	< HTN : ":htn" >
 }
 
 TOKEN :
@@ -1756,6 +1759,7 @@ Exp f_head() :
 void structure_def() :
 {
 	Op op = null;
+	Method meth = null;
 	DerivedPredicate dp = null;
 }
 {
@@ -1763,6 +1767,11 @@ void structure_def() :
 			op=action_def() {
 				this.domain.addOperator(op);
 			}
+	|
+        LOOKAHEAD(2)
+        			meth=method_def() {
+        				this.domain.addMethod(meth);
+        			}
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
 			op=durative_action_def() {
 				this.domain.addOperator(op);
@@ -1822,6 +1831,32 @@ Symbol action_name() :
 {
 	t=<SYMBOL> {
 		return new Symbol(Symbol.Kind.ACTION, t);
+	}
+}
+
+Method method_def() :
+{
+	Symbol name = null;
+}
+{
+	try {
+		left_bracket() <METHOD> name=method_name()
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new Method(name);
+	}
+}
+
+Symbol method_name() :
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> {
+		return new Symbol(Symbol.Kind.METHOD, t);
 	}
 }
 
