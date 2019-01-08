@@ -62,6 +62,10 @@ public class Symbol implements Serializable {
          */
         ACTION,
         /**
+         * The method symbol.
+         */
+        METHOD,
+        /**
          * The preference symbol.
          */
         PREFERENCE,

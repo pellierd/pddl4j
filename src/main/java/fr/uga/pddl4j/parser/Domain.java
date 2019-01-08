@@ -83,6 +83,11 @@ public class Domain implements Serializable {
     private List<Op> ops;
 
     /**
+     * The list of methods of the domain.
+     */
+    private List<Method> meths;
+
+    /**
      * The list of derived predicates of the domain.
      */
     private List<DerivedPredicate> derivedPredicates;
@@ -112,6 +117,7 @@ public class Domain implements Serializable {
         this.functions = new ArrayList<>();
         this.constraints = null;
         this.ops = new ArrayList<>();
+        this.meths = new ArrayList<>();
         this.derivedPredicates = new ArrayList<>();
     }
 
@@ -291,6 +297,29 @@ public class Domain implements Serializable {
             throw new NullPointerException();
         }
         return this.ops.add(op);
+    }
+
+    /**
+     * Returns the list of parsed meths.
+     *
+     * @return the list of parsed meths.
+     */
+    public final List<Method> getMethods() {
+        return this.meths;
+    }
+
+    /**
+     * Adds an operator to the domain.
+     *
+     * @param meth the method to add.
+     * @return <code>true</code> if the method was added; <code>false</code> otherwise.
+     * @throws NullPointerException if the specified method is null.
+     */
+    public final boolean addMethod(final Method meth) {
+        if (meth == null) {
+            throw new NullPointerException();
+        }
+        return this.meths.add(meth);
     }
 
     /**
@@ -494,6 +523,9 @@ public class Domain implements Serializable {
 
         for (Op op : this.ops) {
             str.append(op).append("\n");
+        }
+        for (Method meth : this.meths) {
+            str.append(meth).append("\n");
         }
         str.append(")");
         return str.toString();
