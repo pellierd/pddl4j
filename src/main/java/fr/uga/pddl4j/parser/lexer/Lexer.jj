@@ -261,6 +261,7 @@ TOKEN : {
 |	< CONTINUS_EFFECTS : ":continus-effects" >
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HTN : ":htn" >
+|   < EXPANSION : ":expansion" >
 }
 
 TOKEN :
@@ -665,7 +666,11 @@ Set<RequireKey> require_key() :
 		}
 	|	<DURATION_INEQUALITIES> {
 			requirements.add(RequireKey.DURATION_INEQUALITIES);
-		})
+		}
+	|	<HTN> {
+    			requirements.add(RequireKey.HTN);
+        }
+)
 	{ return requirements; }
 }
 
@@ -1768,7 +1773,7 @@ void structure_def() :
 				this.domain.addOperator(op);
 			}
 	|
-        LOOKAHEAD(2)
+        LOOKAHEAD(2, { this.isRequirement(RequireKey.HTN)})
         			meth=method_def() {
         				this.domain.addMethod(meth);
         			}
@@ -1837,16 +1842,19 @@ Symbol action_name() :
 Method method_def() :
 {
 	Symbol name = null;
+	List<TypedSymbol> parameters = null;
 }
 {
 	try {
-		left_bracket() <METHOD> name=method_name()
-			right_bracket()
+		left_bracket()
+		<METHOD> name=method_name()
+		<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+	    right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Method(name);
+		return new Method(name, parameters);
 	}
 }
 
