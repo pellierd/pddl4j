@@ -358,6 +358,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      *
      * @param listener the SolutionListener to add.
      */
+    @Override
     public void addSolutionListener(SolutionListener listener) {
         solutionListenerList.add(SolutionListener.class, listener);
     }
@@ -367,6 +368,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      *
      * @param listener the SolutionListener to remove.
      */
+    @Override
     public void removeSolutionListener(SolutionListener listener) {
         solutionListenerList.remove(SolutionListener.class, listener);
     }
@@ -376,7 +378,8 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      *
      * @param evt the solution event to process.
      */
-    void fireSolution(SolutionEvent evt) {
+    @Override
+    public void fireSolution(SolutionEvent evt) {
         Object[] listeners = solutionListenerList.getListenerList();
         for (int i = 0; i < listeners.length; i = i + 2) {
             if (listeners[i] == SolutionListener.class) {

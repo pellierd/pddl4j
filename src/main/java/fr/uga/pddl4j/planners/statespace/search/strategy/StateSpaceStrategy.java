@@ -18,6 +18,8 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.util.SolutionListener;
 
 import java.io.Serializable;
 
@@ -174,4 +176,25 @@ public interface StateSpaceStrategy extends Serializable {
      * @return the solution plan or null is no solution was found.
      */
     Plan extractPlan(final Node solutionNode, final CodedProblem codedProblem);
+
+    /**
+     * Adds SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to add.
+     */
+    void addSolutionListener(SolutionListener listener);
+
+    /**
+     * Removes SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to remove.
+     */
+    void removeSolutionListener(SolutionListener listener);
+
+    /**
+     * Processes SolutionEvent when one is fired.
+     *
+     * @param evt the solution event to process.
+     */
+    void fireSolution(SolutionEvent evt);
 }
