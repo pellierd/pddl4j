@@ -21,8 +21,11 @@ import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
+import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.util.SolutionListener;
 
 import java.util.Objects;
+import javax.swing.event.EventListenerList;
 
 /**
  * This abstract class defines the main methods for search strategies.
@@ -37,6 +40,11 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * The serial id of the class.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The list of SolutionListener.
+     */
+    private EventListenerList solutionListenerList = new EventListenerList();
 
     /**
      * The heuristic of the planner.
@@ -343,5 +351,37 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
         this.exploredNodes = 0;
         this.pendingNodes = 0;
         this.createdNodes = 0;
+    }
+
+    /**
+     * Adds SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to add.
+     */
+    public void addSolutionListener(SolutionListener listener) {
+        solutionListenerList.add(SolutionListener.class, listener);
+    }
+
+    /**
+     * Removes SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to remove.
+     */
+    public void removeSolutionListener(SolutionListener listener) {
+        solutionListenerList.remove(SolutionListener.class, listener);
+    }
+
+    /**
+     * Processes SolutionEvent when one is fired.
+     *
+     * @param evt the solution event to process.
+     */
+    void fireSolution(SolutionEvent evt) {
+        Object[] listeners = solutionListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == SolutionListener.class) {
+                ((SolutionListener) listeners[i + 1]).newSolutionFound(evt);
+            }
+        }
     }
 }
