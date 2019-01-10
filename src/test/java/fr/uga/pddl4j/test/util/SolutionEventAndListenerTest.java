@@ -325,7 +325,7 @@ public class SolutionEventAndListenerTest {
 
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        ((AStarAnytime) stateSpaceStrategy).addSolutionListener(e -> firedSolutionEvent = e);
+        stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
 
@@ -350,7 +350,7 @@ public class SolutionEventAndListenerTest {
 
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        ((GreedyBestFirstSearchAnytime) stateSpaceStrategy).addSolutionListener(e -> firedSolutionEvent = e);
+        stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
 
@@ -375,7 +375,7 @@ public class SolutionEventAndListenerTest {
 
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        ((HillClimbing) stateSpaceStrategy).addSolutionListener(e -> firedSolutionEvent = e);
+        stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
 
