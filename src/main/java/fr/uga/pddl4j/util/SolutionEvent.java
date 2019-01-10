@@ -18,7 +18,6 @@ package fr.uga.pddl4j.util;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 
-import java.io.Serializable;
 import java.util.EventObject;
 
 /**
