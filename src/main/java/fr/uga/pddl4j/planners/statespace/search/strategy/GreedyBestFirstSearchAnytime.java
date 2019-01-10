@@ -23,6 +23,7 @@ import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.util.SolutionEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
@@ -149,6 +150,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
                 this.getSolutionNodes().add(new Node(current, current.getParent(), 0,
                     current.getCost(), current.getDepth(), current.getHeuristic()));
                 solution = current;
+                fireSolution(new SolutionEvent(this, solution, problem));
 
                 final Plan p = extractPlan(solution, problem);
                 boundCost = p.cost();

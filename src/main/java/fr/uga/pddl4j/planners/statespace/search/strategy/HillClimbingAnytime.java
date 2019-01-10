@@ -22,6 +22,7 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.SolutionEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
@@ -161,6 +162,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
                 this.setExploredNodes(this.getExploredNodes() + 1);
                 if (successor.satisfy(problem.getGoal())) {
                     solution = successor;
+                    fireSolution(new SolutionEvent(this, solution, problem));
                 } else {
                     successors.clear();
                     openList.clear();
