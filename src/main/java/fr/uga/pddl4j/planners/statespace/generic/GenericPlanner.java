@@ -20,10 +20,7 @@
 package fr.uga.pddl4j.planners.statespace.generic;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategy;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.util.SequentialPlan;
@@ -48,14 +45,14 @@ public final class GenericPlanner extends AbstractStateSpacePlanner {
     /**
      * The search strategy.
      */
-    private final AbstractStateSpaceStrategy searchStrategy;
+    private final StateSpaceStrategy searchStrategy;
 
     /**
      * Creates a new planner with default parameters.
      *
      * @param searchStrategy the search strategy to use to solve the problem.
      */
-    public GenericPlanner(final AbstractStateSpaceStrategy searchStrategy) {
+    public GenericPlanner(final StateSpaceStrategy searchStrategy) {
         Objects.requireNonNull(searchStrategy);
         this.searchStrategy = searchStrategy;
         this.getStateSpaceStrategies().add(this.searchStrategy);
@@ -69,7 +66,7 @@ public final class GenericPlanner extends AbstractStateSpacePlanner {
      * @param searchStrategy the search strategy to use to solve the problem.
      */
     public GenericPlanner(final boolean statisticState, final int traceLevel,
-                          final AbstractStateSpaceStrategy searchStrategy) {
+                          final StateSpaceStrategy searchStrategy) {
         super(statisticState, traceLevel);
         Objects.requireNonNull(searchStrategy);
 
@@ -96,7 +93,7 @@ public final class GenericPlanner extends AbstractStateSpacePlanner {
         }
         if (solutionNode != null) {
             logger.trace("* search strategy succeeded\n");
-            return this.searchStrategy.extractPlan(solutionNode, problem);
+            return (SequentialPlan) this.searchStrategy.extractPlan(solutionNode, problem);
         } else {
             logger.trace("* search strategy failed\n");
             return null;
