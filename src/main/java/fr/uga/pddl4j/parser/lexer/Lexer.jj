@@ -383,6 +383,7 @@ void domain() :
 		[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) constraints(Lexer.PARSER_DOMAIN)]
 		(structure_def())*
 		right_bracket()
+		<EOF>
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
@@ -3000,6 +3001,7 @@ void problem() :
 		[LOOKAHEAD(2) metric_spec()]
 		// [length-spec()] not implemented
 		right_bracket()
+		<EOF>
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
