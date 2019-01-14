@@ -88,6 +88,11 @@ public class MemoryAgent implements Serializable {
     public static final boolean DEFAULT_SKIP_FLYWEIGHT_FIELD = false;
 
     /**
+     * The max depth inspection for deepSizeOf method.
+     */
+    public static final int MAX_DEPTH = 512;
+
+    /**
      * The default value of the memory used.
      */
     public static final long DEFAULT_MEMORY = -1;
@@ -239,7 +244,7 @@ public class MemoryAgent implements Serializable {
         }
         doneObj.put(obj, null);
         size = sizeOf(obj);
-        if (obj instanceof Object[]) {
+        if (obj instanceof Object[] && depth < MAX_DEPTH) {
             for (Object o : (Object[]) obj) {
                 size += deepSizeOf(o, doneObj, depth + 1);
             }
@@ -253,7 +258,7 @@ public class MemoryAgent implements Serializable {
                 } catch (IllegalArgumentException | IllegalAccessException iargException) {
                     throw new FatalException("Fatal error in field.getActionSet(obj) call", iargException);
                 }
-                if (MemoryAgent.isComputable(field)) {
+                if (MemoryAgent.isComputable(field) && depth < MAX_DEPTH) {
                     size += MemoryAgent.deepSizeOf(o, doneObj, depth + 1);
                 }
             }

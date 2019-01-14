@@ -21,6 +21,7 @@ import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.SolutionEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,18 +87,19 @@ public final class AStar extends AbstractStateSpaceStrategy {
         openSet.put(init, root);
 
         this.resetNodesStatistics();
-        Node solutionNode = null;
+        Node solution = null;
         final int timeout = getTimeout();
         long time = 0;
         // Start of the search
-        while (!open.isEmpty() && solutionNode == null && time < timeout) {
+        while (!open.isEmpty() && solution == null && time < timeout) {
             // Pop the first node in the pending list open
             final Node current = open.poll();
             openSet.remove(current);
             closeSet.put(current, current);
             // If the goal is satisfy in the current node then extract the search and return it
             if (current.satisfy(codedProblem.getGoal())) {
-                solutionNode = current;
+                solution = current;
+                fireSolution(new SolutionEvent(this, solution, codedProblem));
             } else {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
@@ -157,6 +159,6 @@ public final class AStar extends AbstractStateSpaceStrategy {
         this.setSearchingTime(time);
 
         // return the search computed or null if no search was found
-        return solutionNode;
+        return solution;
     }
 }

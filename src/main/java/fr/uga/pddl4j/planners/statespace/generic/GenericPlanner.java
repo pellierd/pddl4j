@@ -20,9 +20,7 @@
 package fr.uga.pddl4j.planners.statespace.generic;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.util.SequentialPlan;
@@ -67,7 +65,8 @@ public final class GenericPlanner extends AbstractStateSpacePlanner {
      * @param traceLevel     the trace level of the planner.
      * @param searchStrategy the search strategy to use to solve the problem.
      */
-    public GenericPlanner(final boolean statisticState, final int traceLevel, final StateSpaceStrategy searchStrategy) {
+    public GenericPlanner(final boolean statisticState, final int traceLevel,
+                          final StateSpaceStrategy searchStrategy) {
         super(statisticState, traceLevel);
         Objects.requireNonNull(searchStrategy);
 

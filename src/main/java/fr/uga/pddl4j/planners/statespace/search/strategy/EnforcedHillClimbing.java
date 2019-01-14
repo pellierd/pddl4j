@@ -25,6 +25,7 @@ import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.SolutionEvent;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -98,6 +99,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
                 final double heuristicSuccessor = successor.getHeuristic();
                 if (heuristicSuccessor == 0.0) {
                     solution = successor;
+                    fireSolution(new SolutionEvent(this, solution, codedProblem));
                 }
                 if (heuristicSuccessor < bestHeuristic) {
                     successors.clear();

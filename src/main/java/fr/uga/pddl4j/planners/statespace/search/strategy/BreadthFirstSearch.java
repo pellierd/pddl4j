@@ -19,6 +19,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.SolutionEvent;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -81,6 +82,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
 
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
+                fireSolution(new SolutionEvent(this, solution, codedProblem));
             } else {
                 closeSet.add(current);
                 int index = 0;

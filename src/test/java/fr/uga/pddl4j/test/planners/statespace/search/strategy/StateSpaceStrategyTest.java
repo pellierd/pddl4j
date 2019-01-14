@@ -125,7 +125,7 @@ public class StateSpaceStrategyTest {
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == ASTAR_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == ASTAR_SOLUTION_COST);
+            codedProblem).size() == ASTAR_SOLUTION_SIZE);
     }
 
     /**
@@ -152,7 +152,7 @@ public class StateSpaceStrategyTest {
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == GREEDY_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == GREEDY_SOLUTION_COST);
+            codedProblem).size() == GREEDY_SOLUTION_SIZE);
     }
 
     /**
@@ -179,7 +179,7 @@ public class StateSpaceStrategyTest {
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == ENFORCED_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == ENFORCED_SOLUTION_COST);
+            codedProblem).size() == ENFORCED_SOLUTION_SIZE);
     }
 
     /**
@@ -206,7 +206,7 @@ public class StateSpaceStrategyTest {
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == HILL_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == HILL_SOLUTION_COST);
+            codedProblem).size() == HILL_SOLUTION_SIZE);
     }
 
     /**
@@ -233,7 +233,7 @@ public class StateSpaceStrategyTest {
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == BREADTH_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == BREADTH_SOLUTION_COST);
+            codedProblem).size() == BREADTH_SOLUTION_SIZE);
     }
 
     /**
@@ -260,7 +260,7 @@ public class StateSpaceStrategyTest {
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == DEPTH_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == DEPTH_SOLUTION_COST);
+            codedProblem).size() == DEPTH_SOLUTION_SIZE);
     }
 
     /**

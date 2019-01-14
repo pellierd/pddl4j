@@ -21,6 +21,7 @@ import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
+import fr.uga.pddl4j.util.SolutionEvent;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -90,6 +91,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
 
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
+                fireSolution(new SolutionEvent(this, solution, codedProblem));
             } else {
                 closeSet.add(current);
                 int index = 0;
