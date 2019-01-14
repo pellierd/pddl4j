@@ -1843,12 +1843,14 @@ Method method_def() :
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
+	List<Task> expansion = new ArrayList<Task>();
 }
 {
 	try {
 		left_bracket()
 		<METHOD> name=method_name()
 		<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+		<EXPANSION> left_bracket() expension=task_list() right_bracket()
 	    right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -1859,14 +1861,15 @@ Method method_def() :
 }
 
 Symbol method_name() :
-{
-	Token t = token;
-}
-{
-	t=<SYMBOL> {
-		return new Symbol(Symbol.Kind.METHOD, t);
-	}
-}
+ {
+ 	Token t = token;
+ }
+ {
+ 	t=<SYMBOL> {
+ 		return new Symbol(Symbol.Kind.METHOD, t);
+ 	}
+ }
+
 
 Exp pre_gd() :
 {
