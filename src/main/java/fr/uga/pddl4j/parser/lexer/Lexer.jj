@@ -36,6 +36,7 @@ import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.Op;
 import fr.uga.pddl4j.parser.Method;
+import fr.uga.pddl4j.parser.Task;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
@@ -1843,14 +1844,14 @@ Method method_def() :
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
-	List<Task> expansion = new ArrayList<Task>();
+	List<Task> tasks = null;
 }
 {
 	try {
 		left_bracket()
 		<METHOD> name=method_name()
 		<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
-		<EXPANSION> left_bracket() expension=task_list() right_bracket()
+		<EXPANSION> left_bracket() tasks=task_list() right_bracket()
 	    right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -1870,6 +1871,48 @@ Symbol method_name() :
  	}
  }
 
+Symbol task_name() :
+ {
+ 	Token t = token;
+ }
+ {
+ 	t=<SYMBOL> {
+ 		return new Symbol(Symbol.Kind.TASK, t);
+ 	}
+ }
+
+Task task_def() :
+{
+    Symbol name = null;
+    List<TypedSymbol> parameters = null;
+}
+{
+    left_bracket()
+    name = task_name()
+    parameters = typed_list(Lexer.VARIABLE)
+    right_bracket()
+    {
+        return new Task(name, parameters);
+    }
+}
+
+List<Task> task_list() :
+{
+    List<Task> tasks = new ArrayList<Task>();
+    Task t;
+}
+{
+    try {
+    		(
+    		t = task_def() {tasks.add(t);}
+    		)+
+    	} catch(Throwable e) {
+    		this.error(e, token.beginLine, token.beginColumn);
+    	}
+    {
+        return tasks;
+    }
+}
 
 Exp pre_gd() :
 {
