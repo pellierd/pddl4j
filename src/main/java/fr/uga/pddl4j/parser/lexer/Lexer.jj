@@ -208,6 +208,7 @@ TOKEN :
 {
   	< LEFT_BRACKET: "(">
 | 	< RIGHT_BRACKET: ")">
+|   < ALIAS : "@" >
 }
 
 TOKEN : {
@@ -312,6 +313,8 @@ TOKEN :
 |	< ALWAYS_WITHIN : "always-within" >
 |	< HOLD_DURING : "hold-during" >
 |	< HOLD_AFTER : "hold-after" >
+|	< HOLD_BEFORE : "hold-before" >
+|	< HOLD_BETWEEN : "hold-between" >
 |	< AT: "at" >
 |	< START : "start">
 |	< END : "end">
@@ -322,6 +325,10 @@ TOKEN :
 |	< MAXIMIZE : "maximize" >
 |	< MINIMIZE : "minimize" >
 |	< IS_VIOLATED : "is-violated" >
+|	< BEFORE : "before" >
+|	< AFTER : "after" >
+|	< BETWEEN : "between" >
+
 }
 
 TOKEN :
@@ -1845,6 +1852,7 @@ Method method_def() :
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
 	List<Task> tasks = null;
+	List<Exp> constraints = null;
 }
 {
 	try {
@@ -1852,12 +1860,13 @@ Method method_def() :
 		<METHOD> name=method_name()
 		<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 		<EXPANSION> left_bracket() tasks=task_list() right_bracket()
+		<CONSTRAINTS> left_bracket() constraints=htn_constraints() right_bracket()
 	    right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Method(name, parameters);
+		return new Method(name, parameters, tasks, constraints);
 	}
 }
 
@@ -1884,6 +1893,7 @@ Symbol task_name() :
 Task task_def() :
 {
     Symbol name = null;
+    Symbol alias = null;
     List<TypedSymbol> parameters = null;
 }
 {
@@ -1891,8 +1901,10 @@ Task task_def() :
     name = task_name()
     parameters = typed_list(Lexer.VARIABLE)
     right_bracket()
+    <ALIAS>
+    alias = alias_name()
     {
-        return new Task(name, parameters);
+        return new Task(name, alias, parameters);
     }
 }
 
@@ -1911,6 +1923,277 @@ List<Task> task_list() :
     	}
     {
         return tasks;
+    }
+}
+
+List<Exp> htn_constraints() :
+{
+    List<Exp> constraints = new ArrayList<Exp>();
+    Exp node = null;
+}
+{
+    try {
+        		(
+        		node = htn_constr() {constraints.add(node);}
+        		)*
+        	} catch(Throwable e) {
+        		this.error(e, token.beginLine, token.beginColumn);
+        	}
+        {
+            return constraints;
+        }
+}
+
+Exp htn_constr() :
+{
+	Exp node = null;
+}
+{
+	(	LOOKAHEAD(2) node=htn_before()
+	|	LOOKAHEAD(2) node=htn_hold_before()
+	|	LOOKAHEAD(2) node=htn_hold_after()
+	|	LOOKAHEAD(2) node=htn_hold_between()
+	|	LOOKAHEAD(2) node=htn_hold_during()
+	|	LOOKAHEAD(3) node=htn_at_start()
+	|	LOOKAHEAD(3) node=htn_at_end()
+	|	LOOKAHEAD(2) node=always_con_gd()
+    |	LOOKAHEAD(2) node=sometime_con_gd()
+    |	LOOKAHEAD(2) node=at_most_once_con_gd()
+    |	LOOKAHEAD(2) node=sometime_after_con_gd()
+    |	LOOKAHEAD(2) node=sometime_before_con_gd()
+    |	LOOKAHEAD(2) node=htn_within()
+    |	LOOKAHEAD(2) node=htn_always_within()
+	)
+	{
+		return node;
+	}
+}
+
+Exp htn_before() :
+{
+	Exp node = new Exp(Connective.BEFORE);
+	Exp first;
+	Exp second;
+}
+{
+	left_bracket()
+	<BEFORE>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = alias_set() {
+        		node.addChild(second);
+        		})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_hold_before() :
+{
+	Exp node = new Exp(Connective.HOLD_BEFORE);
+	Exp first;
+	Exp second;
+}
+{
+	left_bracket()
+	<HOLD_BEFORE>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = pre_gd() {
+        		node.addChild(second);
+        		})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_hold_after() :
+{
+	Exp node = new Exp(Connective.HOLD_AFTER);
+	Exp first;
+	Exp second;
+}
+{
+	left_bracket()
+	<HOLD_AFTER>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = effect() {
+        		node.addChild(second);
+        		})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_hold_between() :
+{
+	Exp node = new Exp(Connective.HOLD_BETWEEN);
+	Exp first;
+	Exp second;
+	Exp third;
+}
+{
+	left_bracket()
+	<HOLD_BETWEEN>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = alias_set() {
+        		node.addChild(second);
+        		})
+    (third = pre_gd() {
+            	node.addChild(third);
+            	})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_hold_during() :
+{
+	Exp node = new Exp(Connective.HOLD_DURING);
+	Exp first;
+	Exp second;
+	Exp third;
+}
+{
+	left_bracket()
+	<HOLD_DURING>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = alias_set() {
+        		node.addChild(second);
+        		})
+    (third = pre_gd() {
+            	node.addChild(third);
+            	})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_at_start() :
+{
+	Exp node = new Exp(Connective.AT_START);
+	Exp first;
+}
+{
+	left_bracket()
+	<AT> <START>
+    (first = pre_gd() {
+        		node.addChild(first);
+        		})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_at_end() :
+{
+	Exp node = new Exp(Connective.AT_END);
+	Exp first;
+}
+{
+	left_bracket()
+	<AT> <END>
+    (first = effect() {
+        		node.addChild(first);
+        		})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_within() :
+{
+	Exp node = new Exp(Connective.WITHIN);
+	Exp first;
+	Exp second;
+}
+{
+	left_bracket()
+	<WITHIN>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = pre_gd() {
+        		node.addChild(second);
+        		})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Exp htn_always_within() :
+{
+	Exp node = new Exp(Connective.ALWAYS_WITHIN);
+	Exp first;
+	Exp second;
+	Exp third;
+}
+{
+	left_bracket()
+	<ALWAYS_WITHIN>
+	(first = alias_set() {
+    			node.addChild(first);
+    		})
+    (second = pre_gd() {
+        		node.addChild(second);
+        		})
+    (third = pre_gd() {
+            	node.addChild(third);
+            	})
+	right_bracket()
+	{
+		return node;
+	}
+}
+
+Symbol alias_name() :
+ {
+ 	Token t = token;
+ }
+ {
+ 	t=<SYMBOL> {
+ 		return new Symbol(Symbol.Kind.ALIAS, t);
+ 	}
+ }
+
+Exp alias_set() :
+{
+    Exp node = new Exp(Connective.ALIAS_SET);
+    Exp sibling = new Exp(Connective.ALIAS);
+    Symbol t;
+}
+{
+    (
+        (t = alias_name() {
+            sibling.setAlias(t);
+            node.addChild(sibling);
+            })
+        |
+        left_bracket()
+        (t = alias_name() {
+            sibling.setAlias(t);
+            node.addChild(sibling);
+            })+
+        right_bracket()
+    )
+    {
+        return node;
     }
 }
 

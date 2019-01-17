@@ -15,6 +15,10 @@ public class Task implements Serializable {
      */
     private Symbol name;
     /**
+     * The alias of the task.
+     */
+    private Symbol alias;
+    /**
      * The list of parameters of the task.
      */
     private List<TypedSymbol> parameters;
@@ -25,6 +29,7 @@ public class Task implements Serializable {
     private Task() {
         super();
         this.name = null;
+        this.alias = null;
         this.parameters = null;
     }
 
@@ -33,11 +38,12 @@ public class Task implements Serializable {
      *
      * @param other the other task.
      */
-    public Task(final Method other) {
+    public Task(final Task other) {
         if (other == null) {
             throw new NullPointerException();
         }
         this.name = new Symbol(other.getName());
+        this.alias = new Symbol(other.getAlias());
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
     }
@@ -49,12 +55,13 @@ public class Task implements Serializable {
      * @param parameters    The list of the task parameters.
      * @throws NullPointerException if the specified name is null.
      */
-    public Task(final Symbol name, final List<TypedSymbol> parameters) {
+    public Task(final Symbol name, final Symbol alias, final List<TypedSymbol> parameters) {
         this();
-        if (name == null || parameters == null) {
+        if (name == null || parameters == null || alias == null) {
             throw new NullPointerException();
         }
         this.name = name;
+        this.alias = alias;
         this.parameters = parameters;
     }
 
@@ -77,6 +84,22 @@ public class Task implements Serializable {
             throw new NullPointerException();
         }
         this.name = name;
+    }
+
+    /**
+     * @return the alias of the task.
+     */
+    public Symbol getAlias() {
+        return alias;
+    }
+
+    /**
+     * Sets the alias of the task.
+     *
+     * @param alias The alias of the task.
+     */
+    public void setAlias(Symbol alias) {
+        this.alias = alias;
     }
 
     /**

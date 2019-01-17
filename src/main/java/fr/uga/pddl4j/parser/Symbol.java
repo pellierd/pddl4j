@@ -70,6 +70,10 @@ public class Symbol implements Serializable {
          */
         TASK,
         /**
+         * The alias symbol.
+         */
+        ALIAS,
+        /**
          * The preference symbol.
          */
         PREFERENCE,
