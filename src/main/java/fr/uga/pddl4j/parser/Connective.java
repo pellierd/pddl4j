@@ -208,6 +208,10 @@ public enum Connective {
      */
     HOLD_AFTER("hold-after"),
     /**
+     * The connective for the after expressions.
+     */
+    AFTER("after"),
+    /**
      * The connective for the function term.
      */
     FUNCTION_TERM(""),
@@ -218,7 +222,27 @@ public enum Connective {
     /**
      * The connective for expression of type FALSE.
      */
-    FALSE("false");
+    FALSE("false"),
+    /**
+     * The connective for the hold-before expression.
+     */
+    HOLD_BEFORE("hold-before"),
+    /**
+     * The connective for the before expression.
+     */
+    BEFORE("before"),
+    /**
+     * The connective for the between expression.
+     */
+    HOLD_BETWEEN("hold-between"),
+    /**
+     * Connective for alias expressions.
+     */
+    ALIAS(""),
+    /**
+     * Connective for alias set expression.
+     */
+    ALIAS_SET("");
 
     /**
      * The image associate to the connective in the PDDL language.

@@ -95,6 +95,11 @@ public class Exp implements Serializable {
     private Symbol variable;
 
     /**
+     * The variable.
+     */
+    private Symbol alias;
+
+    /**
      * Creates a new expression from a other one.
      *
      * @param other the other expression.
@@ -897,6 +902,20 @@ public class Exp implements Serializable {
 
         }
         return malformed;
+    }
+
+    /**
+     * @return Return the alias symbol of a task.
+     */
+    public Symbol getAlias() {
+        return alias;
+    }
+
+    /**
+     * @param alias Set the alias symbol of a task.
+     */
+    public void setAlias(Symbol alias) {
+        this.alias = alias;
     }
 }
 

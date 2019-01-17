@@ -18,6 +18,14 @@ public class Method implements Serializable {
      * The list of parameters of the method.
      */
     private List<TypedSymbol> parameters;
+    /**
+     * The tasks of the method.
+     */
+    private List<Task> tasks;
+    /**
+     * The constraints of the method.
+     */
+    private List<Exp> constraints;
 
     /**
      * Create a new method.
@@ -40,6 +48,10 @@ public class Method implements Serializable {
         this.name = new Symbol(other.getName());
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
+        this.tasks = new LinkedList<>();
+        this.tasks.addAll(other.getTasks());
+        this.constraints = new LinkedList<>();
+        this.constraints.addAll(other.getConstraints());
     }
 
     /**
@@ -47,15 +59,18 @@ public class Method implements Serializable {
      *
      * @param name          The name of the method.
      * @param parameters    The list of the method parameters.
+     * @param tasks
      * @throws NullPointerException if the specified name is null.
      */
-    public Method(final Symbol name, final List<TypedSymbol> parameters) {
+    public Method(final Symbol name, final List<TypedSymbol> parameters, List<Task> tasks, List<Exp> constraints) {
         this();
-        if (name == null || parameters == null) {
+        if (name == null || parameters == null || tasks == null) {
             throw new NullPointerException();
         }
         this.name = name;
         this.parameters = parameters;
+        this.tasks = tasks;
+        this.constraints = constraints;
     }
 
     /**
@@ -114,6 +129,20 @@ public class Method implements Serializable {
     }
 
     /**
+     * @return the method tasks.
+     */
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    /**
+     * @param tasks The tasks of the method.
+     */
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    /**
      * Returns the hash code value of the method.
      *
      * @return the hash code value of the method.
@@ -143,5 +172,19 @@ public class Method implements Serializable {
         str.append(")\n");
         str.append(")");
         return str.toString();
+    }
+
+    /**
+     * @return the method constraints.
+     */
+    public List<Exp> getConstraints() {
+        return constraints;
+    }
+
+    /**
+     * @param constraints The method constraints
+     */
+    public void setConstraints(List<Exp> constraints) {
+        this.constraints = constraints;
     }
 }
