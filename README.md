@@ -1,6 +1,6 @@
 ## PDDL4J library
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45971.svg)](http://dx.doi.org/10.5281/zenodo.45971)
-[![Build Status](http://pddl4j.imag.fr/jenkins/job/PDDL4J%20devel/badge/icon)](http://pddl4j.imag.fr/jenkins/job/PDDL4J%20devel/)
+[![Build Status](http://pddl4j.fr/jenkins/job/PDDL4J%20devel/badge/icon)](http://pddl4j.fr/jenkins/job/PDDL4J%20devel/)
 
 ### 1. Contact
 
