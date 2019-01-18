@@ -1852,7 +1852,7 @@ Method method_def() :
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
 	List<Task> tasks = null;
-	List<Exp> constraints = null;
+	Exp constraints = null;
 }
 {
 	try {
@@ -1926,15 +1926,16 @@ List<Task> task_list() :
     }
 }
 
-List<Exp> htn_constraints() :
+Exp htn_constraints() :
 {
-    List<Exp> constraints = new ArrayList<Exp>();
-    Exp node = null;
+    Exp constraints = new Exp(Connective.AND);
+    Exp child = null;
 }
 {
     try {
+        		<AND>
         		(
-        		node = htn_constr() {constraints.add(node);}
+        		child = htn_constr() {constraints.addChild(child);}
         		)*
         	} catch(Throwable e) {
         		this.error(e, token.beginLine, token.beginColumn);

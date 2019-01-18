@@ -24,7 +24,7 @@
   (:method test
          :parameters (?x - block ?y - block)
          :expansion ((pick-up ?x - block)@t1 (put-down ?x)@t2)
-         :constraints (
+         :constraints (and
                         (before (t1 t3) t4)
                         (before (t2 t3) (t5))
                         (hold-before t1 ())

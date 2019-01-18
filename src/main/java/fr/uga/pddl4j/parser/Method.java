@@ -25,7 +25,7 @@ public class Method implements Serializable {
     /**
      * The constraints of the method.
      */
-    private List<Exp> constraints;
+    private Exp constraints;
 
     /**
      * Create a new method.
@@ -34,6 +34,8 @@ public class Method implements Serializable {
         super();
         this.name = null;
         this.parameters = null;
+        this.tasks = null;
+        this.constraints = null;
     }
 
     /**
@@ -50,8 +52,7 @@ public class Method implements Serializable {
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
         this.tasks = new LinkedList<>();
         this.tasks.addAll(other.getTasks());
-        this.constraints = new LinkedList<>();
-        this.constraints.addAll(other.getConstraints());
+        this.constraints = new Exp(other.getConstraints());
     }
 
     /**
@@ -62,7 +63,7 @@ public class Method implements Serializable {
      * @param tasks
      * @throws NullPointerException if the specified name is null.
      */
-    public Method(final Symbol name, final List<TypedSymbol> parameters, List<Task> tasks, List<Exp> constraints) {
+    public Method(final Symbol name, final List<TypedSymbol> parameters, List<Task> tasks, Exp constraints) {
         this();
         if (name == null || parameters == null || tasks == null) {
             throw new NullPointerException();
@@ -177,14 +178,14 @@ public class Method implements Serializable {
     /**
      * @return the method constraints.
      */
-    public List<Exp> getConstraints() {
+    public Exp getConstraints() {
         return constraints;
     }
 
     /**
      * @param constraints The method constraints
      */
-    public void setConstraints(List<Exp> constraints) {
+    public void setConstraints(Exp constraints) {
         this.constraints = constraints;
     }
 }
