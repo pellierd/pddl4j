@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
@@ -153,5 +154,19 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         }
 
         return super.isGoalReachable() ? critical : Integer.MAX_VALUE;
+    }
+
+    /**
+     * Return the estimated distance to the goal to reach the specified state. If the return value is
+     * <code>DOUBLE.MAX_VALUE</code>, it means that the goal is unreachable from the specified
+     * state.
+     *
+     * @param node the state from which the distance to the goal must be estimated.
+     * @param goal the goal expression.
+     * @return the distance to the goal state from the specified state.
+     */
+    @Override
+    public double estimate(final Node node, final BitExp goal) {
+        return estimate((BitState) node, goal);
     }
 }

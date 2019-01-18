@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
 
 /**
  * <p>
@@ -756,6 +756,139 @@ final class PostInstantiation implements Serializable {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
+            case F_EXP:
+                break;
+            default:
+                // do nothing
+        }
+    }
+
+    /**
+     * Extracts "increase" expression and assigns value to the BitOp cost.
+     *
+     * @param operators       the list of operators.
+     * @param functionAndCost functions and associed costs
+     */
+    static void simplifyIncrease(final List<IntOp> operators, final Map<IntExp, Double> functionAndCost) {
+        for (IntOp op : operators) {
+            PostInstantiation.simplifyIncreaseAssignCost(op, op.getEffects(), functionAndCost);
+        }
+    }
+
+    //TODO Deal with WHEN, FORALL etc.
+
+    /**
+     * Do a pass over the effects of an instantiated operator and update the ground inertia table.
+     *
+     * @param exp             the effect.
+     * @param functionAndCost functions and associed costs
+     */
+    private static void simplifyIncreaseAssignCost(final IntOp op,
+                                                   final IntExp exp,
+                                                   final Map<IntExp, Double> functionAndCost) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                break;
+            case AND:
+                Iterator<IntExp> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(Connective.AND)) {
+                    final IntExp ei = i.next();
+                    PostInstantiation.simplifyIncreaseAssignCost(op, ei, functionAndCost);
+                    // If a child expression is INCREASE, we remove it
+                    if (ei.getConnective().equals(Connective.INCREASE)) {
+                        i.remove();
+                    }
+                }
+                break;
+            case OR:
+                break;
+            case FORALL:
+                break;
+            case EXISTS:
+                break;
+            case AT_START:
+                break;
+            case AT_END:
+                break;
+            case WHEN:
+                break;
+            case NOT:
+                break;
+            case F_EXP_T:
+                break;
+            case EQUAL_ATOM:
+                break;
+            case FN_HEAD:
+                break;
+            case FN_ATOM:
+                break;
+            case DURATION_ATOM:
+                break;
+            case LESS:
+                break;
+            case LESS_OR_EQUAL:
+                break;
+            case EQUAL:
+                break;
+            case GREATER:
+                break;
+            case GREATER_OR_EQUAL:
+                break;
+            case ASSIGN:
+                break;
+            case INCREASE:
+                if (functionAndCost.containsKey(exp.getChildren().get(1))) {
+                    op.setCost(functionAndCost.get(exp.getChildren().get(1)));
+                } else {
+                    op.setCost(exp.getChildren().get(1).getValue());
+                }
+                break;
+            case DECREASE:
+                break;
+            case SCALE_UP:
+                break;
+            case SCALE_DOWN:
+                break;
+            case MUL:
+                break;
+            case DIV:
+                break;
+            case MINUS:
+                break;
+            case PLUS:
+                break;
+            case SOMETIME_AFTER:
+                break;
+            case SOMETIME_BEFORE:
+                break;
+            case WITHIN:
+                break;
+            case HOLD_AFTER:
+                break;
+            case ALWAYS_WITHIN:
+                break;
+            case HOLD_DURING:
+                break;
+            case TIME_VAR:
+                break;
+            case IS_VIOLATED:
+                break;
+            case NUMBER:
+                break;
+            case MINIMIZE:
+                break;
+            case MAXIMIZE:
+                break;
+            case UMINUS:
+                break;
+            case ALWAYS:
+                break;
+            case OVER_ALL:
+                break;
+            case SOMETIME:
+                break;
+            case AT_MOST_ONCE:
+                break;
             case F_EXP:
                 break;
             default:

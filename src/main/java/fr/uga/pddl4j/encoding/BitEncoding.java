@@ -94,6 +94,7 @@ final class BitEncoding implements Serializable {
         for (IntOp op : operators) {
             final int arity = op.getArity();
             final BitOp bOp = new BitOp(op.getName(), arity);
+            bOp.setCost(op.getCost());
 
             // Initialize the parameters of the operator
             for (int i = 0; i < arity; i++) {
@@ -289,6 +290,7 @@ final class BitEncoding implements Serializable {
                 final String name = op.getName();
                 final int arity = op.getArity();
                 final IntOp newOp = new IntOp(name, arity);
+                newOp.setCost(op.getCost());
                 for (int i = 0; i < arity; i++) {
                     newOp.setTypeOfParameter(i, op.getTypeOfParameters(i));
                 }

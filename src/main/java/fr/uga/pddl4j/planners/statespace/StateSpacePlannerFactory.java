@@ -23,6 +23,8 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.planners.statespace.ff.FF;
+import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
+import fr.uga.pddl4j.planners.statespace.hc.HCAnytime;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
@@ -69,6 +71,11 @@ public class StateSpacePlannerFactory implements Serializable {
     }
 
     /**
+     * Print cost in solution plan.
+     */
+    private static boolean ACTION_COST = false;
+
+    /**
      * Creates a new StateSpacePlannerFactory.
      */
     private StateSpacePlannerFactory() {
@@ -91,6 +98,14 @@ public class StateSpacePlannerFactory implements Serializable {
 
             case FF:
                 planner = new FF();
+                break;
+
+            case FFAnytime:
+                planner = new FFAnytime();
+                break;
+
+            case HCAnytime:
+                planner = new HCAnytime();
                 break;
 
             default:
@@ -119,6 +134,14 @@ public class StateSpacePlannerFactory implements Serializable {
 
             case FF:
                 planner = new FF(statisticState, traceLevel);
+                break;
+
+            case FFAnytime:
+                planner = new FFAnytime(statisticState, traceLevel);
+                break;
+
+            case HCAnytime:
+                planner = new HCAnytime(statisticState, traceLevel);
                 break;
 
             default:
@@ -153,6 +176,14 @@ public class StateSpacePlannerFactory implements Serializable {
                 planner = new FF(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
+            case FFAnytime:
+                planner = new FFAnytime(timeout, heuristicType, weight, statisticState, traceLevel);
+                break;
+
+            case HCAnytime:
+                planner = new HCAnytime(timeout, heuristicType, weight, statisticState, traceLevel);
+                break;
+
             default:
                 LOGGER.trace(StateSpacePlannerFactory.printUsage());
                 break;
@@ -176,6 +207,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("-p <num>    specifies the state based planner to use (preset: 0)\n")
             .append("     0      HSP planner\n")
             .append("     1      FF planner\n")
+            .append("     2      FF Anytime planner\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
             .append("     0      ff heuristic\n")
             .append("     1      sum heuristic\n")
@@ -186,6 +218,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("     6      combo heuristic\n")
             .append("     7      max heuristic\n")
             .append("     8      set-level heuristic\n")
+            .append("     9      min cost heuristic\n")
             .append("-i <num>    run-time information level (preset: 1)\n")
             .append("     0      nothing\n")
             .append("     1      info on action number, search and search\n")
@@ -208,6 +241,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("               - total memory used in MBytes\n")
             .append("               - length of the solution plan\n")
             .append("-s <bool>   generate statistics or not (preset: true)\n")
+            .append("-d <bool>   print cost in solution plan (preset: false)\n")
             .append("-h          print this message\n\n");
 
         return strb;
@@ -233,6 +267,10 @@ public class StateSpacePlannerFactory implements Serializable {
                         arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.HSP);
                     } else if (planner == 1) {
                         arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FF);
+                    } else if (planner == 2) {
+                        arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.FFAnytime);
+                    } else if (planner == 3) {
+                        arguments.put(AbstractStateSpacePlanner.PLANNER, Planner.Name.HCAnytime);
                     } else {
                         throw (new RuntimeException("Wrong planner argument"));
                     }
@@ -254,7 +292,7 @@ public class StateSpacePlannerFactory implements Serializable {
                     arguments.put(AbstractStateSpacePlanner.TIMEOUT, cpu);
                 } else if ("-u".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final int heuristic = Integer.parseInt(args[i + 1]);
-                    if (heuristic < 0 || heuristic > 8) {
+                    if (heuristic < 0 || heuristic > 9) {
                         LOGGER.trace(StateSpacePlannerFactory.printUsage());
                     }
                     if (heuristic == 0) {
@@ -281,9 +319,12 @@ public class StateSpacePlannerFactory implements Serializable {
                     } else if (heuristic == 7) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.MAX);
-                    } else {
+                    } else if (heuristic == 8) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             Heuristic.Type.SET_LEVEL);
+                    } else {
+                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
+                            Heuristic.Type.MIN_COST);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
@@ -300,6 +341,8 @@ public class StateSpacePlannerFactory implements Serializable {
                 } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final boolean isStatUsed = Boolean.parseBoolean(args[i + 1]);
                     arguments.put(AbstractStateSpacePlanner.STATISTICS, isStatUsed);
+                } else if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    ACTION_COST = Boolean.parseBoolean(args[i + 1]);
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     LOGGER.trace(StateSpacePlannerFactory.printUsage());
@@ -335,6 +378,7 @@ public class StateSpacePlannerFactory implements Serializable {
      * -u <i>num</i>   specifies the state based planner to use (preset: 0)
      *      0      HSP planner
      *      1      FF planner
+     *      2      FF Anytime planner
      * -u <i>num</i>   specifies the heuristic to use (preset: 0)
      *      0      ff heuristic
      *      1      sum heuristic
@@ -345,6 +389,7 @@ public class StateSpacePlannerFactory implements Serializable {
      *      6      combo heuristic
      *      7      max heuristic
      *      8      set-level heuristic
+     *      9      min cost heuristic
      * -i <i>num</i>   run-time information level (preset: 1)
      *      0      nothing
      *      1      info on action number, search and search
@@ -367,6 +412,7 @@ public class StateSpacePlannerFactory implements Serializable {
      *                - total memory used in MBytes
      *                - length of the solution plan
      * -s <i>bool</i>   no statistics (preset: true)
+     * -d <i>bool</i>   print cost in solution plan (preset: false)
      * -h          print this message
      *
      * </pre>
@@ -475,7 +521,12 @@ public class StateSpacePlannerFactory implements Serializable {
                     final StringBuilder strb = new StringBuilder();
                     if (plan != null) {
                         strb.append(String.format("%nfound plan as follows:%n%n"));
-                        strb.append(pb.toString(plan));
+                        if (ACTION_COST) {
+                            strb.append(pb.toStringCost(plan));
+                        } else {
+                            strb.append(pb.toString(plan));
+                        }
+
                         strb.append(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
 
                     } else {

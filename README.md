@@ -75,9 +75,9 @@ Planners are available in the "planners" package of the distribution. For
 instance, this archive contains a simple planner based on A* search strategy
 called HSP. To launch this planner use the following command line:
 
-> java -javaagent:build/libs/pddl4j-3.7.3.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+> java -javaagent:build/libs/pddl4j-3.8.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
-> java -jar build/libs/pddl4j-3.7.3.jar -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
+> java -jar build/libs/pddl4j-3.8.jar -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
 
 Or use the gradle run command:
 > gradle run -PArgs=-o,pddl/blocksworld/domain.pddl,-f,pddl/blocksworld/p15.pddl
@@ -93,6 +93,26 @@ https://doi.org/10.1080/0952813X.2017.1409278
 > D. Pellier & H. Fiorino (2017) PDDL4J: a planning domain description library for java, Journal of Experimental & Theoretical Artificial Intelligence, 30:1, 143-176, DOI: 10.1080/0952813X.2017.1409278
 
 ### 5. Changelog
+
+**PDDL4J v3.8**
+
+*Global*
+* Add ACTION-COST support in PDDL4J (parser, encoder, solver)
+
+*Planner*
+* Add FF Anytime planner
+* Add Hill Climbing Anytime planner
+* Add Generic Anytime planner
+
+*Heuristic*
+* Add MIN_COST heuristic
+
+*Search Strategy*
+* Add Anytime Search Strategies
+
+*Others*
+* Bug fix
+* Add JUnit tests
 
 **PDDL4J v3.7.3**
 

@@ -13,14 +13,14 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.test.planners.statespace.hsp;
+package fr.uga.pddl4j.test.planners.statespace.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.statespace.hsp.HSP;
+import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
@@ -34,23 +34,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * Implements the <tt>HSPTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
+ * Implements the <tt>FFAnytimeTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
- * <p>
- * This class will test the planner on benchmark domain and problem from International planning contest.
+ * <p>This class will test the planner on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 plan using all the file used in the competition and
- * KCL-Planning validator: https://github.com/KCL-Planning/VAL
- * </p>
- * <p>
- * Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
+ * KCL-Planning validator: https://github.com/KCL-Planning/VAL</p>
+ * <p>Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
  * It suppose benchmark directory is a the root of your project.
- * If no test files are provided all test will pass the validation.
- * </p>
+ * If no test files are provided all test will pass the validation.</p>
  *
+ * @author Emmanuel Hermellin
  * @author Cédric Gerard
- * @version 0.1 - 23.06.16
+ * @version 0.1 - 24.01.18
  */
-public class HSPTest {
+public class FFAnytimeTest {
 
     /**
      * Computation timeout.
@@ -78,9 +75,9 @@ public class HSPTest {
     private static final boolean STATISTICS = false;
 
     /**
-     * The HSP planner reference.
+     * The FF planner reference.
      */
-    private HSP planner = null;
+    private FFAnytime planner = null;
 
     /**
      * Test initialization.
@@ -88,16 +85,16 @@ public class HSPTest {
     @Before
     public void initTest() {
         // Creates the planner
-        planner = new HSP(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT, STATISTICS, TRACE_LEVEL);
+        planner = new FFAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT, STATISTICS, TRACE_LEVEL);
         Tools.changeVALPerm();
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC1 gripper tests
      */
     @Test
-    public void testHSP_IPC1_gripper() {
+    public void testFFAnytime_IPC1_gripper() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
             + File.separator;
@@ -112,11 +109,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC1 logistics tests
      */
     @Test
-    public void testHSP_IPC1_logistics() {
+    public void testFFAnytime_IPC1_logistics() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "logistics"
             + File.separator;
@@ -131,11 +128,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC1 movie tests
      */
     //@Test //Error with VAL on this benchmark
-    public void testHSP_IPC1_movie() {
+    public void testFFAnytime_IPC1_movie() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "movie"
             + File.separator;
@@ -150,11 +147,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC1 mprime tests
      */
     @Test
-    public void testHSP_ICP1_mprime() {
+    public void testFFAnytime_ICP1_mprime() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mprime"
             + File.separator;
@@ -169,11 +166,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC1 mystery tests
      */
     @Test
-    public void testHSP_IPC1_mystery() {
+    public void testFFAnytime_IPC1_mystery() {
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "mystery"
             + File.separator;
@@ -188,11 +185,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC2 blocksworld tests
      */
     @Test
-    public void testHSP_IPC2_blocksworld() {
+    public void testFFAnytime_IPC2_blocksworld() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "blocksworld"
             + File.separator;
@@ -207,11 +204,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC2 elevator tests
      */
     @Test
-    public void testHSP_IPC2_elevator() {
+    public void testFFAnytime_IPC2_elevator() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "elevator"
             + File.separator;
@@ -226,11 +223,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC2 freecell tests
      */
     @Test
-    public void testHSP_IPC2_freecell() {
+    public void testFFAnytime_IPC2_freecell() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "freecell"
             + File.separator;
@@ -245,11 +242,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC2 schedule tests
      */
     //@Test
-    public void testHSP_IPC2_schedule() {
+    public void testFFAnytime_IPC2_schedule() {
         final String localTestPath = Tools.BENCH_DIR + "ipc2"
             + File.separator + "schedule"
             + File.separator;
@@ -264,11 +261,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC3 depots tests
      */
     @Test
-    public void testHSP_IPC3_depots() {
+    public void testFFAnytime_IPC3_depots() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "depot"
             + File.separator;
@@ -283,11 +280,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC3 driverlog tests
      */
     @Test
-    public void testHSP_IPC3_driverlog() {
+    public void testFFAnytime_IPC3_driverlog() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "driverlog"
             + File.separator;
@@ -302,11 +299,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC3 rover tests
      */
     @Test
-    public void testHSP_IPC3_rover() {
+    public void testFFAnytime_IPC3_rover() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "rover"
             + File.separator;
@@ -322,11 +319,11 @@ public class HSPTest {
 
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC3 satellite tests
      */
     @Test
-    public void testHSP_IPC3_satellite() {
+    public void testFFAnytime_IPC3_satellite() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "satellite"
             + File.separator;
@@ -341,11 +338,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC3 zenotravel tests
      */
     @Test
-    public void testHSP_IPC3_zenotravel() {
+    public void testFFAnytime_IPC3_zenotravel() {
         final String localTestPath = Tools.BENCH_DIR + "ipc3"
             + File.separator + "zenotravel"
             + File.separator;
@@ -360,11 +357,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC4 airport tests
      */
     @Test
-    public void testHSP_IPC4_airport() {
+    public void testFFAnytime_IPC4_airport() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "airport"
             + File.separator;
@@ -379,11 +376,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC4 optical-telegraph tests
      */
     @Test
-    public void testHSP_IPC4_optical_telegraph() {
+    public void testFFAnytime_IPC4_optical_telegraph() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "optical-telegraph"
             + File.separator;
@@ -398,11 +395,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC4 philosophers tests
      */
     @Test
-    public void testHSP_IPC4_philosophers() {
+    public void testFFAnytime_IPC4_philosophers() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "philosophers"
             + File.separator;
@@ -417,11 +414,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC4 pipeworld tests
      */
     @Test
-    public void testHSP_IPC4_pipeworld() {
+    public void testFFAnytime_IPC4_pipeworld() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pipeworld"
             + File.separator;
@@ -436,11 +433,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC4 psr tests
      */
     @Test
-    public void testHSP_IPC4_psr() {
+    public void testFFAnytime_IPC4_psr() {
         final String localTestPath = Tools.BENCH_DIR + "ipc4"
             + File.separator + "psr"
             + File.separator;
@@ -455,11 +452,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC5 openstacks tests
      */
     @Test
-    public void testHSP_IPC5_openstacks() {
+    public void testFFAnytime_IPC5_openstacks() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "openstacks"
             + File.separator;
@@ -474,11 +471,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC5 pathways tests
      */
     @Test
-    public void testHSP_IPC5_pathways() {
+    public void testFFAnytime_IPC5_pathways() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "pathways"
             + File.separator;
@@ -493,11 +490,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC5 storage tests
      */
     @Test
-    public void testHSP_IPC5_storage() {
+    public void testFFAnytime_IPC5_storage() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "storage"
             + File.separator;
@@ -512,11 +509,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC5 tpp tests
      */
     @Test
-    public void testHSP_IPC5_tpp() {
+    public void testFFAnytime_IPC5_tpp() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "tpp"
             + File.separator;
@@ -531,11 +528,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC5 truck tests
      */
     @Test
-    public void testHSP_IPC5_truck() {
+    public void testFFAnytime_IPC5_truck() {
         final String localTestPath = Tools.BENCH_DIR + "ipc5"
             + File.separator + "truck"
             + File.separator;
@@ -550,11 +547,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC6 pegsol tests
      */
     @Test
-    public void testHSP_IPC6_pegsol() {
+    public void testFFAnytime_IPC6_pegsol() {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "pegsol"
             + File.separator;
@@ -569,11 +566,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC6 sokoban tests
      */
     @Test
-    public void testHSP_IPC6_sokoban() {
+    public void testFFAnytime_IPC6_sokoban() {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "sokoban"
             + File.separator;
@@ -588,11 +585,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC6 transport tests
      */
     @Test
-    public void testHSP_IPC6_transport() {
+    public void testFFAnytime_IPC6_transport() {
         final String localTestPath = Tools.BENCH_DIR + "ipc6"
             + File.separator + "transport"
             + File.separator;
@@ -607,11 +604,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC7 barman tests
      */
     @Test
-    public void testHSP_IPC7_barman() {
+    public void testFFAnytime_IPC7_barman() {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "barman"
             + File.separator;
@@ -626,11 +623,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC7 nomystery tests
      */
     @Test
-    public void testHSP_IPC7_nomystery() {
+    public void testFFAnytime_IPC7_nomystery() {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "nomystery"
             + File.separator;
@@ -645,11 +642,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC7 parking tests
      */
     @Test
-    public void testHSP_IPC7_parking() {
+    public void testFFAnytime_IPC7_parking() {
         final String localTestPath = Tools.BENCH_DIR + "ipc7"
             + File.separator + "parking"
             + File.separator;
@@ -664,11 +661,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC8 childsnack tests
      */
     @Test
-    public void testHSP_IPC8_childsnack() {
+    public void testFFAnytime_IPC8_childsnack() {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "childsnack"
             + File.separator;
@@ -683,11 +680,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC8 hiking tests
      */
     @Test
-    public void testHSP_IPC8_hiking() {
+    public void testFFAnytime_IPC8_hiking() {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "hiking"
             + File.separator;
@@ -702,11 +699,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * IPC8 thoughtful tests
      */
     @Test
-    public void testHSP_IPC8_thoughtful() {
+    public void testFFAnytime_IPC8_thoughtful() {
         final String localTestPath = Tools.BENCH_DIR + "ipc8"
             + File.separator + "thoughtful"
             + File.separator;
@@ -721,11 +718,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * Other Depots tests
      */
     @Test
-    public void testHSP_newTests_Depots() {
+    public void testFFAnytime_newTests_Depots() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Depots"
             + File.separator;
@@ -740,11 +737,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * Other DriverLog tests
      */
     @Test
-    public void testHSP_newTests_DriverLog() {
+    public void testFFAnytime_newTests_DriverLog() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "DriverLog"
             + File.separator;
@@ -759,11 +756,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * Other Freecell tests
      */
     @Test
-    public void testHSP_newTests_Freecell() {
+    public void testFFAnytime_newTests_Freecell() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Freecell"
             + File.separator;
@@ -778,11 +775,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * Other Rover tests
      */
     @Test
-    public void testHSP_newTests_Rover() {
+    public void testFFAnytime_newTests_Rover() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Rover"
             + File.separator;
@@ -797,11 +794,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * Other Satellite tests
      */
     @Test
-    public void testHSP_newTests_Satellite() {
+    public void testFFAnytime_newTests_Satellite() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Satellite"
             + File.separator;
@@ -816,11 +813,11 @@ public class HSPTest {
     }
 
     /**
-     * Method that executes benchmarks using files on the hsp planner to test its output plan.
+     * Method that executes benchmarks using files on the FFAnytime planner to test its output plan.
      * Other Zenotravel tests
      */
     @Test
-    public void testHSP_newTests_Zenotravel() {
+    public void testFFAnytime_newTests_Zenotravel() {
         final String localTestPath = Tools.BENCH_DIR + "newTests"
             + File.separator + "Zenotravel"
             + File.separator;
@@ -835,17 +832,17 @@ public class HSPTest {
     }
 
     /**
-     * test the HSP JSON output method on Gripper p01 problem.
+     * test the FFAnytime JSON output method on Gripper p01 problem.
      *
      * @throws Exception if something went wrong
      */
     @Test
-    public void testHSP_json_output_plan() throws Exception {
-        System.out.println("HSP: Test HSP planner Json output.");
+    public void testFFAnytime_json_output_plan() throws Exception {
+        System.out.println("FFAnytimeTest: Test FFAnytime planner Json output.");
         final ProblemFactory factory = new ProblemFactory();
         final String domainFile = "pddl/gripper/domain.pddl";
         final String problemFile = "pddl/gripper/p01.pddl";
-        String jsonPlan = "";
+        String jsonPlan;
 
         final ErrorManager errorManager = factory.parse(new File(domainFile), new File(problemFile));
         Assert.assertTrue(errorManager.isEmpty());
@@ -890,7 +887,7 @@ public class HSPTest {
             oneDomainPerProblem = true;
         }
 
-        System.out.println("HSPTest: Test HSP planner on " + currentTestPath);
+        System.out.println("FFAnytimeTest: Test FFAnytime planner on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
@@ -958,48 +955,47 @@ public class HSPTest {
     /**
      * Valid JSON output for gripper p01 problem.
      */
-    private static String validGripperP01JSON =
-        "{\"Action 1\":{\"Names\":\"pick\",\"Parameters\":[\"ball2\",\"rooma\",\"right\"],"
-            + "\"Position\":1,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\",\"(free right)\","
-            + "\"(at ball2 rooma)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},"
-            + "\"Effect\":{\"Negatives\":[\"(free right)\",\"(at ball2 rooma)\"],\"Positives\":[\"(carry ball2 right)\""
-            + "]}}]},\"Action 0\":{\"Names\":\"pick\",\"Parameters\":[\"ball4\",\"rooma\",\"left\"],\"Position\":0,"
-            + "\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\",\"(at ball4 rooma)\",\""
-            + "(free left)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\""
-            + ":{\"Negatives\":[\"(at ball4 rooma)\",\"(free left)\"],\"Positives\":[\"(carry ball4 left)\"]}}]},"
-            + "\"Size\":11,\"Action 5\":{\"Names\":\"move\",\"Parameters\":[\"roomb\",\"rooma\"],\"Position\":5,"
-            + "\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby roomb)\"]},\"Condition_Expressions\""
-            + ":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(at-robby roomb)\"],"
-            + "\"Positives\":[\"(at-robby rooma)\"]}}]},\"Type_de_plan\":1,\"Action 4\":{\"Names\":\"drop\","
-            + "\"Parameters\":[\"ball4\",\"roomb\",\"left\"],\"Position\":4,\"Preconditions\":{\"Negatives\":[],"
-            + "\"Positives\":[\"(at-robby roomb)\",\"(carry ball4 left)\"]},\"Condition_Expressions\":[{\"Condition\""
-            + ":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball4 left)\"],\"Positives\""
-            + ":[\"(free left)\",\"(at ball4 roomb)\"]}}]},\"Makespan\":11.0,\"Action 3\":{\"Names\":\"drop\","
-            + "\"Parameters\":[\"ball2\",\"roomb\",\"right\"],\"Position\":3,\"Preconditions\":{\"Negatives\":[],"
-            + "\"Positives\":[\"(at-robby roomb)\",\"(carry ball2 right)\"]},\"Condition_Expressions\":[{\"Condition\""
-            + ":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball2 right)\"],\"Positives\""
-            + ":[\"(free right)\",\"(at ball2 roomb)\"]}}]},\"Action 2\":{\"Names\":\"move\",\"Parameters\":[\"rooma\","
-            + "\"roomb\"],\"Position\":2,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\"]},"
-            + "\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\""
-            + ":[\"(at-robby rooma)\"],\"Positives\":[\"(at-robby roomb)\"]}}]},\"Action 10\":{\"Names\":\"drop\","
-            + "\"Parameters\":[\"ball3\",\"roomb\",\"left\"],\"Position\":10,\"Preconditions\":{\"Negatives\":[],"
-            + "\"Positives\":[\"(at-robby roomb)\",\"(carry ball3 left)\"]},\"Condition_Expressions\":[{\"Condition\""
-            + ":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball3 left)\"],\"Positives\""
-            + ":[\"(free left)\",\"(at ball3 roomb)\"]}}]},\"Action 9\":{\"Names\":\"drop\",\"Parameters\":[\"ball1\","
-            + "\"roomb\",\"right\"],\"Position\":9,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\""
-            + "(at-robby roomb)\",\"(carry ball1 right)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\""
-            + ":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball1 right)\"],\"Positives\":[\"(free right)"
-            + "\",\"(at ball1 roomb)\"]}}]},\"Cost\":11.0,\"Action 8\":{\"Names\":\"move\",\"Parameters\":[\"rooma\","
-            + "\"roomb\"],\"Position\":8,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\"]},"
-            + "\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\""
-            + ":[\"(at-robby rooma)\"],\"Positives\":[\"(at-robby roomb)\"]}}]},\"Action 7\":{\"Names\":\"pick\","
-            + "\"Parameters\":[\"ball3\",\"rooma\",\"left\"],\"Position\":7,\"Preconditions\":{\"Negatives\":[],"
-            + "\"Positives\":[\"(at-robby rooma)\",\"(free left)\",\"(at ball3 rooma)\"]},\"Condition_Expressions\""
-            + ":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(free left)\","
-            + "\"(at ball3 rooma)\"],\"Positives\":[\"(carry ball3 left)\"]}}]},\"Action 6\":{\"Names\":\"pick\","
-            + "\"Parameters\":[\"ball1\",\"rooma\",\"right\"],\"Position\":6,\"Preconditions\":{\"Negatives\":[],"
-            + "\"Positives\":[\"(at-robby rooma)\",\"(free right)\",\"(at ball1 rooma)\"]},\"Condition_Expressions\":"
-            + "[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(free right)\","
-            + "\"(at ball1 rooma)\"],\"Positives\":[\"(carry ball1 right)\"]}}]},\"timeSpecifiers\""
-            + ":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}";
+    private static String validGripperP01JSON = "{\"Action 1\":{\"Names\":\"pick\",\"Parameters\":[\"ball1\",\"rooma\""
+        + ",\"left\"],\"Position\":1,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\","
+        + "\"(free left)\",\"(at ball1 rooma)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],"
+        + "\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(free left)\",\"(at ball1 rooma)\"],\"Positives\":["
+        + "\"(carry ball1 left)\"]}}]},\"Action 0\":{\"Names\":\"pick\",\"Parameters\":[\"ball4\",\"rooma\","
+        + "\"right\"],\"Position\":0,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\","
+        + "\"(at ball4 rooma)\",\"(free right)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],"
+        + "\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(at ball4 rooma)\",\"(free right)\"],\"Positives\":["
+        + "\"(carry ball4 right)\"]}}]},\"Size\":11,\"Action 5\":{\"Names\":\"move\",\"Parameters\":[\"roomb\","
+        + "\"rooma\"],\"Position\":5,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby roomb)\"]},"
+        + "\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives"
+        + "\":[\"(at-robby roomb)\"],\"Positives\":[\"(at-robby rooma)\"]}}]},\"Type_de_plan\":1,\"Action 4\":{"
+        + "\"Names\":\"drop\",\"Parameters\":[\"ball4\",\"roomb\",\"right\"],\"Position\":4,\"Preconditions\":{"
+        + "\"Negatives\":[],\"Positives\":[\"(at-robby roomb)\",\"(carry ball4 right)\"]},\"Condition_Expressions"
+        + "\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball4 right)"
+        + "\"],\"Positives\":[\"(free right)\",\"(at ball4 roomb)\"]}}]},\"Makespan\":11.0,\"Action 3\":{\"Names\":"
+        + "\"drop\",\"Parameters\":[\"ball1\",\"roomb\",\"left\"],\"Position\":3,\"Preconditions\":{\"Negatives"
+        + "\":[],\"Positives\":[\"(at-robby roomb)\",\"(carry ball1 left)\"]},\"Condition_Expressions\":[{"
+        + "\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball1 left)"
+        + "\"],\"Positives\":[\"(free left)\",\"(at ball1 roomb)\"]}}]},\"Action 2\":{\"Names\":\"move\","
+        + "\"Parameters\":[\"rooma\",\"roomb\"],\"Position\":2,\"Preconditions\":{\"Negatives\":[],\"Positives"
+        + "\":[\"(at-robby rooma)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives"
+        + "\":[]},\"Effect\":{\"Negatives\":[\"(at-robby rooma)\"],\"Positives\":[\"(at-robby roomb)\"]}}]},"
+        + "\"Action 10\":{\"Names\":\"drop\",\"Parameters\":[\"ball3\",\"roomb\",\"right\"],\"Position\":10,"
+        + "\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby roomb)\",\"(carry ball3 right)\"]},"
+        + "\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives"
+        + "\":[\"(carry ball3 right)\"],\"Positives\":[\"(free right)\",\"(at ball3 roomb)\"]}}]},\"Action 9\":{"
+        + "\"Names\":\"drop\",\"Parameters\":[\"ball2\",\"roomb\",\"left\"],\"Position\":9,\"Preconditions\":{"
+        + "\"Negatives\":[],\"Positives\":[\"(at-robby roomb)\",\"(carry ball2 left)\"]},\"Condition_Expressions"
+        + "\":[{\"Condition\":{\"Negatives\":[],\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(carry ball2 left)"
+        + "\"],\"Positives\":[\"(free left)\",\"(at ball2 roomb)\"]}}]},\"Cost\":11.0,\"Action 8\":{\"Names\":"
+        + "\"move\",\"Parameters\":[\"rooma\",\"roomb\"],\"Position\":8,\"Preconditions\":{\"Negatives\":[],"
+        + "\"Positives\":[\"(at-robby rooma)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],"
+        + "\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(at-robby rooma)\"],\"Positives\":[\"(at-robby roomb)"
+        + "\"]}}]},\"Action 7\":{\"Names\":\"pick\",\"Parameters\":[\"ball2\",\"rooma\",\"left\"],\"Position"
+        + "\":7,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)\",\"(free left)\","
+        + "\"(at ball2 rooma)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],\"Positives"
+        + "\":[]},\"Effect\":{\"Negatives\":[\"(free left)\",\"(at ball2 rooma)\"],\"Positives\":["
+        + "\"(carry ball2 left)\"]}}]},\"Action 6\":{\"Names\":\"pick\",\"Parameters\":[\"ball3\",\"rooma"
+        + "\",\"right\"],\"Position\":6,\"Preconditions\":{\"Negatives\":[],\"Positives\":[\"(at-robby rooma)"
+        + "\",\"(free right)\",\"(at ball3 rooma)\"]},\"Condition_Expressions\":[{\"Condition\":{\"Negatives\":[],"
+        + "\"Positives\":[]},\"Effect\":{\"Negatives\":[\"(free right)\",\"(at ball3 rooma)\"],\"Positives\":["
+        + "\"(carry ball3 right)\"]}}]},\"timeSpecifiers\":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}";
 }

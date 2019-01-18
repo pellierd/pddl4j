@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.util;
 
+import java.util.Arrays;
+
 /**
  * This abstract class implements the common part of an operator what ever its representation,
  * i.e., integer or bit set.
@@ -287,6 +289,26 @@ public abstract class AbstractCodedOp implements CodedOp {
     }
 
     /**
+     * Returns the list of parameters of the operator.
+     *
+     * @return the list of parameters of the operator.
+     */
+    @Override
+    public int[] getParameters() {
+        return Arrays.copyOf(parameters, parameters.length);
+    }
+
+    /**
+     * Returns the values that represents the instantiated parameters of the operator.
+     *
+     * @return the values that represents the instantiated parameters of the operator.
+     */
+    @Override
+    public int[] getInstantiations() {
+        return Arrays.copyOf(instantiations, instantiations.length);
+    }
+
+    /**
      * Returns <code>true</code> if this operator is equal to an object. This
      * method returns <code>true</code> if the object is a not null instance
      * of the class <code>CodedOp</code> and both operator have the same name.
@@ -299,7 +321,8 @@ public abstract class AbstractCodedOp implements CodedOp {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof CodedOp) {
             final CodedOp other = (CodedOp) obj;
-            return this.getName().equals(other.getName());
+            return this.getName().equals(other.getName())
+                && Arrays.equals(this.getInstantiations(), ((CodedOp) obj).getInstantiations());
         }
         return false;
     }

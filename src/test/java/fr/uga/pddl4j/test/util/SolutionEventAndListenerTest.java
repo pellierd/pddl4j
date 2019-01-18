@@ -18,10 +18,12 @@ package fr.uga.pddl4j.test.util;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
+import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.DepthFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
@@ -100,6 +102,21 @@ public class SolutionEventAndListenerTest {
     private static final double DEPTH_SOLUTION_COST = 41.0;
 
     /**
+     * The cost of AStar Search Anytime solution.
+     */
+    private static final double ASTAR_ANYTIME_SOLUTION_COST = 11.0;
+
+    /**
+     * The cost of Greedy Best First Search Anytime solution.
+     */
+    private static final double GREEDY_ANYTIME_SOLUTION_COST = 11.0;
+
+    /**
+     * The cost of Hill Climbing Anytime solution.
+     */
+    private static final double HILL_ANYTIME_SOLUTION_COST = 13.0;
+
+    /**
      * The size of AStar solution.
      */
     private static final int ASTAR_SOLUTION_SIZE = 11;
@@ -128,6 +145,21 @@ public class SolutionEventAndListenerTest {
      * The size of Depth First Search solution.
      */
     private static final int DEPTH_SOLUTION_SIZE = 41;
+
+    /**
+     * The size of Astar Search Anytime solution.
+     */
+    private static final int ASTAR_ANYTIME_SOLUTION_SIZE = 11;
+
+    /**
+     * The size of Greedy Best First Search Anytime solution.
+     */
+    private static final int GREEDY_ANYTIME_SOLUTION_SIZE = 11;
+
+    /**
+     * The size of Hill Climbing Anytime solution.
+     */
+    private static final int HILL_ANYTIME_SOLUTION_SIZE = 13;
 
     /**
      * The fired SolutionEvent.
@@ -275,6 +307,81 @@ public class SolutionEventAndListenerTest {
         Assert.assertTrue(solutionNode.getCost() == HILL_SOLUTION_COST);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
             codedProblem).size() == HILL_SOLUTION_SIZE);
+
+        Assert.assertTrue(Math.abs(firedSolutionEvent.getSolutionNode().getCost() - solutionNode.getCost()) < 0.00001);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),
+            codedProblem).size() == stateSpaceStrategy.extractPlan(solutionNode, codedProblem).size());
+
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),
+            codedProblem).equals(stateSpaceStrategy.extractPlan(solutionNode, codedProblem)));
+    }
+
+    /**
+     * Method that tests solution event (cost and size) for Astar Anytime search strategy.
+     */
+    @Test
+    public void testAstarAnyFireSolutionEvent() {
+        System.out.println("SolutionEventAndListener: Test fire solution node from Astar Anytime.");
+
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+        stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
+
+        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
+
+        Assert.assertTrue(solutionNode.getCost() == ASTAR_ANYTIME_SOLUTION_COST);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
+            codedProblem).size() == ASTAR_ANYTIME_SOLUTION_SIZE);
+
+        Assert.assertTrue(Math.abs(firedSolutionEvent.getSolutionNode().getCost() - solutionNode.getCost()) < 0.00001);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),
+            codedProblem).size() == stateSpaceStrategy.extractPlan(solutionNode, codedProblem).size());
+
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),
+            codedProblem).equals(stateSpaceStrategy.extractPlan(solutionNode, codedProblem)));
+    }
+
+    /**
+     * Method that tests solution event (cost and size) for GBFS Anytime search strategy.
+     */
+    @Test
+    public void testGbfsAnytimeFireSolutionEvent() {
+        System.out.println("SolutionEventAndListener: Test fire solution node from GBFS Anytime.");
+
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+        stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
+
+        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
+
+        Assert.assertTrue(solutionNode.getCost() == GREEDY_ANYTIME_SOLUTION_COST);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
+            codedProblem).size() == GREEDY_ANYTIME_SOLUTION_SIZE);
+
+        Assert.assertTrue(Math.abs(firedSolutionEvent.getSolutionNode().getCost() - solutionNode.getCost()) < 0.00001);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),
+            codedProblem).size() == stateSpaceStrategy.extractPlan(solutionNode, codedProblem).size());
+
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),
+            codedProblem).equals(stateSpaceStrategy.extractPlan(solutionNode, codedProblem)));
+    }
+
+    /**
+     * Method that tests solution event (cost and size) for HC search strategy.
+     */
+    @Test
+    public void testHCAnytimeFireSolutionEvent() {
+        System.out.println("SolutionEventAndListener: Test fire solution node from HC Anytime.");
+
+        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+        stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
+
+        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
+
+        Assert.assertTrue(solutionNode.getCost() == HILL_ANYTIME_SOLUTION_COST);
+        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
+            codedProblem).size() == HILL_ANYTIME_SOLUTION_SIZE);
 
         Assert.assertTrue(Math.abs(firedSolutionEvent.getSolutionNode().getCost() - solutionNode.getCost()) < 0.00001);
         Assert.assertTrue(stateSpaceStrategy.extractPlan(firedSolutionEvent.getSolutionNode(),

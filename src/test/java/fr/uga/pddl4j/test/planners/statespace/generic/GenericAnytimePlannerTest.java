@@ -19,14 +19,11 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.statespace.generic.GenericPlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
-import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.DepthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.generic.GenericAnytimePlanner;
+import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
+import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategyAnytime;
+import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
+import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbingAnytime;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
@@ -39,7 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * Implements the <tt>GenericPlannerTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
+ * Implements the <tt>GenericAnytimePlannerTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
  * <p>This class will test the planner on benchmark domain and problem from International planning contest.
  * The goal here is to test the PDDL4J 3.0 plan using all the file used in the competition and
@@ -51,7 +48,7 @@ import java.nio.file.Paths;
  * @author Emmanuel Hermellin
  * @version 0.1 - 22.11.18
  */
-public class GenericPlannerTest {
+public class GenericAnytimePlannerTest {
 
     /**
      * Computation timeout.
@@ -81,17 +78,18 @@ public class GenericPlannerTest {
     /**
      * The FF planner reference.
      */
-    private GenericPlanner planner = null;
+    private GenericAnytimePlanner planner = null;
 
     /**
-     * Method that executes benchmarks using files on the Generic planner with Astar search to test its output plan.
+     * Method that executes benchmarks using files on the Generic Anytime planner with Astar Anytime search
+     * to test its output plan.
      * IPC1 gripper tests
      */
     @Test
-    public void testGenericPlanner_Astar_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new AStar(TIMEOUT * 1000,
+    public void testGenericPlanner_AstarAnytime_gripper() {
+        final AbstractStateSpaceStrategyAnytime stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericAnytimePlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -102,63 +100,20 @@ public class GenericPlannerTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath, "Astar");
+        generateValOutputPlans(localTestPath, "Astar Anytime");
         Tools.validatePlans(localTestPath);
     }
 
     /**
-     * Method that executes benchmarks using files on the Generic planner with BFS search to test its output plan.
+     * Method that executes benchmarks using files on the Generic Anytime planner with GBFS Anytime search
+     * to test its output plan.
      * IPC1 gripper tests
      */
     @Test
-    public void testGenericPlanner_BFS_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
-        Tools.changeVALPerm();
-        final String localTestPath = Tools.BENCH_DIR + "ipc1"
-            + File.separator + "gripper"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath, "BFS");
-        Tools.validatePlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the Generic planner with DFS search to test its output plan.
-     * IPC1 gripper tests
-     */
-    @Test
-    public void testGenericPlanner_DFS_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
-        Tools.changeVALPerm();
-        final String localTestPath = Tools.BENCH_DIR + "ipc1"
-            + File.separator + "gripper"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath, "DFS");
-        Tools.validatePlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the Generic planner with EHC search to test its output plan.
-     * IPC1 gripper tests
-     */
-    @Test
-    public void testGenericPlanner_EHC_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000,
+    public void testGenericPlanner_GbfsAnytime_gripper() {
+        final AbstractStateSpaceStrategyAnytime stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericAnytimePlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -169,19 +124,20 @@ public class GenericPlannerTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath, "EHC");
+        generateValOutputPlans(localTestPath, "GBFS Anytime");
         Tools.validatePlans(localTestPath);
     }
 
     /**
-     * Method that executes benchmarks using files on the Generic planner with GBFS search to test its output plan.
+     * Method that executes benchmarks using files on the Generic Anytime planner with HC Anytime search
+     * to test its output plan.
      * IPC1 gripper tests
      */
     @Test
-    public void testGenericPlanner_GBFS_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000,
+    public void testGenericPlanner_HCAnytime_gripper() {
+        final AbstractStateSpaceStrategyAnytime stateSpaceStrategy = new HillClimbingAnytime(TIMEOUT * 1000,
             HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericAnytimePlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -192,30 +148,7 @@ public class GenericPlannerTest {
             return;
         }
 
-        generateValOutputPlans(localTestPath, "GBFS");
-        Tools.validatePlans(localTestPath);
-    }
-
-    /**
-     * Method that executes benchmarks using files on the Generic planner with HC search to test its output plan.
-     * IPC1 gripper tests
-     */
-    @Test
-    public void testGenericPlanner_HC_gripper() {
-        final StateSpaceStrategy stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000,
-            HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
-        Tools.changeVALPerm();
-        final String localTestPath = Tools.BENCH_DIR + "ipc1"
-            + File.separator + "gripper"
-            + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing Benchmark [directory: " + localTestPath + "] test skipped !");
-            return;
-        }
-
-        generateValOutputPlans(localTestPath, "HC");
+        generateValOutputPlans(localTestPath, "HC Anytime");
         Tools.validatePlans(localTestPath);
     }
 
