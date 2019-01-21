@@ -21,7 +21,7 @@ public class Method implements Serializable {
     /**
      * The tasks of the method.
      */
-    private List<Task> tasks;
+    private Exp tasks;
     /**
      * The constraints of the method.
      */
@@ -50,8 +50,7 @@ public class Method implements Serializable {
         this.name = new Symbol(other.getName());
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
-        this.tasks = new LinkedList<>();
-        this.tasks.addAll(other.getTasks());
+        this.tasks = new Exp(other.getTasks());
         this.constraints = new Exp(other.getConstraints());
     }
 
@@ -63,7 +62,7 @@ public class Method implements Serializable {
      * @param tasks
      * @throws NullPointerException if the specified name is null.
      */
-    public Method(final Symbol name, final List<TypedSymbol> parameters, List<Task> tasks, Exp constraints) {
+    public Method(final Symbol name, final List<TypedSymbol> parameters, Exp tasks, Exp constraints) {
         this();
         if (name == null || parameters == null || tasks == null) {
             throw new NullPointerException();
@@ -132,14 +131,14 @@ public class Method implements Serializable {
     /**
      * @return the method tasks.
      */
-    public List<Task> getTasks() {
+    public Exp getTasks() {
         return tasks;
     }
 
     /**
      * @param tasks The tasks of the method.
      */
-    public void setTasks(List<Task> tasks) {
+    public void setTasks(Exp tasks) {
         this.tasks = tasks;
     }
 

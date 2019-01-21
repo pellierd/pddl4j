@@ -25,9 +25,10 @@
          :parameters (?x - block ?y - block)
          :expansion ((pick-up ?x - block)@t1 (put-down ?x)@t2)
          :constraints (and
-                        (before (t1 t3) t4)
+                        (before (t1 t5) t6)
                         (before (t2 t3) (t5))
                         (hold-before t1 ())
+                        (hold-before t1 (t4 t5 t7))
                         (hold-after (t2) (and (not (ontable ?x))
                                          		   (not (clear ?x))
                                          		   (not (handempty))

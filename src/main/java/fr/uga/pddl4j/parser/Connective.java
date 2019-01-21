@@ -236,13 +236,17 @@ public enum Connective {
      */
     HOLD_BETWEEN("hold-between"),
     /**
-     * Connective for alias expressions.
-     */
-    ALIAS(""),
-    /**
      * Connective for alias set expression.
      */
-    ALIAS_SET("");
+    ALIAS_SET(""),
+    /**
+     * Connective for task expression.
+     */
+    TASK(""),
+    /**
+     * Connective for expansions (task sets).
+     */
+    EXPANSION("");
 
     /**
      * The image associate to the connective in the PDDL language.

@@ -36,7 +36,6 @@ import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.Op;
 import fr.uga.pddl4j.parser.Method;
-import fr.uga.pddl4j.parser.Task;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
@@ -1851,7 +1850,7 @@ Method method_def() :
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
-	List<Task> tasks = null;
+	Exp tasks = null;
 	Exp constraints = null;
 }
 {
@@ -1890,33 +1889,36 @@ Symbol task_name() :
  	}
  }
 
-Task task_def() :
+Exp task_def() :
 {
     Symbol name = null;
     Symbol alias = null;
     List<TypedSymbol> parameters = null;
+    List<Symbol> atom = new ArrayList<Symbol>();
+    Exp node = new Exp(Connective.TASK);
 }
 {
     left_bracket()
-    name = task_name()
-    parameters = typed_list(Lexer.VARIABLE)
+    name = task_name() {atom.add(name);}
+    parameters = typed_list(Lexer.VARIABLE) {node.setVariables(parameters);}
     right_bracket()
     <ALIAS>
-    alias = alias_name()
+    alias = alias_name() {atom.add(alias);}
     {
-        return new Task(name, alias, parameters);
+        node.setAtom(atom);
+        return node;
     }
 }
 
-List<Task> task_list() :
+Exp task_list() :
 {
-    List<Task> tasks = new ArrayList<Task>();
-    Task t;
+    Exp tasks = new Exp(Connective.EXPANSION);
+    Exp t = null;
 }
 {
     try {
     		(
-    		t = task_def() {tasks.add(t);}
+    		t = task_def() {tasks.addChild(t);}
     		)+
     	} catch(Throwable e) {
     		this.error(e, token.beginLine, token.beginColumn);
@@ -1934,9 +1936,7 @@ Exp htn_constraints() :
 {
     try {
         		<AND>
-        		(
-        		child = htn_constr() {constraints.addChild(child);}
-        		)*
+        		(child = htn_constr() /*{constraints.addChild(child);}*/)*
         	} catch(Throwable e) {
         		this.error(e, token.beginLine, token.beginColumn);
         	}
@@ -1955,19 +1955,18 @@ Exp htn_constr() :
 	|	LOOKAHEAD(2) node=htn_hold_after()
 	|	LOOKAHEAD(2) node=htn_hold_between()
 	|	LOOKAHEAD(2) node=htn_hold_during()
-	|	LOOKAHEAD(3) node=htn_at_start()
-	|	LOOKAHEAD(3) node=htn_at_end()
-	|	LOOKAHEAD(2) node=always_con_gd()
+    |	LOOKAHEAD(3) node=htn_at_start()
+    |	LOOKAHEAD(3) node=htn_at_end()
+    |	LOOKAHEAD(2) node=always_con_gd()
     |	LOOKAHEAD(2) node=sometime_con_gd()
     |	LOOKAHEAD(2) node=at_most_once_con_gd()
     |	LOOKAHEAD(2) node=sometime_after_con_gd()
     |	LOOKAHEAD(2) node=sometime_before_con_gd()
     |	LOOKAHEAD(2) node=htn_within()
-    |	LOOKAHEAD(2) node=htn_always_within()
-	)
+    |	LOOKAHEAD(2) node=htn_always_within())
 	{
-		return node;
-	}
+	    return node;
+    }
 }
 
 Exp htn_before() :
@@ -2176,24 +2175,19 @@ Symbol alias_name() :
 Exp alias_set() :
 {
     Exp node = new Exp(Connective.ALIAS_SET);
-    Exp sibling = new Exp(Connective.ALIAS);
+    List<Symbol> atom = new ArrayList<Symbol>();
     Symbol t;
 }
 {
     (
-        (t = alias_name() {
-            sibling.setAlias(t);
-            node.addChild(sibling);
-            })
+        (t = alias_name() {atom.add(t);})
         |
         left_bracket()
-        (t = alias_name() {
-            sibling.setAlias(t);
-            node.addChild(sibling);
-            })+
+        (t = alias_name() {atom.add(t);})+
         right_bracket()
     )
     {
+        node.setAtom(atom);
         return node;
     }
 }
@@ -3531,6 +3525,7 @@ Exp timed_literal() :
 		return node;
 	}
 }
+
 
 void goal() :
 {
