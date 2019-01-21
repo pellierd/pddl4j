@@ -1936,7 +1936,7 @@ Exp htn_constraints() :
 {
     try {
         		<AND>
-        		(child = htn_constr() /*{constraints.addChild(child);}*/)*
+        		(child = htn_constr() {constraints.addChild(child);})*
         	} catch(Throwable e) {
         		this.error(e, token.beginLine, token.beginColumn);
         	}
