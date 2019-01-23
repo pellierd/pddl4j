@@ -59,7 +59,7 @@ public class Method implements Serializable {
      *
      * @param name          The name of the method.
      * @param parameters    The list of the method parameters.
-     * @param tasks
+     * @param tasks         The expansion (list of tasks) of the method.
      * @throws NullPointerException if the specified name is null.
      */
     public Method(final Symbol name, final List<TypedSymbol> parameters, Exp tasks, Exp constraints) {
@@ -129,6 +129,8 @@ public class Method implements Serializable {
     }
 
     /**
+     * Returns the expansion of the method.
+     *
      * @return the method tasks.
      */
     public Exp getTasks() {
@@ -136,6 +138,8 @@ public class Method implements Serializable {
     }
 
     /**
+     * Sets the expansion of the method.
+     *
      * @param tasks The tasks of the method.
      */
     public void setTasks(Exp tasks) {
@@ -175,6 +179,8 @@ public class Method implements Serializable {
     }
 
     /**
+     * Returns the constraints of the method.
+     *
      * @return the method constraints.
      */
     public Exp getConstraints() {
@@ -182,6 +188,8 @@ public class Method implements Serializable {
     }
 
     /**
+     * Sets the constraints of the method.
+     *
      * @param constraints The method constraints
      */
     public void setConstraints(Exp constraints) {
