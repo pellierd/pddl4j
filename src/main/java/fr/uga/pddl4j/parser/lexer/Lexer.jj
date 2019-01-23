@@ -54,8 +54,8 @@ public class Lexer {
 	private static final int CONSTANT = 2;
 	private static final int TERM = 3;
 	private static final int ATOMIC_FUNCTION_SKELETON = 4;
+	private static final int PARSER_PROBLEM = 5;
 	private static final int PARSER_DOMAIN = 5;
-	private static final int PARSER_PROBLEM = 6;
 
 	private Domain domain = null;
 	public Domain getDomain() { return this.domain; }
@@ -391,7 +391,7 @@ void domain() :
 			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
 			|| this.isRequirement(RequireKey.ACTION_COSTS)
 		}) functions_def()]
-		[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+		[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) constraints(Lexer.PARSER_DOMAIN)]
 		(structure_def())*
 		right_bracket()
 		<EOF>
@@ -1935,17 +1935,17 @@ Exp htn_constraints() :
 }
 {
     try {
-            <AND>
-            (child = task_const() {constraints.addChild(child);})*
-        } catch(Throwable e) {
-            this.error(e, token.beginLine, token.beginColumn);
+        		<AND>
+        		(child = htn_constr() {constraints.addChild(child);})*
+        	} catch(Throwable e) {
+        		this.error(e, token.beginLine, token.beginColumn);
+        	}
+        {
+            return constraints;
         }
-    {
-        return constraints;
-    }
 }
 
-Exp task_const() :
+Exp htn_constr() :
 {
 	Exp node = null;
 }
@@ -3392,6 +3392,7 @@ Exp da_divide_op() :
 
 void problem() :
 {
+	Exp node = null;
 	Symbol name = null;
 }
 {
@@ -3405,13 +3406,12 @@ void problem() :
 		left_bracket() <P_DOMAIN>
 			domain_problem_name()
 		right_bracket()
-		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) require_def(Lexer.PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
 		init()
 		goal()
 
-		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
-		[LOOKAHEAD(2, {this.isRequirement(RequireKey.HTN)}) htn_const()]
+		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) constraints(Lexer.PROBLEM)]
 		[LOOKAHEAD(2) metric_spec()]
 		// [length-spec()] not implemented
 		right_bracket()
@@ -3529,33 +3529,6 @@ Exp timed_literal() :
 
 void goal() :
 {
-
-}
-{
-    left_bracket() <GOAL>
-    (LOOKAHEAD(2) pddl_goal()
-    | LOOKAHEAD(2, {this.isRequirement(RequireKey.HTN)}) htn_goal())
-    right_bracket()
-}
-
-void htn_goal() :
-{
-	Exp node = null;
-}
-{
-	try {
-		left_bracket()
-		node=task_list() {
-			this.problem.setGoal(node);
-	   	}
-	   	right_bracket()
-	} catch(Throwable e) {
-		this.error(e, token.beginLine, token.beginColumn);
-	}
-}
-
-void pddl_goal() :
-{
 	Exp node = null;
 	Boolean goal_utilities = false;
 	if (this.isRequirement(RequireKey.GOAL_UTILITIES)
@@ -3567,7 +3540,9 @@ void pddl_goal() :
 }
 {
 	try {
-		node=pre_gd() {
+		left_bracket() <GOAL>
+		node=pre_gd()
+		right_bracket() {
 			this.problem.setGoal(node);
 			if (goal_utilities) {
 				this.getRequirements().remove(RequireKey.PREFERENCES);
@@ -3576,9 +3551,10 @@ void pddl_goal() :
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
+
 }
 
-void pddl_const(int type) :
+void constraints(int type) :
 {
 	Exp conGD = null;
 }
@@ -3592,22 +3568,6 @@ void pddl_const(int type) :
 			} else {
 				this.problem.setConstraints(conGD);
 			}
-		}
-	} catch(Throwable e) {
-		this.error(e, token.beginLine, token.beginColumn);
-	}
-}
-
-void htn_const() :
-{
-	Exp constraints = null;
-}
-{
-	try {
-		left_bracket() <CONSTRAINTS> left_bracket()
-			constraints=htn_constraints()
-		right_bracket() {
-			this.problem.setConstraints(constraints);
 		}
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
