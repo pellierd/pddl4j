@@ -1,6 +1,6 @@
 ## PDDL4J library
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45971.svg)](http://dx.doi.org/10.5281/zenodo.45971)
-[![Build Status](http://pddl4j.fr/jenkins/job/PDDL4J%20devel/badge/icon)](http://pddl4j.fr/jenkins/job/PDDL4J%20devel/)
+[![Build Status](http://pddl4j.fr/jenkins/buildStatus/icon?job=PDDL4J devel)](http://pddl4j.fr/jenkins/job/PDDL4J%20devel/)
 
 ### 1. Contact
 
@@ -44,6 +44,20 @@ simply operators into ground actions based on inertia properties.
 
 The pddl4j library is package with "gradle". If ant is not installed on your computer,
 go to https://gradle.org/ and install it.
+
+#### Dependency
+
+Java JDK 8 must be installed on the computer that will run PDDL4J:
+
+**On Windows**
+
+Go to Oracle website and download the JDk corresponding to your computer architecture (x64 or x86): [Java](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+
+After the installation, you have to add java to your Windows *PATH*.
+
+**On Linux (Debian / Ubuntu)**
+
+    sudo apt-get install openjdk-8-jdk
 
 #### 3.1 How to build PDDL4J?
 

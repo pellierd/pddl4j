@@ -1426,6 +1426,7 @@ Exp atomic_formula(int type) :
 	}
 }
 
+//TODO Gérer les term comme des Exp et propager les changement partout
 Symbol term() :
 {
 	Symbol t = null;
@@ -1433,11 +1434,13 @@ Symbol term() :
 {
 	(	t=constant()
 	|	t=variable()
+	/*|   LOOKAHEAD({ this.isRequirement(RequireKey.OBJECT_FLUENTS)}) t=function_term()*/
 	) {
 		return t;
 	}
 }
 
+//TODO Connective.TERM, créer une expression avec : EXP: TERM
 /*Exp function_term() :
 {
 	Exp node = new Exp(Connective.F_EXP);
@@ -1448,11 +1451,11 @@ Symbol term() :
 	<LEFT_BRACKET> t=functor() {
 		function.add(t);
 	}
-	(t=constant() | t=variable()) {
+	(t=constant() | t=variable() {
 			function.add(t);
 	})*
 	right_bracket() {
-		node.setAtom()
+		node.setAtom();
 		return node;
 	}
 }*/
