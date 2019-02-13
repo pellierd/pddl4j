@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
@@ -5,7 +24,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class implements a method for htn planning operator parsed.
+ *
+ * @author H. Fiorino
+ * @version 1.0 - 13.02.2019
+ */
 public class Method implements Serializable {
+
     /**
      * The serial id of the class.
      */
@@ -155,6 +181,23 @@ public class Method implements Serializable {
     @Override
     public int hashCode() {
         return this.name.hashCode();
+    }
+
+    /**
+     * Return if this method is equals to another object.
+     *
+     * @param object the other object.
+     * @return <code>true</code> if <code>object</code> is not <code>null</code>, is an instance of
+     *          the class <code>Op</code>, and has the same name; otherwise it returns <code>false</code>.
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object != null && object instanceof Method) {
+            final Method other = (Method) object;
+            return this.name.equals(other.name);
+        }
+        return false;
     }
 
     /**
