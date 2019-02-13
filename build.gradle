@@ -32,8 +32,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
+
 compileJavacc {
-    arguments = [debug_parser: 'true']
+    arguments = [debug_parser: 'false']
     inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
     outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
 }

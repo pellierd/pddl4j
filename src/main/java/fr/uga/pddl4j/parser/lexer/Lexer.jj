@@ -1894,14 +1894,14 @@ Exp task_def() :
 {
     Symbol name = null;
     Symbol alias = null;
-    List<TypedSymbol> parameters = null;
+    List<Symbol> parameters = null;
     List<Symbol> atom = new ArrayList<Symbol>();
     Exp node = new Exp(Connective.TASK);
 }
 {
     left_bracket()
     name = task_name() {atom.add(name);}
-    parameters = typed_list(Lexer.VARIABLE) {node.setVariables(parameters);}
+    parameters = task_parameters() {atom.addAll(parameters);}
     right_bracket()
     <ALIAS>
     alias = alias_name() {atom.add(alias);}
@@ -1909,6 +1909,20 @@ Exp task_def() :
         node.setAtom(atom);
         return node;
     }
+}
+
+List<Symbol> task_parameters() :
+{
+	List<Symbol> atom = new ArrayList<Symbol>();
+	Symbol t = null;
+}
+{
+	(t=term() {
+			atom.add(t);
+		})*
+	{
+		return atom;
+	}
 }
 
 Exp task_list() :

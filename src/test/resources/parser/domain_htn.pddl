@@ -5,6 +5,7 @@
 (define (domain BLOCKS)
   (:requirements :htn :typing)
   (:types block)
+  (:constants BLOCKA BLOCKB - block)
   (:predicates (on ?x - block ?y - block)
 	       (ontable ?x - block)
 	       (clear ?x - block)
@@ -23,7 +24,7 @@
 
   (:method test
          :parameters (?x - block ?y - block)
-         :expansion ((pick-up ?x - block)@t1 (put-down ?x)@t2)
+         :expansion ((pick-up ?x BLOCKA ?y)@t1 (put-down ?x)@t2)
          :constraints (and
                         (before (t1 t5) t6)
                         (before (t2 t3) (t5))
