@@ -115,7 +115,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                             // Apply the effect to the successor node
                             state.apply(ce.getEffects())
                         );
-                        final double g = current.getCost() + 1;
+                        final double g = current.getCost() + op.getCost();
                         Node result = openSet.get(state);
                         if (result == null) {
                             result = closeSet.get(state);
