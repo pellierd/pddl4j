@@ -62,6 +62,18 @@ public class Symbol implements Serializable {
          */
         ACTION,
         /**
+         * The method symbol.
+         */
+        METHOD,
+        /**
+         * The task symbol.
+         */
+        TASK,
+        /**
+         * The alias symbol.
+         */
+        ALIAS,
+        /**
          * The preference symbol.
          */
         PREFERENCE,
@@ -92,7 +104,7 @@ public class Symbol implements Serializable {
         /**
          * The problem symbol.
          */
-        PROBLEM,
+        PROBLEM
     }
 
     /**

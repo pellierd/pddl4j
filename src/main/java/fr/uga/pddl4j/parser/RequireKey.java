@@ -113,7 +113,12 @@ public enum RequireKey {
     /**
      * The PDDL :duration-inequalities requirement.
      */
-    DURATION_INEQUALITIES(":duration-inequalities");
+    DURATION_INEQUALITIES(":duration-inequalities"),
+    /**
+     * The PDDL :htn requirement.
+     */
+    HTN(":htn");
+
 
     /**
      * The image associate to the require key in the PDDL language.
