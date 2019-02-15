@@ -111,7 +111,8 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
                     returnedSolution.getCost(), returnedSolution.getDepth(), returnedSolution.getHeuristic()));
                 bound = returnedSolution.getCost();
                 solution = returnedSolution;
-                logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: " + bound + "\n");
+                fireSolution(new SolutionEvent(this, solution, problem));
+                logger.trace("* " + this.getSolutionNodes().size() + " solution(s) found. Best cost: " + bound + "\n");
             }
         }
 

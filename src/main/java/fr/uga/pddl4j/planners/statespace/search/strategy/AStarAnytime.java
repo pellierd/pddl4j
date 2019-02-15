@@ -162,12 +162,10 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
                 fireSolution(new SolutionEvent(this, solution, problem));
 
                 final Plan p = extractPlan(solution, problem);
-                nodeComparator.setWeight((p.cost() / boundCost) * this.getWeight());
-                this.setWeight((p.cost() / boundCost) * this.getWeight());
 
                 boundCost = p.cost();
                 boundDepth = p.size();
-                logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: "
+                logger.trace("* " + this.getSolutionNodes().size() + " solution(s) found. Best cost: "
                     + boundCost + "\n");
             } else {
                 // Try to apply the operators of the problem to this node

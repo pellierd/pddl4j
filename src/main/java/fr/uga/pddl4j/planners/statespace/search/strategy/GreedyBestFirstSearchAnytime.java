@@ -27,12 +27,9 @@ import fr.uga.pddl4j.util.SolutionEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
@@ -156,7 +153,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
                 boundCost = p.cost();
                 boundDepth = p.size();
 
-                logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: "
+                logger.trace("* " + this.getSolutionNodes().size() + " solution(s) found. Best cost: "
                     + boundCost + "\n");
             } else {
                 closeSet.add(current);
