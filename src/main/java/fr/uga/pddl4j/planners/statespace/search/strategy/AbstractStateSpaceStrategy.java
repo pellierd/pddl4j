@@ -25,7 +25,6 @@ import fr.uga.pddl4j.util.SolutionEvent;
 import fr.uga.pddl4j.util.SolutionListener;
 
 import java.util.Objects;
-import javax.swing.event.EventListenerList;
 
 /**
  * This abstract class defines the main methods for search strategies.
@@ -40,11 +39,6 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * The serial id of the class.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * The list of SolutionListener.
-     */
-    private EventListenerList solutionListenerList = new EventListenerList();
 
     /**
      * The heuristic of the planner.
@@ -359,9 +353,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param listener the SolutionListener to add.
      */
     @Override
-    public void addSolutionListener(SolutionListener listener) {
-        solutionListenerList.add(SolutionListener.class, listener);
-    }
+    public abstract void addSolutionListener(SolutionListener listener);
 
     /**
      * Removes SolutionListener to the list of SolutionListener.
@@ -369,9 +361,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param listener the SolutionListener to remove.
      */
     @Override
-    public void removeSolutionListener(SolutionListener listener) {
-        solutionListenerList.remove(SolutionListener.class, listener);
-    }
+    public abstract void removeSolutionListener(SolutionListener listener);
 
     /**
      * Processes SolutionEvent when one is fired.
@@ -379,12 +369,5 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param evt the solution event to process.
      */
     @Override
-    public void fireSolution(SolutionEvent evt) {
-        Object[] listeners = solutionListenerList.getListenerList();
-        for (int i = 0; i < listeners.length; i = i + 2) {
-            if (listeners[i] == SolutionListener.class) {
-                ((SolutionListener) listeners[i + 1]).newSolutionFound(evt);
-            }
-        }
-    }
+    public abstract void fireSolution(SolutionEvent evt);
 }

@@ -20,9 +20,11 @@ import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.util.SolutionListener;
 
 import java.util.LinkedList;
 import java.util.Objects;
+import javax.swing.event.EventListenerList;
 
 /**
  * This class implements Breadth First Search strategy.
@@ -36,6 +38,11 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
      * The serial id of the class.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The list of SolutionListener.
+     */
+    private EventListenerList solutionListenerList = new EventListenerList();
 
     /**
      * Creates a new Greedy best First Search search strategy with default parameters.
@@ -121,5 +128,40 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
         this.setSearchingTime(searchingTime);
 
         return solution;
+    }
+
+    /**
+     * Adds SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to add.
+     */
+    @Override
+    public void addSolutionListener(SolutionListener listener) {
+        solutionListenerList.add(SolutionListener.class, listener);
+    }
+
+    /**
+     * Removes SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to remove.
+     */
+    @Override
+    public void removeSolutionListener(SolutionListener listener) {
+        solutionListenerList.remove(SolutionListener.class, listener);
+    }
+
+    /**
+     * Processes SolutionEvent when one is fired.
+     *
+     * @param evt the solution event to process.
+     */
+    @Override
+    public void fireSolution(SolutionEvent evt) {
+        Object[] listeners = solutionListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == SolutionListener.class) {
+                ((SolutionListener) listeners[i + 1]).newSolutionFound(evt);
+            }
+        }
     }
 }
