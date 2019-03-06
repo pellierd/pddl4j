@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -155,14 +156,9 @@ public abstract class Tools {
      */
     public static void changeVALPerm() {
         final File val = new File(Tools.VAL);
-        Set<PosixFilePermission> perms = new HashSet<>();
-        perms.add(PosixFilePermission.OWNER_READ);
-        perms.add(PosixFilePermission.OWNER_WRITE);
-        perms.add(PosixFilePermission.OWNER_EXECUTE);
-        try {
-            Files.setPosixFilePermissions(val.toPath(), perms);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        if (val.exists() && (isUnix() || isMac())) {
+            val.setReadable(true);
+            val.setExecutable(true);
         }
     }
 
@@ -221,8 +217,15 @@ public abstract class Tools {
 
                 for (File valfile : files) {
                     final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
+                    String target;
+                    if (isWindows()) {
+                        target = Tools.VAL + ".exe " + domain + " " + problem + " " + valfile;
+                    } else {
+                        target = Tools.VAL + " " + domain + " " + problem + " " + valfile;
+                    }
+
                     final Runtime rt = Runtime.getRuntime();
-                    final Process proc = rt.exec(Tools.VAL + " " + domain + " " + problem + " " + valfile);
+                    final Process proc = rt.exec(target);
                     proc.waitFor();
 
                     String line;
@@ -254,5 +257,32 @@ public abstract class Tools {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+    }
+
+    /**
+     * Check if the OS is Windows.
+     *
+     * @return true if the OS is Windows, false otherwise.
+     */
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase(new Locale("en", "EN")).contains("win");
+    }
+
+    /**
+     * Check if the OS is Mac.
+     *
+     * @return true if the OS is Mac, false otherwise.
+     */
+    private static boolean isMac() {
+        return System.getProperty("os.name").toLowerCase(new Locale("en", "EN")).contains("mac");
+    }
+
+    /**
+     * Check if the OS is Linux.
+     *
+     * @return true if the OS is Linux, false otherwise.
+     */
+    private static boolean isUnix() {
+        return System.getProperty("os.name").toLowerCase(new Locale("en", "EN")).contains("nux");
     }
 }

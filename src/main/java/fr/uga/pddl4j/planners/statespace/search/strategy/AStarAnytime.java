@@ -24,12 +24,15 @@ import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.util.SolutionListener;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.Vector;
+import javax.swing.event.EventListenerList;
 
 /**
  * This class implements A* Anytime Search strategy.
@@ -43,6 +46,16 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
      * The serial id of the class.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The list of SolutionListener.
+     */
+    private EventListenerList solutionListenerList = new EventListenerList();
+
+    /**
+     * The list containing all the solutions found during anytime process.
+     */
+    private Vector<Node> solutionNodes;
 
     /**
      * The bound cost for strategy search.
@@ -77,6 +90,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
      */
     public AStarAnytime() {
         super();
+        this.solutionNodes = new Vector<>();
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
     }
@@ -90,6 +104,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
      */
     public AStarAnytime(int timeout, Heuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
+        this.solutionNodes = new Vector<>();
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
     }
@@ -106,6 +121,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
     public AStarAnytime(int timeout, Heuristic.Type heuristic, double weight,
                         double boundCost, double boundDepth) {
         super(timeout, heuristic, weight);
+        this.solutionNodes = new Vector<>();
         this.boundCost = boundCost;
         this.boundDepth = boundDepth;
     }
@@ -162,12 +178,10 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
                 fireSolution(new SolutionEvent(this, solution, problem));
 
                 final Plan p = extractPlan(solution, problem);
-                nodeComparator.setWeight((p.cost() / boundCost) * this.getWeight());
-                this.setWeight((p.cost() / boundCost) * this.getWeight());
 
                 boundCost = p.cost();
                 boundDepth = p.size();
-                logger.trace("* " + this.getSolutionNodes().size() + " solutions found. Best cost: "
+                logger.trace("* " + this.getSolutionNodes().size() + " solution(s) found. Best cost: "
                     + boundCost + "\n");
             } else {
                 // Try to apply the operators of the problem to this node
@@ -244,5 +258,75 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
     private void clearBounds() {
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
+    }
+
+    /**
+     * Adds SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to add.
+     */
+    @Override
+    public void addSolutionListener(SolutionListener listener) {
+        solutionListenerList.add(SolutionListener.class, listener);
+    }
+
+    /**
+     * Removes SolutionListener to the list of SolutionListener.
+     *
+     * @param listener the SolutionListener to remove.
+     */
+    @Override
+    public void removeSolutionListener(SolutionListener listener) {
+        solutionListenerList.remove(SolutionListener.class, listener);
+    }
+
+    /**
+     * Processes SolutionEvent when one is fired.
+     *
+     * @param evt the solution event to process.
+     */
+    @Override
+    public void fireSolution(SolutionEvent evt) {
+        Object[] listeners = solutionListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == SolutionListener.class) {
+                ((SolutionListener) listeners[i + 1]).newSolutionFound(evt);
+            }
+        }
+    }
+
+    /**
+     * Cleans the list containing all the solutions found during anytime process.
+     */
+    @Override
+    public void clearResults() {
+        this.solutionNodes.clear();
+    }
+
+    /**
+     * Returns the list containing all solution nodes found.
+     *
+     * @return the list containing all solution nodes found.
+     */
+    @Override
+    public Vector<Node> getSolutionNodes() {
+        return solutionNodes;
+    }
+
+    /**
+     * Returns the list of solution plans.
+     *
+     * @param codedProblem the coded problem.
+     * @return a vector containing all the solutions plans or an empty vector.
+     */
+    @Override
+    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+        final Vector<Plan> plansVector = new Vector<>();
+        if (!this.solutionNodes.isEmpty()) {
+            for (Node node : this.solutionNodes) {
+                plansVector.add(this.extractPlan(node, codedProblem));
+            }
+        }
+        return plansVector;
     }
 }

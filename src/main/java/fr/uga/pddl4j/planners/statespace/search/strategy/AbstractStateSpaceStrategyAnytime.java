@@ -33,16 +33,10 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
     private static final long serialVersionUID = 1L;
 
     /**
-     * The list containing all the solutions found during anytime process.
-     */
-    private Vector<Node> solutionNodes;
-
-    /**
      * Creates a new planner.
      */
     public AbstractStateSpaceStrategyAnytime() {
         super();
-        solutionNodes = new Vector<>();
     }
 
     /**
@@ -54,24 +48,19 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
      */
     public AbstractStateSpaceStrategyAnytime(int timeout, Heuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
-        solutionNodes = new Vector<>();
     }
 
     /**
      * Cleans the list containing all the solutions found during anytime process.
      */
-    public void clearResults() {
-        this.solutionNodes.clear();
-    }
+    public abstract void clearResults();
 
     /**
      * Returns the list containing all solution nodes found.
      *
      * @return the list containing all solution nodes found.
      */
-    public Vector<Node> getSolutionNodes() {
-        return solutionNodes;
-    }
+    public abstract Vector<Node> getSolutionNodes();
 
     /**
      * Returns the list of solution plans.
@@ -79,13 +68,5 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
      * @param codedProblem the coded problem.
      * @return a vector containing all the solutions plans or an empty vector.
      */
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
-        final Vector<Plan> plansVector = new Vector<>();
-        if (!this.solutionNodes.isEmpty()) {
-            for (Node node : this.solutionNodes) {
-                plansVector.add(this.extractPlan(node, codedProblem));
-            }
-        }
-        return plansVector;
-    }
+    public abstract Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
 }
