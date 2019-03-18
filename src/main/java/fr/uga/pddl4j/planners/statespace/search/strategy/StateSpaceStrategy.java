@@ -22,6 +22,7 @@ import fr.uga.pddl4j.util.SolutionEvent;
 import fr.uga.pddl4j.util.SolutionListener;
 
 import java.io.Serializable;
+import javax.swing.event.EventListenerList;
 
 /**
  * This interface defines the main methods for search strategies.
@@ -31,6 +32,11 @@ import java.io.Serializable;
  * @since 3.6
  */
 public interface StateSpaceStrategy extends Serializable {
+
+    /**
+     * The list of SolutionListener.
+     */
+    EventListenerList solutionListenerList = new EventListenerList();
 
     /**
      * Returns the heuristicType to use to solve the planning problem.

@@ -25,6 +25,7 @@ import fr.uga.pddl4j.util.SolutionEvent;
 import fr.uga.pddl4j.util.SolutionListener;
 
 import java.util.Objects;
+import javax.swing.event.EventListenerList;
 
 /**
  * This abstract class defines the main methods for search strategies.
@@ -353,7 +354,9 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param listener the SolutionListener to add.
      */
     @Override
-    public abstract void addSolutionListener(SolutionListener listener);
+    public void addSolutionListener(SolutionListener listener) {
+        solutionListenerList.add(SolutionListener.class, listener);
+    }
 
     /**
      * Removes SolutionListener to the list of SolutionListener.
@@ -361,7 +364,9 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param listener the SolutionListener to remove.
      */
     @Override
-    public abstract void removeSolutionListener(SolutionListener listener);
+    public void removeSolutionListener(SolutionListener listener) {
+        solutionListenerList.remove(SolutionListener.class, listener);
+    }
 
     /**
      * Processes SolutionEvent when one is fired.
@@ -369,5 +374,12 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param evt the solution event to process.
      */
     @Override
-    public abstract void fireSolution(SolutionEvent evt);
+    public void fireSolution(SolutionEvent evt) {
+        Object[] listeners = solutionListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == SolutionListener.class) {
+                ((SolutionListener) listeners[i + 1]).newSolutionFound(evt);
+            }
+        }
+    }
 }
