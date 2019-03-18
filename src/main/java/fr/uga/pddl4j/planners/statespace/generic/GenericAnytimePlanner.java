@@ -50,27 +50,6 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
     private final AbstractStateSpaceStrategyAnytime searchStrategy;
 
     /**
-     * Returns the list containing all solution nodes found.
-     *
-     * @return the list containing all solution nodes found.
-     */
-    @Override
-    public Vector<Node> getSolutionNodes() {
-        return searchStrategy.getSolutionNodes();
-    }
-
-    /**
-     * Returns the list containing all solution plans found.
-     *
-     * @return the list containing all solution plans found.
-     */
-    @Override
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
-        Objects.requireNonNull(codedProblem);
-        return searchStrategy.getSolutionPlans(codedProblem);
-    }
-
-    /**
      * Creates a new planner with default parameters.
      *
      * @param searchStrategy the search strategy to use to solve the problem.

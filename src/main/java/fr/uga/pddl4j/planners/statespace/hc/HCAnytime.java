@@ -44,27 +44,6 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
     private HillClimbingAnytime hillClimbingAnytime;
 
     /**
-     * Returns the list containing all solution nodes found.
-     *
-     * @return the list containing all solution nodes found.
-     */
-    @Override
-    public Vector<Node> getSolutionNodes() {
-        return hillClimbingAnytime.getSolutionNodes();
-    }
-
-    /**
-     * Returns the list containing all solution plans found.
-     *
-     * @return the list containing all solution plans found.
-     */
-    @Override
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
-        Objects.requireNonNull(codedProblem);
-        return hillClimbingAnytime.getSolutionPlans(codedProblem);
-    }
-
-    /**
      * Creates a new planner with default parameters.
      */
     public HCAnytime() {

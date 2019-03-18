@@ -13,31 +13,29 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.util.Plan;
 
 import java.util.Vector;
 
 /**
- * This interface defines the main methods for anytime search strategies.
+ * This interface defines the main methods to access a state space planner anytime.
  *
  * @author E. Hermellin
  * @version 1.0 - 18.03.2019
  * @since 3.8
  */
-public interface StateSpaceStrategyAnytime extends StateSpaceStrategy {
+public interface StateSpacePlannerAnytime extends StateSpacePlanner {
 
     /**
-     * The list containing all the solutions found during anytime process.
+     * Returns the list containing all solution plans found.
+     *
+     * @return the list containing all solution plans found.
      */
-    Vector<Node> solutionNodes = new Vector<>();
-
-    /**
-     * Cleans the list containing all the solutions found during anytime process.
-     */
-    void clearResults();
+    Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
 
     /**
      * Returns the list containing all solution nodes found.
@@ -45,12 +43,4 @@ public interface StateSpaceStrategyAnytime extends StateSpaceStrategy {
      * @return the list containing all solution nodes found.
      */
     Vector<Node> getSolutionNodes();
-
-    /**
-     * Returns the list of solution plans.
-     *
-     * @param codedProblem the coded problem.
-     * @return a vector containing all the solutions plans or an empty vector.
-     */
-    Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
 }
