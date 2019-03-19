@@ -25,7 +25,8 @@ import fr.uga.pddl4j.util.Plan;
 
 import java.util.Vector;
 
-public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpaceStrategy {
+public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpaceStrategy
+    implements StateSpaceStrategyAnytime {
 
     /**
      * The serial id of the class.
@@ -53,14 +54,20 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
     /**
      * Cleans the list containing all the solutions found during anytime process.
      */
-    public abstract void clearResults();
+    @Override
+    public void clearResults() {
+        this.solutionNodes.clear();
+    }
 
     /**
      * Returns the list containing all solution nodes found.
      *
      * @return the list containing all solution nodes found.
      */
-    public abstract Vector<Node> getSolutionNodes();
+    @Override
+    public Vector<Node> getSolutionNodes() {
+        return solutionNodes;
+    }
 
     /**
      * Returns the list of solution plans.
@@ -68,5 +75,14 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
      * @param codedProblem the coded problem.
      * @return a vector containing all the solutions plans or an empty vector.
      */
-    public abstract Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
+    @Override
+    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+        final Vector<Plan> plansVector = new Vector<>();
+        if (!this.solutionNodes.isEmpty()) {
+            for (Node node : this.solutionNodes) {
+                plansVector.add(this.extractPlan(node, codedProblem));
+            }
+        }
+        return plansVector;
+    }
 }

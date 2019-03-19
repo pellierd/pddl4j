@@ -18,7 +18,7 @@ solveHSP(){
 
 	read -p "Choose heuristic [0 - 8]: " heuristic
 
-	java -javaagent:build/libs/pddl4j-3.8.2.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 0 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
+	java -javaagent:build/libs/pddl4j-3.8.3.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 0 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
 
     pause
 }
@@ -32,7 +32,7 @@ solveFF(){
 
 	read -p "Choose heuristic [0 - 8]: " heuristic
 
-	java -javaagent:build/libs/pddl4j-3.8.2.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 1 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
+	java -javaagent:build/libs/pddl4j-3.8.3.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -p 1 -o $domainFile -f $problemFile -t $timeOut -u $heuristic
 
     pause
 }

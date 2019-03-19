@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.8.2
+VERSION=3.8.3
 PROBLEM=""
 TYPE=""
 

@@ -23,12 +23,10 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategyAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
-import java.util.Vector;
 
 /**
  * This class implements a simple generic anytime planner.
@@ -48,27 +46,6 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
      * The search strategy.
      */
     private final AbstractStateSpaceStrategyAnytime searchStrategy;
-
-    /**
-     * Returns the list containing all solution nodes found.
-     *
-     * @return the list containing all solution nodes found.
-     */
-    @Override
-    public Vector<Node> getSolutionNodes() {
-        return searchStrategy.getSolutionNodes();
-    }
-
-    /**
-     * Returns the list containing all solution plans found.
-     *
-     * @return the list containing all solution plans found.
-     */
-    @Override
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
-        Objects.requireNonNull(codedProblem);
-        return searchStrategy.getSolutionPlans(codedProblem);
-    }
 
     /**
      * Creates a new planner with default parameters.

@@ -24,12 +24,9 @@ import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbingAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.Plan;
 import fr.uga.pddl4j.util.SequentialPlan;
-import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
-import java.util.Vector;
+import org.apache.logging.log4j.Logger;
 
 public class HCAnytime extends AbstractStateSpacePlannerAnytime {
 
@@ -42,27 +39,6 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
      * The Enforced Hill Climbing strategy.
      */
     private HillClimbingAnytime hillClimbingAnytime;
-
-    /**
-     * Returns the list containing all solution nodes found.
-     *
-     * @return the list containing all solution nodes found.
-     */
-    @Override
-    public Vector<Node> getSolutionNodes() {
-        return hillClimbingAnytime.getSolutionNodes();
-    }
-
-    /**
-     * Returns the list containing all solution plans found.
-     *
-     * @return the list containing all solution plans found.
-     */
-    @Override
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
-        Objects.requireNonNull(codedProblem);
-        return hillClimbingAnytime.getSolutionPlans(codedProblem);
-    }
 
     /**
      * Creates a new planner with default parameters.

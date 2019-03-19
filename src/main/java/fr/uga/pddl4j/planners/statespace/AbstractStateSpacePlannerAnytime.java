@@ -21,11 +21,14 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategyAnytime;
 import fr.uga.pddl4j.util.Plan;
 
+import java.util.Objects;
 import java.util.Vector;
 
-public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpacePlanner {
+public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpacePlanner
+    implements StateSpacePlannerAnytime {
 
     /**
      * The serial id of the class.
@@ -52,16 +55,27 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
     }
 
     /**
-     * Returns the list containing all solution plans found.
-     *
-     * @return the list containing all solution plans found.
-     */
-    public abstract Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
-
-    /**
      * Returns the list containing all solution nodes found.
      *
      * @return the list containing all solution nodes found.
      */
-    public abstract Vector<Node> getSolutionNodes();
+    @Override
+    public Vector<Node> getSolutionNodes() {
+        final StateSpaceStrategyAnytime stateSpaceStrategyAnytime =
+            (StateSpaceStrategyAnytime) this.getStateSpaceStrategies().get(0);
+        return stateSpaceStrategyAnytime.getSolutionNodes();
+    }
+
+    /**
+     * Returns the list containing all solution plans found.
+     *
+     * @return the list containing all solution plans found.
+     */
+    @Override
+    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+        Objects.requireNonNull(codedProblem);
+        final StateSpaceStrategyAnytime stateSpaceStrategyAnytime =
+            (StateSpaceStrategyAnytime) this.getStateSpaceStrategies().get(0);
+        return stateSpaceStrategyAnytime.getSolutionPlans(codedProblem);
+    }
 }
