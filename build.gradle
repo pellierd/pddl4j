@@ -18,7 +18,7 @@ apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
 
 group 'fr.uga'
-version '3.8.2'
+version '3.8.3'
 sourceCompatibility = 1.8
 
 repositories {
