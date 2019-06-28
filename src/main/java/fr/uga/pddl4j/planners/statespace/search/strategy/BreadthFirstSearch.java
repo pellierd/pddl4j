@@ -21,6 +21,7 @@ import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.util.SolutionEvent;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -64,7 +65,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final LinkedList<Node> closeSet = new LinkedList<>();
+        final HashSet<Node> closeSet = new HashSet<>();
         final LinkedList<Node> openSet = new LinkedList<>();
         final int timeout = getTimeout();
 
