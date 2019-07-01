@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
  *          System.out.println(e.getMessage());
  *        }
  *      if (!parser.getErrorManager().isEmpty()) {
- *          parser.mgr.printAll();
+ *          parser.getErrorManager().printAll();
  *        }
  *    } else {
  *      System.out.println(&quot;\nusage of parser:\n&quot;);
