@@ -235,7 +235,8 @@ TOKEN : {
 |	< INIT : ":init" >
 |	< GOAL: ":goal" >
 |	< METRIC : ":metric" >
-|   < METHOD : ":method" >
+|   < METHOD : ":method" > // ADD HDDL
+|   < TASK : ":task" > // ADD HDDL
 }
 
 TOKEN : {
@@ -261,7 +262,8 @@ TOKEN : {
 |	< CONSTRAINTS : ":constraints" >
 |	< CONTINUS_EFFECTS : ":continus-effects" >
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
-|	< HTN : ":htn" >
+|	< HTN : ":htn" > // ADD HDDL
+|   < HTN_METHOD_PREC : "htn-method-prec" > // ADD HDDL
 |   < EXPANSION : ":expansion" >
 }
 
@@ -443,7 +445,6 @@ void domain_and_problem() :
         goal()
 
         [LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
-        [LOOKAHEAD(2, {this.isRequirement(RequireKey.HTN)}) htn_const()]
         [LOOKAHEAD(2) metric_spec()]
         // [length-spec()] not implemented
         right_bracket()
@@ -675,9 +676,13 @@ Set<RequireKey> require_key() :
 	|	<DURATION_INEQUALITIES> {
 			requirements.add(RequireKey.DURATION_INEQUALITIES);
 		}
-	|	<HTN> {
-    			requirements.add(RequireKey.HTN);
+	|	<HTN> { // ADD HDDL
+    		requirements.add(RequireKey.HTN);
         }
+    |   <HTN_METHOD_PREC> { // ADD HDDL
+            requirements.add(RequireKey.HTN_METHOD_PREC);
+            requirements.add(RequireKey.HTN);
+    }
 )
 	{ return requirements; }
 }
@@ -859,6 +864,47 @@ void predicates_def() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 }
+
+
+NamedTypedList comp_task_def() : // ADD HDDL
+{
+    NamedTypedList task;
+}
+{
+    left_bracket() <TASK> task=task_def() right_bracket() {
+        return task;
+    }
+}
+
+NamedTypedList task_def() : // ADD HDDL
+{
+    Symbol name;
+    List<TypedSymbol> typedList = null;
+}
+{
+    name=task_symbol()
+    <PARAMETERS>
+    left_bracket()
+    typedList=typed_list(Lexer.VARIABLE)
+    right_bracket() {
+        NamedTypedList l = new NamedTypedList(name);
+        for (TypedSymbol s : typedList) {
+            l.add(s);
+        }
+        return l;
+    }
+}
+
+Symbol task_symbol() : // ADD HDDL
+ {
+ 	Token t = token;
+ }
+ {
+ 	t=<SYMBOL> {
+ 		return new Symbol(Symbol.Kind.TASK, t);
+ 	}
+ }
+
 
 NamedTypedList atomic_formula_skeleton() :
 {
@@ -1774,17 +1820,13 @@ void structure_def() :
 	Op op = null;
 	Method meth = null;
 	DerivedPredicate dp = null;
+	NamedTypedList task = null;
 }
 {
 	( 	LOOKAHEAD(2)
 			op=action_def() {
 				this.domain.addOperator(op);
 			}
-	|
-        LOOKAHEAD(2, { this.isRequirement(RequireKey.HTN)})
-        			meth=method_def() {
-        				this.domain.addMethod(meth);
-        			}
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
 			op=durative_action_def() {
 				this.domain.addOperator(op);
@@ -1793,6 +1835,10 @@ void structure_def() :
 			dp=derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
+	|   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
+            task=comp_task_def() {
+                this.domain.addTask(task);
+            }
 	)
 }
 
@@ -1845,366 +1891,6 @@ Symbol action_name() :
 	t=<SYMBOL> {
 		return new Symbol(Symbol.Kind.ACTION, t);
 	}
-}
-
-Method method_def() :
-{
-	Symbol name = null;
-	List<TypedSymbol> parameters = null;
-	Exp tasks = null;
-	Exp constraints = null;
-}
-{
-	try {
-		left_bracket()
-		<METHOD> name=method_name()
-		<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
-		<EXPANSION> left_bracket() tasks=task_list() right_bracket()
-		<CONSTRAINTS> left_bracket() constraints=htn_constraints() right_bracket()
-	    right_bracket()
-	} catch(Throwable e) {
-		this.error(e, token.beginLine, token.beginColumn);
-	}
-	{
-		return new Method(name, parameters, tasks, constraints);
-	}
-}
-
-Symbol method_name() :
- {
- 	Token t = token;
- }
- {
- 	t=<SYMBOL> {
- 		return new Symbol(Symbol.Kind.METHOD, t);
- 	}
- }
-
-Symbol task_name() :
- {
- 	Token t = token;
- }
- {
- 	t=<SYMBOL> {
- 		return new Symbol(Symbol.Kind.TASK, t);
- 	}
- }
-
-Exp task_def() :
-{
-    Symbol name = null;
-    Symbol alias = null;
-    List<Symbol> parameters = null;
-    List<Symbol> atom = new ArrayList<Symbol>();
-    Exp node = new Exp(Connective.TASK);
-}
-{
-    left_bracket()
-    name = task_name() {atom.add(name);}
-    parameters = task_parameters() {atom.addAll(parameters);}
-    right_bracket()
-    <ALIAS>
-    alias = alias_name() {atom.add(alias);}
-    {
-        node.setAtom(atom);
-        return node;
-    }
-}
-
-List<Symbol> task_parameters() :
-{
-	List<Symbol> atom = new ArrayList<Symbol>();
-	Symbol t = null;
-}
-{
-	(t=term() {
-			atom.add(t);
-		})*
-	{
-		return atom;
-	}
-}
-
-Exp task_list() :
-{
-    Exp tasks = new Exp(Connective.EXPANSION);
-    Exp t = null;
-}
-{
-    try {
-    		(
-    		t = task_def() {tasks.addChild(t);}
-    		)+
-    	} catch(Throwable e) {
-    		this.error(e, token.beginLine, token.beginColumn);
-    	}
-    {
-        return tasks;
-    }
-}
-
-Exp htn_constraints() :
-{
-    Exp constraints = new Exp(Connective.AND);
-    Exp child = null;
-}
-{
-    try {
-            <AND>
-            (child = task_const() {constraints.addChild(child);})*
-        } catch(Throwable e) {
-            this.error(e, token.beginLine, token.beginColumn);
-        }
-    {
-        return constraints;
-    }
-}
-
-Exp task_const() :
-{
-	Exp node = null;
-}
-{
-	(	LOOKAHEAD(2) node=htn_before()
-	|	LOOKAHEAD(2) node=htn_hold_before()
-	|	LOOKAHEAD(2) node=htn_hold_after()
-	|	LOOKAHEAD(2) node=htn_hold_between()
-	|	LOOKAHEAD(2) node=htn_hold_during()
-    |	LOOKAHEAD(3) node=htn_at_start()
-    |	LOOKAHEAD(3) node=htn_at_end()
-    |	LOOKAHEAD(2) node=always_con_gd()
-    |	LOOKAHEAD(2) node=sometime_con_gd()
-    |	LOOKAHEAD(2) node=at_most_once_con_gd()
-    |	LOOKAHEAD(2) node=sometime_after_con_gd()
-    |	LOOKAHEAD(2) node=sometime_before_con_gd()
-    |	LOOKAHEAD(2) node=htn_within()
-    |	LOOKAHEAD(2) node=htn_always_within())
-	{
-	    return node;
-    }
-}
-
-Exp htn_before() :
-{
-	Exp node = new Exp(Connective.BEFORE);
-	Exp first;
-	Exp second;
-}
-{
-	left_bracket()
-	<BEFORE>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = alias_set() {
-        		node.addChild(second);
-        		})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_hold_before() :
-{
-	Exp node = new Exp(Connective.HOLD_BEFORE);
-	Exp first;
-	Exp second;
-}
-{
-	left_bracket()
-	<HOLD_BEFORE>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = pre_gd() {
-        		node.addChild(second);
-        		})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_hold_after() :
-{
-	Exp node = new Exp(Connective.HOLD_AFTER);
-	Exp first;
-	Exp second;
-}
-{
-	left_bracket()
-	<HOLD_AFTER>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = effect() {
-        		node.addChild(second);
-        		})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_hold_between() :
-{
-	Exp node = new Exp(Connective.HOLD_BETWEEN);
-	Exp first;
-	Exp second;
-	Exp third;
-}
-{
-	left_bracket()
-	<HOLD_BETWEEN>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = alias_set() {
-        		node.addChild(second);
-        		})
-    (third = pre_gd() {
-            	node.addChild(third);
-            	})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_hold_during() :
-{
-	Exp node = new Exp(Connective.HOLD_DURING);
-	Exp first;
-	Exp second;
-	Exp third;
-}
-{
-	left_bracket()
-	<HOLD_DURING>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = alias_set() {
-        		node.addChild(second);
-        		})
-    (third = pre_gd() {
-            	node.addChild(third);
-            	})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_at_start() :
-{
-	Exp node = new Exp(Connective.AT_START);
-	Exp first;
-}
-{
-	left_bracket()
-	<AT> <START>
-    (first = pre_gd() {
-        		node.addChild(first);
-        		})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_at_end() :
-{
-	Exp node = new Exp(Connective.AT_END);
-	Exp first;
-}
-{
-	left_bracket()
-	<AT> <END>
-    (first = effect() {
-        		node.addChild(first);
-        		})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_within() :
-{
-	Exp node = new Exp(Connective.WITHIN);
-	Exp first;
-	Exp second;
-}
-{
-	left_bracket()
-	<WITHIN>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = pre_gd() {
-        		node.addChild(second);
-        		})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Exp htn_always_within() :
-{
-	Exp node = new Exp(Connective.ALWAYS_WITHIN);
-	Exp first;
-	Exp second;
-	Exp third;
-}
-{
-	left_bracket()
-	<ALWAYS_WITHIN>
-	(first = alias_set() {
-    			node.addChild(first);
-    		})
-    (second = pre_gd() {
-        		node.addChild(second);
-        		})
-    (third = pre_gd() {
-            	node.addChild(third);
-            	})
-	right_bracket()
-	{
-		return node;
-	}
-}
-
-Symbol alias_name() :
- {
- 	Token t = token;
- }
- {
- 	t=<SYMBOL> {
- 		return new Symbol(Symbol.Kind.ALIAS, t);
- 	}
- }
-
-Exp alias_set() :
-{
-    Exp node = new Exp(Connective.ALIAS_SET);
-    List<Symbol> atom = new ArrayList<Symbol>();
-    Symbol t;
-}
-{
-    (
-        (t = alias_name() {atom.add(t);})
-        |
-        left_bracket()
-        (t = alias_name() {atom.add(t);})+
-        right_bracket()
-    )
-    {
-        node.setAtom(atom);
-        return node;
-    }
 }
 
 Exp pre_gd() :
@@ -3426,7 +3112,6 @@ void problem() :
 		goal()
 
 		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
-		[LOOKAHEAD(2, {this.isRequirement(RequireKey.HTN)}) htn_const()]
 		[LOOKAHEAD(2) metric_spec()]
 		// [length-spec()] not implemented
 		right_bracket()
@@ -3548,25 +3233,8 @@ void goal() :
 }
 {
     left_bracket() <GOAL>
-    (LOOKAHEAD(2) pddl_goal()
-    | LOOKAHEAD(2, {this.isRequirement(RequireKey.HTN)}) htn_goal())
+    pddl_goal()
     right_bracket()
-}
-
-void htn_goal() :
-{
-	Exp node = null;
-}
-{
-	try {
-		left_bracket()
-		node=task_list() {
-			this.problem.setGoal(node);
-	   	}
-	   	right_bracket()
-	} catch(Throwable e) {
-		this.error(e, token.beginLine, token.beginColumn);
-	}
 }
 
 void pddl_goal() :
@@ -3613,21 +3281,6 @@ void pddl_const(int type) :
 	}
 }
 
-void htn_const() :
-{
-	Exp constraints = null;
-}
-{
-	try {
-		left_bracket() <CONSTRAINTS> left_bracket()
-			constraints=htn_constraints()
-		right_bracket() {
-			this.problem.setConstraints(constraints);
-		}
-	} catch(Throwable e) {
-		this.error(e, token.beginLine, token.beginColumn);
-	}
-}
 
 Exp pref_con_gd() :
 {

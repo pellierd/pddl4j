@@ -73,6 +73,11 @@ public class Domain implements Serializable {
     private List<NamedTypedList> functions;
 
     /**
+     * The list of functions used in the domain and the problem.
+     */
+    private List<NamedTypedList> tasks;
+
+    /**
      * The constraints declared in the domain.
      */
     private Exp constraints;
@@ -115,6 +120,7 @@ public class Domain implements Serializable {
         this.constants = new ArrayList<>();
         this.predicates = new ArrayList<>();
         this.functions = new ArrayList<>();
+        this.tasks = new ArrayList<>();
         this.constraints = null;
         this.ops = new ArrayList<>();
         this.meths = new ArrayList<>();
@@ -256,6 +262,29 @@ public class Domain implements Serializable {
             throw new NullPointerException();
         }
         return this.functions.add(function);
+    }
+
+    /**
+     * Returns the parsed tasks un the domain file.
+     *
+     * @return the parsed tasks in the domain file.
+     */
+    public final List<NamedTypedList> getTasks() {
+        return this.tasks;
+    }
+
+    /**
+     * Adds a task to the domain.
+     *
+     * @param task the task to add.
+     * @return <code>true</code> if the task was added; <code>false</code> otherwise.
+     * @throws NullPointerException if the specified function is null.
+     */
+    public final boolean addTask(final NamedTypedList task) {
+        if (task == null) {
+            throw new NullPointerException();
+        }
+        return this.tasks.add(task);
     }
 
     /**

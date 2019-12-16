@@ -115,9 +115,13 @@ public enum RequireKey {
      */
     DURATION_INEQUALITIES(":duration-inequalities"),
     /**
-     * The PDDL :htn requirement.
+     * The PDDL :htn requirement for HDDL langage.
      */
-    HTN(":htn");
+    HTN(":htn"),
+    /**
+     * The PDDL :htn-method-prec requirement for HDDL langage.
+     */
+    HTN_METHOD_PREC(":htn-method-prec");
 
 
     /**
