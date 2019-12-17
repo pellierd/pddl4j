@@ -36,22 +36,46 @@ public class Method implements Serializable {
      * The serial id of the class.
      */
     private static final long serialVersionUID = 1L;
+
     /**
      * The name of the method.
      */
     private Symbol name;
+
     /**
      * The list of parameters of the method.
      */
     private List<TypedSymbol> parameters;
+
     /**
-     * The tasks of the method.
+     * The task performed by the method.
      */
-    private Exp tasks;
+    private Exp task;
+
     /**
-     * The constraints of the method.
+     * The preconditions of the method. The precondition of the method are optional.
+     */
+    private Exp preconditions;
+
+    /**
+     * The subtaks of the method.
+     */
+    private Exp subtasks;
+
+    /**
+     * The ordering contraints between the subtasks of the method.
+     */
+    private Exp orderingContraints;
+
+    /**
+     * The constraints on the subtasks of the method.
      */
     private Exp constraints;
+
+    /**
+     * A boolean that indicates whether the subtask list is fully ordered or not.
+     */
+    private boolean isTotalOrdered;
 
     /**
      * Create a new method.
@@ -60,8 +84,12 @@ public class Method implements Serializable {
         super();
         this.name = null;
         this.parameters = null;
-        this.tasks = null;
+        this.task = null;
+        this.preconditions = null;
+        this.subtasks = null;
+        this.orderingContraints = null;
         this.constraints = null;
+        this.isTotalOrdered = true;
     }
 
     /**
@@ -76,27 +104,38 @@ public class Method implements Serializable {
         this.name = new Symbol(other.getName());
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
-        this.tasks = new Exp(other.getTasks());
+        this.task = new Exp(other.getTask());
+        this.preconditions = new Exp(other.getPreconditions());
+        this.subtasks = new Exp(other.getSubTasks());
+        this.orderingContraints = new Exp(other.getOrderingConstraints());
         this.constraints = new Exp(other.getConstraints());
+        this.isTotalOrdered = other.isTotalOrdered();
     }
 
     /**
-     * Creates method with a specified name, list of parameters...
+     * Creates method with a specified name, parameter, task performed, precondition and tasknetwork.
      *
-     * @param name          The name of the method.
-     * @param parameters    The list of the method parameters.
-     * @param tasks         The expansion (list of tasks) of the method.
-     * @throws NullPointerException if the specified name is null.
+     * @param name The name of the method.
+     * @param parameters The list of the method parameters.
+     * @param task The task performed by the method.
+     * @param preconditions The preconditions of the task. This parameter can be null.
+     * @param subtasks The subtasks of the method.
+     * @param ordering The ordering constraints between the subtasks of the method.
+     * @param constraints The constraint on the subtasks of the method.
+     * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
+     * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public Method(final Symbol name, final List<TypedSymbol> parameters, Exp tasks, Exp constraints) {
+    public Method(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
+                  final Exp subtasks, final Exp ordering, final Exp constraints, final boolean ordered) {
         this();
-        if (name == null || parameters == null || tasks == null) {
-            throw new NullPointerException();
-        }
-        this.name = name;
-        this.parameters = parameters;
-        this.tasks = tasks;
-        this.constraints = constraints;
+        this.setName(name);
+        this.setParameters(parameters);
+        this.setTask(task);
+        this.setPreconditions(preconditions);
+        this.setSubtasks(subtasks);
+        this.setOrderingConstraints(ordering);
+        this.setConstraints(constraints);
+        this.setTotalOrdered(ordered);
     }
 
     /**
@@ -155,21 +194,125 @@ public class Method implements Serializable {
     }
 
     /**
-     * Returns the expansion of the method.
+     * Returns the task performed by the method.
      *
      * @return the method tasks.
      */
-    public Exp getTasks() {
-        return tasks;
+    public Exp getTask() {
+        return this.task;
     }
 
     /**
-     *  Sets the expansion of the method.
+     *  Sets the task performed by the method.
      *
-     *  @param tasks The tasks of the method.
+     *  @param task The task performed by the method.
+     *  @throws NullPointerException if the specified parameters is null.
      */
-    public void setTasks(Exp tasks) {
-        this.tasks = tasks;
+    public void setTask(Exp task) {
+        if (task == null) {
+            throw new NullPointerException();
+        }
+        this.task = task;
+    }
+
+    /**
+     * Returns the preconditions of the method. The preconditions are optional.
+     *
+     * @return the preconditions of the method or null if no preconditions are specified.
+     */
+    public Exp getPreconditions() {
+        return this.preconditions;
+    }
+
+    /**
+     *  Sets the preconditions of the method.
+     *
+     *  @param preconditions The precondition to set.
+     */
+    public void setPreconditions(Exp preconditions) {
+        this.preconditions = preconditions;
+    }
+
+    /**
+     * Returns the subtasks of the method.
+     *
+     * @return the subtasks of the method.
+     */
+    public Exp getSubTasks() {
+        return this.subtasks;
+    }
+
+    /**
+     *  Sets the subtasks of the method.
+     *
+     *  @param subtasks The subtasks to set.
+     *  @throws NullPointerException if the specified parameters is null.
+     */
+    public void setSubtasks(Exp subtasks) {
+        if (subtasks == null) {
+            throw new NullPointerException();
+        }
+        this.subtasks = subtasks;
+    }
+
+    /**
+     * Returns the ordering constraints between the subtasks of the method.
+     *
+     * @return the ordering constraints of the method.
+     */
+    public Exp getOrderingConstraints() {
+        return this.orderingContraints;
+    }
+
+    /**
+     *  Sets the ordering constraints between the subtasks of the method.
+     *
+     *  @param constraints The constraints to set.
+     *  @throws NullPointerException if the specified parameters is null.
+     */
+    public void setOrderingConstraints(Exp constraints) {
+        if (constraints == null) {
+            throw new NullPointerException();
+        }
+        this.orderingContraints = constraints;
+    }
+
+    /**
+     * Returns the constraints on the subtasks of the method.
+     *
+     * @return the constraints of the method.
+     */
+    public Exp getConstraints() {
+        return this.constraints;
+    }
+
+    /**
+     *  Sets the  constraints one the subtasks of the method.
+     *
+     *  @param constraints The constraints to set.
+     *  @throws NullPointerException if the specified parameters is null.
+     */
+    public void setConstraints(Exp constraints) {
+        if (constraints == null) {
+            throw new NullPointerException();
+        }
+        this.constraints = constraints;
+    }
+
+    /**
+     * Returns if the method is total ordered or not.
+     *
+     * @return true the method is total ordered or not, false otherwise.
+     */
+    public boolean isTotalOrdered() { return this.isTotalOrdered; }
+
+    /**
+     * Set the boolean total ordered flag to a specified value.
+     *
+     * @param flag The flag to set.
+     */
+    public void setTotalOrdered(boolean flag) {
+        this.isTotalOrdered = flag;
     }
 
     /**
@@ -217,25 +360,29 @@ public class Method implements Serializable {
             str.append(this.parameters.get(this.parameters.size() - 1).toString());
         }
         str.append(")\n");
+        str.append("\t:task (" + this.getTask().toString() + ")\n");
+        if (!this.getPreconditions().getChildren().isEmpty()) {
+            str.append("\t:precondition" + this.getPreconditions().toString() + "\n");
+        }
+        if (!this.getSubTasks().getChildren().isEmpty()) {
+            if (this.isTotalOrdered()) {
+                str.append("\t:ordered-subtasks ");
+            } else {
+                str.append("\t:tasks ");
+            }
+        }
+        str.append(this.getSubTasks().toString() + "\n");
+        if (!this.getOrderingConstraints().getChildren().isEmpty()) {
+            str.append("\t:ordering ");
+            str.append(this.getOrderingConstraints().toString() + "\n");
+        }
+        if (!this.getConstraints().getChildren().isEmpty()) {
+            str.append("\t:constraints ");
+            str.append(this.getConstraints().toString() + "\n");
+        }
+        str.append(")\n");
         str.append(")");
         return str.toString();
     }
 
-    /**
-     * Returns the method constraints.
-     *
-     * @return the method constraints.
-     */
-    public Exp getConstraints() {
-        return constraints;
-    }
-
-    /**
-     * Sets the method constraints.
-     *
-     * @param constraints The method constraints
-     */
-    public void setConstraints(Exp constraints) {
-        this.constraints = constraints;
-    }
 }

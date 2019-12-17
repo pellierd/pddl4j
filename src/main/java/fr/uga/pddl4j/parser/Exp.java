@@ -95,6 +95,11 @@ public class Exp implements Serializable {
     private Symbol variable;
 
     /**
+     * The id. Use to the alias of a task atom.
+     */
+    private Symbol id;
+
+    /**
      * Creates a new expression from a other one.
      *
      * @param other the other expression.
@@ -121,6 +126,9 @@ public class Exp implements Serializable {
         if (other.getVariable() != null) {
             this.variable = new Symbol(other.getVariable());
         }
+        if (other.getId() != null) {
+            this.id = new Symbol(other.getId());
+        }
         this.value = other.getValue();
     }
 
@@ -135,6 +143,7 @@ public class Exp implements Serializable {
         this.prefName = null;
         this.variables = null;
         this.value = null;
+        this.id = null;
     }
 
     /**
@@ -297,6 +306,24 @@ public class Exp implements Serializable {
      */
     public final Double getValue() {
         return this.value;
+    }
+
+    /**
+     * Returns the id of of the task. The id is only use in HTN planning to make alias of task.
+     *
+     * @return the id of variables of this parser node.
+     */
+    public final Symbol getId() {
+        return this.id;
+    }
+
+    /**
+     * Set the id of this expression. The id is only use in HTN planning to make alias of task.
+     *
+     * @param id the id to set.
+     */
+    public final void setId(Symbol id) {
+        this.id = id;
     }
 
     /**

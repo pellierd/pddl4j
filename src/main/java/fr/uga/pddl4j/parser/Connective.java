@@ -236,17 +236,17 @@ public enum Connective {
      */
     HOLD_BETWEEN("hold-between"),
     /**
-     * Connective for alias set expression.
-     */
-    ALIAS_SET(""),
-    /**
-     * Connective for task expression.
+     * Connective for task used in HDDL fragment.
      */
     TASK(""),
     /**
-     * Connective for expansions (task sets).
+     * Connective for ordering constraints used in HDDL fragment.
      */
-    EXPANSION("");
+    ORDERING_CONSTRAINT(""),
+    /**
+     * Connective for task network expression used in HDDL fragment.
+     */
+    TASK_NETWORK("");
 
     /**
      * The image associate to the connective in the PDDL language.

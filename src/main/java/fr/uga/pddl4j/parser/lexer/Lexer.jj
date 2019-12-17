@@ -264,7 +264,10 @@ TOKEN : {
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HTN : ":htn" > // ADD HDDL
 |   < HTN_METHOD_PREC : "htn-method-prec" > // ADD HDDL
-|   < EXPANSION : ":expansion" >
+|   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
+|   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
+|   < TASKS : ":tasks" > // ADD HDDL
+|   < ORDERING : ":ordering" > // ADD HDDL
 }
 
 TOKEN :
@@ -1114,7 +1117,7 @@ Exp at_end_con_gd() :
 }
 {
 		left_bracket() <AT> <END>
-			node=node()
+			node=gd()
 		right_bracket()
 	{
 		conGD.addChild(node);
@@ -1129,7 +1132,7 @@ Exp always_con_gd() :
 }
 {
 	left_bracket() <ALWAYS>
-		node=node()
+		node=gd()
 	right_bracket()
 	{
 		conGD.addChild(node);
@@ -1144,7 +1147,7 @@ Exp sometime_con_gd() :
 }
 {
 	left_bracket() <SOMETIME>
-		node=node()
+		node=gd()
 	right_bracket()
 	{
 		conGD.addChild(node);
@@ -1161,7 +1164,7 @@ Exp within_con_gd() :
 {
 	left_bracket() <WITHIN>
 		token=<NUMBER>
-		node=node()
+		node=gd()
 	right_bracket()
 	{
 		Exp n1 = new Exp(Connective.NUMBER);
@@ -1179,7 +1182,7 @@ Exp at_most_once_con_gd() :
 }
 {
 	left_bracket() <AT_MOST_ONCE>
-		node=node()
+		node=gd()
 	right_bracket()
 	{
 		conGD.addChild(node);
@@ -1195,8 +1198,8 @@ Exp sometime_after_con_gd() :
 }
 {
 	left_bracket() <SOMETIME_AFTER>
-		gd1=node()
-		gd2=node()
+		gd1=gd()
+		gd2=gd()
 	right_bracket()
 	{
 		conGD.addChild(gd1);
@@ -1213,8 +1216,8 @@ Exp sometime_before_con_gd() :
 }
 {
 	left_bracket() <SOMETIME_BEFORE>
-		gd1=node()
-		gd2=node()
+		gd1=gd()
+		gd2=gd()
 	right_bracket()
 	{
 		conGD.addChild(gd1);
@@ -1233,8 +1236,8 @@ Exp always_within_con_gd() :
 {
 	left_bracket() <ALWAYS_WITHIN>
 		token=<NUMBER>
-		gd1=node()
-		gd2=node()
+		gd1=gd()
+		gd2=gd()
 	right_bracket()
 	{
 		Exp n1 = new Exp(Connective.NUMBER);
@@ -1257,7 +1260,7 @@ Exp hold_during_con_gd() :
 	left_bracket() <HOLD_DURING>
 		token1=<NUMBER>
 		token2=<NUMBER>
-		node=node()
+		node=gd()
 	right_bracket()
 	{
 		Exp n1 = new Exp(Connective.NUMBER);
@@ -1280,7 +1283,7 @@ Exp hold_after_con_gd() :
 {
 	left_bracket() <HOLD_AFTER>
 		token=<NUMBER>
-		node=node()
+		node=gd()
 	right_bracket()
 	{
 		Exp n1 = new Exp(Connective.NUMBER);
@@ -1291,7 +1294,7 @@ Exp hold_after_con_gd() :
 	}
 }
 
-Exp node() :
+Exp gd() :
 {
 	Exp node = null;
 }
@@ -1376,7 +1379,7 @@ Exp and_gd() :
 	Exp s = null;
 }
 {
-	left_bracket() <AND> (LOOKAHEAD(2) s=node() {
+	left_bracket() <AND> (LOOKAHEAD(2) s=gd() {
 		node.addChild(s);
 	})* right_bracket()
 	{
@@ -1390,7 +1393,7 @@ Exp or_gd() :
 	Exp s = null;
 }
 {
-	left_bracket() <OR> (LOOKAHEAD(2) s=node() {
+	left_bracket() <OR> (LOOKAHEAD(2) s=gd() {
 		node.addChild(s);
 	})* right_bracket()
 	{
@@ -1404,7 +1407,7 @@ Exp not_gd() :
 	Exp s = null;
 }
 {
-	left_bracket() <NOT> s=node() right_bracket()
+	left_bracket() <NOT> s=gd() right_bracket()
 	{
 		node.addChild(s);
 		return node;
@@ -1418,7 +1421,7 @@ Exp imply_gd() :
 	Exp q = null;
 }
 {
-	left_bracket() <IMPLY> p=node() q=node() right_bracket()
+	left_bracket() <IMPLY> p=gd() q=gd() right_bracket()
 	{
 		Exp not_p = new Exp(Connective.NOT);
 		not_p.addChild(p);
@@ -1439,7 +1442,7 @@ Exp exists_gd() :
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
-		s=node()
+		s=gd()
 	right_bracket() {
 		node.setVariables(typedList);
 		node.addChild(s);
@@ -1458,7 +1461,7 @@ Exp forall_gd() :
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
-		s=node()
+		s=gd()
 	right_bracket() {
 		node.setVariables(typedList);
 		node.addChild(s);
@@ -1824,22 +1827,259 @@ void structure_def() :
 }
 {
 	( 	LOOKAHEAD(2)
-			op=action_def() {
+			op = action_def() {
 				this.domain.addOperator(op);
 			}
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
-			op=durative_action_def() {
+			op = durative_action_def() {
 				this.domain.addOperator(op);
 			}
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DERIVED_PREDICATES)})
-			dp=derived_def() {
+			dp = derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
 	|   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
-            task=comp_task_def() {
+            task = comp_task_def() {
                 this.domain.addTask(task);
             }
+    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
+            meth = method_def() {
+                this.domain.addMethod(meth);
+            }
 	)
+}
+
+Method method_def() : // ADD HDDL
+{
+	Symbol name = null;
+	List<TypedSymbol> parameters = null;
+	Exp task = null;
+	Exp preconditions = new Exp(Connective.AND);
+	Exp subtasks = new Exp(Connective.AND);;
+	Exp ordering = new Exp(Connective.AND);
+	Exp constraints = new Exp(Connective.AND);
+	boolean isTotalOrdered = false;
+}
+{
+	try {
+		left_bracket() <ACTION> name=method_name()
+			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+			<TASK> left_bracket() task=task_formula(Lexer.TERM) right_bracket()
+			(   LOOKAHEAD(2, { this.isRequirement(RequireKey.HTN_METHOD_PREC)})
+			        <PRECONDITION> preconditions=pre_gd()
+			         (   <ORDERED_SUBTASKS> subtasks = subtask_def() {
+			                isTotalOrdered = true;
+			         }
+			         |   <TASKS> subtasks = subtask_def()
+			             [<ORDERING> ordering = ordering_constraint_def()]
+			         )
+			|   LOOKAHEAD(2)
+			        (   <ORDERED_SUBTASKS> subtasks = subtask_def() {
+                            isTotalOrdered = true;
+                        }
+			            [<CONSTRAINTS> constraints = constraint_def()]
+			        |   <TASKS> subtasks = subtask_def()
+                    	[<ORDERING> ordering = ordering_constraint_def()]
+                    	[<CONSTRAINTS> constraints = constraint_def()]
+                    )
+            )
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new Method(name, parameters, task, preconditions, subtasks, ordering, constraints, isTotalOrdered);
+	}
+}
+
+Symbol method_name() : // ADD HDDL
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> {
+		return new Symbol(Symbol.Kind.ACTION, t);
+	}
+}
+
+Exp subtask_def() : // ADD HDDL
+{
+    Exp exp = null;
+    Exp task = null;
+}
+{
+    (   LOOKAHEAD(2)
+            exp=empty_and()
+    |   LOOKAHEAD(2)
+            task=subtask() {
+                exp = new Exp(Connective.AND);
+                exp.addChild(task);
+            }
+    |   LOOKAHEAD(2)
+            exp=and_subtask()
+    ) {
+        return exp;
+    }
+}
+
+Exp and_subtask() : // ADD HDDL
+{
+    Exp exp = new Exp(Connective.AND);
+    Exp task = null;
+}
+{
+    <LEFT_BRACKET> <AND> (task=subtask() {
+        exp.addChild(task);
+    })+ <RIGHT_BRACKET> {
+        return exp;
+    }
+}
+
+Exp subtask() :  // ADD HDDL
+{
+    Symbol id;
+    Exp task;
+}
+{
+    (    LOOKAHEAD(2)
+            <LEFT_BRACKET> task=task_formula(Lexer.TERM) <RIGHT_BRACKET>
+    |   LOOKAHEAD(2)
+            <LEFT_BRACKET> id=subtask_id()
+                <LEFT_BRACKET> task=task_formula(Lexer.TERM) <RIGHT_BRACKET>
+            <RIGHT_BRACKET> {
+                task.setId(id);
+            }
+    ) {
+        return task;
+    }
+}
+
+Exp task_formula(int type) : // ADD HDDL
+{
+	Exp node = new Exp(Connective.TASK);
+	List<Symbol> task = new ArrayList<Symbol>();
+	Symbol t = null;
+}
+{
+	<LEFT_BRACKET> t=task_symbol() {
+		task.add(t);
+	}
+	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
+			task.add(t);
+		})*
+	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
+			task.add(t);
+		})*
+	) right_bracket() {
+		node.setAtom(task);
+		return node;
+	}
+}
+
+Symbol subtask_id() : // ADD HDDL
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> {
+		return new Symbol(Symbol.Kind.ACTION, t);
+	}
+}
+
+Exp ordering_constraint_def() : // ADD HDDL
+{
+    Exp exp = null;
+    Exp task = null;
+}
+{
+    (   LOOKAHEAD(2)
+            exp=empty_and()
+    |   LOOKAHEAD(2)
+            task=ordering_constraint() {
+                exp = new Exp(Connective.AND);
+                exp.addChild(task);
+            }
+    |   LOOKAHEAD(2)
+            exp = and_ordering_constraint()
+    ) {
+        return exp;
+    }
+}
+
+Exp and_ordering_constraint() : // ADD HDDL
+{
+    Exp exp = new Exp(Connective.AND);
+    Exp ordering = null;
+}
+{
+    <LEFT_BRACKET> <AND> (ordering = ordering_constraint() {
+        exp.addChild(ordering);
+    })+ <RIGHT_BRACKET> {
+        return exp;
+    }
+}
+
+Exp ordering_constraint() : // ADD HDDL
+{
+    Exp node = new Exp(Connective.ORDERING_CONSTRAINT);
+    List<Symbol> tasks = new ArrayList<Symbol>();
+    Symbol id1 = null;
+    Symbol id2 = null;
+}
+{
+    <LEFT_BRACKET> id1=subtask_id() <LESS> id2=subtask_id() <RIGHT_BRACKET> {
+        tasks.add(id1);
+        tasks.add(id2);
+        node.setAtom(tasks);
+        return node;
+    }
+}
+
+Exp constraint_def() : // ADD HDDL
+{
+    Exp node = null;
+    Exp c = null;
+}
+{
+    (   LOOKAHEAD(2)
+            node = empty_and()
+    |   LOOKAHEAD(2)
+            c = htn_constraint() {
+                node = new Exp(Connective.AND);
+                node.addChild(c);
+            }
+    |   LOOKAHEAD(2)
+            node = and_htn_constraint()
+    ) {
+        return node;
+    }
+}
+
+Exp and_htn_constraint() :  // ADD HDDL
+{
+    Exp exp = new Exp(Connective.AND);
+    Exp c = null;
+}
+{
+    <LEFT_BRACKET> <AND> (c = htn_constraint() {
+        exp.addChild(c);
+    })+ <RIGHT_BRACKET> {
+        return exp;
+    }
+}
+
+Exp htn_constraint() : // ADD HDDL
+{
+    Exp node;
+}
+{
+    (   LOOKAHEAD(2)
+            node = equal_atomic_formula()
+    |   LOOKAHEAD(2)
+            node = not_equal_atomic_formula()
+    ) {
+        return node;
+    }
 }
 
 DerivedPredicate derived_def() :
@@ -1851,7 +2091,7 @@ DerivedPredicate derived_def() :
 	try {
 		<LEFT_BRACKET>  <DERIVED>
 			head=atomic_formula_skeleton()
-			body=node()
+			body=gd()
 		<RIGHT_BRACKET>
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -1902,7 +2142,7 @@ Exp pre_gd() :
 	|	LOOKAHEAD(2) node=and_pre_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) node=forall_pre_gd()
 	|	LOOKAHEAD(2) node=empty_or()
-	|	LOOKAHEAD(2) node=node()
+	|	LOOKAHEAD(2) node=gd()
 	) {
 		return node;
 	}
@@ -1916,6 +2156,17 @@ Exp empty_or() :
 	t=<LEFT_BRACKET> <RIGHT_BRACKET>
 	{
 		return new Exp(Connective.OR);
+	}
+}
+
+Exp empty_and() :
+{
+	Token t = token;
+}
+{
+	t=<LEFT_BRACKET> <RIGHT_BRACKET>
+	{
+		return new Exp(Connective.AND);
 	}
 }
 
@@ -1963,7 +2214,7 @@ Exp pref_gd() :
 {
 	left_bracket() <PREFERENCE>
 		[pref_name=pref_name()]
-		node=node()
+		node=gd()
 	right_bracket() {
 		node.setPrefName(pref_name);
 		return node;
@@ -2046,7 +2297,7 @@ Exp when_con_effect() :
 }
 {
 	left_bracket() <WHEN>
-		condition=node()
+		condition=gd()
 		effects=cond_effect()
 	right_bracket() {
 		node.addChild(condition);
@@ -2564,7 +2815,7 @@ Exp over_timed_gd() :
 }
 {
 	left_bracket() <OVER> <ALL>
-		child=node()
+		child=gd()
 	right_bracket() {
 		node.addChild(child);
 		return node;
@@ -2590,7 +2841,7 @@ Exp at_start_timed_gd() :
 }
 {
 	left_bracket() <AT> <START>
-		child=node()
+		child=gd()
 	right_bracket() {
 		node.addChild(child);
 		return node;
@@ -2604,7 +2855,7 @@ Exp at_end_timed_gd() :
 }
 {
 	left_bracket() <AT> <END>
-		child=node()
+		child=gd()
 	right_bracket() {
 		node.addChild(child);
 		return node;

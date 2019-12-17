@@ -119,14 +119,13 @@ public class Op implements Serializable {
     /**
      * Creates operator with a specified name, list of parameters, preconditions and effects.
      *
-     * @param name          The name of the operator.
-     * @param parameters    The list of parameters of the operator.
+     * @param name The name of the operator.
+     * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
-     * @param effects       The goal description that represents the effects of the operator.
-     * @param duration      The goal description that represents the duration constraints of the
+     * @param effects The goal description that represents the effects of the operator.
+     * @param duration The goal description that represents the duration constraints of the
      *                      operator.
-     * @throws NullPointerException if the specified name, parameters, preconditions or effects are
-     *                              null.
+     * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
     public Op(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions, final Exp effects,
               final Exp duration) {

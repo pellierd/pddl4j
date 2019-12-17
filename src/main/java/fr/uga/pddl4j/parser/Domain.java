@@ -549,7 +549,6 @@ public class Domain implements Serializable {
         for (DerivedPredicate dp : this.derivedPredicates) {
             str.append(dp).append("\n");
         }
-
         for (Op op : this.ops) {
             str.append(op).append("\n");
         }
