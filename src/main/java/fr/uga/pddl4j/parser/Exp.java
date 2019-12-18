@@ -214,11 +214,11 @@ public class Exp implements Serializable {
      * Set the connective of this node.
      *
      * @param connective the connective.
-     * @throws NullParameterException if the specified connective is null.
+     * @throws NullPointerException if the specified connective is null.
      */
-    public void setConnective(final Connective connective) throws NullParameterException {
+    public void setConnective(final Connective connective) throws NullPointerException {
         if (connective == null) {
-            throw new NullParameterException("Connective can not be null in setConnective call");
+            throw new NullPointerException("Connective can not be null in setConnective call");
         }
         this.connective = connective;
     }
@@ -516,60 +516,55 @@ public class Exp implements Serializable {
      */
     private void negate() throws FatalException {
         Exp exp = this.getChildren().get(0);
-        try {
-            switch (exp.getConnective()) {
-                case FORALL:
-                    this.setConnective(Connective.EXISTS);
-                    Exp negation = new Exp(Connective.NOT);
-                    negation.addChild(exp.getChildren().get(0));
-                    negation.moveNegationInward();
-                    this.children.set(0, negation);
-                    break;
-                case EXISTS:
-                    this.setConnective(Connective.FORALL);
-                    this.setVariables(exp.getVariables());
+        switch (exp.getConnective()) {
+            case FORALL:
+                this.setConnective(Connective.EXISTS);
+                Exp negation = new Exp(Connective.NOT);
+                negation.addChild(exp.getChildren().get(0));
+                negation.moveNegationInward();
+                this.children.set(0, negation);
+                break;
+            case EXISTS:
+                this.setConnective(Connective.FORALL);
+                this.setVariables(exp.getVariables());
+                negation = new Exp(Connective.NOT);
+                negation.addChild(exp.getChildren().get(0));
+                negation.moveNegationInward();
+                this.children.set(0, negation);
+                break;
+            case AND:
+                this.setConnective(Connective.OR);
+                this.children.clear();
+                for (int i = 0; i < exp.getChildren().size(); i++) {
                     negation = new Exp(Connective.NOT);
-                    negation.addChild(exp.getChildren().get(0));
+                    negation.addChild(exp.getChildren().get(i));
                     negation.moveNegationInward();
-                    this.children.set(0, negation);
-                    break;
-                case AND:
-                    this.setConnective(Connective.OR);
-                    this.children.clear();
-                    for (int i = 0; i < exp.getChildren().size(); i++) {
-                        negation = new Exp(Connective.NOT);
-                        negation.addChild(exp.getChildren().get(i));
-                        negation.moveNegationInward();
-                        this.children.add(negation);
-                    }
-                    break;
-                case OR:
-                    this.setConnective(Connective.AND);
-                    this.children.clear();
-                    for (int i = 0; i < exp.getChildren().size(); i++) {
-                        negation = new Exp(Connective.NOT);
-                        negation.addChild(exp.children.get(i));
-                        negation.moveNegationInward();
-                        this.children.add(negation);
-                    }
-                    break;
-                case NOT:
-                    final Exp neg = exp.getChildren().get(0);
-                    this.atom = neg.getAtom();
-                    this.children = neg.getChildren();
-                    this.connective = neg.getConnective();
-                    this.prefName = neg.getPrefName();
-                    this.value = neg.getValue();
-                    this.variable = neg.getVariable();
-                    this.variables = neg.getVariables();
-                    this.moveNegationInward();
-                    break;
-                default:
-                    // do nothing
-            }
-        } catch (NullParameterException npe) {
-            LOGGER.error("a null parameter has been pass to a non null method call", npe);
-            throw new FatalException("Null parameter", npe);
+                    this.children.add(negation);
+                }
+                break;
+            case OR:
+                this.setConnective(Connective.AND);
+                this.children.clear();
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    negation = new Exp(Connective.NOT);
+                    negation.addChild(exp.children.get(i));
+                    negation.moveNegationInward();
+                    this.children.add(negation);
+                }
+                break;
+            case NOT:
+                final Exp neg = exp.getChildren().get(0);
+                this.atom = neg.getAtom();
+                this.children = neg.getChildren();
+                this.connective = neg.getConnective();
+                this.prefName = neg.getPrefName();
+                this.value = neg.getValue();
+                this.variable = neg.getVariable();
+                this.variables = neg.getVariables();
+                this.moveNegationInward();
+                break;
+            default:
+                // do nothing
         }
     }
 
@@ -828,6 +823,28 @@ public class Exp implements Serializable {
                     .append(this.getChildren().get(2).toString(baseOffset))
                     .append(")");
                 break;
+            case TOTAL_ORDERED_TASK_NETWORK:
+                str.append(":ordered-tasks ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                if (!this.getChildren().get(2).getChildren().isEmpty()) {
+                    str.append("constraints ");
+                    str.append(this.getChildren().get(2).toString(baseOffset));
+
+                }
+                break;
+            case PARTIAL_ORDERED_TASK_NETWORK:
+                str.append(":tasks ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                if (!this.getChildren().get(1).getChildren().isEmpty()) {
+                    str.append("constraints ");
+                    str.append(this.getChildren().get(1).toString(baseOffset));
+                }
+                if (!this.getChildren().get(2).getChildren().isEmpty()) {
+                    str.append("constraints ");
+                    str.append(this.getChildren().get(2).toString(baseOffset));
+                }
+                break;
+
             default:
                 // do nothing
 

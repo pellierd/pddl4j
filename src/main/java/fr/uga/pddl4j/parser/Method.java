@@ -58,24 +58,9 @@ public class Method implements Serializable {
     private Exp preconditions;
 
     /**
-     * The subtaks of the method.
+     * The task network of the method.
      */
-    private Exp subtasks;
-
-    /**
-     * The ordering contraints between the subtasks of the method.
-     */
-    private Exp orderingContraints;
-
-    /**
-     * The constraints on the subtasks of the method.
-     */
-    private Exp constraints;
-
-    /**
-     * A boolean that indicates whether the subtask list is fully ordered or not.
-     */
-    private boolean isTotalOrdered;
+    private Exp taskNetwork;
 
     /**
      * Create a new method.
@@ -86,10 +71,7 @@ public class Method implements Serializable {
         this.parameters = null;
         this.task = null;
         this.preconditions = null;
-        this.subtasks = null;
-        this.orderingContraints = null;
-        this.constraints = null;
-        this.isTotalOrdered = true;
+        this.taskNetwork = null;
     }
 
     /**
@@ -106,10 +88,7 @@ public class Method implements Serializable {
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
         this.task = new Exp(other.getTask());
         this.preconditions = new Exp(other.getPreconditions());
-        this.subtasks = new Exp(other.getSubTasks());
-        this.orderingContraints = new Exp(other.getOrderingConstraints());
-        this.constraints = new Exp(other.getConstraints());
-        this.isTotalOrdered = other.isTotalOrdered();
+        this.taskNetwork = new Exp(other.getTaskNetwork());
     }
 
     /**
@@ -136,6 +115,26 @@ public class Method implements Serializable {
         this.setOrderingConstraints(ordering);
         this.setConstraints(constraints);
         this.setTotalOrdered(ordered);
+    }
+
+    /**
+     * Creates method with a specified name, parameter, task performed, precondition and tasknetwork.
+     *
+     * @param name The name of the method.
+     * @param parameters The list of the method parameters.
+     * @param task The task performed by the method.
+     * @param preconditions The preconditions of the task. This parameter can be null.
+     * @param taskNetwork The tasknetwork the method.
+     * @throws NullPointerException if one of the specified parameter except the precondition is null.
+     */
+    public Method(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
+                  final Exp taskNetwork) {
+        this();
+        this.setName(name);
+        this.setParameters(parameters);
+        this.setTask(task);
+        this.setPreconditions(preconditions);
+        this.setTaskNetwork(taskNetwork);
     }
 
     /**
@@ -198,7 +197,7 @@ public class Method implements Serializable {
      *
      * @return the method tasks.
      */
-    public Exp getTask() {
+    public final Exp getTask() {
         return this.task;
     }
 
@@ -208,7 +207,7 @@ public class Method implements Serializable {
      *  @param task The task performed by the method.
      *  @throws NullPointerException if the specified parameters is null.
      */
-    public void setTask(Exp task) {
+    public final void setTask(final Exp task) {
         if (task == null) {
             throw new NullPointerException();
         }
@@ -229,17 +228,38 @@ public class Method implements Serializable {
      *
      *  @param preconditions The precondition to set.
      */
-    public void setPreconditions(Exp preconditions) {
+    public final void setPreconditions(final Exp preconditions) {
         this.preconditions = preconditions;
     }
+
+    /**
+     * Sets the task network of the method. The first child of the task network expression defines the tasks of the
+     * task network. The second child the ordering constraints of the network and finaly the third child the constraints
+     * of the task network.
+     *
+     * @param taskNetworl the task network to set.
+     * @throws NullPointerException if the specified parameters is null.
+     */
+    public final void setTaskNetwork(final Exp taskNetwork) {
+        if (taskNetwork == null) {
+            throw new NullPointerException();
+        }
+        this.taskNetwork = taskNetwork;
+    }
+    /**
+     * Returns the task network of the method. The first child of the task network expression defines the tasks of the
+     * task network. The second child the ordering constraints of the network and finaly the third child the constraints
+     * of the task network.
+     */
+    public final Exp getTaskNetwork() { return this.taskNetwork; }
 
     /**
      * Returns the subtasks of the method.
      *
      * @return the subtasks of the method.
      */
-    public Exp getSubTasks() {
-        return this.subtasks;
+    public final Exp getSubTasks() {
+        return this.taskNetwork.getChildren().get(0);
     }
 
     /**
@@ -248,20 +268,21 @@ public class Method implements Serializable {
      *  @param subtasks The subtasks to set.
      *  @throws NullPointerException if the specified parameters is null.
      */
-    public void setSubtasks(Exp subtasks) {
+    public final void setSubtasks(final Exp subtasks) {
         if (subtasks == null) {
             throw new NullPointerException();
         }
-        this.subtasks = subtasks;
+        this.taskNetwork.getChildren().set(0, subtasks);
     }
 
     /**
      * Returns the ordering constraints between the subtasks of the method.
+     * The method returns an empty conjunction of ordering constraints if the method is totally ordered.
      *
      * @return the ordering constraints of the method.
      */
-    public Exp getOrderingConstraints() {
-        return this.orderingContraints;
+    public final Exp getOrderingConstraints() {
+        return this.taskNetwork.getChildren().get(1);
     }
 
     /**
@@ -270,11 +291,11 @@ public class Method implements Serializable {
      *  @param constraints The constraints to set.
      *  @throws NullPointerException if the specified parameters is null.
      */
-    public void setOrderingConstraints(Exp constraints) {
+    public final void setOrderingConstraints(final Exp constraints) {
         if (constraints == null) {
             throw new NullPointerException();
         }
-        this.orderingContraints = constraints;
+        this.taskNetwork.getChildren().set(1, constraints);
     }
 
     /**
@@ -282,8 +303,8 @@ public class Method implements Serializable {
      *
      * @return the constraints of the method.
      */
-    public Exp getConstraints() {
-        return this.constraints;
+    public final Exp getConstraints() {
+        return this.taskNetwork.getChildren().get(2);
     }
 
     /**
@@ -292,11 +313,11 @@ public class Method implements Serializable {
      *  @param constraints The constraints to set.
      *  @throws NullPointerException if the specified parameters is null.
      */
-    public void setConstraints(Exp constraints) {
+    public final void setConstraints(final Exp constraints) {
         if (constraints == null) {
             throw new NullPointerException();
         }
-        this.constraints = constraints;
+        this.taskNetwork.getChildren().set(2, constraints);
     }
 
     /**
@@ -304,15 +325,21 @@ public class Method implements Serializable {
      *
      * @return true the method is total ordered or not, false otherwise.
      */
-    public boolean isTotalOrdered() { return this.isTotalOrdered; }
+    public final boolean isTotalOrdered() {
+        return this.taskNetwork.getConnective() == Connective.TOTAL_ORDERED_TASK_NETWORK;
+    }
 
     /**
      * Set the boolean total ordered flag to a specified value.
      *
      * @param flag The flag to set.
      */
-    public void setTotalOrdered(boolean flag) {
-        this.isTotalOrdered = flag;
+    public final void setTotalOrdered(final boolean flag) {
+        if (flag) {
+            this.taskNetwork.setConnective(Connective.TOTAL_ORDERED_TASK_NETWORK);
+        } else {
+            this.taskNetwork.setConnective(Connective.PARTIAL_ORDERED_TASK_NETWORK);
+        }
     }
 
     /**
@@ -368,7 +395,7 @@ public class Method implements Serializable {
             if (this.isTotalOrdered()) {
                 str.append("\t:ordered-subtasks ");
             } else {
-                str.append("\t:tasks ");
+                str.append("\t:subtasks ");
             }
         }
         str.append(this.getSubTasks().toString() + "\n");

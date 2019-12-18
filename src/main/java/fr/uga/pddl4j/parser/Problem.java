@@ -61,6 +61,11 @@ public class Problem implements Serializable {
     private List<TypedSymbol> objects;
 
     /**
+     * The task network of the problem.
+     */
+    private Exp taskNetwork;
+
+    /**
      * The list of initial facts declared in the problem.
      */
     private List<Exp> initialFacts;
@@ -84,6 +89,7 @@ public class Problem implements Serializable {
      * Creates a new problem.
      */
     private Problem() {
+        super();
     }
 
     /**
@@ -99,6 +105,7 @@ public class Problem implements Serializable {
         this.name = name;
         this.requirements = new LinkedHashSet<>();
         this.objects = new ArrayList<>();
+        this.taskNetwork = null;
         this.initialFacts = new ArrayList<>();
         this.goal = null;
         this.constraints = null;
@@ -190,6 +197,20 @@ public class Problem implements Serializable {
         }
         return this.objects.add(object);
     }
+
+    /**
+     * Set the initial task network of the problem.
+     *
+     * @param taskNetwork The task network to set.
+     */
+    public final void setTaskNetwork(final Exp taskNetwork) { this.taskNetwork = taskNetwork; }
+
+    /**
+     * Returns the task network of the problem.
+     *
+     * @return the task network of the problem. The task network may null if it is not defined.
+     */
+    public final Exp getTaskNetwork() {return this.taskNetwork; }
 
     /**
      * Returns the list of initial facts defined in the problem file.
@@ -320,6 +341,20 @@ public class Problem implements Serializable {
             }
             str.append("\n)\n");
         }
+        if (this.taskNetwork != null) {
+            str.append("(:htn\n");
+            if (this.taskNetwork.getVariables() != null && !taskNetwork.getVariables().isEmpty()) {
+                str.append("\t(:parameters (");
+                List<TypedSymbol> parameters = this.taskNetwork.getVariables();
+                for (int i = 0; i < parameters.size() - 1; i++) {
+                    str.append(parameters.get(i)).append(" ");
+                }
+                str.append(parameters.get(parameters.size() - 1));
+                str.append(")");
+            }
+            str.append(this.taskNetwork.toString());
+        }
+
         str.append("(:init");
         for (Exp fact : this.initialFacts) {
             str.append("\n  ").append(fact);

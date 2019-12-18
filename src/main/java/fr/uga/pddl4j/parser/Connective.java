@@ -244,9 +244,13 @@ public enum Connective {
      */
     ORDERING_CONSTRAINT(""),
     /**
-     * Connective for task network expression used in HDDL fragment.
+     * Connective for partial order task network expression used in HDDL fragment.
      */
-    TASK_NETWORK("");
+    PARTIAL_ORDERED_TASK_NETWORK(""),
+    /**
+     * Connective for total order task network expression used in HDDL fragment.
+     */
+    TOTAL_ORDERED_TASK_NETWORK("");
 
     /**
      * The image associate to the connective in the PDDL language.

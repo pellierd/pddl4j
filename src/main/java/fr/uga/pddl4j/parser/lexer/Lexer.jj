@@ -444,9 +444,19 @@ void domain_and_problem() :
         right_bracket()
         [LOOKAHEAD(2) require_def(Lexer.PROBLEM)]
         [LOOKAHEAD(2) object_declaration()]
+        [LOOKAHEAD({this.isRequirement(RequireKey.HTN)}) // ADD HDDL
+            left_bracket() <HTN>
+                [<PARAMETERS> typed_list(Lexer.VARIABLE)]
+                (   LOOKAHEAD(2)
+                        <ORDERED_TASKS> subtask_def()
+                |   LOOKAHEAD(2)
+                        <TASKS> subtask_def()
+                        [<ORDERING> ordering_constraint_def()]
+                )
+                [<CONSTRAINTS> constraint_def()]
+        ] // ADD HDDL
         init()
-        goal()
-
+        [LOOKAHEAD({ this.isRequirement(RequireKey.HTN)}) goal()] // ADD HDDL
         [LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
         [LOOKAHEAD(2) metric_spec()]
         // [length-spec()] not implemented
@@ -1855,40 +1865,72 @@ Method method_def() : // ADD HDDL
 	List<TypedSymbol> parameters = null;
 	Exp task = null;
 	Exp preconditions = new Exp(Connective.AND);
-	Exp subtasks = new Exp(Connective.AND);;
-	Exp ordering = new Exp(Connective.AND);
-	Exp constraints = new Exp(Connective.AND);
-	boolean isTotalOrdered = false;
+	Exp tasknetwork = null;
 }
 {
 	try {
 		left_bracket() <ACTION> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> left_bracket() task=task_formula(Lexer.TERM) right_bracket()
-			(   LOOKAHEAD(2, { this.isRequirement(RequireKey.HTN_METHOD_PREC)})
-			        <PRECONDITION> preconditions=pre_gd()
-			         (   <ORDERED_SUBTASKS> subtasks = subtask_def() {
-			                isTotalOrdered = true;
-			         }
-			         |   <TASKS> subtasks = subtask_def()
-			             [<ORDERING> ordering = ordering_constraint_def()]
-			         )
-			|   LOOKAHEAD(2)
-			        (   <ORDERED_SUBTASKS> subtasks = subtask_def() {
-                            isTotalOrdered = true;
-                        }
-			            [<CONSTRAINTS> constraints = constraint_def()]
-			        |   <TASKS> subtasks = subtask_def()
-                    	[<ORDERING> ordering = ordering_constraint_def()]
-                    	[<CONSTRAINTS> constraints = constraint_def()]
-                    )
-            )
+			[LOOKAHEAD({ this.isRequirement(RequireKey.HTN_METHOD_PREC)})
+			    <PRECONDITION> preconditions=pre_gd()
+			]
+            tasknetwork = task_network()
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Method(name, parameters, task, preconditions, subtasks, ordering, constraints, isTotalOrdered);
+		return new Method(name, parameters, task, preconditions, tasknetwork);
+	}
+}
+
+
+Exp task_network() : // ADD HDDL
+{
+    Exp node = null;
+}
+{
+    (   node = total_ordered_task_network()
+    |   node = partial_ordered_task_network())
+    {
+        return node;
+    }
+}
+
+Exp total_ordered_task_network() : // ADD HDDL
+{
+    Exp node = new Exp(Connective.TOTAL_ORDERED_TASK_NETWORK);
+    Exp tasks = null;
+    Exp constraints = new Exp(Connective.AND);
+}
+{
+    (<ORDERED_SUBTASKS> | <ORDERED_TASKS>) tasks = subtask_def()
+	[<CONSTRAINTS> constraints = constraint_def()]
+    {
+	    node.addChild(tasks);
+	    node.addChild(new Exp(Connective.AND));
+	    node.addChild(constraints);
+	    return node;
+	}
+}
+
+Exp partial_ordered_task_network() : // ADD HDDL
+{
+    Exp node = new Exp(Connective.PARTIAL_ORDERED_TASK_NETWORK);
+    Exp tasks = null;
+    Exp ordering = new Exp(Connective.AND);
+    Exp constraints = new Exp(Connective.AND);
+}
+{
+    <TASKS> tasks = subtask_def()
+	[<ORDERING> ordering = ordering_constraint_def()]
+	[<CONSTRAINTS> constraints = constraint_def()]
+	{
+	    node.addChild(tasks);
+	    node.addChild(ordering);
+	    node.addChild(constraints);
+	    return node;
 	}
 }
 
@@ -3359,9 +3401,13 @@ void problem() :
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
+        [LOOKAHEAD({this.isRequirement(RequireKey.HTN)}) // ADD HDDL
+            left_bracket() <HTN>
+                [<PARAMETERS> typed_list(Lexer.VARIABLE)]
+                task_network()
+        ] // ADD HDDL
 		init()
-		goal()
-
+		[LOOKAHEAD({ this.isRequirement(RequireKey.HTN)}) goal()] // ADD HDDL
 		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) metric_spec()]
 		// [length-spec()] not implemented
@@ -3372,6 +3418,8 @@ void problem() :
 	}
 
 }
+
+
 
 Symbol problem_name() :
 { Token t = null; }
