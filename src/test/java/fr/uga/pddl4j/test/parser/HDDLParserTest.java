@@ -1,8 +1,11 @@
 package test.java.fr.uga.pddl4j.test.parser;
 
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.planners.ProblemFactory;
 
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
@@ -17,24 +20,28 @@ public class HDDLParserTest {
 
         final ProblemFactory factory = ProblemFactory.getInstance();
         try {
-           errorManager  = factory.parse(
+           /*errorManager  = factory.parse(
                 "src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl",
                 "src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl");
 
-            errorManager  = factory.parse(
+           errorManager  = factory.parse(
                 "src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/domain.hddl",
                 "src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/pb01.hddl");
 
-            errorManager  = factory.parse(
+           errorManager  = factory.parse(
                 "src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl",
-                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl");
+                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl");*/
 
-            errorManager  = factory.parse(
-                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl",
-                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl");
+           //errorManager  = factory.parse(
+            //    "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl",
+            //    "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl");
 
-            if (!errorManager.isEmpty()) {
-                errorManager.printAll();
+
+            Parser parser = new Parser();
+            parser.parse("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl",
+                    "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl");
+            if (!parser.getErrorManager().isEmpty()) {
+                parser.getErrorManager().printAll();
                 System.exit(0);
             } else {
                 System.out.println("Parsing domain file and problem file done successfully");
