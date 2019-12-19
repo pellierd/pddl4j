@@ -3,17 +3,35 @@ package test.java.fr.uga.pddl4j.test.parser;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 
+import java.io.IOException;
+
 
 /**
  * Created by pellier on 18/12/2019.
  */
 public class HDDLParserTest {
 
-    public void main (String[] args) {
+    public static void main(String[] args) {
+
+        ErrorManager errorManager = null;
 
         final ProblemFactory factory = ProblemFactory.getInstance();
         try {
-            ErrorManager errorManager  = factory.parse(args[0], args[1]);
+           errorManager  = factory.parse(
+                "src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl",
+                "src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl");
+
+            errorManager  = factory.parse(
+                "src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/domain.hddl",
+                "src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/pb01.hddl");
+
+            errorManager  = factory.parse(
+                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl",
+                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl");
+
+            errorManager  = factory.parse(
+                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl",
+                "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl");
 
             if (!errorManager.isEmpty()) {
                 errorManager.printAll();

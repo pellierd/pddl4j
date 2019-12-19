@@ -263,10 +263,11 @@ TOKEN : {
 |	< CONTINUS_EFFECTS : ":continus-effects" >
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HTN : ":htn" > // ADD HDDL
-|   < HTN_METHOD_PREC : "htn-method-prec" > // ADD HDDL
+|   < HTN_METHOD_PREC : ":htn-method-prec" > // ADD HDDL
 |   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
 |   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
-|   < TASKS : ":tasks" > // ADD HDDL
+|   < TASKS : ":tasks" >
+|   < SUBTASKS : ":subtasks" >// ADD HDDL
 |   < ORDERING : ":ordering" > // ADD HDDL
 }
 
@@ -733,7 +734,9 @@ List<TypedSymbol> typed_list(int kind) :
 	List<TypedSymbol> nextTypedList = null;
 }
 {
-	(	LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
+    (   LOOKAHEAD(2)
+        <LEFT_BRACKET> <RIGHT_BRACKET>
+	|   LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
 			(t=primitive_type() {
 				tmp.add(t);
 			})*
@@ -1486,7 +1489,7 @@ Exp atomic_formula(int type) :
 	Symbol t = null;
 }
 {
-	<LEFT_BRACKET> t=predicate() {
+	left_bracket() t=predicate() {
 		atom.add(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
@@ -1869,9 +1872,9 @@ Method method_def() : // ADD HDDL
 }
 {
 	try {
-		left_bracket() <ACTION> name=method_name()
+		left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
-			<TASK> left_bracket() task=task_formula(Lexer.TERM) right_bracket()
+			<TASK> task=task_formula(Lexer.TERM)
 			[LOOKAHEAD({ this.isRequirement(RequireKey.HTN_METHOD_PREC)})
 			    <PRECONDITION> preconditions=pre_gd()
 			]
@@ -1923,7 +1926,7 @@ Exp partial_ordered_task_network() : // ADD HDDL
     Exp constraints = new Exp(Connective.AND);
 }
 {
-    <TASKS> tasks = subtask_def()
+    (<TASKS> | <SUBTASKS>) tasks = subtask_def()
 	[<ORDERING> ordering = ordering_constraint_def()]
 	[<CONSTRAINTS> constraints = constraint_def()]
 	{
@@ -1970,7 +1973,7 @@ Exp and_subtask() : // ADD HDDL
     Exp task = null;
 }
 {
-    <LEFT_BRACKET> <AND> (task=subtask() {
+    <LEFT_BRACKET> <AND> (LOOKAHEAD (2) task=subtask() {
         exp.addChild(task);
     })+ <RIGHT_BRACKET> {
         return exp;
@@ -1983,40 +1986,41 @@ Exp subtask() :  // ADD HDDL
     Exp task;
 }
 {
-    (    LOOKAHEAD(2)
-            <LEFT_BRACKET> task=task_formula(Lexer.TERM) <RIGHT_BRACKET>
-    |   LOOKAHEAD(2)
-            <LEFT_BRACKET> id=subtask_id()
-                <LEFT_BRACKET> task=task_formula(Lexer.TERM) <RIGHT_BRACKET>
+    (   LOOKAHEAD(3)
+            <LEFT_BRACKET>
+                id=subtask_id()
+                task=task_formula(Lexer.TERM)
             <RIGHT_BRACKET> {
                 task.setId(id);
             }
+    |   LOOKAHEAD(2)
+            task=task_formula(Lexer.TERM)
     ) {
         return task;
     }
 }
-
 Exp task_formula(int type) : // ADD HDDL
 {
 	Exp node = new Exp(Connective.TASK);
-	List<Symbol> task = new ArrayList<Symbol>();
+	List<Symbol> atom = new ArrayList<Symbol>();
 	Symbol t = null;
 }
 {
-	<LEFT_BRACKET> t=task_symbol() {
-		task.add(t);
+	left_bracket() t=task_symbol() {
+		atom.add(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
-			task.add(t);
+			atom.add(t);
 		})*
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
-			task.add(t);
+			atom.add(t);
 		})*
 	) right_bracket() {
-		node.setAtom(task);
+		node.setAtom(atom);
 		return node;
 	}
 }
+
 
 Symbol subtask_id() : // ADD HDDL
 {
@@ -2278,7 +2282,8 @@ Exp effect() :
 	Exp node = null;
 }
 {
-	(	LOOKAHEAD(2) node=and_c_effect()
+	(	LOOKAHEAD(2) node=empty_or()
+	|   LOOKAHEAD(2) node=and_c_effect()
 	|	LOOKAHEAD(2) node=c_effect()
 	) {
 		return node;
@@ -3386,6 +3391,16 @@ Exp da_divide_op() :
 
 void problem() :
 {
+}
+{
+    (   LOOKAHEAD({this.isRequirement(RequireKey.HTN)})
+            htn_problem()
+    |    pddl_problem()
+    )
+}
+
+void pddl_problem() :
+{
 	Symbol name = null;
 }
 {
@@ -3401,13 +3416,41 @@ void problem() :
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
-        [LOOKAHEAD({this.isRequirement(RequireKey.HTN)}) // ADD HDDL
-            left_bracket() <HTN>
-                [<PARAMETERS> typed_list(Lexer.VARIABLE)]
-                task_network()
-        ] // ADD HDDL
+        init()
+		goal()
+		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) metric_spec()]
+		// [length-spec()] not implemented
+		right_bracket()
+		<EOF>
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void htn_problem() : // ADD HDDL
+{
+	Symbol name = null;
+}
+{
+	try {
+		left_bracket() <DEFINE>
+		left_bracket() <PROBLEM>
+			name=problem_name() {
+				this.problem = new Problem(name);
+			}
+		right_bracket()
+		left_bracket() <P_DOMAIN>
+			domain_problem_name()
+		right_bracket()
+		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) object_declaration()]
+        left_bracket() <HTN>
+            [<PARAMETERS> typed_list(Lexer.VARIABLE)]
+            task_network()
+        right_bracket()
 		init()
-		[LOOKAHEAD({ this.isRequirement(RequireKey.HTN)}) goal()] // ADD HDDL
+		[LOOKAHEAD(2) goal()]
 		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) metric_spec()]
 		// [length-spec()] not implemented
@@ -3418,7 +3461,6 @@ void problem() :
 	}
 
 }
-
 
 
 Symbol problem_name() :
