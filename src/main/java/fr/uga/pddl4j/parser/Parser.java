@@ -184,6 +184,7 @@ public final class Parser {
                 this.checkPredicatesDeclaration();
                 this.checkFunctionsDeclaration();
                 this.checkDomainConstraints();
+                this.checkTasksDeclaration();
                 this.checkOperatorsDeclaration();
                 this.checkDerivedPredicatesDeclaration();
             } catch (NullPointerException exception) {
@@ -822,7 +823,7 @@ public final class Parser {
 
     /**
      * Checks the predicates declaration. More precisely, this method checks, if the domain is
-     * typed, if each types of the variables used in the predicates declaration are defined, if
+     * typed, if each types of the variables used in the predicates declaration are defined and if
      * there is no duplicated predicate.
      *
      * @return <code>true</code> if the predicates declaration are well formed; <code>false</code> otherwise.
@@ -849,6 +850,42 @@ public final class Parser {
             if (!set.add(str)) {
                 this.mgr.logParserError("predicate \"" + str + "\" declared twice", this.lexer
                     .getFile(), predicateSymbol.getBeginLine(), predicateSymbol
+                    .getBeginColumn());
+                checked = false;
+            }
+        }
+        return checked;
+    }
+
+    /**
+     * Checks the task declaration. More precisely, this method checks, if the domain is
+     * typed, if each types of the variables used in the parameters of the tasks are definied and if
+     * there is no duplicated tasks.
+     *
+     * @return <code>true</code> if the predicates declaration are well formed; <code>false</code> otherwise.
+     */
+    private boolean checkTasksDeclaration() {
+        List<NamedTypedList> tasks = this.domain.getTasks();
+        Set<String> set = new HashSet<>();
+        boolean checked = true;
+        for (NamedTypedList task : tasks) {
+            for (TypedSymbol variable : task.getArguments()) {
+                for (Symbol type : variable.getTypes()) {
+                    if (!this.domain.isDeclaredType(type)) {
+                        this.mgr.logParserError("type \"" + type.getImage()
+                            + "\" of the variable \"" + variable.getImage()
+                            + "\" is undefined", this.lexer.getFile(), variable
+                            .getBeginLine(), variable.getBeginColumn());
+                        checked = false;
+                    }
+                }
+            }
+            Symbol symbol = task.getName();
+            String str = symbol.getImage() + "/" + task.getArguments().size();
+
+            if (!set.add(str)) {
+                this.mgr.logParserError("task \"" + str + "\" declared twice", this.lexer
+                    .getFile(), symbol.getBeginLine(), symbol
                     .getBeginColumn());
                 checked = false;
             }
