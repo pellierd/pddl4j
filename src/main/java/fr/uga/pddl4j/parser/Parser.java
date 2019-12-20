@@ -838,8 +838,8 @@ public final class Parser {
                     if (!this.domain.isDeclaredType(type)) {
                         this.mgr.logParserError("type \"" + type.getImage()
                             + "\" of the variable \"" + variable.getImage()
-                            + "\" is undefined", this.lexer.getFile(), variable
-                            .getBeginLine(), variable.getBeginColumn());
+                            + "\" is undefined in predicate declaration \"" + predicate.getName() + "\"",
+                            this.lexer.getFile(), variable.getBeginLine(), variable.getBeginColumn());
                         checked = false;
                     }
                 }
@@ -874,8 +874,8 @@ public final class Parser {
                     if (!this.domain.isDeclaredType(type)) {
                         this.mgr.logParserError("type \"" + type.getImage()
                             + "\" of the variable \"" + variable.getImage()
-                            + "\" is undefined", this.lexer.getFile(), variable
-                            .getBeginLine(), variable.getBeginColumn());
+                            + "\" is undefined in task declaration \"" + task.getName() + "\"", this.lexer.getFile(),
+                            variable.getBeginLine(), variable.getBeginColumn());
                         checked = false;
                     }
                 }
