@@ -849,29 +849,6 @@ public class Exp implements Serializable {
                     .append(this.getChildren().get(2).toString(baseOffset))
                     .append(")");
                 break;
-            case TOTAL_ORDERED_TASK_NETWORK:
-                off = baseOffset + baseOffset + "  ";
-                str.append(":ordered-tasks\n  ");
-                str.append(this.getChildren().get(0).toString(off));
-                if (!this.getChildren().get(2).getChildren().isEmpty()) {
-                    str.append("\n  :constraints\n  ");
-                    str.append(this.getChildren().get(2).toString(off));
-
-                }
-                break;
-            case PARTIAL_ORDERED_TASK_NETWORK:
-                off = baseOffset + baseOffset + "  ";
-                str.append("  :tasks\n  ");
-                str.append(this.getChildren().get(0).toString(off));
-                if (!this.getChildren().get(1).getChildren().isEmpty()) {
-                    str.append("\n  :ordering\n  ");
-                    str.append(this.getChildren().get(1).toString(off));
-                }
-                if (!this.getChildren().get(2).getChildren().isEmpty()) {
-                    str.append("\n  :constraints\n  ");
-                    str.append(this.getChildren().get(2).toString(off));
-                }
-                break;
             default:
                 // do nothing
 
@@ -911,8 +888,6 @@ public class Exp implements Serializable {
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-            case TOTAL_ORDERED_TASK_NETWORK:
-            case PARTIAL_ORDERED_TASK_NETWORK:
                 malformed = this.children.size() != 3
                     && this.children.get(0).isMalformedExpression()
                     && this.children.get(1).isMalformedExpression()

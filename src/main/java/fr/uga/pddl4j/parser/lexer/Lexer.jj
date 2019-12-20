@@ -38,6 +38,7 @@ import fr.uga.pddl4j.parser.Op;
 import fr.uga.pddl4j.parser.Method;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.parser.TaskNetwork;
 import fr.uga.pddl4j.parser.TypedSymbol;
 
 import java.io.FileInputStream;
@@ -454,7 +455,7 @@ void domain_and_problem() :
                         <TASKS> subtask_def()
                         [<ORDERING> ordering_constraint_def()]
                 )
-                [<CONSTRAINTS> constraint_def()]
+                [<CONSTRAINTS> logical_constraint_def()]
         ] // ADD HDDL
         init()
         [LOOKAHEAD({ this.isRequirement(RequireKey.HTN)}) goal()] // ADD HDDL
@@ -1868,7 +1869,7 @@ Method method_def() : // ADD HDDL
 	List<TypedSymbol> parameters = null;
 	Exp task = null;
 	Exp preconditions = new Exp(Connective.AND);
-	Exp tasknetwork = null;
+	TaskNetwork tn = null;
 }
 {
 	try {
@@ -1878,62 +1879,54 @@ Method method_def() : // ADD HDDL
 			[LOOKAHEAD({ this.isRequirement(RequireKey.HTN_METHOD_PREC)})
 			    <PRECONDITION> preconditions=pre_gd()
 			]
-            tasknetwork = task_network()
+            tn = task_network()
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Method(name, parameters, task, preconditions, tasknetwork);
+		return new Method(name, parameters, task, preconditions, tn);
 	}
 }
 
 
-Exp task_network() : // ADD HDDL
+TaskNetwork task_network() : // ADD HDDL
 {
-    Exp node = null;
+    TaskNetwork tn = null;
 }
 {
-    (   node = total_ordered_task_network()
-    |   node = partial_ordered_task_network())
+    (   tn = total_ordered_task_network()
+    |   tn = partial_ordered_task_network())
     {
-        return node;
+        return tn;
     }
 }
 
-Exp total_ordered_task_network() : // ADD HDDL
+TaskNetwork total_ordered_task_network() : // ADD HDDL
 {
-    Exp node = new Exp(Connective.TOTAL_ORDERED_TASK_NETWORK);
     Exp tasks = null;
-    Exp constraints = new Exp(Connective.AND);
+    Exp logical = new Exp(Connective.AND);
 }
 {
     (<ORDERED_SUBTASKS> | <ORDERED_TASKS>) tasks = subtask_def()
-	[<CONSTRAINTS> constraints = constraint_def()]
+	[<CONSTRAINTS> logical = logical_constraint_def()]
     {
-	    node.addChild(tasks);
-	    node.addChild(new Exp(Connective.AND));
-	    node.addChild(constraints);
-	    return node;
+	    return new TaskNetwork(new ArrayList<TypedSymbol>(), tasks, new Exp(Connective.AND), logical, true);
 	}
 }
 
-Exp partial_ordered_task_network() : // ADD HDDL
+TaskNetwork partial_ordered_task_network() : // ADD HDDL
 {
-    Exp node = new Exp(Connective.PARTIAL_ORDERED_TASK_NETWORK);
     Exp tasks = null;
     Exp ordering = new Exp(Connective.AND);
-    Exp constraints = new Exp(Connective.AND);
+    Exp logical = new Exp(Connective.AND);
 }
 {
     (<TASKS> | <SUBTASKS>) tasks = subtask_def()
 	[<ORDERING> ordering = ordering_constraint_def()]
-	[<CONSTRAINTS> constraints = constraint_def()]
+	[<CONSTRAINTS> logical = logical_constraint_def()]
 	{
-	    node.addChild(tasks);
-	    node.addChild(ordering);
-	    node.addChild(constraints);
-	    return node;
+	    return new TaskNetwork(new ArrayList<TypedSymbol>(), tasks, ordering, logical, false);
 	}
 }
 
@@ -2081,7 +2074,7 @@ Exp ordering_constraint() : // ADD HDDL
     }
 }
 
-Exp constraint_def() : // ADD HDDL
+Exp logical_constraint_def() : // ADD HDDL
 {
     Exp node = null;
     Exp c = null;
@@ -3431,7 +3424,7 @@ void pddl_problem() :
 void htn_problem() : // ADD HDDL
 {
 	Symbol name = null;
-	Exp taskNetwork = null;
+	TaskNetwork taskNetwork = null;
 }
 {
 	try {

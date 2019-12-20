@@ -63,7 +63,7 @@ public class Problem implements Serializable {
     /**
      * The task network of the problem.
      */
-    private Exp taskNetwork;
+    private TaskNetwork taskNetwork;
 
     /**
      * The list of initial facts declared in the problem.
@@ -201,16 +201,22 @@ public class Problem implements Serializable {
     /**
      * Set the initial task network of the problem.
      *
-     * @param taskNetwork The task network to set.
+     * @param network The task network to set.
+     * @thows NullPointerException if the task network to set is null.
      */
-    public final void setTaskNetwork(final Exp taskNetwork) { this.taskNetwork = taskNetwork; }
+    public final void setTaskNetwork(final TaskNetwork network) {
+        if (network == null) {
+           throw new NullPointerException();
+        }
+        this.taskNetwork = network;
+    }
 
     /**
      * Returns the task network of the problem.
      *
      * @return the task network of the problem. The task network may null if it is not defined.
      */
-    public final Exp getTaskNetwork() {return this.taskNetwork; }
+    public final TaskNetwork getTaskNetwork() {return this.taskNetwork; }
 
     /**
      * Returns the list of initial facts defined in the problem file.
@@ -343,19 +349,9 @@ public class Problem implements Serializable {
         }
         if (this.taskNetwork != null) {
             str.append("(:htn\n");
-            if (this.taskNetwork.getVariables() != null && !taskNetwork.getVariables().isEmpty()) {
-                str.append("\t(:parameters (");
-                List<TypedSymbol> parameters = this.taskNetwork.getVariables();
-                for (int i = 0; i < parameters.size() - 1; i++) {
-                    str.append(parameters.get(i)).append(" ");
-                }
-                str.append(parameters.get(parameters.size() - 1));
-                str.append(")");
-            }
             str.append(this.taskNetwork.toString());
             str.append("\n)\n");
         }
-
         str.append("(:init");
         for (Exp fact : this.initialFacts) {
             str.append("\n  ").append(fact);

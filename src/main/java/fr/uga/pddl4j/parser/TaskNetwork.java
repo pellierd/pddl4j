@@ -61,7 +61,7 @@ public class TaskNetwork implements Serializable {
     /**
      * Create a new task network.
      */
-    private TaskNetwork() {
+    protected TaskNetwork() {
         super();
         this.parameters = null;
         this.tasks = null;
@@ -280,17 +280,17 @@ public class TaskNetwork implements Serializable {
             str.append("  :tasks\n  ");
         }
         if (!this.getTasks().getChildren().isEmpty()) {
-            str.append(this.getTasks().toString("  ") + "\n");
+            str.append(this.getTasks().toString("  "));
         } else {
             str.append("()\n");
         }
         if (!this.getOrderingConstraints().getChildren().isEmpty()) {
-            str.append("  :ordering\n  ");
-            str.append(this.getOrderingConstraints().toString("  ") + "\n");
+            str.append("\n  :ordering\n  ");
+            str.append(this.getOrderingConstraints().toString("  "));
         }
         if (!this.getLogicalConstraints().getChildren().isEmpty()) {
-            str.append("  :constraints\n  ");
-            str.append(this.getLogicalConstraints().toString("  ") + "\n");
+            str.append("\n  :constraints\n  ");
+            str.append(this.getLogicalConstraints().toString("  "));
         }
         return str.toString();
     }
