@@ -415,55 +415,9 @@ void domain_and_problem() :
 {
 	try {
     	//Domain file
-    	left_bracket() <DEFINE> left_bracket() <DOMAIN>
-    		name=domain_name() {
-    			this.domain = new Domain(name);
-    		}
-    	right_bracket()
-    	[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
-    	[LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
-    	[LOOKAHEAD(2) constants_def()]
-    	[LOOKAHEAD(2) predicates_def()]
-    	[LOOKAHEAD(2, {
-    		this.isRequirement(RequireKey.FLUENTS)
-    		|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
-    		|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
-    		|| this.isRequirement(RequireKey.ACTION_COSTS)
-    	}) functions_def()]
-    	[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
-    	(structure_def())*
-    	right_bracket()
-
+    	domain()
     	//Problem file
-    	left_bracket() <DEFINE>
-        left_bracket() <PROBLEM>
-        name=problem_name() {
-        	this.problem = new Problem(name);
-        }
-        right_bracket()
-        left_bracket() <P_DOMAIN>
-        domain_problem_name()
-        right_bracket()
-        [LOOKAHEAD(2) require_def(Lexer.PROBLEM)]
-        [LOOKAHEAD(2) object_declaration()]
-        [LOOKAHEAD({this.isRequirement(RequireKey.HTN)}) // ADD HDDL
-            left_bracket() <HTN>
-                [<PARAMETERS> typed_list(Lexer.VARIABLE)]
-                (   LOOKAHEAD(2)
-                        <ORDERED_TASKS> subtask_def()
-                |   LOOKAHEAD(2)
-                        <TASKS> subtask_def()
-                        [<ORDERING> ordering_constraint_def()]
-                )
-                [<CONSTRAINTS> logical_constraint_def()]
-        ] // ADD HDDL
-        init()
-        [LOOKAHEAD({ this.isRequirement(RequireKey.HTN)}) goal()] // ADD HDDL
-        [LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
-        [LOOKAHEAD(2) metric_spec()]
-        // [length-spec()] not implemented
-        right_bracket()
-        <EOF>
+    	problem()
     } catch(Throwable e) {
     	this.error(e, token.beginLine, token.beginColumn);
     }
