@@ -2028,7 +2028,7 @@ Symbol subtask_id() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new Symbol(Symbol.Kind.ACTION, t);
+		return new Symbol(Symbol.Kind.TASK_ID, t);
 	}
 }
 
@@ -2067,7 +2067,7 @@ Exp and_ordering_constraint() : // ADD HDDL
 
 Exp ordering_constraint() : // ADD HDDL
 {
-    Exp node = new Exp(Connective.ORDERING_CONSTRAINT);
+    Exp node = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
     List<Symbol> tasks = new ArrayList<Symbol>();
     Symbol id1 = null;
     Symbol id2 = null;
@@ -3431,6 +3431,7 @@ void pddl_problem() :
 void htn_problem() : // ADD HDDL
 {
 	Symbol name = null;
+	Exp taskNetwork = null;
 }
 {
 	try {
@@ -3447,7 +3448,9 @@ void htn_problem() : // ADD HDDL
 		[LOOKAHEAD(2) object_declaration()]
         left_bracket() <HTN>
             [<PARAMETERS> typed_list(Lexer.VARIABLE)]
-            task_network()
+            taskNetwork = task_network() {
+                this.problem.setTaskNetwork(taskNetwork);
+            }
         right_bracket()
 		init()
 		[LOOKAHEAD(2) goal()]

@@ -359,7 +359,7 @@ public class Op implements Serializable {
         } else {
             str.append("(:durative-action ");
         }
-        str.append(this.name.toString()).append("\n").append(":parameters (");
+        str.append(this.name.toString()).append("\n").append("  :parameters (");
         for (int i = 0; i < this.parameters.size() - 1; i++) {
             str.append(this.parameters.get(i)).append(" ");
         }
@@ -368,12 +368,12 @@ public class Op implements Serializable {
         }
         str.append(")");
         if (this.duration != null) {
-            str.append("\n:duration ").append("\n  ").append(this.duration.toString()).append("\n:condition ");
+            str.append("\n  :duration ").append("\n  ").append(this.duration.toString("  ")).append("\n  :condition ");
         } else {
-            str.append("\n:precondition ");
+            str.append("\n  :precondition ");
         }
-        str.append("\n  ").append(this.preconditions.toString()).append("\n:effect ").append("\n  ")
-            .append(this.effects.toString()).append("\n)");
+        str.append("\n  ").append(this.preconditions.toString("  ")).append("\n  :effect ").append("\n  ")
+            .append(this.effects.toString("  ")).append("\n)");
         return str.toString();
     }
 }

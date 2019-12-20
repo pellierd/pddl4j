@@ -353,13 +353,17 @@ public class Problem implements Serializable {
                 str.append(")");
             }
             str.append(this.taskNetwork.toString());
+            str.append("\n)\n");
         }
 
         str.append("(:init");
         for (Exp fact : this.initialFacts) {
             str.append("\n  ").append(fact);
         }
-        str.append("\n)\n").append("(:goal ").append("  ").append(this.goal).append(")\n");
+        str.append("\n)\n");
+        if (this.getGoal() != null) {
+            str.append("\n)\n").append("(:goal ").append("  ").append(this.goal).append(")\n");
+        }
         if (this.constraints != null) {
             str.append("(:constraints ").append("  ").append(this.constraints).append(")\n");
         }

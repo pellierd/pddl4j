@@ -237,7 +237,7 @@ public class Method implements Serializable {
      * task network. The second child the ordering constraints of the network and finaly the third child the constraints
      * of the task network.
      *
-     * @param taskNetworl the task network to set.
+     * @param taskNetwork the task network to set.
      * @throws NullPointerException if the specified parameters is null.
      */
     public final void setTaskNetwork(final Exp taskNetwork) {
@@ -379,7 +379,7 @@ public class Method implements Serializable {
     public String toString() {
         final StringBuilder str = new StringBuilder();
         str.append("(:method ");
-        str.append(this.name.toString()).append("\n").append("\t:parameters (");
+        str.append(this.name.toString()).append("\n").append("  :parameters (");
         for (int i = 0; i < this.parameters.size() - 1; i++) {
             str.append(this.parameters.get(i)).append(" ");
         }
@@ -387,27 +387,28 @@ public class Method implements Serializable {
             str.append(this.parameters.get(this.parameters.size() - 1).toString());
         }
         str.append(")\n");
-        str.append("\t:task (" + this.getTask().toString() + ")\n");
+        str.append("  :task ").append(this.getTask().toString("  ")).append("\n");
+
+
         if (!this.getPreconditions().getChildren().isEmpty()) {
-            str.append("\t:precondition" + this.getPreconditions().toString() + "\n");
+            str.append("  :precondition\n  " + this.getPreconditions().toString("  ") + "\n");
         }
         if (!this.getSubTasks().getChildren().isEmpty()) {
             if (this.isTotalOrdered()) {
-                str.append("\t:ordered-subtasks ");
+                str.append("  :ordered-subtasks\n  ");
             } else {
-                str.append("\t:subtasks ");
+                str.append("  :subtasks\n  ");
             }
         }
-        str.append(this.getSubTasks().toString() + "\n");
+        str.append(this.getSubTasks().toString("  ") + "\n");
         if (!this.getOrderingConstraints().getChildren().isEmpty()) {
-            str.append("\t:ordering ");
-            str.append(this.getOrderingConstraints().toString() + "\n");
+            str.append("  :ordering\n  ");
+            str.append(this.getOrderingConstraints().toString("  ") + "\n");
         }
         if (!this.getConstraints().getChildren().isEmpty()) {
-            str.append("\t:constraints ");
-            str.append(this.getConstraints().toString() + "\n");
+            str.append("  :constraints\n  ");
+            str.append(this.getConstraints().toString("  ") + "\n");
         }
-        str.append(")\n");
         str.append(")");
         return str.toString();
     }

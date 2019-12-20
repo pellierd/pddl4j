@@ -574,7 +574,7 @@ public class Exp implements Serializable {
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
      *          not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     *          atom, value, preference name, variable and value; otherwise return <tt>false</tt>.
+     *          atom, value, preference name, variable, value and id; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -590,7 +590,9 @@ public class Exp implements Serializable {
                 && ((this.variables == null && other.variables == null)
                 || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
                 && ((this.value == null && other.value == null)
-                || (this.value != null && other.value != null && this.value.equals(other.value)));
+                || (this.value != null && other.value != null && this.value.equals(other.value)))
+                && ((this.id == null && other.id == null)
+                || (this.id != null && other.id != null && this.id.equals(other.id)));
         }
         return false;
     }
@@ -609,6 +611,7 @@ public class Exp implements Serializable {
         result = prime * result + ((children == null) ? 0 : children.hashCode());
         result = prime * result + ((connective == null) ? 0 : connective.hashCode());
         result = prime * result + ((prefName == null) ? 0 : prefName.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         long temp;
         temp = Double.doubleToLongBits(value);
         result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -678,7 +681,7 @@ public class Exp implements Serializable {
      * @throws MalformedExpException if the expression is malformed.
      * @see this#isMalformedExpression
      */
-    private String toString(String baseOffset) {
+    public String toString(String baseOffset) {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
@@ -688,6 +691,19 @@ public class Exp implements Serializable {
             case FN_HEAD:
                 str.append("(");
                 if (!this.atom.isEmpty()) {
+                    for (int i = 0; i < this.atom.size() - 1; i++) {
+                        str.append(this.atom.get(i).toString()).append(" ");
+                    }
+                    str.append(this.atom.get(this.atom.size() - 1).toString());
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                if (!this.atom.isEmpty()) {
+                    if (this.getId() != null) {
+                        str.append(this.getId()).append(" (");
+                    }
                     for (int i = 0; i < this.atom.size() - 1; i++) {
                         str.append(this.atom.get(i).toString()).append(" ");
                     }
@@ -706,16 +722,19 @@ public class Exp implements Serializable {
                 break;
             case AND:
             case OR:
-                String offset = baseOffset + "  ";
-                str.append("(").append(this.getConnective().getImage());
                 if (!this.children.isEmpty()) {
+                    String offset = baseOffset + "  ";
+                    str.append("(").append(this.getConnective().getImage());
                     str.append(" ");
                     for (int i = 0; i < this.children.size() - 1; i++) {
                         str.append(this.children.get(i).toString(offset)).append("\n").append(offset);
                     }
                     str.append(this.children.get(this.children.size() - 1).toString(offset));
+                    str.append(")");
+                } else {
+                    str.append("()");
                 }
-                str.append(")");
+
                 //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case FORALL:
@@ -775,6 +794,13 @@ public class Exp implements Serializable {
                     .append(this.children.get(1).toString(baseOffset))
                     .append(")");
                 break;
+            case LESS_ORDERING_CONSTRAINT:
+                str.append("(")
+                    .append(this.getConnective().getImage()).append(" ")
+                    .append(this.atom.get(0).toString()).append(" ")
+                    .append(this.atom.get(1).toString())
+                    .append(")");
+                break;
             case NOT:
             case UMINUS:
             case AT_START:
@@ -824,27 +850,28 @@ public class Exp implements Serializable {
                     .append(")");
                 break;
             case TOTAL_ORDERED_TASK_NETWORK:
-                str.append(":ordered-tasks ");
-                str.append(this.getChildren().get(0).toString(baseOffset));
+                off = baseOffset + baseOffset + "  ";
+                str.append(":ordered-tasks\n  ");
+                str.append(this.getChildren().get(0).toString(off));
                 if (!this.getChildren().get(2).getChildren().isEmpty()) {
-                    str.append("constraints ");
-                    str.append(this.getChildren().get(2).toString(baseOffset));
+                    str.append("\n  :constraints\n  ");
+                    str.append(this.getChildren().get(2).toString(off));
 
                 }
                 break;
             case PARTIAL_ORDERED_TASK_NETWORK:
-                str.append(":tasks ");
-                str.append(this.getChildren().get(0).toString(baseOffset));
+                off = baseOffset + baseOffset + "  ";
+                str.append("  :tasks\n  ");
+                str.append(this.getChildren().get(0).toString(off));
                 if (!this.getChildren().get(1).getChildren().isEmpty()) {
-                    str.append("constraints ");
-                    str.append(this.getChildren().get(1).toString(baseOffset));
+                    str.append("\n  :ordering\n  ");
+                    str.append(this.getChildren().get(1).toString(off));
                 }
                 if (!this.getChildren().get(2).getChildren().isEmpty()) {
-                    str.append("constraints ");
-                    str.append(this.getChildren().get(2).toString(baseOffset));
+                    str.append("\n  :constraints\n  ");
+                    str.append(this.getChildren().get(2).toString(off));
                 }
                 break;
-
             default:
                 // do nothing
 
@@ -858,7 +885,7 @@ public class Exp implements Serializable {
      * <li>Empty OR and AND expressions, i.e., without any children, are considered as well formed.</li>
      * <li>Quantified expressions (EXISTS, FORALL) is well formed if it has at least one quantified variable and one
      * child expression.</li>
-     * <li>ATOM and F_HEAD expressions without any symbols as arguments are considered as well formed.</li>
+     * <li>ATOM, TASKS, and F_HEAD expressions without any symbols as arguments are considered as well formed.</li>
      * <li>EQUAL_ATOM expression with two symbols as arguments is considered as well formed.</li>
      * <li>NOT, UMINUS, AT_START, AT_END, OVER_ALL, ALWAYS, SOMETIME, AT_MOST_ONCE, MINIMIZE, MAXIMIZE and F_EXP_T
      * expressions must have at least one child expression to be considered as well formed.</li>
@@ -884,6 +911,8 @@ public class Exp implements Serializable {
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
+            case TOTAL_ORDERED_TASK_NETWORK:
+            case PARTIAL_ORDERED_TASK_NETWORK:
                 malformed = this.children.size() != 3
                     && this.children.get(0).isMalformedExpression()
                     && this.children.get(1).isMalformedExpression()
@@ -910,9 +939,8 @@ public class Exp implements Serializable {
             case SOMETIME_BEFORE:
             case HOLD_AFTER:
             case WITHIN:
-                malformed = this.children.size() != 2
-                    && this.children.get(0).isMalformedExpression()
-                    && this.children.get(1).isMalformedExpression();
+            case LESS_ORDERING_CONSTRAINT:
+                malformed = this.atom.size() != 2;
                 break;
             case NOT:
             case UMINUS:
@@ -929,7 +957,10 @@ public class Exp implements Serializable {
                     && this.children.get(0).isMalformedExpression();
                 break;
             case ATOM:
+            case TASK:
             case FN_HEAD:
+                malformed = this.getAtom().size() == 0;
+                break;
             case TIME_VAR:
             case NUMBER:
             case IS_VIOLATED:

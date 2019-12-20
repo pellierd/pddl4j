@@ -104,7 +104,11 @@ public class Symbol implements Serializable {
         /**
          * The problem symbol.
          */
-        PROBLEM
+        PROBLEM,
+        /**
+         * the task id symbol.
+         */
+        TASK_ID;
     }
 
     /**
