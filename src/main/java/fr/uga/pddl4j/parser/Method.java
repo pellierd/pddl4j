@@ -167,8 +167,12 @@ public class Method extends TaskNetwork {
      *  Sets the preconditions of the method.
      *
      *  @param preconditions The precondition to set.
+     *  @throws NullPointerException if the specified parameters is null.
      */
     public final void setPreconditions(final Exp preconditions) {
+        if (preconditions == null) {
+            throw new NullPointerException();
+        }
         this.preconditions = preconditions;
     }
 

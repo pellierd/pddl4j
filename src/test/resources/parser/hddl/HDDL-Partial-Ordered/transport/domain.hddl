@@ -36,7 +36,7 @@
 		:parameters (?l1 - location ?l2 - location ?p - package ?v - vehicle)
 		:task (deliver ?p ?l2)
 		:subtasks (and
-		 (task0 (get_to ?v ?l1))
+		 (task0 (get_to ?v ?l2))
 		 (task1 (load ?v ?l1 ?p))
 		 (task2 (get_to ?v ?l2))
 		 (task3 (unload ?v ?l2 ?p))

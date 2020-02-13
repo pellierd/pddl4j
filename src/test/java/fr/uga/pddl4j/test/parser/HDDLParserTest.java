@@ -41,8 +41,8 @@ public class HDDLParserTest {
                 System.exit(0);
             } else {
                 System.out.println("Parsing domain file and problem file done successfully");
-                System.out.println(parser.getDomain());
-                System.out.println(parser.getProblem());
+                //System.out.println(parser.getDomain());
+                //System.out.println(parser.getProblem());
 
             }
 

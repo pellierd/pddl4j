@@ -83,6 +83,10 @@ import java.util.stream.Collectors;
  * }
  * </pre>
  *
+ * <p>
+ *  TO DO: check the cyclic dependencies of the ordering constraints of the methods.
+ * </p>
+ *
  * @author D Pellier
  * @version 1.0 - 28.01.10
  */
@@ -184,9 +188,10 @@ public final class Parser {
                 this.checkPredicatesDeclaration();
                 this.checkFunctionsDeclaration();
                 this.checkDomainConstraints();
-                this.checkTasksDeclaration();
-                this.checkOperatorsDeclaration();
-                this.checkDerivedPredicatesDeclaration();
+                this.checkTaskDeclaration();
+                this.checkOperatorDeclaration();
+                this.checkMethodDeclaration();
+                this.checkDerivedPredicateDeclaration();
             } catch (NullPointerException exception) {
                 LOGGER.error("domain file is not valid\n");
                 this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
@@ -281,8 +286,9 @@ public final class Parser {
             this.checkConstantsDeclaration();
             this.checkPredicatesDeclaration();
             this.checkFunctionsDeclaration();
-            this.checkOperatorsDeclaration();
-            this.checkDerivedPredicatesDeclaration();
+            this.checkTaskDeclaration();
+            this.checkOperatorDeclaration();
+            this.checkDerivedPredicateDeclaration();
             this.checkDomainName();
             this.checkObjectsDeclaration();
             this.checkInitialFacts();
@@ -864,7 +870,7 @@ public final class Parser {
      *
      * @return <code>true</code> if the predicates declaration are well formed; <code>false</code> otherwise.
      */
-    private boolean checkTasksDeclaration() {
+    private boolean checkTaskDeclaration() {
         List<NamedTypedList> tasks = this.domain.getTasks();
         Set<String> set = new HashSet<>();
         boolean checked = true;
@@ -950,7 +956,7 @@ public final class Parser {
      * @return <code>true</code> if the declared derived predicates are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkDerivedPredicatesDeclaration() {
+    private boolean checkDerivedPredicateDeclaration() {
         boolean checked = true;
         for (DerivedPredicate axiom : this.domain.getDerivesPredicates()) {
             NamedTypedList head = axiom.getHead();
@@ -989,10 +995,10 @@ public final class Parser {
      *
      * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
      */
-    private boolean checkOperatorsDeclaration() {
+    private boolean checkOperatorDeclaration() {
         boolean checked = this.checkOperatorsUniqueness();
         for (Op op : this.domain.getOperators()) {
-            if (this.checkOperatorsParameters(op)) {
+            if (this.checkOperatorParameters(op)) {
                 checked &= this.checkParserNode(op.getPreconditions(), op.getParameters());
                 checked &= this.checkParserNode(op.getEffects(), op.getParameters());
                 if (op.getDuration() != null) {
@@ -1001,6 +1007,107 @@ public final class Parser {
             }
         }
         return checked;
+    }
+
+    /**
+     * Checks if the declared methods are well formed.
+     * <ul>
+     * <li> Methods must have a unique name.</li>
+     * <li> The type of the variables or constants used in their precondition, condition and effects
+     * are type previously declared.</li>
+     * <li> The variable used in their precondition, condition and effects are declared as
+     * parameters of the operators.</li>
+     * <li> The task id used in subtasks declaration are unique.</li>
+     * <li> The task id used in ordering constraints are all defined.</li>
+     * <li> TO DO: check the cyclic dependencies of the ordering constraints of the methods.</li>
+     * </ul>
+     *
+     * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
+     */
+    private boolean checkMethodDeclaration() {
+        boolean checked = this.checkMethodsUniqueness();
+        for (Method meth : this.domain.getMethods()) {
+            if (this.checkMethodParameters(meth)) {
+                checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
+                checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
+                checked &= this.checkParserNode(meth.getTasks(), meth.getParameters());
+                checked &= this.checkParserNode(meth.getLogicalConstraints(), meth.getParameters());
+            }
+            if (this.checkTaskIDsUniqueness(meth)) {
+                final Set<Symbol> taskIds = this.getTaskIDs(meth.getTasks());
+                final Set<Symbol> consIds = this.getTaskIDs(meth.getOrderingConstraints());
+                for (Symbol id : consIds) {
+                    if (!taskIds.contains(id)) {
+                        this.mgr.logParserError("task alias \"" + id + "\" in method "
+                            + "\"" + meth.getName() + "\" is undefined", this.lexer
+                            .getFile(), id.getBeginLine(), id.getBeginColumn());
+                        checked = false;
+                    }
+                }
+
+            } else {
+                checked = false;
+            }
+        }
+        return checked;
+    }
+
+    /**
+     * Returns the set of task IDs contains in an expression.
+     *
+     * @param exp the expression.
+     * @return the set of task IDs contains in exp.
+     */
+    private Set<Symbol> getTaskIDs(Exp exp) {
+        Set<Symbol> taskIDs  = new HashSet<Symbol>();
+        switch (exp.getConnective()) {
+            case TASK:
+                taskIDs.add(exp.getId());
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+                taskIDs.add(exp.getAtom().get(0));
+                taskIDs.add(exp.getAtom().get(1));
+                break;
+            default:
+                for (Exp c : exp.getChildren()) {
+                    taskIDs.addAll(this.getTaskIDs(c));
+                }
+        }
+        return taskIDs;
+    }
+
+    /**
+     * Checks if the tasks ID used in the tasks declaration of the method in parameter are unique.
+     *
+     * @param meth the methode to be tested.
+     * @return true if the all the task ids used in a method declaration are unique; false otherwise.
+     */
+    private boolean checkTaskIDsUniqueness(Method meth) {
+        return this.checkTaskIDsUniqueness(meth, meth.getTasks(), new HashSet<Symbol>());
+    }
+
+    /**
+     * Checks if the tasks ID used in an expression are unique.
+     *
+     * @param meth the method to be tested.
+     * @param exp the expression.
+     * @return true if the all the task ids used in the expression are unique; false otherwise.
+     */
+    private boolean checkTaskIDsUniqueness(Method meth, Exp exp, Set<Symbol> taskIds) {
+        boolean unique = true;
+        if (exp.getConnective().equals(Connective.TASK) && exp.getId() != null) {
+            if (!taskIds.add(exp.getId())) {
+                this.mgr.logParserError("task alias \"" + exp.getId() + "\" in method "
+                    + "\"" + meth.getName() + "\" is already defined", this.lexer
+                    .getFile(), exp.getId().getBeginLine(), exp.getId().getBeginColumn());
+                unique = false;
+            }
+        } else {
+            for (Exp c : exp.getChildren()) {
+                this.checkTaskIDsUniqueness(meth, c, taskIds);
+            }
+        }
+        return unique;
     }
 
     /**
@@ -1026,6 +1133,7 @@ public final class Parser {
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_HEAD:
+                case TASK:
                     checked = this.checkAtom(gd, ctx);
                     break;
                 case EXISTS:
@@ -1215,7 +1323,7 @@ public final class Parser {
      * @return <code>true</code> if the parameters of the specified operator are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkOperatorsParameters(Op op) {
+    private boolean checkOperatorParameters(Op op) {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
         for (TypedSymbol parameter : op.getParameters()) {
@@ -1238,6 +1346,37 @@ public final class Parser {
     }
 
     /**
+     * Checks the method parameters, i.e., if each parameter is single and its type was previously
+     * declared.
+     *
+     * @param method the method to check.
+     * @return <code>true</code> if the parameters of the specified operator are well formed;
+     * <code>false</code> otherwise.
+     */
+    private boolean checkMethodParameters(Method method) {
+        boolean checked = true;
+        Set<Symbol> set = new HashSet<>();
+        for (TypedSymbol parameter : method.getParameters()) {
+            if (!set.add(parameter)) {
+                this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in method \""
+                    + method.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
+                    .getBeginColumn());
+                checked = false;
+            }
+            for (Symbol type : parameter.getTypes()) {
+                if (!this.domain.isDeclaredType(type)) {
+                    this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
+                            + parameter + "\" in method \"" + method.getName() + "\" is undefined",
+                        this.lexer.getFile(), parameter.getBeginLine(), parameter.getBeginColumn());
+                    checked = false;
+                }
+            }
+        }
+        return checked;
+    }
+
+
+    /**
      * Checks the uniqueness of the name of the operators declared.
      *
      * @return <code>true</code> if all the operators are single; <code>false</code> otherwise.
@@ -1247,9 +1386,28 @@ public final class Parser {
         Set<Symbol> set = new HashSet<>();
         for (Op op : this.domain.getOperators()) {
             if (!set.add(op.getName())) {
-                Symbol opName = op.getName();
-                this.mgr.logParserError("action \"" + opName + "\" declared twice", this.lexer
-                    .getFile(), opName.getBeginLine(), opName.getBeginColumn());
+                Symbol name = op.getName();
+                this.mgr.logParserError("action \"" + name + "\" declared twice", this.lexer
+                    .getFile(), name.getBeginLine(), name.getBeginColumn());
+                checked = false;
+            }
+        }
+        return checked;
+    }
+
+    /**
+     * Checks the uniqueness of the name of the methods declared.
+     *
+     * @return <code>true</code> if all the methods are single; <code>false</code> otherwise.
+     */
+    private boolean checkMethodsUniqueness() {
+        boolean checked = true;
+        Set<Symbol> set = new HashSet<>();
+        for (Method meth : this.domain.getMethods()) {
+            if (!set.add(meth.getName())) {
+                Symbol name = meth.getName();
+                this.mgr.logParserError("method \"" + name + "\" declared twice", this.lexer
+                    .getFile(), name.getBeginLine(), name.getBeginColumn());
                 checked = false;
             }
         }
