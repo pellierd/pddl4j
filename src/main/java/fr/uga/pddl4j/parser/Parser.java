@@ -239,6 +239,7 @@ public final class Parser {
             try {
                 this.checkDomainName();
                 this.checkObjectsDeclaration();
+                this.checkInitialTaskNetwork();
                 this.checkInitialFacts();
                 this.checkGoal();
                 this.checkProblemConstraints();
@@ -288,9 +289,11 @@ public final class Parser {
             this.checkFunctionsDeclaration();
             this.checkTaskDeclaration();
             this.checkOperatorDeclaration();
+            this.checkMethodDeclaration();
             this.checkDerivedPredicateDeclaration();
             this.checkDomainName();
             this.checkObjectsDeclaration();
+            this.checkInitialTaskNetwork();
             this.checkInitialFacts();
             this.checkGoal();
             this.checkProblemConstraints();
@@ -1044,12 +1047,69 @@ public final class Parser {
                         checked = false;
                     }
                 }
-
             } else {
                 checked = false;
             }
         }
         return checked;
+    }
+
+    /**
+     * Checks if the declared methods are well formed.
+     * <ul>
+     * <li> Methods must have a unique name.</li>
+     * <li> The type of the variables or constants used in their precondition, condition and effects
+     * are type previously declared.</li>
+     * <li> The variable used in their precondition, condition and effects are declared as
+     * parameters of the operators.</li>
+     * <li> The task id used in subtasks declaration are unique.</li>
+     * <li> The task id used in ordering constraints are all defined.</li>
+     * <li> TO DO: check the cyclic dependencies of the ordering constraints of the methods.</li>
+     * </ul>
+     *
+     * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
+     */
+    private boolean checkInitialTaskNetwork() {
+        final TaskNetwork tn = problem.getTaskNetwork();
+        boolean checked = this.checkParserNode(tn.getTasks(), new LinkedList<TypedSymbol>());
+        if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol>())) {
+            final Set<Symbol> taskIds = this.getTaskIDs(tn.getTasks());
+            final Set<Symbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
+            for (Symbol id : consIds) {
+                if (!taskIds.contains(id)) {
+                    this.mgr.logParserError("task alias \"" + id + "\" initial task network"
+                        + " is undefined", this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
+                    checked = false;
+                }
+            }
+        } else {
+            checked = false;
+        }
+        return checked;
+    }
+
+    /**
+     * Checks if the tasks ID used in an expression are unique.
+     *
+     * @param tn the initial task newtork to be tested.
+     * @param exp the expression.
+     * @return true if the all the task ids used in the expression are unique; false otherwise.
+     */
+    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Exp exp, Set<Symbol> taskIds) {
+        boolean unique = true;
+        if (exp.getConnective().equals(Connective.TASK) && exp.getId() != null) {
+            if (!taskIds.add(exp.getId())) {
+                this.mgr.logParserError("task alias \"" + exp.getId() + "\" in initial task network "
+                    + "is already defined", this.lexer
+                    .getFile(), exp.getId().getBeginLine(), exp.getId().getBeginColumn());
+                unique = false;
+            }
+        } else {
+            for (Exp c : exp.getChildren()) {
+                this.checkTaskIDsUniquenessFromInitialTaskNetwork(c, taskIds);
+            }
+        }
+        return unique;
     }
 
     /**
@@ -1228,6 +1288,41 @@ public final class Parser {
                 .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                 .getName().getBeginColumn());
             checked = false;
+        }
+        else if (checked && gd.getConnective().equals(Connective.TASK)
+            && !this.isDeclaredTask(atomSkeleton)) {
+            this.mgr.logParserError("task \"" + atomSkeleton.getName() + "/"
+                + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
+                .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
+                .getName().getBeginColumn());
+            checked = false;
+        }
+        return checked;
+    }
+
+    /**
+     * Returns if task in parameter was previously declared.
+     *
+     * @param tasks the task.
+     * @return <code>true</code> if this task was previously declared; <code>false</code> otherwise.
+     */
+    private boolean isDeclaredTask(NamedTypedList task) {
+        boolean checked = false;
+        int i = 0;
+        while (i < this.domain.getTasks().size() && !checked) {
+            NamedTypedList t = this.domain.getTasks().get(i);
+            if (task.getName().equals(t.getName())
+                && task.getArguments().size() == t.getArguments().size()) {
+                int j = 0;
+                checked = true;
+                while (j < task.getArguments().size() && checked) {
+                    TypedSymbol arg1 = task.getArguments().get(j);
+                    TypedSymbol arg2 = t.getArguments().get(j);
+                    checked = this.matchTypes(arg1, arg2);
+                    j++;
+                }
+            }
+            i++;
         }
         return checked;
     }

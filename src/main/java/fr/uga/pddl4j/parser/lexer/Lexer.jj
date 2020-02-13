@@ -392,6 +392,7 @@ void domain() :
 		[LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
 		[LOOKAHEAD(2) constants_def()]
 		[LOOKAHEAD(2) predicates_def()]
+		[LOOKAHEAD(2, { this.isRequirement(RequireKey.HTN)}) tasks_def()]
 		[LOOKAHEAD(2, {
 			this.isRequirement(RequireKey.FLUENTS)
 			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
@@ -837,7 +838,42 @@ void predicates_def() :
 }
 
 
-NamedTypedList comp_task_def() : // ADD HDDL
+void tasks_def() :
+{
+	NamedTypedList task = null;
+}
+{
+	try {
+		left_bracket() <TASKS>
+			(LOOKAHEAD(2) task=atomic_formula_skeleton() {
+				this.domain.addTask(task);
+			})+
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+
+NamedTypedList atomic_task_skeleton() : // ADD HDDL
+{
+	Symbol symbol = null;
+	List<TypedSymbol> typedList = null;
+}
+{
+	<LEFT_BRACKET>
+		symbol=task_symbol()
+		typedList=typed_list(Lexer.VARIABLE)
+	right_bracket() {
+		NamedTypedList l = new NamedTypedList(symbol);
+		for (TypedSymbol s : typedList) {
+			l.add(s);
+		}
+		return l;
+	}
+}
+
+/*NamedTypedList comp_task_def() : // ADD HDDL
 {
     NamedTypedList task;
 }
@@ -864,7 +900,7 @@ NamedTypedList task_def() : // ADD HDDL
         }
         return l;
     }
-}
+}*/
 
 Symbol task_symbol() : // ADD HDDL
  {
@@ -1806,10 +1842,10 @@ void structure_def() :
 			dp = derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
-	|   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
-            task = comp_task_def() {
-                this.domain.addTask(task);
-            }
+//	|   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
+//            task = comp_task_def() {
+//                this.domain.addTask(task);
+//            }
     |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
             meth = method_def() {
                 this.domain.addMethod(meth);
@@ -3394,7 +3430,7 @@ void htn_problem() : // ADD HDDL
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
         left_bracket() <HTN>
-            [<PARAMETERS> typed_list(Lexer.VARIABLE)]
+//            [<PARAMETERS> typed_list(Lexer.VARIABLE)] // Is in HDDL definition but has no sens
             taskNetwork = task_network() {
                 this.problem.setTaskNetwork(taskNetwork);
             }

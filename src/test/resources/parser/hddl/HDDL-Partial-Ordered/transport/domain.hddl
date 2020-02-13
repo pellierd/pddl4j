@@ -16,20 +16,15 @@
 		(capacity_predecessor ?arg0 - capacity_number ?arg1 - capacity_number)
 	)
 
-	(:task deliver
-		:parameters (?p - package ?l - location)
-	)
-
-	(:task get_to
-		:parameters (?v - vehicle ?l - location)
-	)
-
-	(:task load
-		:parameters (?v - vehicle ?l - location ?p - package)
-	)
-
-	(:task unload
-		:parameters (?v - vehicle ?l - location ?p - package)
+	(:tasks
+		(deliver ?p - package ?l - location)
+	 	(get_to ?v - vehicle ?l - location)
+		(load ?v - vehicle ?l - location ?p - package)
+	  (unload ?v - vehicle ?l - location ?p - package)
+	  (drop ?v - vehicle ?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number)
+	  (pick_up ?v - vehicle ?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number)
+	  (drive ?v - vehicle ?l1 - location ?l2 - location)
+		(noop ?v - vehicle ?l - location)
 	)
 
 	(:method m_deliver_ordering_0

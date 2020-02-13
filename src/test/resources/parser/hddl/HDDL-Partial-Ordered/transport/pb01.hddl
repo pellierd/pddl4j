@@ -12,7 +12,6 @@
 		truck_0 - vehicle
 	)
 	(:htn
-		:parameters ()
 		:subtasks (and
 		 (task0 (deliver package_0 city_loc_0))
 		 (task1 (deliver package_1 city_loc_2))
