@@ -14,10 +14,12 @@
      (capacity-predecessor ?s1 ?s2 - capacity-number)
   )
 
-  (:task deliver :parameters (?p - package ?l - location))
-  (:task get-to :parameters (?v - vehicle ?l - location))
-  (:task load :parameters (?v - vehicle ?l - location ?p - package))
-  (:task unload :parameters (?v - vehicle ?l - location ?p - package))
+  (:tasks
+    (deliver ?p - package ?l - location)
+    (get-to ?v - vehicle ?l - location)
+    (load ?v - vehicle ?l - location ?p - package)
+    (unload ?v - vehicle ?l - location ?p - package)
+  )
 
   (:method m-deliver
     :parameters (?p - package ?l1 ?l2 - location ?v - vehicle)

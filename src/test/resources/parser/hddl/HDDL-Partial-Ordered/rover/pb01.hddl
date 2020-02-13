@@ -17,7 +17,6 @@
 		objective1 - objective
 	)
 	(:htn
-		:parameters ()
 		:subtasks (and
 		 (task0 (get_soil_data waypoint2))
 		 (task1 (get_rock_data waypoint3))

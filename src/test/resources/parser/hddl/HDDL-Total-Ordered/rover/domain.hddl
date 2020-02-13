@@ -34,15 +34,17 @@
      (visited ?mid - waypoint)
   )
 
-  (:task calibrate_abs :parameters (?rover - rover ?camera - camera))
-  (:task empty-store :parameters (?s - store ?rover - rover))
-  (:task get_image_data :parameters (?objective - objective ?mode - mode))
-  (:task get_rock_data :parameters (?waypoint - waypoint))
-  (:task get_soil_data :parameters (?waypoint - waypoint))
-  (:task navigate_abs :parameters (?rover - rover ?to - waypoint))
-  (:task send_image_data :parameters (?rover - rover ?objective - objective ?mode - mode))
-  (:task send_rock_data :parameters (?rover - rover ?waypoint - waypoint))
-  (:task send_soil_data :parameters (?rover - rover ?waypoint - waypoint))
+  (:tasks
+    (calibrate_abs ?rover - rover ?camera - camera)
+    (empty-store ?s - store ?rover - rover)
+    (get_image_data ?objective - objective ?mode - mode)
+    (get_rock_data ?waypoint - waypoint)
+    (get_soil_data ?waypoint - waypoint)
+    (navigate_abs ?rover - rover ?to - waypoint)
+    (send_image_data ?rover - rover ?objective - objective ?mode - mode)
+    (send_rock_data ?rover - rover ?waypoint - waypoint)
+    (send_soil_data ?rover - rover ?waypoint - waypoint)
+   )
 
   (:method m-empty-store-1
     :parameters (?s - store ?rover - rover)

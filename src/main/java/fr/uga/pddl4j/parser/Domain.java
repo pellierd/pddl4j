@@ -325,6 +325,7 @@ public class Domain implements Serializable {
         if (op == null) {
             throw new NullPointerException();
         }
+        this.tasks.add(op.toTask()); //
         return this.ops.add(op);
     }
 

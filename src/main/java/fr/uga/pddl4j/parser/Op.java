@@ -183,6 +183,19 @@ public class Op implements Serializable {
     }
 
     /**
+     * Returns the task representaion of this operator.
+     *
+     * @return the task representaion of this operator.
+     */
+    public final NamedTypedList toTask() {
+        NamedTypedList task = new NamedTypedList(this.getName());
+        for (TypedSymbol p : this.getParameters()) {
+            task.add(p);
+        }
+        return task;
+    }
+
+    /**
      * Sets a new list of parameters to this operator.
      *
      * @param parameters The list of parameters to set.
