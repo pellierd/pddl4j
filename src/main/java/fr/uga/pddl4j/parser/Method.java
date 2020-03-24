@@ -20,8 +20,10 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -64,9 +66,10 @@ public class Method extends TaskNetwork {
      */
     public Method(final Method other) {
         super(other);
-        this.name = new Symbol(other.getName());
+        this.setName(new Symbol(other.getName()));
         this.task = new Exp(other.getTask());
         this.preconditions = new Exp(other.getPreconditions());
+
     }
 
     /**
@@ -133,6 +136,15 @@ public class Method extends TaskNetwork {
     }
 
     /**
+     * Return the arity of the method, i.e., its number of parameters.
+     *
+     * @return the arity of the method.
+     */
+    public final int getArity() {
+        return this.getParameters().size();
+    }
+
+    /**
      * Returns the task performed by the method.
      *
      * @return the method tasks.
@@ -176,6 +188,67 @@ public class Method extends TaskNetwork {
         this.preconditions = preconditions;
     }
 
+    /**
+     * Normalizes the method.
+     *
+     * @see Exp#renameVariables()
+     * @see Exp#moveNegationInward()
+     */
+    public void normalize() {
+        this.normalize(0);
+    }
+
+    /**
+     * Normalizes the method.
+     *
+     * Warning for the moment the logical constraints are not process.
+     *
+     * @param index the index of the first variable, index, i.e., ?Xi.
+     * @see Exp#renameVariables()
+     * @see Exp#moveNegationInward()
+     */
+    public void normalize(int index) {
+        int i = index;
+        // Rename the parameters
+        final Map<String, String> varCtx = new LinkedHashMap<>();
+        final List<TypedSymbol> parameters = this.getParameters();
+        for (final TypedSymbol params : parameters) {
+            final String image = params.renameVariables(i);
+            varCtx.put(image, params.getImage());
+            i++;
+        }
+        // Rename the task
+        this.getTask().renameVariables(varCtx);
+        // A hack to remove single atom in precondition
+        if (this.preconditions.isLiteral()) {
+            Exp atom = this.preconditions;
+            this.preconditions = new Exp(Connective.AND);
+            this.preconditions.addChild(atom);
+        }
+        // Rename the preconditions
+        this.getPreconditions().renameVariables(varCtx);
+        this.getPreconditions().moveNegationInward();
+        // Rename variables of the tasks contained the method.
+        this.getTasks().renameVariables(varCtx);
+        // Rename task id the tasks contained the method.
+        final Map<String, String> taskIDCtx = new LinkedHashMap<>();
+        this.getTasks().renameTaskIDs(taskIDCtx);
+        // Rename the tag ID used in the ordering constraints of the method
+        this.getOrderingConstraints().renameTaskIDs(taskIDCtx);
+        // In this case enumerate the orderings contraints in the cas of totally ordered
+        if (this.isTotallyOrdered()) {
+            this.setOrderingConstraints(new Exp(Connective.AND));
+            for (int j = 1; j < this.getTasks().getChildren().size(); j++) {
+                Exp c = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
+                c.setAtom(new LinkedList<Symbol>());
+                c.getAtom().add(this.getTasks().getChildren().get(j-1).getId());
+                c.getAtom().add(this.getTasks().getChildren().get(j).getId());
+                this.getOrderingConstraints().addChild(c);
+            }
+        }
+    }
+
+    /**
     /**
      * Returns the hash code value of the method. The hash value of the method is only based on the name of the methode.
      * The name of a method must be unique in a domain.

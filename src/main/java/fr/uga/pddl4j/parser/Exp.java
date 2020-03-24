@@ -336,7 +336,52 @@ public class Exp implements Serializable {
     }
 
     /**
-     * Renames the variables contained in the expression. The variable renames have the form ?X1,..., ?Xn.
+     * Renames the tag of the tasks contained in the expression. The tag tasks renames have the form T0, ..., Tn.
+     */
+    public void renameTaskIDs() {
+        this.renameTaskIDs(new LinkedHashMap<>());
+    }
+
+    /**
+     * Renames the ID of the task contained in the expression with a specified symbol, i.e., the tag tasks
+     * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are alowed as
+     * tasks expression for the moment in method description.
+     *
+     * @param context the images of the renamed ID of the task.
+     * @throws MalformedExpException if this expression is not an AND expression.
+     * @see Exp#isMalformedExpression()
+     */
+    public void renameTaskIDs(final Map<String, String> context) {
+        switch (this.getConnective()) {
+            case AND:
+                for (int i = 0; i < this.getChildren().size(); i++) {
+                    this.getChildren().get(i).renameTaskIDs(context);
+                }
+                break;
+            case TASK:
+                // Set a dummy id to task if no task id was specified
+                if (this.getId() == null) {
+                    String newTaskID = new String(Symbol.DEFAULT_TASK_ID_SYMBOL + context.size());
+                    Symbol taskID = new Symbol(this.getAtom().get(0));
+                    taskID.setKind(Symbol.Kind.TASK_ID);
+                    taskID.setImage(newTaskID);
+                    this.setId(taskID);
+                    context.put(newTaskID, newTaskID);
+                } else {
+                    this.getId().renameTaskID(context);
+                }
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+                this.atom.get(0).rename(context);
+                this.atom.get(1).rename(context);
+                break;
+            default:
+                throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+        }
+    }
+
+    /**
+     * Renames the variables contained in the expression. The variable renames have the form ?X0,..., ?Xn.
      */
     public void renameVariables() {
         this.renameVariables(new LinkedHashMap<>());
@@ -344,7 +389,7 @@ public class Exp implements Serializable {
 
     /**
      * Renames the variables contained in the expression with a specified symbol, i.e., the variable
-     * already renamed. The variable renames have the form ?X1, ..., ?Xn.
+     * already renamed. The variable renames have the form ?X0, ..., ?Xn.
      *
      * @param context the images of the renamed variable.
      * @throws MalformedExpException if this expression is malformed.
@@ -358,6 +403,7 @@ public class Exp implements Serializable {
             case ATOM:
             case FN_HEAD:
             case EQUAL_ATOM:
+            case TASK:
                 for (int i = 0; i < this.getAtom().size(); i++) {
                     this.getAtom().get(i).renameVariables(context);
                 }
@@ -734,8 +780,6 @@ public class Exp implements Serializable {
                 } else {
                     str.append("()");
                 }
-
-                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case FORALL:
             case EXISTS:
@@ -749,7 +793,6 @@ public class Exp implements Serializable {
                     .append(off)
                     .append(this.children.get(0).toString(off))
                     .append(")");
-                //offset = offset.substring(0, offset.length() - 2);  //Unused affectation because String is immutable
                 break;
             case NUMBER:
                 str.append(this.value);

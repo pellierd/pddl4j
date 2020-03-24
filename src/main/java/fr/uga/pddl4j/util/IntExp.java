@@ -56,6 +56,11 @@ public class IntExp implements Serializable {
     private int predicate;
 
     /**
+     * The integer representation of the task.
+     */
+    private int task;
+
+    /**
      * The list of arguments of the expression. This attribute is used to store the argument of the
      * atomic expression.
      */
@@ -98,6 +103,7 @@ public class IntExp implements Serializable {
         this.children = new ArrayList<>(otherChildren.size());
         this.children.addAll(otherChildren.stream().map(IntExp::new).collect(Collectors.toList()));
         this.variable = other.getVariable();
+        this.task = other.getTask();
         this.type = other.getType();
         this.value = other.getValue();
     }
@@ -135,6 +141,15 @@ public class IntExp implements Serializable {
     }
 
     /**
+     * Add a child to this expression.
+     *
+     * @return <code>true</code> if the child was added <code>false</code> otherwise.
+     */
+    public final boolean addChild(final IntExp child) {
+        return this.children.add(child);
+    }
+
+    /**
      * Return the list of children of this expression.
      *
      * @return the list of children of this expression.
@@ -159,6 +174,24 @@ public class IntExp implements Serializable {
      */
     public final void setPredicate(int predicate) {
         this.predicate = predicate;
+    }
+
+    /**
+     * Return the tasks of this expression.
+     *
+     * @return the task.
+     */
+    public final int getTask() {
+        return this.task;
+    }
+
+    /**
+     * Set a new task to this expression.
+     *
+     * @param task the new predicate to set.
+     */
+    public final void setTask(int task) {
+        this.task = task;
     }
 
     /**
@@ -242,6 +275,7 @@ public class IntExp implements Serializable {
     public final void affect(final IntExp other) {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
+        this.task = other.getTask();
         this.arguments = other.getArguments();
         this.children = other.getChildren();
         this.variable = other.getVariable();
@@ -261,6 +295,7 @@ public class IntExp implements Serializable {
             final IntExp other = (IntExp) object;
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
+                && this.task == other.task
                 && Arrays.equals(this.arguments, other.arguments)
                 && Double.compare(this.value, other.value) == 0
                 && this.variable == other.variable
@@ -284,6 +319,7 @@ public class IntExp implements Serializable {
         result = prime * result + this.children.hashCode();
         result = prime * result + this.connective.hashCode();
         result = prime * result + this.predicate;
+        result = prime * result + this.task;
         result = prime * result + this.type;
         long temp;
         temp = Double.doubleToLongBits(this.value);

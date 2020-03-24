@@ -195,7 +195,8 @@ public class JsonAdapter implements Serializable {
      */
     private ArrayList<ArrayList<String>> toJsonString(final BitExp exp) {
         return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
-            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFacts());
+            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getTasks(),
+            this.codedProblem.getRelevantFacts());
     }
 
     /**
@@ -206,6 +207,7 @@ public class JsonAdapter implements Serializable {
      * @param types      the types of the problem.
      * @param predicates the predicates of the problem.
      * @param functions  the functions of the problem.
+     * @param tasks      the tasks of the problem.
      * @param relevants  the facts of the problem.
      * @return an 2D collection of Strings.
      */
@@ -214,6 +216,7 @@ public class JsonAdapter implements Serializable {
                                                              final List<String> types,
                                                              final List<String> predicates,
                                                              final List<String> functions,
+                                                             final List<String> tasks,
                                                              final List<IntExp> relevants) {
         ArrayList<String> fluentsPos = new ArrayList<>();
         ArrayList<String> fluentsNeg = new ArrayList<>();
@@ -221,12 +224,12 @@ public class JsonAdapter implements Serializable {
 
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, " "));
+            fluentsPos.add(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks, " "));
         }
 
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, " "));
+            fluentsNeg.add(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks, " "));
         }
 
         fluents.add(fluentsPos);

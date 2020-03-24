@@ -322,8 +322,10 @@ public class Problem implements Serializable {
             this.getConstraints().moveNegationInward();
         }
         // Rename the goal of the problem
-        this.getGoal().renameVariables();
-        this.getGoal().moveNegationInward();
+        if (this.getGoal() != null) {
+            this.getGoal().renameVariables();
+            this.getGoal().moveNegationInward();
+        }
     }
 
     /**

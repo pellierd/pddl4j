@@ -172,6 +172,16 @@ public final class Encoder implements Serializable {
     static List<List<Integer>> tableOfTypedFunctions;
 
     /**
+     * The table of tasks.
+     */
+    static List<String> tableOfTasks;
+
+    /**
+     * The table that contains the types of the arguments of the tasks.
+     */
+    static List<List<Integer>> tableOfTypedTasks;
+
+    /**
      * The table that defines for each predicates its type of inertia.
      */
     static List<Inertia> tableOfInertia;
@@ -265,34 +275,34 @@ public final class Encoder implements Serializable {
      * @param domain  the domain to encode.
      * @param problem the problem to encode.
      * @return the problem encoded.
-     * @throws IllegalArgumentException if the problem to encode is not ADL and ACTION_COSTS.
+     * @throws IllegalArgumentException if the problem to encode is not ADL or ACTION_COSTS or HTN.
      */
     public static CodedProblem encode(final Domain domain, final Problem problem) throws FatalException {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.
-        Set<RequireKey> adl = new HashSet<>();
-        adl.add(RequireKey.ADL);
-        adl.add(RequireKey.STRIPS);
-        adl.add(RequireKey.TYPING);
-        adl.add(RequireKey.EQUALITY);
-        adl.add(RequireKey.NEGATIVE_PRECONDITIONS);
-        adl.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
-        adl.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
-        adl.add(RequireKey.UNIVERSAL_PRECONDITIONS);
-        adl.add(RequireKey.QUANTIFIED_PRECONDITIONS);
-        adl.add(RequireKey.CONDITIONAL_EFFECTS);
-        adl.add(RequireKey.ACTION_COSTS);
+        Set<RequireKey> accepted = new HashSet<>();
+        accepted.add(RequireKey.ADL);
+        accepted.add(RequireKey.STRIPS);
+        accepted.add(RequireKey.TYPING);
+        accepted.add(RequireKey.EQUALITY);
+        accepted.add(RequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(RequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(RequireKey.ACTION_COSTS);
+        accepted.add(RequireKey.HTN);
+        accepted.add(RequireKey.HTN_METHOD_PREC);
 
         Set<RequireKey> requirements = new LinkedHashSet<>();
         requirements.addAll(domain.getRequirements());
         requirements.addAll(problem.getRequirements());
-        for (RequireKey rk : requirements) {
-            if (!adl.contains(rk)) {
-                throw new IllegalArgumentException("problem to encode not ADL and ACTION_COSTS");
-            }
-        }
 
+        if (!accepted.containsAll(requirements)) {
+            throw new IllegalArgumentException("only ADL, ACTION_COSTS or HTN problem can be encoded");
+        }
 
         // *****************************************************************************************
         // Step 1: Standardization
@@ -317,8 +327,13 @@ public final class Encoder implements Serializable {
         IntEncoding.encodePredicates(domain);
         // Encode the functions defined in the domain.
         IntEncoding.encodeFunctions(domain);
+        // Encode the tasks defined in the domain.
+        IntEncoding.encodeTasks(domain);
         // Encode operators in integer representation
         List<IntOp> intOps = IntEncoding.encodeOperators(domain.getOperators());
+        // Encode method in integer representation
+        List<IntMeth> intMeths = IntEncoding.encodeMethods(domain.getMethods());
+        
         // Encode the initial state in integer representation
         final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
         // Create Map containing functions and associed cost from encoded initial state
@@ -327,7 +342,10 @@ public final class Encoder implements Serializable {
         final Set<IntExp> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
         // Encode the goal in integer representation
-        final IntExp intGoal = IntEncoding.encodeGoal(problem.getGoal());
+        IntExp intGoal =  null;
+        if (!domain.getRequirements().contains(RequireKey.HTN)) {
+            intGoal = IntEncoding.encodeGoal(problem.getGoal());
+        }
 
         final StringBuilder stringBuilder = new StringBuilder();
 
@@ -337,6 +355,14 @@ public final class Encoder implements Serializable {
             stringBuilder.append(System.lineSeparator());
             Encoder.printTableOfPredicates(stringBuilder);
             stringBuilder.append(System.lineSeparator());
+            if (!Encoder.tableOfFunctions.isEmpty()) {
+                Encoder.printTableOfFunctions(stringBuilder);
+                stringBuilder.append(System.lineSeparator());
+            }
+            if (!Encoder.tableOfTasks.isEmpty() && domain.getRequirements().contains(RequireKey.HTN)) {
+                Encoder.printTableOfTasks(stringBuilder);
+                stringBuilder.append(System.lineSeparator());
+            }
             Encoder.printTableOfTypes(stringBuilder);
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
@@ -348,10 +374,20 @@ public final class Encoder implements Serializable {
             for (IntExp f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
-            stringBuilder.append(")").append("\n\nCoded operators:\n\n");
-            for (IntOp op : intOps) {
-                stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
+            if (intGoal != null) {
+                stringBuilder.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
+            }
+            if (!intOps.isEmpty()) {
+                stringBuilder.append(")").append("\n\nCoded operators:\n\n");
+                for (IntOp op : intOps) {
+                    stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
+                }
+            }
+            if (!intMeths.isEmpty()) {
+                stringBuilder.append(")").append("\n\nCoded method:\n\n");
+                for (IntMeth meth : intMeths) {
+                    stringBuilder.append(Encoder.toString(meth)).append(System.lineSeparator());
+                }
             }
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
@@ -387,7 +423,9 @@ public final class Encoder implements Serializable {
             for (IntExp f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
+            if (!Encoder.tableOfTasks.isEmpty() && domain.getRequirements().contains(RequireKey.HTN)) {
+                stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
+            }
             stringBuilder.append("\n\nPre-instantiation operators with infered types (").append(intOps.size())
                 .append(" ops):\n");
             for (IntOp op : intOps) {
@@ -404,7 +442,9 @@ public final class Encoder implements Serializable {
         // Instantiate the operators
         intOps = Instantiation.instantiateOperators(intOps);
         // Expand the quantified expression in the goal
-        Instantiation.expandQuantifiedExpression(intGoal);
+        if (intGoal != null) {
+            Instantiation.expandQuantifiedExpression(intGoal);
+        }
         // The tables of predicates are no more needed
         Encoder.predicatesTables = null;
 
@@ -443,7 +483,9 @@ public final class Encoder implements Serializable {
         // Extract the relevant facts from the simplified and instantiated operators
         PostInstantiation.extractRelevantFacts(intOps, intInitPredicates);
         // Simplify the goal with ground inertia information
-        PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
+        if (intGoal != null) {
+            PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
+        }
         // Extract increase and add value to BitOp cost
         PostInstantiation.simplifyIncrease(intOps, intInitFunctionCost);
 
@@ -594,6 +636,22 @@ public final class Encoder implements Serializable {
     }
 
     /**
+    * Print the table of tasks.
+    */
+    static void printTableOfTasks(StringBuilder stringBuilder) {
+        stringBuilder.append("Tasks table:\n");
+        for (int i = 0; i < Encoder.tableOfTasks.size(); i++) {
+            String predicate = Encoder.tableOfTasks.get(i);
+            stringBuilder.append(i).append(": ").append(predicate).append(" :");
+            for (int j = 0; j < Encoder.tableOfTypedTasks.get(i).size(); j++) {
+                stringBuilder.append(" ")
+                    .append(Encoder.tableOfTypes.get(Encoder.tableOfTypedTasks.get(i).get(j)));
+            }
+            stringBuilder.append("\n");
+        }
+    }
+
+    /**
      * Print the table of inertia.
      */
     static void printTableOfInertia(StringBuilder stringBuilder) {
@@ -647,7 +705,19 @@ public final class Encoder implements Serializable {
     static String toString(final IntOp op) {
         return StringEncoder.toString(op, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions);
+            Encoder.tableOfFunctions, Encoder.tableOfTasks);
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param meth the method to print.
+     * @return a string representation of the specified method.
+     */
+    static String toString(final IntMeth meth) {
+        return StringEncoder.toString(meth, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
 
     /**
@@ -659,7 +729,7 @@ public final class Encoder implements Serializable {
     static String toString(final BitOp op) {
         return StringEncoder.toString(op, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
     }
 
     /**
@@ -671,7 +741,7 @@ public final class Encoder implements Serializable {
     static String toString(final IntExp exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions);
+            Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
 
     /**
@@ -683,7 +753,7 @@ public final class Encoder implements Serializable {
     static String toString(BitExp exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
     }
 
     /**
@@ -695,7 +765,7 @@ public final class Encoder implements Serializable {
     static String toString(CondBitExp exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
     }
 
     /**

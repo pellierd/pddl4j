@@ -19,15 +19,19 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.exceptions.MalformedExpException;
+import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.DerivedPredicate;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Exp;
 import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.Op;
+import fr.uga.pddl4j.parser.Method;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TypedSymbol;
 import fr.uga.pddl4j.util.IntExp;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -98,7 +102,9 @@ final class IntEncoding implements Serializable {
             IntEncoding.encodeTypes(problem.getConstraints());
         }
         // Collect the types from the goal declaration of the problem
-        IntEncoding.encodeTypes(problem.getGoal());
+        if (problem.getGoal() != null) {
+            IntEncoding.encodeTypes(problem.getGoal());
+        }
 
     }
 
@@ -312,6 +318,38 @@ final class IntEncoding implements Serializable {
     }
 
     /**
+     * Encodes all the tasks of a specified domain.
+     *
+     * @param domain the domain.
+     */
+    static void encodeTasks(final Domain domain) {
+        final List<NamedTypedList> tasks = domain.getTasks();
+        final int nbTasks = tasks.size();
+        Encoder.tableOfTasks = new ArrayList<>(nbTasks);
+        Encoder.tableOfTypedTasks = new ArrayList<>(nbTasks);
+        for (NamedTypedList task : tasks) {
+            Encoder.tableOfTasks.add(task.getName().getImage());
+            final List<TypedSymbol> arguments = task.getArguments();
+            final List<Integer> argType = new ArrayList<>(arguments.size());
+            for (TypedSymbol arg : arguments) {
+                final List<Symbol> types = arg.getTypes();
+                if (types.size() > 1) {
+                    final StringBuilder image = new StringBuilder("either");
+                    for (Symbol type : types) {
+                        image.append("~");
+                        image.append(type.getImage());
+                    }
+                    argType.add(Encoder.tableOfTypes.indexOf(image.toString()));
+                } else {
+                    argType.add(Encoder.tableOfTypes.indexOf(types.get(0).getImage()));
+                }
+            }
+            Encoder.tableOfTypedTasks.add(argType);
+        }
+    }
+
+
+    /**
      * Encodes a specified list of operators into its integer representation.
      *
      * @param ops the list of operators to encode.
@@ -320,6 +358,17 @@ final class IntEncoding implements Serializable {
     static List<IntOp> encodeOperators(final List<Op> ops) {
         return ops.stream().map(IntEncoding::encodeOperator).collect(Collectors.toList());
     }
+
+    /**
+     * Encodes a specified list of methods into its integer representation.
+     *
+     * @param meths the list of methods to encode.
+     * @return encoded the list of methods encoded.
+     */
+    static List<IntMeth> encodeMethods(final List<Method> meths) {
+        return meths.stream().map(IntEncoding::encodeMethod).collect(Collectors.toList());
+    }
+
 
     /**
      * Encodes a specified initial state into its integer representation.
@@ -340,13 +389,14 @@ final class IntEncoding implements Serializable {
     static Map<IntExp, Double> encodeFunctionCostInit(final Set<IntExp> init) {
         Map<IntExp, Double> intFunctionCost = new HashMap<>();
         for (IntExp intExp : init) {
-            if (intExp.getConnective().getImage().equals("=")) {
+            if (intExp.getConnective().equals(Connective.EQUAL)) {
                 intFunctionCost.put(intExp.getChildren().get(0),
                     Double.parseDouble(StringEncoder.toString(intExp.getChildren().get(1),
                         Encoder.tableOfConstants,
                         Encoder.tableOfTypes,
                         Encoder.tableOfPredicates,
-                        Encoder.tableOfFunctions, "")));
+                        Encoder.tableOfFunctions,
+                        Encoder.tableOfTasks, "")));
             }
         }
         return intFunctionCost;
@@ -402,6 +452,69 @@ final class IntEncoding implements Serializable {
         intOp.setEffects(effects);
         return intOp;
     }
+
+    /**
+     * Encode an method into its integer representation.
+     *
+     * @param meth the metho to encode.
+     * @return encoded method.
+     */
+    private static IntMeth encodeMethod(final Method meth) {
+        final IntMeth intMeth = new IntMeth(meth.getName().getImage(), meth.getArity());
+        // Encode the parameters of the operator
+        final List<String> variables = new ArrayList<>(meth.getArity());
+        for (int i = 0; i < meth.getArity(); i++) {
+            final TypedSymbol parameter = meth.getParameters().get(i);
+            final String typeImage = IntEncoding.toStringType(parameter.getTypes());
+            final int type = Encoder.tableOfTypes.indexOf(typeImage);
+            intMeth.setTypeOfParameter(i, type);
+            variables.add(parameter.getImage());
+        }
+        // Encode the preconditions of the method
+        final IntExp preconditions = IntEncoding.encodeExp(meth.getPreconditions(), variables);
+        intMeth.setPreconditions(preconditions);
+        // Encode the tasks of the method
+        final IntExp tasks = IntEncoding.encodeExp(meth.getTasks(), variables);
+        intMeth.setTasks(tasks);
+        // Encode the ordering constraints of the method
+        final IntExp orderingConstraints = IntEncoding.encodeOrderingConstraints(meth.getOrderingConstraints());
+        intMeth.setOrderingConstraints(orderingConstraints);
+        return intMeth;
+    }
+
+    /**
+     * Encode the task of the constraints.
+     */
+    /**
+     * Encode the ordering constraints of method. The index used to encode a task in the ordering constraints
+     * expression returned is the index of the task in the AND expression of the tasks list of a method.
+     *
+     * @param exp the constraints to encode. The constraints must be an AND expression.
+     * @throws MalformedExpException if the exp in parameter is unexpected.
+     */
+    private static IntExp encodeOrderingConstraints(final Exp exp) {
+        final IntExp intExp = new IntExp(exp.getConnective());
+        switch (exp.getConnective()) {
+            case AND:
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    intExp.addChild(IntEncoding.encodeOrderingConstraints(exp.getChildren().get(i)));
+                }
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+                IntExp t1 = new IntExp(Connective.TASK);
+                t1.setTask(new Integer(exp.getAtom().get(0).getImage().substring(1)));
+                intExp.addChild(t1);
+                IntExp t2 = new IntExp(Connective.TASK);
+                t2.setTask(new Integer(exp.getAtom().get(1).getImage().substring(1)));
+                intExp.addChild(t2);
+                break;
+            default:
+                throw new MalformedExpException("Expression " + exp.getConnective() + " is malformed");
+        }
+        return intExp;
+    }
+
+
 
     /**
      * Encodes an specified expression into its integer representation.
@@ -470,6 +583,21 @@ final class IntEncoding implements Serializable {
                         args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
                     }
                 }
+                intExp.setArguments(args);
+                break;
+            case TASK:
+                final String task = exp.getAtom().get(0).getImage();
+                intExp.setPredicate(Encoder.tableOfTasks.indexOf(task));
+                args = new int[exp.getAtom().size() - 1];
+                for (int i = 1; i < exp.getAtom().size(); i++) {
+                    final Symbol argument = exp.getAtom().get(i);
+                    if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
+                        args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
+                    } else {
+                        args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
+                    }
+                }
+                intExp.setTask(new Integer(exp.getId().getImage().substring(1)));
                 intExp.setArguments(args);
                 break;
             case AND:

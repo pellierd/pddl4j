@@ -123,7 +123,6 @@ public enum RequireKey {
      */
     HTN_METHOD_PREC(":htn-method-prec");
 
-
     /**
      * The image associate to the require key in the PDDL language.
      */
@@ -156,4 +155,5 @@ public enum RequireKey {
     public String toString() {
         return this.image;
     }
+
 }

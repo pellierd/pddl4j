@@ -58,10 +58,11 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks     the table of functions.
      * @return a string representation of the specified operator.
      */
     static String toString(final IntOp op, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions) {
+                           final List<String> predicates, final List<String> functions, final List<String> tasks) {
         final StringBuilder str = new StringBuilder();
         str.append("Op ").append(op.getName()).append("\n");
         str.append("Instantiations:\n");
@@ -75,10 +76,47 @@ final class StringEncoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n").append(toString(op.getPreconditions(), constants, types, predicates, functions))
+        str.append("Preconditions:\n").append(toString(op.getPreconditions(), constants, types, predicates, functions, tasks))
             .append("\n")
             .append("Effects:\n")
-            .append(toString(op.getEffects(), constants, types, predicates, functions))
+            .append(toString(op.getEffects(), constants, types, predicates, functions, tasks))
+            .append("\n");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param meth       the method to print.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
+     * @return a string representation of the specified method.
+     */
+    static String toString(final IntMeth meth, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Meth ").append(meth.getName()).append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < meth.getArity(); i++) {
+            final int index = meth.getValueOfParameter(i);
+            final String type = types.get(meth.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
+            } else {
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                    .append(constants.get(index)).append(" \n");
+            }
+        }
+        str.append("Preconditions:\n").append(toString(meth.getPreconditions(), constants, types, predicates, functions, tasks))
+            .append("\n");
+        str.append("tasks:\n")
+            .append(toString(meth.getTasks(), constants, types, predicates, functions, tasks))
+            .append("\n");
+        str.append("ordering:\n")
+            .append(toString(meth.getOrderingConstraints(), constants, types, predicates, functions, tasks))
             .append("\n");
         return str.toString();
     }
@@ -91,11 +129,12 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @return a string representation of the specified expression.
      */
-    static String toString(final IntExp exp, final List<String> constants,
-                           final List<String> types, final List<String> predicates, final List<String> functions) {
-        return StringEncoder.toString(exp, constants, types, predicates, functions, " ");
+    static String toString(final IntExp exp, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks) {
+        return StringEncoder.toString(exp, constants, types, predicates, functions, tasks, " ");
     }
 
     /**
@@ -106,12 +145,14 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression.
      */
     static String toString(final IntExp exp, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions, final String separator) {
-        return StringEncoder.toString(exp, constants, types, predicates, functions, "", separator);
+                           final List<String> predicates, final List<String> functions, final List<String> tasks,
+                           final String separator) {
+        return StringEncoder.toString(exp, constants, types, predicates, functions, tasks, "", separator);
     }
 
     /**
@@ -122,13 +163,15 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @param baseOffset the offset white space from the left used for indentation.
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.
      */
     private static String toString(final IntExp exp, final List<String> constants,
                                    final List<String> types, final List<String> predicates,
-                                   final List<String> functions, String baseOffset, final String separator) {
+                                   final List<String> functions, final List<String> tasks,
+                                   String baseOffset, final String separator) {
         final StringBuilder str = new StringBuilder();
         switch (exp.getConnective()) {
             case ATOM:
@@ -146,6 +189,22 @@ final class StringEncoder implements Serializable {
                 break;
             case FN_HEAD:
                 str.append("(").append(functions.get(exp.getPredicate()));
+                args = exp.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                    } else {
+                        str.append(" ").append(constants.get(index));
+                    }
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(exp.getTask());
+                str.append(" ");
+                str.append(tasks.get(exp.getPredicate()));
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -177,10 +236,10 @@ final class StringEncoder implements Serializable {
                 if (!exp.getChildren().isEmpty()) {
                     for (int i = 0; i < exp.getChildren().size() - 1; i++) {
                         str.append(StringEncoder.toString(exp.getChildren().get(i), constants, types, predicates,
-                            functions, offsetOr)).append("\n").append(offsetOr);
+                            functions, tasks, offsetOr)).append("\n").append(offsetOr);
                     }
                     str.append(StringEncoder.toString(exp.getChildren().get(
-                        exp.getChildren().size() - 1), constants, types, predicates, functions, offsetOr));
+                        exp.getChildren().size() - 1), constants, types, predicates, functions, tasks, offsetOr));
                 }
                 str.append(")");
                 break;
@@ -192,7 +251,7 @@ final class StringEncoder implements Serializable {
                     .append(types.get(exp.getType())).append(")\n").append(offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                        functions, offsetEx));
+                        functions, tasks, offsetEx));
                 }
                 str.append(")");
                 break;
@@ -201,7 +260,7 @@ final class StringEncoder implements Serializable {
                 break;
             case F_EXP:
                 str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                    functions, baseOffset));
+                    functions, tasks, baseOffset));
                 break;
             case F_EXP_T:
             case TRUE:
@@ -233,10 +292,10 @@ final class StringEncoder implements Serializable {
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
                 str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                    functions, baseOffset));
+                    functions, tasks, baseOffset));
                 str.append(" ");
                 str.append(StringEncoder.toString(exp.getChildren().get(1), constants, types, predicates,
-                    functions, baseOffset));
+                    functions, tasks, baseOffset));
                 str.append(")");
                 break;
             case AT_START:
@@ -251,12 +310,23 @@ final class StringEncoder implements Serializable {
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
                 str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
-                    functions, baseOffset));
+                    functions, tasks, baseOffset));
                 str.append(")");
                 break;
             case IS_VIOLATED:
                 str.append("(");
                 str.append(exp.getConnective().getImage());
+                str.append(")");
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+                str.append("(");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(exp.getChildren().get(0).getTask());
+                str.append(" ");
+                str.append(exp.getConnective().getImage());
+                str.append(" ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(exp.getChildren().get(1).getTask());
                 str.append(")");
                 break;
             default:
@@ -274,11 +344,13 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified operator.
      */
     static String toString(final BitOp op, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions, final List<IntExp> relevants) {
+                           final List<String> predicates, final List<String> functions,
+                           final List<String> tasks, final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
         str.append("Op ").append(op.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
@@ -292,9 +364,9 @@ final class StringEncoder implements Serializable {
             }
         }
         str.append("Preconditions:\n").append(StringEncoder.toString(op.getPreconditions(), constants, types,
-            predicates, functions, relevants)).append("\n").append("Effects:\n");
+            predicates, functions, tasks, relevants)).append("\n").append("Effects:\n");
         for (CondBitExp condExp : op.getCondEffects()) {
-            str.append(StringEncoder.toString(condExp, constants, types, predicates, functions, relevants))
+            str.append(StringEncoder.toString(condExp, constants, types, predicates, functions, tasks, relevants))
                 .append("\n");
         }
         return str.toString();
@@ -308,22 +380,23 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
     static String toString(BitExp exp, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions))
+            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks))
                 .append("\n");
         }
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates,
-                functions)).append(")\n");
+                functions, tasks)).append(")\n");
         }
         str.append(")");
         return str.toString();
@@ -337,15 +410,16 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
     static String toString(BitState bitState, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         final StringBuilder str = new StringBuilder("(and");
         for (int i = bitState.nextSetBit(0); i >= 0; i = bitState.nextSetBit(i + 1)) {
-            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions))
+            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks))
                 .append("\n");
         }
         str.append(")");
@@ -360,19 +434,20 @@ final class StringEncoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
     static String toString(CondBitExp exp, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringEncoder.toString(exp.getEffects(), constants, types, predicates, functions, relevants));
+            str.append(StringEncoder.toString(exp.getEffects(), constants, types, predicates, functions, tasks, relevants));
         } else {
             str.append("(when ").append(StringEncoder.toString(exp.getCondition(), constants, types, predicates,
-                functions, relevants)).append("\n").append(StringEncoder.toString(exp.getEffects(), constants, types,
-                predicates, functions, relevants)).append(")");
+                functions, tasks, relevants)).append("\n").append(StringEncoder.toString(exp.getEffects(), constants, types,
+                predicates, functions, tasks, relevants)).append(")");
         }
         return str.toString();
     }

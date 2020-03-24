@@ -83,6 +83,17 @@ public class CodedProblem implements Serializable {
     private List<String> functions;
 
     /**
+     * The table of tasks.
+     */
+    private List<String> tasks;
+
+    /**
+     * The table that contains the types of the arguments of the tasks.
+     */
+    private List<List<Integer>> tasksSignatures;
+
+
+    /**
      * The table that contains the types of the arguments of the functions.
      */
     private List<List<Integer>> functionsSignatures;
@@ -140,6 +151,13 @@ public class CodedProblem implements Serializable {
         for (List<Integer> si : other.predicatesSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
             this.predicatesSignatures.add(copy);
+        }
+        this.tasks = new ArrayList<>();
+        this.tasks.addAll(other.tasks.stream().collect(Collectors.toList()));
+        this.tasksSignatures = new ArrayList<>();
+        for (List<Integer> si : other.tasksSignatures) {
+            final List<Integer> copy = si.stream().collect(Collectors.toList());
+            this.tasksSignatures.add(copy);
         }
         this.functions = new ArrayList<>();
         this.functions.addAll(other.functions.stream().collect(Collectors.toList()));
@@ -264,6 +282,42 @@ public class CodedProblem implements Serializable {
      */
     final void setPredicatesSignatures(final List<List<Integer>> signatures) {
         this.predicatesSignatures = signatures;
+    }
+
+    /**
+     * Sets the tasks of the problem.
+     *
+     * @param tasks the tasks to set.
+     */
+    final void setTasks(final List<String> tasks) {
+        this.tasks = tasks;
+    }
+
+    /**
+     * Returns the tasks of the problem.
+     *
+     * @return the tasks of the problem.
+     */
+    public final List<String> getTasks() {
+        return this.tasks;
+    }
+
+    /**
+     * Returns the signatures of the tasks defined in the problem.
+     *
+     * @return the signatures of the tasks defined in the problem.
+     */
+    public final List<List<Integer>> getTasksSignatures() {
+        return this.tasksSignatures;
+    }
+
+    /**
+     * Sets the signatures of the tasks defined in the problem.
+     *
+     * @param signatures the signatures of the tasks defined in the problem.
+     */
+    final void setTasksSignatures(final List<List<Integer>> signatures) {
+        this.tasksSignatures = signatures;
     }
 
     /**
@@ -421,7 +475,7 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(final BitOp op) {
         return StringEncoder.toString(op, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
     /**
@@ -432,7 +486,7 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(final IntExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions);
+            this.predicates, this.functions, this.tasks);
     }
 
     /**
@@ -444,7 +498,7 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(final IntExp exp, final String sep) {
         return StringEncoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, sep);
+            this.predicates, this.functions, this.tasks, sep);
     }
 
     /**
@@ -455,7 +509,7 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(BitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
     /**
@@ -466,7 +520,7 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(BitState bitState) {
         return StringEncoder.toString(bitState, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
     /**
@@ -477,7 +531,7 @@ public class CodedProblem implements Serializable {
      */
     public final String toString(CondBitExp exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
     /**

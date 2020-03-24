@@ -46,6 +46,11 @@ public class Symbol implements Serializable {
     public static final String DEFAULT_VARIABLE_SYMBOL = "?X";
 
     /**
+     * The name of rename task tag.
+     */
+    public static final String DEFAULT_TASK_ID_SYMBOL = "T";
+
+    /**
      * The enumeration used to specified the different types of the symbol.
      */
     public enum Kind {
@@ -337,9 +342,52 @@ public class Symbol implements Serializable {
             final String newImage = context.get(img);
             if (newImage != null) {
                 this.setImage(newImage);
+                return img;
             }
         }
-        return img;
+        return null;
+    }
+
+    /**
+     * Renames the symbol. The symbol is renamed if only if this symbol is contained the map in parameters,
+     * otherwise nothing is done.
+     *
+     * @param context the images of the symbol to renamed .
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws NullPointerException if context == null.
+     */
+    public final String rename(final Map<String, String> context) {
+        if (context == null) {
+            throw new NullPointerException("context == null");
+        }
+        final String odlImage = this.getImage();
+        final String newImage = context.get(odlImage);
+        if (newImage != null) {
+            this.setImage(newImage);
+            return odlImage;
+        }
+        return null;
+    }
+
+    /**
+     * Renames the task ID symbol according to a specific context. The symbol is renamed if only if this symbol is a
+     * task ID, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed task ID.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     */
+    public final String renameTaskID(final Map<String, String> context) {
+        if (this.getKind().equals(Kind.TASK_ID)) {
+            String image = this.getImage();
+            String newImage = context.get(image);
+            if (newImage == null) {
+                newImage = Symbol.DEFAULT_TASK_ID_SYMBOL + context.size();
+                context.put(image, newImage);
+            }
+            this.setImage(newImage);
+            return image;
+        }
+        return null;
     }
 
     /**

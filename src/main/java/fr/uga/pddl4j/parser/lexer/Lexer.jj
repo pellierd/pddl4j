@@ -1954,6 +1954,7 @@ Exp and_subtask() : // ADD HDDL
 {
     Exp exp = new Exp(Connective.AND);
     Exp task = null;
+    int i = 0;
 }
 {
     <LEFT_BRACKET> <AND> (LOOKAHEAD (2) task=subtask() {

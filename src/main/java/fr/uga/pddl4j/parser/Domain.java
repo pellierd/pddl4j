@@ -489,6 +489,10 @@ public class Domain implements Serializable {
         for (int i = 0; i < this.getFunctions().size(); i++) {
             this.getFunctions().get(i).renameVariables();
         }
+        // Rename all the variables from the tasks declaration
+        for (int i = 0; i < this.getTasks().size(); i++) {
+            this.getTasks().get(i).renameVariables();
+        }
         // Rename all the variables from the constraints declaration of the domain
         if (this.getConstraints() != null) {
             this.getConstraints().renameVariables();
@@ -501,6 +505,10 @@ public class Domain implements Serializable {
         // Rename all the variable from the ops
         for (int i = 0; i < this.getOperators().size(); i++) {
             this.getOperators().get(i).normalize();
+        }
+        // Rename all the variable from the methods
+        for (int i = 0; i < this.getMethods().size(); i++) {
+            this.getMethods().get(i).normalize();
         }
     }
 
