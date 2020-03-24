@@ -597,7 +597,7 @@ final class IntEncoding implements Serializable {
                         args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
                     }
                 }
-                intExp.setTask(new Integer(exp.getId().getImage().substring(1)));
+                intExp.setTask(new Integer(exp.getTaskID().getImage().substring(1)));
                 intExp.setArguments(args);
                 break;
             case AND:

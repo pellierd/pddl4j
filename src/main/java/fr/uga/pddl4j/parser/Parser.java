@@ -1097,11 +1097,11 @@ public final class Parser {
      */
     private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Exp exp, Set<Symbol> taskIds) {
         boolean unique = true;
-        if (exp.getConnective().equals(Connective.TASK) && exp.getId() != null) {
-            if (!taskIds.add(exp.getId())) {
-                this.mgr.logParserError("task alias \"" + exp.getId() + "\" in initial task network "
+        if (exp.getConnective().equals(Connective.TASK) && exp.getTaskID() != null) {
+            if (!taskIds.add(exp.getTaskID())) {
+                this.mgr.logParserError("task alias \"" + exp.getTaskID() + "\" in initial task network "
                     + "is already defined", this.lexer
-                    .getFile(), exp.getId().getBeginLine(), exp.getId().getBeginColumn());
+                    .getFile(), exp.getTaskID().getBeginLine(), exp.getTaskID().getBeginColumn());
                 unique = false;
             }
         } else {
@@ -1122,7 +1122,7 @@ public final class Parser {
         Set<Symbol> taskIDs  = new HashSet<Symbol>();
         switch (exp.getConnective()) {
             case TASK:
-                taskIDs.add(exp.getId());
+                taskIDs.add(exp.getTaskID());
                 break;
             case LESS_ORDERING_CONSTRAINT:
                 taskIDs.add(exp.getAtom().get(0));
@@ -1155,11 +1155,11 @@ public final class Parser {
      */
     private boolean checkTaskIDsUniqueness(Method meth, Exp exp, Set<Symbol> taskIds) {
         boolean unique = true;
-        if (exp.getConnective().equals(Connective.TASK) && exp.getId() != null) {
-            if (!taskIds.add(exp.getId())) {
-                this.mgr.logParserError("task alias \"" + exp.getId() + "\" in method "
+        if (exp.getConnective().equals(Connective.TASK) && exp.getTaskID() != null) {
+            if (!taskIds.add(exp.getTaskID())) {
+                this.mgr.logParserError("task alias \"" + exp.getTaskID() + "\" in method "
                     + "\"" + meth.getName() + "\" is already defined", this.lexer
-                    .getFile(), exp.getId().getBeginLine(), exp.getId().getBeginColumn());
+                    .getFile(), exp.getTaskID().getBeginLine(), exp.getTaskID().getBeginColumn());
                 unique = false;
             }
         } else {

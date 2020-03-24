@@ -21,7 +21,6 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.MalformedExpException;
-import fr.uga.pddl4j.exceptions.NullParameterException;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.Serializable;
@@ -47,7 +46,7 @@ import java.util.stream.Collectors;
 public class Exp implements Serializable {
 
     /**
-     * The serial version id of the class.
+     * The serial version taskID of the class.
      */
     private static final long serialVersionUID = 1943664302879209785L;
 
@@ -95,9 +94,9 @@ public class Exp implements Serializable {
     private Symbol variable;
 
     /**
-     * The id. Use to the alias of a task atom.
+     * The taskID. Use to the alias of a task atom.
      */
-    private Symbol id;
+    private Symbol taskID;
 
     /**
      * Creates a new expression from a other one.
@@ -126,8 +125,8 @@ public class Exp implements Serializable {
         if (other.getVariable() != null) {
             this.variable = new Symbol(other.getVariable());
         }
-        if (other.getId() != null) {
-            this.id = new Symbol(other.getId());
+        if (other.getTaskID() != null) {
+            this.taskID = new Symbol(other.getTaskID());
         }
         this.value = other.getValue();
     }
@@ -143,7 +142,7 @@ public class Exp implements Serializable {
         this.prefName = null;
         this.variables = null;
         this.value = null;
-        this.id = null;
+        this.taskID = null;
     }
 
     /**
@@ -309,21 +308,21 @@ public class Exp implements Serializable {
     }
 
     /**
-     * Returns the id of of the task. The id is only use in HTN planning to make alias of task.
+     * Returns the taskID of of the task. The taskID is only use in HTN planning to make alias of task.
      *
-     * @return the id of variables of this parser node.
+     * @return the taskID of variables of this parser node.
      */
-    public final Symbol getId() {
-        return this.id;
+    public final Symbol getTaskID() {
+        return this.taskID;
     }
 
     /**
-     * Set the id of this expression. The id is only use in HTN planning to make alias of task.
+     * Set the taskID of this expression. The taskID is only use in HTN planning to make alias of task.
      *
-     * @param id the id to set.
+     * @param taskID the taskID to set.
      */
-    public final void setId(Symbol id) {
-        this.id = id;
+    public final void setTaskID(Symbol taskID) {
+        this.taskID = taskID;
     }
 
     /**
@@ -359,16 +358,16 @@ public class Exp implements Serializable {
                 }
                 break;
             case TASK:
-                // Set a dummy id to task if no task id was specified
-                if (this.getId() == null) {
+                // Set a dummy taskID to task if no task taskID was specified
+                if (this.getTaskID() == null) {
                     String newTaskID = new String(Symbol.DEFAULT_TASK_ID_SYMBOL + context.size());
                     Symbol taskID = new Symbol(this.getAtom().get(0));
                     taskID.setKind(Symbol.Kind.TASK_ID);
                     taskID.setImage(newTaskID);
-                    this.setId(taskID);
+                    this.setTaskID(taskID);
                     context.put(newTaskID, newTaskID);
                 } else {
-                    this.getId().renameTaskID(context);
+                    this.getTaskID().renameTaskID(context);
                 }
                 break;
             case LESS_ORDERING_CONSTRAINT:
@@ -620,7 +619,7 @@ public class Exp implements Serializable {
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
      *          not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
-     *          atom, value, preference name, variable, value and id; otherwise return <tt>false</tt>.
+     *          atom, value, preference name, variable, value and taskID; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -637,8 +636,8 @@ public class Exp implements Serializable {
                 || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
                 && ((this.value == null && other.value == null)
                 || (this.value != null && other.value != null && this.value.equals(other.value)))
-                && ((this.id == null && other.id == null)
-                || (this.id != null && other.id != null && this.id.equals(other.id)));
+                && ((this.taskID == null && other.taskID == null)
+                || (this.taskID != null && other.taskID != null && this.taskID.equals(other.taskID)));
         }
         return false;
     }
@@ -657,7 +656,7 @@ public class Exp implements Serializable {
         result = prime * result + ((children == null) ? 0 : children.hashCode());
         result = prime * result + ((connective == null) ? 0 : connective.hashCode());
         result = prime * result + ((prefName == null) ? 0 : prefName.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((taskID == null) ? 0 : taskID.hashCode());
         long temp;
         temp = Double.doubleToLongBits(value);
         result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -747,8 +746,8 @@ public class Exp implements Serializable {
             case TASK:
                 str.append("(");
                 if (!this.atom.isEmpty()) {
-                    if (this.getId() != null) {
-                        str.append(this.getId()).append(" (");
+                    if (this.getTaskID() != null) {
+                        str.append(this.getTaskID()).append(" (");
                     }
                     for (int i = 0; i < this.atom.size() - 1; i++) {
                         str.append(this.atom.get(i).toString()).append(" ");

@@ -333,7 +333,7 @@ public final class Encoder implements Serializable {
         List<IntOp> intOps = IntEncoding.encodeOperators(domain.getOperators());
         // Encode method in integer representation
         List<IntMeth> intMeths = IntEncoding.encodeMethods(domain.getMethods());
-        
+
         // Encode the initial state in integer representation
         final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
         // Create Map containing functions and associed cost from encoded initial state
@@ -346,6 +346,8 @@ public final class Encoder implements Serializable {
         if (!domain.getRequirements().contains(RequireKey.HTN)) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
         }
+
+        // Encode the initial task network
 
         final StringBuilder stringBuilder = new StringBuilder();
 

@@ -241,8 +241,8 @@ public class Method extends TaskNetwork {
             for (int j = 1; j < this.getTasks().getChildren().size(); j++) {
                 Exp c = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
                 c.setAtom(new LinkedList<Symbol>());
-                c.getAtom().add(this.getTasks().getChildren().get(j-1).getId());
-                c.getAtom().add(this.getTasks().getChildren().get(j).getId());
+                c.getAtom().add(this.getTasks().getChildren().get(j-1).getTaskID());
+                c.getAtom().add(this.getTasks().getChildren().get(j).getTaskID());
                 this.getOrderingConstraints().addChild(c);
             }
         }

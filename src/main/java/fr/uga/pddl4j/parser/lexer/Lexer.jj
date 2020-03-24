@@ -1966,16 +1966,16 @@ Exp and_subtask() : // ADD HDDL
 
 Exp subtask() :  // ADD HDDL
 {
-    Symbol id;
+    Symbol taskID;
     Exp task;
 }
 {
     (   LOOKAHEAD(3)
             <LEFT_BRACKET>
-                id=subtask_id()
+                taskID=subtask_id()
                 task=task_formula(Lexer.TERM)
             <RIGHT_BRACKET> {
-                task.setId(id);
+                task.setTaskID(taskID);
             }
     |   LOOKAHEAD(2)
             task=task_formula(Lexer.TERM)
