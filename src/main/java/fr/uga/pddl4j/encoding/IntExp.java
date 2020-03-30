@@ -17,10 +17,11 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
 
+import javax.naming.InsufficientResourcesException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +37,24 @@ import java.util.stream.Collectors;
 public class IntExp implements Serializable {
 
     /**
-     * The serial id of the class.
+     * The constant used to encode the default taskID id.
      */
-    private static final long serialVersionUID = 1L;
+    public static final int DEFAULT_TASK_ID = -1;
+
+    /**
+     * The constant used to encode the default variable.
+     */
+    public static final int DEFAULT_VARIABLE = -1;
+
+    /**
+     * The constant used to encode the default type.
+     */
+    public static final int DEFAULT_TYPE = -1;
+
+    /**
+     * The constant used to encode the default variable value.
+     */
+    public static final int DEFAULT_VARIABLE_VALUE = -1;
 
     /**
      * The constant used to encode the specific predicate equal.
@@ -56,9 +72,9 @@ public class IntExp implements Serializable {
     private int predicate;
 
     /**
-     * The integer representation of the task.
+     * The integer representation of the task ID.
      */
-    private int task;
+    private int taskID;
 
     /**
      * The list of arguments of the expression. This attribute is used to store the argument of the
@@ -103,7 +119,7 @@ public class IntExp implements Serializable {
         this.children = new ArrayList<>(otherChildren.size());
         this.children.addAll(otherChildren.stream().map(IntExp::new).collect(Collectors.toList()));
         this.variable = other.getVariable();
-        this.task = other.getTask();
+        this.taskID = other.getTaskID();
         this.type = other.getType();
         this.value = other.getValue();
     }
@@ -117,6 +133,10 @@ public class IntExp implements Serializable {
         this.connective = connective;
         this.arguments = null;
         this.children = new ArrayList<>();
+        this.variable = IntExp.DEFAULT_VARIABLE;
+        this.type = IntExp.DEFAULT_TYPE;
+        this.value = IntExp.DEFAULT_VARIABLE_VALUE;
+        this.taskID = IntExp.DEFAULT_TASK_ID;
     }
 
     /**
@@ -179,19 +199,19 @@ public class IntExp implements Serializable {
     /**
      * Return the tasks of this expression.
      *
-     * @return the task.
+     * @return the taskID.
      */
-    public final int getTask() {
-        return this.task;
+    public final int getTaskID() {
+      return this.taskID;
     }
 
     /**
-     * Set a new task to this expression.
+     * Set a new taskID to this expression.
      *
-     * @param task the new predicate to set.
+     * @param taskID the new predicate to set.
      */
-    public final void setTask(int task) {
-        this.task = task;
+    public final void setTaskID(int taskID) {
+        this.taskID = taskID;
     }
 
     /**
@@ -275,7 +295,7 @@ public class IntExp implements Serializable {
     public final void affect(final IntExp other) {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
-        this.task = other.getTask();
+        this.taskID = other.getTaskID();
         this.arguments = other.getArguments();
         this.children = other.getChildren();
         this.variable = other.getVariable();
@@ -295,7 +315,7 @@ public class IntExp implements Serializable {
             final IntExp other = (IntExp) object;
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
-                && this.task == other.task
+                && this.taskID == other.taskID
                 && Arrays.equals(this.arguments, other.arguments)
                 && Double.compare(this.value, other.value) == 0
                 && this.variable == other.variable
@@ -319,7 +339,7 @@ public class IntExp implements Serializable {
         result = prime * result + this.children.hashCode();
         result = prime * result + this.connective.hashCode();
         result = prime * result + this.predicate;
-        result = prime * result + this.task;
+        result = prime * result + this.taskID;
         result = prime * result + this.type;
         long temp;
         temp = Double.doubleToLongBits(this.value);

@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.parser;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,7 +113,7 @@ public class Method extends AbstractOperator {
      *
      * @return the tasks of the task network.
      */
-    public final Exp getTasks() {
+    public final Exp getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
@@ -121,7 +122,7 @@ public class Method extends AbstractOperator {
      *
      *  @param tasks The tasks to set.
      */
-    public final void setTasks(final Exp tasks) {
+    public final void setSubTasks(final Exp tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 
@@ -192,24 +193,26 @@ public class Method extends AbstractOperator {
     protected Map<String, String> normalize(int index) {
         // Rename the parameters
         final Map<String, String> varCtx = super.normalize(index);
+        // Rename the variable to carried out task of the method.
+        this.getTask().renameVariables(varCtx);
         // Rename variables of the tasks contained the method.
-        this.getTasks().renameVariables(varCtx);
-        if (this.getTasks().getChildren().size() == 1) {
+        this.getSubTasks().renameVariables(varCtx);
+        if (this.getSubTasks().getChildren().size() == 1) {
             this.setTotallyOrdered(true);
         }
         // Rename task id the tasks contained the method.
         final Map<String, String> taskIDCtx = new LinkedHashMap<>();
-        this.getTasks().renameTaskIDs(taskIDCtx);
+        this.getSubTasks().renameTaskIDs(taskIDCtx);
         // Rename the tag ID used in the ordering constraints of the method
         this.getOrderingConstraints().renameTaskIDs(taskIDCtx);
         // In this case enumerate the orderings contraints in the cas of totally ordered
         if (this.isTotallyOrdered()) {
             this.setOrderingConstraints(new Exp(Connective.AND));
-            for (int j = 1; j < this.getTasks().getChildren().size(); j++) {
+            for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {
                 Exp c = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
                 c.setAtom(new LinkedList<Symbol>());
-                c.getAtom().add(this.getTasks().getChildren().get(j-1).getTaskID());
-                c.getAtom().add(this.getTasks().getChildren().get(j).getTaskID());
+                c.getAtom().add(this.getSubTasks().getChildren().get(j-1).getTaskID());
+                c.getAtom().add(this.getSubTasks().getChildren().get(j).getTaskID());
                 this.getOrderingConstraints().addChild(c);
             }
         }
@@ -243,8 +246,8 @@ public class Method extends AbstractOperator {
         } else {
             str.append("  :subtasks\n  ");
         }
-        if (!this.getTasks().getChildren().isEmpty()) {
-            str.append(this.getTasks().toString("  ") + "\n");
+        if (!this.getSubTasks().getChildren().isEmpty()) {
+            str.append(this.getSubTasks().toString("  ") + "\n");
         } else {
             str.append("()\n");
         }

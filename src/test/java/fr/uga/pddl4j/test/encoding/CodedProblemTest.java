@@ -16,9 +16,9 @@
 package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.IntExp;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.IntExp;
 import org.junit.Assert;
 import org.junit.Test;
 

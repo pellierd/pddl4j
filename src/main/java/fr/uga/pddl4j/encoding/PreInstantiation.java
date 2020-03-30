@@ -20,7 +20,6 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,11 +41,11 @@ import java.util.Set;
  * <li> simplify actions and methods with infer types information.</li>
  * </ul>
  *
- * Modifications:
+ * Revisions:
  * <ul>
- *     <li> Add a hack in method simplifiedActionWithInferredType on 19/04/13 to deal with the problem the constant
+ *     <li> 19/04/13: Add a hack in method simplifiedActionWithInferredType to deal with the problem the constant
  *     in in precondition and effect of in action.</li>
- *     <li> Add a method to simplify methods on 30/03/19.</li>
+ *     <li> 30/03/19: Add a method to simplify methods.</li>
  * </ul>
  *
  * @author D. Pellier

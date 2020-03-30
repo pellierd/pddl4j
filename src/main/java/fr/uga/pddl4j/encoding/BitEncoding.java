@@ -24,7 +24,6 @@ import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,13 +35,13 @@ import java.util.Set;
 
 /**
  * <p>
- * This class contains methods to encode operators, goal and initial state into <code>BitSet</code>
+ * This class contains methods to encode actions, goal and initial state into <code>BitSet</code>
  * representation.
  * </p>
  * <p>
  * Before encoding, every expression is normalized, i.e., put in disjunctive normal form (DNF) for
  * preconditions and put in conjunctive normal form (CNF) for effects. If an operator has disjunctive
- * preconditions, a new operator is created such all operators after normalization have only
+ * preconditions, a new operator is created such all actions after normalization have only
  * conjunctive precondition.
  * </p>
  * <p>
@@ -77,17 +76,17 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Encode a list of specified operators into <code>BitSet</code> representation. The specified
+     * Encode a list of specified actions into <code>BitSet</code> representation. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param operators the list of operators to encode.
+     * @param operators the list of actions to encode.
      * @param map       the map that associates to a specified expression its index.
-     * @return the list of operators encoded into bit set.
+     * @return the list of actions encoded into bit set.
      */
     static List<BitOp> encodeOperators(final List<IntAction> operators, final Map<IntExp, Integer> map)
         throws UnexpectedExpressionException {
 
-        // Normalize the operators
+        // Normalize the actions
         BitEncoding.normalize(operators);
 
         final List<BitOp> ops = new ArrayList<>(operators.size());
@@ -190,7 +189,7 @@ final class BitEncoding implements Serializable {
                 op.setDummy(true);
                 op.setPreconditions(dis);
                 op.getCondEffects().add(condEffect);
-                Encoder.operators.add(op);
+                Encoder.actions.add(op);
             }
         } else {
             newGoal = Encoder.codedGoal.get(0);
@@ -272,12 +271,12 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Normalize the operators, i.e, put in disjunctive normal form (DNF) for preconditions and put
+     * Normalize the actions, i.e, put in disjunctive normal form (DNF) for preconditions and put
      * in conjunctive normal form (CNF) for effects. If an operator has disjunctive preconditions, a
-     * new operator is created such all operators after normalization have only conjunctive
+     * new operator is created such all actions after normalization have only conjunctive
      * precondition.
      *
-     * @param operators the list of operators to normalize.
+     * @param operators the list of actions to normalize.
      */
     private static void normalize(final List<IntAction> operators) throws UnexpectedExpressionException {
         final List<IntAction> tmpOps = new ArrayList<>(operators.size() + 100);

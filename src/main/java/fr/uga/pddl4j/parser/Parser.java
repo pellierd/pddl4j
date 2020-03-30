@@ -1037,8 +1037,7 @@ public final class Parser {
      * Checks if the declared methods are well formed.
      * <ul>
      * <li> Methods must have a unique name.</li>
-     * <li> The type of the variables or constants used in their precondition, condition and effects
-     * are type previously declared.</li>
+     * <li> The type of the variables or constants used in their precondition, task and subtasks previously declared.</li>
      * <li> The variable used in their precondition, condition and effects are declared as
      * parameters of the methods.</li>
      * <li> The task id used in subtasks declaration are unique.</li>
@@ -1054,11 +1053,11 @@ public final class Parser {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
-                checked &= this.checkParserNode(meth.getTasks(), meth.getParameters());
+                checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getLogicalConstraints(), meth.getParameters());
             }
             if (this.checkTaskIDsUniqueness(meth)) {
-                final Set<Symbol> taskIds = this.getTaskIDs(meth.getTasks());
+                final Set<Symbol> taskIds = this.getTaskIDs(meth.getSubTasks());
                 final Set<Symbol> consIds = this.getTaskIDs(meth.getOrderingConstraints());
                 for (Symbol id : consIds) {
                     if (!taskIds.contains(id)) {
@@ -1159,7 +1158,7 @@ public final class Parser {
      * @return true if the all the task ids used in a method declaration are unique; false otherwise.
      */
     private boolean checkTaskIDsUniqueness(Method meth) {
-        return this.checkTaskIDsUniqueness(meth, meth.getTasks(), new HashSet<Symbol>());
+        return this.checkTaskIDsUniqueness(meth, meth.getSubTasks(), new HashSet<Symbol>());
     }
 
     /**
@@ -1319,7 +1318,7 @@ public final class Parser {
     /**
      * Returns if task in parameter was previously declared.
      *
-     * @param tasks the task.
+     * @param task the task.
      * @return <code>true</code> if this task was previously declared; <code>false</code> otherwise.
      */
     private boolean isDeclaredTask(NamedTypedList task) {

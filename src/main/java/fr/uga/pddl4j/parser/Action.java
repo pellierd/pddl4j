@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.parser;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -141,6 +142,7 @@ public class Action extends AbstractOperator {
      */
     protected Map<String, String> normalize(int index) {
         final Map<String, String> context = super.normalize(index);
+        //System.out.println(this);
         // Rename the effects
         // A hack to remove single atom in precondition
         if (this.effects.isLiteral()) {
@@ -154,6 +156,12 @@ public class Action extends AbstractOperator {
         if (this.getDuration() != null) {
             this.getDuration().renameVariables(context);
         }
+        /*System.out.println(this);
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
         return context;
     }
 

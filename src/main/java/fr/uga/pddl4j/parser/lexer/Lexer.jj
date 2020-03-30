@@ -848,13 +848,13 @@ void predicates_def() :
 
 void tasks_def() :
 {
-	NamedTypedList task = null;
+	NamedTypedList taskID = null;
 }
 {
 	try {
 		left_bracket() <TASKS>
-			(LOOKAHEAD(2) task=atomic_formula_skeleton() {
-				this.domain.addTask(task);
+			(LOOKAHEAD(2) taskID=atomic_formula_skeleton() {
+				this.domain.addTask(taskID);
 			})+
 		right_bracket()
 	} catch(Throwable e) {
@@ -883,11 +883,11 @@ NamedTypedList atomic_task_skeleton() : // ADD HDDL
 
 /*NamedTypedList comp_task_def() : // ADD HDDL
 {
-    NamedTypedList task;
+    NamedTypedList taskID;
 }
 {
-    left_bracket() <TASK> task=task_def() right_bracket() {
-        return task;
+    left_bracket() <TASK> taskID=task_def() right_bracket() {
+        return taskID;
     }
 }
 
@@ -1835,24 +1835,24 @@ void structure_def() :
 	Action op = null;
 	Method meth = null;
 	DerivedPredicate dp = null;
-	NamedTypedList task = null;
+	NamedTypedList taskID = null;
 }
 {
 	( 	LOOKAHEAD(2)
 			op = action_def() {
-				this.domain.addOperator(op);
+				this.domain.addAction(op);
 			}
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
 			op = durative_action_def() {
-				this.domain.addOperator(op);
+				this.domain.addAction(op);
 			}
 	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DERIVED_PREDICATES)})
 			dp = derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
 //	|   LOOKAHEAD (2, {this.isRequirement(RequireKey.HTN)}) // ADD HDDL
-//            task = comp_task_def() {
-//                this.domain.addTask(task);
+//            taskID = comp_task_def() {
+//                this.domain.addTask(taskID);
 //            }
     |   LOOKAHEAD (2, {this.isRequirement(RequireKey.TOTAL_ORDERED_HTN)
                 || this.isRequirement(RequireKey.PARTIAL_ORDERED_HTN)
@@ -1867,7 +1867,7 @@ Method method_def() : // ADD HDDL
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
-	Exp task = null;
+	Exp taskID = null;
 	Exp preconditions = new Exp(Connective.AND);
 	TaskNetwork tn = null;
 }
@@ -1875,7 +1875,7 @@ Method method_def() : // ADD HDDL
 	try {
 		left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
-			<TASK> task=task_formula(Lexer.TERM)
+			<TASK> taskID=task_formula(Lexer.TERM)
 			[LOOKAHEAD({ this.isRequirement(RequireKey.HTN_METHOD_PRECONDITIONS)})
 			    <PRECONDITION> preconditions=pre_gd()
 			]
@@ -1885,7 +1885,7 @@ Method method_def() : // ADD HDDL
 	    this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Method(name, parameters, task, preconditions, tn);
+		return new Method(name, parameters, taskID, preconditions, tn);
 	}
 }
 
@@ -1957,15 +1957,15 @@ Symbol method_name() : // ADD HDDL
 Exp subtask_def() : // ADD HDDL
 {
     Exp exp = null;
-    Exp task = null;
+    Exp taskID = null;
 }
 {
     (   LOOKAHEAD(2)
             exp=empty_and()
     |   LOOKAHEAD(2)
-            task=subtask() {
+            taskID=subtask() {
                 exp = new Exp(Connective.AND);
-                exp.addChild(task);
+                exp.addChild(taskID);
             }
     |   LOOKAHEAD(2)
             exp=and_subtask()
@@ -2043,15 +2043,15 @@ Symbol subtask_id() : // ADD HDDL
 Exp ordering_constraint_def() : // ADD HDDL
 {
     Exp exp = null;
-    Exp task = null;
+    Exp taskID = null;
 }
 {
     (   LOOKAHEAD(2)
             exp=empty_and()
     |   LOOKAHEAD(2)
-            task=ordering_constraint() {
+            taskID=ordering_constraint() {
                 exp = new Exp(Connective.AND);
-                exp.addChild(task);
+                exp.addChild(taskID);
             }
     |   LOOKAHEAD(2)
             exp = and_ordering_constraint()

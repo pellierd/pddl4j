@@ -23,7 +23,6 @@ import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
 import fr.uga.pddl4j.util.Plan;
 
 import java.io.Serializable;
@@ -34,18 +33,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a problem where operators are instantiated and encoded in
+ * This class implements a problem where actions are instantiated and encoded in
  * <code>BitSet</code> representation.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
 public class CodedProblem implements Serializable {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The table of types.
@@ -393,18 +387,18 @@ public class CodedProblem implements Serializable {
     }
 
     /**
-     * Returns the list of instantiated operators of the problem.
+     * Returns the list of instantiated actions of the problem.
      *
-     * @return the list of instantiated operators of the problem.
+     * @return the list of instantiated actions of the problem.
      */
     public final List<BitOp> getOperators() {
         return operators;
     }
 
     /**
-     * Sets the list of instantiated operators of the problem.
+     * Sets the list of instantiated actions of the problem.
      *
-     * @param operators the list of instantiated operators of the problem.
+     * @param operators the list of instantiated actions of the problem.
      */
     final void setOperators(final List<BitOp> operators) {
         this.operators = operators;

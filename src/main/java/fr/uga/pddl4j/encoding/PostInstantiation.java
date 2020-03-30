@@ -20,7 +20,6 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.IntExp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.Set;
 /**
  * <p>
  * This class contains the methods needed for the post instantiation step the encoding. In
- * other words, it contains methods to extract the relevant facts from the instantiated operators
+ * other words, it contains methods to extract the relevant facts from the instantiated actions
  * and methods to simplify the operator based on ground inertia information.
  * </p>
  * <p>
@@ -78,7 +77,7 @@ final class PostInstantiation implements Serializable {
      * <li>2. it is not an initial fact and not a positive ground inertia.</li>
      * </ul>
      *
-     * @param operators the list of operators.
+     * @param operators the list of actions.
      * @param init      the initial state.
      */
     static void extractRelevantFacts(final List<IntAction> operators, final Set<IntExp> init) {
@@ -454,14 +453,14 @@ final class PostInstantiation implements Serializable {
     }
 
     // *********************************************************************************************
-    // Methods for extracting from the instantiated operators the ground inertia.
+    // Methods for extracting from the instantiated actions the ground inertia.
     // *********************************************************************************************
 
     /**
-     * Do a pass over the effects of all the instantiated operators and update the ground inertia
-     * table. Then, simplify the operators according to the extracted ground inertia.
+     * Do a pass over the effects of all the instantiated actions and update the ground inertia
+     * table. Then, simplify the actions according to the extracted ground inertia.
      *
-     * @param operators the list of operators to simplified.
+     * @param operators the list of actions to simplified.
      * @param init      the initial state.
      */
     static void simplyOperatorsWithGroundInertia(final List<IntAction> operators, final Set<IntExp> init) {
@@ -655,7 +654,7 @@ final class PostInstantiation implements Serializable {
      * Do a pass over the effects of a specified list of instantiated operator and update the ground
      * inertia table.
      *
-     * @param operators the list of instantiated operators.
+     * @param operators the list of instantiated actions.
      */
     static void extractGroundInertia(final List<IntAction> operators) {
         Encoder.tableOfGroundInertia = new LinkedHashMap<>(
@@ -766,7 +765,7 @@ final class PostInstantiation implements Serializable {
     /**
      * Extracts "increase" expression and assigns value to the BitOp cost.
      *
-     * @param operators       the list of operators.
+     * @param operators       the list of actions.
      * @param functionAndCost functions and associed costs
      */
     static void simplifyIncrease(final List<IntAction> operators, final Map<IntExp, Double> functionAndCost) {

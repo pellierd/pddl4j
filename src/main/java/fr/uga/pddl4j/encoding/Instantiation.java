@@ -20,7 +20,6 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.IntExp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,17 +28,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains the methods needed to instantiate the operators.
+ * This class contains the methods needed to instantiate the actions and the method.
+ *
+ * Revisions:
+ * <ul>
+ *     <li>30/03/2019: Add method instantiation.</li>
+ * </ul>
  *
  * @author D. Pellier
  * @version 1.0 - 07.04.2010
  */
 final class Instantiation implements Serializable {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The default constructor with a private access to prevent instance creation.
@@ -48,118 +47,244 @@ final class Instantiation implements Serializable {
     }
 
     /**
-     * Instantiates a specified list of operators.
+     * Instantiates a specified list of actions.
      *
-     * @param operators the list of operators to instantiate.
-     * @return the list of instantiated operators.
+     * @param actions the list of actions to instantiate.
+     * @return the list of instantiated actions.
      */
-    static List<IntAction> instantiateOperators(final List<IntAction> operators) {
-        final List<IntAction> instOps = new ArrayList<>(1000);
-        for (IntAction op : operators) {
-            // If an operator has a parameter with a empty domain the operator must be removed
+    static List<IntAction> instantiateActions(final List<IntAction> actions) {
+        final List<IntAction> instActions = new ArrayList<>(1000);
+        for (IntAction a : actions) {
+            // If an action has a parameter with a empty domain the action must be removed
             boolean toInstantiate = true;
             int i = 0;
-            while (i < op.getArity() && toInstantiate) {
-                toInstantiate = !Encoder.tableOfDomains.get(op.getTypeOfParameters(i)).isEmpty();
+            while (i < a.getArity() && toInstantiate) {
+                toInstantiate = !Encoder.tableOfDomains.get(a.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
             if (toInstantiate) {
-                instOps.addAll(Instantiation.instantiate(op));
+                instActions.addAll(Instantiation.instantiate(a));
             }
         }
-        return instOps;
+        return instActions;
     }
 
     /**
-     * Instantiates a specified operator.
+     * Instantiates a specified list of methods.
      *
-     * @param operator the operator to instantiate.
+     * @param methods the list of methods to instantiate.
+     * @return the list of instantiated methods.
+     */
+    static List<IntMethod> instantiateMethods(final List<IntMethod> methods) {
+        final List<IntMethod> instMethods = new ArrayList<>(1000);
+        for (IntMethod m : methods) {
+            // If an method has a parameter with a empty domain the method can be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < m.getArity() && toInstantiate) {
+                toInstantiate = !Encoder.tableOfDomains.get(m.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (toInstantiate) {
+                instMethods.addAll(Instantiation.instantiate(m));
+            }
+        }
+        return instMethods;
+    }
+
+    /**
+     * Instantiates a specified action.
+     *
+     * @param action the action to instantiate.
      * @param bound    the bound of actions to instantiate.
-     * @return the list of operators instantiated corresponding the specified operator.
+     * @return the list of actions instantiated corresponding the specified action.
      */
-    static List<IntAction> instantiate(final IntAction operator, final int bound) {
+    static List<IntAction> instantiate(final IntAction action, final int bound) {
         final List<IntAction> instOps = new ArrayList<>(100);
-        Instantiation.expandQuantifiedExpression(operator.getPreconditions());
-        Instantiation.simplify(operator.getPreconditions());
-        if (!operator.getPreconditions().getConnective().equals(Connective.FALSE)) {
-            Instantiation.expandQuantifiedExpression(operator.getEffects());
-            Instantiation.simplify(operator.getEffects());
-            if (!operator.getEffects().getConnective().equals(Connective.FALSE)) {
-                Instantiation.instantiate(operator, 0, bound, instOps);
+        Instantiation.expandQuantifiedExpression(action.getPreconditions());
+        Instantiation.simplify(action.getPreconditions());
+        if (!action.getPreconditions().getConnective().equals(Connective.FALSE)) {
+            Instantiation.expandQuantifiedExpression(action.getEffects());
+            Instantiation.simplify(action.getEffects());
+            if (!action.getEffects().getConnective().equals(Connective.FALSE)) {
+                Instantiation.instantiate(action, 0, bound, instOps);
             }
         }
         return instOps;
     }
 
     /**
-     * Instantiates a specified operator.
+     * Instantiates a specified method.
      *
-     * @param operator the operator to instantiate.
-     * @return the list of operators instantiated corresponding the specified operator.
+     * @param method the method to instantiate.
+     * @param bound    the bound of methods to instantiate.
+     * @return the list of methods instantiated corresponding the specified method.
      */
-    static List<IntAction> instantiate(final IntAction operator) {
-        return Instantiation.instantiate(operator, Integer.MAX_VALUE);
+    static List<IntMethod> instantiate(final IntMethod method, final int bound) {
+        final List<IntMethod> instMethods = new ArrayList<>(100);
+        Instantiation.expandQuantifiedExpression(method.getPreconditions());
+        Instantiation.simplify(method.getPreconditions());
+        if (!method.getPreconditions().getConnective().equals(Connective.FALSE)) {
+            Instantiation.instantiate(method, 0, bound, instMethods);
+        }
+        return instMethods;
     }
 
     /**
-     * Instantiates a specified operator.
+     * Instantiates a specified action.
+     *
+     * @param action the action to instantiate.
+     * @return the list of actions instantiated corresponding the specified action.
+     */
+    static List<IntAction> instantiate(final IntAction action) {
+        return Instantiation.instantiate(action, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Instantiates a specified method.
+     *
+     * @param method the method to instantiate.
+     * @return the list of methods instantiated corresponding the specified method.
+     */
+    static List<IntMethod> instantiate(final IntMethod method) {
+        return Instantiation.instantiate(method, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Instantiates a specified action.
      * <p>
-     * The assumption is made that different operator parameters are instantiated with different
+     * The assumption is made that different action parameters are instantiated with different
      * constants, i.e., the planner never generates actions like move(a,a) because we consider this
-     * as a bad domain representation that should be revised. In fact, in operators with identical
+     * as a bad domain representation that should be revised. In fact, in actions with identical
      * constant parameters, all but one of the constants are superfluous and can be skipped from the
-     * representation without loss of information.
+     * representation without loss of information. Warning this assumption make the process no-sound.
      * </p>
      *
-     * @param op        the operator.
-     * @param index     the index of the parameter to instantiate.
-     * @param bound     the bound of actions to instantiate.
-     * @param operators the list of operators already instantiated.
+     * @param action  the action.
+     * @param index   the index of the parameter to instantiate.
+     * @param bound   the bound of actions to instantiate.
+     * @param actions the list of actions already instantiated.
      * @see IntAction
      */
-    private static void instantiate(final IntAction op, final int index, final int bound, final List<IntAction> operators) {
-        if (bound == operators.size()) {
+    private static void instantiate(final IntAction action, final int index, final int bound, final List<IntAction> actions) {
+        if (bound == actions.size()) {
             return;
         }
-        final int arity = op.getArity();
+        final int arity = action.getArity();
         if (index == arity) {
-            final IntExp precond = op.getPreconditions();
+            final IntExp precond = action.getPreconditions();
             Instantiation.simplify(precond);
             if (!precond.getConnective().equals(Connective.FALSE)) {
-                final IntExp effect = op.getEffects();
+                final IntExp effect = action.getEffects();
                 Instantiation.simplify(effect);
                 if (!effect.getConnective().equals(Connective.FALSE)) {
-                    operators.add(op);
+                    actions.add(action);
                 }
             }
         } else {
-            final Set<Integer> values = Encoder.tableOfDomains.get(op.getTypeOfParameters(index));
+            final Set<Integer> values = Encoder.tableOfDomains.get(action.getTypeOfParameters(index));
             for (Integer value : values) {
-                if (!op.isAlreadyInstantiatedWith(value)) {
+                if (!action.isAlreadyInstantiatedWith(value)) {
                     final int varIndex = -index - 1;
-                    final IntExp precond = new IntExp(op.getPreconditions());
+                    final IntExp precond = new IntExp(action.getPreconditions());
                     Instantiation.substitute(precond, varIndex, value);
                     if (!precond.getConnective().equals(Connective.FALSE)) {
-                        final IntExp effects = new IntExp(op.getEffects());
+                        final IntExp effects = new IntExp(action.getEffects());
                         Instantiation.substitute(effects, varIndex, value);
                         if (!effects.getConnective().equals(Connective.FALSE)) {
-                            final IntAction copy = new IntAction(op.getName(), arity);
+                            final IntAction copy = new IntAction(action.getName(), arity);
                             copy.setPreconditions(precond);
                             copy.setEffects(effects);
                             for (int i = 0; i < arity; i++) {
-                                copy.setTypeOfParameter(i, op.getTypeOfParameters(i));
+                                copy.setTypeOfParameter(i, action.getTypeOfParameters(i));
                             }
                             for (int i = 0; i < index; i++) {
-                                copy.setValueOfParameter(i, op.getValueOfParameter(i));
+                                copy.setValueOfParameter(i, action.getValueOfParameter(i));
                             }
                             copy.setValueOfParameter(index, value);
-                            Instantiation.instantiate(copy, index + 1, bound, operators);
+                            Instantiation.instantiate(copy, index + 1, bound, actions);
                         }
                     }
                 }
             }
         }
     }
+
+    /**
+     * Instantiates a specified method.
+     * <p>
+     * The assumption is made that different method parameters are instantiated with different
+     * constants, i.e., the planner never generates methods like move(a,a) because we consider this
+     * as a bad domain representation that should be revised. In fact, in methods with identical
+     * constant parameters, all but one of the constants are superfluous and can be skipped from the
+     * representation without loss of information. Warning this assumption make the process no-sound.
+     * </p>
+     *
+     * @param method    the method.
+     * @param index     the index of the parameter to instantiate.
+     * @param bound     the bound of methods to instantiate.
+     * @param methods the list of methods already instantiated.
+     * @see IntMethod
+     */
+    private static void instantiate(final IntMethod method, final int index, final int bound, final List<IntMethod> methods) {
+        if (bound == methods.size()) {
+            return;
+        }
+        final int arity = method.getArity();
+        if (index == arity) {
+            final IntExp precond = method.getPreconditions();
+            Instantiation.simplify(precond);
+            if (!precond.getConnective().equals(Connective.FALSE)) {
+                    methods.add(method);
+            }
+        } else {
+            final Set<Integer> values = Encoder.tableOfDomains.get(method.getTypeOfParameters(index));
+            for (Integer value : values) {
+                if (!method.isAlreadyInstantiatedWith(value)) {
+                    final int varIndex = -index - 1;
+                    final IntExp preconditionCopy = new IntExp(method.getPreconditions());
+                    Instantiation.substitute(preconditionCopy, varIndex, value);
+                    if (!preconditionCopy.getConnective().equals(Connective.FALSE)) {
+                        final IntMethod copy = new IntMethod(method.getName(), arity);
+                        copy.setPreconditions(preconditionCopy);
+
+                        final IntExp taskCopy = new IntExp(method.getTask());
+                        //System.out.println(Encoder.toString(method.getTask()));
+                        Instantiation.substitute(taskCopy, varIndex, value);
+                        copy.setTask(taskCopy);
+                        //System.out.println(Encoder.toString(taskCopy));
+
+                        final IntExp subTasksCopy = new IntExp(method.getSubTasks());
+                        //System.out.println(Encoder.toString(subTasksCopy));
+                        //System.out.println(varIndex +  " " + value);
+
+                        Instantiation.substitute(subTasksCopy, varIndex, value);
+
+                        //System.out.println(Encoder.toString(subTasksCopy));
+                        //try {
+                        //    System.in.read();
+                        //} catch (Exception e) {}
+
+                        copy.setSubTasks(subTasksCopy);
+
+                        final IntExp orderingConstraintCopy = new IntExp(method.getOrderingConstraints());
+                        Instantiation.substitute(orderingConstraintCopy, varIndex, value);
+                        copy.setSubTasks(orderingConstraintCopy);
+
+                        for (int i = 0; i < arity; i++) {
+                            copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
+                        }
+                        for (int i = 0; i < index; i++) {
+                            copy.setValueOfParameter(i, method.getValueOfParameter(i));
+                        }
+                        copy.setValueOfParameter(index, value);
+                        Instantiation.instantiate(copy, index + 1, bound, methods);
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Expands the quantified expressions contained in a specified expression.
@@ -371,7 +496,7 @@ final class Instantiation implements Serializable {
                         final IntExp antecedent = ei.getChildren().get(0);
                         final IntExp consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional
-                        // effect is removed from the operator. In this case, the effect is never applicable
+                        // effect is removed from the action. In this case, the effect is never applicable
                         // because it requires FALSE to hold, i.e., the state must be inconsistent.
                         if (antecedent.getConnective().equals(Connective.FALSE)) {
                             exp.getChildren().remove(i);
@@ -447,7 +572,7 @@ final class Instantiation implements Serializable {
                         final IntExp antecedent = ei.getChildren().get(0);
                         final IntExp consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
-                        // removed from the operator. In this case, the effect is never applicable because it
+                        // removed from the action. In this case, the effect is never applicable because it
                         // requires FALSE to hold, i.e., the state must be inconsistent.
                         if (antecedent.getConnective().equals(Connective.FALSE)) {
                             exp.getChildren().remove(i);

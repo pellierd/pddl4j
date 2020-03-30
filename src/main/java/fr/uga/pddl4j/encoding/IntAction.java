@@ -20,7 +20,6 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.IntExp;
 
 import java.util.Arrays;
 
@@ -79,8 +78,6 @@ final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);
-         Arrays.fill(this.getParameters(), -1);
-        Arrays.fill(this.getInstantiations(), -1);
         this.effects = new IntExp(Connective.OR);
     }
 

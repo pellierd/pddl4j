@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.IntExp;
-
 /**
  * This class implements an method. This class is used to store compact representation of method
  * during the instantiation process.
@@ -29,6 +27,11 @@ import fr.uga.pddl4j.util.IntExp;
  * @version 1.0 - 14.02.2020
  */
 final class IntMethod extends AbstractIntOperator {
+
+    /**
+     * The task carries out by this method.
+     */
+    private IntExp task;
 
     /**
      * The task network of the methode.
@@ -58,20 +61,38 @@ final class IntMethod extends AbstractIntOperator {
     }
 
     /**
-     * Return the tasks of the method.
+     * Return the task that is carried out by the method.
      *
-     * @return the tasks of the method.
+     * @return the task carried out by the method.
      */
-    public final IntExp getTasks() {
+    public final IntExp getTask() {
+        return this.task;
+    }
+
+    /**
+     * Set the task carried out by the method.
+     *
+     * @param task the task the carried out by the method.
+     */
+    public final void setTask(final IntExp task) {
+        this.task = task;
+    }
+
+    /**
+     * Return the subtasks of the method.
+     *
+     * @return the subtasks of the method.
+     */
+    public final IntExp getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
     /**
-     * Set the tasks of the method.
+     * Set the subtasks of the method.
      *
-     * @param tasks the tasks to set.
+     * @param tasks the subtasks to set.
      */
-    public final void setTasks(final IntExp tasks) {
+    public final void setSubTasks(final IntExp tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 

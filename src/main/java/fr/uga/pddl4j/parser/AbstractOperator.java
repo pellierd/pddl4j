@@ -134,7 +134,7 @@ public abstract class AbstractOperator implements Operator {
     public final NamedTypedList toTask() {
         NamedTypedList task = new NamedTypedList(this.getName());
         for (TypedSymbol p : this.getParameters()) {
-            task.add(p);
+            task.add(new TypedSymbol(p));
         }
         return task;
     }

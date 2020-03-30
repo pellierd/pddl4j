@@ -24,7 +24,6 @@ import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -110,12 +109,14 @@ final class StringEncoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
+        str.append("Task: ").append(toString(meth.getTask(), constants, types, predicates, functions, tasks))
+            .append("\n");
         str.append("Preconditions:\n").append(toString(meth.getPreconditions(), constants, types, predicates, functions, tasks))
             .append("\n");
-        str.append("tasks:\n")
-            .append(toString(meth.getTasks(), constants, types, predicates, functions, tasks))
+        str.append("Subtasks:\n")
+            .append(toString(meth.getSubTasks(), constants, types, predicates, functions, tasks))
             .append("\n");
-        str.append("ordering:\n")
+        str.append("Ordering:\n")
             .append(toString(meth.getOrderingConstraints(), constants, types, predicates, functions, tasks))
             .append("\n");
         return str.toString();
@@ -224,9 +225,11 @@ final class StringEncoder implements Serializable {
                 break;
             case TASK:
                 str.append("(");
-                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                str.append(exp.getTask());
-                str.append(" (");
+                if (exp.getTaskID() != IntExp.DEFAULT_TASK_ID) {
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                    str.append(exp.getTaskID());
+                    str.append(" (");
+                }
                 str.append(tasks.get(exp.getPredicate()));
                 args = exp.getArguments();
                 for (int index : args) {
@@ -236,7 +239,10 @@ final class StringEncoder implements Serializable {
                         str.append(" ").append(constants.get(index));
                     }
                 }
-                str.append("))");
+                if (exp.getTaskID() != IntExp.DEFAULT_TASK_ID) {
+                    str.append(")");
+                }
+                str.append(")");
                 break;
             case EQUAL_ATOM:
                 str.append("(").append("=");
@@ -344,12 +350,12 @@ final class StringEncoder implements Serializable {
             case LESS_ORDERING_CONSTRAINT:
                 str.append("(");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                str.append(exp.getChildren().get(0).getTask());
+                str.append(exp.getChildren().get(0).getTaskID());
                 str.append(" ");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                str.append(exp.getChildren().get(1).getTask());
+                str.append(exp.getChildren().get(1).getTaskID());
                 str.append(")");
                 break;
             default:

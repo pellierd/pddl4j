@@ -26,9 +26,8 @@ import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
 import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
+import fr.uga.pddl4j.encoding.IntExp;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;

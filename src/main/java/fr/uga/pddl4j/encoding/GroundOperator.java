@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.IntExp;
-
 import java.io.Serializable;
 
 /**
@@ -74,7 +72,7 @@ public interface GroundOperator extends Serializable {
      * <p>
      * The assumption is made that different operator parameters are instantiated with different
      * constants, i.e., the planner never generates actions like move(a,a) because we consider this
-     * as a bad domain representation that should be revised. In fact, in operators with identical
+     * as a bad domain representation that should be revised. In fact, in actions with identical
      * constant parameters, all but one of the constants are superfluous and can be skipped from the
      * representation without loss of information.
      * </p>

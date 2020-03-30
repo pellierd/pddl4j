@@ -20,10 +20,8 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.IntExp;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network

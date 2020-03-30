@@ -62,9 +62,9 @@ public interface Operator extends Serializable {
     TypedSymbol getParameter(final Symbol symbol);
 
     /**
-     * Returns the task representaion of this operator.
+     * Returns the task representation of this operator.
      *
-     * @return the task representaion of this operator.
+     * @return the task representation of this operator.
      */
     NamedTypedList toTask();
 

@@ -55,7 +55,7 @@ public final class Constants implements Serializable {
     static final String DUMMY_OPERATOR = "dummy_operator";
 
     /**
-     * The default size of the operators table.
+     * The default size of the actions table.
      */
     static final int DEFAULT_OPERATORS_TABLE_SIZE = 1000;
 

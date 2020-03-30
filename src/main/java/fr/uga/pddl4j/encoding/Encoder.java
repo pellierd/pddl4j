@@ -28,10 +28,10 @@ import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.util.BitExp;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.IntExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,21 +45,21 @@ import java.util.Set;
 /**
  * <p>
  * This class implements the pre-processing needed to instantiate and encode planning problem in an
- * efficient manner (see On the Instantiation of ADL Operators Involving Arbitrary First-Order
- * Formulas. Koehler, J. and Hoffmann, J.).
+ * efficient manner (see On the Instantiation of ADL action and methods involving arbitrary first-order
+ * formulas. Koehler, J. and Hoffmann, J.).
  * </p>
  * <p>
  * Encoder starts by generating the code tables, which map strings to unique numbers, i.e., we
  * obtain one number for each predicate name, variable name, and constant name. Internally, all
  * subsequently described operations work over trees of numbers representing the formulas. Now from
- * the generated code tables, the operators, the initial state and the goal are encoded according to
- * the integer code tables. Then, proceeds over the domain and problem description and collects all
- * used relation names. For each relation it checks if it satisfies one of the following
+ * the generated code tables, the actions, the methids the initial state and the goal are encoded
+ * according to the integer code tables. Then, proceeds over the domain and problem description and
+ * collects all used relation names. For each relation it checks if it satisfies one of the following
  * definitions:
  * </p>
  * <p>
  * <i>Definition:</i> A relation is a negative inertia iff it does not occur negatively in an
- * unconditional effect or the consequent of a conditional effect of an operator.
+ * unconditional effect or the consequent of a conditional effect of an action.
  * </p>
  * <p>
  * Relations, which are positive as well as negative inertia, are simply called inertia. Relations,
@@ -70,9 +70,9 @@ import java.util.Set;
  * </p>
  * <p>
  * Then, the encoding creates the predicates tables to count the number of occurrences of each
- * predicate and instantiate the operators and simplified them. After this first instantiation, the
- * operators are simplifies again with the ground inertia information. So far we have only
- * considered the predicates which are never made true or false by a planning operator. These were
+ * predicate and instantiate the actions and simplified them. After this first instantiation, the
+ * actions are simplifies again with the ground inertia information. So far we have only
+ * considered the predicates which are never made true or false by a planning action. These were
  * used to constrain the instantiation process. Once the set of all actions has been determined, one
  * can similarly define the ground facts that are never made true or false by one of the actions.
  * </p>
@@ -91,7 +91,7 @@ import java.util.Set;
  * the planning process. They are therefore relevant to the representation of the planning problem.
  * </p>
  * <p>
- * Then, encoding extracts relevant facts from the instantiated operator. A relevant fact is
+ * Then, encoding extracts relevant facts from the instantiated actions. A relevant fact is
  * defines as follow:
  * </p>
  * <p>
@@ -102,7 +102,7 @@ import java.util.Set;
  * <li> it is not an initial fact and not a positive ground inertia.</li>
  * </ol>
  * <p>
- * Finally, every operator is normalized, i.e, transform precondition and effects of the operators
+ * Finally, every action is normalized, i.e, transform precondition and effects of the actions
  * in disjunctive and conjunctive normal form, before being encoding in a compact bit set
  * representation.
  * </p>
@@ -208,9 +208,9 @@ public final class Encoder implements Serializable {
     static List<IntExp> tableOfRelevantFacts;
 
     /**
-     * The list of instantiated operator encoded into bit sets.
+     * The list of instantiated actions encoded into bit sets.
      */
-    static List<BitOp> operators;
+    static List<BitOp> actions;
 
     /**
      * The goal.
@@ -248,9 +248,9 @@ public final class Encoder implements Serializable {
      * <ul>
      * <li> 0 - nothing </li>
      * <li> 1 - 1 + info on problem constants, types and predicates</li>
-     * <li> 2 - 1 + 2 + loaded operators, initial and goal state</li>
+     * <li> 2 - 1 + 2 + loaded actions, initial and goal state</li>
      * <li> 3 - 1 + predicates and their inertia status</li>
-     * <li> 4 - 1 + 4 + goal state and operators with unary inertia encoded</li>
+     * <li> 4 - 1 + 4 + goal state and actions with unary inertia encoded</li>
      * <li> 5 - 1 + actions, initial and goal state after expansion of variables</li>
      * <li> 6 - 1 + facts selected as relevant to the problem</li>
      * <li> 7 - 1 + final domain representation</li>
@@ -269,8 +269,7 @@ public final class Encoder implements Serializable {
 
     /**
      * Instantiate, simplify and encode the problem in a compact representation. (see On the
-     * Instantiation of ADL Operators Involving Arbitrary First-Order Formulas. Koehler, J. and
-     * Hoffmann, J.):
+     * Instantiation of ADL action and methid involving arbitrary first-order formulas.
      *
      * @param domain  the domain to encode.
      * @param problem the problem to encode.
@@ -335,7 +334,7 @@ public final class Encoder implements Serializable {
         IntEncoding.encodeFunctions(domain);
         // Encode the tasks defined in the domain.
         IntEncoding.encodeTasks(domain);
-        // Encode operators in integer representation
+        // Encode actions in integer representation
         List<IntAction> intActions = IntEncoding.encodeActions(domain.getActions());
         // Encode method in integer representation
         List<IntMethod> intMethods = IntEncoding.encodeMethods(domain.getMethods());
@@ -466,8 +465,10 @@ public final class Encoder implements Serializable {
         // Step 4: Instantiation
         // *****************************************************************************************
 
-        // Instantiate the operators
-        intActions = Instantiation.instantiateOperators(intActions);
+        // Instantiate the actions
+        intActions = Instantiation.instantiateActions(intActions);
+        // Instantiate the methods
+        intMethods = Instantiation.instantiateMethods(intMethods);
         // Expand the quantified expression in the goal
         if (intGoal != null) {
             Instantiation.expandQuantifiedExpression(intGoal);
@@ -482,18 +483,31 @@ public final class Encoder implements Serializable {
             stringBuilder.append(System.lineSeparator());
             Encoder.printTableOfTypes(stringBuilder);
             stringBuilder.append(System.lineSeparator());
-            stringBuilder.append("\nPre-instantiation initial state:\n").append("(and");
+            stringBuilder.append("\nInstantiation initial state:\n").append("(and");
             for (IntExp f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f));
+                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
-            stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append("(and");
-            for (final IntExp g : intGoal.getChildren()) {
-                stringBuilder.append(" ").append(Encoder.toString(g));
+            if (intGoal != null) {
+                stringBuilder.append(")").append("\n\nInstantiation goal state:\n").append("(and");
+                for (final IntExp g : intGoal.getChildren()) {
+                    stringBuilder.append(" ").append(Encoder.toString(g));
+                }
             }
-            stringBuilder.append("\n\nPre-instantiation operators with inferred types (").append(intActions.size())
-                .append(" ops):\n\n");
+            if (intTaskNetwork != null) {
+                stringBuilder.append(")").append("\n\nInstantiation initial task network:\n")
+                    .append(Encoder.toString(intTaskNetwork));
+            }
+            stringBuilder.append("\n\nInstantiation actions with inferred types (").append(intActions.size())
+                .append(" actions):\n\n");
             for (final IntAction op : intActions) {
                 stringBuilder.append(Encoder.toString(op)).append("\n");
+            }
+            if (Encoder.requirements.contains(RequireKey.HTN)) {
+                stringBuilder.append("\nInstantiation methods with inferred types (").append(intMethods.size())
+                    .append(" methods):\n\n");
+                for (IntMethod meth : intMethods) {
+                    stringBuilder.append(Encoder.toString(meth)).append("\n");
+                }
             }
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
@@ -503,11 +517,11 @@ public final class Encoder implements Serializable {
         // Step 5: PostInstantiation
         // *****************************************************************************************
 
-        // Extract the ground inertia from the instantiated operators
+        // Extract the ground inertia from the instantiated actions
         PostInstantiation.extractGroundInertia(intActions);
-        // Simplify the operators with the ground inertia information previously extracted
+        // Simplify the actions with the ground inertia information previously extracted
         PostInstantiation.simplyOperatorsWithGroundInertia(intActions, intInitPredicates);
-        // Extract the relevant facts from the simplified and instantiated operators
+        // Extract the relevant facts from the simplified and instantiated actions
         PostInstantiation.extractRelevantFacts(intActions, intInitPredicates);
         // Simplify the goal with ground inertia information
         if (intGoal != null) {
@@ -532,7 +546,7 @@ public final class Encoder implements Serializable {
 
 
         // Create a map of the relevant facts with their index to speedup the bit set encoding of
-        // the operators
+        // the actions
         final Map<IntExp, Integer> map = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
         int index = 0;
         for (IntExp fact : Encoder.tableOfRelevantFacts) {
@@ -540,8 +554,8 @@ public final class Encoder implements Serializable {
             index++;
         }
 
-        // Creates the list of bit operators
-        Encoder.operators = new ArrayList<>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
+        // Creates the list of bit actions
+        Encoder.actions = new ArrayList<>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
         // Encode the goal in bit set representation
         if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM)) {
             try {
@@ -556,9 +570,9 @@ public final class Encoder implements Serializable {
 
         // Encode the initial state in bit set representation
         Encoder.init = BitEncoding.encodeInit(intInitPredicates, map);
-        // Encode the operators in bit set representation
+        // Encode the actions in bit set representation
         try {
-            Encoder.operators.addAll(0, BitEncoding.encodeOperators(intActions, map));
+            Encoder.actions.addAll(0, BitEncoding.encodeOperators(intActions, map));
         } catch (UnexpectedExpressionException uee) {
             LOGGER.error("Error with unexpected expression", uee);
             return null;
@@ -566,8 +580,8 @@ public final class Encoder implements Serializable {
 
         // Just for logging
         if (Encoder.logLevel == 7) {
-            stringBuilder.append("\nfinal operators:");
-            for (BitOp op : Encoder.operators) {
+            stringBuilder.append("\nfinal actions:");
+            for (BitOp op : Encoder.actions) {
                 stringBuilder.append(Encoder.toString(op));
             }
 
@@ -587,7 +601,7 @@ public final class Encoder implements Serializable {
         final CodedProblem codedProblem = new CodedProblem();
         codedProblem.setGoal(Encoder.goal);
         codedProblem.setInit(Encoder.init);
-        codedProblem.setOperators(Encoder.operators);
+        codedProblem.setOperators(Encoder.actions);
         codedProblem.setConstants(Encoder.tableOfConstants);
         codedProblem.setDomains(Encoder.tableOfDomains);
         codedProblem.setFunctions(Encoder.tableOfFunctions);
@@ -811,7 +825,7 @@ public final class Encoder implements Serializable {
      * Print the table of inertia.
      */
     static void printTableOfGroundInertia(StringBuilder stringBuilder) {
-        stringBuilder.append("GroundOperator inertia table:");
+        stringBuilder.append("Ground inertia table:");
         for (Entry<IntExp, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
             stringBuilder.append(Encoder.toString(e.getKey())).append(": ").append(e.getValue());
         }

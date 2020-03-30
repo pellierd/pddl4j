@@ -24,7 +24,7 @@
   (:method m-deliver
     :parameters (?p - package ?l1 ?l2 - location ?v - vehicle)
     :task (deliver ?p ?l2)
-     :ordered-subtasks (and
+    :ordered-subtasks (and
       (get-to ?v ?l1)
       (load ?v ?l1 ?p)
       (get-to ?v ?l2)

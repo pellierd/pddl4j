@@ -21,6 +21,7 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -135,12 +136,8 @@ public class Domain implements Serializable {
      * Sets a name to the domain.
      *
      * @param name the name to set.
-     * @throws NullPointerException if the specified name is null.
      */
     public final void setName(final Symbol name) {
-        if (name == null) {
-            throw new NullPointerException();
-        }
         this.name = name;
     }
 
@@ -158,12 +155,8 @@ public class Domain implements Serializable {
      *
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified requirement is null.
      */
     public final boolean addRequirement(final RequireKey requirement) {
-        if (requirements == null) {
-            throw new NullPointerException();
-        }
         return this.requirements.add(requirement);
     }
 
@@ -181,12 +174,8 @@ public class Domain implements Serializable {
      *
      * @param type the type to add.
      * @return <code>true</code> if the type was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified type is null.
      */
     public final boolean addType(final TypedSymbol type) {
-        if (types == null) {
-            throw new NullPointerException();
-        }
         return this.types.add(type);
     }
 
@@ -204,12 +193,8 @@ public class Domain implements Serializable {
      *
      * @param constant the constant to add.
      * @return <code>true</code> if the constant was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified constant is null.
      */
     public final boolean addConstant(final TypedSymbol constant) {
-        if (constant == null) {
-            throw new NullPointerException();
-        }
         return this.constants.add(constant);
     }
 
@@ -250,12 +235,8 @@ public class Domain implements Serializable {
      *
      * @param function the function to add.
      * @return <code>true</code> if the function was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified function is null.
      */
     public final boolean addFunction(final NamedTypedList function) {
-        if (function == null) {
-            throw new NullPointerException();
-        }
         return this.functions.add(function);
     }
 
@@ -273,12 +254,8 @@ public class Domain implements Serializable {
      *
      * @param task the task to add.
      * @return <code>true</code> if the task was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified function is null.
      */
     public final boolean addTask(final NamedTypedList task) {
-        if (task == null) {
-            throw new NullPointerException();
-        }
         return this.tasks.add(task);
     }
 
@@ -310,41 +287,33 @@ public class Domain implements Serializable {
     }
 
     /**
-     * Adds an operator to the domain.
+     * Adds an action to the domain.
      *
-     * @param op the operator to add.
-     * @return <code>true</code> if the operator was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified operator is null.
+     * @param action the action to add.
+     * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */
-    public final boolean addOperator(final Action op) {
-        if (op == null) {
-            throw new NullPointerException();
-        }
-        this.tasks.add(op.toTask()); //
-        return this.ops.add(op);
+    public final boolean addAction(final Action action) {
+        this.tasks.add(action.toTask());
+        return this.ops.add(action);
     }
 
     /**
-     * Returns the list of parsed meths.
+     * Returns the list of parsed methods.
      *
-     * @return the list of parsed meths.
+     * @return the list of parsed methods.
      */
     public final List<Method> getMethods() {
         return this.meths;
     }
 
     /**
-     * Adds an operator to the domain.
+     * Adds a method to the domain.
      *
-     * @param meth the method to add.
+     * @param method the method to add.
      * @return <code>true</code> if the method was added; <code>false</code> otherwise.
-     * @throws NullPointerException if the specified method is null.
      */
-    public final boolean addMethod(final Method meth) {
-        if (meth == null) {
-            throw new NullPointerException();
-        }
-        return this.meths.add(meth);
+    public final boolean addMethod(final Method method) {
+        return this.meths.add(method);
     }
 
     /**
@@ -543,6 +512,13 @@ public class Domain implements Serializable {
         if (!this.functions.isEmpty()) {
             str.append("(:functions ");
             for (NamedTypedList p : this.functions) {
+                str.append("\n  ").append(p);
+            }
+            str.append("\n  )\n");
+        }
+        if (!this.tasks.isEmpty()) {
+            str.append("(:tasks ");
+            for (NamedTypedList p : this.tasks) {
                 str.append("\n  ").append(p);
             }
             str.append("\n  )\n");
