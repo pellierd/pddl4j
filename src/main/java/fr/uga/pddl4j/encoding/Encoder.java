@@ -437,15 +437,26 @@ public final class Encoder implements Serializable {
             Encoder.printTableOfTypes(stringBuilder);
             stringBuilder.append(System.lineSeparator()).append("\nPre-instantiation initial state:\n").append("(and");
             for (IntExp f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f));
+                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
                 stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
             }
-            stringBuilder.append("\n\nPre-instantiation actions with inferred types (").append(intActions.size())
+            if (intTaskNetwork != null) {
+                stringBuilder.append(")").append("\n\nPre-instantiation initial task network:\n")
+                    .append(Encoder.toString(intTaskNetwork));
+            }
+            stringBuilder.append("\nPre-instantiation actions with inferred types (").append(intActions.size())
                 .append(" actions):\n");
-            for (IntAction op : intActions) {
-                stringBuilder.append(Encoder.toString(op));
+            for (IntAction a : intActions) {
+                stringBuilder.append(Encoder.toString(a)).append("\n");
+            }
+            if (Encoder.requirements.contains(RequireKey.HTN)) {
+                stringBuilder.append("\nPre-instantiation methods with inferred types (").append(intMethods.size())
+                    .append(" methods):\n\n");
+                for (IntMethod meth : intMethods) {
+                    stringBuilder.append(Encoder.toString(meth)).append("\n");
+                }
             }
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);

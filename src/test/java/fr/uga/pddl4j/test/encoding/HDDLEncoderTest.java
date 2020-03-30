@@ -18,7 +18,7 @@ public class HDDLEncoderTest {
         try {
             final ProblemFactory factory = new ProblemFactory();
 
-            factory.setTraceLevel(2);
+            factory.setTraceLevel(4);
 
             //ErrorManager errorManager = factory.parse(
             //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl"),
