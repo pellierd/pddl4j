@@ -243,33 +243,31 @@ final class Instantiation implements Serializable {
                 if (!method.isAlreadyInstantiatedWith(value)) {
                     final int varIndex = -index - 1;
                     final IntExp preconditionCopy = new IntExp(method.getPreconditions());
+                    //System.out.print("method: " + Encoder.toString(method));
+
+                    //System.out.print("Instantiate precondition: " + Encoder.toString(preconditionCopy));
                     Instantiation.substitute(preconditionCopy, varIndex, value);
+                    //System.out.println(" => " + Encoder.toString(preconditionCopy));
                     if (!preconditionCopy.getConnective().equals(Connective.FALSE)) {
                         final IntMethod copy = new IntMethod(method.getName(), arity);
                         copy.setPreconditions(preconditionCopy);
 
                         final IntExp taskCopy = new IntExp(method.getTask());
-                        //System.out.println(Encoder.toString(method.getTask()));
+                        //System.out.print("Instantiate task: " + Encoder.toString(taskCopy));
                         Instantiation.substitute(taskCopy, varIndex, value);
                         copy.setTask(taskCopy);
-                        //System.out.println(Encoder.toString(taskCopy));
+                        System.out.println(" => " + Encoder.toString(taskCopy));
 
                         final IntExp subTasksCopy = new IntExp(method.getSubTasks());
-                        //System.out.println(Encoder.toString(subTasksCopy));
-                        //System.out.println(varIndex +  " " + value);
-
+                        //System.out.print("Instantiate subtasks: " + Encoder.toString(subTasksCopy));
                         Instantiation.substitute(subTasksCopy, varIndex, value);
+                        copy.setSubTasks(subTasksCopy);
+                        //System.out.println(" => " + Encoder.toString(subTasksCopy));
 
-                        //System.out.println(Encoder.toString(subTasksCopy));
                         //try {
                         //    System.in.read();
                         //} catch (Exception e) {}
 
-                        copy.setSubTasks(subTasksCopy);
-
-                        final IntExp orderingConstraintCopy = new IntExp(method.getOrderingConstraints());
-                        Instantiation.substitute(orderingConstraintCopy, varIndex, value);
-                        copy.setSubTasks(orderingConstraintCopy);
 
                         for (int i = 0; i < arity; i++) {
                             copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
@@ -284,7 +282,6 @@ final class Instantiation implements Serializable {
             }
         }
     }
-
 
     /**
      * Expands the quantified expressions contained in a specified expression.
@@ -715,6 +712,15 @@ final class Instantiation implements Serializable {
                 }
                 if (updated) {
                     Instantiation.simplyAtom(exp);
+                }
+                break;
+            case TASK:
+                args = exp.getArguments();
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] == var) {
+                        args[i] = cons;
+                        updated = true;
+                    }
                 }
                 break;
             case FN_HEAD:

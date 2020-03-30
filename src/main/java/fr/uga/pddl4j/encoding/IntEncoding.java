@@ -592,7 +592,6 @@ final class IntEncoding implements Serializable {
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
                     final Symbol argument = exp.getAtom().get(i);
-                    System.out.println(argument + " "  + argument.getKind());
                     if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
@@ -603,7 +602,6 @@ final class IntEncoding implements Serializable {
                     intExp.setTaskID(new Integer(exp.getTaskID().getImage().substring(1)));
                 }
                 intExp.setArguments(args);
-                System.out.println(Encoder.toString(intExp));
                 break;
             case AND:
             case OR:

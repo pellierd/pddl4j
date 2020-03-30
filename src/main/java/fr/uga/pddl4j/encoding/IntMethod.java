@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.parser.Connective;
+
 /**
  * This class implements an method. This class is used to store compact representation of method
  * during the instantiation process.
@@ -46,17 +48,21 @@ final class IntMethod extends AbstractIntOperator {
      */
     public IntMethod(final IntMethod other) {
         super(other);
-        this.taskNetwork = other.taskNetwork;
+        this.task = new IntExp(other.getTask());
+        this.taskNetwork = new IntTaskNetwork(other.taskNetwork);
+
     }
 
     /**
-     * Create a new method with a specified name.
+     * Create a new method with a specified name. The task is set to a empty IntExp with TASK as connective and the
+     * task network is set to an empty task network.
      *
      * @param name  the name of the method.
      * @param arity the arity of the method. The arity must be > 0.
      */
     public IntMethod(final String name, final int arity) {
         super(name, arity);
+        this.task = new IntExp(Connective.TASK);
         this.taskNetwork = new IntTaskNetwork();
     }
 
