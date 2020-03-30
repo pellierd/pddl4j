@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.util;
 
+import fr.uga.pddl4j.encoding.AbstractBitOperator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,22 +33,22 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.1 - 08.04.2010
  */
-public class BitOp extends AbstractCodedOp {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The preconditions of the operator.
-     */
-    private BitExp preconditions;
+public class BitOp extends AbstractBitOperator {
 
     /**
      * The list of effects of the operator.
      */
     private List<CondBitExp> effects;
+
+    /**
+     * The cost of the operator.
+     */
+    private double cost;
+
+    /**
+     * The duration of the operator.
+     */
+    private double duration;
 
     /**
      * Creates a new operator from an other. This constructor is the copy constructor.
@@ -56,7 +58,6 @@ public class BitOp extends AbstractCodedOp {
      */
     public BitOp(final BitOp other) {
         super(other);
-        this.preconditions = new BitExp(other.getPreconditions());
         this.effects = new ArrayList<>();
         this.effects.addAll(other.getCondEffects().stream().map(CondBitExp::new).collect(Collectors.toList()));
     }
@@ -69,7 +70,6 @@ public class BitOp extends AbstractCodedOp {
      */
     public BitOp(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new BitExp();
         this.effects = new ArrayList<>();
     }
 
@@ -88,28 +88,6 @@ public class BitOp extends AbstractCodedOp {
         cexp.setCondition(new BitExp());
         cexp.setEffects(effects);
         this.addCondBitEffect(cexp);
-    }
-
-    /**
-     * Sets the preconditions of the operator.
-     *
-     * @param preconditions the preconditions to set.
-     * @throws NullPointerException if <code>preconditions == null</code>.
-     */
-    public final void setPreconditions(final BitExp preconditions) {
-        if (preconditions == null) {
-            throw new NullPointerException("preconditions == null");
-        }
-        this.preconditions = preconditions;
-    }
-
-    /**
-     * Returns the preconditions of the operator.
-     *
-     * @return the preconditions of the operator.
-     */
-    public final BitExp getPreconditions() {
-        return this.preconditions;
     }
 
     /**
@@ -142,7 +120,7 @@ public class BitOp extends AbstractCodedOp {
         if (state == null) {
             throw new NullPointerException("state == null");
         }
-        return state.satisfy(this.preconditions);
+        return state.satisfy(this.getPreconditions());
     }
 
     /**
@@ -158,6 +136,42 @@ public class BitOp extends AbstractCodedOp {
             ucEffect.getNegative().or(condEff.getNegative());
         });
         return ucEffect;
+    }
+
+    /**
+     * Returns the duration of the operator.
+     *
+     * @return the duration of the operator.
+     */
+    public final double getDuration() {
+        return this.duration;
+    }
+
+    /**
+     * Sets the duration of the operator.
+     *
+     * @param duration the duration to set.
+     */
+    public final void setDuration(final double duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * Returns the cost of the operator.
+     *
+     * @return the cost of the operator.
+     */
+    public final double getCost() {
+        return this.cost;
+    }
+
+    /**
+     * Sets the cost of the operator.
+     *
+     * @param cost the cost to set.
+     */
+    public final void setCost(double cost) {
+        this.cost = cost;
     }
 
 }

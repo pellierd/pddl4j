@@ -20,16 +20,8 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.MalformedExpException;
-import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.parser.DerivedPredicate;
-import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.parser.Exp;
-import fr.uga.pddl4j.parser.NamedTypedList;
-import fr.uga.pddl4j.parser.Op;
-import fr.uga.pddl4j.parser.Method;
-import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.parser.Symbol;
-import fr.uga.pddl4j.parser.TypedSymbol;
+import fr.uga.pddl4j.parser.*;
+import fr.uga.pddl4j.parser.Action;
 import fr.uga.pddl4j.util.IntExp;
 
 
@@ -89,7 +81,7 @@ final class IntEncoding implements Serializable {
             IntEncoding.encodeTypes(axiom.getBody());
         }
         // Collect the type from the operators
-        for (Op op : domain.getOperators()) {
+        for (Action op : domain.getActions()) {
             IntEncoding.encodeTypes(op.getParameters());
             if (op.getDuration() != null) {
                 IntEncoding.encodeTypes(op.getDuration());
@@ -355,8 +347,8 @@ final class IntEncoding implements Serializable {
      * @param ops the list of operators to encode.
      * @return encoded the list of operators encoded.
      */
-    static List<IntOp> encodeOperators(final List<Op> ops) {
-        return ops.stream().map(IntEncoding::encodeOperator).collect(Collectors.toList());
+    static List<IntAction> encodeActions(final List<Action> ops) {
+        return ops.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
     }
 
     /**
@@ -365,7 +357,7 @@ final class IntEncoding implements Serializable {
      * @param meths the list of methods to encode.
      * @return encoded the list of methods encoded.
      */
-    static List<IntMeth> encodeMethods(final List<Method> meths) {
+    static List<IntMethod> encodeMethods(final List<Method> meths) {
         return meths.stream().map(IntEncoding::encodeMethod).collect(Collectors.toList());
     }
 
@@ -426,6 +418,20 @@ final class IntEncoding implements Serializable {
         return IntEncoding.encodeExp(goal);
     }
 
+    /**
+     * Encodes a specified task network into its integer representation.
+     * Warning logial contraints are not considered for the moment.
+     *
+     * @param taskNetwork the initial task network to encode.
+     * @return the initial task network encoded.
+     */
+    static IntTaskNetwork encodeInitialTaskNetwork(final TaskNetwork taskNetwork) {
+        // Encode the tasks of the task network
+        final IntExp tasks = IntEncoding.encodeExp(taskNetwork.getTasks());
+        // Encode the ordering constraints of the task network
+        final IntExp orderingConstraints = IntEncoding.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
+        return new IntTaskNetwork(tasks, orderingConstraints, taskNetwork.isTotallyOrdered());
+    }
 
     /**
      * Encode an operator into its integer representation.
@@ -433,8 +439,8 @@ final class IntEncoding implements Serializable {
      * @param op the operator to encode.
      * @return encoded operator.
      */
-    private static IntOp encodeOperator(final Op op) {
-        final IntOp intOp = new IntOp(op.getName().getImage(), op.getArity());
+    private static IntAction encodeAction(final Action op) {
+        final IntAction intOp = new IntAction(op.getName().getImage(), op.getArity());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(op.getArity());
         for (int i = 0; i < op.getArity(); i++) {
@@ -459,8 +465,8 @@ final class IntEncoding implements Serializable {
      * @param meth the metho to encode.
      * @return encoded method.
      */
-    private static IntMeth encodeMethod(final Method meth) {
-        final IntMeth intMeth = new IntMeth(meth.getName().getImage(), meth.getArity());
+    private static IntMethod encodeMethod(final Method meth) {
+        final IntMethod intMeth = new IntMethod(meth.getName().getImage(), meth.getArity());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(meth.getArity());
         for (int i = 0; i < meth.getArity(); i++) {
@@ -482,9 +488,6 @@ final class IntEncoding implements Serializable {
         return intMeth;
     }
 
-    /**
-     * Encode the task of the constraints.
-     */
     /**
      * Encode the ordering constraints of method. The index used to encode a task in the ordering constraints
      * expression returned is the index of the task in the AND expression of the tasks list of a method.

@@ -34,11 +34,6 @@ import java.util.stream.Collectors;
 public class TaskNetwork implements Serializable {
 
     /**
-     * The list of parameters of the method.
-     */
-    private List<TypedSymbol> parameters;
-
-    /**
      * The tasks of the task network.
      */
     private Exp tasks;
@@ -63,7 +58,6 @@ public class TaskNetwork implements Serializable {
      */
     protected TaskNetwork() {
         super();
-        this.parameters = null;
         this.tasks = null;
         this.orderingConstraints = null;
         this.logicalConstraints = null;
@@ -76,11 +70,6 @@ public class TaskNetwork implements Serializable {
      * @param other the other task network.
      */
     public TaskNetwork(final TaskNetwork other) {
-        if (other == null) {
-            throw new NullPointerException();
-        }
-        this.parameters = new LinkedList<>();
-        this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
         this.tasks = new Exp(other.getTasks());
         this.orderingConstraints = new Exp(other.getOrderingConstraints());
         this.logicalConstraints = new  Exp(other.getLogicalConstraints());
@@ -90,55 +79,18 @@ public class TaskNetwork implements Serializable {
     /**
      * Creates a task network with a specified list of parameters, list of tasks, ordering and logicial constraints.
      *
-     * @param parameters The list of the parameters of the task network. The list of parameters can be empty.
      * @param tasks The tasks of the task network.
      * @param ordering The ordering constraints between the tasks of the task network.
      * @param logical The logicial constraint between the tasks of the task network.
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public TaskNetwork(final List<TypedSymbol> parameters, final Exp tasks, final Exp ordering,
-                  final Exp logical, final boolean ordered) {
-        this();
-        this.setParameters(parameters);
+    public TaskNetwork(final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
+        super();
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);
         this.setLogicalConstraints(logical);
         this.setTotallyOrdered(ordered);
-    }
-
-    /**
-     * Returns the list of parameters of the task network.
-     *
-     * @return the list of parameters of the task network.
-     */
-    public final List<TypedSymbol> getParameters() {
-        return this.parameters;
-    }
-
-    /**
-     * Returns the parameter of the task network that has a specified symbol.
-     *
-     * @param symbol The symbol.
-     * @return the parameter of the tasknetwork that has a specified symbol or <code>null</code> if the
-     *          method has no such parameter.
-     */
-    public final TypedSymbol getParameter(final Symbol symbol) {
-        final int index = this.parameters.indexOf(symbol);
-        return (index == -1) ? null : this.parameters.get(index);
-    }
-
-    /**
-     * Sets a new list of parameters to this task network.
-     *
-     * @param parameters The list of parameters to set.
-     * @throws NullPointerException if the specified parameters is null.
-     */
-    public final void setParameters(final List<TypedSymbol> parameters) {
-        if (parameters == null) {
-            throw new NullPointerException();
-        }
-        this.parameters = parameters;
     }
 
     /**
@@ -154,12 +106,8 @@ public class TaskNetwork implements Serializable {
      *  Sets the tasks of the task network.
      *
      *  @param tasks The tasks to set.
-     *  @throws NullPointerException if the specified parameters is null.
      */
     public final void setTasks(final Exp tasks) {
-        if (tasks == null) {
-            throw new NullPointerException();
-        }
         this.tasks = tasks;
     }
 
@@ -177,12 +125,8 @@ public class TaskNetwork implements Serializable {
      *  Sets the ordering constraints between the tasks of the task network.
      *
      *  @param constraints The constraints to set.
-     *  @throws NullPointerException if the specified parameters is null.
      */
     public final void setOrderingConstraints(final Exp constraints) {
-        if (constraints == null) {
-            throw new NullPointerException();
-        }
         this.orderingConstraints = constraints;
     }
 
@@ -199,12 +143,8 @@ public class TaskNetwork implements Serializable {
      *  Sets the logical constraints between the tasks of the task network.
      *
      *  @param constraints The constraints to set.
-     *  @throws NullPointerException if the specified parameters is null.
      */
     public final void setLogicalConstraints(final Exp constraints) {
-        if (constraints == null) {
-            throw new NullPointerException();
-        }
         this.logicalConstraints = constraints;
     }
 
@@ -234,7 +174,7 @@ public class TaskNetwork implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(parameters, tasks, orderingConstraints, logicalConstraints, isTotallyOrdered);
+        return Objects.hash(this.tasks, this.orderingConstraints, this.logicalConstraints, this.isTotallyOrdered);
     }
 
     /**
@@ -242,15 +182,14 @@ public class TaskNetwork implements Serializable {
      *
      * @param object the other object.
      * @return <code>true</code> if <code>object</code> is not <code>null</code>, is an instance of
-     *          the class <code>Op</code>, and has the same attributs; otherwise it returns <code>false</code>.
+     *          the class <code>Action</code>, and has the same attributs; otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(final Object object) {
         if (object != null && object.getClass().equals(this.getClass())) {
             final TaskNetwork other = (TaskNetwork) object;
-            return this.getParameters().equals(other.getParameters())
-                && this.getTasks().equals(other.getTasks())
+            return this.getTasks().equals(other.getTasks())
                 && this.getOrderingConstraints().equals(other.getOrderingConstraints())
                 && this.getLogicalConstraints().equals(other.getLogicalConstraints())
                 && this.isTotallyOrdered() == other.isTotallyOrdered();
@@ -266,18 +205,10 @@ public class TaskNetwork implements Serializable {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        if (!this.parameters.isEmpty()) {
-            str.append("  :parameters (");
-            for (int i = 0; i < this.parameters.size() - 1; i++) {
-                str.append(this.parameters.get(i)).append(" ");
-            }
-            str.append(this.parameters.get(this.parameters.size() - 1).toString());
-        }
-
         if (this.isTotallyOrdered()) {
             str.append("  :ordered-tasks\n  ");
         } else {
-            str.append("  :tasks\n  ");
+            str.append("  :subtasks\n  ");
         }
         if (!this.getTasks().getChildren().isEmpty()) {
             str.append(this.getTasks().toString("  "));

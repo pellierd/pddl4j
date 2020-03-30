@@ -1,5 +1,5 @@
 (define (domain rover_domain)
-	(:requirements :typing :htn :htn-method-prec :negative-preconditions)
+	(:requirements :typing :partial-ordered-htn :htn-method-preconditions :negative-preconditions)
 	(:types
 		waypoint - object
 		mode - object
@@ -66,7 +66,7 @@
 		:precondition (and
 			(not (empty ?s))
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (drop ?rover ?s))
 		)
 	)

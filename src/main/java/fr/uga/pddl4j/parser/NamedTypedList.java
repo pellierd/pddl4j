@@ -34,11 +34,6 @@ import java.util.stream.Collectors;
 public class NamedTypedList implements Serializable {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The name of the typed list.
      */
     private Symbol name;

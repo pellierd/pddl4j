@@ -183,13 +183,14 @@ public final class Parser {
             this.lexer.domain();
             this.domain = this.lexer.getDomain();
             try {
+                this.checkRequirements();
                 this.checkTypesDeclaration();
                 this.checkConstantsDeclaration();
                 this.checkPredicatesDeclaration();
                 this.checkFunctionsDeclaration();
                 this.checkDomainConstraints();
                 this.checkTaskDeclaration();
-                this.checkOperatorDeclaration();
+                this.checkActionDeclaration();
                 this.checkMethodDeclaration();
                 this.checkDerivedPredicateDeclaration();
             } catch (NullPointerException exception) {
@@ -238,6 +239,7 @@ public final class Parser {
             this.problem = this.lexer.getProblem();
             try {
                 this.checkDomainName();
+                this.checkRequirements();
                 this.checkObjectsDeclaration();
                 this.checkInitialTaskNetwork();
                 this.checkInitialFacts();
@@ -283,12 +285,13 @@ public final class Parser {
             this.lexer.domain_and_problem();
             this.domain = this.lexer.getDomain();
             this.problem = this.lexer.getProblem();
+            this.checkRequirements();
             this.checkTypesDeclaration();
             this.checkConstantsDeclaration();
             this.checkPredicatesDeclaration();
             this.checkFunctionsDeclaration();
             this.checkTaskDeclaration();
-            this.checkOperatorDeclaration();
+            this.checkActionDeclaration();
             this.checkMethodDeclaration();
             this.checkDerivedPredicateDeclaration();
             this.checkDomainName();
@@ -459,6 +462,24 @@ public final class Parser {
      */
     public final Problem getProblem() {
         return this.problem;
+    }
+
+    /**
+     * Check if the requirements declared in the domain are consistent. Requirements are consistent iff:
+     *  <ul>
+     *      <li>they do not contain both :partial-ordered-htn and :total-ordered-htn;</li>
+     *      <li>they do not contain :htn-method-precondition with on the total or partial ordered requitrement.</li>
+     *  </ul>
+     *
+     * @return <code>true</code> if the requirements declared in the domain are consistent.
+     * <code>false</code> otherwise.
+     */
+    private boolean checkRequirements() {
+        return !(this.getDomain().getRequirements().contains(RequireKey.PARTIAL_ORDERED_HTN)
+            && this.getDomain().getRequirements().contains(RequireKey.TOTAL_ORDERED_HTN))
+            || (this.getDomain().getRequirements().contains(RequireKey.HTN_METHOD_PRECONDITIONS)
+                && (this.getDomain().getRequirements().contains(RequireKey.TOTAL_ORDERED_HTN)
+                    || this.getDomain().getRequirements().contains(RequireKey.PARTIAL_ORDERED_HTN)));
     }
 
     /**
@@ -868,7 +889,7 @@ public final class Parser {
 
     /**
      * Checks the task declaration. More precisely, this method checks, if the domain is
-     * typed, if each types of the variables used in the parameters of the tasks are definied and if
+     * typed, if each types of the variables used in the parameters of the tasks are well defined and if
      * there is no duplicated tasks.
      *
      * @return <code>true</code> if the predicates declaration are well formed; <code>false</code> otherwise.
@@ -987,25 +1008,25 @@ public final class Parser {
     }
 
     /**
-     * Checks if the declared operators are well formed.
+     * Checks if the declared actions are well formed.
      * <ul>
-     * <li> Operators must have a unique name.</li>
+     * <li> actions must have a unique name.</li>
      * <li> The type of the variables or constants used in their precondition, condition and effects
      * are type previously declared.</li>
      * <li> The variable used in their precondition, condition and effects are declared as
-     * parameters of the operators.</li>
+     * parameters of the actions.</li>
      * </ul>
      *
      * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
      */
-    private boolean checkOperatorDeclaration() {
-        boolean checked = this.checkOperatorsUniqueness();
-        for (Op op : this.domain.getOperators()) {
-            if (this.checkOperatorParameters(op)) {
-                checked &= this.checkParserNode(op.getPreconditions(), op.getParameters());
-                checked &= this.checkParserNode(op.getEffects(), op.getParameters());
-                if (op.getDuration() != null) {
-                    checked &= this.checkParserNode(op.getDuration(), op.getParameters());
+    private boolean checkActionDeclaration() {
+        boolean checked = this.checkActionsUniqueness();
+        for (Action action : this.domain.getActions()) {
+            if (this.checkActionParameters(action)) {
+                checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
+                checked &= this.checkParserNode(action.getEffects(), action.getParameters());
+                if (action.getDuration() != null) {
+                    checked &= this.checkParserNode(action.getDuration(), action.getParameters());
                 }
             }
         }
@@ -1019,7 +1040,7 @@ public final class Parser {
      * <li> The type of the variables or constants used in their precondition, condition and effects
      * are type previously declared.</li>
      * <li> The variable used in their precondition, condition and effects are declared as
-     * parameters of the operators.</li>
+     * parameters of the methods.</li>
      * <li> The task id used in subtasks declaration are unique.</li>
      * <li> The task id used in ordering constraints are all defined.</li>
      * <li> TO DO: check the cyclic dependencies of the ordering constraints of the methods.</li>
@@ -1055,19 +1076,14 @@ public final class Parser {
     }
 
     /**
-     * Checks if the declared methods are well formed.
+     * Checks if the declared initiak task network are well formed:
      * <ul>
-     * <li> Methods must have a unique name.</li>
-     * <li> The type of the variables or constants used in their precondition, condition and effects
-     * are type previously declared.</li>
-     * <li> The variable used in their precondition, condition and effects are declared as
-     * parameters of the operators.</li>
-     * <li> The task id used in subtasks declaration are unique.</li>
-     * <li> The task id used in ordering constraints are all defined.</li>
+     * <li> The task IDs used in subtasks declaration are unique.</li>
+     * <li> The task ID used in ordering constraints are all defined.</li>
      * <li> TO DO: check the cyclic dependencies of the ordering constraints of the methods.</li>
      * </ul>
      *
-     * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
+     * @return <code>true</code> if the initial task network is well formed; <code>false</code> otherwise.
      */
     private boolean checkInitialTaskNetwork() {
         final TaskNetwork tn = problem.getTaskNetwork();
@@ -1091,14 +1107,14 @@ public final class Parser {
     /**
      * Checks if the tasks ID used in an expression are unique.
      *
-     * @param tn the initial task newtork to be tested.
      * @param exp the expression.
+     * @param taskIDs the set of task IDs already encountered.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Exp exp, Set<Symbol> taskIds) {
+    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Exp exp, Set<Symbol> taskIDs) {
         boolean unique = true;
         if (exp.getConnective().equals(Connective.TASK) && exp.getTaskID() != null) {
-            if (!taskIds.add(exp.getTaskID())) {
+            if (!taskIDs.add(exp.getTaskID())) {
                 this.mgr.logParserError("task alias \"" + exp.getTaskID() + "\" in initial task network "
                     + "is already defined", this.lexer
                     .getFile(), exp.getTaskID().getBeginLine(), exp.getTaskID().getBeginColumn());
@@ -1106,7 +1122,7 @@ public final class Parser {
             }
         } else {
             for (Exp c : exp.getChildren()) {
-                this.checkTaskIDsUniquenessFromInitialTaskNetwork(c, taskIds);
+                this.checkTaskIDsUniquenessFromInitialTaskNetwork(c, taskIDs);
             }
         }
         return unique;
@@ -1172,8 +1188,8 @@ public final class Parser {
 
     /**
      * Checks if a PDDL expression such as the preconditions, the effects and the duration of an
-     * operator is well formed. More precisely, check if all variables are well typed and are valid
-     * parameters of the operator or quantified variable and finally, if all atoms match a predicate
+     * action is well formed. More precisely, check if all variables are well typed and are valid
+     * parameters of the action or quantified variable and finally, if all atoms match a predicate
      * previously declared.
      *
      * @param exp     The PDDL expression.
@@ -1411,27 +1427,27 @@ public final class Parser {
     }
 
     /**
-     * Checks the operator parameters, i.e., if each parameter is single and its type was previously
+     * Checks the parameters of an action, i.e., if each parameter is single and its type was previously
      * declared.
      *
-     * @param op the operator to check.
-     * @return <code>true</code> if the parameters of the specified operator are well formed;
+     * @param action the action to check.
+     * @return <code>true</code> if the parameters of the specified action are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkOperatorParameters(Op op) {
+    private boolean checkActionParameters(Action action) {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
-        for (TypedSymbol parameter : op.getParameters()) {
+        for (TypedSymbol parameter : action.getParameters()) {
             if (!set.add(parameter)) {
                 this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in the action \""
-                    + op.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
+                    + action.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
                     .getBeginColumn());
                 checked = false;
             }
             for (Symbol type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
-                            + parameter + "\" in the action \"" + op.getName() + "\" is undefined",
+                            + parameter + "\" in the action \"" + action.getName() + "\" is undefined",
                         this.lexer.getFile(), parameter.getBeginLine(), parameter.getBeginColumn());
                     checked = false;
                 }
@@ -1445,7 +1461,7 @@ public final class Parser {
      * declared.
      *
      * @param method the method to check.
-     * @return <code>true</code> if the parameters of the specified operator are well formed;
+     * @return <code>true</code> if the parameters of the specified method are well formed;
      * <code>false</code> otherwise.
      */
     private boolean checkMethodParameters(Method method) {
@@ -1472,14 +1488,14 @@ public final class Parser {
 
 
     /**
-     * Checks the uniqueness of the name of the operators declared.
+     * Checks the uniqueness of the name of the action declared.
      *
-     * @return <code>true</code> if all the operators are single; <code>false</code> otherwise.
+     * @return <code>true</code> if all the actions are single; <code>false</code> otherwise.
      */
-    private boolean checkOperatorsUniqueness() {
+    private boolean checkActionsUniqueness() {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
-        for (Op op : this.domain.getOperators()) {
+        for (Action op : this.domain.getActions()) {
             if (!set.add(op.getName())) {
                 Symbol name = op.getName();
                 this.mgr.logParserError("action \"" + name + "\" declared twice", this.lexer

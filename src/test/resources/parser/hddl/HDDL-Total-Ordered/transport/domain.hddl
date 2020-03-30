@@ -1,5 +1,5 @@
 (define (domain transport)
-  (:requirements :typing :htn)
+  (:requirements :typing :total-ordered-htn)
   (:types
         location target locatable - object
         vehicle package - locatable
@@ -34,19 +34,19 @@
   (:method m-unload
     :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity-number)
     :task (unload ?v ?l ?p)
-    :subtasks (drop ?v ?l ?p ?s1 ?s2)
+    :ordered-subtasks (drop ?v ?l ?p ?s1 ?s2)
   )
 
   (:method m-load
     :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity-number)
     :task (load  ?v ?l ?p)
-    :subtasks (pick-up ?v ?l ?p ?s1 ?s2)
+    :ordered-subtasks (pick-up ?v ?l ?p ?s1 ?s2)
   )
 
   (:method m-drive-to
     :parameters (?v - vehicle ?l1 ?l2 - location)
     :task (get-to ?v ?l2)
-    :subtasks (and
+    :ordered-subtasks (and
         (drive ?v ?l1 ?l2))
   )
 
@@ -61,7 +61,7 @@
   (:method m-i-am-there
     :parameters (?v - vehicle ?l - location)
     :task (get-to  ?v ?l)
-    :subtasks (and
+    :ordered-subtasks (and
         (noop ?v ?l))
   )
 

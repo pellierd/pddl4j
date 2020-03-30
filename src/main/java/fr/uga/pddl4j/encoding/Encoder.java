@@ -122,14 +122,14 @@ import java.util.Set;
 public final class Encoder implements Serializable {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The logger of the class.
      */
     private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
+
+    /**
+     * The set of requirements
+     */
+    static Set<RequireKey> requirements;
 
     /**
      * The table of types.
@@ -293,15 +293,21 @@ public final class Encoder implements Serializable {
         accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
         accepted.add(RequireKey.CONDITIONAL_EFFECTS);
         accepted.add(RequireKey.ACTION_COSTS);
-        accepted.add(RequireKey.HTN);
-        accepted.add(RequireKey.HTN_METHOD_PREC);
+        accepted.add(RequireKey.TOTAL_ORDERED_HTN);
+        accepted.add(RequireKey.PARTIAL_ORDERED_HTN);
+        accepted.add(RequireKey.HTN_METHOD_PRECONDITIONS);
 
-        Set<RequireKey> requirements = new LinkedHashSet<>();
-        requirements.addAll(domain.getRequirements());
-        requirements.addAll(problem.getRequirements());
+        Encoder.requirements = new LinkedHashSet<>();
+        Encoder.requirements.addAll(domain.getRequirements());
+        Encoder.requirements.addAll(problem.getRequirements());
 
-        if (!accepted.containsAll(requirements)) {
+        if (!accepted.containsAll(Encoder.requirements)) {
             throw new IllegalArgumentException("only ADL, ACTION_COSTS or HTN problem can be encoded");
+        }
+
+        if (Encoder.requirements.contains(RequireKey.PARTIAL_ORDERED_HTN)
+            || Encoder.requirements.contains(RequireKey.TOTAL_ORDERED_HTN)) {
+            Encoder.requirements.add(RequireKey.HTN);
         }
 
         // *****************************************************************************************
@@ -330,9 +336,9 @@ public final class Encoder implements Serializable {
         // Encode the tasks defined in the domain.
         IntEncoding.encodeTasks(domain);
         // Encode operators in integer representation
-        List<IntOp> intOps = IntEncoding.encodeOperators(domain.getOperators());
+        List<IntAction> intOps = IntEncoding.encodeActions(domain.getActions());
         // Encode method in integer representation
-        List<IntMeth> intMeths = IntEncoding.encodeMethods(domain.getMethods());
+        List<IntMethod> intMeths = IntEncoding.encodeMethods(domain.getMethods());
 
         // Encode the initial state in integer representation
         final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
@@ -341,13 +347,17 @@ public final class Encoder implements Serializable {
         // Create Set containing integer representation of initial state without functions and associed cost
         final Set<IntExp> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
-        // Encode the goal in integer representation
+        // Encode the goal in integer representation or the initial task network
         IntExp intGoal =  null;
-        if (!domain.getRequirements().contains(RequireKey.HTN)) {
+        IntTaskNetwork intTaskNetwork = null;
+        if (!Encoder.requirements.contains(RequireKey.HTN)) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
+        } else {
+            intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getTaskNetwork());
+            System.out.println(toString(intTaskNetwork));
+            System.exit(0);
         }
 
-        // Encode the initial task network
 
         final StringBuilder stringBuilder = new StringBuilder();
 
@@ -361,7 +371,7 @@ public final class Encoder implements Serializable {
                 Encoder.printTableOfFunctions(stringBuilder);
                 stringBuilder.append(System.lineSeparator());
             }
-            if (!Encoder.tableOfTasks.isEmpty() && domain.getRequirements().contains(RequireKey.HTN)) {
+            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(RequireKey.HTN)) {
                 Encoder.printTableOfTasks(stringBuilder);
                 stringBuilder.append(System.lineSeparator());
             }
@@ -381,13 +391,13 @@ public final class Encoder implements Serializable {
             }
             if (!intOps.isEmpty()) {
                 stringBuilder.append(")").append("\n\nCoded operators:\n\n");
-                for (IntOp op : intOps) {
+                for (IntAction op : intOps) {
                     stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
                 }
             }
             if (!intMeths.isEmpty()) {
                 stringBuilder.append(")").append("\n\nCoded method:\n\n");
-                for (IntMeth meth : intMeths) {
+                for (IntMethod meth : intMeths) {
                     stringBuilder.append(Encoder.toString(meth)).append(System.lineSeparator());
                 }
             }
@@ -425,12 +435,12 @@ public final class Encoder implements Serializable {
             for (IntExp f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            if (!Encoder.tableOfTasks.isEmpty() && domain.getRequirements().contains(RequireKey.HTN)) {
+            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(RequireKey.HTN)) {
                 stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
             }
             stringBuilder.append("\n\nPre-instantiation operators with infered types (").append(intOps.size())
                 .append(" ops):\n");
-            for (IntOp op : intOps) {
+            for (IntAction op : intOps) {
                 stringBuilder.append(Encoder.toString(op));
             }
             LOGGER.trace(stringBuilder);
@@ -467,7 +477,7 @@ public final class Encoder implements Serializable {
             }
             stringBuilder.append("\n\nPre-instantiation operators with inferred types (").append(intOps.size())
                 .append(" ops):\n\n");
-            for (final IntOp op : intOps) {
+            for (final IntAction op : intOps) {
                 stringBuilder.append(Encoder.toString(op)).append("\n");
             }
             LOGGER.trace(stringBuilder);
@@ -694,7 +704,7 @@ public final class Encoder implements Serializable {
      * @param op the operator.
      * @return a string representation of the specified operator.
      */
-    static String toShortString(final IntOp op) {
+    static String toShortString(final IntAction op) {
         return StringEncoder.toShortString(op, Encoder.tableOfConstants);
     }
 
@@ -704,7 +714,7 @@ public final class Encoder implements Serializable {
      * @param op the operator to print.
      * @return a string representation of the specified operator.
      */
-    static String toString(final IntOp op) {
+    static String toString(final IntAction op) {
         return StringEncoder.toString(op, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
@@ -716,8 +726,20 @@ public final class Encoder implements Serializable {
      * @param meth the method to print.
      * @return a string representation of the specified method.
      */
-    static String toString(final IntMeth meth) {
+    static String toString(final IntMethod meth) {
         return StringEncoder.toString(meth, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfTasks);
+    }
+
+    /**
+     * Returns a string representation of the specified tn.
+     *
+     * @param tn the method to print.
+     * @return a string representation of the specified tn.
+     */
+    static String toString(final IntTaskNetwork tn) {
+        return StringEncoder.toString(tn, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
@@ -774,7 +796,7 @@ public final class Encoder implements Serializable {
      * Print the table of inertia.
      */
     static void printTableOfGroundInertia(StringBuilder stringBuilder) {
-        stringBuilder.append("Ground inertia table:");
+        stringBuilder.append("GroundOperator inertia table:");
         for (Entry<IntExp, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
             stringBuilder.append(Encoder.toString(e.getKey())).append(": ").append(e.getValue());
         }

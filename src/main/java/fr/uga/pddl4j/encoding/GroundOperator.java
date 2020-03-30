@@ -17,7 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.encoding;
+
+import fr.uga.pddl4j.util.IntExp;
 
 import java.io.Serializable;
 
@@ -27,17 +29,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public interface CodedOp extends Serializable {
-
-    /**
-     * The default duration of an operator.
-     */
-    static final double DEFAULT_DURATION = 1.0;
-
-    /**
-     * The default cost of an operator.
-     */
-    static double DEFAULT_COST = 1.0;
+public interface GroundOperator extends Serializable {
 
     /**
      * Return the name of this operator.
@@ -56,7 +48,7 @@ public interface CodedOp extends Serializable {
     /**
      * Returns the type of the parameter at the specified index.
      *
-     * @param index the index of the parameter.
+     * @param index the index of the parameter. The index must be in [0, arity].
      * @return the type of the parameter at the specified index.
      */
     int getTypeOfParameters(final int index);
@@ -64,7 +56,7 @@ public interface CodedOp extends Serializable {
     /**
      * Set a new type the parameter at a specified index.
      *
-     * @param index the index of the parameter.
+     * @param index the index of the parameter. The index must be in [0, arity].
      * @param type  the type to set.
      */
     void setTypeOfParameter(final int index, final int type);
@@ -72,7 +64,7 @@ public interface CodedOp extends Serializable {
     /**
      * Returns the value of the parameter at a specified index.
      *
-     * @param index the index.
+     * @param index the index. The index must be in [0, arity].
      * @return the value of the parameter.
      */
     int getValueOfParameter(final int index);
@@ -87,7 +79,7 @@ public interface CodedOp extends Serializable {
      * representation without loss of information.
      * </p>
      *
-     * @param index the index of the parameter to instantiate.
+     * @param index the index of the parameter to instantiate. The index must be in [0, arity].
      * @param value the value of instantiation.
      */
     void setValueOfParameter(final int index, final int value);
@@ -98,34 +90,6 @@ public interface CodedOp extends Serializable {
      * @return the arity of the operator.
      */
     int getArity();
-
-    /**
-     * Returns the duration of the operator.
-     *
-     * @return the duration of the operator.
-     */
-    double getDuration();
-
-    /**
-     * Sets the duration of the operator.
-     *
-     * @param duration the duration to set.
-     */
-    void setDuration(final double duration);
-
-    /**
-     * Returns the cost of the operator.
-     *
-     * @return the cost of the operator.
-     */
-    double getCost();
-
-    /**
-     * Sets the cost of the operator.
-     *
-     * @param cost the cost of the operator.
-     */
-    void setCost(final double cost);
 
     /**
      * Returns the list of parameters of the operator.
@@ -140,5 +104,28 @@ public interface CodedOp extends Serializable {
      * @return the values that represents the instantiated parameters of the operator.
      */
     int[] getInstantiations();
+
+    /**
+     * Return if the operator is already instantiated with the specified value.
+     *
+     * @param value the value.
+     * @return <code>true</code> if the operator is already instantiated with the specified value; <code>false</code>
+     *          otherwise.
+     */
+    boolean isAlreadyInstantiatedWith(final int value);
+
+    /**
+     * Returns <code>true</code> if the operator is dummy.
+     *
+     * @return <code>true</code> if the operator is dummy; <code>false</code> otherwise.
+     */
+    boolean isDummy();
+
+    /**
+     * Sets the dummy flag of the operator to a specified value.
+     *
+     * @param dummy the value of the dummy flag of the operator to set.
+     */
+    void setDummy(boolean dummy);
 
 }

@@ -61,10 +61,10 @@ final class StringEncoder implements Serializable {
      * @param tasks     the table of functions.
      * @return a string representation of the specified operator.
      */
-    static String toString(final IntOp op, final List<String> constants, final List<String> types,
+    static String toString(final IntAction op, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks) {
         final StringBuilder str = new StringBuilder();
-        str.append("Op ").append(op.getName()).append("\n");
+        str.append("Action ").append(op.getName()).append("\n");
         str.append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
             final int index = op.getValueOfParameter(i);
@@ -95,10 +95,10 @@ final class StringEncoder implements Serializable {
      * @param tasks      the table of tasks.
      * @return a string representation of the specified method.
      */
-    static String toString(final IntMeth meth, final List<String> constants, final List<String> types,
+    static String toString(final IntMethod meth, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks) {
         final StringBuilder str = new StringBuilder();
-        str.append("Meth ").append(meth.getName()).append("\n");
+        str.append("Method ").append(meth.getName()).append("\n");
         str.append("Instantiations:\n");
         for (int i = 0; i < meth.getArity(); i++) {
             final int index = meth.getValueOfParameter(i);
@@ -117,6 +117,30 @@ final class StringEncoder implements Serializable {
             .append("\n");
         str.append("ordering:\n")
             .append(toString(meth.getOrderingConstraints(), constants, types, predicates, functions, tasks))
+            .append("\n");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param tn         the task network to print.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param tasks      the table of tasks.
+     * @return a string representation of the specified method.
+     */
+    static String toString(final IntTaskNetwork tn, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Tasknetwork\n");
+        str.append("tasks:\n")
+            .append(toString(tn.getTasks(), constants, types, predicates, functions, tasks))
+            .append("\n");
+        str.append("ordering:\n")
+            .append(toString(tn.getOrderingConstraints(), constants, types, predicates, functions, tasks))
             .append("\n");
         return str.toString();
     }
@@ -203,7 +227,7 @@ final class StringEncoder implements Serializable {
                 str.append("(");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getTask());
-                str.append(" ");
+                str.append(" (");
                 str.append(tasks.get(exp.getPredicate()));
                 args = exp.getArguments();
                 for (int index : args) {
@@ -213,7 +237,7 @@ final class StringEncoder implements Serializable {
                         str.append(" ").append(constants.get(index));
                     }
                 }
-                str.append(")");
+                str.append("))");
                 break;
             case EQUAL_ATOM:
                 str.append("(").append("=");
@@ -352,7 +376,7 @@ final class StringEncoder implements Serializable {
                            final List<String> predicates, final List<String> functions,
                            final List<String> tasks, final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
-        str.append("Op ").append(op.getName()).append("\n").append("Instantiations:\n");
+        str.append("Action ").append(op.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < op.getArity(); i++) {
             final int index = op.getValueOfParameter(i);
             final String type = types.get(op.getTypeOfParameters(i));
@@ -460,7 +484,7 @@ final class StringEncoder implements Serializable {
      * @param constants the table of constants.
      * @return a string representation of the specified operator.
      */
-    static String toShortString(final IntOp op, final List<String> constants) {
+    static String toShortString(final IntAction op, final List<String> constants) {
         final StringBuilder str = new StringBuilder();
         str.append(op.getName());
         for (int i = 0; i < op.getArity(); i++) {

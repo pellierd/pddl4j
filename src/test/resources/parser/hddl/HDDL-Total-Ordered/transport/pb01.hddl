@@ -7,12 +7,11 @@
   capacity-0 capacity-1 - capacity-number
  )
  (:htn
-  :tasks (and
+  :ordered-subtasks (and
    (deliver package-0 city-loc-0)
    (deliver package-1 city-loc-2)
    )
-  :ordering ( )
-  :constraints ( ))
+ )
  (:init
   (capacity-predecessor capacity-0 capacity-1)
   (road city-loc-0 city-loc-1)

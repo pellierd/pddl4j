@@ -21,7 +21,6 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.MalformedExpException;
-import org.apache.logging.log4j.LogManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,16 +43,6 @@ import java.util.stream.Collectors;
  * @version 1.0 - 28.01.2010
  */
 public class Exp implements Serializable {
-
-    /**
-     * The serial version taskID of the class.
-     */
-    private static final long serialVersionUID = 1943664302879209785L;
-
-    /**
-     * The logger of the class.
-     */
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(Exp.class);
 
     /**
      * The type of the node.

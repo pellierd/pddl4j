@@ -1,5 +1,5 @@
 (define (domain domain_htn)
-	(:requirements :typing :htn)
+	(:requirements :typing :partial-ordered-htn)
 	(:types
 		package - locatable
 		capacity_number - object
@@ -21,10 +21,6 @@
 	 	(get_to ?v - vehicle ?l - location)
 		(load ?v - vehicle ?l - location ?p - package)
 	    (unload ?v - vehicle ?l - location ?p - package)
-	    (drop ?v - vehicle ?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number)
-	    (pick_up ?v - vehicle ?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number)
-	    (drive ?v - vehicle ?l1 - location ?l2 - location)
-		(noop ?v - vehicle ?l - location)
 	)
 
 	(:method m_deliver_ordering_0

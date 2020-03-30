@@ -36,11 +36,6 @@ import java.util.Map;
 public class Symbol implements Serializable {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The name of rename variable.
      */
     public static final String DEFAULT_VARIABLE_SYMBOL = "?X";

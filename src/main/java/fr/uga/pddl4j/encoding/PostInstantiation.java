@@ -81,9 +81,9 @@ final class PostInstantiation implements Serializable {
      * @param operators the list of operators.
      * @param init      the initial state.
      */
-    static void extractRelevantFacts(final List<IntOp> operators, final Set<IntExp> init) {
+    static void extractRelevantFacts(final List<IntAction> operators, final Set<IntExp> init) {
         final Set<IntExp> relevants = new LinkedHashSet<>(10000);
-        for (IntOp op : operators) {
+        for (IntAction op : operators) {
             PostInstantiation.extractRelevantFacts(op.getPreconditions(), relevants, init);
             PostInstantiation.extractRelevantFacts(op.getEffects(), relevants, init);
         }
@@ -464,11 +464,11 @@ final class PostInstantiation implements Serializable {
      * @param operators the list of operators to simplified.
      * @param init      the initial state.
      */
-    static void simplyOperatorsWithGroundInertia(final List<IntOp> operators, final Set<IntExp> init) {
+    static void simplyOperatorsWithGroundInertia(final List<IntAction> operators, final Set<IntExp> init) {
 
         // Then for each instantiated operator try to simplify it.
-        final List<IntOp> tmpOps = new ArrayList<>(operators.size());
-        for (IntOp op : operators) {
+        final List<IntAction> tmpOps = new ArrayList<>(operators.size());
+        for (IntAction op : operators) {
             PostInstantiation.simplifyWithGroundInertia(op.getPreconditions(), false, init);
             PostInstantiation.simplify(op.getPreconditions());
             if (!op.getPreconditions().getConnective().equals(Connective.FALSE)) {
@@ -657,10 +657,10 @@ final class PostInstantiation implements Serializable {
      *
      * @param operators the list of instantiated operators.
      */
-    static void extractGroundInertia(final List<IntOp> operators) {
+    static void extractGroundInertia(final List<IntAction> operators) {
         Encoder.tableOfGroundInertia = new LinkedHashMap<>(
             Constants.DEFAULT_RELEVANT_FACTS_TABLE);
-        for (IntOp op : operators) {
+        for (IntAction op : operators) {
             PostInstantiation.extractGroundInertia(op.getEffects());
         }
 
@@ -769,8 +769,8 @@ final class PostInstantiation implements Serializable {
      * @param operators       the list of operators.
      * @param functionAndCost functions and associed costs
      */
-    static void simplifyIncrease(final List<IntOp> operators, final Map<IntExp, Double> functionAndCost) {
-        for (IntOp op : operators) {
+    static void simplifyIncrease(final List<IntAction> operators, final Map<IntExp, Double> functionAndCost) {
+        for (IntAction op : operators) {
             PostInstantiation.simplifyIncreaseAssignCost(op, op.getEffects(), functionAndCost);
         }
     }
@@ -783,7 +783,7 @@ final class PostInstantiation implements Serializable {
      * @param exp             the effect.
      * @param functionAndCost functions and associed costs
      */
-    private static void simplifyIncreaseAssignCost(final IntOp op,
+    private static void simplifyIncreaseAssignCost(final IntAction op,
                                                    final IntExp exp,
                                                    final Map<IntExp, Double> functionAndCost) {
         switch (exp.getConnective()) {

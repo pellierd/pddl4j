@@ -84,14 +84,14 @@ final class BitEncoding implements Serializable {
      * @param map       the map that associates to a specified expression its index.
      * @return the list of operators encoded into bit set.
      */
-    static List<BitOp> encodeOperators(final List<IntOp> operators, final Map<IntExp, Integer> map)
+    static List<BitOp> encodeOperators(final List<IntAction> operators, final Map<IntExp, Integer> map)
         throws UnexpectedExpressionException {
 
         // Normalize the operators
         BitEncoding.normalize(operators);
 
         final List<BitOp> ops = new ArrayList<>(operators.size());
-        for (IntOp op : operators) {
+        for (IntAction op : operators) {
             final int arity = op.getArity();
             final BitOp bOp = new BitOp(op.getName(), arity);
             bOp.setCost(op.getCost());
@@ -279,9 +279,9 @@ final class BitEncoding implements Serializable {
      *
      * @param operators the list of operators to normalize.
      */
-    private static void normalize(final List<IntOp> operators) throws UnexpectedExpressionException {
-        final List<IntOp> tmpOps = new ArrayList<>(operators.size() + 100);
-        for (IntOp op : operators) {
+    private static void normalize(final List<IntAction> operators) throws UnexpectedExpressionException {
+        final List<IntAction> tmpOps = new ArrayList<>(operators.size() + 100);
+        for (IntAction op : operators) {
             BitEncoding.toCNF(op.getEffects());
             BitEncoding.simplify(op.getEffects());
             final IntExp precond = op.getPreconditions();
@@ -289,7 +289,7 @@ final class BitEncoding implements Serializable {
             for (final IntExp ei : precond.getChildren()) {
                 final String name = op.getName();
                 final int arity = op.getArity();
-                final IntOp newOp = new IntOp(name, arity);
+                final IntAction newOp = new IntAction(name, arity);
                 newOp.setCost(op.getCost());
                 for (int i = 0; i < arity; i++) {
                     newOp.setTypeOfParameter(i, op.getTypeOfParameters(i));

@@ -119,9 +119,17 @@ public enum RequireKey {
      */
     HTN(":htn"),
     /**
+     * The PDDL :total-ordered-htn requirement for HDDL langage.
+     */
+    TOTAL_ORDERED_HTN(":total-ordered-htn"),
+    /**
+     * The PDDL :partial-ordered-htn requirement for HDDL langage.
+     */
+    PARTIAL_ORDERED_HTN(":partial-ordered-htn"),
+    /**
      * The PDDL :htn-method-prec requirement for HDDL langage.
      */
-    HTN_METHOD_PREC(":htn-method-prec");
+    HTN_METHOD_PRECONDITIONS(":htn-method-preconditions");
 
     /**
      * The image associate to the require key in the PDDL language.

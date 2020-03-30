@@ -92,13 +92,13 @@ final class PreInstantiation implements Serializable {
      *
      * @param operators the list of operators to simplified.
      */
-    static void extractInertia(final List<IntOp> operators) {
+    static void extractInertia(final List<IntAction> operators) {
         final int nbPredicates = Encoder.tableOfPredicates.size();
         Encoder.tableOfInertia = new ArrayList<>(nbPredicates);
         for (int i = 0; i < nbPredicates; i++) {
             Encoder.tableOfInertia.add(Inertia.INERTIA);
         }
-        for (final IntOp op : operators) {
+        for (final IntAction op : operators) {
             PreInstantiation.extract(op.getEffects());
         }
 
@@ -383,25 +383,25 @@ final class PreInstantiation implements Serializable {
      *
      * @return the list of simplified operators.
      */
-    static List<IntOp> simplifyOperatorsWithInferedTypes(final List<IntOp> operators) {
-        final List<IntOp> ops = new LinkedList<>();
-        for (final IntOp op : operators) {
+    static List<IntAction> simplifyOperatorsWithInferedTypes(final List<IntAction> operators) {
+        final List<IntAction> ops = new LinkedList<>();
+        for (final IntAction op : operators) {
             ops.addAll(PreInstantiation.simplifyOperatorsWithInferedTypes(op));
         }
         return ops;
     }
 
-    private static List<IntOp> simplifyOperatorsWithInferedTypes(final IntOp op) {
+    private static List<IntAction> simplifyOperatorsWithInferedTypes(final IntAction op) {
         final List<IntExp> unaryInertia = new ArrayList<>();
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(op.getPreconditions()));
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(op.getEffects()));
 
-        List<IntOp> operators = new LinkedList<>();
+        List<IntAction> operators = new LinkedList<>();
         operators.add(op);
 
         for (final IntExp inertia : unaryInertia) {
-            final List<IntOp> newOperators = new ArrayList<>();
-            for (final IntOp o : operators) {
+            final List<IntAction> newOperators = new ArrayList<>();
+            for (final IntAction o : operators) {
                 if (o.getArity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
@@ -438,7 +438,7 @@ final class PreInstantiation implements Serializable {
                     }
 
 
-                    final IntOp op1 = new IntOp(o);
+                    final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
                     PreInstantiation.replace(op1.getPreconditions(), inertia, Connective.TRUE, ti, ts);
                     PreInstantiation.replace(op1.getEffects(), inertia, Connective.TRUE, ti, ts);
@@ -447,7 +447,7 @@ final class PreInstantiation implements Serializable {
                         newOperators.add(op1);
                     }
 
-                    final IntOp op2 = new IntOp(o);
+                    final IntAction op2 = new IntAction(o);
 
 
                     op2.setTypeOfParameter(index, ts);

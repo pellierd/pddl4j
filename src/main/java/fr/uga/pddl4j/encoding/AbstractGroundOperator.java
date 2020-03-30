@@ -17,34 +17,37 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.encoding;
+
+import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.util.IntExp;
 
 import java.util.Arrays;
 
 /**
- * This abstract class implements the common part of an operator what ever its representation,
+ * This abstract class implements the common part of an ground operator (action or method) what ever its representation,
  * i.e., integer or bit set.
  *
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public abstract class AbstractCodedOp implements CodedOp {
+public abstract class AbstractGroundOperator implements GroundOperator {
 
     /**
      * The name of the operator.
      */
-    protected String name;
+    private String name;
 
     /**
      * The list of parameters of the operator. The integer value correspond to the type of the
      * parameters.
      */
-    protected int[] parameters;
+    private int[] parameters;
 
     /**
      * The values that represents the instantiated parameters of the operator.
      */
-    protected int[] instantiations;
+    private int[] instantiations;
 
     /**
      * The flag used to indicate if the operator is dummy. By default, an operator is not dummy.
@@ -52,88 +55,49 @@ public abstract class AbstractCodedOp implements CodedOp {
     private boolean dummy;
 
     /**
-     * The cost of the operator.
+     * Creates a new operator.
      */
-    private double cost;
-
-    /**
-     * The duration of the operator.
-     */
-    private double duration;
+    private AbstractGroundOperator() {
+        super();
+    }
 
     /**
      * Creates a new operator from an other.
      *
      * @param other the other operator.
-     * @throws NullPointerException if <code>other == null</code>.
      */
-    protected AbstractCodedOp(final BitOp other) {
-        if (other == null) {
-            throw new NullPointerException("other == null");
-        }
+    protected AbstractGroundOperator(final GroundOperator other) {
+        super();
         this.setName(other.getName());
         this.parameters = new int[other.getArity()];
-        System.arraycopy(other.parameters, 0, this.parameters, 0, other.getArity());
+        System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.getArity());
         this.instantiations = new int[other.getArity()];
-        System.arraycopy(other.instantiations, 0, this.instantiations, 0, other.getArity());
+        System.arraycopy(other.getInstantiations(), 0, this.instantiations, 0, other.getArity());
         this.dummy = other.isDummy();
-        this.duration = other.getDuration();
-        this.cost = other.getCost();
     }
 
     /**
-     * Creates a new operator with a default cost and duration set to 1.0.
+     * Creates a new operator. The parameters and instantiation are initialized with 0.
      *
      * @param name     the name of the operator.
      * @param arity    the arity of the operator.
-     * @param duration the duration ot the operator.
-     * @param cost     the cost of the operator.
-     * @throws NullPointerException if <code>name == null</code>.
      */
-    protected AbstractCodedOp(final String name, final int arity, final double duration, final double cost) {
-        this.setName(name);
-        this.parameters = new int[arity];
-        this.instantiations = new int[arity];
-        this.duration = duration;
-        this.cost = cost;
-        this.dummy = false;
+    protected AbstractGroundOperator(final String name, final int arity) {
+        this(name, new int[arity], new int[arity]);
     }
 
     /**
-     * Creates a new operator with a default cost and duration set to 1.0.
-     *
-     * @param name  the name of the operator.
-     * @param arity the arity of the operator.
-     * @throws NullPointerException if <code>name == null</code>.
-     */
-    protected AbstractCodedOp(final String name, final int arity) {
-        this(name, arity, CodedOp.DEFAULT_DURATION, CodedOp.DEFAULT_COST);
-    }
-
-    /**
-     * Creates a new operator. The default cost and duration of the operator is set to 1.0.
+     * Creates a new operator. The length of the parameters and the length of instantiations must be the same.
      *
      * @param name           the name of the operator.
      * @param parameters     the types of the parameters.
      * @param instantiations the values of the parameters.
-     * @throws NullPointerException     if
-     *                                  <code>name == null || parameters == null || instantiations == null</code>.
-     * @throws IllegalArgumentException if <code>parameters.length != instantiations.length</code>.
      */
-    protected AbstractCodedOp(final String name, final int[] parameters, final int[] instantiations) {
-        if (name == null || parameters == null || instantiations == null) {
-            throw new NullPointerException("name == null || parameters == null || instantiations == null");
-        }
-
-        if (parameters.length != instantiations.length) {
-            throw new IllegalArgumentException("parameters.length != instantiations.length");
-        }
-
+    protected AbstractGroundOperator(final String name, final int[] parameters, final int[] instantiations) {
+        super();
         this.name = name;
         this.parameters = parameters;
         this.instantiations = instantiations;
-        this.cost = CodedOp.DEFAULT_COST;
-        this.duration = CodedOp.DEFAULT_DURATION;
         this.dummy = false;
     }
 
@@ -151,13 +115,9 @@ public abstract class AbstractCodedOp implements CodedOp {
      * Set the name of the operator.
      *
      * @param name the name to set.
-     * @throws NullPointerException if <code>name == null</code>.
      */
     @Override
     public final void setName(final String name) {
-        if (name == null) {
-            throw new NullPointerException("name == null");
-        }
         this.name = name;
     }
 
@@ -175,22 +135,18 @@ public abstract class AbstractCodedOp implements CodedOp {
     /**
      * Set a new type the parameter at a specified index.
      *
-     * @param index the index of the parameter.
+     * @param index the index of the parameter. The index must be in [0,arity[.
      * @param type  the type to set.
-     * @throws IllegalArgumentException if type &#60; 0.
      */
     @Override
     public final void setTypeOfParameter(final int index, final int type) {
-        if (type < 0) {
-            throw new IllegalArgumentException("type < 0");
-        }
         this.parameters[index] = type;
     }
 
     /**
      * Returns the value of the parameter at a specified index.
      *
-     * @param index the index.
+     * @param index the index. The index must be in [0,arity[.
      * @return the value of the parameter.
      */
     @Override
@@ -208,15 +164,11 @@ public abstract class AbstractCodedOp implements CodedOp {
      * representation without loss of information.
      * </p>
      *
-     * @param index the index of the parameter to instantiate.
+     * @param index the index of the parameter to instantiate. The index must be in [0,arity[.
      * @param value the value of instantiation.
-     * @throws IllegalArgumentException if value &#60; 0.
      */
     @Override
     public final void setValueOfParameter(final int index, final int value) {
-        if (value < 0) {
-            throw new IllegalArgumentException("value < 0");
-        }
         this.instantiations[index] = value;
     }
 
@@ -249,52 +201,12 @@ public abstract class AbstractCodedOp implements CodedOp {
     }
 
     /**
-     * Returns the duration of the operator.
-     *
-     * @return the duration of the operator.
-     */
-    @Override
-    public final double getDuration() {
-        return this.duration;
-    }
-
-    /**
-     * Sets the duration of the operator.
-     *
-     * @param duration the duration to set.
-     */
-    @Override
-    public final void setDuration(final double duration) {
-        this.duration = duration;
-    }
-
-    /**
-     * Returns the cost of the operator.
-     *
-     * @return the cost of the operator.
-     */
-    @Override
-    public final double getCost() {
-        return this.cost;
-    }
-
-    /**
-     * Sets the cost of the operator.
-     *
-     * @param cost the cost to set.
-     */
-    @Override
-    public final void setCost(double cost) {
-        this.cost = cost;
-    }
-
-    /**
      * Returns the list of parameters of the operator.
      *
      * @return the list of parameters of the operator.
      */
     @Override
-    public int[] getParameters() {
+    public final int[] getParameters() {
         return Arrays.copyOf(parameters, parameters.length);
     }
 
@@ -309,20 +221,39 @@ public abstract class AbstractCodedOp implements CodedOp {
     }
 
     /**
+     * Return if the operator is already instantiated with the specified value.
+     *
+     * @param value the value.
+     * @return <code>true</code> if the operator is already instantiated with the specified value; <code>false</code>
+     *          otherwise.
+     */
+    public final boolean isAlreadyInstantiatedWith(final int value) {
+        int i = 0;
+        boolean instantiated = false;
+        while (i < this.instantiations.length && !instantiated) {
+            if (this.instantiations[i] == value) {
+                instantiated = true;
+            }
+            i++;
+        }
+        return instantiated;
+    }
+
+    /**
      * Returns <code>true</code> if this operator is equal to an object. This
      * method returns <code>true</code> if the object is a not null instance
-     * of the class <code>CodedOp</code> and both operator have the same name.
+     * of the class <code>GroundOperator</code> and both operator have the same name.
      *
      * @param obj the object to be compared.
      * @return <code>true</code> if this operator is equal to an object;
      * <code>false</code> otherwise.
      */
     @Override
-    public boolean equals(final Object obj) {
-        if (obj != null && obj instanceof CodedOp) {
-            final CodedOp other = (CodedOp) obj;
+    public final boolean equals(final Object obj) {
+        if (obj != null && obj instanceof GroundOperator) {
+            final GroundOperator other = (GroundOperator) obj;
             return this.getName().equals(other.getName())
-                && Arrays.equals(this.getInstantiations(), ((CodedOp) obj).getInstantiations());
+                && Arrays.equals(this.getInstantiations(), ((GroundOperator) obj).getInstantiations());
         }
         return false;
     }
@@ -335,7 +266,7 @@ public abstract class AbstractCodedOp implements CodedOp {
      * @return a hash code value for this operator.
      */
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return this.getName().hashCode();
     }
 

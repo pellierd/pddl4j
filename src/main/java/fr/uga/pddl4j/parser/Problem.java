@@ -22,10 +22,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.exceptions.FatalException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class implements a planning problem read by the parser.
@@ -34,11 +31,6 @@ import java.util.Set;
  * @version 1.0 - 28.01.2010
  */
 public class Problem implements Serializable {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The name of the problem.
@@ -312,7 +304,7 @@ public class Problem implements Serializable {
      * Normalize the problem. This method renames the variables and then move inward the negation of
      * the goal and the constraints of the problem.
      *
-     * @see Op#normalize()
+     * @see Action#normalize()
      * @see DerivedPredicate#normalize()
      */
     public void standardize() throws FatalException {
@@ -325,6 +317,29 @@ public class Problem implements Serializable {
         if (this.getGoal() != null) {
             this.getGoal().renameVariables();
             this.getGoal().moveNegationInward();
+        }
+        // Standardize the initial task network
+        if (this.getTaskNetwork() != null) {
+            final TaskNetwork tn = this.getTaskNetwork();
+            if (tn.getTasks().getChildren().size() == 1) {
+                tn.setTotallyOrdered(true);
+            }
+            // Rename task id the tasks contained the method.
+            final Map<String, String> taskIDCtx = new LinkedHashMap<>();
+            tn.getTasks().renameTaskIDs(taskIDCtx);
+            // Rename the tag ID used in the ordering constraints of the method
+            tn.getOrderingConstraints().renameTaskIDs(taskIDCtx);
+            // In this case enumerate the orderings contraints in the cas of totally ordered
+            if (tn.isTotallyOrdered()) {
+                tn.setOrderingConstraints(new Exp(Connective.AND));
+                for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
+                    Exp c = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
+                    c.setAtom(new LinkedList<Symbol>());
+                    c.getAtom().add(tn.getTasks().getChildren().get(i-1).getTaskID());
+                    c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
+                    tn.getOrderingConstraints().addChild(c);
+                }
+            }
         }
     }
 

@@ -53,9 +53,9 @@ final class Instantiation implements Serializable {
      * @param operators the list of operators to instantiate.
      * @return the list of instantiated operators.
      */
-    static List<IntOp> instantiateOperators(final List<IntOp> operators) {
-        final List<IntOp> instOps = new ArrayList<>(1000);
-        for (IntOp op : operators) {
+    static List<IntAction> instantiateOperators(final List<IntAction> operators) {
+        final List<IntAction> instOps = new ArrayList<>(1000);
+        for (IntAction op : operators) {
             // If an operator has a parameter with a empty domain the operator must be removed
             boolean toInstantiate = true;
             int i = 0;
@@ -77,8 +77,8 @@ final class Instantiation implements Serializable {
      * @param bound    the bound of actions to instantiate.
      * @return the list of operators instantiated corresponding the specified operator.
      */
-    static List<IntOp> instantiate(final IntOp operator, final int bound) {
-        final List<IntOp> instOps = new ArrayList<>(100);
+    static List<IntAction> instantiate(final IntAction operator, final int bound) {
+        final List<IntAction> instOps = new ArrayList<>(100);
         Instantiation.expandQuantifiedExpression(operator.getPreconditions());
         Instantiation.simplify(operator.getPreconditions());
         if (!operator.getPreconditions().getConnective().equals(Connective.FALSE)) {
@@ -97,7 +97,7 @@ final class Instantiation implements Serializable {
      * @param operator the operator to instantiate.
      * @return the list of operators instantiated corresponding the specified operator.
      */
-    static List<IntOp> instantiate(final IntOp operator) {
+    static List<IntAction> instantiate(final IntAction operator) {
         return Instantiation.instantiate(operator, Integer.MAX_VALUE);
     }
 
@@ -115,9 +115,9 @@ final class Instantiation implements Serializable {
      * @param index     the index of the parameter to instantiate.
      * @param bound     the bound of actions to instantiate.
      * @param operators the list of operators already instantiated.
-     * @see IntOp
+     * @see IntAction
      */
-    private static void instantiate(final IntOp op, final int index, final int bound, final List<IntOp> operators) {
+    private static void instantiate(final IntAction op, final int index, final int bound, final List<IntAction> operators) {
         if (bound == operators.size()) {
             return;
         }
@@ -143,7 +143,7 @@ final class Instantiation implements Serializable {
                         final IntExp effects = new IntExp(op.getEffects());
                         Instantiation.substitute(effects, varIndex, value);
                         if (!effects.getConnective().equals(Connective.FALSE)) {
-                            final IntOp copy = new IntOp(op.getName(), arity);
+                            final IntAction copy = new IntAction(op.getName(), arity);
                             copy.setPreconditions(precond);
                             copy.setEffects(effects);
                             for (int i = 0; i < arity; i++) {

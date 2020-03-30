@@ -19,12 +19,10 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This class implements a method for htn planning operator parsed.
@@ -32,12 +30,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class Method extends TaskNetwork {
-
-    /**
-     * The name of the method.
-     */
-    private Symbol name;
+public class Method extends AbstractOperator {
 
     /**
      * The task performed by the method.
@@ -45,19 +38,9 @@ public class Method extends TaskNetwork {
     private Exp task;
 
     /**
-     * The preconditions of the method. The precondition of the method are optional.
+     * The task network of the method.
      */
-    private Exp preconditions;
-
-    /**
-     * Create a new method.
-     */
-    private Method() {
-        super();
-        this.name = null;
-        this.task = null;
-        this.preconditions = null;
-    }
+    private TaskNetwork taskNetwork;
 
     /**
      * Create a new method from another.
@@ -66,10 +49,8 @@ public class Method extends TaskNetwork {
      */
     public Method(final Method other) {
         super(other);
-        this.setName(new Symbol(other.getName()));
         this.task = new Exp(other.getTask());
-        this.preconditions = new Exp(other.getPreconditions());
-
+        this.taskNetwork = new TaskNetwork(other.taskNetwork);
     }
 
     /**
@@ -87,15 +68,9 @@ public class Method extends TaskNetwork {
      */
     public Method(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
                   final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
-        this();
-        this.setName(name);
-        this.setParameters(parameters);
-        this.setTask(task);
-        this.setPreconditions(preconditions);
-        this.setTasks(tasks);
-        this.setOrderingConstraints(ordering);
-        this.setLogicalConstraints(logical);
-        this.setTotallyOrdered(ordered);
+        super(name, parameters, preconditions);
+        this.task = task;
+        this.taskNetwork = new TaskNetwork(tasks, ordering, logical, ordered);
     }
 
     /**
@@ -115,36 +90,6 @@ public class Method extends TaskNetwork {
     }
 
     /**
-     * Returns the name of the method.
-     *
-     * @return the name of the method.
-     */
-    public final Symbol getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets a new name to the method.
-     *
-     * @param name the name to set.
-     */
-    public final void setName(final Symbol name) {
-        if (name == null) {
-            throw new NullPointerException();
-        }
-        this.name = name;
-    }
-
-    /**
-     * Return the arity of the method, i.e., its number of parameters.
-     *
-     * @return the arity of the method.
-     */
-    public final int getArity() {
-        return this.getParameters().size();
-    }
-
-    /**
      * Returns the task performed by the method.
      *
      * @return the method tasks.
@@ -157,45 +102,82 @@ public class Method extends TaskNetwork {
      *  Sets the task performed by the method.
      *
      *  @param task The task performed by the method.
-     *  @throws NullPointerException if the specified parameters is null.
      */
     public final void setTask(final Exp task) {
-        if (task == null) {
-            throw new NullPointerException();
-        }
         this.task = task;
     }
 
     /**
-     * Returns the preconditions of the method. The preconditions are optional.
+     * Returns the tasks of the task network.
      *
-     * @return the preconditions of the method or null if no preconditions are specified.
+     * @return the tasks of the task network.
      */
-    public Exp getPreconditions() {
-        return this.preconditions;
+    public final Exp getTasks() {
+        return this.taskNetwork.getTasks();
     }
 
     /**
-     *  Sets the preconditions of the method.
+     *  Sets the tasks of the task network.
      *
-     *  @param preconditions The precondition to set.
-     *  @throws NullPointerException if the specified parameters is null.
+     *  @param tasks The tasks to set.
      */
-    public final void setPreconditions(final Exp preconditions) {
-        if (preconditions == null) {
-            throw new NullPointerException();
-        }
-        this.preconditions = preconditions;
+    public final void setTasks(final Exp tasks) {
+        this.taskNetwork.setTasks(tasks);
     }
 
     /**
-     * Normalizes the method.
+     * Returns the ordering constraints between the tasks of the task network.
      *
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     *
+     * @return the ordering constraints of the task network.
      */
-    public void normalize() {
-        this.normalize(0);
+    public final Exp getOrderingConstraints() {
+        return this.taskNetwork.getOrderingConstraints();
+    }
+
+    /**
+     *  Sets the ordering constraints between the tasks of the task network.
+     *
+     *  @param constraints The constraints to set.
+     */
+    public final void setOrderingConstraints(final Exp constraints) {
+        this.taskNetwork.setOrderingConstraints(constraints);
+    }
+
+    /**
+     * Returns the logicial constraints between the tasks of the task network.
+     *
+     * @return the logical constraints of the task network.
+     */
+    public final Exp getLogicalConstraints() {
+        return this.taskNetwork.getLogicalConstraints();
+    }
+
+    /**
+     *  Sets the logical constraints between the tasks of the task network.
+     *
+     *  @param constraints The constraints to set.
+     */
+    public final void setLogicalConstraints(final Exp constraints) {
+        this.taskNetwork.setLogicalConstraints(constraints);
+    }
+
+    /**
+     * Returns if the task network is total ordered or not.
+     *
+     * @return true the method is total ordered or not, false otherwise.
+     */
+    public final boolean isTotallyOrdered() {
+        return this.taskNetwork.isTotallyOrdered();
+    }
+
+    /**
+     * Set the boolean totally ordered flag of the task network to a specified value.
+     *
+     * @param flag The flag to set.
+     */
+    public final void setTotallyOrdered(final boolean flag) {
+        this.taskNetwork.setTotallyOrdered(flag);
     }
 
     /**
@@ -207,29 +189,14 @@ public class Method extends TaskNetwork {
      * @see Exp#renameVariables()
      * @see Exp#moveNegationInward()
      */
-    public void normalize(int index) {
-        int i = index;
+    protected Map<String, String> normalize(int index) {
         // Rename the parameters
-        final Map<String, String> varCtx = new LinkedHashMap<>();
-        final List<TypedSymbol> parameters = this.getParameters();
-        for (final TypedSymbol params : parameters) {
-            final String image = params.renameVariables(i);
-            varCtx.put(image, params.getImage());
-            i++;
-        }
-        // Rename the task
-        this.getTask().renameVariables(varCtx);
-        // A hack to remove single atom in precondition
-        if (this.preconditions.isLiteral()) {
-            Exp atom = this.preconditions;
-            this.preconditions = new Exp(Connective.AND);
-            this.preconditions.addChild(atom);
-        }
-        // Rename the preconditions
-        this.getPreconditions().renameVariables(varCtx);
-        this.getPreconditions().moveNegationInward();
+        final Map<String, String> varCtx = super.normalize(index);
         // Rename variables of the tasks contained the method.
         this.getTasks().renameVariables(varCtx);
+        if (this.getTasks().getChildren().size() == 1) {
+            this.setTotallyOrdered(true);
+        }
         // Rename task id the tasks contained the method.
         final Map<String, String> taskIDCtx = new LinkedHashMap<>();
         this.getTasks().renameTaskIDs(taskIDCtx);
@@ -246,36 +213,7 @@ public class Method extends TaskNetwork {
                 this.getOrderingConstraints().addChild(c);
             }
         }
-    }
-
-    /**
-    /**
-     * Returns the hash code value of the method. The hash value of the method is only based on the name of the methode.
-     * The name of a method must be unique in a domain.
-     *
-     * @return the hash code value of the method.
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return this.name.hashCode();
-    }
-
-    /**
-     * Return if this method is equals to another object.
-     *
-     * @param object the other object.
-     * @return <code>true</code> if <code>object</code> is not <code>null</code>, is an instance of
-     *          the class <code>Op</code>, and has the same name; otherwise it returns <code>false</code>.
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(final Object object) {
-        if (object != null && object.getClass().equals(this.getClass())) {
-            final Method other = (Method) object;
-            return this.name.equals(other.name);
-        }
-        return false;
+        return varCtx;
     }
 
     /**
@@ -287,7 +225,7 @@ public class Method extends TaskNetwork {
     public String toString() {
         final StringBuilder str = new StringBuilder();
         str.append("(:method ");
-        str.append(this.name.toString()).append("\n");
+        str.append(this.getName().toString()).append("\n");
         str.append("  :parameters (");
         if (!super.getParameters().isEmpty()) {
             for (int i = 0; i < super.getParameters().size() - 1; i++) {

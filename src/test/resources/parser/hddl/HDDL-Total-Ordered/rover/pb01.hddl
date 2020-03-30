@@ -9,13 +9,12 @@
 	objective0 objective1 - objective
 	)
  (:htn
-  :tasks (and
+  :ordered-subtasks (and
    (get_soil_data waypoint2)
    (get_rock_data waypoint3)
    (get_image_data objective1 high_res)
    )
-  :ordering ( )
-  :constraints ( ))
+  :constraints ())
 (:init
 	(visible waypoint1 waypoint0)
 	(visible waypoint0 waypoint1)

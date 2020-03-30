@@ -1,5 +1,5 @@
 (define (domain rover)
-  (:requirements :typing :htn :htn-method-prec :negative-preconditions)
+  (:requirements :typing :total-ordered-htn :htn-method-preconditions :negative-preconditions)
 
   (:types
       rover waypoint objective camera mode lander store - object
@@ -50,14 +50,14 @@
     :parameters (?s - store ?rover - rover)
     :task (empty-store ?s ?rover)
     :precondition (empty ?s)
-    :subtasks ()
+    :ordered-subtasks ()
   )
 
   (:method m-empty-store-2
     :parameters (?s - store ?rover - rover)
     :task (empty-store ?s ?rover)
     :precondition (not (empty ?s))
-    :subtasks (drop ?rover ?s)
+    :ordered-subtasks (drop ?rover ?s)
   )
 
   (:method m-navigate_abs-1

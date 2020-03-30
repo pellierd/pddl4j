@@ -38,11 +38,6 @@ import java.util.Set;
 public class Domain implements Serializable {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The name of the domain.
      */
     private Symbol name;
@@ -85,7 +80,7 @@ public class Domain implements Serializable {
     /**
      * The list of actions of the domain.
      */
-    private List<Op> ops;
+    private List<Action> ops;
 
     /**
      * The list of methods of the domain.
@@ -310,7 +305,7 @@ public class Domain implements Serializable {
      *
      * @return the list of parsed ops.
      */
-    public final List<Op> getOperators() {
+    public final List<Action> getActions() {
         return this.ops;
     }
 
@@ -321,7 +316,7 @@ public class Domain implements Serializable {
      * @return <code>true</code> if the operator was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified operator is null.
      */
-    public final boolean addOperator(final Op op) {
+    public final boolean addOperator(final Action op) {
         if (op == null) {
             throw new NullPointerException();
         }
@@ -477,7 +472,7 @@ public class Domain implements Serializable {
      * Normalize the domain. This method rename the variables used in the domain and normalize its
      * ops and derived predicates.
      *
-     * @see Op#normalize()
+     * @see Action#normalize()
      * @see DerivedPredicate#normalize()
      */
     public void standardize() throws FatalException {
@@ -503,8 +498,8 @@ public class Domain implements Serializable {
             this.getDerivesPredicates().get(i).normalize();
         }
         // Rename all the variable from the ops
-        for (int i = 0; i < this.getOperators().size(); i++) {
-            this.getOperators().get(i).normalize();
+        for (int i = 0; i < this.getActions().size(); i++) {
+            this.getActions().get(i).normalize();
         }
         // Rename all the variable from the methods
         for (int i = 0; i < this.getMethods().size(); i++) {
@@ -558,7 +553,7 @@ public class Domain implements Serializable {
         for (DerivedPredicate dp : this.derivedPredicates) {
             str.append(dp).append("\n");
         }
-        for (Op op : this.ops) {
+        for (Action op : this.ops) {
             str.append(op).append("\n");
         }
         for (Method meth : this.meths) {

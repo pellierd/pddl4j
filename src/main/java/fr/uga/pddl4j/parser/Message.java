@@ -31,11 +31,6 @@ import java.io.Serializable;
 public class Message implements Serializable, Comparable<Message> {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = -6769894590368065516L;
-
-    /**
      * This enumeration defines the type of message log in the error manager.
      */
     public enum Type {
