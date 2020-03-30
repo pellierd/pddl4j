@@ -55,7 +55,7 @@ public class Problem implements Serializable {
     /**
      * The task network of the problem.
      */
-    private TaskNetwork taskNetwork;
+    private TaskNetwork initialTaskNetwork;
 
     /**
      * The list of initial facts declared in the problem.
@@ -97,7 +97,7 @@ public class Problem implements Serializable {
         this.name = name;
         this.requirements = new LinkedHashSet<>();
         this.objects = new ArrayList<>();
-        this.taskNetwork = null;
+        this.initialTaskNetwork = null;
         this.initialFacts = new ArrayList<>();
         this.goal = null;
         this.constraints = null;
@@ -196,11 +196,11 @@ public class Problem implements Serializable {
      * @param network The task network to set.
      * @thows NullPointerException if the task network to set is null.
      */
-    public final void setTaskNetwork(final TaskNetwork network) {
+    public final void setInitialTaskNetwork(final TaskNetwork network) {
         if (network == null) {
            throw new NullPointerException();
         }
-        this.taskNetwork = network;
+        this.initialTaskNetwork = network;
     }
 
     /**
@@ -208,7 +208,7 @@ public class Problem implements Serializable {
      *
      * @return the task network of the problem. The task network may null if it is not defined.
      */
-    public final TaskNetwork getTaskNetwork() {return this.taskNetwork; }
+    public final TaskNetwork getInitialTaskNetwork() {return this.initialTaskNetwork; }
 
     /**
      * Returns the list of initial facts defined in the problem file.
@@ -319,8 +319,8 @@ public class Problem implements Serializable {
             this.getGoal().moveNegationInward();
         }
         // Standardize the initial task network
-        if (this.getTaskNetwork() != null) {
-            final TaskNetwork tn = this.getTaskNetwork();
+        if (this.getInitialTaskNetwork() != null) {
+            final TaskNetwork tn = this.getInitialTaskNetwork();
             if (tn.getTasks().getChildren().size() == 1) {
                 tn.setTotallyOrdered(true);
             }
@@ -364,9 +364,9 @@ public class Problem implements Serializable {
             }
             str.append("\n)\n");
         }
-        if (this.taskNetwork != null) {
+        if (this.initialTaskNetwork != null) {
             str.append("(:htn\n");
-            str.append(this.taskNetwork.toString());
+            str.append(this.initialTaskNetwork.toString());
             str.append("\n)\n");
         }
         str.append("(:init");

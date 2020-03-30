@@ -336,9 +336,9 @@ public final class Encoder implements Serializable {
         // Encode the tasks defined in the domain.
         IntEncoding.encodeTasks(domain);
         // Encode operators in integer representation
-        List<IntAction> intOps = IntEncoding.encodeActions(domain.getActions());
+        List<IntAction> intActions = IntEncoding.encodeActions(domain.getActions());
         // Encode method in integer representation
-        List<IntMethod> intMeths = IntEncoding.encodeMethods(domain.getMethods());
+        List<IntMethod> intMethods = IntEncoding.encodeMethods(domain.getMethods());
 
         // Encode the initial state in integer representation
         final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
@@ -353,11 +353,8 @@ public final class Encoder implements Serializable {
         if (!Encoder.requirements.contains(RequireKey.HTN)) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
         } else {
-            intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getTaskNetwork());
-            System.out.println(toString(intTaskNetwork));
-            System.exit(0);
+            intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
         }
-
 
         final StringBuilder stringBuilder = new StringBuilder();
 
@@ -384,20 +381,24 @@ public final class Encoder implements Serializable {
         if (Encoder.logLevel == 2) {
             stringBuilder.append("\nCoded initial state:\n").append("(and");
             for (IntExp f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f));
+                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
                 stringBuilder.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
             }
-            if (!intOps.isEmpty()) {
-                stringBuilder.append(")").append("\n\nCoded operators:\n\n");
-                for (IntAction op : intOps) {
+            if (intTaskNetwork != null) {
+                stringBuilder.append(")").append("\n\nCoded initial task network:\n")
+                    .append(Encoder.toString(intTaskNetwork));
+            }
+            if (!intActions.isEmpty()) {
+                stringBuilder.append(")").append("\n\nCoded actions:\n\n");
+                for (IntAction op : intActions) {
                     stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
                 }
             }
-            if (!intMeths.isEmpty()) {
-                stringBuilder.append(")").append("\n\nCoded method:\n\n");
-                for (IntMethod meth : intMeths) {
+            if (!intMethods.isEmpty()) {
+                stringBuilder.append(")").append("\n\nCoded methods:\n\n");
+                for (IntMethod meth : intMethods) {
                     stringBuilder.append(Encoder.toString(meth)).append(System.lineSeparator());
                 }
             }
@@ -409,12 +410,15 @@ public final class Encoder implements Serializable {
         // Step 3: PreInstantiation
         // *****************************************************************************************
 
-        // Computed inertia from the encode operators
-        PreInstantiation.extractInertia(intOps);
+        // Computed inertia from the encode actions
+        PreInstantiation.extractInertia(intActions);
         // Infer the type from the unary inertia
         PreInstantiation.inferTypesFromInertia(intInitPredicates);
-        // Simply the encoded operators with the inferred types.
-        intOps = PreInstantiation.simplifyOperatorsWithInferedTypes(intOps);
+        // Simply the encoded action with the inferred types.
+        intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
+        // Simply the encoded methods with the inferred types.
+        intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
+
         // Create the predicates tables used to count the occurrences of the predicates in the
         // initial state
         PreInstantiation.createPredicatesTables(intInitPredicates);
@@ -435,12 +439,12 @@ public final class Encoder implements Serializable {
             for (IntExp f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f));
             }
-            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(RequireKey.HTN)) {
+            if (intGoal != null) {
                 stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
             }
-            stringBuilder.append("\n\nPre-instantiation operators with infered types (").append(intOps.size())
-                .append(" ops):\n");
-            for (IntAction op : intOps) {
+            stringBuilder.append("\n\nPre-instantiation actions with inferred types (").append(intActions.size())
+                .append(" actions):\n");
+            for (IntAction op : intActions) {
                 stringBuilder.append(Encoder.toString(op));
             }
             LOGGER.trace(stringBuilder);
@@ -452,7 +456,7 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Instantiate the operators
-        intOps = Instantiation.instantiateOperators(intOps);
+        intActions = Instantiation.instantiateOperators(intActions);
         // Expand the quantified expression in the goal
         if (intGoal != null) {
             Instantiation.expandQuantifiedExpression(intGoal);
@@ -475,9 +479,9 @@ public final class Encoder implements Serializable {
             for (final IntExp g : intGoal.getChildren()) {
                 stringBuilder.append(" ").append(Encoder.toString(g));
             }
-            stringBuilder.append("\n\nPre-instantiation operators with inferred types (").append(intOps.size())
+            stringBuilder.append("\n\nPre-instantiation operators with inferred types (").append(intActions.size())
                 .append(" ops):\n\n");
-            for (final IntAction op : intOps) {
+            for (final IntAction op : intActions) {
                 stringBuilder.append(Encoder.toString(op)).append("\n");
             }
             LOGGER.trace(stringBuilder);
@@ -489,17 +493,17 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Extract the ground inertia from the instantiated operators
-        PostInstantiation.extractGroundInertia(intOps);
+        PostInstantiation.extractGroundInertia(intActions);
         // Simplify the operators with the ground inertia information previously extracted
-        PostInstantiation.simplyOperatorsWithGroundInertia(intOps, intInitPredicates);
+        PostInstantiation.simplyOperatorsWithGroundInertia(intActions, intInitPredicates);
         // Extract the relevant facts from the simplified and instantiated operators
-        PostInstantiation.extractRelevantFacts(intOps, intInitPredicates);
+        PostInstantiation.extractRelevantFacts(intActions, intInitPredicates);
         // Simplify the goal with ground inertia information
         if (intGoal != null) {
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
         }
         // Extract increase and add value to BitOp cost
-        PostInstantiation.simplifyIncrease(intOps, intInitFunctionCost);
+        PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
 
         // The table of ground inertia are no more needed
         Encoder.tableOfGroundInertia = null;
@@ -543,7 +547,7 @@ public final class Encoder implements Serializable {
         Encoder.init = BitEncoding.encodeInit(intInitPredicates, map);
         // Encode the operators in bit set representation
         try {
-            Encoder.operators.addAll(0, BitEncoding.encodeOperators(intOps, map));
+            Encoder.operators.addAll(0, BitEncoding.encodeOperators(intActions, map));
         } catch (UnexpectedExpressionException uee) {
             LOGGER.error("Error with unexpected expression", uee);
             return null;

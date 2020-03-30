@@ -3458,7 +3458,7 @@ void htn_problem() : // ADD HDDL
         left_bracket() <HTN>
 //            [<PARAMETERS> typed_list(Lexer.VARIABLE)] // Is in HDDL definition but has no sens
             taskNetwork = task_network() {
-                this.problem.setTaskNetwork(taskNetwork);
+                this.problem.setInitialTaskNetwork(taskNetwork);
             }
         right_bracket()
 		init()

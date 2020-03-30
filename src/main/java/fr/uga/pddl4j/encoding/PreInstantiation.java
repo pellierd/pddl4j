@@ -32,29 +32,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-/*
- * Add a hack in method simplifiedOperatorWithInferredType 19/04/13.
- * Problem of the type of the constant in predicate in precondition and effect of operator.
- */
 
 /**
  * This class contains the methods for the pre instantiation step. In other words, it contains methods in order to:
  * <ul>
- * <li> extract inertia information from the operators encoded into integer representation.</li>
+ * <li> extract inertia information from the action and method encoded into integer representation.</li>
  * <li> create predicates tables used to count the occurrences of a specified predicates in the initial state.</li>
  * <li> infer types from unary inertia information.</li>
- * <li> simplify operators with infer types information.</li>
+ * <li> simplify actions and methods with infer types information.</li>
+ * </ul>
+ *
+ * Modifications:
+ * <ul>
+ *     <li> Add a hack in method simplifiedActionWithInferredType on 19/04/13 to deal with the problem the constant
+ *     in in precondition and effect of in action.</li>
+ *     <li> Add a method to simplify methods on 30/03/19.</li>
  * </ul>
  *
  * @author D. Pellier
  * @version 1.0 - 10.04.2010
  */
 final class PreInstantiation implements Serializable {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The logger of the class.
@@ -68,15 +66,15 @@ final class PreInstantiation implements Serializable {
     }
 
     /**
-     * This method proceeds over the operators of the domain and checks for all atom which kind of
+     * This method proceeds over the actions of the domain and checks for all atom which kind of
      * inertia it is. For each atom it checks if it satisfies one of the following definitions:
      * <p>
      * <i>Definition:</i> A relation is a positive inertia iff it does not occur positively in an
-     * unconditional effect or the consequent of a conditional effect of an operator.
+     * unconditional effect or the consequent of a conditional effect of an action.
      * </p>
      * <p>
      * <i>Definition:</i> A relation is a negative inertia iff it does not occur negatively in an
-     * unconditional effect or the consequent of a conditional effect of an operator.
+     * unconditional effect or the consequent of a conditional effect of an action.
      * </p>
      * <p>
      * Relations, which are positive as well as negative inertia, are simply called inertia.
@@ -90,22 +88,22 @@ final class PreInstantiation implements Serializable {
      * be move inward the expression.
      * </p>
      *
-     * @param operators the list of operators to simplified.
+     * @param actions the list of actions to simplified.
      */
-    static void extractInertia(final List<IntAction> operators) {
+    static void extractInertia(final List<IntAction> actions) {
         final int nbPredicates = Encoder.tableOfPredicates.size();
         Encoder.tableOfInertia = new ArrayList<>(nbPredicates);
         for (int i = 0; i < nbPredicates; i++) {
             Encoder.tableOfInertia.add(Inertia.INERTIA);
         }
-        for (final IntAction op : operators) {
+        for (final IntAction op : actions) {
             PreInstantiation.extract(op.getEffects());
         }
 
     }
 
     /**
-     * Do a pass over the effects of an operator and update the inertia table.
+     * Do a pass over the effects of an action and update the inertia table.
      *
      * @param exp the effect.
      */
@@ -379,29 +377,29 @@ final class PreInstantiation implements Serializable {
     }
 
     /**
-     * .
+     * Symplify the actions with the infered types.
      *
-     * @return the list of simplified operators.
+     * @return the list of simplified actions.
      */
-    static List<IntAction> simplifyOperatorsWithInferedTypes(final List<IntAction> operators) {
+    static List<IntAction> simplifyActionsWithInferredTypes(final List<IntAction> actions) {
         final List<IntAction> ops = new LinkedList<>();
-        for (final IntAction op : operators) {
-            ops.addAll(PreInstantiation.simplifyOperatorsWithInferedTypes(op));
+        for (final IntAction op : actions) {
+            ops.addAll(PreInstantiation.simplifyActionsWithInferredTypes(op));
         }
         return ops;
     }
 
-    private static List<IntAction> simplifyOperatorsWithInferedTypes(final IntAction op) {
+    private static List<IntAction> simplifyActionsWithInferredTypes(final IntAction action) {
         final List<IntExp> unaryInertia = new ArrayList<>();
-        unaryInertia.addAll(PreInstantiation.collectUnaryInertia(op.getPreconditions()));
-        unaryInertia.addAll(PreInstantiation.collectUnaryInertia(op.getEffects()));
+        unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getPreconditions()));
+        unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getEffects()));
 
-        List<IntAction> operators = new LinkedList<>();
-        operators.add(op);
+        List<IntAction> actions = new LinkedList<>();
+        actions.add(action);
 
         for (final IntExp inertia : unaryInertia) {
-            final List<IntAction> newOperators = new ArrayList<>();
-            for (final IntAction o : operators) {
+            final List<IntAction> newActions = new ArrayList<>();
+            for (final IntAction o : actions) {
                 if (o.getArity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
@@ -410,9 +408,8 @@ final class PreInstantiation implements Serializable {
                         break;
                     }
 
-                    final int dtIndex = op.getTypeOfParameters(index);
+                    final int dtIndex = action.getTypeOfParameters(index);
 
-                    // Compute the
                     final String declaredType = Encoder.tableOfTypes.get(dtIndex);
                     final int itIndex = inertia.getPredicate();
                     final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
@@ -437,34 +434,106 @@ final class PreInstantiation implements Serializable {
                         Encoder.tableOfDomains.add(dt2);
                     }
 
-
                     final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
                     PreInstantiation.replace(op1.getPreconditions(), inertia, Connective.TRUE, ti, ts);
                     PreInstantiation.replace(op1.getEffects(), inertia, Connective.TRUE, ti, ts);
                     if (!op1.getPreconditions().getConnective().equals(Connective.FALSE)
                         && !op1.getEffects().getConnective().equals(Connective.FALSE)) {
-                        newOperators.add(op1);
+                        newActions.add(op1);
                     }
 
                     final IntAction op2 = new IntAction(o);
-
-
                     op2.setTypeOfParameter(index, ts);
                     PreInstantiation.replace(op2.getPreconditions(), inertia, Connective.FALSE, ti, ts);
                     PreInstantiation.replace(op2.getEffects(), inertia, Connective.FALSE, ti, ts);
-
                     if (!op2.getPreconditions().getConnective().equals(Connective.FALSE)
                         && !op2.getEffects().getConnective().equals(Connective.FALSE)) {
-                        newOperators.add(op2);
+                        newActions.add(op2);
                     }
                 }
-
             }
-            operators = newOperators;
-
+            actions = newActions;
         }
-        return operators;
+        return actions;
+    }
+
+    /**
+     * Symplify the method with the infered types.
+     *
+     * @return the list of simplified methods.
+     */
+    static List<IntMethod> simplifyMethodsWithInferredTypes(final List<IntMethod> methods) {
+        final List<IntMethod> meths = new LinkedList<>();
+        for (final IntMethod meth : methods) {
+            meths.addAll(PreInstantiation.simplifyMethodsWithInferredTypes(meth));
+        }
+        return meths;
+    }
+
+    private static List<IntMethod> simplifyMethodsWithInferredTypes(final IntMethod meth) {
+        final List<IntExp> unaryInertia = new ArrayList<>();
+        unaryInertia.addAll(PreInstantiation.collectUnaryInertia(meth.getPreconditions()));
+
+        List<IntMethod> methods = new LinkedList<>();
+        methods.add(meth);
+
+        for (final IntExp inertia : unaryInertia) {
+            final List<IntMethod> newMethods = new ArrayList<>();
+            for (final IntMethod m : methods) {
+                if (m.getArity() > 0) {
+
+                    int index = -inertia.getArguments()[0] - 1;
+                    // Hack add for constant in predicate
+                    if (index < 0) {
+                        break;
+                    }
+
+                    final int dtIndex = meth.getTypeOfParameters(index);
+
+                    final String declaredType = Encoder.tableOfTypes.get(dtIndex);
+                    final int itIndex = inertia.getPredicate();
+                    final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
+
+                    final String sti = declaredType + "^" + inertiaType;
+                    int ti = Encoder.tableOfTypes.indexOf(sti);
+                    if (ti == -1) {
+                        ti = Encoder.tableOfTypes.size();
+                        Encoder.tableOfTypes.add(sti);
+                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
+                        Encoder.tableOfDomains.add(dt1);
+                    }
+
+                    final String sts = declaredType + "\\" + inertiaType;
+                    int ts = Encoder.tableOfTypes.indexOf(sts);
+                    if (ts == -1) {
+                        ts = Encoder.tableOfTypes.size();
+                        Encoder.tableOfTypes.add(sts);
+                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
+                        Encoder.tableOfDomains.add(dt2);
+                    }
+
+                    final IntMethod meth1 = new IntMethod(m);
+                    meth1.setTypeOfParameter(index, ti);
+                    PreInstantiation.replace(meth1.getPreconditions(), inertia, Connective.TRUE, ti, ts);
+                    if (!meth1.getPreconditions().getConnective().equals(Connective.FALSE)) {
+                        newMethods.add(meth1);
+                    }
+
+                    final IntMethod meth2 = new IntMethod(m);
+                    meth2.setTypeOfParameter(index, ts);
+                    PreInstantiation.replace(meth2.getPreconditions(), inertia, Connective.FALSE, ti, ts);
+
+                    if (!meth2.getPreconditions().getConnective().equals(Connective.FALSE)) {
+                        newMethods.add(meth2);
+                    }
+                }
+            }
+            methods = newMethods;
+        }
+        return methods;
     }
 
     /**

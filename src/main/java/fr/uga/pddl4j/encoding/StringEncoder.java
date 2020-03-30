@@ -135,7 +135,6 @@ final class StringEncoder implements Serializable {
     static String toString(final IntTaskNetwork tn, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks) {
         final StringBuilder str = new StringBuilder();
-        str.append("Tasknetwork\n");
         str.append("tasks:\n")
             .append(toString(tn.getTasks(), constants, types, predicates, functions, tasks))
             .append("\n");
