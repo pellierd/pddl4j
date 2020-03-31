@@ -243,11 +243,8 @@ final class Instantiation implements Serializable {
                 if (!method.isAlreadyInstantiatedWith(value)) {
                     final int varIndex = -index - 1;
                     final IntExp preconditionCopy = new IntExp(method.getPreconditions());
-                    //System.out.print("method: " + Encoder.toString(method));
 
-                    //System.out.print("Instantiate precondition: " + Encoder.toString(preconditionCopy));
                     Instantiation.substitute(preconditionCopy, varIndex, value);
-                    //System.out.println(" => " + Encoder.toString(preconditionCopy));
                     if (!preconditionCopy.getConnective().equals(Connective.FALSE)) {
                         final IntMethod copy = new IntMethod(method.getName(), arity);
                         copy.setPreconditions(preconditionCopy);
@@ -256,18 +253,10 @@ final class Instantiation implements Serializable {
                         //System.out.print("Instantiate task: " + Encoder.toString(taskCopy));
                         Instantiation.substitute(taskCopy, varIndex, value);
                         copy.setTask(taskCopy);
-                        System.out.println(" => " + Encoder.toString(taskCopy));
 
                         final IntExp subTasksCopy = new IntExp(method.getSubTasks());
-                        //System.out.print("Instantiate subtasks: " + Encoder.toString(subTasksCopy));
                         Instantiation.substitute(subTasksCopy, varIndex, value);
                         copy.setSubTasks(subTasksCopy);
-                        //System.out.println(" => " + Encoder.toString(subTasksCopy));
-
-                        //try {
-                        //    System.in.read();
-                        //} catch (Exception e) {}
-
 
                         for (int i = 0; i < arity; i++) {
                             copy.setTypeOfParameter(i, method.getTypeOfParameters(i));

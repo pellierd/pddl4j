@@ -31,7 +31,6 @@ import fr.uga.pddl4j.util.CondBitExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -520,9 +519,11 @@ public final class Encoder implements Serializable {
         // Extract the ground inertia from the instantiated actions
         PostInstantiation.extractGroundInertia(intActions);
         // Simplify the actions with the ground inertia information previously extracted
-        PostInstantiation.simplyOperatorsWithGroundInertia(intActions, intInitPredicates);
+        PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
+        // Simplify the methods with the ground inertia information previously extracted
+        PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
         // Extract the relevant facts from the simplified and instantiated actions
-        PostInstantiation.extractRelevantFacts(intActions, intInitPredicates);
+        PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
         // Simplify the goal with ground inertia information
         if (intGoal != null) {
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
@@ -555,9 +556,9 @@ public final class Encoder implements Serializable {
         }
 
         // Creates the list of bit actions
-        Encoder.actions = new ArrayList<>(Constants.DEFAULT_OPERATORS_TABLE_SIZE);
+        Encoder.actions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);
         // Encode the goal in bit set representation
-        if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM)) {
+        if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM))) {
             try {
                 Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
             } catch (UnexpectedExpressionException uee) {

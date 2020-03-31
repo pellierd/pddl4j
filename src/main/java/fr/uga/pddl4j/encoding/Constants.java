@@ -42,7 +42,7 @@ public final class Constants implements Serializable {
     /**
      * The default size of the table of relevant facts.
      */
-    static final int DEFAULT_RELEVANT_FACTS_TABLE = 1000;
+    static final int DEFAULT_RELEVANT_FACTS_TABLE_SIZE = 1000;
 
     /**
      * The name of the dummy predicate used to replace the goal when the goal is a disjunction.
@@ -57,7 +57,7 @@ public final class Constants implements Serializable {
     /**
      * The default size of the actions table.
      */
-    static final int DEFAULT_OPERATORS_TABLE_SIZE = 1000;
+    static final int DEFAULT_ACTION_TABLE_SIZE = 1000;
 
     /**
      * default private constructor to prevent form class instantiation.

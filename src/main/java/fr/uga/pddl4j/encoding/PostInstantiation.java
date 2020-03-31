@@ -34,7 +34,7 @@ import java.util.Set;
  * <p>
  * This class contains the methods needed for the post instantiation step the encoding. In
  * other words, it contains methods to extract the relevant facts from the instantiated actions
- * and methods to simplify the operator based on ground inertia information.
+ * and methods to simplify the actions and the methods based on ground inertia information.
  * </p>
  * <p>
  * <i>Definition:</i> A ground fact is a positive ground inertia if and only if it does not occur
@@ -59,32 +59,31 @@ import java.util.Set;
 final class PostInstantiation implements Serializable {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The default constructor with a private access to prevent instance creation.
      */
     private PostInstantiation() {
     }
 
     /**
-     * Extracts the relevant facts from the instantiated operator. A ground fact is relevant if and
+     * Extracts the relevant facts from the instantiated actions. A ground fact is relevant if and
      * only if:
      * <ul>
      * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
      * <li>2. it is not an initial fact and not a positive ground inertia.</li>
      * </ul>
      *
-     * @param operators the list of actions.
-     * @param init      the initial state.
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     * @param init    the initial state.
      */
-    static void extractRelevantFacts(final List<IntAction> operators, final Set<IntExp> init) {
+    static void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods, final Set<IntExp> init) {
         final Set<IntExp> relevants = new LinkedHashSet<>(10000);
-        for (IntAction op : operators) {
-            PostInstantiation.extractRelevantFacts(op.getPreconditions(), relevants, init);
-            PostInstantiation.extractRelevantFacts(op.getEffects(), relevants, init);
+        for (IntAction a : actions) {
+            PostInstantiation.extractRelevantFacts(a.getPreconditions(), relevants, init);
+            PostInstantiation.extractRelevantFacts(a.getEffects(), relevants, init);
+        }
+        for (IntMethod m : methods) {
+            PostInstantiation.extractRelevantFacts(m.getPreconditions(), relevants, init);
         }
         Encoder.tableOfRelevantFacts = new ArrayList<>(relevants.size());
         for (IntExp exp : relevants) {
@@ -457,30 +456,48 @@ final class PostInstantiation implements Serializable {
     // *********************************************************************************************
 
     /**
-     * Do a pass over the effects of all the instantiated actions and update the ground inertia
+     * Do a pass over the preconditions and the effects of all the instantiated actions and update the ground inertia
      * table. Then, simplify the actions according to the extracted ground inertia.
      *
-     * @param operators the list of actions to simplified.
-     * @param init      the initial state.
+     * @param actions the list of actions to simplified.
+     * @param init    the initial state.
      */
-    static void simplyOperatorsWithGroundInertia(final List<IntAction> operators, final Set<IntExp> init) {
-
-        // Then for each instantiated operator try to simplify it.
-        final List<IntAction> tmpOps = new ArrayList<>(operators.size());
-        for (IntAction op : operators) {
-            PostInstantiation.simplifyWithGroundInertia(op.getPreconditions(), false, init);
-            PostInstantiation.simplify(op.getPreconditions());
-            if (!op.getPreconditions().getConnective().equals(Connective.FALSE)) {
-                PostInstantiation.simplifyWithGroundInertia(op.getEffects(), true, init);
-                PostInstantiation.simplify(op.getEffects());
-                if (!op.getEffects().getConnective().equals(Connective.FALSE)
-                    && !op.getEffects().getConnective().equals(Connective.TRUE)) {
-                    tmpOps.add(op);
+    static void simplyActionsWithGroundInertia(final List<IntAction> actions, final Set<IntExp> init) {
+        final List<IntAction> tmpActions = new ArrayList<>(actions.size());
+        for (IntAction a : actions) {
+            PostInstantiation.simplifyWithGroundInertia(a.getPreconditions(), false, init);
+            PostInstantiation.simplify(a.getPreconditions());
+            if (!a.getPreconditions().getConnective().equals(Connective.FALSE)) {
+                PostInstantiation.simplifyWithGroundInertia(a.getEffects(), true, init);
+                PostInstantiation.simplify(a.getEffects());
+                if (!a.getEffects().getConnective().equals(Connective.FALSE)
+                    && !a.getEffects().getConnective().equals(Connective.TRUE)) {
+                    tmpActions.add(a);
                 }
             }
         }
-        operators.clear();
-        operators.addAll(tmpOps);
+        actions.clear();
+        actions.addAll(tmpActions);
+    }
+
+    /**
+     * Do a pass over the preconditions of all the instantiated methods and update the ground inertia
+     * table. Then, simplify the methods according to the extracted ground inertia.
+     *
+     * @param methods the list of methods to simplified.
+     * @param init    the initial state.
+     */
+    static void simplyMethodsWithGroundInertia(final List<IntMethod> methods, final Set<IntExp> init) {
+        final List<IntMethod> tmpMethods = new ArrayList<>(methods.size());
+        for (IntMethod m : methods) {
+            PostInstantiation.simplifyWithGroundInertia(m.getPreconditions(), false, init);
+            PostInstantiation.simplify(m.getPreconditions());
+            if (!m.getPreconditions().getConnective().equals(Connective.FALSE)) {
+                tmpMethods.add(m);
+            }
+        }
+        methods.clear();
+        methods.addAll(tmpMethods);
     }
 
     /**
@@ -651,22 +668,21 @@ final class PostInstantiation implements Serializable {
     }
 
     /**
-     * Do a pass over the effects of a specified list of instantiated operator and update the ground
+     * Do a pass over the effects of a specified list of instantiated actions and update the ground
      * inertia table.
      *
-     * @param operators the list of instantiated actions.
+     * @param actions the list of instantiated actions.
      */
-    static void extractGroundInertia(final List<IntAction> operators) {
-        Encoder.tableOfGroundInertia = new LinkedHashMap<>(
-            Constants.DEFAULT_RELEVANT_FACTS_TABLE);
-        for (IntAction op : operators) {
-            PostInstantiation.extractGroundInertia(op.getEffects());
+    static void extractGroundInertia(final List<IntAction> actions) {
+        Encoder.tableOfGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
+        for (IntAction a : actions) {
+            PostInstantiation.extractGroundInertia(a.getEffects());
         }
 
     }
 
     /**
-     * Do a pass over the effects of an instantiated operator and update the ground inertia table.
+     * Do a pass over the effects of an instantiated action and update the ground inertia table.
      *
      * @param exp the effect.
      */
@@ -765,24 +781,23 @@ final class PostInstantiation implements Serializable {
     /**
      * Extracts "increase" expression and assigns value to the BitOp cost.
      *
-     * @param operators       the list of actions.
+     * @param actions         the list of actions.
      * @param functionAndCost functions and associed costs
      */
-    static void simplifyIncrease(final List<IntAction> operators, final Map<IntExp, Double> functionAndCost) {
-        for (IntAction op : operators) {
-            PostInstantiation.simplifyIncreaseAssignCost(op, op.getEffects(), functionAndCost);
+    static void simplifyIncrease(final List<IntAction> actions, final Map<IntExp, Double> functionAndCost) {
+        for (IntAction a : actions) {
+            PostInstantiation.simplifyIncreaseAssignCost(a, a.getEffects(), functionAndCost);
         }
     }
 
-    //TODO Deal with WHEN, FORALL etc.
-
     /**
-     * Do a pass over the effects of an instantiated operator and update the ground inertia table.
+     * Do a pass over the effects of an instantiated action and update the ground inertia table.
+     * Warning this method deal only with AND expression for the moment.
      *
      * @param exp             the effect.
      * @param functionAndCost functions and associed costs
      */
-    private static void simplifyIncreaseAssignCost(final IntAction op,
+    private static void simplifyIncreaseAssignCost(final IntAction action,
                                                    final IntExp exp,
                                                    final Map<IntExp, Double> functionAndCost) {
         switch (exp.getConnective()) {
@@ -792,7 +807,7 @@ final class PostInstantiation implements Serializable {
                 Iterator<IntExp> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(Connective.AND)) {
                     final IntExp ei = i.next();
-                    PostInstantiation.simplifyIncreaseAssignCost(op, ei, functionAndCost);
+                    PostInstantiation.simplifyIncreaseAssignCost(action, ei, functionAndCost);
                     // If a child expression is INCREASE, we remove it
                     if (ei.getConnective().equals(Connective.INCREASE)) {
                         i.remove();
@@ -837,9 +852,9 @@ final class PostInstantiation implements Serializable {
                 break;
             case INCREASE:
                 if (functionAndCost.containsKey(exp.getChildren().get(1))) {
-                    op.setCost(functionAndCost.get(exp.getChildren().get(1)));
+                    action.setCost(functionAndCost.get(exp.getChildren().get(1)));
                 } else {
-                    op.setCost(exp.getChildren().get(1).getValue());
+                    action.setCost(exp.getChildren().get(1).getValue());
                 }
                 break;
             case DECREASE:

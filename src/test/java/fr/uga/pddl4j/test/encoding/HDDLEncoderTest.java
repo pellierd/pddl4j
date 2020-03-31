@@ -18,19 +18,19 @@ public class HDDLEncoderTest {
         try {
             final ProblemFactory factory = new ProblemFactory();
 
-            factory.setTraceLevel(5);
+            factory.setTraceLevel(6);
 
-            ErrorManager errorManager = factory.parse(
-                new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl"),
-                new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl"));
+            //ErrorManager errorManager = factory.parse(
+            //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl"),
+            //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl"));
 
             //ErrorManager errorManager = factory.parse(
             //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/domain.hddl"),
             //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/pb01.hddl"));
 
-            //ErrorManager errorManager = factory.parse(
-            //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl"),
-            //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl"));
+            ErrorManager errorManager = factory.parse(
+                new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl"),
+                new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl"));
 
             //ErrorManager errorManager = factory.parse(
             //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl"),
