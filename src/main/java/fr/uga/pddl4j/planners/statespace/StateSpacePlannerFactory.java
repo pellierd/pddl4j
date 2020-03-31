@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.exceptions.FileException;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -164,7 +164,7 @@ public class StateSpacePlannerFactory implements Serializable {
      * @see fr.uga.pddl4j.planners.Planner.Name
      */
     public AbstractStateSpacePlanner getPlanner(final Planner.Name name, final int timeout,
-                                                final Heuristic.Type heuristicType, final double weight,
+                                                final RelaxationHeuristic.Type heuristicType, final double weight,
                                                 final boolean statisticState, final int traceLevel) {
         AbstractStateSpacePlanner planner = null;
         switch (name) {
@@ -297,34 +297,34 @@ public class StateSpacePlannerFactory implements Serializable {
                     }
                     if (heuristic == 0) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.FAST_FORWARD);
+                            RelaxationHeuristic.Type.FAST_FORWARD);
                     } else if (heuristic == 1) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.SUM);
+                            RelaxationHeuristic.Type.SUM);
                     } else if (heuristic == 2) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.SUM_MUTEX);
+                            RelaxationHeuristic.Type.SUM_MUTEX);
                     } else if (heuristic == 3) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.AJUSTED_SUM);
+                            RelaxationHeuristic.Type.AJUSTED_SUM);
                     } else if (heuristic == 4) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.AJUSTED_SUM2);
+                            RelaxationHeuristic.Type.AJUSTED_SUM2);
                     } else if (heuristic == 5) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.AJUSTED_SUM2M);
+                            RelaxationHeuristic.Type.AJUSTED_SUM2M);
                     } else if (heuristic == 6) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.COMBO);
+                            RelaxationHeuristic.Type.COMBO);
                     } else if (heuristic == 7) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.MAX);
+                            RelaxationHeuristic.Type.MAX);
                     } else if (heuristic == 8) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.SET_LEVEL);
+                            RelaxationHeuristic.Type.SET_LEVEL);
                     } else {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            Heuristic.Type.MIN_COST);
+                            RelaxationHeuristic.Type.MIN_COST);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);
@@ -432,7 +432,7 @@ public class StateSpacePlannerFactory implements Serializable {
             final File problem = (File) arguments.get(AbstractStateSpacePlanner.PROBLEM);
             final int traceLevel = (Integer) arguments.get(AbstractStateSpacePlanner.TRACE_LEVEL);
             final int timeout = (Integer) arguments.get(AbstractStateSpacePlanner.TIMEOUT);
-            final Heuristic.Type heuristicType = (Heuristic.Type) arguments.get(AbstractStateSpacePlanner.HEURISTIC);
+            final RelaxationHeuristic.Type heuristicType = (RelaxationHeuristic.Type) arguments.get(AbstractStateSpacePlanner.HEURISTIC);
             final double weight = (Double) arguments.get(AbstractStateSpacePlanner.WEIGHT);
             final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.STATISTICS);
 
@@ -471,7 +471,7 @@ public class StateSpacePlannerFactory implements Serializable {
             }
 
             if (pb != null) {
-                planner.getStatistics().setNumberOfActions(pb.getOperators().size());
+                planner.getStatistics().setNumberOfActions(pb.getActions().size());
                 planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
 
                 if (traceLevel > 0 && traceLevel != 8) {

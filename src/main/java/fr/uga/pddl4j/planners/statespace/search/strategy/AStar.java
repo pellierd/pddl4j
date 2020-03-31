@@ -16,10 +16,10 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.encoding.Action;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -56,7 +56,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public AStar(int timeout, Heuristic.Type heuristic, double weight) {
+    public AStar(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -69,12 +69,12 @@ public final class AStar extends AbstractStateSpaceStrategy {
     public Node search(final CodedProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         // Get the initial state from the planning problem
-        final BitState init = new BitState(codedProblem.getInit());
+        final State init = new State(codedProblem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
-        final Map<BitState, Node> closeSet = new HashMap<>();
-        final Map<BitState, Node> openSet = new HashMap<>();
+        final Map<State, Node> closeSet = new HashMap<>();
+        final Map<State, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
         final double currWeight = getWeight();
         // The list stores the node ordered according to the A* (getFValue = g + h) function
@@ -103,7 +103,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
             } else {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
-                for (Action op : codedProblem.getOperators()) {
+                for (Action op : codedProblem.getActions()) {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         Node state = new Node(current);

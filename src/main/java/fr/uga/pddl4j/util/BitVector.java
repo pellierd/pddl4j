@@ -17,7 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.util;
+
+import fr.uga.pddl4j.operators.BitExp;
 
 import java.util.BitSet;
 
@@ -28,11 +30,6 @@ import java.util.BitSet;
  * @version 1.1 - 13.04.2010
  */
 public class BitVector extends BitSet {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new <code>BitVector</code> with a specific size.

@@ -20,8 +20,8 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
 
 import java.io.Serializable;
 
@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public interface Heuristic extends Serializable {
+public interface RelaxationHeuristic extends Serializable {
 
     //TODO work on that part to make more generic the addition of MIN_COST
 
@@ -51,7 +51,7 @@ public interface Heuristic extends Serializable {
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
      */
-    int estimate(final BitState state, final BitExp goal);
+    int estimate(final State state, final BitExp goal);
 
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is

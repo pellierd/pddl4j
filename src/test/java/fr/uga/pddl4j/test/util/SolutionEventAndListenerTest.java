@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.test.util;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
@@ -49,7 +49,7 @@ public class SolutionEventAndListenerTest {
     /**
      * Default Heuristic Type.
      */
-    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+    private static final RelaxationHeuristic.Type HEURISTIC_TYPE = RelaxationHeuristic.Type.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.

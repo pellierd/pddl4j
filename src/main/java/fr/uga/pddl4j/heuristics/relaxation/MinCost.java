@@ -21,9 +21,9 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.Action;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.encoding.State;
 
 import java.util.LinkedList;
 
@@ -62,7 +62,7 @@ public class MinCost extends AbstractHeuristic {
      * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal) {
+    public int estimate(final State state, final BitExp goal) {
         return (int) estimateCost(new Node(state), goal);
     }
 
@@ -107,7 +107,7 @@ public class MinCost extends AbstractHeuristic {
             for (Action op : getOperators()) {
                 if (op.isApplicable(current)) {
                     if (op.getCost() <= cost) { //TODO take into account = or not
-                        final BitState nextState = new BitState(current);
+                        final State nextState = new State(current);
                         nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

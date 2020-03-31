@@ -315,7 +315,6 @@ public class IntExp implements Serializable {
             final IntExp other = (IntExp) object;
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
-                && this.taskID == other.taskID
                 && Arrays.equals(this.arguments, other.arguments)
                 && Double.compare(this.value, other.value) == 0
                 && this.variable == other.variable
@@ -339,7 +338,6 @@ public class IntExp implements Serializable {
         result = prime * result + this.children.hashCode();
         result = prime * result + this.connective.hashCode();
         result = prime * result + this.predicate;
-        result = prime * result + this.taskID;
         result = prime * result + this.type;
         long temp;
         temp = Double.doubleToLongBits(this.value);

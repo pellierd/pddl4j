@@ -16,11 +16,11 @@
 package fr.uga.pddl4j.test.util;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.encoding.Action;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.plan.Plan;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class PlanTest {
     /**
      * Default Heuristic Type.
      */
-    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+    private static final RelaxationHeuristic.Type HEURISTIC_TYPE = RelaxationHeuristic.Type.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.

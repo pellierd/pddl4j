@@ -19,6 +19,9 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.CondBitExp;
 import fr.uga.pddl4j.plan.Plan;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -42,11 +45,6 @@ import java.util.List;
  * @version 1.0 - 07.19.2016
  */
 public class JsonAdapter implements Serializable {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The current coded problem the plan is based on.

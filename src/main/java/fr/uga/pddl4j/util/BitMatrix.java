@@ -26,15 +26,15 @@ import java.util.BitSet;
 /**
  * This class implements a bit matrix.
  *
+ * Revisions:
+ * <ul>
+ *     <li>31.03.2020: Add a deep copy constructor.</li>
+ * </ul>
+ *
  * @author D. Pellier
  * @version 1.0 - 30.08.2010
  */
 public final class BitMatrix implements Serializable {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The number of rows.
@@ -63,6 +63,21 @@ public final class BitMatrix implements Serializable {
         this.bitsets = new BitSet[this.rows];
         for (int i = 0; i < this.rows; i++) {
             this.bitsets[i] = new BitSet(this.columns);
+        }
+    }
+
+    /**
+     * Creates a deep copy from an other matrix.
+     *
+     * @param other    The number matrix.
+     */
+    public BitMatrix(final BitMatrix other) {
+        this.rows = other.rows();
+        this.columns = other.columns();
+        this.bitsets = new BitSet[this.rows];
+        for (int i = 0; i < this.rows; i++) {
+            this.bitsets[i] = new BitSet();
+            this.bitsets[i].or(other.getRow(i));
         }
     }
 

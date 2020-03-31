@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -56,7 +56,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public HillClimbing(int timeout, Heuristic.Type heuristic, double weight) {
+    public HillClimbing(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -69,9 +69,9 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
     public Node search(final CodedProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
 
-        BitState init = new BitState(codedProblem.getInit());
+        State init = new State(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 
@@ -121,13 +121,13 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @return the list of successors from the parent node.
      */
     private LinkedList<Node> getSuccessors(final Node parent, final CodedProblem problem,
-                                           final Heuristic heuristic) {
+                                           final RelaxationHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
-        for (Action op : problem.getOperators()) {
+        for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
-                final BitState nextState = new BitState(parent);
+                final State nextState = new State(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                 nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

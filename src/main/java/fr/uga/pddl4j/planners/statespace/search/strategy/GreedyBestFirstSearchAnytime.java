@@ -16,11 +16,11 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.encoding.Action;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -89,7 +89,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public GreedyBestFirstSearchAnytime(int timeout, Heuristic.Type heuristic, double weight) {
+    public GreedyBestFirstSearchAnytime(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
@@ -104,7 +104,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
      * @param boundCost  the cost bound for the search.
      * @param boundDepth the depth bound for the search.
      */
-    public GreedyBestFirstSearchAnytime(int timeout, Heuristic.Type heuristic, double weight,
+    public GreedyBestFirstSearchAnytime(int timeout, RelaxationHeuristic.Type heuristic, double weight,
                                         double boundCost, double boundDepth) {
         super(timeout, heuristic, weight);
         this.boundCost = boundCost;
@@ -124,12 +124,12 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
 
         final long begin = System.currentTimeMillis();
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), problem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), problem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();
 
-        BitState init = new BitState(problem.getInit());
+        State init = new State(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         root.setDepth(0);
         openSet.add(root);
@@ -158,11 +158,11 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
             } else {
                 closeSet.add(current);
                 int index = 0;
-                for (Action op : problem.getOperators()) {
+                for (Action op : problem.getActions()) {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        final BitState nextState = new BitState(current);
+                        final State nextState = new State(current);
                         nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

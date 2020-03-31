@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
 
 /**
  * This class implement the adjusted sum 2M heuristic. This heuristic improves the adjusted sum 2
@@ -84,7 +84,7 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal) {
+    public int estimate(final State state, final BitExp goal) {
         super.setGoal(goal);
         // First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
         super.expandRelaxedPlanningGraph(state);
@@ -106,7 +106,7 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final BitExp goal) {
-        return estimate((BitState) node, goal);
+        return estimate((State) node, goal);
     }
 
 }

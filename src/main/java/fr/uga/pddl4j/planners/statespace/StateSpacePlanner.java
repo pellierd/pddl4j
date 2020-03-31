@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +45,7 @@ public interface StateSpacePlanner extends Planner {
     /**
      * The default heuristicType.
      */
-    Heuristic.Type DEFAULT_HEURISTIC = Heuristic.Type.FAST_FORWARD;
+    RelaxationHeuristic.Type DEFAULT_HEURISTIC = RelaxationHeuristic.Type.FAST_FORWARD;
 
     /**
      * The weight key for properties.

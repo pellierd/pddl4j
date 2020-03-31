@@ -35,7 +35,7 @@ The library contains:
 concepts. The parser can be configured to accept only specified requirements of
 PDDL language.
   * A set of useful pre-processing mechanisms in order to instantiate and
-simply operators into ground actions based on inertia properties.
+simply actions into ground actions based on inertia properties.
   * A set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
   * Several examples of planners using PDDL4J.
 
@@ -169,7 +169,7 @@ https://doi.org/10.1080/0952813X.2017.1409278
 * Add Generic planner structure
 
 *Parser*
-* Fix parser bug 
+* Fix parser bug
 
 *Global*
 * Add BNF

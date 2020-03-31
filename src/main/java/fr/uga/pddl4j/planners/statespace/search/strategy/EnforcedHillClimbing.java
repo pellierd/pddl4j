@@ -19,11 +19,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -59,7 +59,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public EnforcedHillClimbing(int timeout, Heuristic.Type heuristic, double weight) {
+    public EnforcedHillClimbing(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -73,11 +73,11 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = getTimeout();
 
-        BitState init = new BitState(codedProblem.getInit());
+        State init = new State(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 
@@ -128,14 +128,14 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, RelaxationHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
-        for (Action op : problem.getOperators()) {
+        for (Action op : problem.getActions()) {
             // Test if a specified operator is applicable in the current state
             if (op.isApplicable(parent)) {
-                final BitState nextState = new BitState(parent);
+                final State nextState = new State(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                 nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

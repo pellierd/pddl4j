@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.operators;
 
 import java.io.Serializable;
 
@@ -28,11 +28,6 @@ import java.io.Serializable;
  * @version 1.0 - 10.06.2010
  */
 public class CondBitExp implements Serializable {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The conditions of the expression.

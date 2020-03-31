@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 
 import java.util.Vector;
@@ -47,7 +47,7 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
      * @param timeout   the time out of the planner.
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceStrategyAnytime(int timeout, Heuristic.Type heuristic, double weight) {
+    public AbstractStateSpaceStrategyAnytime(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 

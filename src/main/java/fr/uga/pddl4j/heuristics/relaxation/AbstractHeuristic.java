@@ -19,9 +19,9 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.BitExp;
+import fr.uga.pddl4j.operators.BitExp;
 import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public abstract class AbstractHeuristic implements Heuristic {
+public abstract class AbstractHeuristic implements RelaxationHeuristic {
 
     /**
      * The goal to reached.
@@ -66,7 +66,7 @@ public abstract class AbstractHeuristic implements Heuristic {
         }
         this.facts = problem.getRelevantFacts();
         this.goal = problem.getGoal();
-        this.operators = problem.getOperators();
+        this.operators = problem.getActions();
         this.isAdmissible = true;
     }
 

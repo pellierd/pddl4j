@@ -77,16 +77,16 @@ final class PostInstantiation implements Serializable {
      * @param init    the initial state.
      */
     static void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods, final Set<IntExp> init) {
-        final Set<IntExp> relevants = new LinkedHashSet<>(10000);
+        final Set<IntExp> facts = new LinkedHashSet<>(10000);
         for (IntAction a : actions) {
-            PostInstantiation.extractRelevantFacts(a.getPreconditions(), relevants, init);
-            PostInstantiation.extractRelevantFacts(a.getEffects(), relevants, init);
+            PostInstantiation.extractRelevantFacts(a.getPreconditions(), facts, init);
+            PostInstantiation.extractRelevantFacts(a.getEffects(), facts, init);
         }
         for (IntMethod m : methods) {
-            PostInstantiation.extractRelevantFacts(m.getPreconditions(), relevants, init);
+            PostInstantiation.extractRelevantFacts(m.getPreconditions(), facts, init);
         }
-        Encoder.tableOfRelevantFacts = new ArrayList<>(relevants.size());
-        for (IntExp exp : relevants) {
+        Encoder.tableOfRelevantFacts = new ArrayList<>(facts.size());
+        for (IntExp exp : facts) {
             final IntExp relevant = new IntExp(exp);
             Encoder.tableOfRelevantFacts.add(relevant);
         }
@@ -101,14 +101,14 @@ final class PostInstantiation implements Serializable {
      * </ul>
      *
      * @param exp       the expression.
-     * @param relevants the set of relevant facts.
+     * @param facts the set of relevant facts.
      * @param init      the initial state.
      */
-    private static void extractRelevantFacts(final IntExp exp, final Set<IntExp> relevants,
+    private static void extractRelevantFacts(final IntExp exp, final Set<IntExp> facts,
                                              final Set<IntExp> init) {
         switch (exp.getConnective()) {
             case ATOM:
-                relevants.add(exp);
+                facts.add(exp);
                 break;
             case FN_HEAD:
                 break;
@@ -117,7 +117,7 @@ final class PostInstantiation implements Serializable {
             case AND:
             case OR:
                 for (IntExp e : exp.getChildren()) {
-                    PostInstantiation.extractRelevantFacts(e, relevants, init);
+                    PostInstantiation.extractRelevantFacts(e, facts, init);
                 }
                 break;
             case FORALL:
@@ -130,7 +130,7 @@ final class PostInstantiation implements Serializable {
             case SOMETIME:
             case AT_MOST_ONCE:
             case NOT:
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), relevants, init);
+                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 break;
             case WHEN:
             case LESS:
@@ -152,19 +152,19 @@ final class PostInstantiation implements Serializable {
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), relevants, init);
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(1), relevants, init);
+                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                PostInstantiation.extractRelevantFacts(exp.getChildren().get(1), facts, init);
                 break;
             case F_EXP_T:
                 if (!exp.getChildren().isEmpty()) {
-                    PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), relevants, init);
+                    PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 }
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), relevants, init);
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(1), relevants, init);
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(3), relevants, init);
+                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                PostInstantiation.extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                PostInstantiation.extractRelevantFacts(exp.getChildren().get(3), facts, init);
                 break;
             case FN_ATOM:
             case NUMBER:
@@ -176,9 +176,50 @@ final class PostInstantiation implements Serializable {
                 break;
             default:
                 // do nothing
-
         }
+    }
 
+    /**
+     * Extracts the relevant tasks from the instantiated methiods. A ground tasks is relevant if and
+     * only if it occurs as a task or a subtask of a instantiated method.
+     *
+     * @param methods the list of instantiated methods
+     */
+    static void extractRelevantTasks(List<IntMethod> methods) {
+        final Set<IntExp> tasks = new LinkedHashSet<>(10000);
+        for (IntMethod m : methods) {
+            tasks.add(m.getTask());
+            PostInstantiation.extractRelevantTasks(m.getSubTasks(), tasks);
+        }
+        Encoder.tableOfRelevantTasks = new ArrayList<>(tasks.size());
+        for (IntExp exp : tasks) {
+            final IntExp task = new IntExp(exp);
+            task.setTaskID(IntExp.DEFAULT_TASK_ID);
+            Encoder.tableOfRelevantTasks.add(task);
+        }
+    }
+
+    /**
+     * Extracts the tasks from a specified expression. A ground task is relevant if and
+     * only if it occurs as a subtask of a instantiated method.
+     *
+     * @param exp       the expression.
+     * @param tasks the set of relevant tasks.
+     */
+    private static void extractRelevantTasks(final IntExp exp, final Set<IntExp> tasks) {
+        switch (exp.getConnective()) {
+            case TASK:
+                    tasks.add(exp);
+                break;
+            case AND:
+            case OR:
+                for (IntExp e : exp.getChildren()) {
+                    PostInstantiation.extractRelevantTasks(e, tasks);
+                }
+                break;
+            default:
+                // do nothing
+        }
     }
 
     /**

@@ -27,12 +27,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public final class Constants implements Serializable {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
+public interface Constants {
 
     /**
      * The default logging level.
@@ -60,10 +55,9 @@ public final class Constants implements Serializable {
     static final int DEFAULT_ACTION_TABLE_SIZE = 1000;
 
     /**
-     * default private constructor to prevent form class instantiation.
+     * The default size of the method table.
      */
-    private Constants() {
-    }
+    public static final int DEFAULT_METHOD_TABLE_SIZE = 1000;
 
 
 }

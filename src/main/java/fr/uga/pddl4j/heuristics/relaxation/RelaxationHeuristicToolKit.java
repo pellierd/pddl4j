@@ -28,9 +28,9 @@ import java.io.Serializable;
  *
  * @author D. Pellier
  * @version 1.0 - 09.02.2011
- * @see Heuristic
+ * @see RelaxationHeuristic
  */
-public final class HeuristicToolKit implements Serializable {
+public final class RelaxationHeuristicToolKit implements Serializable {
 
     /**
      * The serial version id of the class.
@@ -40,7 +40,7 @@ public final class HeuristicToolKit implements Serializable {
     /**
      * Private constructor just for prevent user to instantiate this class.
      */
-    private HeuristicToolKit() {
+    private RelaxationHeuristicToolKit() {
     }
 
     /**
@@ -51,27 +51,27 @@ public final class HeuristicToolKit implements Serializable {
      * @return the heuristic created.
      * @throws NullPointerException if <code>type == null || problem == null</code>.
      */
-    public static Heuristic createHeuristic(final Heuristic.Type type, final CodedProblem problem) {
-        Heuristic heuristic = null;
-        if (type.equals(Heuristic.Type.FAST_FORWARD)) {
+    public static RelaxationHeuristic createHeuristic(final RelaxationHeuristic.Type type, final CodedProblem problem) {
+        RelaxationHeuristic heuristic = null;
+        if (type.equals(RelaxationHeuristic.Type.FAST_FORWARD)) {
             heuristic = new FastForward(problem);
-        } else if (type.equals(Heuristic.Type.SUM)) {
+        } else if (type.equals(RelaxationHeuristic.Type.SUM)) {
             heuristic = new Sum(problem);
-        } else if (type.equals(Heuristic.Type.SUM_MUTEX)) {
+        } else if (type.equals(RelaxationHeuristic.Type.SUM_MUTEX)) {
             heuristic = new SumMutex(problem);
-        } else if (type.equals(Heuristic.Type.AJUSTED_SUM)) {
+        } else if (type.equals(RelaxationHeuristic.Type.AJUSTED_SUM)) {
             heuristic = new AdjustedSum(problem);
-        } else if (type.equals(Heuristic.Type.AJUSTED_SUM2)) {
+        } else if (type.equals(RelaxationHeuristic.Type.AJUSTED_SUM2)) {
             heuristic = new AdjustedSum2(problem);
-        } else if (type.equals(Heuristic.Type.AJUSTED_SUM2M)) {
+        } else if (type.equals(RelaxationHeuristic.Type.AJUSTED_SUM2M)) {
             heuristic = new AjustedSum2M(problem);
-        } else if (type.equals(Heuristic.Type.COMBO)) {
+        } else if (type.equals(RelaxationHeuristic.Type.COMBO)) {
             heuristic = new Combo(problem);
-        } else if (type.equals(Heuristic.Type.MAX)) {
+        } else if (type.equals(RelaxationHeuristic.Type.MAX)) {
             heuristic = new Max(problem);
-        } else if (type.equals(Heuristic.Type.MIN_COST)) {
+        } else if (type.equals(RelaxationHeuristic.Type.MIN_COST)) {
             heuristic = new MinCost(problem);
-        } else if (type.equals(Heuristic.Type.SET_LEVEL)) {
+        } else if (type.equals(RelaxationHeuristic.Type.SET_LEVEL)) {
             heuristic = new SetLevel(problem);
         }
         return heuristic;

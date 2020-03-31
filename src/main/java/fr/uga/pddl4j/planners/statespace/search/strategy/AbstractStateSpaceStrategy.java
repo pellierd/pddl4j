@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
@@ -43,7 +43,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
     /**
      * The heuristic of the planner.
      */
-    private Heuristic.Type heuristic;
+    private RelaxationHeuristic.Type heuristic;
 
     /**
      * The heuristic weight.
@@ -86,7 +86,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @return the heuristicType to use to solve the planning problem.
      */
     @Override
-    public final Heuristic.Type getHeuristicType() {
+    public final RelaxationHeuristic.Type getHeuristicType() {
         return this.heuristic;
     }
 
@@ -96,7 +96,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
      */
     @Override
-    public final void setHeuristicType(final Heuristic.Type heuristicType) {
+    public final void setHeuristicType(final RelaxationHeuristic.Type heuristicType) {
         Objects.requireNonNull(heuristicType);
         this.heuristic = heuristicType;
     }
@@ -276,7 +276,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param timeout   the time out of the planner.
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceStrategy(int timeout, Heuristic.Type heuristic, double weight) {
+    public AbstractStateSpaceStrategy(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super();
         this.timeout = timeout;
         this.heuristic = heuristic;
@@ -328,7 +328,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
             Node n = node;
             final SequentialPlan plan = new SequentialPlan();
             while (n.getParent() != null) {
-                final Action op = problem.getOperators().get(n.getOperator());
+                final Action op = problem.getActions().get(n.getOperator());
                 plan.add(0, op);
                 n = n.getParent();
             }

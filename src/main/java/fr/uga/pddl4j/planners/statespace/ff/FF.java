@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.planners.statespace.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
@@ -94,7 +94,7 @@ public final class FF extends AbstractStateSpacePlanner {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      */
-    public FF(final int timeout, final Heuristic.Type heuristicType, final double weight,
+    public FF(final int timeout, final RelaxationHeuristic.Type heuristicType, final double weight,
               final boolean statisticState, final int traceLevel) {
         super();
         this.setSaveState(statisticState);

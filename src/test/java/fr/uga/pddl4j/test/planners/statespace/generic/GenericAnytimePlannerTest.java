@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.test.planners.statespace.generic;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.generic.GenericAnytimePlanner;
@@ -25,7 +25,7 @@ import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrat
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbingAnytime;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.plan.Plan;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,7 +58,7 @@ public class GenericAnytimePlannerTest {
     /**
      * Default Heuristic Type.
      */
-    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+    private static final RelaxationHeuristic.Type HEURISTIC_TYPE = RelaxationHeuristic.Type.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.

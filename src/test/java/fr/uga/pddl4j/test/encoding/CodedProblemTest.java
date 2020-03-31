@@ -18,7 +18,7 @@ package fr.uga.pddl4j.test.encoding;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.IntExp;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.operators.Action;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -80,7 +80,7 @@ public class CodedProblemTest {
         System.out.println("CodedProblem: Test the size of the operator list from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            Assert.assertTrue(codedProblem.getOperators().size() == opList.size());
+            Assert.assertTrue(codedProblem.getActions().size() == opList.size());
         }
     }
 
@@ -92,7 +92,7 @@ public class CodedProblemTest {
         System.out.println("CodedProblem: Test each operator from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            final List<Action> opListCodedProblem = codedProblem.getOperators();
+            final List<Action> opListCodedProblem = codedProblem.getActions();
             for (int i = 0; i < opList.size(); i++) {
                 Assert.assertTrue(codedProblem.toShortString(opListCodedProblem.get(i)).equals(opList.get(i)));
             }

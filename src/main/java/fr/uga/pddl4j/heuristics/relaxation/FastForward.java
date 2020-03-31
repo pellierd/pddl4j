@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
 
 /**
  * This class implements the heuristics of the fast forward planner. For more about this
@@ -82,7 +82,7 @@ public final class FastForward extends RelaxedGraphHeuristic {
      * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal) {
+    public int estimate(final State state, final BitExp goal) {
         super.setGoal(goal);
         super.expandRelaxedPlanningGraph(state);
         return super.isGoalReachable() ? super.getRelaxedPlanValue() : Integer.MAX_VALUE;
@@ -99,7 +99,7 @@ public final class FastForward extends RelaxedGraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final BitExp goal) {
-        return estimate((BitState) node, goal);
+        return estimate((State) node, goal);
     }
 
 }

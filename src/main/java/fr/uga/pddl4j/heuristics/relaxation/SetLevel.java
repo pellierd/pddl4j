@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
 
 /**
  * This heuristic returns the level of the planning graph where all the propositions of the goal are
@@ -67,7 +67,7 @@ public final class SetLevel extends GraphHeuristic {
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal) {
+    public int estimate(final State state, final BitExp goal) {
         super.setGoal(goal);
         return this.expandPlanningGraph(state);
     }
@@ -83,7 +83,7 @@ public final class SetLevel extends GraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final BitExp goal) {
-        return estimate((BitState) node, goal);
+        return estimate((State) node, goal);
     }
 
 }

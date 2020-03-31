@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
 
 /**
  * This class implements the SUM_ID mutex heuristic is an adaptation of the sum heuristic where mutual
@@ -66,7 +66,7 @@ public final class SumMutex extends GraphHeuristic {
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal) {
+    public int estimate(final State state, final BitExp goal) {
         super.setGoal(goal);
         super.expandPlanningGraph(state);
         return super.isGoalReachable() ? this.getSumValue() : Integer.MAX_VALUE;
@@ -83,6 +83,6 @@ public final class SumMutex extends GraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final BitExp goal) {
-        return estimate((BitState) node, goal);
+        return estimate((State) node, goal);
     }
 }

@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -57,7 +57,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public GreedyBestFirstSearch(int timeout, Heuristic.Type heuristic, double weight) {
+    public GreedyBestFirstSearch(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -72,12 +72,12 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();
 
-        BitState init = new BitState(codedProblem.getInit());
+        State init = new State(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         root.setDepth(0);
         openSet.add(root);
@@ -95,11 +95,11 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
             } else {
                 closeSet.add(current);
                 int index = 0;
-                for (Action op : codedProblem.getOperators()) {
+                for (Action op : codedProblem.getActions()) {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        final BitState nextState = new BitState(current);
+                        final State nextState = new State(current);
                         nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

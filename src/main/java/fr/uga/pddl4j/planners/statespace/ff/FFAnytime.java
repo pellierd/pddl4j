@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.planners.statespace.ff;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
@@ -116,7 +116,7 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      */
-    public FFAnytime(final int timeout, final Heuristic.Type heuristicType, final double weight,
+    public FFAnytime(final int timeout, final RelaxationHeuristic.Type heuristicType, final double weight,
                      final boolean statisticState, final int traceLevel) {
         super(statisticState, traceLevel);
 

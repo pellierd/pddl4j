@@ -20,7 +20,12 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.TaskNetwork;
 import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.util.BitMatrix;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,11 +60,6 @@ import java.util.Set;
  * @version 1.0 - 10.06.2010
  */
 final class BitEncoding implements Serializable {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The logger of the class.
@@ -192,6 +192,55 @@ final class BitEncoding implements Serializable {
             newGoal = Encoder.codedGoal.get(0);
         }
         return newGoal;
+    }
+
+    /**
+     * Encode a specified task network.
+     * map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param taskNetwork the tasknetwork to encode.
+     * @param map  the map that associates to a specified expression its index.
+     * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
+     * <code>BitExp</code>.
+     */
+    static TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork, final Map<IntExp, Integer> map) {
+        // We encode first the tasks
+        List<Integer> encodedTasks = new ArrayList<Integer>();
+        BitEncoding.encodeTasks(taskNetwork.getTasks(), map, encodedTasks);
+        int[] tasks = new int[encodedTasks.size()];
+        for (int i = 0 ; i < encodedTasks.size(); i++) {
+            tasks[i] = encodedTasks.get(i);
+        }
+        // We encode then the ordering constraints
+        BitMatrix constraints = new BitMatrix(tasks.length, tasks.length);
+        for (IntExp c : taskNetwork.getOrderingConstraints().getChildren()) {
+            constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
+            //constraints.set(c.getChildren().get(1).getTaskID(), c.getChildren().get(0).getTaskID());
+        }
+        return new TaskNetwork(tasks, constraints, taskNetwork.isTotallyOrdered());
+    }
+
+    /**
+     * Encode the list of tasks expressed as an IntExp into a list of integer.
+     *
+     * @param exp the list of tasks expressed as an IntExp.
+     * @param map the map containing the index associated to the tasks.
+     * @param tasks the list of task encoded as integer.
+     */
+    static void encodeTasks(IntExp exp, final Map<IntExp, Integer> map, List<Integer> tasks) {
+        switch (exp.getConnective()) {
+            case TASK:
+                tasks.add(map.get(exp));
+                break;
+            case AND:
+            case OR:
+                for (IntExp e : exp.getChildren()) {
+                    encodeTasks(e, map, tasks);
+                }
+                break;
+            default:
+                // Do nothing
+        }
     }
 
     /**

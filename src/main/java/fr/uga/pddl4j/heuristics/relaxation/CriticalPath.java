@@ -19,12 +19,12 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
-import fr.uga.pddl4j.encoding.BitVector;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     }
 
     @Override
-    public int estimate(BitState state, BitExp goal) {
+    public int estimate(State state, BitExp goal) {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
@@ -167,6 +167,6 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final BitExp goal) {
-        return estimate((BitState) node, goal);
+        return estimate((State) node, goal);
     }
 }

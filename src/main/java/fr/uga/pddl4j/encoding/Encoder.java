@@ -21,6 +21,11 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.Method;
+import fr.uga.pddl4j.operators.TaskNetwork;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
@@ -204,14 +209,29 @@ public final class Encoder implements Serializable {
     static List<IntExp> tableOfRelevantFacts;
 
     /**
+     * The table of the relevant task.
+     */
+    static List<IntExp> tableOfRelevantTasks;
+
+    /**
      * The list of instantiated actions encoded into bit sets.
      */
     static List<Action> actions;
 
     /**
+     * The list of instantiated methods encoded into bit sets.
+     */
+    static List<Method> methods;
+
+    /**
      * The goal.
      */
     static BitExp goal;
+
+    /**
+     * The initial task network..
+     */
+    static TaskNetwork initialTaskNetwork;
 
     /**
      * The encoded goal.
@@ -519,8 +539,11 @@ public final class Encoder implements Serializable {
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
         // Simplify the methods with the ground inertia information previously extracted
         PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
-        // Extract the relevant facts from the simplified and instantiated actions
+        // Extract the relevant facts from the simplified and instantiated actions and methods
         PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
+        // Extract the relevant task for the simplified instantiated methods
+        PostInstantiation.extractRelevantTasks(intMethods);
+
         // Simplify the goal with ground inertia information
         if (intGoal != null) {
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
@@ -534,6 +557,10 @@ public final class Encoder implements Serializable {
         // Just for logging
         if (Encoder.logLevel == 6) {
             Encoder.printRelevantFactsTable(stringBuilder);
+            if (!Encoder.tableOfRelevantTasks.isEmpty()) {
+                stringBuilder.append("\n");
+                Encoder.printRelevantTasksTable(stringBuilder);
+            }
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
         }
@@ -542,22 +569,30 @@ public final class Encoder implements Serializable {
         // Step 6: Finalization and bit set encoding of the problem
         // *****************************************************************************************
 
-
-        // Create a map of the relevant facts with their index to speedup the bit set encoding of
-        // the actions
-        final Map<IntExp, Integer> map = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
+        // Create a map of the relevant facts with their index to speedup the bit set encoding of the actions
+        final Map<IntExp, Integer> factIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
         int index = 0;
         for (IntExp fact : Encoder.tableOfRelevantFacts) {
-            map.put(fact, index);
+            factIndexMap.put(fact, index);
             index++;
         }
 
-        // Creates the list of bit actions
+        // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
+        final Map<IntExp, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
+        index = 0;
+        for (IntExp task : Encoder.tableOfRelevantTasks) {
+            taskIndexMap.put(task, index);
+            index++;
+        }
+
+        // Creates the list of actions and methods
         Encoder.actions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);
+        Encoder.methods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
+
         // Encode the goal in bit set representation
         if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM))) {
             try {
-                Encoder.goal = BitEncoding.encodeGoal(intGoal, map);
+                Encoder.goal = BitEncoding.encodeGoal(intGoal, factIndexMap);
             } catch (UnexpectedExpressionException uee) {
                 LOGGER.error("Error with unexpected expression", uee);
                 return null;
@@ -566,11 +601,17 @@ public final class Encoder implements Serializable {
             Encoder.goal = new BitExp();
         }
 
+        if (intTaskNetwork != null) {
+            Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(intTaskNetwork, taskIndexMap);
+            System.out.println(Encoder.toString(Encoder.initialTaskNetwork));
+            System.exit(0);
+        }
+
         // Encode the initial state in bit set representation
-        Encoder.init = BitEncoding.encodeInit(intInitPredicates, map);
+        Encoder.init = BitEncoding.encodeInit(intInitPredicates, factIndexMap);
         // Encode the actions in bit set representation
         try {
-            Encoder.actions.addAll(0, BitEncoding.encodeOperators(intActions, map));
+            Encoder.actions.addAll(0, BitEncoding.encodeOperators(intActions, factIndexMap));
         } catch (UnexpectedExpressionException uee) {
             LOGGER.error("Error with unexpected expression", uee);
             return null;
@@ -599,7 +640,8 @@ public final class Encoder implements Serializable {
         final CodedProblem codedProblem = new CodedProblem();
         codedProblem.setGoal(Encoder.goal);
         codedProblem.setInit(Encoder.init);
-        codedProblem.setOperators(Encoder.actions);
+        codedProblem.setActions(Encoder.actions);
+        codedProblem.setMethods(Encoder.methods);
         codedProblem.setConstants(Encoder.tableOfConstants);
         codedProblem.setDomains(Encoder.tableOfDomains);
         codedProblem.setFunctions(Encoder.tableOfFunctions);
@@ -607,6 +649,7 @@ public final class Encoder implements Serializable {
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicates(Encoder.tableOfPredicates);
         codedProblem.setRelevantFacts(Encoder.tableOfRelevantFacts);
+        codedProblem.setRelevantTasks(Encoder.tableOfRelevantTasks);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
         codedProblem.setTypes(Encoder.tableOfTypes);
@@ -620,6 +663,8 @@ public final class Encoder implements Serializable {
 
     /**
      * Print the table of types.
+     *
+     * @param stringBuilder the string builder used to print.
      */
     static void printTableOfTypes(StringBuilder stringBuilder) {
         stringBuilder.append("Types table:\n");
@@ -635,6 +680,8 @@ public final class Encoder implements Serializable {
 
     /**
      * Print the table of constants.
+     *
+     * @param stringBuilder the string builder used to print.
      */
     static void printTableOfConstants(StringBuilder stringBuilder) {
         stringBuilder.append("Constants table:\n");
@@ -645,6 +692,8 @@ public final class Encoder implements Serializable {
 
     /**
      * Print the table of predicates.
+     *
+     * @param stringBuilder the string builder used to print.
      */
     static void printTableOfPredicates(StringBuilder stringBuilder) {
         stringBuilder.append("Predicates table:\n");
@@ -661,6 +710,7 @@ public final class Encoder implements Serializable {
 
     /**
      * Print the table of functions.
+     * @param stringBuilder the string builder used to print.
      */
     static void printTableOfFunctions(StringBuilder stringBuilder) {
         stringBuilder.append("Functions table:\n");
@@ -675,8 +725,10 @@ public final class Encoder implements Serializable {
     }
 
     /**
-    * Print the table of tasks.
-    */
+     * Print the table of tasks.
+     *
+     * @param stringBuilder the string builder used to print.
+     */
     static void printTableOfTasks(StringBuilder stringBuilder) {
         stringBuilder.append("Tasks table:\n");
         for (int i = 0; i < Encoder.tableOfTasks.size(); i++) {
@@ -692,6 +744,8 @@ public final class Encoder implements Serializable {
 
     /**
      * Print the table of inertia.
+     *
+     * @param stringBuilder the string builder used to print.
      */
     static void printTableOfInertia(StringBuilder stringBuilder) {
         stringBuilder.append("Inertias table:\n");
@@ -704,9 +758,11 @@ public final class Encoder implements Serializable {
 
     /**
      * Print the relevant facts table.
+     *
+     * @param stringBuilder the string builder used to print.
      */
     static void printRelevantFactsTable(StringBuilder stringBuilder) {
-        stringBuilder.append("selected the following facts as relevant:\n");
+        stringBuilder.append("Relevant facts:\n");
         for (int i = 0; i < Encoder.tableOfRelevantFacts.size(); i++) {
             stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFacts.get(i)));
             stringBuilder.append("\n");
@@ -714,7 +770,22 @@ public final class Encoder implements Serializable {
     }
 
     /**
+     * Print the relevant facts table.
+     *
+     * @param stringBuilder the string builder used to print.
+     */
+    static void printRelevantTasksTable(StringBuilder stringBuilder) {
+        stringBuilder.append("Relevant tasks:\n");
+        for (int i = 0; i < Encoder.tableOfRelevantTasks.size(); i++) {
+            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantTasks.get(i)));
+            stringBuilder.append("\n");
+        }
+    }
+
+    /**
      * Print the goal.
+     *
+     * @param stringBuilder the string builder used to print.
      */
     static void printGoal(StringBuilder stringBuilder) {
         stringBuilder.append("Goal state is:\n");
@@ -772,15 +843,28 @@ public final class Encoder implements Serializable {
     }
 
     /**
-     * Returns a string representation of the specified operator.
+     * Returns a string representation of the specified action.
      *
-     * @param op the operator to print.
-     * @return a string representation of the specified operator.
+     * @param a the action to print.
+     * @return a string representation of the specified action.
      */
-    static String toString(final Action op) {
-        return StringEncoder.toString(op, Encoder.tableOfConstants,
+    static String toString(final Action a) {
+        return StringEncoder.toString(a, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param taskNetwork the task network to print.
+     * @return a string representation of the specified task network.
+     */
+    static String toString(final TaskNetwork taskNetwork) {
+        return StringEncoder.toString(taskNetwork, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfTasks,
+            Encoder.tableOfRelevantTasks);
     }
 
     /**

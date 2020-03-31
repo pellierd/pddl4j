@@ -17,30 +17,31 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.operators;
 
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
- * during the instantiation process.
+ * in a planning problem.
  *
  * @author D. Pellier
- * @version 1.0 - 25.03.2020
+ * @version 1.0 - 01.03.2020
  */
-public final class IntTaskNetwork implements Serializable {
+public final class TaskNetwork implements Serializable {
 
     /**
-     * The expression that represents the list of tasks of the task network.
+     * The array that defined the list of task of task network. Each task is defined as an integer. The integer
+     * indicates the index of the task in the task table of the planning problem.
      */
-    private IntExp tasks;
+    private int[] tasks;
 
     /**
-     * The expression that represents the ordering constraints of the task network.
+     * The represents the ordering constraints of the task network.
      */
-    private IntExp orderingConstraints;
+    private BitMatrix orderingConstraints;
 
     /**
      * A boolean flag to indicate if the task network is totally ordered or not.
@@ -48,48 +49,59 @@ public final class IntTaskNetwork implements Serializable {
     private boolean isTotallyOrdered;
 
     /**
-     * Create a new task network. The tasks and the ordering constraints are empty and expression.
+     * Create a new task network. The list of task is set to an empty set with no ordering constraints and not totally
+     * ordered.
      */
-    public IntTaskNetwork() {
-        this.tasks = new IntExp(Connective.AND);
-        this.orderingConstraints = new IntExp(Connective.AND);
+    public TaskNetwork() {
+        super();
+        this.tasks = new int[0];
+        this.orderingConstraints = new BitMatrix(0, 0);
+        this.isTotallyOrdered = false;
     }
 
     /**
      * Create a new method from a specified task network. This constructor create a deep copy of the
      * specified task network.
      *
-     * @param other the other tasknetwork.
+     * @param other the other task network.
      */
-    public IntTaskNetwork(final IntTaskNetwork other) {
+    public TaskNetwork(final TaskNetwork other) {
         super();
-        this.tasks = new IntExp(other.getTasks());
-        this.orderingConstraints = new IntExp(other.getOrderingConstraints());
+        this.tasks = new int[other.size()];
+        this.orderingConstraints = new BitMatrix(other.getOrderingConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered;
     }
 
     /**
      * Create a new task network with a set of tasks and orderings constraints. Warning the method does not check if
      * the ordering constraints given in parameter are consistent with boolean flag that indicates that the task network
-     * is totally ordered.
+     * is totally ordered or if the constraints are not cyclic.
      *
-     * @param tasks  the tasks of the task network.
-     * @param orderingConstraints the orderings constraints of the task network.
+     * @param tasks          the tasks of the task network.
+     * @param constraints    the orderings constraints of the task network.
      * @param totallyOrdered the boolean flag to indicate if the task network is totally ordered or not.
      */
-    public IntTaskNetwork(final IntExp tasks, final IntExp orderingConstraints, final boolean totallyOrdered) {
+    public TaskNetwork(final int[] tasks, final BitMatrix constraints, final boolean totallyOrdered) {
         super();
         this.tasks = tasks;
-        this.orderingConstraints = orderingConstraints;
+        this.orderingConstraints = constraints;
         this.isTotallyOrdered = totallyOrdered;
     }
 
     /**
-     * Return the tasks of the method.
+     * Returns the size of the task network, i.e., its number of tasks.
+     *
+     * @return the size of the task network.
+     */
+    public final int size() {
+        return this.tasks.length;
+    }
+    /**
+     * Returns the tasks of the method.
      *
      * @return the tasks of the method.
      */
-    public final IntExp getTasks() {
+    public final int[] getTasks() {
         return this.tasks;
     }
 
@@ -98,44 +110,26 @@ public final class IntTaskNetwork implements Serializable {
      *
      * @param tasks the tasks to set.
      */
-    public final void setTasks(final IntExp tasks) {
-
+    public final void setTasks(final int[] tasks) {
         this.tasks = tasks;
     }
+
     /**
-     * Return the ordering constraints of the method.
+     * Returns the ordering constraints of the method.
      *
      * @return the ordering constraints of the method.
      */
-    public final IntExp getOrderingConstraints() {
+    public final BitMatrix getOrderingConstraints() {
         return this.orderingConstraints;
     }
 
     /**
      * Set the new ordering constraints of the method.
      *
-     * @param ordering the orderings constraints to set
+     * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final IntExp ordering) {
-        this.orderingConstraints = ordering;
-    }
-
-    /**
-     * Returns <code>true</code> if the task network is totally ordered.
-     *
-     * @return <code>true</code> if the task network is totally ordered, <code>false</code> otherwise.
-     */
-    public final boolean isTotallyOrdered() {
-        return this.isTotallyOrdered;
-    }
-
-    /**
-     * Set this task network totally ordered.
-     *
-     * @param flag the flag used to indicated that this task network is totally ordered.
-     */
-    public final void setTotallyOrdered(final boolean flag) {
-        this.isTotallyOrdered = flag;
+    public final void setOrderingConstraints(final BitMatrix constraints) {
+        this.orderingConstraints = constraints;
     }
 
     /**
@@ -150,8 +144,8 @@ public final class IntTaskNetwork implements Serializable {
      */
     @Override
     public final boolean equals(final Object obj) {
-        if (obj != null && obj instanceof IntTaskNetwork) {
-            final IntTaskNetwork other = (IntTaskNetwork) obj;
+        if (obj != null && obj instanceof TaskNetwork) {
+            final TaskNetwork other = (TaskNetwork) obj;
             return this.getTasks().equals(other.getTasks())
                 && this.getOrderingConstraints().equals(other.getOrderingConstraints());
         }

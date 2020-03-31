@@ -19,23 +19,21 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.util.BitVector;
+
 /**
  * This class implements a logical state.
  *
  * @author D. Pellier
  * @version 1.1 - 13.04.2010
  */
-public class BitState extends BitVector {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
+public class State extends BitVector {
 
     /**
      * Creates a new state.
      */
-    public BitState() {
+    public State() {
         super();
     }
 
@@ -44,7 +42,7 @@ public class BitState extends BitVector {
      *
      * @param exp the <code>BitExp</code> that represents the logical state.
      */
-    public BitState(final BitExp exp) {
+    public State(final BitExp exp) {
         this();
         if (exp == null) {
             throw new NullPointerException("exp == null");
@@ -58,7 +56,7 @@ public class BitState extends BitVector {
      *
      * @param state the other state to copy.
      */
-    public BitState(final BitState state) {
+    public State(final State state) {
         this();
         if (state == null) {
             throw new NullPointerException("state == null");

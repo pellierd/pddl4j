@@ -19,7 +19,13 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.TaskNetwork;
+import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -138,6 +144,44 @@ final class StringEncoder implements Serializable {
         str.append("ordering:\n")
             .append(toString(tn.getOrderingConstraints(), constants, types, predicates, functions, tasks))
             .append("\n");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param tn            the task network to print.
+     * @param constants     the table of constants.
+     * @param types         the table of types.
+     * @param predicates    the table of predicates.
+     * @param functions     the table of functions.
+     * @param tasks         the table of tasks.
+     * @param relevantTasks the table of relevant tasks.
+     * @return a string representation of the specified method.
+     */
+    static String toString(final TaskNetwork tn, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions, final List<String> tasks,
+                           final List<IntExp> relevantTasks) {
+        final StringBuilder str = new StringBuilder();
+        str.append("tasks:\n");
+        for (int i = 0; i < tn.getTasks().length; i++) {
+            str.append(" " + Symbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
+            str.append(StringEncoder.toString(relevantTasks.get(tn.getTasks()[i]), constants, types, predicates,
+                functions, tasks)).append("\n");
+        }
+        str.append("ordering:\n");
+        BitMatrix constraints = tn.getOrderingConstraints();
+        int index = 0;
+        for (int r = 0 ; r < constraints.rows(); r ++) {
+            BitSet row = constraints.getRow(r);
+            for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
+                str.append(" C").append(index).append(": ").append(Symbol.DEFAULT_TASK_ID_SYMBOL + r).append(" ");
+                str.append(Connective.LESS_ORDERING_CONSTRAINT.getImage()).append(" ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c).append("\n");
+                index++;
+            }
+
+        }
         return str.toString();
     }
 
@@ -439,7 +483,7 @@ final class StringEncoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(BitState bitState, final List<String> constants, final List<String> types,
+    static String toString(State bitState, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         final StringBuilder str = new StringBuilder("(and");

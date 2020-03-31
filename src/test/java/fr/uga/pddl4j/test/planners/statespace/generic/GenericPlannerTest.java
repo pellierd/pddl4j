@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.test.planners.statespace.generic;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.generic.GenericPlanner;
@@ -28,7 +28,7 @@ import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.plan.Plan;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,7 +61,7 @@ public class GenericPlannerTest {
     /**
      * Default Heuristic Type.
      */
-    private static final Heuristic.Type HEURISTIC_TYPE = Heuristic.Type.FAST_FORWARD;
+    private static final RelaxationHeuristic.Type HEURISTIC_TYPE = RelaxationHeuristic.Type.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.

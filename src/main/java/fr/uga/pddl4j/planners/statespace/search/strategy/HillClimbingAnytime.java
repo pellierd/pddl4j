@@ -16,11 +16,11 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.encoding.Action;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 import org.apache.logging.log4j.Logger;
@@ -69,7 +69,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public HillClimbingAnytime(int timeout, Heuristic.Type heuristic, double weight) {
+    public HillClimbingAnytime(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
         restartList = new LinkedList<>();
         openList = new LinkedList<>();
@@ -85,9 +85,9 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
         final Logger logger = Planner.getLogger();
         Objects.requireNonNull(problem);
 
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
 
-        BitState init = new BitState(problem.getInit());
+        State init = new State(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         root.setHeuristic(heuristic.estimate(root, problem.getGoal()));
         restartList.add(root);
@@ -132,12 +132,12 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param heuristic the heuristic used in hill climbing.
      * @return the solution node or null.
      */
-    private Node hillClimbingAnytime(CodedProblem problem, Node node, Heuristic heuristic, long searchingTime) {
+    private Node hillClimbingAnytime(CodedProblem problem, Node node, RelaxationHeuristic heuristic, long searchingTime) {
         openList.clear();
 
         Node root = node;
         if (node == null) {
-            BitState init = new BitState(problem.getInit());
+            State init = new State(problem.getInit());
             root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
             root.setHeuristic(heuristic.estimate(root, problem.getGoal()));
             openList.add(root);
@@ -185,13 +185,13 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, Heuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, RelaxationHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
-        for (Action op : problem.getOperators()) {
+        for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
-                final BitState nextState = new BitState(parent);
+                final State nextState = new State(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                 nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

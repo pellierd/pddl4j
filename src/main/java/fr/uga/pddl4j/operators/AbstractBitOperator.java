@@ -17,7 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.operators;
+
+import fr.uga.pddl4j.encoding.AbstractGroundOperator;
 
 /**
  * This abstract class implements the common part of an operator (action of method) with bitset representation.

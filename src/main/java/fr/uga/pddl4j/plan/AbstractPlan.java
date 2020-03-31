@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.operators.Action;
 
 /**
  * This abstract class implements the main methods of a search.

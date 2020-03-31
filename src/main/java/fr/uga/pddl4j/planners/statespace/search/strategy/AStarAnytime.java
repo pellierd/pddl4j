@@ -15,12 +15,12 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.encoding.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -88,7 +88,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public AStarAnytime(int timeout, Heuristic.Type heuristic, double weight) {
+    public AStarAnytime(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
         this.boundCost = Double.MAX_VALUE;
         this.boundDepth = Double.MAX_VALUE;
@@ -103,7 +103,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
      * @param boundCost  the cost bound for the search.
      * @param boundDepth the depth bound for the search.
      */
-    public AStarAnytime(int timeout, Heuristic.Type heuristic, double weight,
+    public AStarAnytime(int timeout, RelaxationHeuristic.Type heuristic, double weight,
                         double boundCost, double boundDepth) {
         super(timeout, heuristic, weight);
         this.boundCost = boundCost;
@@ -122,13 +122,13 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
         Objects.requireNonNull(problem);
 
         final long begin = System.currentTimeMillis();
-        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         // Get the initial state from the planning problem
-        final BitState init = new BitState(problem.getInit());
+        final State init = new State(problem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
-        final Map<BitState, Node> closeSet = new HashMap<>();
+        final Map<State, Node> closeSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
-        final Map<BitState, Node> openSet = new HashMap<>();
+        final Map<State, Node> openSet = new HashMap<>();
         // Initialize the weight to use
         final double currWeight = this.getWeight();
         // Initialize the node comparator
@@ -170,7 +170,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
             } else {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
-                for (Action op : problem.getOperators()) {
+                for (Action op : problem.getActions()) {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         Node state = new Node(current);

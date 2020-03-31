@@ -20,11 +20,11 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.Action;
-import fr.uga.pddl4j.encoding.BitState;
-import fr.uga.pddl4j.encoding.BitVector;
-import fr.uga.pddl4j.encoding.CondBitExp;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.BitVector;
+import fr.uga.pddl4j.operators.CondBitExp;
 
 import java.util.Arrays;
 import java.util.List;
@@ -130,7 +130,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         final int nbOperators = super.getOperators().size();
         // Compute the number of unconditional operators
         int nbUncondOperators = 0;
-        final List<Action> operators = problem.getOperators();
+        final List<Action> operators = problem.getActions();
         for (Action op : operators) {
             nbUncondOperators += op.getCondEffects().size();
         }
@@ -261,7 +261,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
      * @param state the initial state of the relaxed planning graph.
      * @return the level of the graph built.
      */
-    protected final int expandRelaxedPlanningGraph(final BitState state) {
+    protected final int expandRelaxedPlanningGraph(final State state) {
 
         Arrays.fill(this.operatorsLevel, Integer.MAX_VALUE);
         // The array that contains the level of the positive proposition apparition

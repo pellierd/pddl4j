@@ -17,7 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.operators;
+
+import fr.uga.pddl4j.encoding.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +116,7 @@ public class Action extends AbstractBitOperator {
      * <code>false</code> otherwise.
      * @throws NullPointerException if <code>state == null</code>.
      */
-    public boolean isApplicable(final BitState state) {
+    public boolean isApplicable(final State state) {
         if (state == null) {
             throw new NullPointerException("state == null");
         }

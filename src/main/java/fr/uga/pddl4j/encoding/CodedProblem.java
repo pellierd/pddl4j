@@ -19,6 +19,10 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.Method;
 import fr.uga.pddl4j.plan.Plan;
 
 import java.io.Serializable;
@@ -99,9 +103,19 @@ public class CodedProblem implements Serializable {
     private List<IntExp> relevantFacts;
 
     /**
-     * The list of instantiated operator encoded into bit sets.
+     * The table of the relevant tasks.
      */
-    private List<Action> operators;
+    private List<IntExp> relevantTasks;
+
+    /**
+     * The list of instantiated actions encoded into bit sets.
+     */
+    private List<Action> actions;
+
+    /**
+     * The list of instantiated methods encoded into bit sets.
+     */
+    private List<Method> methods;
 
     /**
      * The goal.
@@ -160,8 +174,12 @@ public class CodedProblem implements Serializable {
         this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
         this.relevantFacts = new ArrayList<>();
         this.relevantFacts.addAll(other.relevantFacts.stream().map(IntExp::new).collect(Collectors.toList()));
-        this.operators = new ArrayList<>();
-        this.operators.addAll(other.operators.stream().map(Action::new).collect(Collectors.toList()));
+        this.relevantTasks = new ArrayList<>();
+        this.relevantTasks.addAll(other.relevantTasks.stream().map(IntExp::new).collect(Collectors.toList()));
+        this.actions = new ArrayList<>();
+        this.actions.addAll(other.actions.stream().map(Action::new).collect(Collectors.toList()));
+        this.methods = new ArrayList<>();
+        this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
         this.goal = new BitExp(other.goal);
         this.init = new BitExp(other.init);
     }
@@ -194,9 +212,9 @@ public class CodedProblem implements Serializable {
     }
 
     /**
-     * .
+     * Sets the inferred domain of the problem.
      *
-     * @param inferredDomains the inferredDomains to set
+     * @param inferredDomains the inferredDomains to set.
      */
     final void setInferredDomains(final List<Set<Integer>> inferredDomains) {
         this.inferredDomains = inferredDomains;
@@ -376,10 +394,28 @@ public class CodedProblem implements Serializable {
     /**
      * Sets the list of relevant facts used the problem.
      *
-     * @param relavants the list of relevant facts to set.
+     * @param facts the list of relevant facts to set.
      */
-    final void setRelevantFacts(final List<IntExp> relavants) {
-        this.relevantFacts = relavants;
+    final void setRelevantFacts(final List<IntExp> facts) {
+        this.relevantFacts = facts;
+    }
+
+    /**
+     * Returns the list of relevant tasks used the problem.
+     *
+     * @return the list of relevant tasks used the problem.
+     */
+    public final List<IntExp> getRelevantTasks() {
+        return this.relevantTasks;
+    }
+
+    /**
+     * Sets the list of relevant tasks used the problem.
+     *
+     * @param tasks the list of relevant tasks to set.
+     */
+    final void setRelevantTasks(final List<IntExp> tasks) {
+        this.relevantTasks = tasks;
     }
 
     /**
@@ -387,17 +423,35 @@ public class CodedProblem implements Serializable {
      *
      * @return the list of instantiated actions of the problem.
      */
-    public final List<Action> getOperators() {
-        return operators;
+    public final List<Action> getActions() {
+        return this.actions;
     }
 
     /**
      * Sets the list of instantiated actions of the problem.
      *
-     * @param operators the list of instantiated actions of the problem.
+     * @param actions the list of instantiated actions of the problem.
      */
-    final void setOperators(final List<Action> operators) {
-        this.operators = operators;
+    final void setActions(final List<Action> actions) {
+        this.actions = actions;
+    }
+
+    /**
+     * Returns the list of instantiated methods of the problem.
+     *
+     * @return the list of instantiated methods of the problem.
+     */
+    public final List<Method> getMethods() {
+        return this.methods;
+    }
+
+    /**
+     * Sets the list of instantiated methods of the problem.
+     *
+     * @param methods the list of instantiated methods of the problem.
+     */
+    final void setMethods(final List<Method> methods) {
+        this.methods = methods;
     }
 
     /**
@@ -508,7 +562,7 @@ public class CodedProblem implements Serializable {
      * @param bitState the state.
      * @return a string representation of the specified state.
      */
-    public final String toString(BitState bitState) {
+    public final String toString(State bitState) {
         return StringEncoder.toString(bitState, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }

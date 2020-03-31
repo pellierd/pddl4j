@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.encoding.BitExp;
-import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.encoding.State;
 
 /**
  * This class implements the SUM_ID heuristic. (for more details on this heuristic see Blai Bonet and
@@ -87,7 +87,7 @@ public final class Sum extends RelaxedGraphHeuristic {
      * @throws NullPointerException if <code>state == null</code>.
      */
     @Override
-    public int estimate(final BitState state, final BitExp goal) {
+    public int estimate(final State state, final BitExp goal) {
         super.setGoal(goal);
         this.expandRelaxedPlanningGraph(state);
         return super.isGoalReachable() ? super.getSumValue() : Integer.MAX_VALUE;
@@ -104,7 +104,7 @@ public final class Sum extends RelaxedGraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final BitExp goal) {
-        return estimate((BitState) node, goal);
+        return estimate((State) node, goal);
     }
 
 }
