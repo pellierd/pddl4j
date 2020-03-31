@@ -21,9 +21,6 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.CondBitExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -83,16 +80,16 @@ final class BitEncoding implements Serializable {
      * @param map       the map that associates to a specified expression its index.
      * @return the list of actions encoded into bit set.
      */
-    static List<BitOp> encodeOperators(final List<IntAction> operators, final Map<IntExp, Integer> map)
+    static List<Action> encodeOperators(final List<IntAction> operators, final Map<IntExp, Integer> map)
         throws UnexpectedExpressionException {
 
         // Normalize the actions
         BitEncoding.normalize(operators);
 
-        final List<BitOp> ops = new ArrayList<>(operators.size());
+        final List<Action> ops = new ArrayList<>(operators.size());
         for (IntAction op : operators) {
             final int arity = op.getArity();
-            final BitOp bOp = new BitOp(op.getName(), arity);
+            final Action bOp = new Action(op.getName(), arity);
             bOp.setCost(op.getCost());
 
             // Initialize the parameters of the operator
@@ -185,7 +182,7 @@ final class BitEncoding implements Serializable {
             final CondBitExp condEffect = new CondBitExp(newGoal);
             // for each disjunction create a dummy action
             for (BitExp dis : Encoder.codedGoal) {
-                final BitOp op = new BitOp(Constants.DUMMY_OPERATOR, 0);
+                final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
                 op.setDummy(true);
                 op.setPreconditions(dis);
                 op.getCondEffects().add(condEffect);

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 25.03.2020
  */
-public abstract class AbstractOperator implements Operator {
+public abstract class AbstractOperatorExp implements OperatorExp {
 
     /**
      * The name of the operator.
@@ -52,7 +52,7 @@ public abstract class AbstractOperator implements Operator {
      * Create a new operator from another.
      *
      */
-    private AbstractOperator() {
+    private AbstractOperatorExp() {
         super();
     }
 
@@ -61,7 +61,7 @@ public abstract class AbstractOperator implements Operator {
      *
      * @param other the other operator.
      */
-    protected AbstractOperator(final Operator other) {
+    protected AbstractOperatorExp(final OperatorExp other) {
         if (other == null) {
             throw new NullPointerException();
         }
@@ -78,7 +78,7 @@ public abstract class AbstractOperator implements Operator {
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
-    protected AbstractOperator(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions) {
+    protected AbstractOperatorExp(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions) {
         this.name = name;
         this.parameters = parameters;
         this.preconditions = preconditions;
@@ -234,8 +234,8 @@ public abstract class AbstractOperator implements Operator {
      */
     @Override
     public final boolean equals(final Object object) {
-        if (object != null && object instanceof AbstractOperator) {
-            final AbstractOperator other = (Action) object;
+        if (object != null && object instanceof AbstractOperatorExp) {
+            final AbstractOperatorExp other = (ActionExp) object;
             return this.name.equals(other.name);
         }
         return false;

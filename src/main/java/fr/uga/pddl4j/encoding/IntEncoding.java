@@ -21,10 +21,8 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.MalformedExpException;
 import fr.uga.pddl4j.parser.*;
-import fr.uga.pddl4j.parser.Action;
 
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,12 +69,12 @@ final class IntEncoding implements Serializable {
             IntEncoding.encodeTypes(domain.getConstraints());
         }
         // Collect the types from the derived predicates
-        for (DerivedPredicate axiom : domain.getDerivesPredicates()) {
+        for (DerivedPredicateExp axiom : domain.getDerivesPredicates()) {
             IntEncoding.encodeTypes(axiom.getHead().getArguments());
             IntEncoding.encodeTypes(axiom.getBody());
         }
         // Collect the type from the actions
-        for (Action op : domain.getActions()) {
+        for (ActionExp op : domain.getActions()) {
             IntEncoding.encodeTypes(op.getParameters());
             if (op.getDuration() != null) {
                 IntEncoding.encodeTypes(op.getDuration());
@@ -342,7 +340,7 @@ final class IntEncoding implements Serializable {
      * @param ops the list of actions to encode.
      * @return encoded the list of actions encoded.
      */
-    static List<IntAction> encodeActions(final List<Action> ops) {
+    static List<IntAction> encodeActions(final List<ActionExp> ops) {
         return ops.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
     }
 
@@ -352,7 +350,7 @@ final class IntEncoding implements Serializable {
      * @param meths the list of methods to encode.
      * @return encoded the list of methods encoded.
      */
-    static List<IntMethod> encodeMethods(final List<Method> meths) {
+    static List<IntMethod> encodeMethods(final List<MethodExp> meths) {
         return meths.stream().map(IntEncoding::encodeMethod).collect(Collectors.toList());
     }
 
@@ -434,7 +432,7 @@ final class IntEncoding implements Serializable {
      * @param action the operator to encode.
      * @return encoded operator.
      */
-    private static IntAction encodeAction(final Action action) {
+    private static IntAction encodeAction(final ActionExp action) {
         final IntAction intAction = new IntAction(action.getName().getImage(), action.getArity());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(action.getArity());
@@ -460,7 +458,7 @@ final class IntEncoding implements Serializable {
      * @param method the metho to encode.
      * @return encoded method.
      */
-    private static IntMethod encodeMethod(final Method method) {
+    private static IntMethod encodeMethod(final MethodExp method) {
         final IntMethod intMeth = new IntMethod(method.getName().getImage(), method.getArity());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(method.getArity());

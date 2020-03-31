@@ -19,7 +19,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.encoding.Action;
 import fr.uga.pddl4j.util.Plan;
 import org.junit.Assert;
 import org.junit.Before;
@@ -173,8 +173,8 @@ public class PlanTest {
             if (pb != null) {
                 final Plan plan = planner.search(pb);
                 int j = 0;
-                for (BitOp bitOp : plan.actions()) {
-                    Assert.assertTrue(pb.toShortString(bitOp).equals(plansOperators.get(i).get(j)));
+                for (Action a : plan.actions()) {
+                    Assert.assertTrue(pb.toShortString(a).equals(plansOperators.get(i).get(j)));
                     j++;
                 }
             }

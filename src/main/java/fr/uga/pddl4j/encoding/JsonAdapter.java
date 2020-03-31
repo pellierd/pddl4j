@@ -19,10 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.plan.Plan;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -105,7 +102,7 @@ public class JsonAdapter implements Serializable {
             JSONObject actionJson = new JSONObject();
 
             // Actions
-            for (BitOp action : plan.getActionSet(i)) {
+            for (Action action : plan.getActionSet(i)) {
 
                 List<String> parameters = new ArrayList<>();
                 // Parameters

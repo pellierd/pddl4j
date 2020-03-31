@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.encoding.BitExp;
+import fr.uga.pddl4j.encoding.BitState;
 
 /**
  * This class implements the MAX heuristic. (for more details on this heuristic see Blai Bonet and

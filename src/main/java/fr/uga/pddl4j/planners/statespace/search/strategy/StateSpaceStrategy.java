@@ -17,9 +17,9 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
-import fr.uga.pddl4j.util.Plan;
-import fr.uga.pddl4j.util.SolutionEvent;
-import fr.uga.pddl4j.util.SolutionListener;
+import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.SolutionEvent;
+import fr.uga.pddl4j.planners.SolutionListener;
 
 import java.io.Serializable;
 import javax.swing.event.EventListenerList;

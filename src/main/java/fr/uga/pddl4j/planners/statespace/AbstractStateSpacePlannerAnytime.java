@@ -22,7 +22,7 @@ package fr.uga.pddl4j.planners.statespace;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategyAnytime;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.plan.Plan;
 
 import java.util.Objects;
 import java.util.Vector;

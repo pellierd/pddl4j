@@ -30,7 +30,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class DerivedPredicate implements Serializable {
+public class DerivedPredicateExp implements Serializable {
 
     /**
      * The head of the derived predicate.
@@ -45,7 +45,7 @@ public class DerivedPredicate implements Serializable {
     /**
      * Creates a new derived predicate.
      */
-    private DerivedPredicate() {
+    private DerivedPredicateExp() {
         this.head = null;
         this.body = null;
     }
@@ -56,7 +56,7 @@ public class DerivedPredicate implements Serializable {
      * @param head the head of the derived predicate.
      * @param body the body of the derived predicate.
      */
-    public DerivedPredicate(final NamedTypedList head, final Exp body) {
+    public DerivedPredicateExp(final NamedTypedList head, final Exp body) {
         this();
         if (head == null || body == null) {
             throw new NullPointerException();
@@ -139,7 +139,7 @@ public class DerivedPredicate implements Serializable {
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass().equals(this.getClass())) {
-            final DerivedPredicate other = (DerivedPredicate) obj;
+            final DerivedPredicateExp other = (DerivedPredicateExp) obj;
             return ((this.head == null && other.head == null)
                 || this.head != null && this.head.equals(other.head))
                 && ((this.body == null && other.body == null)

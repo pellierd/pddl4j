@@ -13,7 +13,9 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.plan;
+
+import fr.uga.pddl4j.encoding.Action;
 
 import java.io.Serializable;
 import java.util.List;
@@ -62,7 +64,7 @@ public interface Plan extends Serializable {
      *
      * @return the ordered set of actions of the search.
      */
-    List<BitOp> actions();
+    List<Action> actions();
 
     /**
      * Returns the set of actions at a specified time specifier.
@@ -71,7 +73,7 @@ public interface Plan extends Serializable {
      * @return the set of actions at a specified time specifier or null if no actions are scheduled in the search at the
      *          the time specifier.
      */
-    Set<BitOp> getActionSet(final int time);
+    Set<Action> getActionSet(final int time);
 
     /**
      * Returns if the search is empty.
@@ -92,7 +94,7 @@ public interface Plan extends Serializable {
      * @param time   the time specifier of the action in the search.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */
-    boolean add(final int time, final BitOp action);
+    boolean add(final int time, final Action action);
 
     /**
      * Removes an action at a specified time specifier of the search.
@@ -101,7 +103,7 @@ public interface Plan extends Serializable {
      * @param time   the time specifier of the action in the search to remove.
      * @return <code>true</code> if the action was removed; <code>false</code> otherwise.
      */
-    boolean remove(final int time, final BitOp action);
+    boolean remove(final int time, final Action action);
 
     /**
      * Removes all the actions at a specified time specifier of the search.
@@ -119,7 +121,7 @@ public interface Plan extends Serializable {
      * @return <code>true</code> if the specified action is contained in the search at the specified time specifier;
      * <code>false</code> otherwise.
      */
-    boolean contains(final int time, final BitOp action);
+    boolean contains(final int time, final Action action);
 
 
 }

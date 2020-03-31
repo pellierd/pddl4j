@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.1 - 28.01.2010
  */
-public class Action extends AbstractOperator {
+public class ActionExp extends AbstractOperatorExp {
 
     /**
      * The goal description that represents the effects of the operator.
@@ -53,7 +52,7 @@ public class Action extends AbstractOperator {
      *
      * @param other the other operator.
      */
-    public Action(final Action other) {
+    public ActionExp(final ActionExp other) {
         super(other);
         this.effects = new Exp(other.getEffects());
         if (this.duration != null) {
@@ -69,7 +68,7 @@ public class Action extends AbstractOperator {
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
      */
-    public Action(final Symbol name, final List<TypedSymbol> parameters, final Exp preconds, final Exp effects) {
+    public ActionExp(final Symbol name, final List<TypedSymbol> parameters, final Exp preconds, final Exp effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -84,8 +83,8 @@ public class Action extends AbstractOperator {
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
-    public Action(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions, final Exp effects,
-                  final Exp duration) {
+    public ActionExp(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions, final Exp effects,
+                     final Exp duration) {
         super(name, parameters, preconditions);
         this.effects = effects;
         this.duration = duration;

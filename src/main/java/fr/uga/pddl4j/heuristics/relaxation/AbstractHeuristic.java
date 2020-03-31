@@ -19,9 +19,9 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
+import fr.uga.pddl4j.encoding.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.encoding.BitExp;
 import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public abstract class AbstractHeuristic implements Heuristic {
     /**
      * The lists of operators of the relaxed problem.
      */
-    private List<BitOp> operators;
+    private List<Action> operators;
 
     /**
      * The boolean flag used to indicate if the heuristic is admissible.
@@ -123,7 +123,7 @@ public abstract class AbstractHeuristic implements Heuristic {
      *
      * @return the operators.
      */
-    protected final List<BitOp> getOperators() {
+    protected final List<Action> getOperators() {
         return this.operators;
     }
 

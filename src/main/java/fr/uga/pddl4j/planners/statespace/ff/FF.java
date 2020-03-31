@@ -26,7 +26,7 @@ import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
-import fr.uga.pddl4j.util.SequentialPlan;
+import fr.uga.pddl4j.plan.SequentialPlan;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;

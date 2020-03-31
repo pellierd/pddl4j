@@ -27,7 +27,7 @@ import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
 import fr.uga.pddl4j.planners.statespace.hc.HCAnytime;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.plan.Plan;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

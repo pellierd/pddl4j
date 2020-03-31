@@ -16,10 +16,10 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.encoding.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.planners.SolutionEvent;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -86,7 +86,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceStrategy {
             } else {
                 closeSet.add(current);
                 int index = 0;
-                for (BitOp op : codedProblem.getOperators()) {
+                for (Action op : codedProblem.getOperators()) {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {

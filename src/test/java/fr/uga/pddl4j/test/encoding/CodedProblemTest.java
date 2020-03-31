@@ -18,7 +18,7 @@ package fr.uga.pddl4j.test.encoding;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.IntExp;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.util.BitOp;
+import fr.uga.pddl4j.encoding.Action;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -92,7 +92,7 @@ public class CodedProblemTest {
         System.out.println("CodedProblem: Test each operator from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            final List<BitOp> opListCodedProblem = codedProblem.getOperators();
+            final List<Action> opListCodedProblem = codedProblem.getOperators();
             for (int i = 0; i < opList.size(); i++) {
                 Assert.assertTrue(codedProblem.toShortString(opListCodedProblem.get(i)).equals(opList.get(i)));
             }

@@ -15,17 +15,16 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
+import fr.uga.pddl4j.encoding.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.Plan;
-import fr.uga.pddl4j.util.SequentialPlan;
-import fr.uga.pddl4j.util.SolutionEvent;
-import fr.uga.pddl4j.util.SolutionListener;
+import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.SolutionEvent;
+import fr.uga.pddl4j.planners.SolutionListener;
 
 import java.util.Objects;
-import javax.swing.event.EventListenerList;
 
 /**
  * This abstract class defines the main methods for search strategies.
@@ -329,7 +328,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
             Node n = node;
             final SequentialPlan plan = new SequentialPlan();
             while (n.getParent() != null) {
-                final BitOp op = problem.getOperators().get(n.getOperator());
+                final Action op = problem.getOperators().get(n.getOperator());
                 plan.add(0, op);
                 n = n.getParent();
             }

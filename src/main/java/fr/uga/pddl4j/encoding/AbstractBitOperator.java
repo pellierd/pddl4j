@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.BitExp;
-
 /**
  * This abstract class implements the common part of an operator (action of method) with bitset representation.
  *

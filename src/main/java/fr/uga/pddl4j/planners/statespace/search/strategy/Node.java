@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.encoding.BitState;
 
 /**
  * This class implements a node of the tree search.

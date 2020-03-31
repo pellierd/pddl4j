@@ -13,24 +13,26 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.plan;
+
+import fr.uga.pddl4j.encoding.Action;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
- * This class implements a parallel plan based on the Graphplan planner semantic. A parallel plan in the Graphplan
- * planner semantic is a sequence of sets of actionSets. Each action contained in a set are considered as unordered.
+ * This class implements a temporal plan.
  *
  * @author D. Pellier
- * @version 1.0 - 15.03.2016
+ * @version 1.0 - 23.03.2016
  * @since 3.0
  */
-public class ParallelPlan extends AbstractPlan {
+public class TemporalPlan extends AbstractPlan {
 
     /**
      * The serial id of the class.
@@ -38,67 +40,71 @@ public class ParallelPlan extends AbstractPlan {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The list of set of unordered actions contained in the plan.
+     * The list used to store the actions contained in the plan.
      */
-    private List<HashSet<BitOp>> actions;
+    private TreeMap<Integer, Set<Action>> actions;
 
     /**
-     * Creates a new empty parallel plan.
+     * Creates a new empty temporal plan.
      *
      * @see AbstractPlan#AbstractPlan()
      */
-    public ParallelPlan() {
+    public TemporalPlan() {
         super();
-        this.actions = new ArrayList<>();
+        this.actions = new TreeMap<>();
     }
 
     /**
-     * Creates a new parallel plan from an other. This constructor creates a deep copy of the specified plan.
+     * Creates a new temporal plan from an other. This constructor creates a deep copy of the specified plan.
      *
      * @param other the other plan.
      * @see AbstractPlan#AbstractPlan(Plan)
      */
-    public ParallelPlan(final Plan other) {
+    public TemporalPlan(final Plan other) {
         super(other);
     }
 
     /**
-     * Returns the makespan of the plan. The makespan of parallel plan is the number of parallel time step of the plan.
+     * Returns the makespan of the plan. The makespan of a sequential plan is its size.
      *
      * @return the makespan of the plan.
-     * @see Plan#makespan()
+     * @see Plan#size()
      */
     @Override
     public final double makespan() {
-        return this.actions.size();
-    }
-
-    /**
-     * Returns the ordered set of time specifiers used in this plan.
-     *
-     * @return the ordered set of time specifiers used in this plan.
-     * @see Plan#timeSpecifiers()
-     */
-    @Override
-    public Set<Integer> timeSpecifiers() {
-        final Set<Integer> ts = new LinkedHashSet<>();
-        for (int i = 0; i < this.actions.size(); i++) {
-            ts.add(i);
+        double makespan = 0.0;
+        if (!this.isEmpty()) {
+            final int start = this.actions.firstKey();
+            final int last = this.actions.lastKey();
+            final Action action = this.actions.lastEntry().getValue().stream().max(
+                Comparator.comparing(a -> a.getDuration())).get();
+            makespan = last + action.getDuration() - start;
         }
-        return ts;
+        return makespan;
     }
 
     /**
-     * Returns the list of actions contained in the plan in the ordering of their time specifiers.
+     * Returns the list of actions contained in the plan ordered depending on their time specifier.
      *
      * @return the ordered set of actions of the plan.
      * @see Plan#actions()
      */
     @Override
-    public final List<BitOp> actions() {
-        List<BitOp> acts = new ArrayList<>();
+    public final List<Action> actions() {
+        final List<Action> acts = new ArrayList<>();
         this.actions.forEach(acts::addAll);
         return acts;
+    }
+
+    /**
+     * Returns the set of time specifiers used in this plan.
+     *
+     * @return the set of time specifiers used in this plan.
+     * @see Plan#timeSpecifiers()
+     */
+    @Override
+    public final Set<Integer> timeSpecifiers() {
+        return this.actions.keySet();
     }
 
     /**
@@ -110,11 +116,8 @@ public class ParallelPlan extends AbstractPlan {
      * @see Plan#getActionSet(int)
      */
     @Override
-    public final Set<BitOp> getActionSet(final int time) {
-        if (this.isTimeSpecifierOutOfBound(time)) {
-            return null;
-        }
-        return this.getActionSet(time);
+    public final Set<Action> getActionSet(final int time) {
+        return this.actions.get(time);
     }
 
     /**
@@ -123,14 +126,16 @@ public class ParallelPlan extends AbstractPlan {
      * @param action the action to add.
      * @param time   the time specifier of the action in the plan.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
-     * @see Plan#add(int, BitOp)
+     * @see Plan#add(int, Action)
      */
     @Override
-    public final boolean add(final int time, final BitOp action) {
-        if (this.isTimeSpecifierOutOfBound(time)) {
-            return false;
+    public final boolean add(final int time, final Action action) {
+        Set<Action> set = this.actions.get(time);
+        if (set == null) {
+            set = new HashSet<Action>();
+            this.actions.put(time, set);
         }
-        return this.actions.get(time).add(action);
+        return set.add(action);
     }
 
     /**
@@ -138,14 +143,10 @@ public class ParallelPlan extends AbstractPlan {
      *
      * @param action the action to remove.
      * @param time   the time specifier of the action in the plan to remove.
-     * @return <code>true</code> if the action was removed; <code>false</code> otherwise.
-     * @see Plan#remove(int, BitOp)
+     * @see Plan#remove(int, Action)
      */
     @Override
-    public final boolean remove(final int time, final BitOp action) {
-        if (this.isTimeSpecifierOutOfBound(time)) {
-            return false;
-        }
+    public final boolean remove(final int time, final Action action) {
         return this.actions.get(time).remove(action);
     }
 
@@ -153,16 +154,11 @@ public class ParallelPlan extends AbstractPlan {
      * Removes all the actions at a specified time specifier of the plan.
      *
      * @param time the time specifier of the actions in the plan to remove.
-     * @return <code>true</code> if the action was removed; <code>false</code> otherwise.
      * @see Plan#remove(int)
      */
     @Override
     public final boolean remove(final int time) {
-        if (this.isTimeSpecifierOutOfBound(time)) {
-            return false;
-        }
-        this.actions.remove(time);
-        return true;
+        return this.actions.remove(time) != null;
     }
 
     /**
@@ -172,11 +168,12 @@ public class ParallelPlan extends AbstractPlan {
      * @param action the action.
      * @return <code>true</code> if the specified action is contained in the plan at the specified time specifier;
      * <code>false</code> otherwise.
-     * @see Plan#contains(int, BitOp)
+     * @see Plan#contains(int, Action)
      */
     @Override
-    public final boolean contains(final int time, final BitOp action) {
-        return !this.isTimeSpecifierOutOfBound(time) && this.actions.get(time).contains(action);
+    public final boolean contains(final int time, final Action action) {
+        final Set<Action> set = this.actions.get(time);
+        return set != null && set.contains(action);
     }
 
     /**
@@ -196,13 +193,13 @@ public class ParallelPlan extends AbstractPlan {
      *
      * @param obj the object to be compared.
      * @return <code>true</code> if this plan is equal to the specified object; <code>false</code> otherwise.
-     * @see BitOp#equals(Object)
+     * @see Action#equals(Object)
      * @see java.lang.Object#equals(Object)
      */
     @Override
     public boolean equals(Object obj) {
         if (obj != null && this.getClass() == obj.getClass()) {
-            final ParallelPlan other = (ParallelPlan) obj;
+            final TemporalPlan other = (TemporalPlan) obj;
             return Objects.equals(actions, other.actions);
         }
         return false;
@@ -217,16 +214,5 @@ public class ParallelPlan extends AbstractPlan {
     @Override
     public int hashCode() {
         return Objects.hash(actions);
-    }
-
-    /**
-     * Returns if a specified time specifier is invalid. Formally a time specifier is invalid if it is less
-     * than 0 or greater than the size of the plan.
-     *
-     * @param time the time stamp.
-     * @return <code>true</code> if the specified time specifier is out of bound; <code>false</code> otherwise.
-     */
-    protected final boolean isTimeSpecifierOutOfBound(final int time) {
-        return time < 0 || time > this.makespan();
     }
 }

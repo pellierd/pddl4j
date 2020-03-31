@@ -20,12 +20,12 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
+import fr.uga.pddl4j.encoding.BitExp;
 import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.BitVector;
-import fr.uga.pddl4j.util.CondBitExp;
+import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.encoding.BitVector;
+import fr.uga.pddl4j.encoding.CondBitExp;
 import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.ArrayList;
@@ -178,8 +178,8 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
 
         // Compute the number of unconditional operators of the problem
         this.nbOperators = this.nbPropositions;
-        final List<BitOp> pbOperators = problem.getOperators();
-        for (BitOp op : pbOperators) {
+        final List<Action> pbOperators = problem.getOperators();
+        for (Action op : pbOperators) {
             this.nbOperators += op.getCondEffects().size();
         }
 
@@ -224,7 +224,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
 
         // Start enumerating the unconditional opsLayer
         int uncondOpIndex = this.nbPropositions;
-        for (final BitOp op : pbOperators) {
+        for (final Action op : pbOperators) {
             final List<CondBitExp> condEffects = op.getCondEffects();
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {

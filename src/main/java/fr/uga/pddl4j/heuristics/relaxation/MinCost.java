@@ -21,9 +21,9 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.encoding.BitExp;
+import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.encoding.BitState;
 
 import java.util.LinkedList;
 
@@ -104,7 +104,7 @@ public class MinCost extends AbstractHeuristic {
             Node nextNode = null;
             double cost = Double.MAX_VALUE;
 
-            for (BitOp op : getOperators()) {
+            for (Action op : getOperators()) {
                 if (op.isApplicable(current)) {
                     if (op.getCost() <= cost) { //TODO take into account = or not
                         final BitState nextState = new BitState(current);

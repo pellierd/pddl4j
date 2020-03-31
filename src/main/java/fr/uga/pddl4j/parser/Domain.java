@@ -21,7 +21,6 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.exceptions.FatalException;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,17 +80,17 @@ public class Domain implements Serializable {
     /**
      * The list of actions of the domain.
      */
-    private List<Action> ops;
+    private List<ActionExp> ops;
 
     /**
      * The list of methods of the domain.
      */
-    private List<Method> meths;
+    private List<MethodExp> meths;
 
     /**
      * The list of derived predicates of the domain.
      */
-    private List<DerivedPredicate> derivedPredicates;
+    private List<DerivedPredicateExp> derivedPredicates;
 
     /**
      * Creates a new domain.
@@ -282,7 +281,7 @@ public class Domain implements Serializable {
      *
      * @return the list of parsed ops.
      */
-    public final List<Action> getActions() {
+    public final List<ActionExp> getActions() {
         return this.ops;
     }
 
@@ -292,7 +291,7 @@ public class Domain implements Serializable {
      * @param action the action to add.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */
-    public final boolean addAction(final Action action) {
+    public final boolean addAction(final ActionExp action) {
         this.tasks.add(action.toTask());
         return this.ops.add(action);
     }
@@ -302,7 +301,7 @@ public class Domain implements Serializable {
      *
      * @return the list of parsed methods.
      */
-    public final List<Method> getMethods() {
+    public final List<MethodExp> getMethods() {
         return this.meths;
     }
 
@@ -312,7 +311,7 @@ public class Domain implements Serializable {
      * @param method the method to add.
      * @return <code>true</code> if the method was added; <code>false</code> otherwise.
      */
-    public final boolean addMethod(final Method method) {
+    public final boolean addMethod(final MethodExp method) {
         return this.meths.add(method);
     }
 
@@ -321,7 +320,7 @@ public class Domain implements Serializable {
      *
      * @return the list of parsed derived predicates.
      */
-    public final List<DerivedPredicate> getDerivesPredicates() {
+    public final List<DerivedPredicateExp> getDerivesPredicates() {
         return this.derivedPredicates;
     }
 
@@ -332,7 +331,7 @@ public class Domain implements Serializable {
      * @return <code>true</code> if the derived predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */
-    public final boolean addDerivedPredicate(final DerivedPredicate predicate) {
+    public final boolean addDerivedPredicate(final DerivedPredicateExp predicate) {
         if (predicate == null) {
             throw new NullPointerException();
         }
@@ -441,8 +440,8 @@ public class Domain implements Serializable {
      * Normalize the domain. This method rename the variables used in the domain and normalize its
      * ops and derived predicates.
      *
-     * @see Action#normalize()
-     * @see DerivedPredicate#normalize()
+     * @see ActionExp#normalize()
+     * @see DerivedPredicateExp#normalize()
      */
     public void standardize() throws FatalException {
         // Rename all the variables from the predicates declaration
@@ -526,13 +525,13 @@ public class Domain implements Serializable {
         if (this.constraints != null) {
             str.append("(:constraints ").append("  ").append(this.constraints).append(")\n");
         }
-        for (DerivedPredicate dp : this.derivedPredicates) {
+        for (DerivedPredicateExp dp : this.derivedPredicates) {
             str.append(dp).append("\n");
         }
-        for (Action op : this.ops) {
+        for (ActionExp op : this.ops) {
             str.append(op).append("\n");
         }
-        for (Method meth : this.meths) {
+        for (MethodExp meth : this.meths) {
             str.append(meth).append("\n");
         }
         str.append(")");

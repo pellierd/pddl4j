@@ -29,7 +29,7 @@ import java.util.List;
  * @version 1.0 - 25.03.2020
  */
 
-public interface Operator extends Serializable {
+public interface OperatorExp extends Serializable {
 
     /**
      * Returns the name of the operator.

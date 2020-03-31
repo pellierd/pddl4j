@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +30,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class Method extends AbstractOperator {
+public class MethodExp extends AbstractOperatorExp {
 
     /**
      * The task performed by the method.
@@ -48,7 +47,7 @@ public class Method extends AbstractOperator {
      *
      * @param other the other method.
      */
-    public Method(final Method other) {
+    public MethodExp(final MethodExp other) {
         super(other);
         this.task = new Exp(other.getTask());
         this.taskNetwork = new TaskNetwork(other.taskNetwork);
@@ -67,8 +66,8 @@ public class Method extends AbstractOperator {
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public Method(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
-                  final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
+    public MethodExp(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
+                     final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
         super(name, parameters, preconditions);
         this.task = task;
         this.taskNetwork = new TaskNetwork(tasks, ordering, logical, ordered);
@@ -84,8 +83,8 @@ public class Method extends AbstractOperator {
      * @param network the task network of the method.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public Method(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
-                  final TaskNetwork network) {
+    public MethodExp(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
+                     final TaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrderingConstraints(),
             network.getLogicalConstraints(), network.isTotallyOrdered());
     }

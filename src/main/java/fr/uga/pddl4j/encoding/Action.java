@@ -17,9 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
-
-import fr.uga.pddl4j.encoding.AbstractBitOperator;
+package fr.uga.pddl4j.encoding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.1 - 08.04.2010
  */
-public class BitOp extends AbstractBitOperator {
+public class Action extends AbstractBitOperator {
 
     /**
      * The list of effects of the operator.
@@ -56,7 +54,7 @@ public class BitOp extends AbstractBitOperator {
      * @param other the other operator.
      * @throws NullPointerException if <code>other == null</code>.
      */
-    public BitOp(final BitOp other) {
+    public Action(final Action other) {
         super(other);
         this.effects = new ArrayList<>();
         this.effects.addAll(other.getCondEffects().stream().map(CondBitExp::new).collect(Collectors.toList()));
@@ -68,7 +66,7 @@ public class BitOp extends AbstractBitOperator {
      * @param name  the name of the operator.
      * @param arity the arity of the operator.
      */
-    public BitOp(final String name, final int arity) {
+    public Action(final String name, final int arity) {
         super(name, arity);
         this.effects = new ArrayList<>();
     }
@@ -81,7 +79,7 @@ public class BitOp extends AbstractBitOperator {
      * @param preconditions the precondition of the operator.
      * @param effects       the effects of the operator.
      */
-    public BitOp(final String name, final int arity, final BitExp preconditions, final BitExp effects) {
+    public Action(final String name, final int arity, final BitExp preconditions, final BitExp effects) {
         this(name, arity);
         this.setPreconditions(preconditions);
         CondBitExp cexp = new CondBitExp();

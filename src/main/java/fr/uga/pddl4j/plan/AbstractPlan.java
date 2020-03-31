@@ -13,7 +13,9 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.plan;
+
+import fr.uga.pddl4j.encoding.Action;
 
 /**
  * This abstract class implements the main methods of a search.
@@ -38,7 +40,7 @@ public abstract class AbstractPlan implements Plan {
      */
     protected AbstractPlan(final Plan other) {
         this();
-        other.timeSpecifiers().forEach(t -> other.getActionSet(t).forEach(a -> this.add(t, new BitOp(a))));
+        other.timeSpecifiers().forEach(t -> other.getActionSet(t).forEach(a -> this.add(t, new Action(a))));
     }
 
     /**

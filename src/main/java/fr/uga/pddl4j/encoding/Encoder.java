@@ -25,9 +25,6 @@ import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.CondBitExp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -209,7 +206,7 @@ public final class Encoder implements Serializable {
     /**
      * The list of instantiated actions encoded into bit sets.
      */
-    static List<BitOp> actions;
+    static List<Action> actions;
 
     /**
      * The goal.
@@ -582,7 +579,7 @@ public final class Encoder implements Serializable {
         // Just for logging
         if (Encoder.logLevel == 7) {
             stringBuilder.append("\nfinal actions:");
-            for (BitOp op : Encoder.actions) {
+            for (Action op : Encoder.actions) {
                 stringBuilder.append(Encoder.toString(op));
             }
 
@@ -780,7 +777,7 @@ public final class Encoder implements Serializable {
      * @param op the operator to print.
      * @return a string representation of the specified operator.
      */
-    static String toString(final BitOp op) {
+    static String toString(final Action op) {
         return StringEncoder.toString(op, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);

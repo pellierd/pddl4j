@@ -20,11 +20,11 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.BitVector;
-import fr.uga.pddl4j.util.CondBitExp;
+import fr.uga.pddl4j.encoding.BitExp;
+import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.encoding.BitVector;
+import fr.uga.pddl4j.encoding.CondBitExp;
 
 import java.util.Arrays;
 import java.util.List;
@@ -130,8 +130,8 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         final int nbOperators = super.getOperators().size();
         // Compute the number of unconditional operators
         int nbUncondOperators = 0;
-        final List<BitOp> operators = problem.getOperators();
-        for (BitOp op : operators) {
+        final List<Action> operators = problem.getOperators();
+        for (Action op : operators) {
             nbUncondOperators += op.getCondEffects().size();
         }
         // Initialize the array that must contain the level of the positive propositions
@@ -176,7 +176,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
 
         // Start enumerating the unconditional operators
         for (int opIndex = 0; opIndex < operators.size(); opIndex++) {
-            final BitOp op = operators.get(opIndex);
+            final Action op = operators.get(opIndex);
             final List<CondBitExp> condEffects = op.getCondEffects();
 
             // For each conditional effect we create a new operator

@@ -15,15 +15,15 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
+import fr.uga.pddl4j.encoding.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.encoding.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
-import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.SolutionEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
@@ -170,7 +170,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
             } else {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
-                for (BitOp op : problem.getOperators()) {
+                for (Action op : problem.getOperators()) {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         Node state = new Node(current);

@@ -20,10 +20,6 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.Symbol;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.CondBitExp;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -377,7 +373,7 @@ final class StringEncoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified operator.
      */
-    static String toString(final BitOp op, final List<String> constants, final List<String> types,
+    static String toString(final Action op, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<String> tasks, final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();
@@ -511,7 +507,7 @@ final class StringEncoder implements Serializable {
      * @param constants the table of constants.
      * @return a string representation of the specified operator.
      */
-    static String toShortString(final BitOp op, final List<String> constants) {
+    static String toShortString(final Action op, final List<String> constants) {
         final StringBuilder str = new StringBuilder();
         str.append(op.getName());
         for (int i = 0; i < op.getArity(); i++) {

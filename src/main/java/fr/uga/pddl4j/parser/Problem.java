@@ -304,8 +304,8 @@ public class Problem implements Serializable {
      * Normalize the problem. This method renames the variables and then move inward the negation of
      * the goal and the constraints of the problem.
      *
-     * @see Action#normalize()
-     * @see DerivedPredicate#normalize()
+     * @see ActionExp#normalize()
+     * @see DerivedPredicateExp#normalize()
      */
     public void standardize() throws FatalException {
         // Rename the constraints of the problem

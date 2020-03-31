@@ -19,12 +19,12 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
+import fr.uga.pddl4j.encoding.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.BitVector;
+import fr.uga.pddl4j.encoding.BitExp;
+import fr.uga.pddl4j.encoding.BitState;
+import fr.uga.pddl4j.encoding.BitVector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +64,9 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
-        final List<BitOp> operator = this.getOperators();
+        final List<Action> operator = this.getOperators();
         int startPoint = 0;
-        for (BitOp op : operator) {
+        for (Action op : operator) {
             startPoint += op.getCondEffects().size();
         }
         int nbRelevantFacts = super.getRevelantFacts().size();
@@ -93,7 +93,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
                 nGoalBitVector.set(p);
             }
             //Compute the positive preconditions
-            for (BitOp op : this.getOperators()) {
+            for (Action op : this.getOperators()) {
                 final BitExp pre = new BitExp(op.getPreconditions());
                 final BitExp npre = new BitExp(op.getPreconditions());
                 BitVector nprecon = npre.getNegative();

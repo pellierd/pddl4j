@@ -28,7 +28,7 @@ import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.planners.SolutionEvent;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -19,11 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.util.BitExp;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.CondBitExp;
-import fr.uga.pddl4j.util.Plan;
+import fr.uga.pddl4j.plan.Plan;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -105,7 +101,7 @@ public class CodedProblem implements Serializable {
     /**
      * The list of instantiated operator encoded into bit sets.
      */
-    private List<BitOp> operators;
+    private List<Action> operators;
 
     /**
      * The goal.
@@ -165,7 +161,7 @@ public class CodedProblem implements Serializable {
         this.relevantFacts = new ArrayList<>();
         this.relevantFacts.addAll(other.relevantFacts.stream().map(IntExp::new).collect(Collectors.toList()));
         this.operators = new ArrayList<>();
-        this.operators.addAll(other.operators.stream().map(BitOp::new).collect(Collectors.toList()));
+        this.operators.addAll(other.operators.stream().map(Action::new).collect(Collectors.toList()));
         this.goal = new BitExp(other.goal);
         this.init = new BitExp(other.init);
     }
@@ -391,7 +387,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the list of instantiated actions of the problem.
      */
-    public final List<BitOp> getOperators() {
+    public final List<Action> getOperators() {
         return operators;
     }
 
@@ -400,7 +396,7 @@ public class CodedProblem implements Serializable {
      *
      * @param operators the list of instantiated actions of the problem.
      */
-    final void setOperators(final List<BitOp> operators) {
+    final void setOperators(final List<Action> operators) {
         this.operators = operators;
     }
 
@@ -457,7 +453,7 @@ public class CodedProblem implements Serializable {
      * @param op the operator.
      * @return a string representation of the specified operator.
      */
-    public final String toShortString(final BitOp op) {
+    public final String toShortString(final Action op) {
         return StringEncoder.toShortString(op, this.constants);
     }
 
@@ -467,7 +463,7 @@ public class CodedProblem implements Serializable {
      * @param op the operator.
      * @return a string representation of the specified operator.
      */
-    public final String toString(final BitOp op) {
+    public final String toString(final Action op) {
         return StringEncoder.toString(op, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
@@ -537,7 +533,7 @@ public class CodedProblem implements Serializable {
     public final String toString(final Plan plan) {
         int max = Integer.MIN_VALUE;
         for (Integer t : plan.timeSpecifiers()) {
-            for (BitOp a : plan.getActionSet(t)) {
+            for (Action a : plan.getActionSet(t)) {
                 int length = this.toShortString(a).length();
                 if (max < length) {
                     max = length;
@@ -564,7 +560,7 @@ public class CodedProblem implements Serializable {
     public final String toStringCost(final Plan plan) {
         int max = Integer.MIN_VALUE;
         for (Integer t : plan.timeSpecifiers()) {
-            for (BitOp a : plan.getActionSet(t)) {
+            for (Action a : plan.getActionSet(t)) {
                 int length = this.toShortString(a).length();
                 if (max < length) {
                     max = length;

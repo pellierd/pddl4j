@@ -13,7 +13,9 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.planners;
+
+import fr.uga.pddl4j.planners.SolutionEvent;
 
 import java.io.Serializable;
 import java.util.EventListener;

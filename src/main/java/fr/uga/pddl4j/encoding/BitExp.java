@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.encoding;
 
 import java.io.Serializable;
 
@@ -29,11 +29,6 @@ import java.io.Serializable;
  * @version 1.0 - 07.06.2010
  */
 public class BitExp implements Serializable {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The bit state used to store the positive facts of the expression.

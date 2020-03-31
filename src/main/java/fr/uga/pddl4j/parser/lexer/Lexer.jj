@@ -27,15 +27,15 @@ PARSER_BEGIN(Lexer)
 package fr.uga.pddl4j.parser.lexer;
 
 import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.parser.DerivedPredicate;
+import fr.uga.pddl4j.parser.DerivedPredicateExp;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.Exp;
 import fr.uga.pddl4j.parser.Domain;
 import fr.uga.pddl4j.parser.Problem;
 import fr.uga.pddl4j.parser.NamedTypedList;
-import fr.uga.pddl4j.parser.Action;
-import fr.uga.pddl4j.parser.Method;
+import fr.uga.pddl4j.parser.ActionExp;
+import fr.uga.pddl4j.parser.MethodExp;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.TaskNetwork;
@@ -1832,9 +1832,9 @@ Exp f_head() :
 
 void structure_def() :
 {
-	Action op = null;
-	Method meth = null;
-	DerivedPredicate dp = null;
+	ActionExp op = null;
+	MethodExp meth = null;
+	DerivedPredicateExp dp = null;
 	NamedTypedList taskID = null;
 }
 {
@@ -1863,7 +1863,7 @@ void structure_def() :
 	)
 }
 
-Method method_def() : // ADD HDDL
+MethodExp method_def() : // ADD HDDL
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
@@ -1885,7 +1885,7 @@ Method method_def() : // ADD HDDL
 	    this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Method(name, parameters, taskID, preconditions, tn);
+		return new MethodExp(name, parameters, taskID, preconditions, tn);
 	}
 }
 
@@ -2136,7 +2136,7 @@ Exp htn_constraint() : // ADD HDDL
     }
 }
 
-DerivedPredicate derived_def() :
+DerivedPredicateExp derived_def() :
 {
 	NamedTypedList head = null;
 	Exp body = null;
@@ -2151,11 +2151,11 @@ DerivedPredicate derived_def() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new DerivedPredicate(head, body);
+		return new DerivedPredicateExp(head, body);
 	}
 }
 
-Action action_def() :
+ActionExp action_def() :
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
@@ -2173,7 +2173,7 @@ Action action_def() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Action(name, parameters, preconds, effects);
+		return new ActionExp(name, parameters, preconds, effects);
 	}
 }
 
@@ -2562,7 +2562,7 @@ Exp decrease() :
 	}
 }
 
-Action durative_action_def() :
+ActionExp durative_action_def() :
 {
 	Symbol name = null;
 	List<TypedSymbol> parameters = null;
@@ -2585,7 +2585,7 @@ Action durative_action_def() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new Action(name, parameters, condition, effect, duration);
+		return new ActionExp(name, parameters, condition, effect, duration);
 	}
 }
 

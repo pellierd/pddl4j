@@ -19,10 +19,10 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.Heuristic;
 import fr.uga.pddl4j.heuristics.relaxation.HeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
+import fr.uga.pddl4j.encoding.Action;
+import fr.uga.pddl4j.encoding.BitState;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.SolutionEvent;
+import fr.uga.pddl4j.planners.SolutionEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
@@ -189,7 +189,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
-        for (BitOp op : problem.getOperators()) {
+        for (Action op : problem.getOperators()) {
             if (op.isApplicable(parent)) {
                 final BitState nextState = new BitState(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());

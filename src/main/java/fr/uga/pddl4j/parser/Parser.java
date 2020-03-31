@@ -982,7 +982,7 @@ public final class Parser {
      */
     private boolean checkDerivedPredicateDeclaration() {
         boolean checked = true;
-        for (DerivedPredicate axiom : this.domain.getDerivesPredicates()) {
+        for (DerivedPredicateExp axiom : this.domain.getDerivesPredicates()) {
             NamedTypedList head = axiom.getHead();
             for (TypedSymbol argument : head.getArguments()) {
                 for (Symbol type : argument.getTypes()) {
@@ -1021,7 +1021,7 @@ public final class Parser {
      */
     private boolean checkActionDeclaration() {
         boolean checked = this.checkActionsUniqueness();
-        for (Action action : this.domain.getActions()) {
+        for (ActionExp action : this.domain.getActions()) {
             if (this.checkActionParameters(action)) {
                 checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
                 checked &= this.checkParserNode(action.getEffects(), action.getParameters());
@@ -1049,7 +1049,7 @@ public final class Parser {
      */
     private boolean checkMethodDeclaration() {
         boolean checked = this.checkMethodsUniqueness();
-        for (Method meth : this.domain.getMethods()) {
+        for (MethodExp meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
@@ -1157,7 +1157,7 @@ public final class Parser {
      * @param meth the methode to be tested.
      * @return true if the all the task ids used in a method declaration are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(Method meth) {
+    private boolean checkTaskIDsUniqueness(MethodExp meth) {
         return this.checkTaskIDsUniqueness(meth, meth.getSubTasks(), new HashSet<Symbol>());
     }
 
@@ -1168,7 +1168,7 @@ public final class Parser {
      * @param exp the expression.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(Method meth, Exp exp, Set<Symbol> taskIds) {
+    private boolean checkTaskIDsUniqueness(MethodExp meth, Exp exp, Set<Symbol> taskIds) {
         boolean unique = true;
         if (exp.getConnective().equals(Connective.TASK) && exp.getTaskID() != null) {
             if (!taskIds.add(exp.getTaskID())) {
@@ -1433,7 +1433,7 @@ public final class Parser {
      * @return <code>true</code> if the parameters of the specified action are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkActionParameters(Action action) {
+    private boolean checkActionParameters(ActionExp action) {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
         for (TypedSymbol parameter : action.getParameters()) {
@@ -1463,7 +1463,7 @@ public final class Parser {
      * @return <code>true</code> if the parameters of the specified method are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkMethodParameters(Method method) {
+    private boolean checkMethodParameters(MethodExp method) {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
         for (TypedSymbol parameter : method.getParameters()) {
@@ -1494,7 +1494,7 @@ public final class Parser {
     private boolean checkActionsUniqueness() {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
-        for (Action op : this.domain.getActions()) {
+        for (ActionExp op : this.domain.getActions()) {
             if (!set.add(op.getName())) {
                 Symbol name = op.getName();
                 this.mgr.logParserError("action \"" + name + "\" declared twice", this.lexer
@@ -1513,7 +1513,7 @@ public final class Parser {
     private boolean checkMethodsUniqueness() {
         boolean checked = true;
         Set<Symbol> set = new HashSet<>();
-        for (Method meth : this.domain.getMethods()) {
+        for (MethodExp meth : this.domain.getMethods()) {
             if (!set.add(meth.getName())) {
                 Symbol name = meth.getName();
                 this.mgr.logParserError("method \"" + name + "\" declared twice", this.lexer
