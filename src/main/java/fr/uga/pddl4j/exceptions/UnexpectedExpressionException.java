@@ -25,7 +25,7 @@ package fr.uga.pddl4j.exceptions;
  * @author Cedric Gerard
  * @version 1.0 - 03/03/2016
  */
-public class UnexpectedExpressionException extends Exception {
+public class UnexpectedExpressionException extends RuntimeException {
 
     /**
      * Default constructor with only string message.

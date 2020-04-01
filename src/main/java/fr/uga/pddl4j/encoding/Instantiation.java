@@ -248,9 +248,9 @@ final class Instantiation implements Serializable {
                     if (!preconditionCopy.getConnective().equals(Connective.FALSE)) {
                         final IntMethod copy = new IntMethod(method.getName(), arity);
                         copy.setPreconditions(preconditionCopy);
+                        copy.setOrderingConstraints(new IntExp(method.getOrderingConstraints()));
 
                         final IntExp taskCopy = new IntExp(method.getTask());
-                        //System.out.print("Instantiate task: " + Encoder.toString(taskCopy));
                         Instantiation.substitute(taskCopy, varIndex, value);
                         copy.setTask(taskCopy);
 

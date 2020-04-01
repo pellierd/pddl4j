@@ -124,4 +124,21 @@ public final class Method extends AbstractBitOperator {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 
+    /**
+     * Returns the task network of this method.
+     *
+     * @return the task network of this method.
+     */
+    public final TaskNetwork getTaskNetwork() {
+        return this.taskNetwork;
+    }
+
+    /**
+     * Set the task network of this method.
+     *
+     * @param taskNetwork the task network to set.
+     */
+    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
+        this.taskNetwork = taskNetwork;
+    }
 }

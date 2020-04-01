@@ -43,10 +43,6 @@ public final class TaskNetwork implements Serializable {
      */
     private BitMatrix orderingConstraints;
 
-    /**
-     * A boolean flag to indicate if the task network is totally ordered or not.
-     */
-    private boolean isTotallyOrdered;
 
     /**
      * Create a new task network. The list of task is set to an empty set with no ordering constraints and not totally
@@ -56,7 +52,6 @@ public final class TaskNetwork implements Serializable {
         super();
         this.tasks = new int[0];
         this.orderingConstraints = new BitMatrix(0, 0);
-        this.isTotallyOrdered = false;
     }
 
     /**
@@ -69,23 +64,18 @@ public final class TaskNetwork implements Serializable {
         super();
         this.tasks = new int[other.size()];
         this.orderingConstraints = new BitMatrix(other.getOrderingConstraints());
-        this.isTotallyOrdered = other.isTotallyOrdered;
     }
 
     /**
-     * Create a new task network with a set of tasks and orderings constraints. Warning the method does not check if
-     * the ordering constraints given in parameter are consistent with boolean flag that indicates that the task network
-     * is totally ordered or if the constraints are not cyclic.
+     * Create a new task network with a set of tasks and orderings constraints.
      *
      * @param tasks          the tasks of the task network.
      * @param constraints    the orderings constraints of the task network.
-     * @param totallyOrdered the boolean flag to indicate if the task network is totally ordered or not.
      */
-    public TaskNetwork(final int[] tasks, final BitMatrix constraints, final boolean totallyOrdered) {
+    public TaskNetwork(final int[] tasks, final BitMatrix constraints) {
         super();
         this.tasks = tasks;
         this.orderingConstraints = constraints;
-        this.isTotallyOrdered = totallyOrdered;
     }
 
     /**
@@ -130,6 +120,21 @@ public final class TaskNetwork implements Serializable {
      */
     public final void setOrderingConstraints(final BitMatrix constraints) {
         this.orderingConstraints = constraints;
+    }
+
+    /**
+     * Returns <code>true</code> if the task network is totally ordered. The return value is computed from the ordering
+     * constraints of the task network.
+     *
+     * @return <code>true</code> if the task network is totally ordered.
+     */
+    public final boolean isTotallyOrdered() {
+        boolean ordered = true;
+        int i = 1;
+        while (i < this.tasks.length && ordered) {
+            ordered = this.orderingConstraints.get(i - 1, i);
+        }
+        return ordered;
     }
 
     /**

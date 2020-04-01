@@ -120,4 +120,22 @@ final class IntMethod extends AbstractIntOperator {
         this.taskNetwork.setOrderingConstraints(ordering);
     }
 
+    /**
+     * Returns the task network of this method.
+     *
+     * @return the task network of this method.
+     */
+    public final IntTaskNetwork getTaskNetwork() {
+        return this.taskNetwork;
+    }
+
+    /**
+     * Set the task network of this method.
+     *
+     * @param taskNetwork the task network to set.
+     */
+    public final void setTaskNetwork(final IntTaskNetwork taskNetwork) {
+        this.taskNetwork = taskNetwork;
+    }
+
 }

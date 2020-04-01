@@ -33,6 +33,7 @@ import fr.uga.pddl4j.parser.RequireKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -529,6 +530,7 @@ public final class Encoder implements Serializable {
             stringBuilder.setLength(0);
         }
 
+
         // *****************************************************************************************
         // Step 5: PostInstantiation
         // *****************************************************************************************
@@ -591,12 +593,7 @@ public final class Encoder implements Serializable {
 
         // Encode the goal in bit set representation
         if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM))) {
-            try {
-                Encoder.goal = BitEncoding.encodeGoal(intGoal, factIndexMap);
-            } catch (UnexpectedExpressionException uee) {
-                LOGGER.error("Error with unexpected expression", uee);
-                return null;
-            }
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, factIndexMap);
         } else {
             Encoder.goal = new BitExp();
         }
@@ -607,23 +604,27 @@ public final class Encoder implements Serializable {
 
         // Encode the initial state in bit set representation
         Encoder.init = BitEncoding.encodeInit(intInitPredicates, factIndexMap);
+
         // Encode the actions in bit set representation
-        try {
-            Encoder.actions.addAll(0, BitEncoding.encodeOperators(intActions, factIndexMap));
-        } catch (UnexpectedExpressionException uee) {
-            LOGGER.error("Error with unexpected expression", uee);
-            return null;
-        }
+        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, factIndexMap));
+
+        // Encode the methods in bit set representation
+        Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, factIndexMap, taskIndexMap));
 
         // Just for logging
         if (Encoder.logLevel == 7) {
-            stringBuilder.append("\nfinal actions:");
-            for (Action op : Encoder.actions) {
-                stringBuilder.append(Encoder.toString(op));
+            stringBuilder.append("\nFinal actions:\n");
+            for (Action a : Encoder.actions) {
+                stringBuilder.append(Encoder.toString(a) + "\n");
+            }
+
+            stringBuilder.append("\nFinal methods:\n");
+            for (Method m : Encoder.methods) {
+                stringBuilder.append(Encoder.toString(m) + "\n");
             }
 
             if (!Encoder.requirements.contains(RequireKey.HTN)) {
-                stringBuilder.append("\nfinal goal state:");
+                stringBuilder.append("\nFinal goal state:");
                 if (Encoder.goal == null) { // Goal null
                     stringBuilder.append("goal can be simplified to FALSE");
                 } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty
@@ -632,7 +633,7 @@ public final class Encoder implements Serializable {
                     stringBuilder.append("goal can be simplified to TRUE");
                 }
             } else {
-                stringBuilder.append("\nfinal initial task network state:");
+                stringBuilder.append("Final initial task network state:\n");
                 stringBuilder.append(Encoder.toString(Encoder.initialTaskNetwork));
             }
             LOGGER.trace(stringBuilder);
@@ -854,6 +855,19 @@ public final class Encoder implements Serializable {
         return StringEncoder.toString(a, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param m the method to print.
+     * @return a string representation of the specified method.
+     */
+    static String toString(final Method m) {
+        return StringEncoder.toString(m, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfTasks,
+            Encoder.tableOfRelevantFacts, Encoder.tableOfRelevantTasks);
     }
 
     /**
