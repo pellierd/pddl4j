@@ -603,8 +603,6 @@ public final class Encoder implements Serializable {
 
         if (intTaskNetwork != null) {
             Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(intTaskNetwork, taskIndexMap);
-            System.out.println(Encoder.toString(Encoder.initialTaskNetwork));
-            System.exit(0);
         }
 
         // Encode the initial state in bit set representation
@@ -624,14 +622,18 @@ public final class Encoder implements Serializable {
                 stringBuilder.append(Encoder.toString(op));
             }
 
-            stringBuilder.append("\nfinal initial state:").append(Encoder.toString(Encoder.init))
-                .append("\nfinal goal state:");
-            if (Encoder.goal == null) { // Goal null
-                stringBuilder.append("goal can be simplified to FALSE");
-            } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty
-                stringBuilder.append(Encoder.toString(Encoder.goal));
-            } else { // Goal not Null and empty
-                stringBuilder.append("goal can be simplified to TRUE");
+            if (!Encoder.requirements.contains(RequireKey.HTN)) {
+                stringBuilder.append("\nfinal goal state:");
+                if (Encoder.goal == null) { // Goal null
+                    stringBuilder.append("goal can be simplified to FALSE");
+                } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty
+                    stringBuilder.append(Encoder.toString(Encoder.goal));
+                } else { // Goal not Null and empty
+                    stringBuilder.append("goal can be simplified to TRUE");
+                }
+            } else {
+                stringBuilder.append("\nfinal initial task network state:");
+                stringBuilder.append(Encoder.toString(Encoder.initialTaskNetwork));
             }
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
