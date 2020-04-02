@@ -1085,7 +1085,7 @@ public final class Parser {
      * @return <code>true</code> if the initial task network is well formed; <code>false</code> otherwise.
      */
     private boolean checkInitialTaskNetwork() {
-        final TaskNetwork tn = problem.getInitialTaskNetwork();
+        final TaskNetworkExp tn = problem.getInitialTaskNetwork();
         boolean checked = this.checkParserNode(tn.getTasks(), new LinkedList<TypedSymbol>());
         if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol>())) {
             final Set<Symbol> taskIds = this.getTaskIDs(tn.getTasks());

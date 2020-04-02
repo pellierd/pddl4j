@@ -55,7 +55,7 @@ public class Problem implements Serializable {
     /**
      * The task network of the problem.
      */
-    private TaskNetwork initialTaskNetwork;
+    private TaskNetworkExp initialTaskNetwork;
 
     /**
      * The list of initial facts declared in the problem.
@@ -196,7 +196,7 @@ public class Problem implements Serializable {
      * @param network The task network to set.
      * @thows NullPointerException if the task network to set is null.
      */
-    public final void setInitialTaskNetwork(final TaskNetwork network) {
+    public final void setInitialTaskNetwork(final TaskNetworkExp network) {
         if (network == null) {
            throw new NullPointerException();
         }
@@ -208,7 +208,7 @@ public class Problem implements Serializable {
      *
      * @return the task network of the problem. The task network may null if it is not defined.
      */
-    public final TaskNetwork getInitialTaskNetwork() {return this.initialTaskNetwork; }
+    public final TaskNetworkExp getInitialTaskNetwork() {return this.initialTaskNetwork; }
 
     /**
      * Returns the list of initial facts defined in the problem file.
@@ -320,7 +320,7 @@ public class Problem implements Serializable {
         }
         // Standardize the initial task network
         if (this.getInitialTaskNetwork() != null) {
-            final TaskNetwork tn = this.getInitialTaskNetwork();
+            final TaskNetworkExp tn = this.getInitialTaskNetwork();
             if (tn.getTasks().getChildren().size() == 1) {
                 tn.setTotallyOrdered(true);
             }

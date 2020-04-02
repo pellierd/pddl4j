@@ -20,10 +20,7 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * This class implements a task network.
@@ -31,7 +28,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class TaskNetwork implements Serializable {
+public class TaskNetworkExp implements Serializable {
 
     /**
      * The tasks of the task network.
@@ -56,7 +53,7 @@ public class TaskNetwork implements Serializable {
     /**
      * Create a new task network.
      */
-    protected TaskNetwork() {
+    protected TaskNetworkExp() {
         super();
         this.tasks = null;
         this.orderingConstraints = null;
@@ -69,7 +66,7 @@ public class TaskNetwork implements Serializable {
      *
      * @param other the other task network.
      */
-    public TaskNetwork(final TaskNetwork other) {
+    public TaskNetworkExp(final TaskNetworkExp other) {
         this.tasks = new Exp(other.getTasks());
         this.orderingConstraints = new Exp(other.getOrderingConstraints());
         this.logicalConstraints = new  Exp(other.getLogicalConstraints());
@@ -85,7 +82,7 @@ public class TaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public TaskNetwork(final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
+    public TaskNetworkExp(final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
         super();
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);
@@ -188,7 +185,7 @@ public class TaskNetwork implements Serializable {
     @Override
     public boolean equals(final Object object) {
         if (object != null && object.getClass().equals(this.getClass())) {
-            final TaskNetwork other = (TaskNetwork) object;
+            final TaskNetworkExp other = (TaskNetworkExp) object;
             return this.getTasks().equals(other.getTasks())
                 && this.getOrderingConstraints().equals(other.getOrderingConstraints())
                 && this.getLogicalConstraints().equals(other.getLogicalConstraints())

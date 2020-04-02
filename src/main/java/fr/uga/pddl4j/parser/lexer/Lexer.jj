@@ -38,7 +38,7 @@ import fr.uga.pddl4j.parser.ActionExp;
 import fr.uga.pddl4j.parser.MethodExp;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
-import fr.uga.pddl4j.parser.TaskNetwork;
+import fr.uga.pddl4j.parser.TaskNetworkExp;
 import fr.uga.pddl4j.parser.TypedSymbol;
 
 import java.io.FileInputStream;
@@ -1869,7 +1869,7 @@ MethodExp method_def() : // ADD HDDL
 	List<TypedSymbol> parameters = null;
 	Exp taskID = null;
 	Exp preconditions = new Exp(Connective.AND);
-	TaskNetwork tn = null;
+	TaskNetworkExp tn = null;
 }
 {
 	try {
@@ -1890,9 +1890,9 @@ MethodExp method_def() : // ADD HDDL
 }
 
 
-TaskNetwork task_network() : // ADD HDDL
+TaskNetworkExp task_network() : // ADD HDDL
 {
-    TaskNetwork tn = null;
+    TaskNetworkExp tn = null;
 }
 {
     (    LOOKAHEAD ({this.isRequirement(RequireKey.TOTAL_ORDERED_HTN)})
@@ -1904,7 +1904,7 @@ TaskNetwork task_network() : // ADD HDDL
     }
 }
 
-TaskNetwork total_ordered_task_network() : // ADD HDDL
+TaskNetworkExp total_ordered_task_network() : // ADD HDDL
 {
     Exp tasks = null;
     Exp logical = new Exp(Connective.AND);
@@ -1915,11 +1915,11 @@ TaskNetwork total_ordered_task_network() : // ADD HDDL
     <ORDERED_SUBTASKS> tasks = subtask_def()
 	[<CONSTRAINTS> logical = logical_constraint_def()]
     {
-	    return new TaskNetwork(tasks, new Exp(Connective.AND), logical, true);
+	    return new TaskNetworkExp(tasks, new Exp(Connective.AND), logical, true);
 	}
 }
 
-TaskNetwork partial_ordered_task_network() : // ADD HDDL
+TaskNetworkExp partial_ordered_task_network() : // ADD HDDL
 {
     Exp tasks = null;
     Exp ordering = new Exp(Connective.AND);
@@ -1933,13 +1933,13 @@ TaskNetwork partial_ordered_task_network() : // ADD HDDL
 	        [<ORDERING> ordering = ordering_constraint_def()]
 	        [<CONSTRAINTS> logical = logical_constraint_def()]
 	        {
-                return new TaskNetwork(tasks, ordering, logical, false);
+                return new TaskNetworkExp(tasks, ordering, logical, false);
             }
 	|  LOOKAHEAD(2)
 	        <ORDERED_SUBTASKS> tasks = subtask_def()
             [<CONSTRAINTS> logical = logical_constraint_def()]
             {
-                return new TaskNetwork(tasks, ordering, logical, true);
+                return new TaskNetworkExp(tasks, ordering, logical, true);
             }
 
 }
@@ -3440,7 +3440,7 @@ void pddl_problem() :
 void htn_problem() : // ADD HDDL
 {
 	Symbol name = null;
-	TaskNetwork taskNetwork = null;
+	TaskNetworkExp taskNetwork = null;
 }
 {
 	try {

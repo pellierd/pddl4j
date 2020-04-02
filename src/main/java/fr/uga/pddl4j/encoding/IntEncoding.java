@@ -418,7 +418,7 @@ final class IntEncoding implements Serializable {
      * @param taskNetwork the initial task network to encode.
      * @return the initial task network encoded.
      */
-    static IntTaskNetwork encodeInitialTaskNetwork(final TaskNetwork taskNetwork) {
+    static IntTaskNetwork encodeInitialTaskNetwork(final TaskNetworkExp taskNetwork) {
         // Encode the tasks of the task network
         final IntExp tasks = IntEncoding.encodeExp(taskNetwork.getTasks());
         // Encode the ordering constraints of the task network

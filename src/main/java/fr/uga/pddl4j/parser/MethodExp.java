@@ -40,7 +40,7 @@ public class MethodExp extends AbstractOperatorExp {
     /**
      * The task network of the method.
      */
-    private TaskNetwork taskNetwork;
+    private TaskNetworkExp taskNetwork;
 
     /**
      * Create a new method from another.
@@ -50,7 +50,7 @@ public class MethodExp extends AbstractOperatorExp {
     public MethodExp(final MethodExp other) {
         super(other);
         this.task = new Exp(other.getTask());
-        this.taskNetwork = new TaskNetwork(other.taskNetwork);
+        this.taskNetwork = new TaskNetworkExp(other.taskNetwork);
     }
 
     /**
@@ -70,7 +70,7 @@ public class MethodExp extends AbstractOperatorExp {
                      final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
         super(name, parameters, preconditions);
         this.task = task;
-        this.taskNetwork = new TaskNetwork(tasks, ordering, logical, ordered);
+        this.taskNetwork = new TaskNetworkExp(tasks, ordering, logical, ordered);
     }
 
     /**
@@ -84,7 +84,7 @@ public class MethodExp extends AbstractOperatorExp {
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
     public MethodExp(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
-                     final TaskNetwork network) {
+                     final TaskNetworkExp network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrderingConstraints(),
             network.getLogicalConstraints(), network.isTotallyOrdered());
     }

@@ -43,7 +43,6 @@ public final class TaskNetwork implements Serializable {
      */
     private BitMatrix orderingConstraints;
 
-
     /**
      * Create a new task network. The list of task is set to an empty set with no ordering constraints and not totally
      * ordered.
