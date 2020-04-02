@@ -20,7 +20,7 @@ import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -129,7 +129,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();
 
-        State init = new State(problem.getInit());
+        ClosedWorldState init = new ClosedWorldState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         root.setDepth(0);
         openSet.add(root);
@@ -162,7 +162,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        final State nextState = new State(current);
+                        final ClosedWorldState nextState = new ClosedWorldState(current);
                         nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

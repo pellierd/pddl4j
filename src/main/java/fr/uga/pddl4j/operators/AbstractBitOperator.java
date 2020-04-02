@@ -32,7 +32,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
     /**
      * The preconditions of the operator.
      */
-    private BitExp preconditions;
+    private State preconditions;
 
     /*
     * Creates a new operator from an other.
@@ -52,7 +52,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
      */
     protected AbstractBitOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new BitExp();
+        this.preconditions = new State();
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
      * @param preconditions  the preconditions of the operator.
      */
     protected AbstractBitOperator(final String name, final int[] parameters, final int[] instantiations,
-                                  final BitExp preconditions) {
+                                  final State preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
     }
@@ -74,7 +74,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final BitExp getPreconditions() {
+    public final State getPreconditions() {
         return this.preconditions;
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final BitExp preconditions) {
+    public final void setPreconditions(final State preconditions) {
         this.preconditions = preconditions;
     }
 }

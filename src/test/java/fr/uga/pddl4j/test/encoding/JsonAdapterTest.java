@@ -16,12 +16,12 @@
 package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.JsonAdapter;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
+import fr.uga.pddl4j.plan.JsonAdapter;
 import fr.uga.pddl4j.plan.Plan;
 import org.junit.Assert;
 import org.junit.Before;

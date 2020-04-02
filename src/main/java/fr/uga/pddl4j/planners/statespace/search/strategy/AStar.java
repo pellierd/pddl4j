@@ -19,7 +19,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -71,10 +71,10 @@ public final class AStar extends AbstractStateSpaceStrategy {
         final long begin = System.currentTimeMillis();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         // Get the initial state from the planning problem
-        final State init = new State(codedProblem.getInit());
+        final ClosedWorldState init = new ClosedWorldState(codedProblem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
-        final Map<State, Node> closeSet = new HashMap<>();
-        final Map<State, Node> openSet = new HashMap<>();
+        final Map<ClosedWorldState, Node> closeSet = new HashMap<>();
+        final Map<ClosedWorldState, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
         final double currWeight = getWeight();
         // The list stores the node ordered according to the A* (getFValue = g + h) function

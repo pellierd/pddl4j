@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 /**
  * This class implement the combo heuristic. This heuristic improves the adjusted sum
@@ -79,7 +79,7 @@ public final class Combo extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public int estimate(final State state, final BitExp goal) {
+    public int estimate(final ClosedWorldState state, final State goal) {
         super.setGoal(goal);
         // First, we expand the relaxed planing graph to compute the sum heuristic
         super.expandRelaxedPlanningGraph(state);
@@ -98,8 +98,8 @@ public final class Combo extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final BitExp goal) {
-        return estimate((State) node, goal);
+    public double estimate(final Node node, final State goal) {
+        return estimate((ClosedWorldState) node, goal);
     }
 
 }

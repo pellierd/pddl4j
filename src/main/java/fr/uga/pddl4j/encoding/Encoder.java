@@ -20,10 +20,9 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.FatalException;
-import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.operators.Method;
 import fr.uga.pddl4j.operators.TaskNetwork;
 import fr.uga.pddl4j.parser.Connective;
@@ -33,7 +32,6 @@ import fr.uga.pddl4j.parser.RequireKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -227,7 +225,7 @@ public final class Encoder implements Serializable {
     /**
      * The goal.
      */
-    static BitExp goal;
+    static State goal;
 
     /**
      * The initial task network..
@@ -237,13 +235,13 @@ public final class Encoder implements Serializable {
     /**
      * The encoded goal.
      */
-    static List<BitExp> codedGoal;
+    static List<State> codedGoal;
 
 
     /**
      * The initial state.
      */
-    static BitExp init;
+    static State init;
 
     /**
      * Creates a new planner.
@@ -595,7 +593,7 @@ public final class Encoder implements Serializable {
         if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM))) {
             Encoder.goal = BitEncoding.encodeGoal(intGoal, factIndexMap);
         } else {
-            Encoder.goal = new BitExp();
+            Encoder.goal = new State();
         }
 
         if (intTaskNetwork != null) {
@@ -792,7 +790,7 @@ public final class Encoder implements Serializable {
      */
     static void printGoal(StringBuilder stringBuilder) {
         stringBuilder.append("Goal state is:\n");
-        for (BitExp exp : Encoder.codedGoal) {
+        for (State exp : Encoder.codedGoal) {
             stringBuilder.append(Encoder.toString(exp));
             stringBuilder.append("\n");
         }
@@ -901,7 +899,7 @@ public final class Encoder implements Serializable {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(BitExp exp) {
+    static String toString(State exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
@@ -913,7 +911,7 @@ public final class Encoder implements Serializable {
      * @param exp the conditional expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(CondBitExp exp) {
+    static String toString(ConditionalEffect exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);

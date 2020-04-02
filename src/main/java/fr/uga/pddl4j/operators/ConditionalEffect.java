@@ -22,110 +22,103 @@ package fr.uga.pddl4j.operators;
 import java.io.Serializable;
 
 /**
- * This class allows to implements a conditional effects of an operator.
+ * This class allows to implements the conditional effects of an action.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public class CondBitExp implements Serializable {
+public class ConditionalEffect implements Serializable {
 
     /**
      * The conditions of the expression.
      */
-    private BitExp conditions;
+    private State conditions;
 
     /**
      * The effects associated to the conditions.
      */
-    private BitExp effects;
+    private State effects;
 
     /**
-     * Creates a conditional bit expression from an other. This constructor is the copy constructor.
+     * Creates a conditional effect from an other. This constructor is the copy constructor.
      *
      * @param other the other conditional bit expression.
      */
-    public CondBitExp(final CondBitExp other) {
+    public ConditionalEffect(final ConditionalEffect other) {
         if (other == null) {
             throw new NullPointerException("other == null");
         }
-        this.conditions = new BitExp(other.getCondition());
-        this.effects = new BitExp(other.getEffects());
+        this.conditions = new State(other.getCondition());
+        this.effects = new State(other.getEffects());
     }
 
     /**
-     * Creates a new empty conditional expression.
+     * Creates a new empty conditional effect.
      */
-    public CondBitExp() {
-        this(new BitExp(), new BitExp());
+    public ConditionalEffect() {
+        this(new State(), new State());
     }
 
     /**
-     * Creates a new conditional expression with some specified effects.
+     * Creates a new conditional effect with some specified effects.
      *
      * @param effects the effects.
      */
-    public CondBitExp(final BitExp effects) {
-        this(new BitExp(), effects);
+    public ConditionalEffect(final State effects) {
+        this(new State(), effects);
     }
 
     /**
-     * Creates a new conditional expression with some specified conditions and effects.
+     * Creates a new conditional effect with some specified conditions and effects.
      *
      * @param conditions the conditions.
      * @param effects    the effects.
      */
-    public CondBitExp(BitExp conditions, BitExp effects) {
+    public ConditionalEffect(State conditions, State effects) {
         this.setEffects(effects);
         this.setCondition(conditions);
     }
 
     /**
-     * Returns the conditions of the conditional expression.
+     * Returns the conditions of the conditional effect.
      *
-     * @return the conditions of the conditional expression.
+     * @return the conditions of the conditional effect.
      */
-    public final BitExp getCondition() {
+    public final State getCondition() {
         return this.conditions;
     }
 
     /**
-     * Sets the conditions of the conditional expression.
+     * Sets the conditions of the conditional effect.
      *
      * @param conditions the conditions to set.
      */
-    public final void setCondition(BitExp conditions) {
-        if (conditions == null) {
-            throw new NullPointerException("conditions == null");
-        }
+    public final void setCondition(State conditions) {
         this.conditions = conditions;
     }
 
     /**
-     * Returns the effects of the conditional expression.
+     * Returns the effects of the conditional effect.
      *
-     * @return the effects of the conditional expression.
+     * @return the effects of the conditional effect.
      */
-    public final BitExp getEffects() {
+    public final State getEffects() {
         return this.effects;
     }
 
     /**
-     * Sets the effects of the conditional expression.
+     * Sets the effects of the conditional effect.
      *
      * @param effects the effects to set
-     * @throws NullPointerException if <code>effects == null</code>.
      */
-    public final void setEffects(BitExp effects) {
-        if (effects == null) {
-            throw new NullPointerException("effects == null");
-        }
-        this.effects = effects;
+    public final void setEffects(State effects) {
+       this.effects = effects;
     }
 
     /**
-     * Returns the hash code of this conditional expression.
+     * Returns the hash code of this conditional effect.
      *
-     * @return the hash code of this conditional expression.
+     * @return the hash code of this conditional effect.
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -150,8 +143,8 @@ public class CondBitExp implements Serializable {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (obj != null && obj instanceof CondBitExp) {
-            CondBitExp other = (CondBitExp) obj;
+        if (obj != null && obj instanceof ConditionalEffect) {
+            ConditionalEffect other = (ConditionalEffect) obj;
             return this.conditions.equals(other.conditions) && this.effects.equals(other.effects);
         }
         return false;

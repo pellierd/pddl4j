@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 /**
  * This class implements a node of the tree search.
@@ -27,7 +27,7 @@ import fr.uga.pddl4j.encoding.State;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class Node extends State {
+public final class Node extends ClosedWorldState {
 
     /**
      * The serial id of the class.
@@ -64,7 +64,7 @@ public final class Node extends State {
      *
      * @param state the state.
      */
-    public Node(State state) {
+    public Node(ClosedWorldState state) {
         super(state);
     }
 
@@ -77,7 +77,7 @@ public final class Node extends State {
      * @param cost      the cost to reach the node from the root node.
      * @param heuristic the estimated distance to reach the goal from the node.
      */
-    public Node(State state, Node parent, int operator, double cost, double heuristic) {
+    public Node(ClosedWorldState state, Node parent, int operator, double cost, double heuristic) {
         super(state);
         this.parent = parent;
         this.operator = operator;
@@ -96,7 +96,7 @@ public final class Node extends State {
      * @param depth     the depth of the node.
      * @param heuristic the estimated distance to reach the goal from the node.
      */
-    public Node(State state, Node parent, int operator, double cost, int depth, double heuristic) {
+    public Node(ClosedWorldState state, Node parent, int operator, double cost, int depth, double heuristic) {
         super(state);
         this.parent = parent;
         this.operator = operator;
@@ -215,7 +215,7 @@ public final class Node extends State {
      *
      * @param obj the other oject.
      * @return <code>true</code> if the node is equal to the other specified object; <code>false</code> otherwise.
-     * @see State#equals(Object)
+     * @see ClosedWorldState#equals(Object)
      */
     @Override
     public boolean equals(Object obj) {
@@ -227,7 +227,7 @@ public final class Node extends State {
      * the class BitState.
      *
      * @return the hashcode value for this node.
-     * @see State#hashCode()
+     * @see ClosedWorldState#hashCode()
      */
     @Override
     public int hashCode() {

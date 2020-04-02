@@ -19,7 +19,7 @@ import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -71,7 +71,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
         final LinkedList<Node> openList = new LinkedList<>();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
 
-        State init = new State(codedProblem.getInit());
+        ClosedWorldState init = new ClosedWorldState(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 
@@ -127,7 +127,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
         int index = 0;
         for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
-                final State nextState = new State(parent);
+                final ClosedWorldState nextState = new ClosedWorldState(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                 nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

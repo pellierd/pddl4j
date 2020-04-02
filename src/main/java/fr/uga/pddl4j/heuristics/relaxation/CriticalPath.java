@@ -22,8 +22,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
@@ -45,9 +45,9 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      */
     private static final long serialVersionUID = 1L;
 
-    private BitExp[] precond;
-    private BitExp[] effect;
-    private BitExp[] neffect;
+    private State[] precond;
+    private State[] effect;
+    private State[] neffect;
     private int[] pGoal;
     private int[] nGoal;
     private static final int COEF = 2;
@@ -60,7 +60,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     }
 
     @Override
-    public int estimate(State state, BitExp goal) {
+    public int estimate(ClosedWorldState state, State goal) {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
@@ -72,9 +72,9 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         int nbRelevantFacts = super.getRevelantFacts().size();
         this.pGoal = new int[nbRelevantFacts];
         this.nGoal = new int[nbRelevantFacts];
-        this.precond = new BitExp[startPoint];
-        this.effect = new BitExp[startPoint];
-        this.neffect = new BitExp[startPoint];
+        this.precond = new State[startPoint];
+        this.effect = new State[startPoint];
+        this.neffect = new State[startPoint];
         BitVector pGoalBitVector = super.getGoal().getPositive();
         BitVector nGoalBitVector = super.getGoal().getNegative();
 
@@ -94,8 +94,8 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
             }
             //Compute the positive preconditions
             for (Action op : this.getOperators()) {
-                final BitExp pre = new BitExp(op.getPreconditions());
-                final BitExp npre = new BitExp(op.getPreconditions());
+                final State pre = new State(op.getPreconditions());
+                final State npre = new State(op.getPreconditions());
                 BitVector nprecon = npre.getNegative();
                 BitVector precon = pre.getPositive();
                 for (int p = precon.nextSetBit(0); p >= 0; p = precon.nextSetBit(p + 1)) {
@@ -109,7 +109,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
                 }
 
                 //Get the positive and negative effects
-                BitExp effects = op.getCondEffects().get(0).getEffects();
+                State effects = op.getCondEffects().get(0).getEffects();
                 BitVector positiveEffect = effects.getPositive();
                 BitVector negativeEffect = effects.getNegative();
                 BitVector newProp = new BitVector();
@@ -166,7 +166,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final BitExp goal) {
-        return estimate((State) node, goal);
+    public double estimate(final Node node, final State goal) {
+        return estimate((ClosedWorldState) node, goal);
     }
 }

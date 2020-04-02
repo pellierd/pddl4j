@@ -20,8 +20,8 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 import java.io.Serializable;
 
@@ -51,7 +51,7 @@ public interface RelaxationHeuristic extends Serializable {
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
      */
-    int estimate(final State state, final BitExp goal);
+    int estimate(final ClosedWorldState state, final State goal);
 
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is
@@ -62,7 +62,7 @@ public interface RelaxationHeuristic extends Serializable {
      * @param goal the goal expression.
      * @return the distance to the goal state from the specified state.
      */
-    double estimate(final Node node, final BitExp goal);
+    double estimate(final Node node, final State goal);
 
     /**
      * Returns <code>true</code> if this heuristic is admissible.

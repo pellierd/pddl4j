@@ -20,10 +20,11 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.operators.Method;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -120,12 +121,12 @@ public class CodedProblem implements Serializable {
     /**
      * The goal.
      */
-    private BitExp goal;
+    private State goal;
 
     /**
      * The initial state.
      */
-    private BitExp init;
+    private State init;
 
     /**
      * The default constructor with a private package access to prevent instance creation.
@@ -180,8 +181,8 @@ public class CodedProblem implements Serializable {
         this.actions.addAll(other.actions.stream().map(Action::new).collect(Collectors.toList()));
         this.methods = new ArrayList<>();
         this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
-        this.goal = new BitExp(other.goal);
-        this.init = new BitExp(other.init);
+        this.goal = new State(other.goal);
+        this.init = new State(other.init);
     }
 
     /**
@@ -459,7 +460,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the goal of the problem.
      */
-    public final BitExp getGoal() {
+    public final State getGoal() {
         return this.goal;
     }
 
@@ -478,7 +479,7 @@ public class CodedProblem implements Serializable {
      *
      * @param goal the goal to set
      */
-    final void setGoal(final BitExp goal) {
+    final void setGoal(final State goal) {
         this.goal = goal;
     }
 
@@ -487,7 +488,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the initial state of the problem.
      */
-    public final BitExp getInit() {
+    public final State getInit() {
         return this.init;
     }
 
@@ -496,7 +497,7 @@ public class CodedProblem implements Serializable {
      *
      * @param init the initial state to set.
      */
-    final void setInit(final BitExp init) {
+    final void setInit(final State init) {
         this.init = init;
     }
 
@@ -551,7 +552,7 @@ public class CodedProblem implements Serializable {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    public final String toString(BitExp exp) {
+    public final String toString(State exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
@@ -562,7 +563,7 @@ public class CodedProblem implements Serializable {
      * @param bitState the state.
      * @return a string representation of the specified state.
      */
-    public final String toString(State bitState) {
+    public final String toString(ClosedWorldState bitState) {
         return StringEncoder.toString(bitState, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
@@ -573,7 +574,7 @@ public class CodedProblem implements Serializable {
      * @param exp the conditional expression.
      * @return a string representation of the specified expression.
      */
-    public final String toString(CondBitExp exp) {
+    public final String toString(ConditionalEffect exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }

@@ -20,7 +20,7 @@ import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 import org.apache.logging.log4j.Logger;
@@ -87,7 +87,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
 
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
 
-        State init = new State(problem.getInit());
+        ClosedWorldState init = new ClosedWorldState(problem.getInit());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         root.setHeuristic(heuristic.estimate(root, problem.getGoal()));
         restartList.add(root);
@@ -137,7 +137,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
 
         Node root = node;
         if (node == null) {
-            State init = new State(problem.getInit());
+            ClosedWorldState init = new ClosedWorldState(problem.getInit());
             root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
             root.setHeuristic(heuristic.estimate(root, problem.getGoal()));
             openList.add(root);
@@ -191,7 +191,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
         int index = 0;
         for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
-                final State nextState = new State(parent);
+                final ClosedWorldState nextState = new ClosedWorldState(parent);
                 nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                 nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

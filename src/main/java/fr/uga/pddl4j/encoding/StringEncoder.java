@@ -21,12 +21,13 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.operators.Method;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.operators.TaskNetwork;
 import fr.uga.pddl4j.parser.Connective;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.util.BitMatrix;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -442,7 +443,7 @@ final class StringEncoder implements Serializable {
         }
         str.append("Preconditions:\n").append(StringEncoder.toString(action.getPreconditions(), constants, types,
             predicates, functions, tasks, relevants)).append("\n").append("Effects:\n");
-        for (CondBitExp condExp : action.getCondEffects()) {
+        for (ConditionalEffect condExp : action.getCondEffects()) {
             str.append(StringEncoder.toString(condExp, constants, types, predicates, functions, tasks, relevants))
                 .append("\n");
         }
@@ -495,7 +496,7 @@ final class StringEncoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(BitExp exp, final List<String> constants, final List<String> types,
+    static String toString(State exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         final StringBuilder str = new StringBuilder("(and");
@@ -525,7 +526,7 @@ final class StringEncoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(State bitState, final List<String> constants, final List<String> types,
+    static String toString(ClosedWorldState bitState, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         final StringBuilder str = new StringBuilder("(and");
@@ -549,7 +550,7 @@ final class StringEncoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(CondBitExp exp, final List<String> constants, final List<String> types,
+    static String toString(ConditionalEffect exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExp> relevants) {
         StringBuilder str = new StringBuilder();

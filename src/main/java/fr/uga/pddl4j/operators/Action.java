@@ -19,16 +19,14 @@
 
 package fr.uga.pddl4j.operators;
 
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
- * This class implements a compact representation for action based on <code>BitSet</code>
- * structure.
+ * This class implements a compact representation for action of the planning problem.
  *
  * @author D. Pellier
  * @version 1.1 - 08.04.2010
@@ -36,37 +34,36 @@ import java.util.stream.Collectors;
 public class Action extends AbstractBitOperator {
 
     /**
-     * The list of effects of the operator.
+     * The list of effects of the action.
      */
-    private List<CondBitExp> effects;
+    private List<ConditionalEffect> effects;
 
     /**
-     * The cost of the operator.
+     * The cost of the action.
      */
     private double cost;
 
     /**
-     * The duration of the operator.
+     * The duration of the action.
      */
     private double duration;
 
     /**
-     * Creates a new operator from an other. This constructor is the copy constructor.
+     * Creates a new action from an other. This constructor is the copy constructor.
      *
-     * @param other the other operator.
-     * @throws NullPointerException if <code>other == null</code>.
+     * @param other the other action.
      */
     public Action(final Action other) {
         super(other);
         this.effects = new ArrayList<>();
-        this.effects.addAll(other.getCondEffects().stream().map(CondBitExp::new).collect(Collectors.toList()));
+        this.effects.addAll(other.getCondEffects().stream().map(ConditionalEffect::new).collect(Collectors.toList()));
     }
 
     /**
-     * Creates a new operator.
+     * Creates a new action.
      *
-     * @param name  the name of the operator.
-     * @param arity the arity of the operator.
+     * @param name  the name of the action.
+     * @param arity the arity of the action.
      */
     public Action(final String name, final int arity) {
         super(name, arity);
@@ -74,64 +71,60 @@ public class Action extends AbstractBitOperator {
     }
 
     /**
-     * Creates a new operator.
+     * Creates a new action.
      *
-     * @param name          the name of the operator.
-     * @param arity         the arity of the operator.
-     * @param preconditions the precondition of the operator.
-     * @param effects       the effects of the operator.
+     * @param name          the name of the action.
+     * @param arity         the arity of the action.
+     * @param preconditions the precondition of the action.
+     * @param effects       the effects of the action.
      */
-    public Action(final String name, final int arity, final BitExp preconditions, final BitExp effects) {
+    public Action(final String name, final int arity, final State preconditions, final State effects) {
         this(name, arity);
         this.setPreconditions(preconditions);
-        CondBitExp cexp = new CondBitExp();
-        cexp.setCondition(new BitExp());
+        ConditionalEffect cexp = new ConditionalEffect();
+        cexp.setCondition(new State());
         cexp.setEffects(effects);
         this.addCondBitEffect(cexp);
     }
 
     /**
-     * Returns the effects of the operator.
+     * Returns the effects of the action.
      *
-     * @return the effects of the operator.
+     * @return the effects of the action.
      */
-    public final List<CondBitExp> getCondEffects() {
+    public final List<ConditionalEffect> getCondEffects() {
         return this.effects;
     }
 
     /**
-     * Adds a conditional effect to the operator.
+     * Adds a conditional effect to the action.
      *
      * @param effect the conditional effect to add.
      */
-    public final void addCondBitEffect(CondBitExp effect) {
+    public final void addCondBitEffect(ConditionalEffect effect) {
         this.effects.add(effect);
     }
 
     /**
-     * Returns <code>true</code> if this operators is applicable in a specified state.
+     * Returns <code>true</code> if this action is applicable in a specified state.
      *
      * @param state the state.
-     * @return <code>true</code> if this operators is applicable in a specified state;
+     * @return <code>true</code> if this action is applicable in a specified state;
      * <code>false</code> otherwise.
-     * @throws NullPointerException if <code>state == null</code>.
      */
-    public boolean isApplicable(final State state) {
-        if (state == null) {
-            throw new NullPointerException("state == null");
-        }
+    public boolean isApplicable(final ClosedWorldState state) {
         return state.satisfy(this.getPreconditions());
     }
 
     /**
-     * Returns the unconditional effects of the operator.
+     * Returns the unconditional effects of the action.
      *
-     * @return the unconditional effects of the operator.
+     * @return the unconditional effects of the action.
      */
-    public BitExp getUnconditionalEffects() {
-        final BitExp ucEffect = new BitExp();
+    public State getUnconditionalEffects() {
+        final State ucEffect = new State();
         this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
-            final BitExp condEff = cEffect.getEffects();
+            final State condEff = cEffect.getEffects();
             ucEffect.getPositive().or(condEff.getPositive());
             ucEffect.getNegative().or(condEff.getNegative());
         });
@@ -139,16 +132,16 @@ public class Action extends AbstractBitOperator {
     }
 
     /**
-     * Returns the duration of the operator.
+     * Returns the duration of the action.
      *
-     * @return the duration of the operator.
+     * @return the duration of the action.
      */
     public final double getDuration() {
         return this.duration;
     }
 
     /**
-     * Sets the duration of the operator.
+     * Sets the duration of the action.
      *
      * @param duration the duration to set.
      */
@@ -157,16 +150,16 @@ public class Action extends AbstractBitOperator {
     }
 
     /**
-     * Returns the cost of the operator.
+     * Returns the cost of the action.
      *
-     * @return the cost of the operator.
+     * @return the cost of the action.
      */
     public final double getCost() {
         return this.cost;
     }
 
     /**
-     * Sets the cost of the operator.
+     * Sets the cost of the action.
      *
      * @param cost the cost to set.
      */

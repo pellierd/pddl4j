@@ -21,7 +21,7 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.State;
 import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     /**
      * The goal to reached.
      */
-    private BitExp goal;
+    private State goal;
 
     /**
      * The list of facts of the relaxed problem.
@@ -94,7 +94,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
      *
      * @return the goal.
      */
-    protected final BitExp getGoal() {
+    protected final State getGoal() {
         return this.goal;
     }
 
@@ -103,7 +103,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
      *
      * @param goal the goal.
      */
-    protected void setGoal(final BitExp goal) {
+    protected void setGoal(final State goal) {
         if (!goal.equals(this.goal)) {
             this.goal = goal;
         }

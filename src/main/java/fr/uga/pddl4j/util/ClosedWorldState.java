@@ -17,10 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.util.BitVector;
+import fr.uga.pddl4j.operators.State;
 
 /**
  * This class implements a logical state.
@@ -28,12 +27,12 @@ import fr.uga.pddl4j.util.BitVector;
  * @author D. Pellier
  * @version 1.1 - 13.04.2010
  */
-public class State extends BitVector {
+public class ClosedWorldState extends BitVector {
 
     /**
      * Creates a new state.
      */
-    public State() {
+    public ClosedWorldState() {
         super();
     }
 
@@ -42,7 +41,7 @@ public class State extends BitVector {
      *
      * @param exp the <code>BitExp</code> that represents the logical state.
      */
-    public State(final BitExp exp) {
+    public ClosedWorldState(final State exp) {
         this();
         if (exp == null) {
             throw new NullPointerException("exp == null");
@@ -56,7 +55,7 @@ public class State extends BitVector {
      *
      * @param state the other state to copy.
      */
-    public State(final State state) {
+    public ClosedWorldState(final ClosedWorldState state) {
         this();
         if (state == null) {
             throw new NullPointerException("state == null");
@@ -70,7 +69,7 @@ public class State extends BitVector {
      *
      * @param exp the expression to apply.
      */
-    public final void apply(final BitExp exp) {
+    public final void apply(final State exp) {
         if (exp == null) {
             throw new NullPointerException("exp == null");
         }
@@ -84,7 +83,7 @@ public class State extends BitVector {
      * @param exp the expression to be tested.
      * @return <code>true</code> if this state satisfy a specified expression; <code>false</code> otherwise.
      */
-    public final boolean satisfy(final BitExp exp) {
+    public final boolean satisfy(final State exp) {
         if (exp == null) {
             throw new NullPointerException("exp == null");
         }

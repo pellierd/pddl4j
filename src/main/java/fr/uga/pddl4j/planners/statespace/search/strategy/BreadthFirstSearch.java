@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
@@ -69,7 +69,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
         final LinkedList<Node> openSet = new LinkedList<>();
         final int timeout = getTimeout();
 
-        State init = new State(codedProblem.getInit());
+        ClosedWorldState init = new ClosedWorldState(codedProblem.getInit());
         Node root = new Node(init, null, 0, 0, 0);
         root.setDepth(0);
         openSet.add(root);
@@ -91,7 +91,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        final State nextState = new State(current);
+                        final ClosedWorldState nextState = new ClosedWorldState(current);
                         nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.State;
 
 import java.util.BitSet;
 
@@ -52,7 +52,7 @@ public class BitVector extends BitSet {
      *
      * @param exp the <code>BitExp</code> that represents <code>BitVector</code>.
      */
-    public BitVector(final BitExp exp) {
+    public BitVector(final State exp) {
         this();
         if (exp == null) {
             throw new NullPointerException("exp == null");

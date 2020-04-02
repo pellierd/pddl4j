@@ -17,11 +17,12 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.plan;
 
+import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.operators.BitExp;
-import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.plan.Plan;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -125,7 +126,7 @@ public class JsonAdapter implements Serializable {
                 precondJson.put("Negatives", negativeJsonPrecondition);
 
                 //CondExp
-                List<CondBitExp> condExp = action.getCondEffects();
+                List<ConditionalEffect> condExp = action.getCondEffects();
 
                 // Condition object
                 JSONArray condExpJsonArray = new JSONArray();
@@ -187,43 +188,19 @@ public class JsonAdapter implements Serializable {
      * @param exp the BitExp instance to convert.
      * @return an 2D collection of Strings.
      */
-    private ArrayList<ArrayList<String>> toJsonString(final BitExp exp) {
-        return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
-            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getTasks(),
-            this.codedProblem.getRelevantFacts());
-    }
-
-    /**
-     * Convert a BitExp into a String collection.
-     *
-     * @param exp        the BitExp instance to convert.
-     * @param constants  the constants of the problem.
-     * @param types      the types of the problem.
-     * @param predicates the predicates of the problem.
-     * @param functions  the functions of the problem.
-     * @param tasks      the tasks of the problem.
-     * @param relevants  the facts of the problem.
-     * @return an 2D collection of Strings.
-     */
-    private static ArrayList<ArrayList<String>> toJsonString(final BitExp exp,
-                                                             final List<String> constants,
-                                                             final List<String> types,
-                                                             final List<String> predicates,
-                                                             final List<String> functions,
-                                                             final List<String> tasks,
-                                                             final List<IntExp> relevants) {
+    private ArrayList<ArrayList<String>> toJsonString(final State exp) {
         ArrayList<String> fluentsPos = new ArrayList<>();
         ArrayList<String> fluentsNeg = new ArrayList<>();
         ArrayList<ArrayList<String>> fluents = new ArrayList<>();
 
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks, " "));
+            fluentsPos.add(this.codedProblem.toString(codedProblem.getRelevantFacts().get(i)));
         }
 
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks, " "));
+            fluentsNeg.add(this.codedProblem.toString(codedProblem.getRelevantFacts().get(i)));
         }
 
         fluents.add(fluentsPos);

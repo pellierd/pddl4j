@@ -21,9 +21,9 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.State;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 
 import java.util.LinkedList;
 
@@ -62,7 +62,7 @@ public class MinCost extends AbstractHeuristic {
      * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
-    public int estimate(final State state, final BitExp goal) {
+    public int estimate(final ClosedWorldState state, final State goal) {
         return (int) estimateCost(new Node(state), goal);
     }
 
@@ -76,7 +76,7 @@ public class MinCost extends AbstractHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final BitExp goal) {
+    public double estimate(final Node node, final State goal) {
         return estimateCost(node, goal);
     }
 
@@ -89,7 +89,7 @@ public class MinCost extends AbstractHeuristic {
      * @param goal the goal to reach.
      * @return the distance to the goal state from the specified node.
      */
-    public double estimateCost(final Node node, final BitExp goal) {
+    public double estimateCost(final Node node, final State goal) {
         final LinkedList<Node> openList = new LinkedList<>();
 
         openList.add(node);
@@ -107,7 +107,7 @@ public class MinCost extends AbstractHeuristic {
             for (Action op : getOperators()) {
                 if (op.isApplicable(current)) {
                     if (op.getCost() <= cost) { //TODO take into account = or not
-                        final State nextState = new State(current);
+                        final ClosedWorldState nextState = new ClosedWorldState(current);
                         nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

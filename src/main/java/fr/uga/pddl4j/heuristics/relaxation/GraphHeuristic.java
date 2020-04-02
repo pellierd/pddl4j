@@ -20,12 +20,12 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.operators.BitExp;
+import fr.uga.pddl4j.operators.State;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.BitVector;
-import fr.uga.pddl4j.operators.CondBitExp;
+import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.ArrayList;
@@ -225,10 +225,10 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
         // Start enumerating the unconditional opsLayer
         int uncondOpIndex = this.nbPropositions;
         for (final Action op : pbOperators) {
-            final List<CondBitExp> condEffects = op.getCondEffects();
+            final List<ConditionalEffect> condEffects = op.getCondEffects();
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
-                final CondBitExp cEffect = condEffects.get(ceIndex);
+                final ConditionalEffect cEffect = condEffects.get(ceIndex);
                 if (debug) {
                     this.operators[uncondOpIndex] = "(" + problem.toShortString(op) + ")_" + ceIndex;
                 }
@@ -292,7 +292,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * @param goal the goal.
      */
     @Override
-    protected final void setGoal(final BitExp goal) {
+    protected final void setGoal(final State goal) {
         super.setGoal(goal);
         // Set the goal to the state representation
         this.bvgoal = new BitVector();
@@ -309,7 +309,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
      * @param state the initial state of the relaxed planning graph.
      * @return the level of the graph built.
      */
-    protected final int expandPlanningGraph(final State state) {
+    protected final int expandPlanningGraph(final ClosedWorldState state) {
 
         // The array that contains the level of the positive proposition apparition
         Arrays.fill(this.propositionsLevel, Integer.MAX_VALUE);

@@ -26,7 +26,6 @@ import fr.uga.pddl4j.util.BitMatrix;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,13 +101,13 @@ final class BitEncoding implements Serializable {
             // Initialize the effects of the action
             final List<IntExp> effects = intAction.getEffects().getChildren();
 
-            final CondBitExp unCondEffects = new CondBitExp();
+            final ConditionalEffect unCondEffects = new ConditionalEffect();
             boolean hasUnConditionalEffects = false;
             for (IntExp ei : effects) {
                 final Connective connective = ei.getConnective();
                 final List<IntExp> children = ei.getChildren();
                 if (connective.equals(Connective.WHEN)) {
-                    final CondBitExp condBitExp = new CondBitExp();
+                    final ConditionalEffect condBitExp = new ConditionalEffect();
                     condBitExp.setCondition(BitEncoding.encode(children.get(0), map));
                     condBitExp.setEffects(BitEncoding.encode(children.get(1), map));
                     a.getCondEffects().add(condBitExp);
@@ -183,12 +182,12 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static BitExp encodeGoal(IntExp goal, final Map<IntExp, Integer> map) throws UnexpectedExpressionException {
+    static State encodeGoal(IntExp goal, final Map<IntExp, Integer> map) throws UnexpectedExpressionException {
         if (goal.getConnective().equals(Connective.FALSE)) {
             return null;
         }
 
-        BitExp newGoal;
+        State newGoal;
         BitEncoding.toDNF(goal);
         Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
         for (IntExp exp : goal.getChildren()) {
@@ -211,11 +210,11 @@ final class BitEncoding implements Serializable {
             final int dummyGoalIndex = Encoder.tableOfRelevantFacts.size();
             Encoder.tableOfRelevantFacts.add(dummyGoal);
             map.put(dummyGoal, dummyGoalIndex);
-            newGoal = new BitExp();
+            newGoal = new State();
             newGoal.getPositive().set(dummyGoalIndex);
-            final CondBitExp condEffect = new CondBitExp(newGoal);
+            final ConditionalEffect condEffect = new ConditionalEffect(newGoal);
             // for each disjunction create a dummy action
-            for (BitExp dis : Encoder.codedGoal) {
+            for (State dis : Encoder.codedGoal) {
                 final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
                 op.setDummy(true);
                 op.setPreconditions(dis);
@@ -285,8 +284,8 @@ final class BitEncoding implements Serializable {
      * @param map  the map that associates to a specified expression its index.
      * @return the <code>BitExp</code> that represents the initial encoded.
      */
-    static BitExp encodeInit(final Set<IntExp> init, final Map<IntExp, Integer> map) {
-        final BitExp bitInit = new BitExp();
+    static State encodeInit(final Set<IntExp> init, final Map<IntExp, Integer> map) {
+        final State bitInit = new State();
         for (final IntExp fact : init) {
             if (fact.getConnective().equals(Connective.ATOM)) {
                 final Integer i = map.get(fact);
@@ -311,9 +310,9 @@ final class BitEncoding implements Serializable {
      * @param map the map that associate to a specified expression its index.
      * @return the expression in bit set representation.
      */
-    private static BitExp encode(final IntExp exp, final Map<IntExp, Integer> map)
+    private static State encode(final IntExp exp, final Map<IntExp, Integer> map)
         throws UnexpectedExpressionException {
-        final BitExp bitExp = new BitExp();
+        final State bitExp = new State();
         if (exp.getConnective().equals(Connective.ATOM)) {
             final Integer index = map.get(exp);
             if (index != null) {

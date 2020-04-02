@@ -24,13 +24,13 @@ import fr.uga.pddl4j.util.BitVector;
 import java.io.Serializable;
 
 /**
- * This class implements an bit set expression. A bit set expression is used to encode preconditions
+ * This class implements an state. A bit set expression is used to encode preconditions
  * (negative and positive) but also effects of the instantiated operators.
  *
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public class BitExp implements Serializable {
+public class State implements Serializable {
 
     /**
      * The bit state used to store the positive facts of the expression.
@@ -46,7 +46,7 @@ public class BitExp implements Serializable {
      * Creates a new bit set expression. By default the expression has no positive and no negative
      * fact.
      */
-    public BitExp() {
+    public State() {
         this(new BitVector(), new BitVector());
     }
 
@@ -55,11 +55,8 @@ public class BitExp implements Serializable {
      *
      * @param other the other one.
      */
-    public BitExp(final BitExp other) {
+    public State(final State other) {
         this();
-        if (other == null) {
-            throw new NullPointerException("other == null");
-        }
         this.positive.or(other.positive);
         this.negative.or(other.negative);
     }
@@ -71,10 +68,7 @@ public class BitExp implements Serializable {
      * @param positive the bit set that represents the positive facts of the expression.
      * @param negative the bit set that represents the negative facts of the expression.
      */
-    public BitExp(BitVector positive, BitVector negative) {
-        if (positive == null || negative == null) {
-            throw new NullPointerException("positive == null || negative == null");
-        }
+    public State(BitVector positive, BitVector negative) {
         this.positive = positive;
         this.negative = negative;
     }
@@ -144,8 +138,8 @@ public class BitExp implements Serializable {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (obj != null && obj instanceof BitExp) {
-            BitExp other = (BitExp) obj;
+        if (obj != null && obj instanceof State) {
+            State other = (State) obj;
             return this.positive.equals(other.positive) && this.negative.equals(other.negative);
         }
         return false;

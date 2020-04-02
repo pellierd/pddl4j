@@ -20,7 +20,7 @@ import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.encoding.State;
+import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -124,11 +124,11 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
         final long begin = System.currentTimeMillis();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         // Get the initial state from the planning problem
-        final State init = new State(problem.getInit());
+        final ClosedWorldState init = new ClosedWorldState(problem.getInit());
         // Initialize the closed list of nodes (store the nodes explored)
-        final Map<State, Node> closeSet = new HashMap<>();
+        final Map<ClosedWorldState, Node> closeSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
-        final Map<State, Node> openSet = new HashMap<>();
+        final Map<ClosedWorldState, Node> openSet = new HashMap<>();
         // Initialize the weight to use
         final double currWeight = this.getWeight();
         // Initialize the node comparator
