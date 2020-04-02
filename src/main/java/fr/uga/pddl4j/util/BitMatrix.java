@@ -96,7 +96,7 @@ public final class BitMatrix implements Serializable {
      * @param row the row position.
      * @param col the column position.
      */
-    public void set(final int row, final int col) {
+    public final void set(final int row, final int col) {
         this.bitsets[row].set(col);
     }
 
@@ -106,7 +106,7 @@ public final class BitMatrix implements Serializable {
      * @param row the row position.
      * @param col the column position.
      */
-    public void clear(final int row, final int col) {
+    public final void clear(final int row, final int col) {
         this.bitsets[row].clear(col);
     }
 
@@ -116,7 +116,7 @@ public final class BitMatrix implements Serializable {
      * @param row the index of the row.
      * @return the ith row of the matrix.
      */
-    public BitSet getRow(final int row) {
+    public final BitSet getRow(final int row) {
         return this.bitsets[row];
     }
 
@@ -126,7 +126,7 @@ public final class BitMatrix implements Serializable {
      * @param col the index of the column.
      * @return the jth column of the matrix.
      */
-    public BitSet getColumn(final int col) {
+    public final BitSet getColumn(final int col) {
         final BitSet column = new BitSet(this.rows);
         for (int i = 0; i < this.rows; i++) {
             column.set(i, this.bitsets[i].get(col));
@@ -141,7 +141,7 @@ public final class BitMatrix implements Serializable {
      * @param col The column of the bit.
      * @return the value of the bit at a specific position in the matrix.
      */
-    public boolean get(final int row, final int col) {
+    public final boolean get(final int row, final int col) {
         return this.bitsets[row].get(col);
     }
 
@@ -151,7 +151,7 @@ public final class BitMatrix implements Serializable {
      *
      * @return Returns the cardinality of the matrix.
      */
-    public int cardinality() {
+    public final int cardinality() {
         int cardinality = 0;
         for (int i = 0; i < this.rows; i++) {
             cardinality += this.bitsets[i].cardinality();
@@ -164,7 +164,7 @@ public final class BitMatrix implements Serializable {
      *
      * @return the number of columns of the matrix.
      */
-    public int columns() {
+    public final int columns() {
         return this.columns;
     }
 
@@ -173,7 +173,7 @@ public final class BitMatrix implements Serializable {
      *
      * @return the number of rows of the matrix.
      */
-    public int rows() {
+    public final int rows() {
         return this.rows;
     }
 

@@ -28,13 +28,13 @@ public class HDDLEncoderTest {
             //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/domain.hddl"),
             //    new File("src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/pb01.hddl"));
 
-            ErrorManager errorManager = factory.parse(
-                new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl"),
-                new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl"));
-
             //ErrorManager errorManager = factory.parse(
-            //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl"),
-            //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl"));
+            //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl"),
+            //    new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl"));
+
+            ErrorManager errorManager = factory.parse(
+                new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl"),
+                new File("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl"));
 
 
             if (!errorManager.isEmpty()) {

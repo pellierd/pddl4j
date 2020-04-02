@@ -87,16 +87,16 @@ public final class TaskNetwork implements Serializable {
         return this.tasks.length;
     }
     /**
-     * Returns the tasks of the method.
+     * Returns the tasks of the task network.
      *
-     * @return the tasks of the method.
+     * @return the tasks of the task network.
      */
     public final int[] getTasks() {
         return this.tasks;
     }
 
     /**
-     * Set the tasks of the method.
+     * Set the tasks of the task network.
      *
      * @param tasks the tasks to set.
      */
@@ -135,6 +135,44 @@ public final class TaskNetwork implements Serializable {
             ordered = this.orderingConstraints.get(i - 1, i);
         }
         return ordered;
+    }
+
+    /**
+     * Returns if this task network contains cyclic ordering constraints.
+     *
+     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code> otherwise.
+     */
+    public final boolean isAcyclic() {
+        this.transitiveClosure();
+        final int size = this.orderingConstraints.rows();
+        boolean acyclic = true;
+        int i = 0;
+        while (i < size && acyclic) {
+            acyclic &= !this.getOrderingConstraints().get(i, i);
+            i++;
+        }
+        return acyclic;
+    }
+
+    /**
+     * Compute the transitive closure of the ordering constraints. The computation of the transitive closure is based
+     * on Warshall algorithm. The complexity is O(n) where n is the number of tasks of the task network.
+     */
+    private final void transitiveClosure() {
+        final int size = this.orderingConstraints.rows();
+        for (int k = 0; k < size; k++) {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    if (!this.getOrderingConstraints().get(i, j)
+                            || (!this.getOrderingConstraints().get(i, k)
+                                && !this.getOrderingConstraints().get(k, i))) {
+                        this.orderingConstraints.set(i, j);
+                    } else {
+                        this.orderingConstraints.clear(i, j);
+                    }
+                }
+            }
+        }
     }
 
     /**
