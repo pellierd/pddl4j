@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.operators.Action;
@@ -23,6 +24,7 @@ import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -104,10 +106,13 @@ public final class AStar extends AbstractStateSpaceStrategy {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
                 for (Action op : codedProblem.getActions()) {
+
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
+                        //System.out.println("IS APPLICABLE");
                         Node state = new Node(current);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
+
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
@@ -144,7 +149,6 @@ public final class AStar extends AbstractStateSpaceStrategy {
                             result.setOperator(index);
                             result.setDepth(current.getDepth() + 1);
                         }
-
                     }
                     index++;
                 }

@@ -621,9 +621,14 @@ public final class Encoder implements Serializable {
                     stringBuilder.append(Encoder.toString(m) + "\n");
                 }
             }
+            stringBuilder.append("Final initial state:\n").append("(and");
+            for (IntExp f : intInitPredicates) {
+                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
+            }
+
 
             if (!Encoder.requirements.contains(RequireKey.HTN)) {
-                stringBuilder.append("\nFinal goal state:");
+                stringBuilder.append("\nFinal goal state:\n");
                 if (Encoder.goal == null) { // Goal null
                     stringBuilder.append("goal can be simplified to FALSE");
                 } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty

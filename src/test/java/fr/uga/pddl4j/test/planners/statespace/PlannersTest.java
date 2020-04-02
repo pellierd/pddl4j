@@ -20,7 +20,7 @@ public class PlannersTest {
 
         ErrorManager errorManager = null;
         try {
-            errorManager = factory.parse(new File("./pddl/blocksworld/domain.pddl"), new File("./pddl/blocksworld/p01.pddl"));
+            errorManager = factory.parse(new File("./pddl/blocksworld/domain.pddl"), new File("./pddl/blocksworld/p03.pddl"));
         } catch (IOException e) {
             System.out.println("Unexpected error when parsing the PDDL planning problem description.");
             e.printStackTrace();
