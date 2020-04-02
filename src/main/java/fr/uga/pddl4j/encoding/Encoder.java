@@ -615,10 +615,11 @@ public final class Encoder implements Serializable {
             for (Action a : Encoder.actions) {
                 stringBuilder.append(Encoder.toString(a) + "\n");
             }
-
-            stringBuilder.append("\nFinal methods:\n");
-            for (Method m : Encoder.methods) {
-                stringBuilder.append(Encoder.toString(m) + "\n");
+            if (Encoder.requirements.contains(RequireKey.HTN)) {
+                stringBuilder.append("\nFinal methods:\n");
+                for (Method m : Encoder.methods) {
+                    stringBuilder.append(Encoder.toString(m) + "\n");
+                }
             }
 
             if (!Encoder.requirements.contains(RequireKey.HTN)) {
@@ -634,6 +635,7 @@ public final class Encoder implements Serializable {
                 stringBuilder.append("Final initial task network state:\n");
                 stringBuilder.append(Encoder.toString(Encoder.initialTaskNetwork));
             }
+            stringBuilder.append("\n\n");
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
         }

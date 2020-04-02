@@ -84,10 +84,8 @@ final class BitEncoding implements Serializable {
         // Normalize the actions
         BitEncoding.normalizeActions(actions);
 
-
         final List<Action> encodedActions = new ArrayList<>(actions.size());
         for (IntAction intAction : actions) {
-            System.out.println(Encoder.toString(intAction));
             final int arity = intAction.getArity();
             final Action a = new Action(intAction.getName(), arity);
             a.setCost(intAction.getCost());
@@ -136,12 +134,6 @@ final class BitEncoding implements Serializable {
                 a.getCondEffects().add(unCondEffects);
             }
             encodedActions.add(a);
-            System.out.println(Encoder.toString(a));
-            try {
-                System.in.read();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return encodedActions;
     }
