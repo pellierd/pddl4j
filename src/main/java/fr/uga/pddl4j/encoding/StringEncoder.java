@@ -501,8 +501,8 @@ final class StringEncoder implements Serializable {
                            final List<IntExp> relevants) {
         final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = exp.getPositive();
-        for (int i = positive.nextSetBit(0); i > 0; i = positive.nextSetBit(i + 1)) {
-            str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks))
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ").append(StringEncoder.toString(relevants.get(j), constants, types, predicates, functions, tasks))
                 .append("\n");
         }
         final BitSet negative = exp.getNegative();
