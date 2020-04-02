@@ -25,6 +25,7 @@ import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.sound.midi.SysexMessage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -1085,20 +1086,23 @@ public final class Parser {
      * @return <code>true</code> if the initial task network is well formed; <code>false</code> otherwise.
      */
     private boolean checkInitialTaskNetwork() {
-        final TaskNetworkExp tn = problem.getInitialTaskNetwork();
-        boolean checked = this.checkParserNode(tn.getTasks(), new LinkedList<TypedSymbol>());
-        if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol>())) {
-            final Set<Symbol> taskIds = this.getTaskIDs(tn.getTasks());
-            final Set<Symbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
-            for (Symbol id : consIds) {
-                if (!taskIds.contains(id)) {
-                    this.mgr.logParserError("task alias \"" + id + "\" initial task network"
-                        + " is undefined", this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
-                    checked = false;
+        boolean checked = true;
+        if (problem.getInitialTaskNetwork() != null) {
+            final TaskNetworkExp tn = problem.getInitialTaskNetwork();
+            checked = this.checkParserNode(tn.getTasks(), new LinkedList<TypedSymbol>());
+            if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol>())) {
+                final Set<Symbol> taskIds = this.getTaskIDs(tn.getTasks());
+                final Set<Symbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
+                for (Symbol id : consIds) {
+                    if (!taskIds.contains(id)) {
+                        this.mgr.logParserError("task alias \"" + id + "\" initial task network"
+                            + " is undefined", this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
+                        checked = false;
+                    }
                 }
+            } else {
+                checked = false;
             }
-        } else {
-            checked = false;
         }
         return checked;
     }
