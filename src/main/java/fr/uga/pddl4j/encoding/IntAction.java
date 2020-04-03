@@ -79,6 +79,8 @@ final class IntAction extends AbstractIntOperator {
     public IntAction(final String name, final int arity) {
         super(name, arity);
         this.effects = new IntExp(Connective.OR);
+        this.cost = IntAction.DEFAULT_COST;
+        this.duration = IntAction.DEFAULT_DURATION;
     }
 
     /**
