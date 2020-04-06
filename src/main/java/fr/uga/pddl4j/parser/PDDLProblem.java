@@ -30,57 +30,57 @@ import java.util.*;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class Problem implements Serializable {
+public class PDDLProblem implements Serializable {
 
     /**
      * The name of the problem.
      */
-    private Symbol name;
+    private PDDLSymbol name;
 
     /**
      * The name of the domain.
      */
-    private Symbol domain;
+    private PDDLSymbol domain;
 
     /**
      * The set of requirements.
      */
-    private Set<RequireKey> requirements;
+    private Set<PDDLRequireKey> requirements;
 
     /**
      * The list of objects declared in the problem.
      */
-    private List<TypedSymbol> objects;
+    private List<PDDLTypedSymbol> objects;
 
     /**
      * The task network of the problem.
      */
-    private TaskNetworkExp initialTaskNetwork;
+    private PDDLTaskNetwork initialTaskNetwork;
 
     /**
      * The list of initial facts declared in the problem.
      */
-    private List<Exp> initialFacts;
+    private List<PDDLExpression> initialFacts;
 
     /**
      * The goal of the problem.
      */
-    private Exp goal;
+    private PDDLExpression goal;
 
     /**
      * The constraints declared in the problem.
      */
-    private Exp constraints;
+    private PDDLExpression constraints;
 
     /**
      * The metric constraints of the problem.
      */
-    private Exp metric;
+    private PDDLExpression metric;
 
     /**
      * Creates a new problem.
      */
-    private Problem() {
+    private PDDLProblem() {
         super();
     }
 
@@ -89,7 +89,7 @@ public class Problem implements Serializable {
      *
      * @param name the name of the problem.
      */
-    public Problem(final Symbol name) {
+    public PDDLProblem(final PDDLSymbol name) {
         this();
         if (name == null) {
             throw new NullPointerException();
@@ -109,7 +109,7 @@ public class Problem implements Serializable {
      *
      * @return the name of the problem.
      */
-    public final Symbol getName() {
+    public final PDDLSymbol getName() {
         return this.name;
     }
 
@@ -118,7 +118,7 @@ public class Problem implements Serializable {
      *
      * @param name the name to set.
      */
-    public final void setName(final Symbol name) {
+    public final void setName(final PDDLSymbol name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -130,7 +130,7 @@ public class Problem implements Serializable {
      *
      * @return the name of the domain declared in the problem.
      */
-    public final Symbol getDomain() {
+    public final PDDLSymbol getDomain() {
         return this.domain;
     }
 
@@ -139,7 +139,7 @@ public class Problem implements Serializable {
      *
      * @param domain the domain to set.
      */
-    public final void setDomain(final Symbol domain) {
+    public final void setDomain(final PDDLSymbol domain) {
         if (domain == null) {
             throw new NullPointerException();
         }
@@ -151,7 +151,7 @@ public class Problem implements Serializable {
      *
      * @return the set of requirements.
      */
-    public Set<RequireKey> getRequirements() {
+    public Set<PDDLRequireKey> getRequirements() {
         return this.requirements;
     }
 
@@ -161,7 +161,7 @@ public class Problem implements Serializable {
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
-    public final boolean addRequirement(final RequireKey requirement) {
+    public final boolean addRequirement(final PDDLRequireKey requirement) {
         if (requirement == null) {
             throw new NullPointerException();
         }
@@ -173,7 +173,7 @@ public class Problem implements Serializable {
      *
      * @return the list of objects declared in the problem file.
      */
-    public List<TypedSymbol> getObjects() {
+    public List<PDDLTypedSymbol> getObjects() {
         return this.objects;
     }
 
@@ -183,7 +183,7 @@ public class Problem implements Serializable {
      * @param object the object to add.
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
      */
-    public final boolean addObject(final TypedSymbol object) {
+    public final boolean addObject(final PDDLTypedSymbol object) {
         if (object == null) {
             throw new NullPointerException();
         }
@@ -196,7 +196,7 @@ public class Problem implements Serializable {
      * @param network The task network to set.
      * @thows NullPointerException if the task network to set is null.
      */
-    public final void setInitialTaskNetwork(final TaskNetworkExp network) {
+    public final void setInitialTaskNetwork(final PDDLTaskNetwork network) {
         if (network == null) {
            throw new NullPointerException();
         }
@@ -208,14 +208,14 @@ public class Problem implements Serializable {
      *
      * @return the task network of the problem. The task network may null if it is not defined.
      */
-    public final TaskNetworkExp getInitialTaskNetwork() {return this.initialTaskNetwork; }
+    public final PDDLTaskNetwork getInitialTaskNetwork() {return this.initialTaskNetwork; }
 
     /**
      * Returns the list of initial facts defined in the problem file.
      *
      * @return the list of initial facts defined in the problem file.
      */
-    public List<Exp> getInit() {
+    public List<PDDLExpression> getInit() {
         return this.initialFacts;
     }
 
@@ -225,7 +225,7 @@ public class Problem implements Serializable {
      * @param fact the fact to add.
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
      */
-    public final boolean addInitialFact(final Exp fact) {
+    public final boolean addInitialFact(final PDDLExpression fact) {
         if (fact == null) {
             throw new NullPointerException();
         }
@@ -237,7 +237,7 @@ public class Problem implements Serializable {
      *
      * @return the list of goal defined in the problem file.
      */
-    public Exp getGoal() {
+    public PDDLExpression getGoal() {
         return this.goal;
     }
 
@@ -246,7 +246,7 @@ public class Problem implements Serializable {
      *
      * @param goal the goal to set.
      */
-    public final void setGoal(final Exp goal) {
+    public final void setGoal(final PDDLExpression goal) {
         if (goal == null) {
             throw new NullPointerException();
         }
@@ -258,7 +258,7 @@ public class Problem implements Serializable {
      *
      * @return the problem constraints loaded or <code>null</code> if the problem has no constraints.
      */
-    public Exp getConstraints() {
+    public PDDLExpression getConstraints() {
         return this.constraints;
     }
 
@@ -267,7 +267,7 @@ public class Problem implements Serializable {
      *
      * @param constraints the constraints to set.
      */
-    public final void setConstraints(final Exp constraints) {
+    public final void setConstraints(final PDDLExpression constraints) {
         this.constraints = constraints;
     }
 
@@ -276,7 +276,7 @@ public class Problem implements Serializable {
      *
      * @return the metric of the problem or <code>null</code> if the problem has no metric specification.
      */
-    public Exp getMetric() {
+    public PDDLExpression getMetric() {
         return this.metric;
     }
 
@@ -285,7 +285,7 @@ public class Problem implements Serializable {
      *
      * @param metric the metric to set.
      */
-    public final void setMetric(final Exp metric) {
+    public final void setMetric(final PDDLExpression metric) {
         this.metric = metric;
     }
 
@@ -295,7 +295,7 @@ public class Problem implements Serializable {
      * @param symbol The symbol.
      * @return the object from a specified symbol or <code>null</code> if no object with this symbol was declared.
      */
-    public final TypedSymbol getObject(final Symbol symbol) {
+    public final PDDLTypedSymbol getObject(final PDDLSymbol symbol) {
         final int index = this.objects.indexOf(symbol);
         return (index == -1) ? null : this.objects.get(index);
     }
@@ -304,8 +304,8 @@ public class Problem implements Serializable {
      * Normalize the problem. This method renames the variables and then move inward the negation of
      * the goal and the constraints of the problem.
      *
-     * @see ActionExp#normalize()
-     * @see DerivedPredicateExp#normalize()
+     * @see PDDLAction#normalize()
+     * @see PDDLDerivedPredicate#normalize()
      */
     public void standardize() throws FatalException {
         // Rename the constraints of the problem
@@ -320,7 +320,7 @@ public class Problem implements Serializable {
         }
         // Standardize the initial task network
         if (this.getInitialTaskNetwork() != null) {
-            final TaskNetworkExp tn = this.getInitialTaskNetwork();
+            final PDDLTaskNetwork tn = this.getInitialTaskNetwork();
             if (tn.getTasks().getChildren().size() == 1) {
                 tn.setTotallyOrdered(true);
             }
@@ -331,10 +331,10 @@ public class Problem implements Serializable {
             tn.getOrderingConstraints().renameTaskIDs(taskIDCtx);
             // In this case enumerate the orderings contraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
-                tn.setOrderingConstraints(new Exp(Connective.AND));
+                tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
-                    Exp c = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
-                    c.setAtom(new LinkedList<Symbol>());
+                    PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    c.setAtom(new LinkedList<PDDLSymbol>());
                     c.getAtom().add(tn.getTasks().getChildren().get(i-1).getTaskID());
                     c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
                     tn.getOrderingConstraints().addChild(c);
@@ -353,13 +353,13 @@ public class Problem implements Serializable {
         StringBuilder str = new StringBuilder();
         str.append("(define (problem ").append(this.name).append(")").append("\n(:domain ")
             .append(this.domain).append(")").append("\n(:requirements");
-        for (RequireKey r : this.requirements) {
+        for (PDDLRequireKey r : this.requirements) {
             str.append(" ").append(r);
         }
         str.append(")\n");
         if (!this.objects.isEmpty()) {
             str.append("(:objects ");
-            for (TypedSymbol obj : this.objects) {
+            for (PDDLTypedSymbol obj : this.objects) {
                 str.append("\n  ").append(obj);
             }
             str.append("\n)\n");
@@ -370,7 +370,7 @@ public class Problem implements Serializable {
             str.append("\n)\n");
         }
         str.append("(:init");
-        for (Exp fact : this.initialFacts) {
+        for (PDDLExpression fact : this.initialFacts) {
             str.append("\n  ").append(fact);
         }
         str.append("\n)\n");

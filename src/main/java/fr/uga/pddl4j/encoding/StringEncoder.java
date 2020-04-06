@@ -24,8 +24,8 @@ import fr.uga.pddl4j.operators.Method;
 import fr.uga.pddl4j.operators.State;
 import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.operators.TaskNetwork;
-import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.ClosedWorldState;
 
@@ -73,9 +73,9 @@ final class StringEncoder implements Serializable {
             final int index = op.getValueOfParameter(i);
             final String type = types.get(op.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
                     .append(constants.get(index)).append(" \n");
             }
         }
@@ -107,9 +107,9 @@ final class StringEncoder implements Serializable {
             final int index = meth.getValueOfParameter(i);
             final String type = types.get(meth.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
                     .append(constants.get(index)).append(" \n");
             }
         }
@@ -163,14 +163,14 @@ final class StringEncoder implements Serializable {
      */
     static String toString(final TaskNetwork tn, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
-                           final List<IntExp> relevantTasks) {
+                           final List<IntExpression> relevantTasks) {
         final StringBuilder str = new StringBuilder();
         str.append("Tasks:\n");
         if (tn.getTasks().length == 0) {
             str.append(" ()\n");
         } else {
             for (int i = 0; i < tn.getTasks().length; i++) {
-                str.append(" " + Symbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
+                str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
                 str.append(StringEncoder.toString(relevantTasks.get(tn.getTasks()[i]), constants, types, predicates,
                     functions, tasks)).append("\n");
             }
@@ -184,9 +184,9 @@ final class StringEncoder implements Serializable {
             for (int r = 0; r < constraints.rows(); r++) {
                 BitSet row = constraints.getRow(r);
                 for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
-                    str.append(" C").append(index).append(": ").append(Symbol.DEFAULT_TASK_ID_SYMBOL + r).append(" ");
-                    str.append(Connective.LESS_ORDERING_CONSTRAINT.getImage()).append(" ");
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c).append("\n");
+                    str.append(" C").append(index).append(": ").append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r).append(" ");
+                    str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage()).append(" ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c).append("\n");
                     index++;
                 }
             }
@@ -205,7 +205,7 @@ final class StringEncoder implements Serializable {
      * @param tasks      the table of tasks.
      * @return a string representation of the specified expression.
      */
-    static String toString(final IntExp exp, final List<String> constants, final List<String> types,
+    static String toString(final IntExpression exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks) {
         return StringEncoder.toString(exp, constants, types, predicates, functions, tasks, " ");
     }
@@ -222,7 +222,7 @@ final class StringEncoder implements Serializable {
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression.
      */
-    static String toString(final IntExp exp, final List<String> constants, final List<String> types,
+    static String toString(final IntExpression exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final String separator) {
         return StringEncoder.toString(exp, constants, types, predicates, functions, tasks, "", separator);
@@ -241,7 +241,7 @@ final class StringEncoder implements Serializable {
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.
      */
-    private static String toString(final IntExp exp, final List<String> constants,
+    private static String toString(final IntExpression exp, final List<String> constants,
                                    final List<String> types, final List<String> predicates,
                                    final List<String> functions, final List<String> tasks,
                                    String baseOffset, final String separator) {
@@ -253,7 +253,7 @@ final class StringEncoder implements Serializable {
                 int[] args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
-                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
                         str.append(" ").append(constants.get(index));
                     }
@@ -265,7 +265,7 @@ final class StringEncoder implements Serializable {
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
-                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
                         str.append(" ").append(constants.get(index));
                     }
@@ -274,8 +274,8 @@ final class StringEncoder implements Serializable {
                 break;
             case TASK:
                 str.append("(");
-                if (exp.getTaskID() != IntExp.DEFAULT_TASK_ID) {
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
                     str.append(exp.getTaskID());
                     str.append(" (");
                 }
@@ -283,12 +283,12 @@ final class StringEncoder implements Serializable {
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
-                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
                         str.append(" ").append(constants.get(index));
                     }
                 }
-                if (exp.getTaskID() != IntExp.DEFAULT_TASK_ID) {
+                if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
                     str.append(")");
                 }
                 str.append(")");
@@ -298,7 +298,7 @@ final class StringEncoder implements Serializable {
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
-                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
                         str.append(" ").append(constants.get(index));
                     }
@@ -325,7 +325,7 @@ final class StringEncoder implements Serializable {
             case EXISTS:
                 String offsetEx = baseOffset + baseOffset + "  ";
                 str.append(" (").append(exp.getConnective().getImage())
-                    .append(" (").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-exp.getVariable() - 1).append(" - ")
+                    .append(" (").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-exp.getVariable() - 1).append(" - ")
                     .append(types.get(exp.getType())).append(")\n").append(offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(StringEncoder.toString(exp.getChildren().get(0), constants, types, predicates,
@@ -398,12 +398,12 @@ final class StringEncoder implements Serializable {
                 break;
             case LESS_ORDERING_CONSTRAINT:
                 str.append("(");
-                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(0).getTaskID());
                 str.append(" ");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
-                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(1).getTaskID());
                 str.append(")");
                 break;
@@ -428,16 +428,16 @@ final class StringEncoder implements Serializable {
      */
     static String toString(final Action action, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                           final List<String> tasks, final List<IntExp> relevants) {
+                           final List<String> tasks, final List<IntExpression> relevants) {
         StringBuilder str = new StringBuilder();
         str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < action.getArity(); i++) {
             final int index = action.getValueOfParameter(i);
             final String type = types.get(action.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
                     .append(constants.get(index)).append(" \n");
             }
         }
@@ -464,16 +464,16 @@ final class StringEncoder implements Serializable {
      */
     static String toString(final Method method, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
-                           final  List<IntExp> relevantFacts, final List<IntExp> relevantTasks) {
+                           final  List<IntExpression> relevantFacts, final List<IntExpression> relevantTasks) {
         final StringBuilder str = new StringBuilder();
         str.append("Method ").append(method.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < method.getArity(); i++) {
             final int index = method.getValueOfParameter(i);
             final String type = types.get(method.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
                     .append(constants.get(index)).append(" \n");
             }
         }
@@ -498,7 +498,7 @@ final class StringEncoder implements Serializable {
      */
     static String toString(State exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
-                           final List<IntExp> relevants) {
+                           final List<IntExpression> relevants) {
         final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = exp.getPositive();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
@@ -528,7 +528,7 @@ final class StringEncoder implements Serializable {
      */
     static String toString(ClosedWorldState bitState, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
-                           final List<IntExp> relevants) {
+                           final List<IntExpression> relevants) {
         final StringBuilder str = new StringBuilder("(and");
         for (int i = bitState.nextSetBit(0); i >= 0; i = bitState.nextSetBit(i + 1)) {
             str.append(" ").append(StringEncoder.toString(relevants.get(i), constants, types, predicates, functions, tasks))
@@ -552,7 +552,7 @@ final class StringEncoder implements Serializable {
      */
     static String toString(ConditionalEffect exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
-                           final List<IntExp> relevants) {
+                           final List<IntExpression> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
             str.append(StringEncoder.toString(exp.getEffects(), constants, types, predicates, functions, tasks, relevants));

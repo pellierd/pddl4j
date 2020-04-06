@@ -31,28 +31,28 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 25.03.2020
  */
-public abstract class AbstractOperatorExp implements OperatorExp {
+public abstract class PDDLAbstractOperator implements PDDLOperator {
 
     /**
      * The name of the operator.
      */
-    private Symbol name;
+    private PDDLSymbol name;
 
     /**
      * The list of parameters of the operators.
      */
-    private List<TypedSymbol> parameters;
+    private List<PDDLTypedSymbol> parameters;
 
     /**
      * The goal description that represents the preconditions of the operator.
      */
-    private Exp preconditions;
+    private PDDLExpression preconditions;
 
     /**
      * Create a new operator from another.
      *
      */
-    private AbstractOperatorExp() {
+    private PDDLAbstractOperator() {
         super();
     }
 
@@ -61,14 +61,14 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @param other the other operator.
      */
-    protected AbstractOperatorExp(final OperatorExp other) {
+    protected PDDLAbstractOperator(final PDDLOperator other) {
         if (other == null) {
             throw new NullPointerException();
         }
-        this.name = new Symbol(other.getName());
+        this.name = new PDDLSymbol(other.getName());
         this.parameters = new LinkedList<>();
-        this.parameters.addAll(other.getParameters().stream().map(TypedSymbol::new).collect(Collectors.toList()));
-        this.preconditions = new Exp(other.getPreconditions());
+        this.parameters.addAll(other.getParameters().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
+        this.preconditions = new PDDLExpression(other.getPreconditions());
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
-    protected AbstractOperatorExp(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions) {
+    protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconditions) {
         this.name = name;
         this.parameters = parameters;
         this.preconditions = preconditions;
@@ -89,7 +89,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @return the name of the operator.
      */
-    public final Symbol getName() {
+    public final PDDLSymbol getName() {
         return this.name;
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @param name the name to set.
      */
-    public final void setName(final Symbol name) {
+    public final void setName(final PDDLSymbol name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -110,7 +110,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @return the list of parameters of the operator.
      */
-    public final List<TypedSymbol> getParameters() {
+    public final List<PDDLTypedSymbol> getParameters() {
         return this.parameters;
     }
 
@@ -121,7 +121,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
      *          operator has no such parameter.
      */
-    public final TypedSymbol getParameter(final Symbol symbol) {
+    public final PDDLTypedSymbol getParameter(final PDDLSymbol symbol) {
         final int index = this.parameters.indexOf(symbol);
         return (index == -1) ? null : this.parameters.get(index);
     }
@@ -131,10 +131,10 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @return the task representaion of this operator.
      */
-    public final NamedTypedList toTask() {
-        NamedTypedList task = new NamedTypedList(this.getName());
-        for (TypedSymbol p : this.getParameters()) {
-            task.add(new TypedSymbol(p));
+    public final PDDLNamedTypedList toTask() {
+        PDDLNamedTypedList task = new PDDLNamedTypedList(this.getName());
+        for (PDDLTypedSymbol p : this.getParameters()) {
+            task.add(new PDDLTypedSymbol(p));
         }
         return task;
     }
@@ -145,7 +145,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      * @param parameters The list of parameters to set.
      * @throws NullPointerException if the specified parameters is null.
      */
-    public final void setParameters(final List<TypedSymbol> parameters) {
+    public final void setParameters(final List<PDDLTypedSymbol> parameters) {
         if (parameters == null) {
             throw new NullPointerException();
         }
@@ -157,7 +157,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @return The goal description that represents the preconditions of the operator.
      */
-    public final Exp getPreconditions() {
+    public final PDDLExpression getPreconditions() {
         return this.preconditions;
     }
 
@@ -168,7 +168,7 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *                      operator to set.
      * @throws NullPointerException if the specified preconditions is null.
      */
-    public final void setPreconditions(final Exp preconditions) {
+    public final void setPreconditions(final PDDLExpression preconditions) {
         if (preconditions == null) {
             throw new NullPointerException();
         }
@@ -187,8 +187,8 @@ public abstract class AbstractOperatorExp implements OperatorExp {
     /**
      * Normalizes the operators.
      *
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#moveNegationInward()
      */
     public final void normalize() {
         this.normalize(0);
@@ -199,23 +199,23 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#moveNegationInward()
      */
     protected Map<String, String> normalize(int index) {
         int i = index;
         // Rename the parameters
         final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol> parameters = this.getParameters();
-        for (final TypedSymbol params : parameters) {
+        final List<PDDLTypedSymbol> parameters = this.getParameters();
+        for (final PDDLTypedSymbol params : parameters) {
             final String image = params.renameVariables(i);
             context.put(image, params.getImage());
             i++;
         }
         // A hack to remove single atom in precondition
         if (this.preconditions.isLiteral()) {
-            Exp atom = this.preconditions;
-            this.preconditions = new Exp(Connective.AND);
+            PDDLExpression atom = this.preconditions;
+            this.preconditions = new PDDLExpression(PDDLConnective.AND);
             this.preconditions.addChild(atom);
         }
         // Rename the preconditions
@@ -234,8 +234,8 @@ public abstract class AbstractOperatorExp implements OperatorExp {
      */
     @Override
     public final boolean equals(final Object object) {
-        if (object != null && object instanceof AbstractOperatorExp) {
-            final AbstractOperatorExp other = (ActionExp) object;
+        if (object != null && object instanceof PDDLAbstractOperator) {
+            final PDDLAbstractOperator other = (PDDLAction) object;
             return this.name.equals(other.name);
         }
         return false;

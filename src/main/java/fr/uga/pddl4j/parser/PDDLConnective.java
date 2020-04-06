@@ -21,12 +21,12 @@ package fr.uga.pddl4j.parser;
 
 /**
  * This enumeration defines the connective that can be used in PDDL expressions implemented by the
- * class <code>Exp</code>.
+ * class <code>PDDLExpression</code>.
  *
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public enum Connective {
+public enum PDDLConnective {
     /**
      * The connective for an atom, i.e, atomic formula.
      */
@@ -236,11 +236,11 @@ public enum Connective {
      */
     HOLD_BETWEEN("hold-between"),
     /**
-     * Connective for task used in HDDL fragment.
+     * PDDLConnective for task used in HDDL fragment.
      */
     TASK(""),
     /**
-     * Connective for ordering constraints used in HDDL fragment.
+     * PDDLConnective for ordering constraints used in HDDL fragment.
      */
     LESS_ORDERING_CONSTRAINT("<");
 
@@ -254,7 +254,7 @@ public enum Connective {
      *
      * @param image the image of the connective. The image of the connective must be not null.
      */
-    Connective(String image) {
+    PDDLConnective(String image) {
         this.image = image;
     }
 

@@ -25,10 +25,10 @@ import fr.uga.pddl4j.operators.State;
 import fr.uga.pddl4j.operators.ConditionalEffect;
 import fr.uga.pddl4j.operators.Method;
 import fr.uga.pddl4j.operators.TaskNetwork;
-import fr.uga.pddl4j.parser.Connective;
-import fr.uga.pddl4j.parser.Domain;
-import fr.uga.pddl4j.parser.Problem;
-import fr.uga.pddl4j.parser.RequireKey;
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -129,7 +129,7 @@ public final class Encoder implements Serializable {
     /**
      * The set of requirements
      */
-    static Set<RequireKey> requirements;
+    static Set<PDDLRequireKey> requirements;
 
     /**
      * The table of types.
@@ -194,7 +194,7 @@ public final class Encoder implements Serializable {
     /**
      * The table that contains the ground inertia.
      */
-    static Map<IntExp, Inertia> tableOfGroundInertia;
+    static Map<IntExpression, Inertia> tableOfGroundInertia;
 
     /**
      * The list of predicates tables used to count the occurrence of a specified predicate in the
@@ -205,12 +205,12 @@ public final class Encoder implements Serializable {
     /**
      * The table of the relevant facts.
      */
-    static List<IntExp> tableOfRelevantFacts;
+    static List<IntExpression> tableOfRelevantFacts;
 
     /**
      * The table of the relevant task.
      */
-    static List<IntExp> tableOfRelevantTasks;
+    static List<IntExpression> tableOfRelevantTasks;
 
     /**
      * The list of instantiated actions encoded into bit sets.
@@ -291,25 +291,25 @@ public final class Encoder implements Serializable {
      * @return the problem encoded.
      * @throws IllegalArgumentException if the problem to encode is not ADL or ACTION_COSTS or HTN.
      */
-    public static CodedProblem encode(final Domain domain, final Problem problem) throws FatalException {
+    public static CodedProblem encode(final PDDLDomain domain, final PDDLProblem problem) throws FatalException {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.
-        Set<RequireKey> accepted = new HashSet<>();
-        accepted.add(RequireKey.ADL);
-        accepted.add(RequireKey.STRIPS);
-        accepted.add(RequireKey.TYPING);
-        accepted.add(RequireKey.EQUALITY);
-        accepted.add(RequireKey.NEGATIVE_PRECONDITIONS);
-        accepted.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
-        accepted.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
-        accepted.add(RequireKey.UNIVERSAL_PRECONDITIONS);
-        accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
-        accepted.add(RequireKey.CONDITIONAL_EFFECTS);
-        accepted.add(RequireKey.ACTION_COSTS);
-        accepted.add(RequireKey.TOTAL_ORDERED_HTN);
-        accepted.add(RequireKey.PARTIAL_ORDERED_HTN);
-        accepted.add(RequireKey.HTN_METHOD_PRECONDITIONS);
+        Set<PDDLRequireKey> accepted = new HashSet<>();
+        accepted.add(PDDLRequireKey.ADL);
+        accepted.add(PDDLRequireKey.STRIPS);
+        accepted.add(PDDLRequireKey.TYPING);
+        accepted.add(PDDLRequireKey.EQUALITY);
+        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(PDDLRequireKey.ACTION_COSTS);
+        accepted.add(PDDLRequireKey.TOTAL_ORDERED_HTN);
+        accepted.add(PDDLRequireKey.PARTIAL_ORDERED_HTN);
+        accepted.add(PDDLRequireKey.HTN_METHOD_PRECONDITIONS);
 
         Encoder.requirements = new LinkedHashSet<>();
         Encoder.requirements.addAll(domain.getRequirements());
@@ -319,9 +319,9 @@ public final class Encoder implements Serializable {
             throw new IllegalArgumentException("only ADL, ACTION_COSTS or HTN problem can be encoded");
         }
 
-        if (Encoder.requirements.contains(RequireKey.PARTIAL_ORDERED_HTN)
-            || Encoder.requirements.contains(RequireKey.TOTAL_ORDERED_HTN)) {
-            Encoder.requirements.add(RequireKey.HTN);
+        if (Encoder.requirements.contains(PDDLRequireKey.PARTIAL_ORDERED_HTN)
+            || Encoder.requirements.contains(PDDLRequireKey.TOTAL_ORDERED_HTN)) {
+            Encoder.requirements.add(PDDLRequireKey.HTN);
         }
 
         // *****************************************************************************************
@@ -355,16 +355,16 @@ public final class Encoder implements Serializable {
         List<IntMethod> intMethods = IntEncoding.encodeMethods(domain.getMethods());
 
         // Encode the initial state in integer representation
-        final Set<IntExp> intInit = IntEncoding.encodeInit(problem.getInit());
+        final Set<IntExpression> intInit = IntEncoding.encodeInit(problem.getInit());
         // Create Map containing functions and associed cost from encoded initial state
-        final Map<IntExp, Double> intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
+        final Map<IntExpression, Double> intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
         // Create Set containing integer representation of initial state without functions and associed cost
-        final Set<IntExp> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
+        final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
         // Encode the goal in integer representation or the initial task network
-        IntExp intGoal =  null;
+        IntExpression intGoal =  null;
         IntTaskNetwork intTaskNetwork = null;
-        if (!Encoder.requirements.contains(RequireKey.HTN)) {
+        if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
         } else {
             intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
@@ -382,7 +382,7 @@ public final class Encoder implements Serializable {
                 Encoder.printTableOfFunctions(stringBuilder);
                 stringBuilder.append(System.lineSeparator());
             }
-            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(RequireKey.HTN)) {
+            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 Encoder.printTableOfTasks(stringBuilder);
                 stringBuilder.append(System.lineSeparator());
             }
@@ -394,7 +394,7 @@ public final class Encoder implements Serializable {
         // Just for logging
         if (Encoder.logLevel == 2) {
             stringBuilder.append("\nCoded initial state:\n").append("(and");
-            for (IntExp f : intInitPredicates) {
+            for (IntExpression f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
@@ -450,7 +450,7 @@ public final class Encoder implements Serializable {
             stringBuilder.append(System.lineSeparator());
             Encoder.printTableOfTypes(stringBuilder);
             stringBuilder.append(System.lineSeparator()).append("\nPre-instantiation initial state:\n").append("(and");
-            for (IntExp f : intInitPredicates) {
+            for (IntExpression f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
@@ -465,7 +465,7 @@ public final class Encoder implements Serializable {
             for (IntAction a : intActions) {
                 stringBuilder.append(Encoder.toString(a)).append("\n");
             }
-            if (Encoder.requirements.contains(RequireKey.HTN)) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 stringBuilder.append("\nPre-instantiation methods with inferred types (").append(intMethods.size())
                     .append(" methods):\n\n");
                 for (IntMethod meth : intMethods) {
@@ -499,12 +499,12 @@ public final class Encoder implements Serializable {
             Encoder.printTableOfTypes(stringBuilder);
             stringBuilder.append(System.lineSeparator());
             stringBuilder.append("\nInstantiation initial state:\n").append("(and");
-            for (IntExp f : intInitPredicates) {
+            for (IntExpression f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
                 stringBuilder.append(")").append("\n\nInstantiation goal state:\n").append("(and");
-                for (final IntExp g : intGoal.getChildren()) {
+                for (final IntExpression g : intGoal.getChildren()) {
                     stringBuilder.append(" ").append(Encoder.toString(g));
                 }
             }
@@ -517,7 +517,7 @@ public final class Encoder implements Serializable {
             for (final IntAction op : intActions) {
                 stringBuilder.append(Encoder.toString(op)).append("\n");
             }
-            if (Encoder.requirements.contains(RequireKey.HTN)) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 stringBuilder.append("\nInstantiation methods with inferred types (").append(intMethods.size())
                     .append(" methods):\n\n");
                 for (IntMethod meth : intMethods) {
@@ -570,17 +570,17 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Create a map of the relevant facts with their index to speedup the bit set encoding of the actions
-        final Map<IntExp, Integer> factIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
+        final Map<IntExpression, Integer> factIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
         int index = 0;
-        for (IntExp fact : Encoder.tableOfRelevantFacts) {
+        for (IntExpression fact : Encoder.tableOfRelevantFacts) {
             factIndexMap.put(fact, index);
             index++;
         }
 
         // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
-        final Map<IntExp, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
+        final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
         index = 0;
-        for (IntExp task : Encoder.tableOfRelevantTasks) {
+        for (IntExpression task : Encoder.tableOfRelevantTasks) {
             taskIndexMap.put(task, index);
             index++;
         }
@@ -590,7 +590,7 @@ public final class Encoder implements Serializable {
         Encoder.methods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
 
         // Encode the goal in bit set representation
-        if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(Connective.ATOM))) {
+        if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
             Encoder.goal = BitEncoding.encodeGoal(intGoal, factIndexMap);
         } else {
             Encoder.goal = new State();
@@ -615,19 +615,19 @@ public final class Encoder implements Serializable {
             for (Action a : Encoder.actions) {
                 stringBuilder.append(Encoder.toString(a) + "\n");
             }
-            if (Encoder.requirements.contains(RequireKey.HTN)) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 stringBuilder.append("\nFinal methods:\n");
                 for (Method m : Encoder.methods) {
                     stringBuilder.append(Encoder.toString(m) + "\n");
                 }
             }
             stringBuilder.append("Final initial state:\n").append("(and");
-            for (IntExp f : intInitPredicates) {
+            for (IntExpression f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
 
 
-            if (!Encoder.requirements.contains(RequireKey.HTN)) {
+            if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 stringBuilder.append("\nFinal goal state:\n");
                 if (Encoder.goal == null) { // Goal null
                     stringBuilder.append("goal can be simplified to FALSE");
@@ -894,7 +894,7 @@ public final class Encoder implements Serializable {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(final IntExp exp) {
+    static String toString(final IntExpression exp) {
         return StringEncoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
@@ -929,7 +929,7 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfGroundInertia(StringBuilder stringBuilder) {
         stringBuilder.append("Ground inertia table:");
-        for (Entry<IntExp, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
+        for (Entry<IntExpression, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
             stringBuilder.append(Encoder.toString(e.getKey())).append(": ").append(e.getValue());
         }
     }

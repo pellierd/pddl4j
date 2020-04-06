@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public final class TypedSymbol extends Symbol {
+public final class PDDLTypedSymbol extends PDDLSymbol {
 
     /**
      * The list of the types of this symbol.
      */
-    private List<Symbol> types;
+    private List<PDDLSymbol> types;
 
     /**
      * Creates a typed symbol from a specified typed symbol.
@@ -43,25 +43,25 @@ public final class TypedSymbol extends Symbol {
      * @param symbol the symbol.
      * @throws NullPointerException if the specified typed symbol is null.
      */
-    public TypedSymbol(final TypedSymbol symbol) {
+    public PDDLTypedSymbol(final PDDLTypedSymbol symbol) {
         super(symbol);
         this.types = new ArrayList<>();
-        this.types.addAll(symbol.getTypes().stream().map(Symbol::new).collect(Collectors.toList()));
+        this.types.addAll(symbol.getTypes().stream().map(PDDLSymbol::new).collect(Collectors.toList()));
     }
 
     /**
      * Creates a new typed symbol from a specified symbol. This symbol is by default of type object. If a
-     * typed symbol is created with the specified symbol <code>Parser.OBJECT</code> or
-     * <code>Parser.NUMBER</code>, the typed list is creates with an empty list of super types.
+     * typed symbol is created with the specified symbol <code>PDDLParser.OBJECT</code> or
+     * <code>PDDLParser.NUMBER</code>, the typed list is creates with an empty list of super types.
      *
      * @param symbol the symbol.
      */
-    public TypedSymbol(final Symbol symbol) {
+    public PDDLTypedSymbol(final PDDLSymbol symbol) {
         super(symbol.getKind(), symbol.getImage(), symbol.getBeginLine(), symbol.getBeginColumn(), symbol
             .getEndLine(), symbol.getEndColumn());
         this.types = new ArrayList<>();
-        if (!symbol.equals(Parser.OBJECT) && !symbol.equals(Parser.NUMBER)) {
-            this.types.add(Parser.OBJECT);
+        if (!symbol.equals(PDDLParser.OBJECT) && !symbol.equals(PDDLParser.NUMBER)) {
+            this.types.add(PDDLParser.OBJECT);
         }
     }
 
@@ -70,7 +70,7 @@ public final class TypedSymbol extends Symbol {
      *
      * @return the list of types of this typed token.
      */
-    public List<Symbol> getTypes() {
+    public List<PDDLSymbol> getTypes() {
         return this.types;
     }
 
@@ -79,12 +79,12 @@ public final class TypedSymbol extends Symbol {
      *
      * @param type the type to add.
      */
-    public void addType(final Symbol type) {
+    public void addType(final PDDLSymbol type) {
         if (type == null) {
             throw new NullPointerException();
         }
-        if (!type.equals(Parser.OBJECT)) {
-            this.types.remove(Parser.OBJECT);
+        if (!type.equals(PDDLParser.OBJECT)) {
+            this.types.remove(PDDLParser.OBJECT);
         }
         if (!this.types.contains(type)) {
             this.types.add(type);
@@ -110,7 +110,7 @@ public final class TypedSymbol extends Symbol {
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append(super.toString());
-        if (!this.equals(Parser.OBJECT) && !this.equals(Parser.NUMBER)) {
+        if (!this.equals(PDDLParser.OBJECT) && !this.equals(PDDLParser.NUMBER)) {
             str.append(" - ");
             if (this.types.size() == 1) {
                 str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));

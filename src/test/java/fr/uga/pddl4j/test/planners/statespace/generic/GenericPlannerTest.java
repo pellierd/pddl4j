@@ -279,7 +279,7 @@ public class GenericPlannerTest {
                             + " in " + TIMEOUT + " seconds");
                         plan = planner.search(pb);
                     } else {
-                        System.err.println("* Problem [" + currentProblem + "]" + " not solvable.");
+                        System.err.println("* PDDLProblem [" + currentProblem + "]" + " not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.out.println("ERR: " + err.getMessage() + " - test aborted");

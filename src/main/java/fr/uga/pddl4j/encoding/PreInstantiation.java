@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.parser.PDDLConnective;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,7 +106,7 @@ final class PreInstantiation implements Serializable {
      *
      * @param exp the effect.
      */
-    private static void extract(final IntExp exp) {
+    private static void extract(final IntExpression exp) {
         switch (exp.getConnective()) {
             case ATOM:
                 int predicate = exp.getPredicate();
@@ -135,8 +135,8 @@ final class PreInstantiation implements Serializable {
                 PreInstantiation.extract(exp.getChildren().get(1));
                 break;
             case NOT:
-                final IntExp neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(Connective.ATOM)) {
+                final IntExpression neg = exp.getChildren().get(0);
+                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
                     predicate = neg.getPredicate();
                     switch (Encoder.tableOfInertia.get(predicate)) {
                         case INERTIA:
@@ -198,14 +198,14 @@ final class PreInstantiation implements Serializable {
      *
      * @param init the initial state.
      */
-    static void inferTypesFromInertia(final Set<IntExp> init) {
+    static void inferTypesFromInertia(final Set<IntExpression> init) {
         Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.tableOfPredicates.size());
         for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
             if (Encoder.tableOfTypedPredicates.get(i).size() == 1
                 && Encoder.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
-                for (IntExp fact : init) {
-                    if (fact.getConnective().equals(Connective.NOT)) {
+                for (IntExpression fact : init) {
+                    if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
                     if (fact.getPredicate() == i) {
@@ -224,7 +224,7 @@ final class PreInstantiation implements Serializable {
      *
      * @param init the initial state.
      */
-    static void createPredicatesTables(final Set<IntExp> init) {
+    static void createPredicatesTables(final Set<IntExpression> init) {
         final int tableSize = Encoder.tableOfConstants.size();
         final int nbPredicate = Encoder.tableOfPredicates.size();
         Encoder.predicatesTables = new ArrayList<>(nbPredicate);
@@ -239,8 +239,8 @@ final class PreInstantiation implements Serializable {
             Encoder.predicatesTables.add(pTables);
         }
 
-        for (IntExp fact : init) {
-            if (fact.getConnective().equals(Connective.NOT)) {
+        for (IntExpression fact : init) {
+            if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
             final int arity = Encoder.tableOfTypedPredicates.get(fact.getPredicate()).size();
@@ -389,14 +389,14 @@ final class PreInstantiation implements Serializable {
     }
 
     private static List<IntAction> simplifyActionsWithInferredTypes(final IntAction action) {
-        final List<IntExp> unaryInertia = new ArrayList<>();
+        final List<IntExpression> unaryInertia = new ArrayList<>();
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getPreconditions()));
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getEffects()));
 
         List<IntAction> actions = new LinkedList<>();
         actions.add(action);
 
-        for (final IntExp inertia : unaryInertia) {
+        for (final IntExpression inertia : unaryInertia) {
             final List<IntAction> newActions = new ArrayList<>();
             for (final IntAction o : actions) {
                 if (o.getArity() > 0) {
@@ -435,19 +435,19 @@ final class PreInstantiation implements Serializable {
 
                     final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
-                    PreInstantiation.replace(op1.getPreconditions(), inertia, Connective.TRUE, ti, ts);
-                    PreInstantiation.replace(op1.getEffects(), inertia, Connective.TRUE, ti, ts);
-                    if (!op1.getPreconditions().getConnective().equals(Connective.FALSE)
-                        && !op1.getEffects().getConnective().equals(Connective.FALSE)) {
+                    PreInstantiation.replace(op1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
+                    PreInstantiation.replace(op1.getEffects(), inertia, PDDLConnective.TRUE, ti, ts);
+                    if (!op1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
+                        && !op1.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                         newActions.add(op1);
                     }
 
                     final IntAction op2 = new IntAction(o);
                     op2.setTypeOfParameter(index, ts);
-                    PreInstantiation.replace(op2.getPreconditions(), inertia, Connective.FALSE, ti, ts);
-                    PreInstantiation.replace(op2.getEffects(), inertia, Connective.FALSE, ti, ts);
-                    if (!op2.getPreconditions().getConnective().equals(Connective.FALSE)
-                        && !op2.getEffects().getConnective().equals(Connective.FALSE)) {
+                    PreInstantiation.replace(op2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
+                    PreInstantiation.replace(op2.getEffects(), inertia, PDDLConnective.FALSE, ti, ts);
+                    if (!op2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
+                        && !op2.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                         newActions.add(op2);
                     }
                 }
@@ -471,13 +471,13 @@ final class PreInstantiation implements Serializable {
     }
 
     private static List<IntMethod> simplifyMethodsWithInferredTypes(final IntMethod meth) {
-        final List<IntExp> unaryInertia = new ArrayList<>();
+        final List<IntExpression> unaryInertia = new ArrayList<>();
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(meth.getPreconditions()));
 
         List<IntMethod> methods = new LinkedList<>();
         methods.add(meth);
 
-        for (final IntExp inertia : unaryInertia) {
+        for (final IntExpression inertia : unaryInertia) {
             final List<IntMethod> newMethods = new ArrayList<>();
             for (final IntMethod m : methods) {
                 if (m.getArity() > 0) {
@@ -516,16 +516,16 @@ final class PreInstantiation implements Serializable {
 
                     final IntMethod meth1 = new IntMethod(m);
                     meth1.setTypeOfParameter(index, ti);
-                    PreInstantiation.replace(meth1.getPreconditions(), inertia, Connective.TRUE, ti, ts);
-                    if (!meth1.getPreconditions().getConnective().equals(Connective.FALSE)) {
+                    PreInstantiation.replace(meth1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
+                    if (!meth1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                         newMethods.add(meth1);
                     }
 
                     final IntMethod meth2 = new IntMethod(m);
                     meth2.setTypeOfParameter(index, ts);
-                    PreInstantiation.replace(meth2.getPreconditions(), inertia, Connective.FALSE, ti, ts);
+                    PreInstantiation.replace(meth2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
 
-                    if (!meth2.getPreconditions().getConnective().equals(Connective.FALSE)) {
+                    if (!meth2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                         newMethods.add(meth2);
                     }
                 }
@@ -545,7 +545,7 @@ final class PreInstantiation implements Serializable {
      * @param ti         the type intersection.
      * @param ts         the type substract.
      */
-    private static void replace(final IntExp exp, final IntExp inertia, final Connective connective, final int ti,
+    private static void replace(final IntExpression exp, final IntExpression inertia, final PDDLConnective connective, final int ti,
                                 final int ts) {
         switch (exp.getConnective()) {
             case ATOM:
@@ -554,25 +554,25 @@ final class PreInstantiation implements Serializable {
                 }
                 break;
             case AND:
-                Iterator<IntExp> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connective.AND)) {
-                    final IntExp ei = i.next();
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
                     PreInstantiation.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(Connective.FALSE)) {
-                        exp.setConnective(Connective.FALSE);
-                    } else if (ei.getConnective().equals(Connective.TRUE)) {
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         i.remove();
                     }
                 }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connective.OR)) {
-                    final IntExp ei = i.next();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
                     PreInstantiation.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(Connective.TRUE)) {
-                        exp.setConnective(Connective.TRUE);
-                    } else if (ei.getConnective().equals(Connective.FALSE)) {
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         i.remove();
                     }
                 }
@@ -580,17 +580,17 @@ final class PreInstantiation implements Serializable {
             case FORALL:
             case EXISTS:
                 if (inertia.getArguments()[0] == exp.getVariable()) {
-                    final IntExp ei = new IntExp(exp);
+                    final IntExpression ei = new IntExpression(exp);
                     ei.setType(ti);
-                    PreInstantiation.replace(ei, inertia, Connective.TRUE, ti, ts);
-                    final IntExp es = new IntExp(exp);
+                    PreInstantiation.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
+                    final IntExpression es = new IntExpression(exp);
                     es.setType(ts);
-                    PreInstantiation.replace(es, inertia, Connective.FALSE, ti, ts);
+                    PreInstantiation.replace(es, inertia, PDDLConnective.FALSE, ti, ts);
                     exp.getChildren().clear();
-                    if (exp.getConnective().equals(Connective.FORALL)) {
-                        exp.setConnective(Connective.AND);
+                    if (exp.getConnective().equals(PDDLConnective.FORALL)) {
+                        exp.setConnective(PDDLConnective.AND);
                     } else {
-                        exp.setConnective(Connective.OR);
+                        exp.setConnective(PDDLConnective.OR);
                     }
                     exp.getChildren().add(ei);
                     exp.getChildren().add(es);
@@ -657,8 +657,8 @@ final class PreInstantiation implements Serializable {
      * @param exp the expression.
      * @return the list of unary inertia expression collected.
      */
-    private static List<IntExp> collectUnaryInertia(final IntExp exp) {
-        final List<IntExp> unaryInertia = new ArrayList<>();
+    private static List<IntExpression> collectUnaryInertia(final IntExpression exp) {
+        final List<IntExpression> unaryInertia = new ArrayList<>();
         switch (exp.getConnective()) {
             case ATOM:
                 if (Encoder.tableOfInferredDomains.get(exp.getPredicate()) != null) {
@@ -667,13 +667,13 @@ final class PreInstantiation implements Serializable {
                 break;
             case AND:
             case OR:
-                for (final IntExp ei : exp.getChildren()) {
+                for (final IntExpression ei : exp.getChildren()) {
                     unaryInertia.addAll(PreInstantiation.collectUnaryInertia(ei));
                 }
                 break;
             case FORALL:
             case EXISTS:
-                final IntExp qExp = exp.getChildren().get(0);
+                final IntExpression qExp = exp.getChildren().get(0);
                 unaryInertia.addAll(PreInstantiation.collectUnaryInertia(qExp));
                 break;
             case AT_START:

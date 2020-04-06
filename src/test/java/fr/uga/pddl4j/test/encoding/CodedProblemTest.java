@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.test.encoding;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.encoding.IntExp;
+import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.operators.Action;
 import org.junit.Assert;
@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Implements the <tt>CodedProblemTest</tt> of the PDD4L library.
- * Domain and problem used: Blocksworld domain and p01 problem.
+ * PDDLDomain and problem used: Blocksworld domain and p01 problem.
  *
  * @author E. Hermellin
  * @version 0.1 - 16.03.18
@@ -119,7 +119,7 @@ public class CodedProblemTest {
         System.out.println("CodedProblem: Test each fact from a specified coded problem.");
         final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            final List<IntExp> factListCodedProblem = codedProblem.getRelevantFacts();
+            final List<IntExpression> factListCodedProblem = codedProblem.getRelevantFacts();
             for (int i = 0; i < factList.size(); i++) {
                 Assert.assertTrue(codedProblem.toString(factListCodedProblem.get(i)).equals(factList.get(i)));
             }

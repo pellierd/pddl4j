@@ -9,23 +9,23 @@
 		<Method name="isSharedFlyweight" />
 	</Match>
 	<Match>
-		<Class name="fr.uga.pddl4j.parser.Connective" />
+		<Class name="fr.uga.pddl4j.parser.PDDLConnective" />
 		<Method name="getImage" />
 	</Match>
 	<Match>
-		<Class name="fr.uga.pddl4j.parser.Parser" />
+		<Class name="fr.uga.pddl4j.parser.PDDLParser" />
 		<Method name="parse" />
 	</Match>
 		<Match>
-		<Class name="fr.uga.pddl4j.parser.Parser" />
+		<Class name="fr.uga.pddl4j.parser.PDDLParser" />
 		<Method name="parseString" />
 	</Match>
     <Match>
-        <Class name="fr.uga.pddl4j.encoding.IntExp" />
+        <Class name="fr.uga.pddl4j.encoding.IntExpression" />
         <Method name="getArguments" />
     </Match>
     <Match>
-        <Class name="fr.uga.pddl4j.encoding.IntExp" />
+        <Class name="fr.uga.pddl4j.encoding.IntExpression" />
         <Method name="setArguments" />
     </Match>
 </FindBugsFilter>

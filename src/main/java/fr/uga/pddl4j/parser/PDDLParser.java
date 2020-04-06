@@ -25,7 +25,6 @@ import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.sound.midi.SysexMessage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,7 +45,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Implements the <tt>Parser</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
+ * Implements the <tt>PDDLParser</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
  * <p>
  * A simple example of how to use the parser:
@@ -55,7 +54,7 @@ import java.util.stream.Collectors;
  * public static void main(String[] args) {
  *
  *  if (args.length == 2 &amp;&amp; args[0].equals(&quot;-p&quot;)) {
- *      Parser parser = new Parser();
+ *      PDDLParser parser = new PDDLParser();
  *      try {
  *          parser.parse(args[1]);
  *        } catch (FileNotFoundException e) {
@@ -65,7 +64,7 @@ import java.util.stream.Collectors;
  *      parser.getErrorManager().printAll();
  *        }
  *    } else if (args.length == 4 &amp;&amp; args[0].equals(&quot;-o&quot;) &amp;&amp; args[2].equals(&quot;-f&quot;)) {
- *    Parser parser = new Parser();
+ *    PDDLParser parser = new PDDLParser();
  *    try {
  *          parser.parse(args[1], args[3]);
  *        } catch (FileNotFoundException e) {
@@ -91,32 +90,32 @@ import java.util.stream.Collectors;
  * @author D Pellier
  * @version 1.0 - 28.01.10
  */
-public final class Parser {
+public final class PDDLParser {
 
     /**
      * Logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(Parser.class);
+    private static final Logger LOGGER = LogManager.getLogger(PDDLParser.class);
 
     /**
      * The specific symbol object.
      */
-    public static final Symbol OBJECT = new Symbol(Symbol.Kind.TYPE, "object");
+    public static final PDDLSymbol OBJECT = new PDDLSymbol(PDDLSymbol.Kind.TYPE, "object");
 
     /**
      * The specific symbol number.
      */
-    public static final Symbol NUMBER = new Symbol(Symbol.Kind.TYPE, "number");
+    public static final PDDLSymbol NUMBER = new PDDLSymbol(PDDLSymbol.Kind.TYPE, "number");
 
     /**
      * The specific symbol total-costs.
      */
-    public static final Symbol TOTAL_COST = new Symbol(Symbol.Kind.FUNCTOR, "total-cost");
+    public static final PDDLSymbol TOTAL_COST = new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, "total-cost");
 
     /**
      * The specific symbol total-costs.
      */
-    public static final Symbol TOTAL_TIME = new Symbol(Symbol.Kind.FUNCTOR, "total-time");
+    public static final PDDLSymbol TOTAL_TIME = new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, "total-time");
 
     /**
      * Message for unhandled error.
@@ -136,17 +135,17 @@ public final class Parser {
     /**
      * The planning domain parsed.
      */
-    private Domain domain;
+    private PDDLDomain domain;
 
     /**
      * The planning problem parsed.
      */
-    private Problem problem;
+    private PDDLProblem problem;
 
     /**
-     * Create a new <tt>Parser</tt>.
+     * Create a new <tt>PDDLParser</tt>.
      */
-    public Parser() {
+    public PDDLParser() {
         super();
         this.mgr = new ErrorManager();
     }
@@ -196,7 +195,7 @@ public final class Parser {
                 this.checkDerivedPredicateDeclaration();
             } catch (NullPointerException exception) {
                 LOGGER.error("domain file is not valid\n");
-                this.domain = new Domain(new Symbol(Symbol.Kind.DOMAIN, "domain"));
+                this.domain = new PDDLDomain(new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, "domain"));
             } finally {
                 inputStream.close();
             }
@@ -452,7 +451,7 @@ public final class Parser {
      *
      * @return the domain parsed.
      */
-    public final Domain getDomain() {
+    public final PDDLDomain getDomain() {
         return this.domain;
     }
 
@@ -461,7 +460,7 @@ public final class Parser {
      *
      * @return the problem parsed.
      */
-    public final Problem getProblem() {
+    public final PDDLProblem getProblem() {
         return this.problem;
     }
 
@@ -476,11 +475,11 @@ public final class Parser {
      * <code>false</code> otherwise.
      */
     private boolean checkRequirements() {
-        return !(this.getDomain().getRequirements().contains(RequireKey.PARTIAL_ORDERED_HTN)
-            && this.getDomain().getRequirements().contains(RequireKey.TOTAL_ORDERED_HTN))
-            || (this.getDomain().getRequirements().contains(RequireKey.HTN_METHOD_PRECONDITIONS)
-                && (this.getDomain().getRequirements().contains(RequireKey.TOTAL_ORDERED_HTN)
-                    || this.getDomain().getRequirements().contains(RequireKey.PARTIAL_ORDERED_HTN)));
+        return !(this.getDomain().getRequirements().contains(PDDLRequireKey.PARTIAL_ORDERED_HTN)
+            && this.getDomain().getRequirements().contains(PDDLRequireKey.TOTAL_ORDERED_HTN))
+            || (this.getDomain().getRequirements().contains(PDDLRequireKey.HTN_METHOD_PRECONDITIONS)
+                && (this.getDomain().getRequirements().contains(PDDLRequireKey.TOTAL_ORDERED_HTN)
+                    || this.getDomain().getRequirements().contains(PDDLRequireKey.PARTIAL_ORDERED_HTN)));
     }
 
     /**
@@ -529,43 +528,43 @@ public final class Parser {
      * @param exp The expression.
      * @return <code>true</code> if a specified ground PDDL expression is well formed; <code>false</code> otherwise.
      */
-    private boolean checkGroundedParserNode(Exp exp) {
+    private boolean checkGroundedParserNode(PDDLExpression exp) {
         boolean checked = true;
         if (exp == null) {
             return true;
         }
-        LinkedList<Exp> stackGD = new LinkedList<>();
-        LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<>();
+        LinkedList<PDDLExpression> stackGD = new LinkedList<>();
+        LinkedList<List<PDDLTypedSymbol>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(new LinkedList<>());
         while (!stackGD.isEmpty()) {
-            Exp gd = stackGD.poll();
-            List<TypedSymbol> ctx = stackCtx.poll();
-            List<TypedSymbol> newCtx = new LinkedList<>(ctx);
+            PDDLExpression gd = stackGD.poll();
+            List<PDDLTypedSymbol> ctx = stackCtx.poll();
+            List<PDDLTypedSymbol> newCtx = new LinkedList<>(ctx);
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_HEAD:
                 case EQUAL_ATOM:
                     boolean error = false;
-                    final List<Symbol> atom = gd.getAtom();
-                    final NamedTypedList atomSkeleton = new NamedTypedList(atom.get(0));
+                    final List<PDDLSymbol> atom = gd.getAtom();
+                    final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(atom.get(0));
                     for (int i = 1; i < atom.size(); i++) {
-                        Symbol symbol = atom.get(i);
-                        Iterator<TypedSymbol> j = ctx.iterator();
-                        TypedSymbol qvar = null;
+                        PDDLSymbol symbol = atom.get(i);
+                        Iterator<PDDLTypedSymbol> j = ctx.iterator();
+                        PDDLTypedSymbol qvar = null;
                         while (j.hasNext() && qvar == null) {
-                            TypedSymbol vj = j.next();
+                            PDDLTypedSymbol vj = j.next();
                             if (vj.equals(symbol)) {
                                 qvar = vj;
                             }
                         }
-                        if (symbol.getKind().equals(Symbol.Kind.VARIABLE) && qvar == null) {
+                        if (symbol.getKind().equals(PDDLSymbol.Kind.VARIABLE) && qvar == null) {
                             this.mgr.logParserError("variable \"" + symbol + "\" is undefined",
                                 this.lexer.getFile(), symbol.getBeginLine(), symbol
                                     .getBeginColumn());
                             error = true;
                         } else {
-                            TypedSymbol object = null;
+                            PDDLTypedSymbol object = null;
                             if (qvar != null) {
                                 object = qvar;
                             }
@@ -581,7 +580,7 @@ public final class Parser {
                                         .getBeginColumn());
                                 error = true;
                             } else {
-                                for (Symbol type : object.getTypes()) {
+                                for (PDDLSymbol type : object.getTypes()) {
                                     if (!this.domain.isDeclaredType(type)) {
                                         this.mgr.logParserError("type \"" + type.getImage()
                                             + "\" of the object \"" + object.getImage()
@@ -595,14 +594,14 @@ public final class Parser {
                         }
                         checked = !error;
                     }
-                    if (checked && gd.getConnective().equals(Connective.ATOM)
+                    if (checked && gd.getConnective().equals(PDDLConnective.ATOM)
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                             .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                             .getName().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(Connective.FN_HEAD)
+                    } else if (checked && gd.getConnective().equals(PDDLConnective.FN_HEAD)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -613,9 +612,9 @@ public final class Parser {
                     break;
                 case EXISTS:
                 case FORALL:
-                    for (TypedSymbol variable : gd.getVariables()) {
+                    for (PDDLTypedSymbol variable : gd.getVariables()) {
                         error = false;
-                        for (Symbol type : variable.getTypes()) {
+                        for (PDDLSymbol type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {
                                 this.mgr.logParserError("type \"" + type.getImage()
                                     + "\" used in quantified expression is undefined", this.lexer
@@ -647,22 +646,22 @@ public final class Parser {
      */
     private boolean checkInitialFacts() {
         boolean checked = true;
-        LinkedList<Exp> stackGD = new LinkedList<>();
+        LinkedList<PDDLExpression> stackGD = new LinkedList<>();
         stackGD.addAll(this.problem.getInit());
         while (!stackGD.isEmpty()) {
-            Exp gd = stackGD.poll();
+            PDDLExpression gd = stackGD.poll();
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_ATOM:
                     boolean error = false;
-                    List<Symbol> atom = gd.getAtom();
+                    List<PDDLSymbol> atom = gd.getAtom();
                     if (atom == null) {
                         atom = gd.getChildren().get(0).getAtom();
                     }
-                    final NamedTypedList atomSkeleton = new NamedTypedList(atom.get(0));
+                    final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(atom.get(0));
                     for (int i = 1; i < atom.size(); i++) {
-                        Symbol symbol = atom.get(i);
-                        TypedSymbol object = this.problem.getObject(symbol);
+                        PDDLSymbol symbol = atom.get(i);
+                        PDDLTypedSymbol object = this.problem.getObject(symbol);
                         if (object == null) {
                             object = this.domain.getConstant(symbol);
                         }
@@ -672,7 +671,7 @@ public final class Parser {
                                     .getBeginColumn());
                             error = true;
                         } else {
-                            for (Symbol type : object.getTypes()) {
+                            for (PDDLSymbol type : object.getTypes()) {
                                 if (!this.domain.isDeclaredType(type)) {
                                     this.mgr.logParserError("type \"" + type.getImage()
                                         + "\" of the object \"" + object.getImage()
@@ -685,14 +684,14 @@ public final class Parser {
                         }
                     }
                     checked = !error;
-                    if (checked && gd.getConnective().equals(Connective.ATOM)
+                    if (checked && gd.getConnective().equals(PDDLConnective.ATOM)
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                             .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                             .getName().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(Connective.FN_ATOM)
+                    } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -722,9 +721,9 @@ public final class Parser {
      */
     private boolean checkObjectsDeclaration() {
         boolean checked = true;
-        List<TypedSymbol> objects = this.problem.getObjects();
-        for (TypedSymbol object : objects) {
-            for (Symbol type : object.getTypes()) {
+        List<PDDLTypedSymbol> objects = this.problem.getObjects();
+        for (PDDLTypedSymbol object : objects) {
+            for (PDDLSymbol type : object.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getImage() + "\" of the object \""
                         + object.getImage() + "\" is undefined", this.lexer
@@ -760,30 +759,30 @@ public final class Parser {
      */
     private boolean checkTypesDeclaration() {
 
-        List<TypedSymbol> types = this.domain.getTypes();
+        List<PDDLTypedSymbol> types = this.domain.getTypes();
 
         // Gathering types declaration
-        final Map<String, TypedSymbol> map = new HashMap<>();
-        map.put(Parser.OBJECT.getImage(), new TypedSymbol(Parser.OBJECT));
+        final Map<String, PDDLTypedSymbol> map = new HashMap<>();
+        map.put(PDDLParser.OBJECT.getImage(), new PDDLTypedSymbol(PDDLParser.OBJECT));
 
-        for (TypedSymbol type : types) {
+        for (PDDLTypedSymbol type : types) {
             // Special cas for the type object
-            if ((type.equals(Parser.OBJECT) || type.equals(Parser.NUMBER)) && !type.getTypes().isEmpty()) {
+            if ((type.equals(PDDLParser.OBJECT) || type.equals(PDDLParser.NUMBER)) && !type.getTypes().isEmpty()) {
                 this.mgr.logParserError("type \"" + type.getImage() + "\" cannot be used as derived type",
                     this.lexer.getFile(), type.getBeginLine(), type.getBeginColumn());
             } else { // General case
                 // check if all super types are defined otherwise create a new type inherited from object
                 type.getTypes().stream().filter(superType -> !types.contains(superType)).forEach(superType -> {
-                    TypedSymbol st = new TypedSymbol(superType);
+                    PDDLTypedSymbol st = new PDDLTypedSymbol(superType);
                     map.put(superType.getImage(), st);
                 });
                 // If the type was already encountered, it means that there is multiple inheritance
                 // thus the super types are gathered
-                TypedSymbol t = map.get(type.getImage());
+                PDDLTypedSymbol t = map.get(type.getImage());
                 if (t == null) {
                     map.put(type.getImage(), type);
                 } else {
-                    Set<Symbol> set = new HashSet<>();
+                    Set<PDDLSymbol> set = new HashSet<>();
                     set.addAll(t.getTypes());
                     set.addAll(type.getTypes());
                     t.getTypes().clear();
@@ -795,15 +794,15 @@ public final class Parser {
 
         // Check the consistency of the types declaration, i.e., if there is no loop in the types declaration
         boolean consistent = true;
-        Iterator<TypedSymbol> iterator = map.values().iterator();
+        Iterator<PDDLTypedSymbol> iterator = map.values().iterator();
         while (iterator.hasNext() && consistent) {
-            final TypedSymbol type = iterator.next();
-            final LinkedList<TypedSymbol> open = new LinkedList<>();
+            final PDDLTypedSymbol type = iterator.next();
+            final LinkedList<PDDLTypedSymbol> open = new LinkedList<>();
             open.add(type);
             while (!open.isEmpty() && consistent) {
-                final TypedSymbol current = open.poll();
-                for (Symbol st : current.getTypes()) {
-                    final TypedSymbol c = map.get(st.getImage());
+                final PDDLTypedSymbol current = open.poll();
+                for (PDDLSymbol st : current.getTypes()) {
+                    final PDDLTypedSymbol c = map.get(st.getImage());
                     consistent = !c.equals(type);
                     open.add(c);
                 }
@@ -816,8 +815,8 @@ public final class Parser {
 
         // Add a copy of the types to the planning domain.
         this.domain.getTypes().clear();
-        for (TypedSymbol type : map.values()) {
-            this.domain.getTypes().add(new TypedSymbol(type));
+        for (PDDLTypedSymbol type : map.values()) {
+            this.domain.getTypes().add(new PDDLTypedSymbol(type));
         }
         return consistent;
     }
@@ -829,17 +828,17 @@ public final class Parser {
      * @return <code>true</code> if the constants declaration are well formed; <code>false</code> otherwise.
      */
     private boolean checkConstantsDeclaration() {
-        List<TypedSymbol> constants = this.domain.getConstants();
-        Set<Symbol> set = new HashSet<>();
+        List<PDDLTypedSymbol> constants = this.domain.getConstants();
+        Set<PDDLSymbol> set = new HashSet<>();
         boolean checked = true;
-        for (TypedSymbol constant : constants) {
+        for (PDDLTypedSymbol constant : constants) {
             if (!set.add(constant)) {
                 this.mgr.logParserError("constant \"" + constant.getImage()
                         + "\" already defined", this.lexer.getFile(), constant.getBeginLine(),
                     constant.getBeginColumn());
                 checked = false;
             }
-            for (Symbol type : constant.getTypes()) {
+            for (PDDLSymbol type : constant.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getImage() + "\" of the constant \""
                         + constant.getImage() + "\" is undefined", this.lexer
@@ -860,12 +859,12 @@ public final class Parser {
      * @return <code>true</code> if the predicates declaration are well formed; <code>false</code> otherwise.
      */
     private boolean checkPredicatesDeclaration() {
-        List<NamedTypedList> predicates = this.domain.getPredicates();
+        List<PDDLNamedTypedList> predicates = this.domain.getPredicates();
         Set<String> set = new HashSet<>();
         boolean checked = true;
-        for (NamedTypedList predicate : predicates) {
-            for (TypedSymbol variable : predicate.getArguments()) {
-                for (Symbol type : variable.getTypes()) {
+        for (PDDLNamedTypedList predicate : predicates) {
+            for (PDDLTypedSymbol variable : predicate.getArguments()) {
+                for (PDDLSymbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
                         this.mgr.logParserError("type \"" + type.getImage()
                             + "\" of the variable \"" + variable.getImage()
@@ -875,7 +874,7 @@ public final class Parser {
                     }
                 }
             }
-            Symbol predicateSymbol = predicate.getName();
+            PDDLSymbol predicateSymbol = predicate.getName();
             String str = predicateSymbol.getImage() + "/" + predicate.getArguments().size();
 
             if (!set.add(str)) {
@@ -896,12 +895,12 @@ public final class Parser {
      * @return <code>true</code> if the predicates declaration are well formed; <code>false</code> otherwise.
      */
     private boolean checkTaskDeclaration() {
-        List<NamedTypedList> tasks = this.domain.getTasks();
+        List<PDDLNamedTypedList> tasks = this.domain.getTasks();
         Set<String> set = new HashSet<>();
         boolean checked = true;
-        for (NamedTypedList task : tasks) {
-            for (TypedSymbol variable : task.getArguments()) {
-                for (Symbol type : variable.getTypes()) {
+        for (PDDLNamedTypedList task : tasks) {
+            for (PDDLTypedSymbol variable : task.getArguments()) {
+                for (PDDLSymbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
                         this.mgr.logParserError("type \"" + type.getImage()
                             + "\" of the variable \"" + variable.getImage()
@@ -911,7 +910,7 @@ public final class Parser {
                     }
                 }
             }
-            Symbol symbol = task.getName();
+            PDDLSymbol symbol = task.getName();
             String str = symbol.getImage() + "/" + task.getArguments().size();
 
             if (!set.add(str)) {
@@ -934,19 +933,19 @@ public final class Parser {
     private boolean checkFunctionsDeclaration() {
 
         Set<String> predicates = new HashSet<>();
-        for (NamedTypedList predicate : this.domain.getPredicates()) {
-            Symbol predicateSymbol = predicate.getName();
+        for (PDDLNamedTypedList predicate : this.domain.getPredicates()) {
+            PDDLSymbol predicateSymbol = predicate.getName();
             String str = predicateSymbol.getImage() + "/" + predicate.getArguments().size();
             predicates.add(str);
         }
 
-        List<NamedTypedList> functions = this.domain.getFunctions();
+        List<PDDLNamedTypedList> functions = this.domain.getFunctions();
         Set<String> set = new HashSet<>();
         boolean checked = true;
-        for (NamedTypedList function : functions) {
-            Symbol functionSymbol = function.getName();
-            for (TypedSymbol variable : function.getArguments()) {
-                for (Symbol type : variable.getTypes()) {
+        for (PDDLNamedTypedList function : functions) {
+            PDDLSymbol functionSymbol = function.getName();
+            for (PDDLTypedSymbol variable : function.getArguments()) {
+                for (PDDLSymbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
                         this.mgr.logParserError("type \"" + type.getImage()
                             + "\" of the variable \"" + variable.getImage()
@@ -983,10 +982,10 @@ public final class Parser {
      */
     private boolean checkDerivedPredicateDeclaration() {
         boolean checked = true;
-        for (DerivedPredicateExp axiom : this.domain.getDerivesPredicates()) {
-            NamedTypedList head = axiom.getHead();
-            for (TypedSymbol argument : head.getArguments()) {
-                for (Symbol type : argument.getTypes()) {
+        for (PDDLDerivedPredicate axiom : this.domain.getDerivesPredicates()) {
+            PDDLNamedTypedList head = axiom.getHead();
+            for (PDDLTypedSymbol argument : head.getArguments()) {
+                for (PDDLSymbol type : argument.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
                         this.mgr.logParserError("type \"" + type.getImage()
                             + "\" used in derived predicate", this.lexer.getFile(), type
@@ -1022,7 +1021,7 @@ public final class Parser {
      */
     private boolean checkActionDeclaration() {
         boolean checked = this.checkActionsUniqueness();
-        for (ActionExp action : this.domain.getActions()) {
+        for (PDDLAction action : this.domain.getActions()) {
             if (this.checkActionParameters(action)) {
                 checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
                 checked &= this.checkParserNode(action.getEffects(), action.getParameters());
@@ -1050,7 +1049,7 @@ public final class Parser {
      */
     private boolean checkMethodDeclaration() {
         boolean checked = this.checkMethodsUniqueness();
-        for (MethodExp meth : this.domain.getMethods()) {
+        for (PDDLMethod meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
@@ -1058,9 +1057,9 @@ public final class Parser {
                 checked &= this.checkParserNode(meth.getLogicalConstraints(), meth.getParameters());
             }
             if (this.checkTaskIDsUniqueness(meth)) {
-                final Set<Symbol> taskIds = this.getTaskIDs(meth.getSubTasks());
-                final Set<Symbol> consIds = this.getTaskIDs(meth.getOrderingConstraints());
-                for (Symbol id : consIds) {
+                final Set<PDDLSymbol> taskIds = this.getTaskIDs(meth.getSubTasks());
+                final Set<PDDLSymbol> consIds = this.getTaskIDs(meth.getOrderingConstraints());
+                for (PDDLSymbol id : consIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" in method "
                             + "\"" + meth.getName() + "\" is undefined", this.lexer
@@ -1088,12 +1087,12 @@ public final class Parser {
     private boolean checkInitialTaskNetwork() {
         boolean checked = true;
         if (problem.getInitialTaskNetwork() != null) {
-            final TaskNetworkExp tn = problem.getInitialTaskNetwork();
-            checked = this.checkParserNode(tn.getTasks(), new LinkedList<TypedSymbol>());
-            if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol>())) {
-                final Set<Symbol> taskIds = this.getTaskIDs(tn.getTasks());
-                final Set<Symbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
-                for (Symbol id : consIds) {
+            final PDDLTaskNetwork tn = problem.getInitialTaskNetwork();
+            checked = this.checkParserNode(tn.getTasks(), new LinkedList<PDDLTypedSymbol>());
+            if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<PDDLSymbol>())) {
+                final Set<PDDLSymbol> taskIds = this.getTaskIDs(tn.getTasks());
+                final Set<PDDLSymbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
+                for (PDDLSymbol id : consIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" initial task network"
                             + " is undefined", this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
@@ -1114,9 +1113,9 @@ public final class Parser {
      * @param taskIDs the set of task IDs already encountered.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Exp exp, Set<Symbol> taskIDs) {
+    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(PDDLExpression exp, Set<PDDLSymbol> taskIDs) {
         boolean unique = true;
-        if (exp.getConnective().equals(Connective.TASK) && exp.getTaskID() != null) {
+        if (exp.getConnective().equals(PDDLConnective.TASK) && exp.getTaskID() != null) {
             if (!taskIDs.add(exp.getTaskID())) {
                 this.mgr.logParserError("task alias \"" + exp.getTaskID() + "\" in initial task network "
                     + "is already defined", this.lexer
@@ -1124,7 +1123,7 @@ public final class Parser {
                 unique = false;
             }
         } else {
-            for (Exp c : exp.getChildren()) {
+            for (PDDLExpression c : exp.getChildren()) {
                 this.checkTaskIDsUniquenessFromInitialTaskNetwork(c, taskIDs);
             }
         }
@@ -1137,8 +1136,8 @@ public final class Parser {
      * @param exp the expression.
      * @return the set of task IDs contains in exp.
      */
-    private Set<Symbol> getTaskIDs(Exp exp) {
-        Set<Symbol> taskIDs  = new HashSet<Symbol>();
+    private Set<PDDLSymbol> getTaskIDs(PDDLExpression exp) {
+        Set<PDDLSymbol> taskIDs  = new HashSet<PDDLSymbol>();
         switch (exp.getConnective()) {
             case TASK:
                 taskIDs.add(exp.getTaskID());
@@ -1148,7 +1147,7 @@ public final class Parser {
                 taskIDs.add(exp.getAtom().get(1));
                 break;
             default:
-                for (Exp c : exp.getChildren()) {
+                for (PDDLExpression c : exp.getChildren()) {
                     taskIDs.addAll(this.getTaskIDs(c));
                 }
         }
@@ -1161,8 +1160,8 @@ public final class Parser {
      * @param meth the methode to be tested.
      * @return true if the all the task ids used in a method declaration are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(MethodExp meth) {
-        return this.checkTaskIDsUniqueness(meth, meth.getSubTasks(), new HashSet<Symbol>());
+    private boolean checkTaskIDsUniqueness(PDDLMethod meth) {
+        return this.checkTaskIDsUniqueness(meth, meth.getSubTasks(), new HashSet<PDDLSymbol>());
     }
 
     /**
@@ -1172,9 +1171,9 @@ public final class Parser {
      * @param exp the expression.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(MethodExp meth, Exp exp, Set<Symbol> taskIds) {
+    private boolean checkTaskIDsUniqueness(PDDLMethod meth, PDDLExpression exp, Set<PDDLSymbol> taskIds) {
         boolean unique = true;
-        if (exp.getConnective().equals(Connective.TASK) && exp.getTaskID() != null) {
+        if (exp.getConnective().equals(PDDLConnective.TASK) && exp.getTaskID() != null) {
             if (!taskIds.add(exp.getTaskID())) {
                 this.mgr.logParserError("task alias \"" + exp.getTaskID() + "\" in method "
                     + "\"" + meth.getName() + "\" is already defined", this.lexer
@@ -1182,7 +1181,7 @@ public final class Parser {
                 unique = false;
             }
         } else {
-            for (Exp c : exp.getChildren()) {
+            for (PDDLExpression c : exp.getChildren()) {
                 this.checkTaskIDsUniqueness(meth, c, taskIds);
             }
         }
@@ -1199,16 +1198,16 @@ public final class Parser {
      * @param context The symbolEncoding.
      * @return <code>true</code> if the expression is well formed; <code>false</code> otherwise.
      */
-    private boolean checkParserNode(Exp exp, List<TypedSymbol> context) {
+    private boolean checkParserNode(PDDLExpression exp, List<PDDLTypedSymbol> context) {
         boolean checked = true;
-        LinkedList<Exp> stackGD = new LinkedList<>();
-        LinkedList<List<TypedSymbol>> stackCtx = new LinkedList<>();
+        LinkedList<PDDLExpression> stackGD = new LinkedList<>();
+        LinkedList<List<PDDLTypedSymbol>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(context);
         while (!stackGD.isEmpty()) {
-            Exp gd = stackGD.poll();
-            List<TypedSymbol> ctx = stackCtx.poll();
-            List<TypedSymbol> newCtx = new LinkedList<>(ctx);
+            PDDLExpression gd = stackGD.poll();
+            List<PDDLTypedSymbol> ctx = stackCtx.poll();
+            List<PDDLTypedSymbol> newCtx = new LinkedList<>(ctx);
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_HEAD:
@@ -1217,9 +1216,9 @@ public final class Parser {
                     break;
                 case EXISTS:
                 case FORALL:
-                    for (TypedSymbol variable : gd.getVariables()) {
+                    for (PDDLTypedSymbol variable : gd.getVariables()) {
                         boolean error = false;
-                        for (Symbol type : variable.getTypes()) {
+                        for (PDDLSymbol type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {
                                 this.mgr.logParserError("type \"" + type.getImage()
                                     + "\" used in quantified expression is undefined", this.lexer
@@ -1252,17 +1251,17 @@ public final class Parser {
      * @param context The symbolEncoding, i.e., the quantified variables if any.
      * @return <code>true</code> if an atom used is well typed and declared, <code>false</code> otherwise.
      */
-    private boolean checkAtom(Exp gd, List<TypedSymbol> context) {
+    private boolean checkAtom(PDDLExpression gd, List<PDDLTypedSymbol> context) {
         boolean checked = true;
-        List<Symbol> atom = gd.getAtom();
-        final NamedTypedList atomSkeleton = new NamedTypedList(atom.get(0));
+        List<PDDLSymbol> atom = gd.getAtom();
+        final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(atom.get(0));
         for (int i = 1; i < atom.size(); i++) {
-            final Symbol s = atom.get(i);
-            if (s.getKind().equals(Symbol.Kind.VARIABLE)) {
-                TypedSymbol param = null;
-                Iterator<TypedSymbol> itr = context.iterator();
+            final PDDLSymbol s = atom.get(i);
+            if (s.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+                PDDLTypedSymbol param = null;
+                Iterator<PDDLTypedSymbol> itr = context.iterator();
                 while (itr.hasNext() && param == null) {
-                    TypedSymbol pi = itr.next();
+                    PDDLTypedSymbol pi = itr.next();
                     if (pi.equals(s)) {
                         param = pi;
                     }
@@ -1272,12 +1271,12 @@ public final class Parser {
                         this.lexer.getFile(), s.getBeginLine(), s.getBeginColumn());
                     checked = false;
                 } else {
-                    final TypedSymbol arg = new TypedSymbol(s);
+                    final PDDLTypedSymbol arg = new PDDLTypedSymbol(s);
                     param.getTypes().forEach(arg::addType);
                     atomSkeleton.add(arg);
                 }
             } else {
-                TypedSymbol constant = this.domain.getConstant(s);
+                PDDLTypedSymbol constant = this.domain.getConstant(s);
                 if (constant == null) {
                     if (this.problem != null) {
                         constant = this.problem.getObject(s);
@@ -1293,14 +1292,14 @@ public final class Parser {
 
             }
         }
-        if (checked && gd.getConnective().equals(Connective.ATOM)
+        if (checked && gd.getConnective().equals(PDDLConnective.ATOM)
             && !this.isDeclaredPredicate(atomSkeleton)) {
             this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                 .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                 .getName().getBeginColumn());
             checked = false;
-        } else if (checked && gd.getConnective().equals(Connective.FN_ATOM)
+        } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
             && !this.isDeclaredFunction(atomSkeleton)) {
             this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1308,7 +1307,7 @@ public final class Parser {
                 .getName().getBeginColumn());
             checked = false;
         }
-        else if (checked && gd.getConnective().equals(Connective.TASK)
+        else if (checked && gd.getConnective().equals(PDDLConnective.TASK)
             && !this.isDeclaredTask(atomSkeleton)) {
             this.mgr.logParserError("task \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1325,18 +1324,18 @@ public final class Parser {
      * @param task the task.
      * @return <code>true</code> if this task was previously declared; <code>false</code> otherwise.
      */
-    private boolean isDeclaredTask(NamedTypedList task) {
+    private boolean isDeclaredTask(PDDLNamedTypedList task) {
         boolean checked = false;
         int i = 0;
         while (i < this.domain.getTasks().size() && !checked) {
-            NamedTypedList t = this.domain.getTasks().get(i);
+            PDDLNamedTypedList t = this.domain.getTasks().get(i);
             if (task.getName().equals(t.getName())
                 && task.getArguments().size() == t.getArguments().size()) {
                 int j = 0;
                 checked = true;
                 while (j < task.getArguments().size() && checked) {
-                    TypedSymbol arg1 = task.getArguments().get(j);
-                    TypedSymbol arg2 = t.getArguments().get(j);
+                    PDDLTypedSymbol arg1 = task.getArguments().get(j);
+                    PDDLTypedSymbol arg2 = t.getArguments().get(j);
                     checked = this.matchTypes(arg1, arg2);
                     j++;
                 }
@@ -1352,18 +1351,18 @@ public final class Parser {
      * @param predicate the predicate.
      * @return <code>true</code> if this predicate was previously declared; <code>false</code> otherwise.
      */
-    private boolean isDeclaredPredicate(NamedTypedList predicate) {
+    private boolean isDeclaredPredicate(PDDLNamedTypedList predicate) {
         boolean checked = false;
         int i = 0;
         while (i < this.domain.getPredicates().size() && !checked) {
-            NamedTypedList p = this.domain.getPredicates().get(i);
+            PDDLNamedTypedList p = this.domain.getPredicates().get(i);
             if (predicate.getName().equals(p.getName())
                 && predicate.getArguments().size() == p.getArguments().size()) {
                 int j = 0;
                 checked = true;
                 while (j < predicate.getArguments().size() && checked) {
-                    TypedSymbol arg1 = predicate.getArguments().get(j);
-                    TypedSymbol arg2 = p.getArguments().get(j);
+                    PDDLTypedSymbol arg1 = predicate.getArguments().get(j);
+                    PDDLTypedSymbol arg2 = p.getArguments().get(j);
                     checked = this.matchTypes(arg1, arg2);
                     j++;
                 }
@@ -1379,18 +1378,18 @@ public final class Parser {
      * @param function the function.
      * @return <code>true</code> if this function was previously declared; <code>false</code> otherwise.
      */
-    private boolean isDeclaredFunction(NamedTypedList function) {
+    private boolean isDeclaredFunction(PDDLNamedTypedList function) {
         boolean checked = false;
         int i = 0;
         while (i < this.domain.getFunctions().size() && !checked) {
-            NamedTypedList p = this.domain.getFunctions().get(i);
+            PDDLNamedTypedList p = this.domain.getFunctions().get(i);
             if (function.getName().equals(p.getName())
                 && function.getArguments().size() == p.getArguments().size()) {
                 int j = 0;
                 checked = true;
                 while (j < function.getArguments().size() && checked) {
-                    TypedSymbol arg1 = function.getArguments().get(j);
-                    TypedSymbol arg2 = p.getArguments().get(j);
+                    PDDLTypedSymbol arg1 = function.getArguments().get(j);
+                    PDDLTypedSymbol arg2 = p.getArguments().get(j);
                     checked = this.matchTypes(arg1, arg2);
                     j++;
                 }
@@ -1408,21 +1407,21 @@ public final class Parser {
      * @param s2 the second typed symbol.
      * @return <code>true</code> if the types can be viewed as a subtype, <code>false</code> otherwise.
      */
-    private boolean matchTypes(TypedSymbol s1, TypedSymbol s2) {
-        List<Symbol> copy = new LinkedList<>(s1.getTypes());
+    private boolean matchTypes(PDDLTypedSymbol s1, PDDLTypedSymbol s2) {
+        List<PDDLSymbol> copy = new LinkedList<>(s1.getTypes());
         copy.retainAll(s2.getTypes());
         boolean isSubType = !copy.isEmpty();
-        Iterator<Symbol> i = s1.getTypes().iterator();
+        Iterator<PDDLSymbol> i = s1.getTypes().iterator();
         while (i.hasNext() && !isSubType) {
-            TypedSymbol type = this.domain.getType(i.next());
-            LinkedList<TypedSymbol> stack = new LinkedList<>();
+            PDDLTypedSymbol type = this.domain.getType(i.next());
+            LinkedList<PDDLTypedSymbol> stack = new LinkedList<>();
             stack.push(type);
             while (!stack.isEmpty() && !isSubType) {
-                TypedSymbol t = stack.poll();
+                PDDLTypedSymbol t = stack.poll();
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                t.getTypes().stream().filter(s -> !s.equals(Parser.OBJECT)).forEach(s ->
+                t.getTypes().stream().filter(s -> !s.equals(PDDLParser.OBJECT)).forEach(s ->
                     stack.push(this.domain.getType(s)));
             }
         }
@@ -1437,17 +1436,17 @@ public final class Parser {
      * @return <code>true</code> if the parameters of the specified action are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkActionParameters(ActionExp action) {
+    private boolean checkActionParameters(PDDLAction action) {
         boolean checked = true;
-        Set<Symbol> set = new HashSet<>();
-        for (TypedSymbol parameter : action.getParameters()) {
+        Set<PDDLSymbol> set = new HashSet<>();
+        for (PDDLTypedSymbol parameter : action.getParameters()) {
             if (!set.add(parameter)) {
                 this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in the action \""
                     + action.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
                     .getBeginColumn());
                 checked = false;
             }
-            for (Symbol type : parameter.getTypes()) {
+            for (PDDLSymbol type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
                             + parameter + "\" in the action \"" + action.getName() + "\" is undefined",
@@ -1467,17 +1466,17 @@ public final class Parser {
      * @return <code>true</code> if the parameters of the specified method are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkMethodParameters(MethodExp method) {
+    private boolean checkMethodParameters(PDDLMethod method) {
         boolean checked = true;
-        Set<Symbol> set = new HashSet<>();
-        for (TypedSymbol parameter : method.getParameters()) {
+        Set<PDDLSymbol> set = new HashSet<>();
+        for (PDDLTypedSymbol parameter : method.getParameters()) {
             if (!set.add(parameter)) {
                 this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in method \""
                     + method.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
                     .getBeginColumn());
                 checked = false;
             }
-            for (Symbol type : parameter.getTypes()) {
+            for (PDDLSymbol type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
                             + parameter + "\" in method \"" + method.getName() + "\" is undefined",
@@ -1497,10 +1496,10 @@ public final class Parser {
      */
     private boolean checkActionsUniqueness() {
         boolean checked = true;
-        Set<Symbol> set = new HashSet<>();
-        for (ActionExp op : this.domain.getActions()) {
+        Set<PDDLSymbol> set = new HashSet<>();
+        for (PDDLAction op : this.domain.getActions()) {
             if (!set.add(op.getName())) {
-                Symbol name = op.getName();
+                PDDLSymbol name = op.getName();
                 this.mgr.logParserError("action \"" + name + "\" declared twice", this.lexer
                     .getFile(), name.getBeginLine(), name.getBeginColumn());
                 checked = false;
@@ -1516,10 +1515,10 @@ public final class Parser {
      */
     private boolean checkMethodsUniqueness() {
         boolean checked = true;
-        Set<Symbol> set = new HashSet<>();
-        for (MethodExp meth : this.domain.getMethods()) {
+        Set<PDDLSymbol> set = new HashSet<>();
+        for (PDDLMethod meth : this.domain.getMethods()) {
             if (!set.add(meth.getName())) {
-                Symbol name = meth.getName();
+                PDDLSymbol name = meth.getName();
                 this.mgr.logParserError("method \"" + name + "\" declared twice", this.lexer
                     .getFile(), name.getBeginLine(), name.getBeginColumn());
                 checked = false;
@@ -1557,7 +1556,7 @@ public final class Parser {
 
         if (args.length == 2 && "-p".equals(args[0])) {
             strb.append("parse problem ").append("\"").append(args[1]).append("\": ");
-            Parser parser = new Parser();
+            PDDLParser parser = new PDDLParser();
             try {
                 parser.parse(args[1]);
             } catch (FileNotFoundException fnfException) {
@@ -1572,7 +1571,7 @@ public final class Parser {
         } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
             strb.append("Parsed files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
                 .append("\": ");
-            Parser parser = new Parser();
+            PDDLParser parser = new PDDLParser();
             try {
                 parser.parse(args[1], args[3]);
             } catch (FileNotFoundException fnfException) {

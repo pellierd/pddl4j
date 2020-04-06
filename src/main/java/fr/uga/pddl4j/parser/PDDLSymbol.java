@@ -33,7 +33,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class Symbol implements Serializable {
+public class PDDLSymbol implements Serializable {
 
     /**
      * The name of rename variable.
@@ -147,7 +147,7 @@ public class Symbol implements Serializable {
      * @param symbol the symbol.
      * @throws NullPointerException if the specified symbol is null.
      */
-    public Symbol(final Symbol symbol) {
+    public PDDLSymbol(final PDDLSymbol symbol) {
         if (symbol == null) {
             throw new NullPointerException("symbol == null");
         }
@@ -165,7 +165,7 @@ public class Symbol implements Serializable {
      * @param kind  the kind of the symbol.
      * @param token the token.
      */
-    public Symbol(final Kind kind, final Token token) {
+    public PDDLSymbol(final Kind kind, final Token token) {
         if (token == null || kind == null) {
             throw new NullPointerException();
         }
@@ -187,8 +187,8 @@ public class Symbol implements Serializable {
      * @param endLine     the end line of the symbol.
      * @param endColumn   the end column of the symbol.
      */
-    public Symbol(final Kind kind, final String image, final int beginLine, final int beginColumn,
-                  final int endLine, final int endColumn) {
+    public PDDLSymbol(final Kind kind, final String image, final int beginLine, final int beginColumn,
+                      final int endLine, final int endColumn) {
         if (image == null || kind == null) {
             throw new NullPointerException();
         }
@@ -207,7 +207,7 @@ public class Symbol implements Serializable {
      * @param kind  the kind of the symbol.
      * @param image the string image of the symbol.
      */
-    public Symbol(final Kind kind, final String image) {
+    public PDDLSymbol(final Kind kind, final String image) {
         this(kind, image, -1, -1, -1, -1);
     }
 
@@ -312,9 +312,9 @@ public class Symbol implements Serializable {
             throw new IllegalArgumentException("index < 0");
         }
         String img = null;
-        if (this.getKind().equals(Symbol.Kind.VARIABLE)) {
+        if (this.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
             img = this.getImage();
-            this.setImage(Symbol.DEFAULT_VARIABLE_SYMBOL + index);
+            this.setImage(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
         }
         return img;
     }
@@ -332,7 +332,7 @@ public class Symbol implements Serializable {
             throw new NullPointerException("context == null");
         }
         String img = null;
-        if (this.getKind().equals(Symbol.Kind.VARIABLE)) {
+        if (this.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
             img = this.getImage();
             final String newImage = context.get(img);
             if (newImage != null) {
@@ -376,7 +376,7 @@ public class Symbol implements Serializable {
             String image = this.getImage();
             String newImage = context.get(image);
             if (newImage == null) {
-                newImage = Symbol.DEFAULT_TASK_ID_SYMBOL + context.size();
+                newImage = PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size();
                 context.put(image, newImage);
             }
             this.setImage(newImage);
@@ -390,13 +390,13 @@ public class Symbol implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this symbol is equal to <tt>object</tt>, i.e., <tt>other</tt>
-     *          is not null and of kind <tt>Symbol</tt> and it has the same image; otherwise return <tt>false</tt>.
+     *          is not null and of kind <tt>PDDLSymbol</tt> and it has the same image; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(final Object object) {
-        if (object != null && object instanceof Symbol) {
-            Symbol other = (Symbol) object;
+        if (object != null && object instanceof PDDLSymbol) {
+            PDDLSymbol other = (PDDLSymbol) object;
             return other.getImage().equals(this.getImage());
         }
         return false;

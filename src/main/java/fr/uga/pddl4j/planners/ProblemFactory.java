@@ -17,10 +17,10 @@ package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.encoding.Encoder;
-import fr.uga.pddl4j.parser.Domain;
+import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.parser.Problem;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,7 +51,7 @@ public class ProblemFactory {
     /**
      * The parser used to parser domain and problem description in PDDL.
      */
-    private Parser parser;
+    private PDDLParser parser;
 
     /**
      * The trace level.
@@ -68,7 +68,7 @@ public class ProblemFactory {
      */
     public ProblemFactory() {
         super();
-        this.parser = new Parser();
+        this.parser = new PDDLParser();
         this.traceLevel = ProblemFactory.DEFAULT_TRACE_LEVEL;
     }
 
@@ -131,8 +131,8 @@ public class ProblemFactory {
         if (!this.parser.getErrorManager().isEmpty()) {
             return null;
         }
-        final Domain domain = this.parser.getDomain();
-        final Problem problem = this.parser.getProblem();
+        final PDDLDomain domain = this.parser.getDomain();
+        final PDDLProblem problem = this.parser.getProblem();
         Encoder.setLogLevel(this.getTraceLevel());
         try {
             return Encoder.encode(domain, problem);

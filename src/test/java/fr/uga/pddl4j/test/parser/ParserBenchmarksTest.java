@@ -21,7 +21,7 @@ package fr.uga.pddl4j.test.parser;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.test.Tools;
 import org.junit.Test;
 
@@ -294,13 +294,13 @@ public class ParserBenchmarksTest {
     }
 
     /**
-     * Instantiate the Parser and parse all domains and problems in the specified test path.
+     * Instantiate the PDDLParser and parse all domains and problems in the specified test path.
      *
      * @param currentTestPath the path where try to find domain and problems pddl files
      * @return all issues report as a ArrayList of String
      */
     private ArrayList<String> validate(String currentTestPath) {
-        final Parser parser = new Parser();
+        final PDDLParser parser = new PDDLParser();
         final ArrayList<String> errors = new ArrayList<>();
         String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
@@ -353,14 +353,14 @@ public class ParserBenchmarksTest {
                     errors.add(builder.toString());
 
                 } else {
-                    System.out.println("Parser test successful: \n   --" + currentProblem + "\n   --" + currentDomain);
+                    System.out.println("PDDLParser test successful: \n   --" + currentProblem + "\n   --" + currentDomain);
                 }
 
             } catch (FileNotFoundException fnfException) {
                 System.err.println("Test files not found !");
                 System.err.println("  -- " + currentDomain);
                 System.err.println("  -- " + currentProblem);
-                System.err.println("Parser test aborted !");
+                System.err.println("PDDLParser test aborted !");
             }
         }
 

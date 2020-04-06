@@ -212,7 +212,7 @@ public class JsonAdapterTest {
                 // Searches for a solution plan
                 plan = planner.search(pb);
             } else {
-                System.err.println("Problem not solvable.");
+                System.err.println("PDDLProblem not solvable.");
             }
         } catch (OutOfMemoryError err) {
             System.err.println("ERR: " + err.getMessage() + " - test aborted");

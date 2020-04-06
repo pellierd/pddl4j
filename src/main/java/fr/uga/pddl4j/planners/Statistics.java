@@ -251,7 +251,7 @@ public class Statistics implements Serializable {
         final double memoryUsedToSearchInMBytes = Statistics.byteToMByte(this.memoryUsedToSearch);
         final double totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;
 
-        strb.append(String.format("* Problem features:%n"));
+        strb.append(String.format("* PDDLProblem features:%n"));
         strb.append(String.format("%8d number of actions %n", this.numberOfActions));
         strb.append(String.format("%8d number of relevant facts %n", this.numberOfRelevantFacts));
         strb.append(String.format("%n* Time spent:%n"));

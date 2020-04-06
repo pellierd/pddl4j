@@ -263,9 +263,9 @@ public class Message implements Serializable, Comparable<Message> {
         if (this.type == Type.LEXICAL_ERROR) {
             str.append("Lexical error");
         } else if (this.type == Type.PARSER_ERROR) {
-            str.append("Parser error");
+            str.append("PDDLParser error");
         } else {
-            str.append("Parser warning");
+            str.append("PDDLParser warning");
         }
         str.append(" at line ").append(this.line).append(", column ").append(this.column)
             .append(", file (").append(this.file).append(")")

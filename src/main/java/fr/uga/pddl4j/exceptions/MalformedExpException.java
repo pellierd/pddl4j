@@ -19,13 +19,13 @@
 
 package fr.uga.pddl4j.exceptions;
 
-import fr.uga.pddl4j.parser.Exp;
+import fr.uga.pddl4j.parser.PDDLExpression;
 
 /**
  * Thrown to indicate that a malformed expression has occurred.
  *
  * @author Damien Pellier
- * @see Exp
+ * @see PDDLExpression
  */
 public class MalformedExpException extends RuntimeException {
 

@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
  * This abstract class implements the common part of an operator (action of method) with integer representation.
@@ -32,7 +32,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
     /**
      * The expression that represents the preconditions of the operator.
      */
-    private IntExp preconditions;
+    private IntExpression preconditions;
 
     /*
     * Creates a new operator from an other.
@@ -52,7 +52,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      */
     protected AbstractIntOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new IntExp(Connective.OR);
+        this.preconditions = new IntExpression(PDDLConnective.OR);
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      * @param preconditions  the preconditions of the operator.
      */
     protected AbstractIntOperator(final String name, final int[] parameters, final int[] instantiations,
-                                  final IntExp preconditions) {
+                                  final IntExpression preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
     }
@@ -74,7 +74,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final IntExp getPreconditions() {
+    public final IntExpression getPreconditions() {
         return this.preconditions;
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final IntExp preconditions) {
+    public final void setPreconditions(final IntExpression preconditions) {
         this.preconditions = preconditions;
     }
 }

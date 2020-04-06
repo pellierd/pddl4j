@@ -35,28 +35,28 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.1 - 28.01.2010
  */
-public class ActionExp extends AbstractOperatorExp {
+public class PDDLAction extends PDDLAbstractOperator {
 
     /**
      * The goal description that represents the effects of the operator.
      */
-    private Exp effects;
+    private PDDLExpression effects;
 
     /**
      * The goal description that represents the constraints duration of temporal operator.
      */
-    private Exp duration;
+    private PDDLExpression duration;
 
     /**
      * Create a new operator from another.
      *
      * @param other the other operator.
      */
-    public ActionExp(final ActionExp other) {
+    public PDDLAction(final PDDLAction other) {
         super(other);
-        this.effects = new Exp(other.getEffects());
+        this.effects = new PDDLExpression(other.getEffects());
         if (this.duration != null) {
-            this.duration = new Exp(other.getDuration());
+            this.duration = new PDDLExpression(other.getDuration());
         }
     }
 
@@ -68,7 +68,7 @@ public class ActionExp extends AbstractOperatorExp {
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
      */
-    public ActionExp(final Symbol name, final List<TypedSymbol> parameters, final Exp preconds, final Exp effects) {
+    public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconds, final PDDLExpression effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -83,8 +83,8 @@ public class ActionExp extends AbstractOperatorExp {
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
-    public ActionExp(final Symbol name, final List<TypedSymbol> parameters, final Exp preconditions, final Exp effects,
-                     final Exp duration) {
+    public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconditions, final PDDLExpression effects,
+                      final PDDLExpression duration) {
         super(name, parameters, preconditions);
         this.effects = effects;
         this.duration = duration;
@@ -96,7 +96,7 @@ public class ActionExp extends AbstractOperatorExp {
      *
      * @return The goal description that represents the effects of the operator.
      */
-    public final Exp getEffects() {
+    public final PDDLExpression getEffects() {
         return this.effects;
     }
 
@@ -106,7 +106,7 @@ public class ActionExp extends AbstractOperatorExp {
      * @param effects he new goal description that represents the effects of the operator to set.
      * @throws NullPointerException if the specified effects is null.
      */
-    public final void setEffects(final Exp effects) {
+    public final void setEffects(final PDDLExpression effects) {
         if (effects == null) {
             throw new NullPointerException();
         }
@@ -118,7 +118,7 @@ public class ActionExp extends AbstractOperatorExp {
      *
      * @return the goal description that represents the duration constraints of the operator.
      */
-    public final Exp getDuration() {
+    public final PDDLExpression getDuration() {
         return this.duration;
     }
 
@@ -127,7 +127,7 @@ public class ActionExp extends AbstractOperatorExp {
      *
      * @param duration the duration constraint to set
      */
-    public final void setDuration(final Exp duration) {
+    public final void setDuration(final PDDLExpression duration) {
         this.duration = duration;
     }
 
@@ -136,8 +136,8 @@ public class ActionExp extends AbstractOperatorExp {
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#moveNegationInward()
      */
     protected Map<String, String> normalize(int index) {
         final Map<String, String> context = super.normalize(index);
@@ -145,8 +145,8 @@ public class ActionExp extends AbstractOperatorExp {
         // Rename the effects
         // A hack to remove single atom in precondition
         if (this.effects.isLiteral()) {
-            Exp atom = this.effects;
-            this.effects = new Exp(Connective.AND);
+            PDDLExpression atom = this.effects;
+            this.effects = new PDDLExpression(PDDLConnective.AND);
             this.effects.addChild(atom);
         }
         this.getEffects().renameVariables(context);

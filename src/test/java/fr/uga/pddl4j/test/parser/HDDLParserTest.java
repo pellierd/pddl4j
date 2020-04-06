@@ -1,11 +1,10 @@
 package test.java.fr.uga.pddl4j.test.parser;
 
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.planners.ProblemFactory;
 
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
@@ -20,19 +19,19 @@ public class HDDLParserTest {
 
         final ProblemFactory factory = ProblemFactory.getInstance();
         try {
-            Parser parser = new Parser();
+            PDDLParser parser = new PDDLParser();
             //parser.parse("src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl",
             //    "src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl");
 
-            //Parser parser = new Parser();
+            //PDDLParser parser = new PDDLParser();
             //parser.parse("src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/domain.hddl",
             //    "src/test/resources/parser/hddl/HDDL-Total-Ordered/transport/pb01.hddl");
 
-            //Parser parser = new Parser();
+            //PDDLParser parser = new PDDLParser();
             //parser.parse("src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/domain.hddl",
             //        "src/test/resources/parser/hddl/HDDL-Partial-Ordered/rover/pb01.hddl");
 
-            //Parser parser = new Parser();
+            //PDDLParser parser = new PDDLParser();
             parser.parse("src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/domain.hddl",
                    "src/test/resources/parser/hddl/HDDL-Partial-Ordered/transport/pb01.hddl");
 

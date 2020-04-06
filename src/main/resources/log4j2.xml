@@ -30,7 +30,7 @@
         <logger name="fr.uga.pddl4j.parser.ErrorManager" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
-        <logger name="fr.uga.pddl4j.parser.Parser" level="trace" additivity="false">
+        <logger name="fr.uga.pddl4j.parser.PDDLParser" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
         <Root level="error">

@@ -42,30 +42,30 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class Exp implements Serializable {
+public class PDDLExpression implements Serializable {
 
     /**
      * The type of the node.
      */
-    private Connective connective;
+    private PDDLConnective connective;
 
     /**
      * only for parsing: the variable in quantifiers.
      */
-    private List<TypedSymbol> variables;
+    private List<PDDLTypedSymbol> variables;
 
     /**
      * AND, OR, NOT, WHEN &#61;&#62; NULL ALL, EX &#61;&#62; the quantified variable with its type ATOM &#61;&#62;
      * the atom as predicate&#45;&#62;param1&#45;&#62;param2&#45;&#62;...
      */
-    private List<Symbol> atom;
+    private List<PDDLSymbol> atom;
 
     /**
      * (a) for AND, OR this is the list of sons(a AND b AND c...), (b) for the rest this is the son,
      * e.g. a subtree that is negated (c) for WHEN, the first son is the condition and the next son
      * is the effect
      */
-    private List<Exp> children;
+    private List<PDDLExpression> children;
 
     /**
      * The value associate to this node.
@@ -75,17 +75,17 @@ public class Exp implements Serializable {
     /**
      * The name of the preference.
      */
-    private Symbol prefName;
+    private PDDLSymbol prefName;
 
     /**
      * The variable.
      */
-    private Symbol variable;
+    private PDDLSymbol variable;
 
     /**
      * The taskID. Use to the alias of a task atom.
      */
-    private Symbol taskID;
+    private PDDLSymbol taskID;
 
     /**
      * Creates a new expression from a other one.
@@ -93,29 +93,29 @@ public class Exp implements Serializable {
      * @param other the other expression.
      * @throws NullPointerException if other is null.
      */
-    public Exp(final Exp other) {
+    public PDDLExpression(final PDDLExpression other) {
         if (other == null) {
             throw new NullPointerException("other == null");
         }
         this.connective = other.getConnective();
         if (other.getAtom() != null) {
             this.atom = new ArrayList<>();
-            this.atom.addAll(other.getAtom().stream().map(Symbol::new).collect(Collectors.toList()));
+            this.atom.addAll(other.getAtom().stream().map(PDDLSymbol::new).collect(Collectors.toList()));
         }
         if (other.getChildren() != null) {
             this.children = new ArrayList<>();
-            this.children.addAll(other.getChildren().stream().map(Exp::new).collect(Collectors.toList()));
+            this.children.addAll(other.getChildren().stream().map(PDDLExpression::new).collect(Collectors.toList()));
         }
         this.prefName = other.getPrefName();
         if (other.getVariables() != null) {
             this.variables = new ArrayList<>();
-            this.variables.addAll(other.getVariables().stream().map(TypedSymbol::new).collect(Collectors.toList()));
+            this.variables.addAll(other.getVariables().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
         }
         if (other.getVariable() != null) {
-            this.variable = new Symbol(other.getVariable());
+            this.variable = new PDDLSymbol(other.getVariable());
         }
         if (other.getTaskID() != null) {
-            this.taskID = new Symbol(other.getTaskID());
+            this.taskID = new PDDLSymbol(other.getTaskID());
         }
         this.value = other.getValue();
     }
@@ -123,9 +123,9 @@ public class Exp implements Serializable {
     /**
      * Creates a new planning node.
      */
-    private Exp() {
+    private PDDLExpression() {
         super();
-        this.connective = Connective.AND;
+        this.connective = PDDLConnective.AND;
         this.atom = null;
         this.children = new ArrayList<>();
         this.prefName = null;
@@ -140,10 +140,10 @@ public class Exp implements Serializable {
      * @param connective the connective.
      * @throws RuntimeException if the specified connective is null.
      */
-    public Exp(final Connective connective) {
+    public PDDLExpression(final PDDLConnective connective) {
         this();
         if (connective == null) {
-            throw new FatalException("Connective can not be null in Exp constructor");
+            throw new FatalException("PDDLConnective can not be null in PDDLExpression constructor");
         }
         this.connective = connective;
     }
@@ -155,7 +155,7 @@ public class Exp implements Serializable {
      * @return <code>true</code> if the node was added; <code>false</code> otherwise
      * @throws RuntimeException if the specified node is null
      */
-    public boolean addChild(final Exp exp) {
+    public boolean addChild(final PDDLExpression exp) {
         if (exp == null) {
             throw new FatalException("exp can not be null in addChild call");
         }
@@ -167,7 +167,7 @@ public class Exp implements Serializable {
      *
      * @param variables the parse variables.
      */
-    public void setVariables(final List<TypedSymbol> variables) {
+    public void setVariables(final List<PDDLTypedSymbol> variables) {
         this.variables = variables;
     }
 
@@ -176,7 +176,7 @@ public class Exp implements Serializable {
      *
      * @return the variable of this parser node.
      */
-    public final Symbol getVariable() {
+    public final PDDLSymbol getVariable() {
         return this.variable;
     }
 
@@ -185,7 +185,7 @@ public class Exp implements Serializable {
      *
      * @param variable the new variable to set.
      */
-    public void setVariable(final Symbol variable) {
+    public void setVariable(final PDDLSymbol variable) {
         this.variable = variable;
     }
 
@@ -194,7 +194,7 @@ public class Exp implements Serializable {
      *
      * @param atom the atom of this node.
      */
-    public final void setAtom(final List<Symbol> atom) {
+    public final void setAtom(final List<PDDLSymbol> atom) {
         this.atom = atom;
     }
 
@@ -204,9 +204,9 @@ public class Exp implements Serializable {
      * @param connective the connective.
      * @throws NullPointerException if the specified connective is null.
      */
-    public void setConnective(final Connective connective) throws NullPointerException {
+    public void setConnective(final PDDLConnective connective) throws NullPointerException {
         if (connective == null) {
-            throw new NullPointerException("Connective can not be null in setConnective call");
+            throw new NullPointerException("PDDLConnective can not be null in setConnective call");
         }
         this.connective = connective;
     }
@@ -225,7 +225,7 @@ public class Exp implements Serializable {
      *
      * @param name the name of the preference to set.
      */
-    public final void setPrefName(final Symbol name) {
+    public final void setPrefName(final PDDLSymbol name) {
         this.prefName = name;
     }
 
@@ -234,7 +234,7 @@ public class Exp implements Serializable {
      *
      * @return the list of child of this parser node.
      */
-    public final List<Exp> getChildren() {
+    public final List<PDDLExpression> getChildren() {
         return this.children;
     }
 
@@ -243,7 +243,7 @@ public class Exp implements Serializable {
      *
      * @return the name of the preference or <code>null</code> if the preference name was not initialized.
      */
-    public final Symbol getPrefName() {
+    public final PDDLSymbol getPrefName() {
         return this.prefName;
     }
 
@@ -252,7 +252,7 @@ public class Exp implements Serializable {
      *
      * @return the connective of this parser node.
      */
-    public final Connective getConnective() {
+    public final PDDLConnective getConnective() {
         return this.connective;
     }
 
@@ -262,7 +262,7 @@ public class Exp implements Serializable {
      *
      * @return the list of variables of this parser node.
      */
-    public final List<TypedSymbol> getVariables() {
+    public final List<PDDLTypedSymbol> getVariables() {
         return this.variables;
     }
 
@@ -273,9 +273,9 @@ public class Exp implements Serializable {
      * @return <code>true</code> if this expression is a literal <code>false</code> otherwise.
      */
     public final boolean isLiteral() {
-        return this.getConnective().equals(Connective.ATOM)
-            || (this.getConnective().equals(Connective.NOT) && this.getChildren().size() == 1 && this.getChildren()
-            .get(0).getConnective().equals(Connective.ATOM));
+        return this.getConnective().equals(PDDLConnective.ATOM)
+            || (this.getConnective().equals(PDDLConnective.NOT) && this.getChildren().size() == 1 && this.getChildren()
+            .get(0).getConnective().equals(PDDLConnective.ATOM));
     }
 
     /**
@@ -283,7 +283,7 @@ public class Exp implements Serializable {
      *
      * @return the atom
      */
-    public final List<Symbol> getAtom() {
+    public final List<PDDLSymbol> getAtom() {
         return this.atom;
     }
 
@@ -301,7 +301,7 @@ public class Exp implements Serializable {
      *
      * @return the taskID of variables of this parser node.
      */
-    public final Symbol getTaskID() {
+    public final PDDLSymbol getTaskID() {
         return this.taskID;
     }
 
@@ -310,7 +310,7 @@ public class Exp implements Serializable {
      *
      * @param taskID the taskID to set.
      */
-    public final void setTaskID(Symbol taskID) {
+    public final void setTaskID(PDDLSymbol taskID) {
         this.taskID = taskID;
     }
 
@@ -337,7 +337,7 @@ public class Exp implements Serializable {
      *
      * @param context the images of the renamed ID of the task.
      * @throws MalformedExpException if this expression is not an AND expression.
-     * @see Exp#isMalformedExpression()
+     * @see PDDLExpression#isMalformedExpression()
      */
     public void renameTaskIDs(final Map<String, String> context) {
         switch (this.getConnective()) {
@@ -349,9 +349,9 @@ public class Exp implements Serializable {
             case TASK:
                 // Set a dummy taskID to task if no task taskID was specified
                 if (this.getTaskID() == null) {
-                    String newTaskID = new String(Symbol.DEFAULT_TASK_ID_SYMBOL + context.size());
-                    Symbol taskID = new Symbol(this.getAtom().get(0));
-                    taskID.setKind(Symbol.Kind.TASK_ID);
+                    String newTaskID = new String(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size());
+                    PDDLSymbol taskID = new PDDLSymbol(this.getAtom().get(0));
+                    taskID.setKind(PDDLSymbol.Kind.TASK_ID);
                     taskID.setImage(newTaskID);
                     this.setTaskID(taskID);
                     context.put(newTaskID, newTaskID);
@@ -381,7 +381,7 @@ public class Exp implements Serializable {
      *
      * @param context the images of the renamed variable.
      * @throws MalformedExpException if this expression is malformed.
-     * @see Exp#isMalformedExpression()
+     * @see PDDLExpression#isMalformedExpression()
      */
     public void renameVariables(final Map<String, String> context) {
         if (this.isMalformedExpression()) {
@@ -406,7 +406,7 @@ public class Exp implements Serializable {
             case EXISTS:
                 final Map<String, String> newContext = new LinkedHashMap<>(context);
                 for (int i = 0; i < this.getVariables().size(); i++) {
-                    final TypedSymbol var = this.getVariables().get(i);
+                    final PDDLTypedSymbol var = this.getVariables().get(i);
                     final String image = var.renameVariables(newContext.size() + i);
                     newContext.put(image, var.getImage());
                 }
@@ -472,7 +472,7 @@ public class Exp implements Serializable {
     /**
      * Moves the negation inward the expression.
      *
-     * @see Exp#isMalformedExpression
+     * @see PDDLExpression#isMalformedExpression
      */
     public void moveNegationInward() throws FatalException {
         if (this.isMalformedExpression()) {
@@ -481,7 +481,7 @@ public class Exp implements Serializable {
         switch (this.connective) {
             case AND:
             case OR:
-                this.children.forEach(fr.uga.pddl4j.parser.Exp::moveNegationInward);
+                this.children.forEach(PDDLExpression::moveNegationInward);
                 break;
             case FORALL:
             case EXISTS:
@@ -549,45 +549,45 @@ public class Exp implements Serializable {
      * Negates the expression.
      */
     private void negate() throws FatalException {
-        Exp exp = this.getChildren().get(0);
+        PDDLExpression exp = this.getChildren().get(0);
         switch (exp.getConnective()) {
             case FORALL:
-                this.setConnective(Connective.EXISTS);
-                Exp negation = new Exp(Connective.NOT);
+                this.setConnective(PDDLConnective.EXISTS);
+                PDDLExpression negation = new PDDLExpression(PDDLConnective.NOT);
                 negation.addChild(exp.getChildren().get(0));
                 negation.moveNegationInward();
                 this.children.set(0, negation);
                 break;
             case EXISTS:
-                this.setConnective(Connective.FORALL);
+                this.setConnective(PDDLConnective.FORALL);
                 this.setVariables(exp.getVariables());
-                negation = new Exp(Connective.NOT);
+                negation = new PDDLExpression(PDDLConnective.NOT);
                 negation.addChild(exp.getChildren().get(0));
                 negation.moveNegationInward();
                 this.children.set(0, negation);
                 break;
             case AND:
-                this.setConnective(Connective.OR);
+                this.setConnective(PDDLConnective.OR);
                 this.children.clear();
                 for (int i = 0; i < exp.getChildren().size(); i++) {
-                    negation = new Exp(Connective.NOT);
+                    negation = new PDDLExpression(PDDLConnective.NOT);
                     negation.addChild(exp.getChildren().get(i));
                     negation.moveNegationInward();
                     this.children.add(negation);
                 }
                 break;
             case OR:
-                this.setConnective(Connective.AND);
+                this.setConnective(PDDLConnective.AND);
                 this.children.clear();
                 for (int i = 0; i < exp.getChildren().size(); i++) {
-                    negation = new Exp(Connective.NOT);
+                    negation = new PDDLExpression(PDDLConnective.NOT);
                     negation.addChild(exp.children.get(i));
                     negation.moveNegationInward();
                     this.children.add(negation);
                 }
                 break;
             case NOT:
-                final Exp neg = exp.getChildren().get(0);
+                final PDDLExpression neg = exp.getChildren().get(0);
                 this.atom = neg.getAtom();
                 this.children = neg.getChildren();
                 this.connective = neg.getConnective();
@@ -607,14 +607,14 @@ public class Exp implements Serializable {
      *
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
-     *          not null and is an instance of <tt>Exp</tt> and it has the same connective, children,
+     *          not null and is an instance of <tt>PDDLExpression</tt> and it has the same connective, children,
      *          atom, value, preference name, variable, value and taskID; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object object) {
-        if (object != null && object instanceof Exp) {
-            Exp other = (Exp) object;
+        if (object != null && object instanceof PDDLExpression) {
+            PDDLExpression other = (PDDLExpression) object;
             return this.connective.equals(other.connective)
                 && ((this.atom == null && other.atom == null)
                 || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
@@ -663,8 +663,8 @@ public class Exp implements Serializable {
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
      *          this expression; <code>false</code> otherwise.
      */
-    public final boolean contains(final Exp exp) {
-        for (Exp s : this.getChildren()) {
+    public final boolean contains(final PDDLExpression exp) {
+        for (PDDLExpression s : this.getChildren()) {
             if (s.equals(exp) || s.contains(exp)) {
                 return true;
             }
@@ -680,11 +680,11 @@ public class Exp implements Serializable {
      * @return <code>true</code> if the specified expression <code>exp</code> was removed;
      *          <code>false</code> otherwise.
      */
-    public final boolean remove(final Exp exp) {
+    public final boolean remove(final PDDLExpression exp) {
         boolean removed = false;
-        Iterator<Exp> it = this.getChildren().iterator();
+        Iterator<PDDLExpression> it = this.getChildren().iterator();
         while (it.hasNext()) {
-            Exp s = it.next();
+            PDDLExpression s = it.next();
             if (s.equals(exp)) {
                 it.remove();
                 removed = true;
@@ -700,7 +700,7 @@ public class Exp implements Serializable {
      *
      * @return a string representation of this node.
      * @see java.lang.Object#toString
-     * @see Exp#isMalformedExpression
+     * @see PDDLExpression#isMalformedExpression
      */
     @Override
     public String toString() {

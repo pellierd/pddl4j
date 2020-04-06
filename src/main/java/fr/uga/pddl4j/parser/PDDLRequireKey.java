@@ -25,7 +25,7 @@ package fr.uga.pddl4j.parser;
  * @author Damien Pellier
  * @version 1.0 - 28.01.2010
  */
-public enum RequireKey {
+public enum PDDLRequireKey {
     /**
      * The PDDL :strips requirement.
      */
@@ -141,7 +141,7 @@ public enum RequireKey {
      *
      * @param image the image of the require key. The image of the require key must be not null.
      */
-    RequireKey(String image) {
+    PDDLRequireKey(String image) {
         this.image = image;
     }
 

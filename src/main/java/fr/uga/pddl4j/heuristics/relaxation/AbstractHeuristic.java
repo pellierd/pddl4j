@@ -19,10 +19,10 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
+import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.operators.State;
-import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     /**
      * The list of facts of the relaxed problem.
      */
-    private List<IntExp> facts;
+    private List<IntExpression> facts;
 
     /**
      * The lists of operators of the relaxed problem.
@@ -114,7 +114,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
      *
      * @return the relevant facts.
      */
-    protected final List<IntExp> getRevelantFacts() {
+    protected final List<IntExpression> getRevelantFacts() {
         return this.facts;
     }
 

@@ -29,28 +29,28 @@ import java.util.List;
  * @version 1.0 - 25.03.2020
  */
 
-public interface OperatorExp extends Serializable {
+public interface PDDLOperator extends Serializable {
 
     /**
      * Returns the name of the operator.
      *
      * @return the name of the operator.
      */
-    Symbol getName();
+    PDDLSymbol getName();
 
     /**
      * Sets a new name to the operator.
      *
      * @param name the name to set.
      */
-    void setName(final Symbol name);
+    void setName(final PDDLSymbol name);
 
     /**
      * Returns the list of parameters of the operator.
      *
      * @return the list of parameters of the operator.
      */
-    List<TypedSymbol> getParameters();
+    List<PDDLTypedSymbol> getParameters();
 
     /**
      * Returns the parameter of the operator that has a specified symbol.
@@ -59,14 +59,14 @@ public interface OperatorExp extends Serializable {
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
      *          operator has no such parameter.
      */
-    TypedSymbol getParameter(final Symbol symbol);
+    PDDLTypedSymbol getParameter(final PDDLSymbol symbol);
 
     /**
      * Returns the task representation of this operator.
      *
      * @return the task representation of this operator.
      */
-    NamedTypedList toTask();
+    PDDLNamedTypedList toTask();
 
     /**
      * Sets a new list of parameters to this operator.
@@ -74,14 +74,14 @@ public interface OperatorExp extends Serializable {
      * @param parameters The list of parameters to set.
      * @throws NullPointerException if the specified parameters is null.
      */
-    void setParameters(final List<TypedSymbol> parameters);
+    void setParameters(final List<PDDLTypedSymbol> parameters);
 
     /**
      * Returns the goal description that represents the preconditions of the operator.
      *
      * @return The goal description that represents the preconditions of the operator.
      */
-    Exp getPreconditions();
+    PDDLExpression getPreconditions();
     /**
      * Sets new preconditions to the operator.
      *
@@ -89,7 +89,7 @@ public interface OperatorExp extends Serializable {
      *                      operator to set.
      * @throws NullPointerException if the specified preconditions is null.
      */
-    void setPreconditions(final Exp preconditions);
+    void setPreconditions(final PDDLExpression preconditions);
 
     /**
      * Return the arity of the operator, i.e., the number of parameters of the operator.
@@ -101,8 +101,8 @@ public interface OperatorExp extends Serializable {
     /**
      * Normalizes the operators.
      *
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#moveNegationInward()
      */
     void normalize();
 

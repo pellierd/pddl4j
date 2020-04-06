@@ -55,13 +55,13 @@ final class IntEncoding implements Serializable {
      * @param domain  the domain.
      * @param problem the problem.
      */
-    static void encodeEitherTypes(final Domain domain, final Problem problem) {
+    static void encodeEitherTypes(final PDDLDomain domain, final PDDLProblem problem) {
         // Collect the types from the predicates declaration
-        for (NamedTypedList predicate : domain.getPredicates()) {
+        for (PDDLNamedTypedList predicate : domain.getPredicates()) {
             IntEncoding.encodeTypes(predicate.getArguments());
         }
         // Collect the types from the functions declaration
-        for (NamedTypedList function : domain.getFunctions()) {
+        for (PDDLNamedTypedList function : domain.getFunctions()) {
             IntEncoding.encodeTypes(function.getArguments());
         }
         // Collect the types from the constraints declaration of the domain
@@ -69,12 +69,12 @@ final class IntEncoding implements Serializable {
             IntEncoding.encodeTypes(domain.getConstraints());
         }
         // Collect the types from the derived predicates
-        for (DerivedPredicateExp axiom : domain.getDerivesPredicates()) {
+        for (PDDLDerivedPredicate axiom : domain.getDerivesPredicates()) {
             IntEncoding.encodeTypes(axiom.getHead().getArguments());
             IntEncoding.encodeTypes(axiom.getBody());
         }
         // Collect the type from the actions
-        for (ActionExp op : domain.getActions()) {
+        for (PDDLAction op : domain.getActions()) {
             IntEncoding.encodeTypes(op.getParameters());
             if (op.getDuration() != null) {
                 IntEncoding.encodeTypes(op.getDuration());
@@ -98,12 +98,12 @@ final class IntEncoding implements Serializable {
      *
      * @param domain the domain.
      */
-    static void encodeTypes(final Domain domain) {
-        final List<TypedSymbol> types = domain.getTypes();
+    static void encodeTypes(final PDDLDomain domain) {
+        final List<PDDLTypedSymbol> types = domain.getTypes();
         final int nbTypes = types.size();
         Encoder.tableOfTypes = new ArrayList<>(nbTypes);
         Encoder.tableOfDomains = new ArrayList<>(nbTypes);
-        for (TypedSymbol type : types) {
+        for (PDDLTypedSymbol type : types) {
             Encoder.tableOfTypes.add(type.getImage());
             Encoder.tableOfDomains.add(new LinkedHashSet<>());
         }
@@ -114,15 +114,15 @@ final class IntEncoding implements Serializable {
      *
      * @param list the list of typed symbol.
      */
-    private static void encodeTypes(final List<TypedSymbol> list) {
-        for (TypedSymbol elt : list) {
-            final List<Symbol> types = elt.getTypes();
+    private static void encodeTypes(final List<PDDLTypedSymbol> list) {
+        for (PDDLTypedSymbol elt : list) {
+            final List<PDDLSymbol> types = elt.getTypes();
             if (types.size() > 1) {
                 String newType;
                 Set<Integer> newTypeDomain = new LinkedHashSet<>();
                 StringBuilder buf = new StringBuilder();
                 buf.append("either");
-                for (Symbol type : types) {
+                for (PDDLSymbol type : types) {
                     final String image = type.getImage();
                     buf.append("~");
                     buf.append(image);
@@ -145,7 +145,7 @@ final class IntEncoding implements Serializable {
      *
      * @param exp the expression.
      */
-    private static void encodeTypes(final Exp exp) {
+    private static void encodeTypes(final PDDLExpression exp) {
         switch (exp.getConnective()) {
             case AND:
             case OR:
@@ -221,19 +221,19 @@ final class IntEncoding implements Serializable {
      * @param domain  the domain.
      * @param problem the problem.
      */
-    static void encodeConstants(final Domain domain, final Problem problem) {
-        final List<TypedSymbol> constants = domain.getConstants();
+    static void encodeConstants(final PDDLDomain domain, final PDDLProblem problem) {
+        final List<PDDLTypedSymbol> constants = domain.getConstants();
         Encoder.tableOfConstants = new ArrayList<>(domain.getConstants().size());
         constants.addAll(problem.getObjects());
-        for (TypedSymbol constant : constants) {
+        for (PDDLTypedSymbol constant : constants) {
             int ic = Encoder.tableOfConstants.indexOf(constant.getImage());
             if (ic == -1) {
                 ic = Encoder.tableOfConstants.size();
                 Encoder.tableOfConstants.add(constant.getImage());
             }
-            final LinkedList<Symbol> types = new LinkedList<>(constant.getTypes());
+            final LinkedList<PDDLSymbol> types = new LinkedList<>(constant.getTypes());
             while (!types.isEmpty()) {
-                Symbol type = types.poll();
+                PDDLSymbol type = types.poll();
                 final int it = Encoder.tableOfTypes.indexOf(type.getImage());
                 types.addAll(domain.getType(type).getTypes());
                 Encoder.tableOfDomains.get(it).add(ic);
@@ -246,20 +246,20 @@ final class IntEncoding implements Serializable {
      *
      * @param domain the domain.
      */
-    static void encodePredicates(final Domain domain) {
-        final List<NamedTypedList> predicates = domain.getPredicates();
+    static void encodePredicates(final PDDLDomain domain) {
+        final List<PDDLNamedTypedList> predicates = domain.getPredicates();
         final int nbPredicates = predicates.size();
         Encoder.tableOfPredicates = new ArrayList<>(nbPredicates);
         Encoder.tableOfTypedPredicates = new ArrayList<>(nbPredicates);
-        for (NamedTypedList predicate : predicates) {
+        for (PDDLNamedTypedList predicate : predicates) {
             Encoder.tableOfPredicates.add(predicate.getName().getImage());
-            final List<TypedSymbol> arguments = predicate.getArguments();
+            final List<PDDLTypedSymbol> arguments = predicate.getArguments();
             final List<Integer> argType = new ArrayList<>(arguments.size());
-            for (TypedSymbol arg : arguments) {
-                final List<Symbol> types = arg.getTypes();
+            for (PDDLTypedSymbol arg : arguments) {
+                final List<PDDLSymbol> types = arg.getTypes();
                 if (types.size() > 1) {
                     final StringBuilder image = new StringBuilder("either");
-                    for (Symbol type : types) {
+                    for (PDDLSymbol type : types) {
                         image.append("~");
                         image.append(type.getImage());
                     }
@@ -277,19 +277,19 @@ final class IntEncoding implements Serializable {
      *
      * @param domain the domain.
      */
-    static void encodeFunctions(final Domain domain) {
-        final List<NamedTypedList> functions = domain.getFunctions();
+    static void encodeFunctions(final PDDLDomain domain) {
+        final List<PDDLNamedTypedList> functions = domain.getFunctions();
         Encoder.tableOfFunctions = new ArrayList<>(functions.size());
         Encoder.tableOfTypedFunctions = new ArrayList<>(functions.size());
-        for (NamedTypedList function : functions) {
+        for (PDDLNamedTypedList function : functions) {
             Encoder.tableOfFunctions.add(function.getName().getImage());
-            List<TypedSymbol> arguments = function.getArguments();
+            List<PDDLTypedSymbol> arguments = function.getArguments();
             List<Integer> argType = new ArrayList<>(arguments.size());
-            for (TypedSymbol argument : arguments) {
-                List<Symbol> types = argument.getTypes();
+            for (PDDLTypedSymbol argument : arguments) {
+                List<PDDLSymbol> types = argument.getTypes();
                 if (types.size() > 1) {
                     StringBuilder type = new StringBuilder("either");
-                    for (Symbol type1 : types) {
+                    for (PDDLSymbol type1 : types) {
                         type.append("~").append(type1.getImage());
                     }
                     argType.add(Encoder.tableOfTypes.indexOf(type.toString()));
@@ -307,20 +307,20 @@ final class IntEncoding implements Serializable {
      *
      * @param domain the domain.
      */
-    static void encodeTasks(final Domain domain) {
-        final List<NamedTypedList> tasks = domain.getTasks();
+    static void encodeTasks(final PDDLDomain domain) {
+        final List<PDDLNamedTypedList> tasks = domain.getTasks();
         final int nbTasks = tasks.size();
         Encoder.tableOfTasks = new ArrayList<>(nbTasks);
         Encoder.tableOfTypedTasks = new ArrayList<>(nbTasks);
-        for (NamedTypedList task : tasks) {
+        for (PDDLNamedTypedList task : tasks) {
             Encoder.tableOfTasks.add(task.getName().getImage());
-            final List<TypedSymbol> arguments = task.getArguments();
+            final List<PDDLTypedSymbol> arguments = task.getArguments();
             final List<Integer> argType = new ArrayList<>(arguments.size());
-            for (TypedSymbol arg : arguments) {
-                final List<Symbol> types = arg.getTypes();
+            for (PDDLTypedSymbol arg : arguments) {
+                final List<PDDLSymbol> types = arg.getTypes();
                 if (types.size() > 1) {
                     final StringBuilder image = new StringBuilder("either");
-                    for (Symbol type : types) {
+                    for (PDDLSymbol type : types) {
                         image.append("~");
                         image.append(type.getImage());
                     }
@@ -340,7 +340,7 @@ final class IntEncoding implements Serializable {
      * @param ops the list of actions to encode.
      * @return encoded the list of actions encoded.
      */
-    static List<IntAction> encodeActions(final List<ActionExp> ops) {
+    static List<IntAction> encodeActions(final List<PDDLAction> ops) {
         return ops.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
     }
 
@@ -350,7 +350,7 @@ final class IntEncoding implements Serializable {
      * @param meths the list of methods to encode.
      * @return encoded the list of methods encoded.
      */
-    static List<IntMethod> encodeMethods(final List<MethodExp> meths) {
+    static List<IntMethod> encodeMethods(final List<PDDLMethod> meths) {
         return meths.stream().map(IntEncoding::encodeMethod).collect(Collectors.toList());
     }
 
@@ -361,7 +361,7 @@ final class IntEncoding implements Serializable {
      * @param init the initial state to encode.
      * @return the initial state encoded.
      */
-    static Set<IntExp> encodeInit(final List<Exp> init) {
+    static Set<IntExpression> encodeInit(final List<PDDLExpression> init) {
         return init.stream().map(IntEncoding::encodeExp).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -371,10 +371,10 @@ final class IntEncoding implements Serializable {
      * @param init the initial state encoded.
      * @return the encoded functions and costs from initial state.
      */
-    static Map<IntExp, Double> encodeFunctionCostInit(final Set<IntExp> init) {
-        Map<IntExp, Double> intFunctionCost = new HashMap<>();
-        for (IntExp intExp : init) {
-            if (intExp.getConnective().equals(Connective.EQUAL)) {
+    static Map<IntExpression, Double> encodeFunctionCostInit(final Set<IntExpression> init) {
+        Map<IntExpression, Double> intFunctionCost = new HashMap<>();
+        for (IntExpression intExp : init) {
+            if (intExp.getConnective().equals(PDDLConnective.EQUAL)) {
                 intFunctionCost.put(intExp.getChildren().get(0),
                     Double.parseDouble(StringEncoder.toString(intExp.getChildren().get(1),
                         Encoder.tableOfConstants,
@@ -396,7 +396,7 @@ final class IntEncoding implements Serializable {
      * @param init the initial state to encode.
      * @return the initial state encoded without functions and costs.
      */
-    static Set<IntExp> removeFunctionCost(final Set<IntExp> init) {
+    static Set<IntExpression> removeFunctionCost(final Set<IntExpression> init) {
         return init.stream().filter(x -> !x.getConnective().getImage().equals("="))
             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
@@ -407,7 +407,7 @@ final class IntEncoding implements Serializable {
      * @param goal the goal to encode.
      * @return the goal encoded.
      */
-    static IntExp encodeGoal(final Exp goal) {
+    static IntExpression encodeGoal(final PDDLExpression goal) {
         return IntEncoding.encodeExp(goal);
     }
 
@@ -418,11 +418,11 @@ final class IntEncoding implements Serializable {
      * @param taskNetwork the initial task network to encode.
      * @return the initial task network encoded.
      */
-    static IntTaskNetwork encodeInitialTaskNetwork(final TaskNetworkExp taskNetwork) {
+    static IntTaskNetwork encodeInitialTaskNetwork(final PDDLTaskNetwork taskNetwork) {
         // Encode the tasks of the task network
-        final IntExp tasks = IntEncoding.encodeExp(taskNetwork.getTasks());
+        final IntExpression tasks = IntEncoding.encodeExp(taskNetwork.getTasks());
         // Encode the ordering constraints of the task network
-        final IntExp orderingConstraints = IntEncoding.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
+        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
         return new IntTaskNetwork(tasks, orderingConstraints, taskNetwork.isTotallyOrdered());
     }
 
@@ -432,22 +432,22 @@ final class IntEncoding implements Serializable {
      * @param action the operator to encode.
      * @return encoded operator.
      */
-    private static IntAction encodeAction(final ActionExp action) {
+    private static IntAction encodeAction(final PDDLAction action) {
         final IntAction intAction = new IntAction(action.getName().getImage(), action.getArity());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(action.getArity());
         for (int i = 0; i < action.getArity(); i++) {
-            final TypedSymbol parameter = action.getParameters().get(i);
+            final PDDLTypedSymbol parameter = action.getParameters().get(i);
             final String typeImage = IntEncoding.toStringType(parameter.getTypes());
             final int type = Encoder.tableOfTypes.indexOf(typeImage);
             intAction.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
         // Encode the preconditions of the operator
-        final IntExp preconditions = IntEncoding.encodeExp(action.getPreconditions(), variables);
+        final IntExpression preconditions = IntEncoding.encodeExp(action.getPreconditions(), variables);
         intAction.setPreconditions(preconditions);
         // Encode the effects of the operator
-        final IntExp effects = IntEncoding.encodeExp(action.getEffects(), variables);
+        final IntExpression effects = IntEncoding.encodeExp(action.getEffects(), variables);
         intAction.setEffects(effects);
         return intAction;
     }
@@ -458,28 +458,28 @@ final class IntEncoding implements Serializable {
      * @param method the metho to encode.
      * @return encoded method.
      */
-    private static IntMethod encodeMethod(final MethodExp method) {
+    private static IntMethod encodeMethod(final PDDLMethod method) {
         final IntMethod intMeth = new IntMethod(method.getName().getImage(), method.getArity());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(method.getArity());
         for (int i = 0; i < method.getArity(); i++) {
-            final TypedSymbol parameter = method.getParameters().get(i);
+            final PDDLTypedSymbol parameter = method.getParameters().get(i);
             final String typeImage = IntEncoding.toStringType(parameter.getTypes());
             final int type = Encoder.tableOfTypes.indexOf(typeImage);
             intMeth.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
         // Encode the task carried out by the method
-        final IntExp task = IntEncoding.encodeExp(method.getTask(), variables);
+        final IntExpression task = IntEncoding.encodeExp(method.getTask(), variables);
         intMeth.setTask(task);
         // Encode the preconditions of the method
-        final IntExp preconditions = IntEncoding.encodeExp(method.getPreconditions(), variables);
+        final IntExpression preconditions = IntEncoding.encodeExp(method.getPreconditions(), variables);
         intMeth.setPreconditions(preconditions);
         // Encode the subtasks of the method
-        final IntExp subtasks = IntEncoding.encodeExp(method.getSubTasks(), variables);
+        final IntExpression subtasks = IntEncoding.encodeExp(method.getSubTasks(), variables);
         intMeth.setSubTasks(subtasks);
         // Encode the ordering constraints of the method
-        final IntExp orderingConstraints = IntEncoding.encodeOrderingConstraints(method.getOrderingConstraints());
+        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(method.getOrderingConstraints());
         intMeth.setOrderingConstraints(orderingConstraints);
         return intMeth;
     }
@@ -491,8 +491,8 @@ final class IntEncoding implements Serializable {
      * @param exp the constraints to encode. The constraints must be an AND expression.
      * @throws MalformedExpException if the exp in parameter is unexpected.
      */
-    private static IntExp encodeOrderingConstraints(final Exp exp) {
-        final IntExp intExp = new IntExp(exp.getConnective());
+    private static IntExpression encodeOrderingConstraints(final PDDLExpression exp) {
+        final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case AND:
                 for (int i = 0; i < exp.getChildren().size(); i++) {
@@ -500,10 +500,10 @@ final class IntEncoding implements Serializable {
                 }
                 break;
             case LESS_ORDERING_CONSTRAINT:
-                IntExp t1 = new IntExp(Connective.TASK);
+                IntExpression t1 = new IntExpression(PDDLConnective.TASK);
                 t1.setTaskID(new Integer(exp.getAtom().get(0).getImage().substring(1)));
                 intExp.addChild(t1);
-                IntExp t2 = new IntExp(Connective.TASK);
+                IntExpression t2 = new IntExpression(PDDLConnective.TASK);
                 t2.setTaskID(new Integer(exp.getAtom().get(1).getImage().substring(1)));
                 intExp.addChild(t2);
                 break;
@@ -521,7 +521,7 @@ final class IntEncoding implements Serializable {
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
-    private static IntExp encodeExp(final Exp exp) {
+    private static IntExpression encodeExp(final PDDLExpression exp) {
         return IntEncoding.encodeExp(exp, new ArrayList<>());
     }
 
@@ -539,16 +539,16 @@ final class IntEncoding implements Serializable {
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
      */
-    private static IntExp encodeExp(final Exp exp,
-                                    final List<String> variables) {
-        final IntExp intExp = new IntExp(exp.getConnective());
+    private static IntExpression encodeExp(final PDDLExpression exp,
+                                           final List<String> variables) {
+        final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
-                intExp.setPredicate(IntExp.EQUAL_PREDICATE);
+                intExp.setPredicate(IntExpression.EQUAL_PREDICATE);
                 int[] args = new int[exp.getAtom().size()];
                 for (int i = 0; i < exp.getAtom().size(); i++) {
-                    final Symbol argument = exp.getAtom().get(i);
-                    if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
+                    final PDDLSymbol argument = exp.getAtom().get(i);
+                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
                         args[i] = Encoder.tableOfConstants.indexOf(argument.getImage());
@@ -561,8 +561,8 @@ final class IntEncoding implements Serializable {
                 intExp.setPredicate(Encoder.tableOfFunctions.indexOf(functor));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final Symbol argument = exp.getAtom().get(i);
-                    if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
+                    final PDDLSymbol argument = exp.getAtom().get(i);
+                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
                         args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
@@ -575,8 +575,8 @@ final class IntEncoding implements Serializable {
                 intExp.setPredicate(Encoder.tableOfPredicates.indexOf(predicate));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final Symbol argument = exp.getAtom().get(i);
-                    if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
+                    final PDDLSymbol argument = exp.getAtom().get(i);
+                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
                         args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
@@ -589,8 +589,8 @@ final class IntEncoding implements Serializable {
                 intExp.setPredicate(Encoder.tableOfTasks.indexOf(task));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final Symbol argument = exp.getAtom().get(i);
-                    if (argument.getKind().equals(Symbol.Kind.VARIABLE)) {
+                    final PDDLSymbol argument = exp.getAtom().get(i);
+                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
                         args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
@@ -610,7 +610,7 @@ final class IntEncoding implements Serializable {
             case FORALL:
             case EXISTS:
                 final List<String> newVariables = new ArrayList<>(variables);
-                final List<TypedSymbol> qvar = exp.getVariables();
+                final List<PDDLTypedSymbol> qvar = exp.getVariables();
                 final String type = IntEncoding.toStringType(qvar.get(0).getTypes());
                 int typeIndex = Encoder.tableOfTypes.indexOf(type);
                 intExp.setType(typeIndex);
@@ -690,11 +690,11 @@ final class IntEncoding implements Serializable {
      * @param types the list of types.
      * @return the string representation of this type.
      */
-    private static String toStringType(final List<Symbol> types) {
+    private static String toStringType(final List<PDDLSymbol> types) {
         final StringBuilder str = new StringBuilder();
         if (types.size() > 1) {
             str.append("either");
-            for (Symbol type : types) {
+            for (PDDLSymbol type : types) {
                 str.append("~");
                 str.append(type.getImage());
             }

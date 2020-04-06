@@ -28,22 +28,22 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class TaskNetworkExp implements Serializable {
+public class PDDLTaskNetwork implements Serializable {
 
     /**
      * The tasks of the task network.
      */
-    private Exp tasks;
+    private PDDLExpression tasks;
 
     /**
      * The ordering constraints of the task network.
      */
-    private Exp orderingConstraints;
+    private PDDLExpression orderingConstraints;
 
     /**
      * The constraints of the task network.
      */
-    private Exp logicalConstraints;
+    private PDDLExpression logicalConstraints;
 
     /**
      * A boolean flag to indicate if the task network is totally ordered or not.
@@ -53,7 +53,7 @@ public class TaskNetworkExp implements Serializable {
     /**
      * Create a new task network.
      */
-    protected TaskNetworkExp() {
+    protected PDDLTaskNetwork() {
         super();
         this.tasks = null;
         this.orderingConstraints = null;
@@ -66,10 +66,10 @@ public class TaskNetworkExp implements Serializable {
      *
      * @param other the other task network.
      */
-    public TaskNetworkExp(final TaskNetworkExp other) {
-        this.tasks = new Exp(other.getTasks());
-        this.orderingConstraints = new Exp(other.getOrderingConstraints());
-        this.logicalConstraints = new  Exp(other.getLogicalConstraints());
+    public PDDLTaskNetwork(final PDDLTaskNetwork other) {
+        this.tasks = new PDDLExpression(other.getTasks());
+        this.orderingConstraints = new PDDLExpression(other.getOrderingConstraints());
+        this.logicalConstraints = new PDDLExpression(other.getLogicalConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered();
     }
 
@@ -82,7 +82,7 @@ public class TaskNetworkExp implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public TaskNetworkExp(final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
+    public PDDLTaskNetwork(final PDDLExpression tasks, final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
         super();
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);
@@ -95,7 +95,7 @@ public class TaskNetworkExp implements Serializable {
      *
      * @return the tasks of the task network.
      */
-    public final Exp getTasks() {
+    public final PDDLExpression getTasks() {
         return this.tasks;
     }
 
@@ -104,7 +104,7 @@ public class TaskNetworkExp implements Serializable {
      *
      *  @param tasks The tasks to set.
      */
-    public final void setTasks(final Exp tasks) {
+    public final void setTasks(final PDDLExpression tasks) {
         this.tasks = tasks;
     }
 
@@ -114,7 +114,7 @@ public class TaskNetworkExp implements Serializable {
      *
      * @return the ordering constraints of the task network.
      */
-    public final Exp getOrderingConstraints() {
+    public final PDDLExpression getOrderingConstraints() {
         return this.orderingConstraints;
     }
 
@@ -123,7 +123,7 @@ public class TaskNetworkExp implements Serializable {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setOrderingConstraints(final Exp constraints) {
+    public final void setOrderingConstraints(final PDDLExpression constraints) {
         this.orderingConstraints = constraints;
     }
 
@@ -132,7 +132,7 @@ public class TaskNetworkExp implements Serializable {
      *
      * @return the logical constraints of the task network.
      */
-    public final Exp getLogicalConstraints() {
+    public final PDDLExpression getLogicalConstraints() {
         return this.logicalConstraints;
     }
 
@@ -141,7 +141,7 @@ public class TaskNetworkExp implements Serializable {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setLogicalConstraints(final Exp constraints) {
+    public final void setLogicalConstraints(final PDDLExpression constraints) {
         this.logicalConstraints = constraints;
     }
 
@@ -185,7 +185,7 @@ public class TaskNetworkExp implements Serializable {
     @Override
     public boolean equals(final Object object) {
         if (object != null && object.getClass().equals(this.getClass())) {
-            final TaskNetworkExp other = (TaskNetworkExp) object;
+            final PDDLTaskNetwork other = (PDDLTaskNetwork) object;
             return this.getTasks().equals(other.getTasks())
                 && this.getOrderingConstraints().equals(other.getOrderingConstraints())
                 && this.getLogicalConstraints().equals(other.getLogicalConstraints())

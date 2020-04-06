@@ -19,9 +19,8 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.parser.PDDLConnective;
 
-import javax.naming.InsufficientResourcesException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 07.04.2010
  */
-public class IntExp implements Serializable {
+public class IntExpression implements Serializable {
 
     /**
      * The constant used to encode the default taskID id.
@@ -64,7 +63,7 @@ public class IntExp implements Serializable {
     /**
      * The connective of the expression.
      */
-    private Connective connective;
+    private PDDLConnective connective;
 
     /**
      * The integer representation of the predicate.
@@ -85,7 +84,7 @@ public class IntExp implements Serializable {
     /**
      * The children of the expression.
      */
-    private List<IntExp> children;
+    private List<IntExpression> children;
 
     /**
      * The variable is used by quantified expression.
@@ -108,16 +107,16 @@ public class IntExp implements Serializable {
      *
      * @param other the expression.
      */
-    public IntExp(final IntExp other) {
+    public IntExpression(final IntExpression other) {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
         this.arguments = other.getArguments();
         if (this.arguments != null) {
             this.arguments = Arrays.copyOf(other.getArguments(), other.getArguments().length);
         }
-        List<IntExp> otherChildren = other.getChildren();
+        List<IntExpression> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
-        this.children.addAll(otherChildren.stream().map(IntExp::new).collect(Collectors.toList()));
+        this.children.addAll(otherChildren.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.variable = other.getVariable();
         this.taskID = other.getTaskID();
         this.type = other.getType();
@@ -129,14 +128,14 @@ public class IntExp implements Serializable {
      *
      * @param connective the connective of the expression.
      */
-    public IntExp(final Connective connective) {
+    public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
         this.arguments = null;
         this.children = new ArrayList<>();
-        this.variable = IntExp.DEFAULT_VARIABLE;
-        this.type = IntExp.DEFAULT_TYPE;
-        this.value = IntExp.DEFAULT_VARIABLE_VALUE;
-        this.taskID = IntExp.DEFAULT_TASK_ID;
+        this.variable = IntExpression.DEFAULT_VARIABLE;
+        this.type = IntExpression.DEFAULT_TYPE;
+        this.value = IntExpression.DEFAULT_VARIABLE_VALUE;
+        this.taskID = IntExpression.DEFAULT_TASK_ID;
     }
 
     /**
@@ -144,7 +143,7 @@ public class IntExp implements Serializable {
      *
      * @return the connective of the expression.
      */
-    public final Connective getConnective() {
+    public final PDDLConnective getConnective() {
         return this.connective;
     }
 
@@ -153,7 +152,7 @@ public class IntExp implements Serializable {
      *
      * @param connective the new connective to set.
      */
-    public final void setConnective(final Connective connective) {
+    public final void setConnective(final PDDLConnective connective) {
         if (connective == null) {
             throw new NullPointerException("connective == null");
         }
@@ -165,7 +164,7 @@ public class IntExp implements Serializable {
      *
      * @return <code>true</code> if the child was added <code>false</code> otherwise.
      */
-    public final boolean addChild(final IntExp child) {
+    public final boolean addChild(final IntExpression child) {
         return this.children.add(child);
     }
 
@@ -174,7 +173,7 @@ public class IntExp implements Serializable {
      *
      * @return the list of children of this expression.
      */
-    public final List<IntExp> getChildren() {
+    public final List<IntExpression> getChildren() {
         return this.children;
     }
 
@@ -292,7 +291,7 @@ public class IntExp implements Serializable {
      *
      * @param other expression.
      */
-    public final void affect(final IntExp other) {
+    public final void affect(final IntExpression other) {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
         this.taskID = other.getTaskID();
@@ -311,8 +310,8 @@ public class IntExp implements Serializable {
      */
     @Override
     public boolean equals(final Object object) {
-        if (object != null && object instanceof IntExp) {
-            final IntExp other = (IntExp) object;
+        if (object != null && object instanceof IntExpression) {
+            final IntExpression other = (IntExpression) object;
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
                 && Arrays.equals(this.arguments, other.arguments)

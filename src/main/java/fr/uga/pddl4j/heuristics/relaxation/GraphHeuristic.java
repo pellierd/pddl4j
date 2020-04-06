@@ -20,13 +20,13 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.operators.State;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.operators.Action;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.operators.ConditionalEffect;
-import fr.uga.pddl4j.encoding.IntExp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -170,7 +170,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             // The array that contains string representation of the problem propositions
             this.propositions = new String[this.nbPropositions];
             for (int i = 0; i < this.negOffset; i++) {
-                IntExp prop = super.getRevelantFacts().get(i);
+                IntExpression prop = super.getRevelantFacts().get(i);
                 this.propositions[i] = problem.toString(prop);
                 this.propositions[i + this.negOffset] = "(not " + this.propositions[i] + ")";
             }
@@ -198,7 +198,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
         for (int i = 0; i < this.negOffset; i++) {
 
             // Positive NOOP actions
-            final IntExp proposition = super.getRevelantFacts().get(i);
+            final IntExpression proposition = super.getRevelantFacts().get(i);
             if (debug) {
                 this.operators[i] = "noop(" + problem.toString(proposition) + ")";
             }

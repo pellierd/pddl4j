@@ -19,9 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.Connective;
-
-import java.util.Arrays;
+import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
  * This class implements an operator. This class is used to store compact representation of operator
@@ -45,7 +43,7 @@ final class IntAction extends AbstractIntOperator {
     /**
      * The expression that represents the effect of the operator.
      */
-    private IntExp effects;
+    private IntExpression effects;
 
     /**
      * The cost of the operator.
@@ -65,7 +63,7 @@ final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final IntAction other) {
         super(other);
-        this.effects = new IntExp(other.getEffects());
+        this.effects = new IntExpression(other.getEffects());
         this.cost = other.getCost();
         this.duration = other.getDuration();
     }
@@ -78,7 +76,7 @@ final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);
-        this.effects = new IntExp(Connective.OR);
+        this.effects = new IntExpression(PDDLConnective.OR);
         this.cost = IntAction.DEFAULT_COST;
         this.duration = IntAction.DEFAULT_DURATION;
     }
@@ -124,7 +122,7 @@ final class IntAction extends AbstractIntOperator {
      *
      * @return the effects of the operator.
      */
-    public final IntExp getEffects() {
+    public final IntExpression getEffects() {
         return this.effects;
     }
 
@@ -133,7 +131,7 @@ final class IntAction extends AbstractIntOperator {
      *
      * @param effects the effects to set
      */
-    public final void setEffects(final IntExp effects) {
+    public final void setEffects(final IntExpression effects) {
         this.effects = effects;
     }
 

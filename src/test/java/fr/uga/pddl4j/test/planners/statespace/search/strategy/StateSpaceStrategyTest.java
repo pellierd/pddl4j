@@ -19,7 +19,7 @@ import org.junit.Test;
 
 /**
  * Implements the <tt>StateSpaceStrategyTest</tt> of the PDD4L library.
- * Domain and problem used: Gripper domain and p01 problem.
+ * PDDLDomain and problem used: Gripper domain and p01 problem.
  *
  * @author E. Hermellin
  * @version 0.1 - 18.06.18

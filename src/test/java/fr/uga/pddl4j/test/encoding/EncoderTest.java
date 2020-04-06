@@ -799,9 +799,9 @@ public class EncoderTest {
                     pb = factory.encode();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println(" * Problem encoded and is solvable.");
+                        System.out.println(" * PDDLProblem encoded and is solvable.");
                     } else {
-                        System.out.println(" * Problem encoded and is  not solvable.");
+                        System.out.println(" * PDDLProblem encoded and is  not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");

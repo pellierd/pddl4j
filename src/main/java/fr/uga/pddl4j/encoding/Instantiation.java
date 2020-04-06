@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -103,10 +103,10 @@ final class Instantiation implements Serializable {
         final List<IntAction> instOps = new ArrayList<>(100);
         Instantiation.expandQuantifiedExpression(action.getPreconditions());
         Instantiation.simplify(action.getPreconditions());
-        if (!action.getPreconditions().getConnective().equals(Connective.FALSE)) {
+        if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
             Instantiation.expandQuantifiedExpression(action.getEffects());
             Instantiation.simplify(action.getEffects());
-            if (!action.getEffects().getConnective().equals(Connective.FALSE)) {
+            if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                 Instantiation.instantiate(action, 0, bound, instOps);
             }
         }
@@ -124,7 +124,7 @@ final class Instantiation implements Serializable {
         final List<IntMethod> instMethods = new ArrayList<>(100);
         Instantiation.expandQuantifiedExpression(method.getPreconditions());
         Instantiation.simplify(method.getPreconditions());
-        if (!method.getPreconditions().getConnective().equals(Connective.FALSE)) {
+        if (!method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
             Instantiation.instantiate(method, 0, bound, instMethods);
         }
         return instMethods;
@@ -172,12 +172,12 @@ final class Instantiation implements Serializable {
         }
         final int arity = action.getArity();
         if (index == arity) {
-            final IntExp precond = action.getPreconditions();
+            final IntExpression precond = action.getPreconditions();
             Instantiation.simplify(precond);
-            if (!precond.getConnective().equals(Connective.FALSE)) {
-                final IntExp effect = action.getEffects();
+            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                final IntExpression effect = action.getEffects();
                 Instantiation.simplify(effect);
-                if (!effect.getConnective().equals(Connective.FALSE)) {
+                if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
                     actions.add(action);
                 }
             }
@@ -186,12 +186,12 @@ final class Instantiation implements Serializable {
             for (Integer value : values) {
                 if (!action.isAlreadyInstantiatedWith(value)) {
                     final int varIndex = -index - 1;
-                    final IntExp precond = new IntExp(action.getPreconditions());
+                    final IntExpression precond = new IntExpression(action.getPreconditions());
                     Instantiation.substitute(precond, varIndex, value);
-                    if (!precond.getConnective().equals(Connective.FALSE)) {
-                        final IntExp effects = new IntExp(action.getEffects());
+                    if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                        final IntExpression effects = new IntExpression(action.getEffects());
                         Instantiation.substitute(effects, varIndex, value);
-                        if (!effects.getConnective().equals(Connective.FALSE)) {
+                        if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
                             final IntAction copy = new IntAction(action.getName(), arity);
                             copy.setPreconditions(precond);
                             copy.setEffects(effects);
@@ -232,9 +232,9 @@ final class Instantiation implements Serializable {
         }
         final int arity = method.getArity();
         if (index == arity) {
-            final IntExp precond = method.getPreconditions();
+            final IntExpression precond = method.getPreconditions();
             Instantiation.simplify(precond);
-            if (!precond.getConnective().equals(Connective.FALSE)) {
+            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                     methods.add(method);
             }
         } else {
@@ -242,19 +242,19 @@ final class Instantiation implements Serializable {
             for (Integer value : values) {
                 if (!method.isAlreadyInstantiatedWith(value)) {
                     final int varIndex = -index - 1;
-                    final IntExp preconditionCopy = new IntExp(method.getPreconditions());
+                    final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
 
                     Instantiation.substitute(preconditionCopy, varIndex, value);
-                    if (!preconditionCopy.getConnective().equals(Connective.FALSE)) {
+                    if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
                         final IntMethod copy = new IntMethod(method.getName(), arity);
                         copy.setPreconditions(preconditionCopy);
-                        copy.setOrderingConstraints(new IntExp(method.getOrderingConstraints()));
+                        copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
 
-                        final IntExp taskCopy = new IntExp(method.getTask());
+                        final IntExpression taskCopy = new IntExpression(method.getTask());
                         Instantiation.substitute(taskCopy, varIndex, value);
                         copy.setTask(taskCopy);
 
-                        final IntExp subTasksCopy = new IntExp(method.getSubTasks());
+                        final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
                         Instantiation.substitute(subTasksCopy, varIndex, value);
                         copy.setSubTasks(subTasksCopy);
 
@@ -277,57 +277,57 @@ final class Instantiation implements Serializable {
      *
      * @param exp the expression.
      */
-    static void expandQuantifiedExpression(final IntExp exp) {
+    static void expandQuantifiedExpression(final IntExpression exp) {
         switch (exp.getConnective()) {
             case AND:
-                Iterator<IntExp> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connective.AND)) {
-                    final IntExp ei = i.next();
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(Connective.FORALL) || ei.getConnective().equals(Connective.EXISTS))
+                    if ((ei.getConnective().equals(PDDLConnective.FORALL) || ei.getConnective().equals(PDDLConnective.EXISTS))
                         && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
                     Instantiation.expandQuantifiedExpression(ei);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(Connective.FALSE)) {
-                        exp.setConnective(Connective.FALSE);
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connective.OR)) {
-                    final IntExp ei = i.next();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(Connective.FORALL) || ei.getConnective().equals(Connective.EXISTS))
+                    if ((ei.getConnective().equals(PDDLConnective.FORALL) || ei.getConnective().equals(PDDLConnective.EXISTS))
                         && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
                     Instantiation.expandQuantifiedExpression(ei);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (ei.getConnective().equals(Connective.TRUE)) {
-                        exp.setConnective(Connective.TRUE);
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
                     }
                 }
                 break;
             case FORALL:
                 Set<Integer> constants = Encoder.tableOfDomains.get(exp.getType());
-                IntExp qExp = exp.getChildren().get(0);
+                IntExpression qExp = exp.getChildren().get(0);
                 int var = exp.getVariable();
-                exp.setConnective(Connective.AND);
+                exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 Iterator<Integer> it = constants.iterator();
-                while (it.hasNext() && exp.getConnective().equals(Connective.AND)) {
+                while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     int cons = it.next();
-                    IntExp copy = new IntExp(qExp);
+                    IntExpression copy = new IntExpression(qExp);
                     Instantiation.substitute(copy, var, cons);
                     exp.getChildren().add(copy);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (copy.getConnective().equals(Connective.FALSE)) {
-                        exp.setConnective(Connective.FALSE);
+                    if (copy.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
                 Instantiation.expandQuantifiedExpression(exp);
@@ -336,17 +336,17 @@ final class Instantiation implements Serializable {
                 constants = Encoder.tableOfDomains.get(exp.getType());
                 qExp = exp.getChildren().get(0);
                 var = exp.getVariable();
-                exp.setConnective(Connective.OR);
+                exp.setConnective(PDDLConnective.OR);
                 exp.getChildren().clear();
                 it = constants.iterator();
-                while (it.hasNext() && exp.getConnective().equals(Connective.OR)) {
+                while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     int cons = it.next();
-                    IntExp copy = new IntExp(qExp);
+                    IntExpression copy = new IntExpression(qExp);
                     Instantiation.substitute(copy, var, cons);
                     exp.getChildren().add(copy);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (copy.getConnective().equals(Connective.TRUE)) {
-                        exp.setConnective(Connective.TRUE);
+                    if (copy.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
                     }
                 }
                 Instantiation.expandQuantifiedExpression(exp);
@@ -430,7 +430,7 @@ final class Instantiation implements Serializable {
      *
      * @param exp the expression to simplify.
      */
-    private static void simplify(final IntExp exp) {
+    private static void simplify(final IntExpression exp) {
         switch (exp.getConnective()) {
             case ATOM:
                 break;
@@ -444,62 +444,62 @@ final class Instantiation implements Serializable {
                 final int arg2 = args[1];
                 if (arg1 == arg2) {
                     // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
-                    exp.setConnective(Connective.TRUE);
+                    exp.setConnective(PDDLConnective.TRUE);
                 } else if (arg1 >= 0 && arg2 >= 0) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
-                    exp.setConnective(Connective.FALSE);
+                    exp.setConnective(PDDLConnective.FALSE);
                 }
                 break;
             case AND:
                 int i = 0;
-                while (i < exp.getChildren().size() && exp.getConnective().equals(Connective.AND)) {
-                    final IntExp ei = exp.getChildren().get(i);
+                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = exp.getChildren().get(i);
                     Instantiation.simplify(ei);
-                    if (ei.getConnective().equals(Connective.FALSE)) {
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                        exp.setConnective(Connective.FALSE);
-                    } else if (ei.getConnective().equals(Connective.TRUE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         // If a child expression is TRUE, we can remove the child expression.
                         exp.getChildren().remove(i);
-                    } else if (ei.getConnective().equals(Connective.AND)) {
+                    } else if (ei.getConnective().equals(PDDLConnective.AND)) {
                         // If the child expression to add is a conjunction, we can simplify the expression by
                         exp.getChildren().remove(i); // removing the inner conjunction.
                         int j = 0;
                         int added = 0;
-                        while (j < ei.getChildren().size() && exp.getConnective().equals(Connective.AND)) {
-                            final IntExp ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(Connective.FALSE)) {
-                                exp.setConnective(Connective.FALSE);
-                            } else if (!ej.getConnective().equals(Connective.TRUE)) {
+                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
+                            final IntExpression ej = ei.getChildren().get(j);
+                            if (ej.getConnective().equals(PDDLConnective.FALSE)) {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
                                 exp.getChildren().add(i + added, ej);
                                 added++;
                             }
                             j++;
                         }
                         i += added + 1;
-                    } else if (ei.getConnective().equals(Connective.WHEN)) {
+                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
                         // Simplification of the conditional expression.
-                        final IntExp antecedent = ei.getChildren().get(0);
-                        final IntExp consequent = ei.getChildren().get(1);
+                        final IntExpression antecedent = ei.getChildren().get(0);
+                        final IntExpression consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional
                         // effect is removed from the action. In this case, the effect is never applicable
                         // because it requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(Connective.FALSE)) {
+                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
                             exp.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(Connective.TRUE)) {
+                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
                             // If the antecedent of a conditional effect becomes TRUE, the conditional
                             // effect becomes unconditional.
-                            if (consequent.getConnective().equals(Connective.AND)) {
+                            if (consequent.getConnective().equals(PDDLConnective.AND)) {
                                 exp.getChildren().remove(i);
                                 int j = 0;
                                 int added = 0;
                                 while (j < consequent.getChildren().size()
-                                    && exp.getConnective().equals(Connective.AND)) {
+                                    && exp.getConnective().equals(PDDLConnective.AND)) {
 
-                                    final IntExp ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(Connective.FALSE)) {
-                                        exp.setConnective(Connective.FALSE);
-                                    } else if (!ej.getConnective().equals(Connective.TRUE)) {
+                                    final IntExpression ej = consequent.getChildren().get(j);
+                                    if (ej.getConnective().equals(PDDLConnective.FALSE)) {
+                                        exp.setConnective(PDDLConnective.FALSE);
+                                    } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
                                         exp.getChildren().add(i + added, ej);
                                         added++;
                                     }
@@ -510,7 +510,7 @@ final class Instantiation implements Serializable {
                                 exp.getChildren().set(i, consequent);
                                 i++;
                             }
-                        } else if (consequent.getConnective().equals(Connective.TRUE)) {
+                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
                             // If the consequent of a conditional effect becomes TRUE, the conditional
                             // effect is removed because it does not lead to any state transition.
                             exp.getChildren().remove(i);
@@ -523,59 +523,59 @@ final class Instantiation implements Serializable {
                 }
                 // Finally, if the conjunction is empty, the expression becomes TRUE.
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(Connective.TRUE);
+                    exp.setConnective(PDDLConnective.TRUE);
                 } else if (exp.getChildren().size() == 1) {
                     exp.affect(exp.getChildren().get(0));
                 }
                 break;
             case OR:
                 i = 0;
-                while (i < exp.getChildren().size() && exp.getConnective().equals(Connective.OR)) {
-                    final IntExp ei = exp.getChildren().get(i);
+                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = exp.getChildren().get(i);
                     Instantiation.simplify(ei);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(Connective.TRUE)) {
-                        exp.setConnective(Connective.TRUE);
-                    } else if (ei.getConnective().equals(Connective.OR)) {
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    } else if (ei.getConnective().equals(PDDLConnective.OR)) {
                         // If the child expression to add is a disjunction, we can simplify the expression by
                         // removing the inner disjunction.
                         exp.getChildren().remove(i);
                         int j = 0;
                         int added = 0;
-                        while (j < ei.getChildren().size() && exp.getConnective().equals(Connective.OR)) {
-                            final IntExp ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(Connective.TRUE)) {
-                                exp.setConnective(Connective.TRUE);
-                            } else if (!ej.getConnective().equals(Connective.FALSE)) {
+                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
+                            final IntExpression ej = ei.getChildren().get(j);
+                            if (ej.getConnective().equals(PDDLConnective.TRUE)) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
                                 exp.getChildren().add(i + added, ej);
                                 added++;
                             }
                             j++;
                         }
                         i += added + 1;
-                    } else if (ei.getConnective().equals(Connective.WHEN)) {
+                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
                         // Simplification of the conditional expression.
-                        final IntExp antecedent = ei.getChildren().get(0);
-                        final IntExp consequent = ei.getChildren().get(1);
+                        final IntExpression antecedent = ei.getChildren().get(0);
+                        final IntExpression consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
                         // removed from the action. In this case, the effect is never applicable because it
                         // requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(Connective.FALSE)) {
+                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
                             exp.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(Connective.TRUE)) {
+                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
                             // If the antecedent of a conditional effect becomes TRUE, the conditional effect
                             // becomes unconditional.
-                            if (consequent.getConnective().equals(Connective.OR)) {
+                            if (consequent.getConnective().equals(PDDLConnective.OR)) {
                                 exp.getChildren().remove(i);
                                 int j = 0;
                                 int added = 0;
                                 while (j < consequent.getChildren().size()
-                                    && exp.getConnective().equals(Connective.OR)) {
+                                    && exp.getConnective().equals(PDDLConnective.OR)) {
 
-                                    final IntExp ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(Connective.TRUE)) {
-                                        exp.setConnective(Connective.TRUE);
-                                    } else if (!ej.getConnective().equals(Connective.FALSE)) {
+                                    final IntExpression ej = consequent.getChildren().get(j);
+                                    if (ej.getConnective().equals(PDDLConnective.TRUE)) {
+                                        exp.setConnective(PDDLConnective.TRUE);
+                                    } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
                                         exp.getChildren().add(i + added, ej);
                                         added++;
                                     }
@@ -586,7 +586,7 @@ final class Instantiation implements Serializable {
                                 exp.getChildren().set(i, consequent);
                                 i++;
                             }
-                        } else if (consequent.getConnective().equals(Connective.TRUE)) {
+                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
                             // If the consequent of a conditional effect becomes TRUE, the conditional
                             // effect is removed because it does not lead to any state transition.
                             exp.getChildren().remove(i);
@@ -599,18 +599,18 @@ final class Instantiation implements Serializable {
                 }
                 // Finally, if the disjunction is empty, the expression becomes TRUE.
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(Connective.TRUE);
+                    exp.setConnective(PDDLConnective.TRUE);
                 } else if (exp.getChildren().size() == 1) {
                     exp.affect(exp.getChildren().get(0));
                 } else {
-                    final Iterator<IntExp> it = exp.getChildren().iterator();
+                    final Iterator<IntExpression> it = exp.getChildren().iterator();
                     while (it.hasNext()) {
-                        if (it.next().getConnective().equals(Connective.FALSE)) {
+                        if (it.next().getConnective().equals(PDDLConnective.FALSE)) {
                             it.remove();
                         }
                     }
                     if (exp.getChildren().isEmpty()) {
-                        exp.setConnective(Connective.FALSE);
+                        exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
                 break;
@@ -626,12 +626,12 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(exp.getChildren().get(0));
                 break;
             case NOT:
-                final IntExp neg = exp.getChildren().get(0);
+                final IntExpression neg = exp.getChildren().get(0);
                 Instantiation.simplify(neg);
-                if (neg.getConnective().equals(Connective.TRUE)) {
-                    exp.setConnective(Connective.FALSE);
-                } else if (neg.getConnective().equals(Connective.FALSE)) {
-                    exp.setConnective(Connective.TRUE);
+                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
                 }
                 break;
             case WHEN:
@@ -688,7 +688,7 @@ final class Instantiation implements Serializable {
      * @param var  the variable.
      * @param cons the constant.
      */
-    private static void substitute(final IntExp exp, final int var, final int cons) {
+    private static void substitute(final IntExpression exp, final int var, final int cons) {
         switch (exp.getConnective()) {
             case ATOM:
                 boolean updated = false;
@@ -734,41 +734,41 @@ final class Instantiation implements Serializable {
                 }
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1 == arg2) {
-                    exp.setConnective(Connective.TRUE);
+                    exp.setConnective(PDDLConnective.TRUE);
                 } else if (arg1 >= 0 && arg2 >= 0) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
-                    exp.setConnective(Connective.FALSE);
+                    exp.setConnective(PDDLConnective.FALSE);
                 }
                 break;
             case AND:
-                Iterator<IntExp> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connective.AND)) {
-                    final IntExp ei = i.next();
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
                     Instantiation.substitute(ei, var, cons);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(Connective.FALSE)) {
-                        exp.setConnective(Connective.FALSE);
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connective.OR)) {
-                    final IntExp ei = i.next();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
                     Instantiation.substitute(ei, var, cons);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(Connective.TRUE)) {
-                        exp.setConnective(Connective.TRUE);
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
                     }
                 }
                 break;
             case NOT:
-                final IntExp neg = exp.getChildren().get(0);
+                final IntExpression neg = exp.getChildren().get(0);
                 Instantiation.substitute(neg, var, cons);
-                if (neg.getConnective().equals(Connective.TRUE)) {
-                    exp.setConnective(Connective.FALSE);
-                } else if (neg.getConnective().equals(Connective.FALSE)) {
-                    exp.setConnective(Connective.TRUE);
+                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
                 }
                 break;
             case WHEN:
@@ -842,7 +842,7 @@ final class Instantiation implements Serializable {
      *
      * @param exp the atomic expression to simplify.
      */
-    private static void simplyAtom(final IntExp exp) {
+    private static void simplyAtom(final IntExpression exp) {
         final int predicate = exp.getPredicate();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
@@ -878,12 +878,12 @@ final class Instantiation implements Serializable {
         // 0 then the expression is simplified to FALSE.
         final Inertia inertia = Encoder.tableOfInertia.get(predicate);
         if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
-            exp.setConnective(Connective.FALSE);
+            exp.setConnective(PDDLConnective.FALSE);
         } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
             // CASE 2: If the expression is a negative inertia and then the number of all possible
             // type-consistent ground instances of the specified expression then the expression is
             // simplified to TRUE.
-            exp.setConnective(Connective.TRUE);
+            exp.setConnective(PDDLConnective.TRUE);
         }
     }
 

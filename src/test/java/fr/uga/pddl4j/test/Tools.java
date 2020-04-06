@@ -2,7 +2,7 @@ package fr.uga.pddl4j.test;
 
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import org.junit.Assert;
 
@@ -16,10 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +30,7 @@ import java.util.regex.Pattern;
 public abstract class Tools {
 
     /**
-     * This enumeration defines the type of file: Domain or Problem.
+     * This enumeration defines the type of file: PDDLDomain or PDDLProblem.
      */
     public enum FileType {
         /**
@@ -124,7 +121,7 @@ public abstract class Tools {
     }
 
     /**
-     * Instantiate the Parser and parse domain file specified in the given path.
+     * Instantiate the PDDLParser and parse domain file specified in the given path.
      *
      * @param path        the path to the pddl file to test
      * @param errorToTest the type of issue to test
@@ -132,7 +129,7 @@ public abstract class Tools {
      * @return an ErrorManager from the parsing file
      */
     public static ErrorManager generateErrorMessages(String path, String errorToTest, Tools.FileType fileType) {
-        final Parser parser = new Parser();
+        final PDDLParser parser = new PDDLParser();
         ErrorManager errManager = new ErrorManager();
         final File file = new File(path);
         try {

@@ -34,7 +34,7 @@ import org.junit.Test;
 
 /**
  * Implements the <tt>SolutionEventAndListenerTest</tt> of the PDD4L library.
- * Domain and problem used: Gripper domain and p01, p02 problems.
+ * PDDLDomain and problem used: Gripper domain and p01, p02 problems.
  *
  * @author E. Hermellin
  * @version 0.1 - 10.01.19

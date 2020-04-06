@@ -101,12 +101,12 @@ public class CodedProblem implements Serializable {
     /**
      * The table of the relevant facts.
      */
-    private List<IntExp> relevantFacts;
+    private List<IntExpression> relevantFacts;
 
     /**
      * The table of the relevant tasks.
      */
-    private List<IntExp> relevantTasks;
+    private List<IntExpression> relevantTasks;
 
     /**
      * The list of instantiated actions encoded into bit sets.
@@ -174,9 +174,9 @@ public class CodedProblem implements Serializable {
         this.inertia = new ArrayList<>();
         this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
         this.relevantFacts = new ArrayList<>();
-        this.relevantFacts.addAll(other.relevantFacts.stream().map(IntExp::new).collect(Collectors.toList()));
+        this.relevantFacts.addAll(other.relevantFacts.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.relevantTasks = new ArrayList<>();
-        this.relevantTasks.addAll(other.relevantTasks.stream().map(IntExp::new).collect(Collectors.toList()));
+        this.relevantTasks.addAll(other.relevantTasks.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.actions = new ArrayList<>();
         this.actions.addAll(other.actions.stream().map(Action::new).collect(Collectors.toList()));
         this.methods = new ArrayList<>();
@@ -388,7 +388,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the list of relevant facts used the problem.
      */
-    public final List<IntExp> getRelevantFacts() {
+    public final List<IntExpression> getRelevantFacts() {
         return this.relevantFacts;
     }
 
@@ -397,7 +397,7 @@ public class CodedProblem implements Serializable {
      *
      * @param facts the list of relevant facts to set.
      */
-    final void setRelevantFacts(final List<IntExp> facts) {
+    final void setRelevantFacts(final List<IntExpression> facts) {
         this.relevantFacts = facts;
     }
 
@@ -406,7 +406,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the list of relevant tasks used the problem.
      */
-    public final List<IntExp> getRelevantTasks() {
+    public final List<IntExpression> getRelevantTasks() {
         return this.relevantTasks;
     }
 
@@ -415,7 +415,7 @@ public class CodedProblem implements Serializable {
      *
      * @param tasks the list of relevant tasks to set.
      */
-    final void setRelevantTasks(final List<IntExp> tasks) {
+    final void setRelevantTasks(final List<IntExpression> tasks) {
         this.relevantTasks = tasks;
     }
 
@@ -529,7 +529,7 @@ public class CodedProblem implements Serializable {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    public final String toString(final IntExp exp) {
+    public final String toString(final IntExpression exp) {
         return StringEncoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks);
     }
@@ -541,7 +541,7 @@ public class CodedProblem implements Serializable {
      * @param sep the string separator used between the predicate symbol and the arguments.
      * @return a string representation of the specified expression.
      */
-    public final String toString(final IntExp exp, final String sep) {
+    public final String toString(final IntExpression exp, final String sep) {
         return StringEncoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks, sep);
     }

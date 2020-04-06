@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.test.parser;
 
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.test.Tools;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
  * Implements the <tt>ParserTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
  * <p>
- * This class will test all the methods from Parser class.
+ * This class will test all the methods from PDDLParser class.
  * </p>
  *
  * @author E Hermellin
@@ -45,11 +45,11 @@ public class ParserTest {
     @Test
     public void parseFromFileTest() {
         try {
-            System.out.println("Parser: Test parsing from files.");
+            System.out.println("PDDLParser: Test parsing from files.");
             final File domain = new File("src/test/resources/encoding/domain.pddl");
             final File problem = new File("src/test/resources/encoding/p01.pddl");
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parse(domain, problem);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -66,11 +66,11 @@ public class ParserTest {
     @Test
     public void parseFromStringFileTest() {
         try {
-            System.out.println("Parser: Test parsing from path files.");
+            System.out.println("PDDLParser: Test parsing from path files.");
             final String domain = "src/test/resources/encoding/domain.pddl";
             final String problem = "src/test/resources/encoding/p01.pddl";
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parse(domain, problem);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -87,13 +87,13 @@ public class ParserTest {
     @Test
     public void parseFromStringTest() {
         try {
-            System.out.println("Parser: Test parsing from string.");
+            System.out.println("PDDLParser: Test parsing from string.");
             final String domain = Tools.readFile("src/test/resources/encoding/domain.pddl",
                 StandardCharsets.UTF_8);
             final String problem = Tools.readFile("src/test/resources/encoding/p01.pddl",
                 StandardCharsets.UTF_8);
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parseFromString(domain, problem);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -110,10 +110,10 @@ public class ParserTest {
     @Test
     public void parseFromSingleFileTest() {
         try {
-            System.out.println("Parser: Test parsing from one file.");
+            System.out.println("PDDLParser: Test parsing from one file.");
             final File domainAndProblem = new File("src/test/resources/encoding/domainAndProblem.pddl");
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parse(domainAndProblem);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -130,10 +130,10 @@ public class ParserTest {
     @Test
     public void parseFromStringSingleFileTest() {
         try {
-            System.out.println("Parser: Test parsing from one path file.");
+            System.out.println("PDDLParser: Test parsing from one path file.");
             final String domainAndProblem = "src/test/resources/encoding/domainAndProblem.pddl";
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parse(domainAndProblem);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -150,12 +150,12 @@ public class ParserTest {
     @Test
     public void parseFromStringSingleTest() {
         try {
-            System.out.println("Parser: Test parsing from one string.");
+            System.out.println("PDDLParser: Test parsing from one string.");
             final String domainAndProblem = "src/test/resources/encoding/domainAndProblem.pddl";
             final String domainAndProblemString = Tools.readFile(domainAndProblem,
                 StandardCharsets.UTF_8);
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parseFromString(domainAndProblemString);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -172,14 +172,14 @@ public class ParserTest {
     @Test
     public void parseFromStreamSingleTest() {
         try {
-            System.out.println("Parser: Test parsing from one stream.");
+            System.out.println("PDDLParser: Test parsing from one stream.");
             final String domainAndProblem = "src/test/resources/encoding/domainAndProblem.pddl";
             final String domainAndProblemString = Tools.readFile(domainAndProblem,
                 StandardCharsets.UTF_8);
 
             InputStream is = new ByteArrayInputStream(domainAndProblemString.getBytes("UTF-8"));
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parseFromStream(is);
             final ErrorManager errManager = parser.getErrorManager();
 
@@ -196,7 +196,7 @@ public class ParserTest {
     @Test
     public void parseFromStreamTest() {
         try {
-            System.out.println("Parser: Test parsing from two streams.");
+            System.out.println("PDDLParser: Test parsing from two streams.");
             final String domain = Tools.readFile("src/test/resources/encoding/domain.pddl",
                 StandardCharsets.UTF_8);
             final String problem = Tools.readFile("src/test/resources/encoding/p01.pddl",
@@ -205,7 +205,7 @@ public class ParserTest {
             InputStream isDomain = new ByteArrayInputStream(domain.getBytes("UTF-8"));
             InputStream isProblem = new ByteArrayInputStream(problem.getBytes("UTF-8"));
 
-            final Parser parser = new Parser();
+            final PDDLParser parser = new PDDLParser();
             parser.parseFromStream(isDomain,isProblem);
             final ErrorManager errManager = parser.getErrorManager();
 

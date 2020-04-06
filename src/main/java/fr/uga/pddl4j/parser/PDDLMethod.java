@@ -30,27 +30,27 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class MethodExp extends AbstractOperatorExp {
+public class PDDLMethod extends PDDLAbstractOperator {
 
     /**
      * The task performed by the method.
      */
-    private Exp task;
+    private PDDLExpression task;
 
     /**
      * The task network of the method.
      */
-    private TaskNetworkExp taskNetwork;
+    private PDDLTaskNetwork taskNetwork;
 
     /**
      * Create a new method from another.
      *
      * @param other the other method.
      */
-    public MethodExp(final MethodExp other) {
+    public PDDLMethod(final PDDLMethod other) {
         super(other);
-        this.task = new Exp(other.getTask());
-        this.taskNetwork = new TaskNetworkExp(other.taskNetwork);
+        this.task = new PDDLExpression(other.getTask());
+        this.taskNetwork = new PDDLTaskNetwork(other.taskNetwork);
     }
 
     /**
@@ -66,11 +66,11 @@ public class MethodExp extends AbstractOperatorExp {
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public MethodExp(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
-                     final Exp tasks, final Exp ordering, final Exp logical, final boolean ordered) {
+    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task, final PDDLExpression preconditions,
+                      final PDDLExpression tasks, final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
         super(name, parameters, preconditions);
         this.task = task;
-        this.taskNetwork = new TaskNetworkExp(tasks, ordering, logical, ordered);
+        this.taskNetwork = new PDDLTaskNetwork(tasks, ordering, logical, ordered);
     }
 
     /**
@@ -83,8 +83,8 @@ public class MethodExp extends AbstractOperatorExp {
      * @param network the task network of the method.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public MethodExp(final Symbol name, final List<TypedSymbol> parameters, final Exp task, final Exp preconditions,
-                     final TaskNetworkExp network) {
+    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task, final PDDLExpression preconditions,
+                      final PDDLTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrderingConstraints(),
             network.getLogicalConstraints(), network.isTotallyOrdered());
     }
@@ -94,7 +94,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      * @return the method tasks.
      */
-    public final Exp getTask() {
+    public final PDDLExpression getTask() {
         return this.task;
     }
 
@@ -103,7 +103,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      *  @param task The task performed by the method.
      */
-    public final void setTask(final Exp task) {
+    public final void setTask(final PDDLExpression task) {
         this.task = task;
     }
 
@@ -112,7 +112,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      * @return the tasks of the task network.
      */
-    public final Exp getSubTasks() {
+    public final PDDLExpression getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
@@ -121,7 +121,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      *  @param tasks The tasks to set.
      */
-    public final void setSubTasks(final Exp tasks) {
+    public final void setSubTasks(final PDDLExpression tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 
@@ -131,7 +131,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      * @return the ordering constraints of the task network.
      */
-    public final Exp getOrderingConstraints() {
+    public final PDDLExpression getOrderingConstraints() {
         return this.taskNetwork.getOrderingConstraints();
     }
 
@@ -140,7 +140,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setOrderingConstraints(final Exp constraints) {
+    public final void setOrderingConstraints(final PDDLExpression constraints) {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 
@@ -149,7 +149,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      * @return the logical constraints of the task network.
      */
-    public final Exp getLogicalConstraints() {
+    public final PDDLExpression getLogicalConstraints() {
         return this.taskNetwork.getLogicalConstraints();
     }
 
@@ -158,7 +158,7 @@ public class MethodExp extends AbstractOperatorExp {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setLogicalConstraints(final Exp constraints) {
+    public final void setLogicalConstraints(final PDDLExpression constraints) {
         this.taskNetwork.setLogicalConstraints(constraints);
     }
 
@@ -186,8 +186,8 @@ public class MethodExp extends AbstractOperatorExp {
      * Warning for the moment the logical constraints are not process.
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#moveNegationInward()
      */
     protected Map<String, String> normalize(int index) {
         // Rename the parameters
@@ -206,10 +206,10 @@ public class MethodExp extends AbstractOperatorExp {
         this.getOrderingConstraints().renameTaskIDs(taskIDCtx);
         // In this case enumerate the orderings contraints in the cas of totally ordered
         if (this.isTotallyOrdered()) {
-            this.setOrderingConstraints(new Exp(Connective.AND));
+            this.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
             for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {
-                Exp c = new Exp(Connective.LESS_ORDERING_CONSTRAINT);
-                c.setAtom(new LinkedList<Symbol>());
+                PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                c.setAtom(new LinkedList<PDDLSymbol>());
                 c.getAtom().add(this.getSubTasks().getChildren().get(j-1).getTaskID());
                 c.getAtom().add(this.getSubTasks().getChildren().get(j).getTaskID());
                 this.getOrderingConstraints().addChild(c);

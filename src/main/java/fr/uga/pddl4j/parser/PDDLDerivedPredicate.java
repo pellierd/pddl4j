@@ -30,22 +30,22 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class DerivedPredicateExp implements Serializable {
+public class PDDLDerivedPredicate implements Serializable {
 
     /**
      * The head of the derived predicate.
      */
-    private NamedTypedList head;
+    private PDDLNamedTypedList head;
 
     /**
      * The body of the derived predicate.
      */
-    private Exp body;
+    private PDDLExpression body;
 
     /**
      * Creates a new derived predicate.
      */
-    private DerivedPredicateExp() {
+    private PDDLDerivedPredicate() {
         this.head = null;
         this.body = null;
     }
@@ -56,7 +56,7 @@ public class DerivedPredicateExp implements Serializable {
      * @param head the head of the derived predicate.
      * @param body the body of the derived predicate.
      */
-    public DerivedPredicateExp(final NamedTypedList head, final Exp body) {
+    public PDDLDerivedPredicate(final PDDLNamedTypedList head, final PDDLExpression body) {
         this();
         if (head == null || body == null) {
             throw new NullPointerException();
@@ -70,7 +70,7 @@ public class DerivedPredicateExp implements Serializable {
      *
      * @return the head of the derived predicate.
      */
-    public final NamedTypedList getHead() {
+    public final PDDLNamedTypedList getHead() {
         return this.head;
     }
 
@@ -79,7 +79,7 @@ public class DerivedPredicateExp implements Serializable {
      *
      * @param head the head to set.
      */
-    public final void setHead(final NamedTypedList head) {
+    public final void setHead(final PDDLNamedTypedList head) {
         if (head == null) {
             throw new NullPointerException();
         }
@@ -91,7 +91,7 @@ public class DerivedPredicateExp implements Serializable {
      *
      * @return the body of the derived predicate.
      */
-    public final Exp getBody() {
+    public final PDDLExpression getBody() {
         return body;
     }
 
@@ -100,7 +100,7 @@ public class DerivedPredicateExp implements Serializable {
      *
      * @param body the body to set.
      */
-    public final void setBody(final Exp body) {
+    public final void setBody(final PDDLExpression body) {
         if (body == null) {
             throw new NullPointerException();
         }
@@ -111,15 +111,15 @@ public class DerivedPredicateExp implements Serializable {
      * Normalizes the derived predicates, i.e, renames the variables contained in the derived
      * predicate and move the negation inward.
      *
-     * @see Exp#renameVariables()
-     * @see Exp#moveNegationInward()
+     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#moveNegationInward()
      */
     public void normalize() {
         // Rename the head of the derived predicate
         final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol> arguments = this.getHead().getArguments();
+        final List<PDDLTypedSymbol> arguments = this.getHead().getArguments();
         for (int i = 0; i < arguments.size(); i++) {
-            final TypedSymbol argument = arguments.get(i);
+            final PDDLTypedSymbol argument = arguments.get(i);
             final String image = argument.renameVariables(i);
             context.put(image, argument.getImage());
         }
@@ -139,7 +139,7 @@ public class DerivedPredicateExp implements Serializable {
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass().equals(this.getClass())) {
-            final DerivedPredicateExp other = (DerivedPredicateExp) obj;
+            final PDDLDerivedPredicate other = (PDDLDerivedPredicate) obj;
             return ((this.head == null && other.head == null)
                 || this.head != null && this.head.equals(other.head))
                 && ((this.body == null && other.body == null)

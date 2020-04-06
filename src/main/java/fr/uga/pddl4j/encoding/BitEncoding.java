@@ -21,12 +21,11 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
 import fr.uga.pddl4j.operators.*;
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.util.BitMatrix;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +77,7 @@ final class BitEncoding implements Serializable {
      * @param map     the map that associates to a specified expression its index.
      * @return the list of actions encoded into bit set.
      */
-    static List<Action> encodeActions(final List<IntAction> actions, final Map<IntExp, Integer> map)
+    static List<Action> encodeActions(final List<IntAction> actions, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
 
         // Normalize the actions
@@ -100,27 +99,27 @@ final class BitEncoding implements Serializable {
             a.setPreconditions(BitEncoding.encode(intAction.getPreconditions(), map));
 
             // Initialize the effects of the action
-            final List<IntExp> effects = intAction.getEffects().getChildren();
+            final List<IntExpression> effects = intAction.getEffects().getChildren();
 
             final ConditionalEffect unCondEffects = new ConditionalEffect();
             boolean hasUnConditionalEffects = false;
-            for (IntExp ei : effects) {
-                final Connective connective = ei.getConnective();
-                final List<IntExp> children = ei.getChildren();
-                if (connective.equals(Connective.WHEN)) {
+            for (IntExpression ei : effects) {
+                final PDDLConnective connective = ei.getConnective();
+                final List<IntExpression> children = ei.getChildren();
+                if (connective.equals(PDDLConnective.WHEN)) {
                     final ConditionalEffect condBitExp = new ConditionalEffect();
                     condBitExp.setCondition(BitEncoding.encode(children.get(0), map));
                     condBitExp.setEffects(BitEncoding.encode(children.get(1), map));
                     a.getCondEffects().add(condBitExp);
-                } else if (connective.equals(Connective.ATOM)) {
+                } else if (connective.equals(PDDLConnective.ATOM)) {
                     final Integer index = map.get(ei);
                     if (index != null) {
                         unCondEffects.getEffects().getPositive().set(index);
                         hasUnConditionalEffects = true;
                     }
-                } else if (connective.equals(Connective.TRUE)) {
+                } else if (connective.equals(PDDLConnective.TRUE)) {
                     // do nothing
-                } else if (connective.equals(Connective.NOT)) {
+                } else if (connective.equals(PDDLConnective.NOT)) {
                     final Integer index = map.get(children.get(0));
                     if (index != null) {
                         unCondEffects.getEffects().getNegative().set(index);
@@ -147,8 +146,8 @@ final class BitEncoding implements Serializable {
      * @param taskMap       the map that associates at a specified task its index in the table of relevant tasks.
      * @return the list of methods encoded into final compact representation.
      */
-    static List<Method> encodeMethods(final List<IntMethod> methods, final Map<IntExp, Integer> factMap,
-                                      final Map<IntExp, Integer> taskMap) throws UnexpectedExpressionException {
+    static List<Method> encodeMethods(final List<IntMethod> methods, final Map<IntExpression, Integer> factMap,
+                                      final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
 
         // Normalize the methods
         BitEncoding.normalizeMethods(methods);
@@ -183,17 +182,17 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static State encodeGoal(IntExp goal, final Map<IntExp, Integer> map) throws UnexpectedExpressionException {
-        if (goal.getConnective().equals(Connective.FALSE)) {
+    static State encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map) throws UnexpectedExpressionException {
+        if (goal.getConnective().equals(PDDLConnective.FALSE)) {
             return null;
         }
 
         State newGoal;
         BitEncoding.toDNF(goal);
         Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
-        for (IntExp exp : goal.getChildren()) {
-            if (exp.getConnective().equals(Connective.ATOM)) {
-                IntExp and = new IntExp(Connective.AND);
+        for (IntExpression exp : goal.getChildren()) {
+            if (exp.getConnective().equals(PDDLConnective.ATOM)) {
+                IntExpression and = new IntExpression(PDDLConnective.AND);
                 and.getChildren().add(exp);
                 Encoder.codedGoal.add(BitEncoding.encode(and, map));
             } else {
@@ -205,7 +204,7 @@ final class BitEncoding implements Serializable {
             final int dummyPredicateIndex = Encoder.tableOfPredicates.size();
             Encoder.tableOfPredicates.add(Constants.DUMMY_GOAL);
             Encoder.tableOfTypedPredicates.add(new ArrayList<>());
-            IntExp dummyGoal = new IntExp(Connective.ATOM);
+            IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
             dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);
             final int dummyGoalIndex = Encoder.tableOfRelevantFacts.size();
@@ -237,7 +236,7 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork, final Map<IntExp, Integer> map) {
+    static TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork, final Map<IntExpression, Integer> map) {
         // We encode first the tasks
         List<Integer> encodedTasks = new ArrayList<Integer>();
         BitEncoding.encodeTasks(taskNetwork.getTasks(), map, encodedTasks);
@@ -247,7 +246,7 @@ final class BitEncoding implements Serializable {
         }
         // We encode then the ordering constraints
         BitMatrix constraints = new BitMatrix(tasks.length, tasks.length);
-        for (IntExp c : taskNetwork.getOrderingConstraints().getChildren()) {
+        for (IntExpression c : taskNetwork.getOrderingConstraints().getChildren()) {
             constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
             //constraints.set(c.getChildren().get(1).getTaskID(), c.getChildren().get(0).getTaskID());
         }
@@ -255,20 +254,20 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Encode the list of tasks expressed as an IntExp into a list of integer.
+     * Encode the list of tasks expressed as an IntExpression into a list of integer.
      *
-     * @param exp the list of tasks expressed as an IntExp.
+     * @param exp the list of tasks expressed as an IntExpression.
      * @param map the map containing the index associated to the tasks.
      * @param tasks the list of task encoded as integer.
      */
-    static void encodeTasks(IntExp exp, final Map<IntExp, Integer> map, List<Integer> tasks) {
+    static void encodeTasks(IntExpression exp, final Map<IntExpression, Integer> map, List<Integer> tasks) {
         switch (exp.getConnective()) {
             case TASK:
                 tasks.add(map.get(exp));
                 break;
             case AND:
             case OR:
-                for (IntExp e : exp.getChildren()) {
+                for (IntExpression e : exp.getChildren()) {
                     encodeTasks(e, map, tasks);
                 }
                 break;
@@ -285,10 +284,10 @@ final class BitEncoding implements Serializable {
      * @param map  the map that associates to a specified expression its index.
      * @return the <code>BitExp</code> that represents the initial encoded.
      */
-    static State encodeInit(final Set<IntExp> init, final Map<IntExp, Integer> map) {
+    static State encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
         final State bitInit = new State();
-        for (final IntExp fact : init) {
-            if (fact.getConnective().equals(Connective.ATOM)) {
+        for (final IntExpression fact : init) {
+            if (fact.getConnective().equals(PDDLConnective.ATOM)) {
                 final Integer i = map.get(fact);
                 if (i != null) {
                     bitInit.getPositive().set(i);
@@ -304,40 +303,40 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Encode an specified <code>IntExp</code> in its <code>BitExp</code> representation.The
+     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
      * specified map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param exp the <code>IntExp</code>.
+     * @param exp the <code>IntExpression</code>.
      * @param map the map that associate to a specified expression its index.
      * @return the expression in bit set representation.
      */
-    private static State encode(final IntExp exp, final Map<IntExp, Integer> map)
+    private static State encode(final IntExpression exp, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
         final State bitExp = new State();
-        if (exp.getConnective().equals(Connective.ATOM)) {
+        if (exp.getConnective().equals(PDDLConnective.ATOM)) {
             final Integer index = map.get(exp);
             if (index != null) {
                 bitExp.getPositive().set(index);
             }
-        } else if (exp.getConnective().equals(Connective.NOT)) {
+        } else if (exp.getConnective().equals(PDDLConnective.NOT)) {
             final Integer index = map.get(exp.getChildren().get(0));
             if (index != null) {
                 bitExp.getNegative().set(index);
             }
-        } else if (exp.getConnective().equals(Connective.AND)) {
-            final List<IntExp> children = exp.getChildren();
-            for (IntExp ei : children) {
-                if (ei.getConnective().equals(Connective.ATOM)) {
+        } else if (exp.getConnective().equals(PDDLConnective.AND)) {
+            final List<IntExpression> children = exp.getChildren();
+            for (IntExpression ei : children) {
+                if (ei.getConnective().equals(PDDLConnective.ATOM)) {
                     final Integer index = map.get(ei);
                     if (index != null) {
                         bitExp.getPositive().set(index);
                     }
-                } else if (ei.getConnective().equals(Connective.NOT)) {
+                } else if (ei.getConnective().equals(PDDLConnective.NOT)) {
                     final Integer index = map.get(ei.getChildren().get(0));
                     if (index != null) {
                         bitExp.getNegative().set(index);
                     }
-                } else if (ei.getConnective().equals(Connective.TRUE)) {
+                } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                     // do nothing
                 } else {
                     throw new UnexpectedExpressionException(Encoder.toString(exp));
@@ -363,10 +362,10 @@ final class BitEncoding implements Serializable {
         for (IntAction a : actions) {
             BitEncoding.toCNF(a.getEffects());
             BitEncoding.simplify(a.getEffects());
-            final IntExp precond = a.getPreconditions();
+            final IntExpression precond = a.getPreconditions();
             BitEncoding.toDNF(precond);
             if (precond.getChildren().size() > 0) {
-                for (final IntExp ei : precond.getChildren()) {
+                for (final IntExpression ei : precond.getChildren()) {
                     final String name = a.getName();
                     final int arity = a.getArity();
                     final IntAction newAction = new IntAction(name, arity);
@@ -379,7 +378,7 @@ final class BitEncoding implements Serializable {
                     }
                     newAction.setPreconditions(ei);
 
-                    newAction.setEffects(new IntExp(a.getEffects()));
+                    newAction.setEffects(new IntExpression(a.getEffects()));
                     normalisedActions.add(newAction);
                 }
             } else {
@@ -401,10 +400,10 @@ final class BitEncoding implements Serializable {
     private static void normalizeMethods(final List<IntMethod> methods) throws UnexpectedExpressionException {
         final List<IntMethod> normalisedMethods = new ArrayList<>(methods.size() + 100);
         for (IntMethod m : methods) {
-            final IntExp precond = m.getPreconditions();
+            final IntExpression precond = m.getPreconditions();
             BitEncoding.toDNF(precond);
             if (precond.getChildren().size() > 0) {
-                for (final IntExp ei : precond.getChildren()) {
+                for (final IntExpression ei : precond.getChildren()) {
                     final String name = m.getName();
                     final int arity = m.getArity();
                     final IntMethod newMethod = new IntMethod(name, arity);
@@ -415,7 +414,7 @@ final class BitEncoding implements Serializable {
                         newMethod.setValueOfParameter(i, m.getValueOfParameter(i));
                     }
                     newMethod.setPreconditions(ei);
-                    newMethod.setTask(new IntExp(m.getTask()));
+                    newMethod.setTask(new IntExpression(m.getTask()));
                     newMethod.setTaskNetwork(new IntTaskNetwork(m.getTaskNetwork()));
                     normalisedMethods.add(newMethod);
                 }
@@ -433,19 +432,19 @@ final class BitEncoding implements Serializable {
      *
      * @param exp the expression.
      */
-    private static void simplify(IntExp exp) {
+    private static void simplify(IntExpression exp) {
         boolean simplified;
         int i = 0;
         do {
             simplified = false;
-            final List<IntExp> children = exp.getChildren();
+            final List<IntExpression> children = exp.getChildren();
             while (i < children.size()) {
-                final IntExp ei = children.get(i);
-                if (ei.getConnective().equals(Connective.AND)
-                    || ei.getConnective().equals(Connective.OR)) {
+                final IntExpression ei = children.get(i);
+                if (ei.getConnective().equals(PDDLConnective.AND)
+                    || ei.getConnective().equals(PDDLConnective.OR)) {
                     simplified = true;
                     children.remove(i);
-                    for (IntExp ej : ei.getChildren()) {
+                    for (IntExpression ej : ei.getChildren()) {
                         children.add(i, ej);
                         i++;
                     }
@@ -461,29 +460,29 @@ final class BitEncoding implements Serializable {
      *
      * @param exp the expression to transform in CNF.
      */
-    private static void toCNF(final IntExp exp) throws UnexpectedExpressionException {
+    private static void toCNF(final IntExpression exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case WHEN:
-                final IntExp antecedent = exp.getChildren().get(0);
-                final IntExp consequence = exp.getChildren().get(1);
+                final IntExpression antecedent = exp.getChildren().get(0);
+                final IntExpression consequence = exp.getChildren().get(1);
                 BitEncoding.toDNF(antecedent);
-                exp.setConnective(Connective.AND);
+                exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
-                for (IntExp ei : antecedent.getChildren()) {
-                    final IntExp newWhen = new IntExp(Connective.WHEN);
+                for (IntExpression ei : antecedent.getChildren()) {
+                    final IntExpression newWhen = new IntExpression(PDDLConnective.WHEN);
                     newWhen.getChildren().add(ei);
                     newWhen.getChildren().add(consequence);
                     exp.getChildren().add(newWhen);
                 }
                 break;
             case AND:
-                final List<IntExp> children = exp.getChildren();
+                final List<IntExpression> children = exp.getChildren();
                 int i = 0;
                 while (i < children.size()) {
-                    final IntExp ei = children.get(i);
+                    final IntExpression ei = children.get(i);
                     BitEncoding.toCNF(ei);
                     exp.getChildren().remove(i);
-                    for (IntExp ej : ei.getChildren()) {
+                    for (IntExpression ej : ei.getChildren()) {
                         exp.getChildren().add(i, ej);
                         i++;
                     }
@@ -492,8 +491,8 @@ final class BitEncoding implements Serializable {
             case ATOM:
             case NOT:
             case TRUE:
-                IntExp copy = new IntExp(exp);
-                exp.setConnective(Connective.AND);
+                IntExpression copy = new IntExpression(exp);
+                exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 exp.getChildren().add(copy);
                 break;
@@ -507,17 +506,17 @@ final class BitEncoding implements Serializable {
      *
      * @param exp the expression to transform in DNF.
      */
-    private static void toDNF(final IntExp exp) throws UnexpectedExpressionException {
+    private static void toDNF(final IntExpression exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case OR:
-                List<IntExp> children = exp.getChildren();
+                List<IntExpression> children = exp.getChildren();
                 int index = 0;
                 while (index < children.size()) {
-                    final IntExp ei = children.get(index);
+                    final IntExpression ei = children.get(index);
                     BitEncoding.toDNF(ei);
-                    if (ei.getConnective().equals(Connective.OR)) {
+                    if (ei.getConnective().equals(PDDLConnective.OR)) {
                         children.remove(index);
-                        for (IntExp ej : ei.getChildren()) {
+                        for (IntExpression ej : ei.getChildren()) {
                             children.add(index, ej);
                             index++;
                         }
@@ -526,18 +525,18 @@ final class BitEncoding implements Serializable {
                 break;
             case AND:
                 children = exp.getChildren();
-                for (IntExp child : children) {
+                for (IntExpression child : children) {
                     BitEncoding.toDNF(child);
                 }
-                IntExp dnf = exp.getChildren().get(0);
+                IntExpression dnf = exp.getChildren().get(0);
                 for (int i = 1; i < exp.getChildren().size(); i++) {
-                    final IntExp orExp = exp.getChildren().get(i);
-                    final IntExp newOr = new IntExp(Connective.OR);
-                    for (IntExp newAnd : dnf.getChildren()) {
-                        for (IntExp ek : orExp.getChildren()) {
+                    final IntExpression orExp = exp.getChildren().get(i);
+                    final IntExpression newOr = new IntExpression(PDDLConnective.OR);
+                    for (IntExpression newAnd : dnf.getChildren()) {
+                        for (IntExpression ek : orExp.getChildren()) {
                             ek.getChildren().stream().filter(el -> !newAnd.getChildren().contains(el)).forEach(el -> {
-                                if (el.getConnective().equals(Connective.OR)
-                                    || el.getConnective().equals(Connective.AND)
+                                if (el.getConnective().equals(PDDLConnective.OR)
+                                    || el.getConnective().equals(PDDLConnective.AND)
                                     && el.getChildren().size() == 1) {
                                     newAnd.getChildren().add(el.getChildren().get(0));
                                 } else {
@@ -545,8 +544,8 @@ final class BitEncoding implements Serializable {
                                 }
                             });
                             boolean add = true;
-                            for (IntExp el : newAnd.getChildren()) {
-                                if (el.getConnective().equals(Connective.FALSE)) {
+                            for (IntExpression el : newAnd.getChildren()) {
+                                if (el.getConnective().equals(PDDLConnective.FALSE)) {
                                     add = false;
                                     break;
                                 }
@@ -567,9 +566,9 @@ final class BitEncoding implements Serializable {
             case ATOM:
             case NOT:
             case TRUE:
-                IntExp and = new IntExp(Connective.AND);
-                and.getChildren().add(new IntExp(exp));
-                exp.setConnective(Connective.OR);
+                IntExpression and = new IntExpression(PDDLConnective.AND);
+                and.getChildren().add(new IntExpression(exp));
+                exp.setConnective(PDDLConnective.OR);
                 exp.getChildren().clear();
                 exp.getChildren().add(and);
                 break;

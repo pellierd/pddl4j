@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.Connective;
+import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
  * This class implements an method. This class is used to store compact representation of method
@@ -33,7 +33,7 @@ final class IntMethod extends AbstractIntOperator {
     /**
      * The task carries out by this method.
      */
-    private IntExp task;
+    private IntExpression task;
 
     /**
      * The task network of the methode.
@@ -48,13 +48,13 @@ final class IntMethod extends AbstractIntOperator {
      */
     public IntMethod(final IntMethod other) {
         super(other);
-        this.task = new IntExp(other.getTask());
+        this.task = new IntExpression(other.getTask());
         this.taskNetwork = new IntTaskNetwork(other.taskNetwork);
 
     }
 
     /**
-     * Create a new method with a specified name. The task is set to a empty IntExp with TASK as connective and the
+     * Create a new method with a specified name. The task is set to a empty IntExpression with TASK as connective and the
      * task network is set to an empty task network.
      *
      * @param name  the name of the method.
@@ -62,7 +62,7 @@ final class IntMethod extends AbstractIntOperator {
      */
     public IntMethod(final String name, final int arity) {
         super(name, arity);
-        this.task = new IntExp(Connective.TASK);
+        this.task = new IntExpression(PDDLConnective.TASK);
         this.taskNetwork = new IntTaskNetwork();
     }
 
@@ -71,7 +71,7 @@ final class IntMethod extends AbstractIntOperator {
      *
      * @return the task carried out by the method.
      */
-    public final IntExp getTask() {
+    public final IntExpression getTask() {
         return this.task;
     }
 
@@ -80,7 +80,7 @@ final class IntMethod extends AbstractIntOperator {
      *
      * @param task the task the carried out by the method.
      */
-    public final void setTask(final IntExp task) {
+    public final void setTask(final IntExpression task) {
         this.task = task;
     }
 
@@ -89,7 +89,7 @@ final class IntMethod extends AbstractIntOperator {
      *
      * @return the subtasks of the method.
      */
-    public final IntExp getSubTasks() {
+    public final IntExpression getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
@@ -98,7 +98,7 @@ final class IntMethod extends AbstractIntOperator {
      *
      * @param tasks the subtasks to set.
      */
-    public final void setSubTasks(final IntExp tasks) {
+    public final void setSubTasks(final IntExpression tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 
@@ -107,7 +107,7 @@ final class IntMethod extends AbstractIntOperator {
      *
      * @return the ordering constraints of the method.
      */
-    public final IntExp getOrderingConstraints() {
+    public final IntExpression getOrderingConstraints() {
         return this.taskNetwork.getOrderingConstraints();
     }
 
@@ -116,7 +116,7 @@ final class IntMethod extends AbstractIntOperator {
      *
      * @param ordering the orderings constraints to set
      */
-    public final void setOrderingConstraints(final IntExp ordering) {
+    public final void setOrderingConstraints(final IntExpression ordering) {
         this.taskNetwork.setOrderingConstraints(ordering);
     }
 

@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Implements the <tt>PlanTest</tt> of the PDD4L library.
- * Domain and problem used: Blocksworld domain and p01, p02, p03, p04 problems.
+ * PDDLDomain and problem used: Blocksworld domain and p01, p02, p03, p04 problems.
  *
  * @author E. Hermellin
  * @version 0.1 - 19.03.18
