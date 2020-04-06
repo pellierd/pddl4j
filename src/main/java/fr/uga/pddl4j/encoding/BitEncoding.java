@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.exceptions.UnexpectedExpressionException;
-import fr.uga.pddl4j.operators.*;
+import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.util.BitMatrix;
 import org.apache.logging.log4j.LogManager;

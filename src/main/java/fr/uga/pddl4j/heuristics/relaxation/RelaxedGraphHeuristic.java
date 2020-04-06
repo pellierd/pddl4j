@@ -19,12 +19,12 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.operators.State;
-import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.BitVector;
-import fr.uga.pddl4j.operators.ConditionalEffect;
+import fr.uga.pddl4j.problem.ConditionalEffect;
 
 import java.util.Arrays;
 import java.util.List;
@@ -122,7 +122,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
      *
      * @param problem the problem to be solved.
      */
-    protected RelaxedGraphHeuristic(final CodedProblem problem) {
+    protected RelaxedGraphHeuristic(final Problem problem) {
         super(problem);
         // Get the number of relevant facts of the problem
         final int nbRelevantFacts = super.getRevelantFacts().size();

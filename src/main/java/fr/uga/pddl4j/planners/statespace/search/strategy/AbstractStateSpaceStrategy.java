@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
@@ -293,7 +293,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @return the solution node or null.
      */
     @Override
-    public Node searchSolutionNode(final CodedProblem codedProblem) {
+    public Node searchSolutionNode(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         return search(codedProblem);
     }
@@ -305,7 +305,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @return the solution plan or null.
      */
     @Override
-    public Plan searchPlan(final CodedProblem codedProblem) {
+    public Plan searchPlan(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final Node solutionNode = search(codedProblem);
         if (solutionNode != null) {
@@ -323,7 +323,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @return the solution plan or null is no solution was found.
      */
     @Override
-    public SequentialPlan extractPlan(final Node node, final CodedProblem problem) {
+    public SequentialPlan extractPlan(final Node node, final Problem problem) {
         if (node != null) {
             Node n = node;
             final SequentialPlan plan = new SequentialPlan();

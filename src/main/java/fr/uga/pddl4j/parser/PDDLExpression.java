@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import fr.uga.pddl4j.exceptions.FatalException;
 import fr.uga.pddl4j.exceptions.MalformedExpException;
 
 import java.io.Serializable;
@@ -142,9 +141,6 @@ public class PDDLExpression implements Serializable {
      */
     public PDDLExpression(final PDDLConnective connective) {
         this();
-        if (connective == null) {
-            throw new FatalException("PDDLConnective can not be null in PDDLExpression constructor");
-        }
         this.connective = connective;
     }
 
@@ -156,9 +152,6 @@ public class PDDLExpression implements Serializable {
      * @throws RuntimeException if the specified node is null
      */
     public boolean addChild(final PDDLExpression exp) {
-        if (exp == null) {
-            throw new FatalException("exp can not be null in addChild call");
-        }
         return this.children.add(exp);
     }
 
@@ -474,7 +467,7 @@ public class PDDLExpression implements Serializable {
      *
      * @see PDDLExpression#isMalformedExpression
      */
-    public void moveNegationInward() throws FatalException {
+    public void moveNegationInward() {
         if (this.isMalformedExpression()) {
             throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
         }
@@ -548,7 +541,7 @@ public class PDDLExpression implements Serializable {
     /**
      * Negates the expression.
      */
-    private void negate() throws FatalException {
+    private void negate() {
         PDDLExpression exp = this.getChildren().get(0);
         switch (exp.getConnective()) {
             case FORALL:

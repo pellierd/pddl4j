@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.problem.State;
 
 /**
  * This class implements a logical state.

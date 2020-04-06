@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 
@@ -76,7 +76,7 @@ public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpa
      * @return a vector containing all the solutions plans or an empty vector.
      */
     @Override
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+    public Vector<Plan> getSolutionPlans(final Problem codedProblem) {
         final Vector<Plan> plansVector = new Vector<>();
         if (!this.solutionNodes.isEmpty()) {
             for (Node node : this.solutionNodes) {

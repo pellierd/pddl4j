@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.operators;
+package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.encoding.AbstractGroundOperator;
 
@@ -27,7 +27,7 @@ import fr.uga.pddl4j.encoding.AbstractGroundOperator;
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public abstract class AbstractBitOperator extends AbstractGroundOperator {
+public abstract class AbstractOperator extends AbstractGroundOperator {
 
     /**
      * The preconditions of the operator.
@@ -39,7 +39,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
     *
     * @param other the other operator.
     */
-    protected AbstractBitOperator(final AbstractBitOperator other) {
+    protected AbstractOperator(final AbstractOperator other) {
         super(other);
         this.preconditions = other.getPreconditions();
     }
@@ -50,7 +50,7 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
      * @param name  the name of the operator.
      * @param arity the arity of the operator.
      */
-    protected AbstractBitOperator(final String name, final int arity) {
+    protected AbstractOperator(final String name, final int arity) {
         super(name, arity);
         this.preconditions = new State();
     }
@@ -63,8 +63,8 @@ public abstract class AbstractBitOperator extends AbstractGroundOperator {
      * @param instantiations the values of the parameters.
      * @param preconditions  the preconditions of the operator.
      */
-    protected AbstractBitOperator(final String name, final int[] parameters, final int[] instantiations,
-                                  final State preconditions) {
+    protected AbstractOperator(final String name, final int[] parameters, final int[] instantiations,
+                               final State preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
     }

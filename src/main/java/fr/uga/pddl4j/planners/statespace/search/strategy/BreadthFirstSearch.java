@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -61,7 +61,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return a solution plan or null if it does not exist.
      */
-    public Node search(final CodedProblem codedProblem) {
+    public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 

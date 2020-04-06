@@ -19,16 +19,16 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.exceptions.FatalException;
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.operators.State;
-import fr.uga.pddl4j.operators.ConditionalEffect;
-import fr.uga.pddl4j.operators.Method;
-import fr.uga.pddl4j.operators.TaskNetwork;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.Method;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.State;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -291,7 +291,7 @@ public final class Encoder implements Serializable {
      * @return the problem encoded.
      * @throws IllegalArgumentException if the problem to encode is not ADL or ACTION_COSTS or HTN.
      */
-    public static CodedProblem encode(final PDDLDomain domain, final PDDLProblem problem) throws FatalException {
+    public static Problem encode(final PDDLDomain domain, final PDDLProblem problem) {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.
@@ -645,7 +645,7 @@ public final class Encoder implements Serializable {
             stringBuilder.setLength(0);
         }
 
-        final CodedProblem codedProblem = new CodedProblem();
+        final Problem codedProblem = new Problem();
         codedProblem.setGoal(Encoder.goal);
         codedProblem.setInit(Encoder.init);
         codedProblem.setActions(Encoder.actions);
@@ -811,7 +811,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified operator.
      */
     static String toShortString(final IntAction op) {
-        return StringEncoder.toShortString(op, Encoder.tableOfConstants);
+        return StringDecoder.toShortString(op, Encoder.tableOfConstants);
     }
 
     /**
@@ -821,7 +821,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified operator.
      */
     static String toString(final IntAction op) {
-        return StringEncoder.toString(op, Encoder.tableOfConstants,
+        return StringDecoder.toString(op, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
@@ -833,7 +833,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified method.
      */
     static String toString(final IntMethod meth) {
-        return StringEncoder.toString(meth, Encoder.tableOfConstants,
+        return StringDecoder.toString(meth, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
@@ -845,7 +845,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified tn.
      */
     static String toString(final IntTaskNetwork tn) {
-        return StringEncoder.toString(tn, Encoder.tableOfConstants,
+        return StringDecoder.toString(tn, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
@@ -857,7 +857,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified action.
      */
     static String toString(final Action a) {
-        return StringEncoder.toString(a, Encoder.tableOfConstants,
+        return StringDecoder.toString(a, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
     }
@@ -869,7 +869,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified method.
      */
     static String toString(final Method m) {
-        return StringEncoder.toString(m, Encoder.tableOfConstants,
+        return StringDecoder.toString(m, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks,
             Encoder.tableOfRelevantFacts, Encoder.tableOfRelevantTasks);
@@ -882,7 +882,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified task network.
      */
     static String toString(final TaskNetwork taskNetwork) {
-        return StringEncoder.toString(taskNetwork, Encoder.tableOfConstants,
+        return StringDecoder.toString(taskNetwork, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks,
             Encoder.tableOfRelevantTasks);
@@ -895,7 +895,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(final IntExpression exp) {
-        return StringEncoder.toString(exp, Encoder.tableOfConstants,
+        return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
@@ -907,7 +907,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(State exp) {
-        return StringEncoder.toString(exp, Encoder.tableOfConstants,
+        return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
     }
@@ -919,7 +919,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(ConditionalEffect exp) {
-        return StringEncoder.toString(exp, Encoder.tableOfConstants,
+        return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
     }

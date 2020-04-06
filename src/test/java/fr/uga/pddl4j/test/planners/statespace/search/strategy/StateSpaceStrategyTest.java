@@ -1,6 +1,6 @@
 package fr.uga.pddl4j.test.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
@@ -152,7 +152,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testAstarSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from AStar.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new AStar(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == ASTAR_SOLUTION_COST);
@@ -166,7 +166,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testAstarPlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from AStar.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new AStar(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == ASTAR_SOLUTION_COST);
@@ -179,7 +179,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testGreedySolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Greedy Best First Search.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == GREEDY_SOLUTION_COST);
@@ -193,7 +193,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testGreedyPlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Greedy Best First Search.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == GREEDY_SOLUTION_COST);
@@ -206,7 +206,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testEnforcedSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Enforced Hill Climbing.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == ENFORCED_SOLUTION_COST);
@@ -220,7 +220,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testEnforcedPlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Enforced Hill Climbing.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == ENFORCED_SOLUTION_COST);
@@ -233,7 +233,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testHillSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Hill Climbing.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == HILL_SOLUTION_COST);
@@ -247,7 +247,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testHillPlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Hill Climbing.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == HILL_SOLUTION_COST);
@@ -260,7 +260,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testBreadthSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Breadth First Search.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == BREADTH_SOLUTION_COST);
@@ -274,7 +274,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testBreadthPlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Breadth First Search.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == BREADTH_SOLUTION_COST);
@@ -287,7 +287,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testDepthSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Depth First Search.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == DEPTH_SOLUTION_COST);
@@ -301,7 +301,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testDepthPlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Depth First Search.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == DEPTH_SOLUTION_COST);
@@ -314,7 +314,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testAstarAnytimeSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Astar Search Anytime.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == ASTAR_ANYTIME_SOLUTION_COST);
@@ -328,7 +328,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testAstarAnytimePlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Astar Search Anytime.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == ASTAR_ANYTIME_SOLUTION_COST);
@@ -341,7 +341,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testGreedyAnytimeSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Greedy Best First Search Anytime.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == GREEDY_ANYTIME_SOLUTION_COST);
@@ -355,7 +355,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testGreedyAnytimePlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Greedy Best First Search Anytime.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == GREEDY_ANYTIME_SOLUTION_COST);
@@ -368,7 +368,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testHillAnytimeSolutionNode() {
         System.out.println("StateSpaceStrategy: Test solution node from Hill Climbing Anytime.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
         Assert.assertTrue(solutionNode.getCost() == HILL_ANYTIME_SOLUTION_COST);
@@ -382,7 +382,7 @@ public class StateSpaceStrategyTest {
     @Test
     public void testHillAnytimePlan() {
         System.out.println("StateSpaceStrategy: Test solution plan from Hill Climbing Anytime.");
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == HILL_ANYTIME_SOLUTION_COST);

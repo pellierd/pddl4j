@@ -376,7 +376,7 @@ final class IntEncoding implements Serializable {
         for (IntExpression intExp : init) {
             if (intExp.getConnective().equals(PDDLConnective.EQUAL)) {
                 intFunctionCost.put(intExp.getChildren().get(0),
-                    Double.parseDouble(StringEncoder.toString(intExp.getChildren().get(1),
+                    Double.parseDouble(StringDecoder.toString(intExp.getChildren().get(1),
                         Encoder.tableOfConstants,
                         Encoder.tableOfTypes,
                         Encoder.tableOfPredicates,

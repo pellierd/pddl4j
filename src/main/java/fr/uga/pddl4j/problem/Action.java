@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.operators;
+package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.util.ClosedWorldState;
 
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.1 - 08.04.2010
  */
-public class Action extends AbstractBitOperator {
+public class Action extends AbstractOperator {
 
     /**
      * The list of effects of the action.

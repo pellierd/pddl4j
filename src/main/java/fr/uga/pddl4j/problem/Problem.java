@@ -17,12 +17,11 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.encoding;
+package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.operators.State;
-import fr.uga.pddl4j.operators.ConditionalEffect;
-import fr.uga.pddl4j.operators.Method;
+import fr.uga.pddl4j.encoding.Inertia;
+import fr.uga.pddl4j.encoding.IntExpression;
+import fr.uga.pddl4j.encoding.StringDecoder;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.util.ClosedWorldState;
 
@@ -40,7 +39,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public class CodedProblem implements Serializable {
+public class Problem implements Serializable {
 
     /**
      * The table of types.
@@ -129,17 +128,18 @@ public class CodedProblem implements Serializable {
     private State init;
 
     /**
-     * The default constructor with a private package access to prevent instance creation.
+     * Create a new empty problem. All the attributs of the problem are initialize with null.
      */
-    CodedProblem() {
+    public Problem() {
+        super();
     }
 
     /**
-     * Create a new <code>CodedProblem</code> copy of another.
+     * Create a new <code>Problem</code> copy of another.
      *
-     * @param other the other <code>CodedProblem</code>;
+     * @param other the other <code>Problem</code>;
      */
-    public CodedProblem(CodedProblem other) {
+    public Problem(Problem other) {
         super();
         this.types = new ArrayList<>();
         this.types.addAll(other.types.stream().collect(Collectors.toList()));
@@ -199,7 +199,7 @@ public class CodedProblem implements Serializable {
      *
      * @param types the table of type to set
      */
-    final void setTypes(final List<String> types) {
+    public final void setTypes(final List<String> types) {
         this.types = types;
     }
 
@@ -208,7 +208,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the inferredDomains
      */
-    final List<Set<Integer>> getInferredDomains() {
+    public final List<Set<Integer>> getInferredDomains() {
         return this.inferredDomains;
     }
 
@@ -217,7 +217,7 @@ public class CodedProblem implements Serializable {
      *
      * @param inferredDomains the inferredDomains to set.
      */
-    final void setInferredDomains(final List<Set<Integer>> inferredDomains) {
+    public final void setInferredDomains(final List<Set<Integer>> inferredDomains) {
         this.inferredDomains = inferredDomains;
     }
 
@@ -235,7 +235,7 @@ public class CodedProblem implements Serializable {
      *
      * @param domains the domains to set.
      */
-    final void setDomains(final List<Set<Integer>> domains) {
+    public final void setDomains(final List<Set<Integer>> domains) {
         this.domains = domains;
     }
 
@@ -253,7 +253,7 @@ public class CodedProblem implements Serializable {
      *
      * @param constants the constants to set
      */
-    final void setConstants(final List<String> constants) {
+    public final void setConstants(final List<String> constants) {
         this.constants = constants;
     }
 
@@ -271,7 +271,7 @@ public class CodedProblem implements Serializable {
      *
      * @param predicates the predicates to set.
      */
-    final void setPredicates(final List<String> predicates) {
+    public final void setPredicates(final List<String> predicates) {
         this.predicates = predicates;
     }
 
@@ -289,7 +289,7 @@ public class CodedProblem implements Serializable {
      *
      * @param signatures the signatures of the predicates defined in the problem.
      */
-    final void setPredicatesSignatures(final List<List<Integer>> signatures) {
+    public final void setPredicatesSignatures(final List<List<Integer>> signatures) {
         this.predicatesSignatures = signatures;
     }
 
@@ -298,7 +298,7 @@ public class CodedProblem implements Serializable {
      *
      * @param tasks the tasks to set.
      */
-    final void setTasks(final List<String> tasks) {
+    public final void setTasks(final List<String> tasks) {
         this.tasks = tasks;
     }
 
@@ -325,7 +325,7 @@ public class CodedProblem implements Serializable {
      *
      * @param signatures the signatures of the tasks defined in the problem.
      */
-    final void setTasksSignatures(final List<List<Integer>> signatures) {
+    public final void setTasksSignatures(final List<List<Integer>> signatures) {
         this.tasksSignatures = signatures;
     }
 
@@ -334,7 +334,7 @@ public class CodedProblem implements Serializable {
      *
      * @return the functions of the problem.
      */
-    final List<String> getFunctions() {
+    public final List<String> getFunctions() {
         return this.functions;
     }
 
@@ -343,7 +343,7 @@ public class CodedProblem implements Serializable {
      *
      * @param functions the functions to set.
      */
-    final void setFunctions(final List<String> functions) {
+    public final void setFunctions(final List<String> functions) {
         this.functions = functions;
     }
 
@@ -361,7 +361,7 @@ public class CodedProblem implements Serializable {
      *
      * @param signatures the signatures of the function defined in the problem.
      */
-    final void setFunctionsSignatures(final List<List<Integer>> signatures) {
+    public final void setFunctionsSignatures(final List<List<Integer>> signatures) {
         this.functionsSignatures = signatures;
     }
 
@@ -379,7 +379,7 @@ public class CodedProblem implements Serializable {
      *
      * @param inertia the inertia to set.
      */
-    final void setInertia(final List<Inertia> inertia) {
+    public final void setInertia(final List<Inertia> inertia) {
         this.inertia = inertia;
     }
 
@@ -397,7 +397,7 @@ public class CodedProblem implements Serializable {
      *
      * @param facts the list of relevant facts to set.
      */
-    final void setRelevantFacts(final List<IntExpression> facts) {
+    public final void setRelevantFacts(final List<IntExpression> facts) {
         this.relevantFacts = facts;
     }
 
@@ -415,7 +415,7 @@ public class CodedProblem implements Serializable {
      *
      * @param tasks the list of relevant tasks to set.
      */
-    final void setRelevantTasks(final List<IntExpression> tasks) {
+    public final void setRelevantTasks(final List<IntExpression> tasks) {
         this.relevantTasks = tasks;
     }
 
@@ -433,7 +433,7 @@ public class CodedProblem implements Serializable {
      *
      * @param actions the list of instantiated actions of the problem.
      */
-    final void setActions(final List<Action> actions) {
+    public final void setActions(final List<Action> actions) {
         this.actions = actions;
     }
 
@@ -451,7 +451,7 @@ public class CodedProblem implements Serializable {
      *
      * @param methods the list of instantiated methods of the problem.
      */
-    final void setMethods(final List<Method> methods) {
+    public final void setMethods(final List<Method> methods) {
         this.methods = methods;
     }
 
@@ -479,7 +479,7 @@ public class CodedProblem implements Serializable {
      *
      * @param goal the goal to set
      */
-    final void setGoal(final State goal) {
+    public final void setGoal(final State goal) {
         this.goal = goal;
     }
 
@@ -497,7 +497,7 @@ public class CodedProblem implements Serializable {
      *
      * @param init the initial state to set.
      */
-    final void setInit(final State init) {
+    public final void setInit(final State init) {
         this.init = init;
     }
 
@@ -509,7 +509,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified operator.
      */
     public final String toShortString(final Action op) {
-        return StringEncoder.toShortString(op, this.constants);
+        return StringDecoder.toShortString(op, this.constants);
     }
 
     /**
@@ -519,7 +519,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified operator.
      */
     public final String toString(final Action op) {
-        return StringEncoder.toString(op, this.constants, this.types,
+        return StringDecoder.toString(op, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
@@ -530,7 +530,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified expression.
      */
     public final String toString(final IntExpression exp) {
-        return StringEncoder.toString(exp, this.constants, this.types,
+        return StringDecoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks);
     }
 
@@ -542,7 +542,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified expression.
      */
     public final String toString(final IntExpression exp, final String sep) {
-        return StringEncoder.toString(exp, this.constants, this.types,
+        return StringDecoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks, sep);
     }
 
@@ -553,7 +553,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified expression.
      */
     public final String toString(State exp) {
-        return StringEncoder.toString(exp, this.constants, this.types,
+        return StringDecoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
@@ -564,7 +564,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified state.
      */
     public final String toString(ClosedWorldState bitState) {
-        return StringEncoder.toString(bitState, this.constants, this.types,
+        return StringDecoder.toString(bitState, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 
@@ -575,7 +575,7 @@ public class CodedProblem implements Serializable {
      * @return a string representation of the specified expression.
      */
     public final String toString(ConditionalEffect exp) {
-        return StringEncoder.toString(exp, this.constants, this.types,
+        return StringDecoder.toString(exp, this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantFacts);
     }
 

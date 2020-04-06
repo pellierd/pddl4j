@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategyAnytime;
 import fr.uga.pddl4j.plan.Plan;
@@ -72,7 +72,7 @@ public abstract class AbstractStateSpacePlannerAnytime extends AbstractStateSpac
      * @return the list containing all solution plans found.
      */
     @Override
-    public Vector<Plan> getSolutionPlans(final CodedProblem codedProblem) {
+    public Vector<Plan> getSolutionPlans(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final StateSpaceStrategyAnytime stateSpaceStrategyAnytime =
             (StateSpaceStrategyAnytime) this.getStateSpaceStrategies().get(0);

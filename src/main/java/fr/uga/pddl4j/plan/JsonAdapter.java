@@ -19,11 +19,10 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.operators.State;
-import fr.uga.pddl4j.operators.ConditionalEffect;
-import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.ConditionalEffect;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -50,7 +49,7 @@ public class JsonAdapter implements Serializable {
     /**
      * The current coded problem the plan is based on.
      */
-    private CodedProblem codedProblem;
+    private Problem codedProblem;
 
     /**
      * Plan in its JSON form.
@@ -62,8 +61,8 @@ public class JsonAdapter implements Serializable {
      *
      * @param codedProblem the pddl4j problem representation.
      */
-    public JsonAdapter(CodedProblem codedProblem) {
-        this.codedProblem = new CodedProblem(codedProblem);
+    public JsonAdapter(Problem codedProblem) {
+        this.codedProblem = new Problem(codedProblem);
     }
 
     /**

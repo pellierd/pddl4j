@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -66,7 +66,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node.
      */
-    public Node search(final CodedProblem codedProblem) {
+    public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
@@ -120,7 +120,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(final Node parent, final CodedProblem problem,
+    private LinkedList<Node> getSuccessors(final Node parent, final Problem problem,
                                            final RelaxationHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 

@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.hc;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbingAnytime;
@@ -89,7 +89,7 @@ public class HCAnytime extends AbstractStateSpacePlannerAnytime {
      * @param problem the problem to solve.
      */
     @Override
-    public SequentialPlan search(final CodedProblem problem) {
+    public SequentialPlan search(final Problem problem) {
         final Logger logger = this.getLogger();
 
         logger.trace("* starting hill climbing anytime search\n");

@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import fr.uga.pddl4j.exceptions.FatalException;
 
 import java.io.Serializable;
 import java.util.*;
@@ -307,7 +306,7 @@ public class PDDLProblem implements Serializable {
      * @see PDDLAction#normalize()
      * @see PDDLDerivedPredicate#normalize()
      */
-    public void standardize() throws FatalException {
+    public void standardize() {
         // Rename the constraints of the problem
         if (this.getConstraints() != null) {
             this.getConstraints().renameVariables();

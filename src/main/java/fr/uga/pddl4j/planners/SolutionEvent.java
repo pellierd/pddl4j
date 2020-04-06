@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 
 import java.util.EventObject;
@@ -42,7 +42,7 @@ public class SolutionEvent extends EventObject {
     /**
      * The coded problem associated to the solution node.
      */
-    private CodedProblem codedProblem;
+    private Problem codedProblem;
 
     /**
      * Create a new SolutionEvent.
@@ -51,7 +51,7 @@ public class SolutionEvent extends EventObject {
      * @param solutionNode the solution node.
      * @param codedProblem the coded problem associated.
      */
-    public SolutionEvent(Object source, Node solutionNode, CodedProblem codedProblem) {
+    public SolutionEvent(Object source, Node solutionNode, Problem codedProblem) {
         super(source);
         this.solutionNode = solutionNode;
         this.codedProblem = codedProblem;
@@ -71,7 +71,7 @@ public class SolutionEvent extends EventObject {
      *
      * @return the coded problem associated to the solution node of the event.
      */
-    public CodedProblem getCodedProblem() {
+    public Problem getCodedProblem() {
         return codedProblem;
     }
 }

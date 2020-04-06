@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.test.util;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.plan.Plan;
 import org.junit.Assert;
 import org.junit.Before;
@@ -169,7 +169,7 @@ public class PlanTest {
         System.out.println("PlanTest: Test the operators of a solution plan (blocksworld).");
         int i = 0;
         for (String problemFile : problemList) {
-            final CodedProblem pb = Tools.generateCodedProblem(domainFile, problemFile);
+            final Problem pb = Tools.generateCodedProblem(domainFile, problemFile);
             if (pb != null) {
                 final Plan plan = planner.search(pb);
                 int j = 0;

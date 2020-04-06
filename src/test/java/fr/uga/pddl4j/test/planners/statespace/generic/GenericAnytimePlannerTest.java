@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.test.planners.statespace.generic;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -200,7 +200,7 @@ public class GenericAnytimePlannerTest {
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
                 Assert.assertTrue(errorManager.isEmpty());
 
-                CodedProblem pb = null;
+                Problem pb = null;
                 Plan plan = null;
                 try {
                     // Encodes and instantiates the problem in a compact representation

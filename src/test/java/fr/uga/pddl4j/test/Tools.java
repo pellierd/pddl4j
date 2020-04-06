@@ -1,6 +1,6 @@
 package fr.uga.pddl4j.test;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -105,7 +105,7 @@ public abstract class Tools {
      *
      * @return a coded problem from the parsing file
      */
-    public static CodedProblem generateCodedProblem(String domainFile, String problemFile) {
+    public static Problem generateCodedProblem(String domainFile, String problemFile) {
         try {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);

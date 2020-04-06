@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.test.encoding;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -95,7 +95,7 @@ public class JsonAdapterTest {
             return;
         }
 
-        final CodedProblem problem = get01Problem(localTestPath);
+        final Problem problem = get01Problem(localTestPath);
         Assert.assertFalse(problem == null);
 
         final Plan plan = getPlan(problem);
@@ -122,7 +122,7 @@ public class JsonAdapterTest {
             return;
         }
 
-        final CodedProblem problem = get01Problem(localTestPath);
+        final Problem problem = get01Problem(localTestPath);
         Assert.assertFalse(problem == null);
 
         final Plan plan = getPlan(problem);
@@ -151,13 +151,13 @@ public class JsonAdapterTest {
      * @param currentTestPath the path where to find the problem
      * @return the plan
      */
-    private CodedProblem get01Problem(String currentTestPath) {
+    private Problem get01Problem(String currentTestPath) {
         final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + Tools.DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
-        CodedProblem pb = null;
+        Problem pb = null;
 
         // Check if there is on domain per problem or a shared domain for all
         if (!new File(currentDomain).exists()) {
@@ -200,12 +200,12 @@ public class JsonAdapterTest {
     }
 
     /**
-     * Get a plan from a CodedProblem.
+     * Get a plan from a Problem.
      *
      * @param pb the codedProblem to solve
      * @return the Plan object
      */
-    private Plan getPlan(CodedProblem pb) {
+    private Plan getPlan(Problem pb) {
         Plan plan = null;
         try {
             if (pb.isSolvable()) {

@@ -20,9 +20,9 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.encoding.IntExpression;
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.State;
 
 import java.util.List;
 
@@ -60,7 +60,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
      *
      * @param problem the problem to solve.
      */
-    protected AbstractHeuristic(final CodedProblem problem) {
+    protected AbstractHeuristic(final Problem problem) {
         if (problem == null) {
             throw new NullPointerException("problem == null");
         }

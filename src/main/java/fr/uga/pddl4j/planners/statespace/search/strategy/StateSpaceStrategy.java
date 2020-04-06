@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -156,7 +156,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return a solution search or null if it does not exist.
      */
-    Node search(final CodedProblem codedProblem);
+    Node search(final Problem codedProblem);
 
     /**
      * Search a solution node to a specified domain and problem.
@@ -164,7 +164,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node or null.
      */
-    Node searchSolutionNode(final CodedProblem codedProblem);
+    Node searchSolutionNode(final Problem codedProblem);
 
     /**
      * Search a solution plan to a specified domain and problem.
@@ -172,7 +172,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null.
      */
-    Plan searchPlan(final CodedProblem codedProblem);
+    Plan searchPlan(final Problem codedProblem);
 
     /**
      * Extract a plan from a solution node for the specified planning problem.
@@ -181,7 +181,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    Plan extractPlan(final Node solutionNode, final CodedProblem codedProblem);
+    Plan extractPlan(final Node solutionNode, final Problem codedProblem);
 
     /**
      * Adds SolutionListener to the list of SolutionListener.

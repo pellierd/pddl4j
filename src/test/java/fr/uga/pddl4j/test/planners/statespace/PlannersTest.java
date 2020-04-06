@@ -1,6 +1,6 @@
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -34,7 +34,7 @@ public class PlannersTest {
             System.out.println("Parsing domain file and problem file done successfully");
         }
         factory.setTraceLevel(7);
-        final CodedProblem pb = factory.encode();
+        final Problem pb = factory.encode();
 
         System.out.println("Encoding problem done successfully ("
             + pb.getActions().size() + " actions, "

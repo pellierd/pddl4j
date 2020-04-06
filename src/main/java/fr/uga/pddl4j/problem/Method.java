@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.operators;
+package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.util.BitMatrix;
 
@@ -28,7 +28,7 @@ import fr.uga.pddl4j.util.BitMatrix;
  * @author D. Pellier
  * @version 1.0 - 31.03.2020
  */
-public final class Method extends AbstractBitOperator {
+public final class Method extends AbstractOperator {
 
     /**
      * The default task index.

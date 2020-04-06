@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.exceptions.FatalException;
-import fr.uga.pddl4j.planners.Planner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +28,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * This class implements memory agent enable to compute approximation of the size of java objects.
@@ -54,11 +51,6 @@ import java.util.Objects;
  * @see java.lang.instrument.Instrumentation
  */
 public class MemoryAgent implements Serializable {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The logger of the class.
@@ -93,9 +85,9 @@ public class MemoryAgent implements Serializable {
     public static final int MAX_DEPTH = 512;
 
     /**
-     * The default value of the memory used.
+     * The value returns if an error occurs when computing the size of the object.
      */
-    public static final long DEFAULT_MEMORY = -1;
+    public static final long ERROR_MEMORY = -1;
 
     /**
      * The flag used to indicate if flyweight field must be skip during the computation process.
@@ -164,14 +156,15 @@ public class MemoryAgent implements Serializable {
      * Returns the amount of storage consumed by the specified object in bytes.
      *
      * @param object the object to size.
-     * @return the amount of storage consumed by the specified object in bytes. -1 if JVM command line is incorrect.
+     * @return the amount of storage consumed by the specified object in bytes. ERROR_MEMORY if
+     *          an error occurs when computing the size of the object.
      */
     public static long getSizeOf(Object object) {
         try {
             return MemoryAgent.sizeOf(object);
         } catch (IllegalStateException ilException) {
             LOGGER.error(ilException + "\n");
-            return MemoryAgent.DEFAULT_MEMORY;
+            return MemoryAgent.ERROR_MEMORY;
         }
     }
 
@@ -179,15 +172,18 @@ public class MemoryAgent implements Serializable {
      * Returns the amount of storage consumed by objectToSize and by all the objects reachable from it.
      *
      * @param object the object to size.
-     * @return the amount of storage consumed by objectToSize and by all the objects reachable from it. -1 if
-     *          JVM command line is incorrect.
+     * @return the amount of storage consumed by objectToSize and by all the objects reachable from it. ERROR_MEMORY if
+     *          an error occurs when computing the size of the object.
      */
     public static long getDeepSizeOf(Object object) {
         try {
             return MemoryAgent.deepSizeOf(object);
-        } catch (IllegalStateException ilException) {
-            LOGGER.error(ilException + "\n");
-            return MemoryAgent.DEFAULT_MEMORY;
+        } catch (IllegalStateException ise) {
+            LOGGER.error(ise + "\n");
+            return MemoryAgent.ERROR_MEMORY;
+        } catch (IllegalAccessException iae) {
+            LOGGER.error(iae + "\n");
+            return MemoryAgent.ERROR_MEMORY;
         }
     }
 
@@ -220,8 +216,9 @@ public class MemoryAgent implements Serializable {
      * @param object the object to size.
      * @return an implementation-specific approximation of the amount of storage consumed by
      *          objectToSize and by all the objects reachable from it
+     * @throws IllegalAccessException if an error occurs during access to the object attributes.
      */
-    public static long deepSizeOf(Object object) {
+    public static long deepSizeOf(Object object) throws IllegalAccessException {
         final Map<Object, Object> doneObj = new IdentityHashMap<>();
         return MemoryAgent.deepSizeOf(object, doneObj, 0);
     }
@@ -234,7 +231,7 @@ public class MemoryAgent implements Serializable {
      * @param depth   the depth of the computation.
      * @return the deep size of an specified object.
      */
-    private static long deepSizeOf(Object obj, Map<Object, Object> doneObj, int depth) {
+    private static long deepSizeOf(Object obj, Map<Object, Object> doneObj, int depth) throws IllegalAccessException {
         if (obj == null) {
             return 0;
         }
@@ -253,11 +250,7 @@ public class MemoryAgent implements Serializable {
             for (Field field : fields) {
                 field.setAccessible(true); //TODO Not available with Java 10 and further, find another alternative
                 final Object o;
-                try {
-                    o = field.get(obj);
-                } catch (IllegalArgumentException | IllegalAccessException iargException) {
-                    throw new FatalException("Fatal error in field.getActionSet(obj) call", iargException);
-                }
+                o = field.get(obj);
                 if (MemoryAgent.isComputable(field) && depth < MAX_DEPTH) {
                     size += MemoryAgent.deepSizeOf(o, doneObj, depth + 1);
                 }

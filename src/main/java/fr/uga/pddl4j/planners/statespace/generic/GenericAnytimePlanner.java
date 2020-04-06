@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.generic;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategyAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
@@ -81,7 +81,7 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public SequentialPlan search(final CodedProblem problem) {
+    public SequentialPlan search(final Problem problem) {
         final Logger logger = this.getLogger();
         Objects.requireNonNull(problem);
 

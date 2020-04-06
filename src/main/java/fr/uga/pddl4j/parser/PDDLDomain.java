@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import fr.uga.pddl4j.exceptions.FatalException;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -443,7 +441,7 @@ public class PDDLDomain implements Serializable {
      * @see PDDLAction#normalize()
      * @see PDDLDerivedPredicate#normalize()
      */
-    public void standardize() throws FatalException {
+    public void standardize() {
         // Rename all the variables from the predicates declaration
         for (int i = 0; i < this.getPredicates().size(); i++) {
             this.getPredicates().get(i).renameVariables();

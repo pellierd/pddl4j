@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
@@ -81,7 +81,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param problem the problem to be solved. The problem cannot be null.
      * @return the solution node.
      */
-    public Node search(final CodedProblem problem) {
+    public Node search(final Problem problem) {
         final Logger logger = Planner.getLogger();
         Objects.requireNonNull(problem);
 
@@ -132,7 +132,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param heuristic the heuristic used in hill climbing.
      * @return the solution node or null.
      */
-    private Node hillClimbingAnytime(CodedProblem problem, Node node, RelaxationHeuristic heuristic, long searchingTime) {
+    private Node hillClimbingAnytime(Problem problem, Node node, RelaxationHeuristic heuristic, long searchingTime) {
         openList.clear();
 
         Node root = node;
@@ -185,7 +185,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, CodedProblem problem, RelaxationHeuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, Problem problem, RelaxationHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

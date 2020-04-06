@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.test.util;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
@@ -173,7 +173,7 @@ public class SolutionEventAndListenerTest {
     public void testAstarFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from AStar.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new AStar(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -198,7 +198,7 @@ public class SolutionEventAndListenerTest {
     public void testBFSFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from BFS.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -223,7 +223,7 @@ public class SolutionEventAndListenerTest {
     public void testDFSFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from DFS.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -248,7 +248,7 @@ public class SolutionEventAndListenerTest {
     public void testEHCFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from EHC.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -273,7 +273,7 @@ public class SolutionEventAndListenerTest {
     public void testGbfsFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from GBFS.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -298,7 +298,7 @@ public class SolutionEventAndListenerTest {
     public void testHCFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from HC.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -323,7 +323,7 @@ public class SolutionEventAndListenerTest {
     public void testAstarAnyFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from Astar Anytime.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -348,7 +348,7 @@ public class SolutionEventAndListenerTest {
     public void testGbfsAnytimeFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from GBFS Anytime.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 
@@ -373,7 +373,7 @@ public class SolutionEventAndListenerTest {
     public void testHCAnytimeFireSolutionEvent() {
         System.out.println("SolutionEventAndListener: Test fire solution node from HC Anytime.");
 
-        final CodedProblem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
+        final Problem codedProblem = Tools.generateCodedProblem(domainFile, p01ProblemFile);
         stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
         stateSpaceStrategy.addSolutionListener(e -> firedSolutionEvent = e);
 

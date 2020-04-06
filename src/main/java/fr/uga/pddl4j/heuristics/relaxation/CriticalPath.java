@@ -19,10 +19,10 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.operators.Action;
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.BitVector;
 
@@ -54,7 +54,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     private int goalCard;
     private int critical;
 
-    public CriticalPath(CodedProblem problem) {
+    public CriticalPath(Problem problem) {
         super(problem);
         super.setAdmissible(true);
     }

@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.plan.Plan;
 
@@ -35,7 +35,7 @@ public interface StateSpacePlannerAnytime extends StateSpacePlanner {
      *
      * @return the list containing all solution plans found.
      */
-    Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
+    Vector<Plan> getSolutionPlans(final Problem codedProblem);
 
     /**
      * Returns the list containing all solution nodes found.

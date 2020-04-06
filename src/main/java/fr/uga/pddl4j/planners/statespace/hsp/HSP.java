@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.hsp;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
@@ -93,7 +93,7 @@ public final class HSP extends AbstractStateSpacePlanner {
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public SequentialPlan search(final CodedProblem problem) {
+    public SequentialPlan search(final Problem problem) {
         final Logger logger = this.getLogger();
         Objects.requireNonNull(problem);
 

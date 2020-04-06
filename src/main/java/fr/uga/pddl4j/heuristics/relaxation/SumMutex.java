@@ -19,9 +19,9 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.operators.State;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.util.ClosedWorldState;
 
 /**
@@ -48,7 +48,7 @@ public final class SumMutex extends GraphHeuristic {
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public SumMutex(CodedProblem problem) {
+    public SumMutex(Problem problem) {
         super(problem);
         super.setAdmissible(false);
     }

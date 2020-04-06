@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.operators.Action;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.util.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.plan.Plan;
@@ -118,7 +118,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
      * @param problem the problem to be solved. The problem cannot be null.
      * @return a solution plan or null if it does not exist.
      */
-    public Node search(final CodedProblem problem) {
+    public Node search(final Problem problem) {
         final Logger logger = Planner.getLogger();
         Objects.requireNonNull(problem);
 

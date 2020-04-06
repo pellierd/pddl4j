@@ -15,8 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
-import fr.uga.pddl4j.exceptions.FileException;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.Planner;
@@ -32,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Properties;
@@ -253,10 +253,10 @@ public class StateSpacePlannerFactory implements Serializable {
      * @param args             the arguments from the command line.
      * @param defaultArguments the default arguments to use.
      * @return The arguments of the planner.
-     * @throws FileException if files not found
+     * @throws FileNotFoundException if files not found
      */
     public static Properties parseArguments(String[] args, Properties defaultArguments)
-        throws FileException {
+        throws FileNotFoundException {
 
         final Properties arguments = defaultArguments;
         try {
@@ -346,7 +346,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 } else {
                     LOGGER.trace("\nUnknown argument for \"" + args[i] + "\" or missing value\n");
                     LOGGER.trace(StateSpacePlannerFactory.printUsage());
-                    throw new FileException("Unknown arguments: " + args[i]);
+                    throw new FileNotFoundException("Unknown arguments: " + args[i]);
                 }
             }
             if (arguments.get(AbstractStateSpacePlanner.DOMAIN) == null
@@ -354,7 +354,7 @@ public class StateSpacePlannerFactory implements Serializable {
 
                 LOGGER.trace("\nMissing DOMAIN or PROBLEM\n");
                 LOGGER.trace(StateSpacePlannerFactory.printUsage());
-                throw new FileException("Missing domain or problem");
+                throw new FileNotFoundException("Missing domain or problem");
             }
         } catch (RuntimeException runExp) {
             LOGGER.trace("\nError when parsing arguments\n");
@@ -464,7 +464,7 @@ public class StateSpacePlannerFactory implements Serializable {
 
             // Encodes and instantiates the problem in a compact representation
             begin = System.currentTimeMillis();
-            final CodedProblem pb = factory.encode();
+            final Problem pb = factory.encode();
             if (saveStats) {
                 planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
                 planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
@@ -581,9 +581,6 @@ public class StateSpacePlannerFactory implements Serializable {
             }
         } catch (IOException ioExp) {
             LOGGER.error(ioExp);
-        } catch (FileException fileEx) {
-            LOGGER.error(fileEx);
-            System.exit(1);
         }
     }
 }

@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.encoding.CodedProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.plan.Plan;
 
 import java.util.Vector;
@@ -52,5 +52,5 @@ public interface StateSpaceStrategyAnytime extends StateSpaceStrategy {
      * @param codedProblem the coded problem.
      * @return a vector containing all the solutions plans or an empty vector.
      */
-    Vector<Plan> getSolutionPlans(final CodedProblem codedProblem);
+    Vector<Plan> getSolutionPlans(final Problem codedProblem);
 }
