@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
@@ -17,36 +17,32 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.exceptions;
-
-import fr.uga.pddl4j.parser.PDDLExpression;
+package fr.uga.pddl4j.parser;
 
 /**
- * Thrown to indicate that a malformed expression has occurred.
+ * Exception use for issues with unexpected expression occurs.
  *
- * @author Damien Pellier
- * @see PDDLExpression
+ * @author Cedric Gerard
+ * @version 1.0 - 03/03/2016
  */
-public class MalformedExpException extends RuntimeException {
+public class UnexpectedExpressionException extends RuntimeException {
 
     /**
-     * Creates a new malformed expression exception.
+     * Default constructor with only string message.
      *
-     * @see Exception#Exception()
+     * @param message the error description
      */
-    public MalformedExpException() {
-        super();
-    }
-
-    /**
-     * Creates a new malformed expression exception with a specific message.
-     *
-     * @param message the message.
-     * @see Exception#Exception(String)
-     */
-    public MalformedExpException(String message) {
+    public UnexpectedExpressionException(String message) {
         super(message);
     }
 
-
+    /**
+     * Default constructor with string message and the Java Throwable cause.
+     *
+     * @param message the error description
+     * @param cause   the cause this trigger the exception
+     */
+    public UnexpectedExpressionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

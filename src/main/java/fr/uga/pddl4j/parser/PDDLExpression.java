@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import fr.uga.pddl4j.exceptions.MalformedExpException;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -329,10 +327,13 @@ public class PDDLExpression implements Serializable {
      * tasks expression for the moment in method description.
      *
      * @param context the images of the renamed ID of the task.
-     * @throws MalformedExpException if this expression is not an AND expression.
+     * @throws MalformedExpressionException if this expression is not an AND expression.
      * @see PDDLExpression#isMalformedExpression()
      */
-    public void renameTaskIDs(final Map<String, String> context) {
+    public void renameTaskIDs(final Map<String, String> context) throws MalformedExpressionException {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
+        }
         switch (this.getConnective()) {
             case AND:
                 for (int i = 0; i < this.getChildren().size(); i++) {
@@ -357,7 +358,7 @@ public class PDDLExpression implements Serializable {
                 this.atom.get(1).rename(context);
                 break;
             default:
-                throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+                // Do nothing
         }
     }
 
@@ -373,12 +374,12 @@ public class PDDLExpression implements Serializable {
      * already renamed. The variable renames have the form ?X0, ..., ?Xn.
      *
      * @param context the images of the renamed variable.
-     * @throws MalformedExpException if this expression is malformed.
+     * @throws MalformedExpressionException if this expression is malformed.
      * @see PDDLExpression#isMalformedExpression()
      */
-    public void renameVariables(final Map<String, String> context) {
+    public void renameVariables(final Map<String, String> context) throws MalformedExpressionException {
         if (this.isMalformedExpression()) {
-            throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
         }
         switch (this.getConnective()) {
             case ATOM:
@@ -458,18 +459,18 @@ public class PDDLExpression implements Serializable {
             case NUMBER:
             case TIME_VAR:
             default:
-                // do nothing
+                // Do nothing
         }
     }
 
     /**
      * Moves the negation inward the expression.
      *
-     * @see PDDLExpression#isMalformedExpression
+     * @throws MalformedExpressionException if this expression is malformed.
      */
-    public void moveNegationInward() {
+    public void moveNegationInward() throws MalformedExpressionException {
         if (this.isMalformedExpression()) {
-            throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
         }
         switch (this.connective) {
             case AND:
@@ -534,14 +535,19 @@ public class PDDLExpression implements Serializable {
                 // Do nothing
                 break;
             default:
-                // do nothing
+                // Do nothing
         }
     }
 
     /**
      * Negates the expression.
+     *
+     * @throws MalformedExpressionException if the expression is malformed.
      */
-    private void negate() {
+    private void negate() throws MalformedExpressionException {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
+        }
         PDDLExpression exp = this.getChildren().get(0);
         switch (exp.getConnective()) {
             case FORALL:
@@ -591,7 +597,7 @@ public class PDDLExpression implements Serializable {
                 this.moveNegationInward();
                 break;
             default:
-                // do nothing
+                // Do nothing
         }
     }
 
@@ -693,7 +699,6 @@ public class PDDLExpression implements Serializable {
      *
      * @return a string representation of this node.
      * @see java.lang.Object#toString
-     * @see PDDLExpression#isMalformedExpression
      */
     @Override
     public String toString() {
@@ -705,12 +710,12 @@ public class PDDLExpression implements Serializable {
      *
      * @param baseOffset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
-     * @throws MalformedExpException if the expression is malformed.
+     * @throws MalformedExpressionException if the expression is malformed.
      * @see this#isMalformedExpression
      */
-    public String toString(String baseOffset) {
+    public String toString(String baseOffset) throws MalformedExpressionException {
         if (this.isMalformedExpression()) {
-            throw new MalformedExpException("Expression " + this.getConnective() + " is malformed");
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
         }
         StringBuilder str = new StringBuilder();
         switch (this.connective) {
@@ -874,7 +879,7 @@ public class PDDLExpression implements Serializable {
                     .append(")");
                 break;
             default:
-                // do nothing
+                // Do nothing
 
         }
         return str.toString();
@@ -967,7 +972,7 @@ public class PDDLExpression implements Serializable {
             case OR:
                 break;
             default:
-                // do nothing
+                // Do nothing
 
         }
         return malformed;

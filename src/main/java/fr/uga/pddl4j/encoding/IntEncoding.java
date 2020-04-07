@@ -19,9 +19,18 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.exceptions.MalformedExpException;
-import fr.uga.pddl4j.parser.*;
-
+import fr.uga.pddl4j.parser.PDDLAction;
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLExpression;
+import fr.uga.pddl4j.parser.PDDLMethod;
+import fr.uga.pddl4j.parser.PDDLNamedTypedList;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.PDDLTaskNetwork;
+import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -489,7 +498,8 @@ final class IntEncoding implements Serializable {
      * expression returned is the index of the task in the AND expression of the tasks list of a method.
      *
      * @param exp the constraints to encode. The constraints must be an AND expression.
-     * @throws MalformedExpException if the exp in parameter is unexpected.
+     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only
+     *  AND and LESS_ORDERING_CONSTRAINTS are expected.
      */
     private static IntExpression encodeOrderingConstraints(final PDDLExpression exp) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
@@ -508,7 +518,7 @@ final class IntEncoding implements Serializable {
                 intExp.addChild(t2);
                 break;
             default:
-                throw new MalformedExpException("Expression " + exp.getConnective() + " is malformed");
+                throw new UnexpectedExpressionException("Expression " + exp.getConnective() + " is unexpected.");
         }
         return intExp;
     }
