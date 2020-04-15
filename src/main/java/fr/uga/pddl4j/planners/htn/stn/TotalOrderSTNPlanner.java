@@ -69,7 +69,8 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         }
 
         int task = root.getTaskNetwork().getTasks()[0];
-        System.out.println(problem.getRelevantTasks().get(task));
+        
+        System.out.println(problem.toString(problem.getRelevantTasks().get(task)));
 
 
 

@@ -654,6 +654,7 @@ public final class Encoder implements Serializable {
         codedProblem.setConstants(Encoder.tableOfConstants);
         codedProblem.setDomains(Encoder.tableOfDomains);
         codedProblem.setFunctions(Encoder.tableOfFunctions);
+        codedProblem.setTasks(Encoder.tableOfTasks);
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicates(Encoder.tableOfPredicates);
