@@ -22,6 +22,7 @@ import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.TaskNetwork;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,16 +53,24 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     }
 
     /**
-     * Solves the planning problem and returns the first solution search found.
-     * The  method search is an implementation of the total order STN procedure describes in the book of automated
-     * planning of Ghallab page 239.
+     * Solves the planning problem and returns the first solution search found. The search method is an implementation
+     * of the total order STN procedure describes in the book of Automated Planning of Ghallab and al. page 239.
      *
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
      */
     @Override
     public Plan search(final Problem problem) {
-        //TaskNetwork initial = problem.ge
+        STNNode root = new STNNode(problem.getInitialState(), problem.getInitialTaskNetwork());
+
+        // No task have to be done thus the empty plan is solution.
+        if (root.getTaskNetwork().getTasks().length == 0) {
+            return new SequentialPlan();
+        }
+
+        int task = root.getTaskNetwork().getTasks()[0];
+        System.out.println(problem.getRelevantTasks().get(task));
+
 
 
         return new SequentialPlan();
