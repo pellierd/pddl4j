@@ -74,32 +74,32 @@ import java.util.Set;
  * actions are simplifies again with the ground inertia information. So far we have only
  * considered the predicates which are never made true or false by a planning action. These were
  * used to constrain the instantiation process. Once the set of all actions has been determined, one
- * can similarly define the ground facts that are never made true or false by one of the actions.
+ * can similarly define the ground fluents that are never made true or false by one of the actions.
  * </p>
  * <p>
- * <i>Definition:</i> A ground fact is a negative ground inertia iff it does not occur negatively
+ * <i>Definition:</i> A ground fluent is a negative ground inertia iff it does not occur negatively
  * in an unconditional effect or the consequent of a conditional effect of an action.
  * </p>
  * <p>
- * An initial fact, which is a negative ground inertia, is never made FALSE and thus always
+ * An initial fluent, which is a negative ground inertia, is never made FALSE and thus always
  * satisfied in all reachable world states. It can be removed from the state description. All its
  * occurrences in the preconditions of actions and in the antecedents of conditional effects can be
- * simplified to TRUE. A fact, which is a positive ground inertia and not contained in the initial
+ * simplified to TRUE. A fluent, which is a positive ground inertia and not contained in the initial
  * state, is never satisfied in any reachable world state. All its occurrences in the preconditions
  * of actions and in the antecedents of conditional effects can be simplified to FALSE. The
- * remaining facts are fluents that, roughly speaking, can possibly change their truth value during
+ * remaining fluents are fluents that, roughly speaking, can possibly change their truth value during
  * the planning process. They are therefore relevant to the representation of the planning problem.
  * </p>
  * <p>
- * Then, encoding extracts relevant facts from the instantiated actions. A relevant fact is
+ * Then, encoding extracts relevant fluents from the instantiated actions. A relevant fluent is
  * defines as follow:
  * </p>
  * <p>
- * <i>Definition:</i> A ground fact is relevant if and only if:
+ * <i>Definition:</i> A ground fluent is relevant if and only if:
  * </p>
  * <ol>
- * <li> it is an initial fact and not a negative ground inertia, or if</li>
- * <li> it is not an initial fact and not a positive ground inertia.</li>
+ * <li> it is an initial fluent and not a negative ground inertia, or if</li>
+ * <li> it is not an initial fluent and not a positive ground inertia.</li>
  * </ol>
  * <p>
  * Finally, every action is normalized, i.e, transform precondition and effects of the actions
@@ -203,9 +203,9 @@ public final class Encoder implements Serializable {
     static List<List<IntMatrix>> predicatesTables;
 
     /**
-     * The table of the relevant facts.
+     * The table of the relevant fluents.
      */
-    static List<IntExpression> tableOfRelevantFacts;
+    static List<IntExpression> tableOfRelevantFluents;
 
     /**
      * The table of the relevant task.
@@ -267,7 +267,7 @@ public final class Encoder implements Serializable {
      * <li> 3 - 1 + predicates and their inertia status</li>
      * <li> 4 - 1 + 4 + goal state and actions with unary inertia encoded</li>
      * <li> 5 - 1 + actions, initial and goal state after expansion of variables</li>
-     * <li> 6 - 1 + facts selected as relevant to the problem</li>
+     * <li> 6 - 1 + fluents selected as relevant to the problem</li>
      * <li> 7 - 1 + final domain representation</li>
      * <li> 8 - 1 + various debugging information</li>
      * </ul>
@@ -529,6 +529,7 @@ public final class Encoder implements Serializable {
         }
 
 
+
         // *****************************************************************************************
         // Step 5: PostInstantiation
         // *****************************************************************************************
@@ -539,10 +540,12 @@ public final class Encoder implements Serializable {
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
         // Simplify the methods with the ground inertia information previously extracted
         PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
-        // Extract the relevant facts from the simplified and instantiated actions and methods
+        // Extract the relevant fluents from the simplified and instantiated actions and methods
         PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
         // Extract the relevant task for the simplified instantiated methods
         PostInstantiation.extractRelevantTasks(intMethods);
+        // Extract the primitive tasks from the relevant tasks.
+        //PostInstantiation.extractPrimitiveTasks(intActions);
 
         // Simplify the goal with ground inertia information
         if (intGoal != null) {
@@ -569,11 +572,11 @@ public final class Encoder implements Serializable {
         // Step 6: Finalization and bit set encoding of the problem
         // *****************************************************************************************
 
-        // Create a map of the relevant facts with their index to speedup the bit set encoding of the actions
-        final Map<IntExpression, Integer> factIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFacts.size());
+        // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
+        final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
         int index = 0;
-        for (IntExpression fact : Encoder.tableOfRelevantFacts) {
-            factIndexMap.put(fact, index);
+        for (IntExpression fluent : Encoder.tableOfRelevantFluents) {
+            fluentIndexMap.put(fluent, index);
             index++;
         }
 
@@ -591,7 +594,7 @@ public final class Encoder implements Serializable {
 
         // Encode the goal in bit set representation
         if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, factIndexMap);
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
         } else {
             Encoder.goal = new State();
         }
@@ -601,13 +604,13 @@ public final class Encoder implements Serializable {
         }
 
         // Encode the initial state in bit set representation
-        Encoder.init = BitEncoding.encodeInit(intInitPredicates, factIndexMap);
+        Encoder.init = BitEncoding.encodeInit(intInitPredicates, fluentIndexMap);
 
         // Encode the actions in bit set representation
-        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, factIndexMap));
+        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
 
         // Encode the methods in bit set representation
-        Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, factIndexMap, taskIndexMap));
+        Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, fluentIndexMap, taskIndexMap));
 
         // Just for logging
         if (Encoder.logLevel == 7) {
@@ -658,7 +661,7 @@ public final class Encoder implements Serializable {
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicates(Encoder.tableOfPredicates);
-        codedProblem.setRelevantFluents(Encoder.tableOfRelevantFacts);
+        codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents);
         codedProblem.setRelevantTasks(Encoder.tableOfRelevantTasks);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
@@ -767,27 +770,33 @@ public final class Encoder implements Serializable {
     }
 
     /**
-     * Print the relevant facts table.
+     * Print the relevant fluents table.
      *
      * @param stringBuilder the string builder used to print.
      */
     static void printRelevantFactsTable(StringBuilder stringBuilder) {
-        stringBuilder.append("Relevant facts:\n");
-        for (int i = 0; i < Encoder.tableOfRelevantFacts.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFacts.get(i)));
+        stringBuilder.append("Relevant fluents:\n");
+        for (int i = 0; i < Encoder.tableOfRelevantFluents.size(); i++) {
+            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFluents.get(i)));
             stringBuilder.append("\n");
         }
     }
 
     /**
-     * Print the relevant facts table.
+     * Print the relevant fluents table.
      *
      * @param stringBuilder the string builder used to print.
      */
     static void printRelevantTasksTable(StringBuilder stringBuilder) {
         stringBuilder.append("Relevant tasks:\n");
         for (int i = 0; i < Encoder.tableOfRelevantTasks.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantTasks.get(i)));
+            IntExpression task = Encoder.tableOfRelevantTasks.get(i);
+            stringBuilder.append(i).append(": ").append(Encoder.toString(task));
+            if (task.isPrimtive()) {
+                stringBuilder.append(" - PRIMITIVE");
+            } else {
+                stringBuilder.append(" - COMPOUND");
+            }
             stringBuilder.append("\n");
         }
     }
@@ -861,7 +870,7 @@ public final class Encoder implements Serializable {
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 
     /**
@@ -874,7 +883,7 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(m, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks,
-            Encoder.tableOfRelevantFacts, Encoder.tableOfRelevantTasks);
+            Encoder.tableOfRelevantFluents, Encoder.tableOfRelevantTasks);
     }
 
     /**
@@ -911,7 +920,7 @@ public final class Encoder implements Serializable {
     static String toString(State exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 
     /**
@@ -923,7 +932,7 @@ public final class Encoder implements Serializable {
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 
     /**

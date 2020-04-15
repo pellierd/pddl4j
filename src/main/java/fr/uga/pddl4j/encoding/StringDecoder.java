@@ -487,7 +487,6 @@ public final class StringDecoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */

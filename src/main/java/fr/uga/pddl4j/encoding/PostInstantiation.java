@@ -22,13 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -85,10 +79,10 @@ final class PostInstantiation implements Serializable {
         for (IntMethod m : methods) {
             PostInstantiation.extractRelevantFacts(m.getPreconditions(), facts, init);
         }
-        Encoder.tableOfRelevantFacts = new ArrayList<>(facts.size());
+        Encoder.tableOfRelevantFluents = new ArrayList<>(facts.size());
         for (IntExpression exp : facts) {
             final IntExpression relevant = new IntExpression(exp);
-            Encoder.tableOfRelevantFacts.add(relevant);
+            Encoder.tableOfRelevantFluents.add(relevant);
         }
     }
 
@@ -180,22 +174,25 @@ final class PostInstantiation implements Serializable {
     }
 
     /**
-     * Extracts the relevant tasks from the instantiated methiods. A ground tasks is relevant if and
+     * Extracts the relevant tasks from the instantiated methods. A ground tasks is relevant if and
      * only if it occurs as a task or a subtask of a instantiated method.
      *
      * @param methods the list of instantiated methods
      */
     static void extractRelevantTasks(List<IntMethod> methods) {
-        final Set<IntExpression> tasks = new LinkedHashSet<>(10000);
+        final Set<IntExpression> tasks = new LinkedHashSet<>(1000);
+        final Set<IntExpression> compoundTasks = new LinkedHashSet<>(methods.size());
         for (IntMethod m : methods) {
             tasks.add(m.getTask());
             PostInstantiation.extractRelevantTasks(m.getSubTasks(), tasks);
+            compoundTasks.add(m.getTask());
         }
         Encoder.tableOfRelevantTasks = new ArrayList<>(tasks.size());
-        for (IntExpression exp : tasks) {
-            final IntExpression task = new IntExpression(exp);
-            task.setTaskID(IntExpression.DEFAULT_TASK_ID);
-            Encoder.tableOfRelevantTasks.add(task);
+        for (IntExpression task : tasks) {
+            final IntExpression copy = new IntExpression(task);
+            copy.setPrimtive(!compoundTasks.contains(task));
+            copy.setTaskID(IntExpression.DEFAULT_TASK_ID);
+            Encoder.tableOfRelevantTasks.add(copy);
         }
     }
 

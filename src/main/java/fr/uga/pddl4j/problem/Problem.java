@@ -86,7 +86,6 @@ public class Problem implements Serializable {
      */
     private List<List<Integer>> tasksSignatures;
 
-
     /**
      * The table that contains the types of the arguments of the functions.
      */
@@ -106,6 +105,11 @@ public class Problem implements Serializable {
      * The table of the relevant tasks.
      */
     private List<IntExpression> relevantTasks;
+
+    /**
+     * The table that indicates if a task is primitive or not.
+     */
+    private List<Boolean> primitiveTasks;
 
     /**
      * The list of instantiated actions encoded into bit sets.

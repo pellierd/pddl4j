@@ -60,6 +60,11 @@ public class IntExpression implements Serializable {
      */
     public static final int EQUAL_PREDICATE = -1;
 
+    /*
+     * The constant used to encode the default predicate value.
+     */
+    public static final int DEFAULT_PREDICATE = -2;
+
     /**
      * The connective of the expression.
      */
@@ -102,6 +107,11 @@ public class IntExpression implements Serializable {
     private double value;
 
     /**
+     * A flag to indicate if this expression represente a primitive task.
+     */
+    private boolean isPrimtive;
+
+    /**
      * Create a new expression from an other one. This constructor make a deep copy of the specified
      * expression.
      *
@@ -110,6 +120,7 @@ public class IntExpression implements Serializable {
     public IntExpression(final IntExpression other) {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
+        this.taskID = other.getTaskID();
         this.arguments = other.getArguments();
         if (this.arguments != null) {
             this.arguments = Arrays.copyOf(other.getArguments(), other.getArguments().length);
@@ -118,9 +129,9 @@ public class IntExpression implements Serializable {
         this.children = new ArrayList<>(otherChildren.size());
         this.children.addAll(otherChildren.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.variable = other.getVariable();
-        this.taskID = other.getTaskID();
         this.type = other.getType();
         this.value = other.getValue();
+        this.isPrimtive = other.isPrimtive();
     }
 
     /**
@@ -130,12 +141,14 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
+        this.predicate = IntExpression.DEFAULT_PREDICATE;
+        this.taskID = IntExpression.DEFAULT_TASK_ID;
         this.arguments = null;
         this.children = new ArrayList<>();
         this.variable = IntExpression.DEFAULT_VARIABLE;
         this.type = IntExpression.DEFAULT_TYPE;
         this.value = IntExpression.DEFAULT_VARIABLE_VALUE;
-        this.taskID = IntExpression.DEFAULT_TASK_ID;
+        this.isPrimtive = false;
     }
 
     /**
@@ -153,9 +166,6 @@ public class IntExpression implements Serializable {
      * @param connective the new connective to set.
      */
     public final void setConnective(final PDDLConnective connective) {
-        if (connective == null) {
-            throw new NullPointerException("connective == null");
-        }
         this.connective = connective;
     }
 
@@ -201,7 +211,7 @@ public class IntExpression implements Serializable {
      * @return the taskID.
      */
     public final int getTaskID() {
-      return this.taskID;
+        return this.taskID;
     }
 
     /**
@@ -286,6 +296,24 @@ public class IntExpression implements Serializable {
     }
 
     /**
+     * Returns <code>true</code> if the expression is a primitive task.
+     *
+     * @return <code>true</code> if the expression is a primitive task, <code>false</code> otherwise.
+     */
+    public final boolean isPrimtive() {
+        return this.isPrimtive;
+    }
+
+    /**
+     * Set the boolean flag used to specified if the expression is a primitive task to a specified value.
+     *
+     * @param flag the flag.
+     */
+    public final void setPrimtive(final boolean flag) {
+        this.isPrimtive = flag;
+    }
+
+    /**
      * Affect this expression to an other. After affectation this expression and the other are
      * equal. No copy of the content of the other expression is done.
      *
@@ -300,10 +328,12 @@ public class IntExpression implements Serializable {
         this.variable = other.getVariable();
         this.type = other.getType();
         this.value = other.getValue();
+        this.isPrimtive = other.isPrimtive();
     }
 
     /**
-     * Return if the expression is equal to an other object.
+     * Return if the expression is equal to an other object. The primitive flag and the task id are not used for
+     * comparison.
      *
      * @param object the other object.
      * @see java.lang.Object#equals(java.lang.Object)

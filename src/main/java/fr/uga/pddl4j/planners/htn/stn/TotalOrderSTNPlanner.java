@@ -15,17 +15,21 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.TaskNetwork;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -61,18 +65,43 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
      */
     @Override
     public Plan search(final Problem problem) {
-        STNNode root = new STNNode(problem.getInitialState(), problem.getInitialTaskNetwork());
 
-        // No task have to be done thus the empty plan is solution.
-        if (root.getTaskNetwork().getTasks().length == 0) {
+        // No task have to be done in the probmem thus the empty plan is returned as solution.
+        if (problem.getInitialTaskNetwork().getTasks().length == 0) {
             return new SequentialPlan();
         }
 
-        int task = root.getTaskNetwork().getTasks()[0];
-        
-        System.out.println(problem.toString(problem.getRelevantTasks().get(task)));
+        // Create the list of pending nodes to explore
+        LinkedList<STNNode> open = new LinkedList<STNNode>();
+        // Create the root node of the search space
+        STNNode root = new STNNode(problem.getInitialState(), problem.getInitialTaskNetwork());
+        // Add the root node to the list of the pending node to explore.
+        open.add(root);
+
+        // Declare the plan used to store the result of the exploration
+        Plan plan = null;
+
+        // Start exploring the search space
+        while (!open.isEmpty() && plan == null) {
+            STNNode current = open.poll();
+            int[] tasks = current.getTaskNetwork().getTasks();
 
 
+
+        }
+
+
+
+
+
+        /*for (IntExpression tasks : problem.getRelevantTasks()) {
+            System.out.println(problem.toString(tasks));
+        }
+
+        System.out.println("ACTIONS");
+        for (Action a : problem.getActions()) {
+            System.out.println(problem.toShortString(a));
+        }*/
 
         return new SequentialPlan();
 
@@ -135,6 +164,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         }
 
         // Encode the problem into compact representation
+        factory.setTraceLevel(0);
         final Problem pb = factory.encode();
         System.out.println("\nencoding problem done successfully ("
                 + pb.getActions().size() + " actions, "
