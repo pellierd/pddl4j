@@ -520,7 +520,7 @@ public class Problem implements Serializable {
      */
     public final String toString(final Action op) {
         return StringDecoder.toString(op, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantFacts);
+            this.predicates, this.functions, this.relevantFacts);
     }
 
     /**
@@ -554,7 +554,7 @@ public class Problem implements Serializable {
      */
     public final String toString(State exp) {
         return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantFacts);
+            this.predicates, this.functions, this.relevantFacts);
     }
 
     /**
@@ -576,7 +576,7 @@ public class Problem implements Serializable {
      */
     public final String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantFacts);
+            this.predicates, this.functions, this.relevantFacts);
     }
 
     /**

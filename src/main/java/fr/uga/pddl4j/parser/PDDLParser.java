@@ -302,10 +302,10 @@ public final class PDDLParser {
             this.checkProblemConstraints();
             this.checkMetric();
         } catch (TokenMgrError | ParseException | RuntimeException exception) {
+            exception.printStackTrace();
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
-
     /**
      * Parses a planning domain and a planning problem from their respective string description.
      *

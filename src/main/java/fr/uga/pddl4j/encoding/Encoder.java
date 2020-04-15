@@ -859,7 +859,7 @@ public final class Encoder implements Serializable {
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
     }
 
     /**
@@ -909,7 +909,7 @@ public final class Encoder implements Serializable {
     static String toString(State exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
     }
 
     /**
@@ -921,7 +921,7 @@ public final class Encoder implements Serializable {
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfTasks, Encoder.tableOfRelevantFacts);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFacts);
     }
 
     /**

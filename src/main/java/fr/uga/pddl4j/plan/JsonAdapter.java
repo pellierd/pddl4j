@@ -19,10 +19,13 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.encoding.IntExpression;
+import fr.uga.pddl4j.encoding.StringDecoder;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -188,18 +191,41 @@ public class JsonAdapter implements Serializable {
      * @return an 2D collection of Strings.
      */
     private ArrayList<ArrayList<String>> toJsonString(final State exp) {
+        return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
+            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFacts());
+    }
+
+    /**
+     * Convert a BitExp into a String collection.
+     *
+     * @param exp        the BitExp instance to convert.
+     * @param constants  the constants of the problem.
+     * @param types      the types of the problem.
+     * @param predicates the predicates of the problem.
+     * @param functions  the functions of the problem.
+     * @param relevants  the facts of the problem.
+     * @return an 2D collection of Strings.
+     */
+    private static ArrayList<ArrayList<String>> toJsonString(final State exp,
+                                                             final List<String> constants,
+                                                             final List<String> types,
+                                                             final List<String> predicates,
+                                                             final List<String> functions,
+                                                             final List<IntExpression> relevants) {
         ArrayList<String> fluentsPos = new ArrayList<>();
         ArrayList<String> fluentsNeg = new ArrayList<>();
         ArrayList<ArrayList<String>> fluents = new ArrayList<>();
 
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(this.codedProblem.toString(codedProblem.getRelevantFacts().get(i)));
+            fluentsPos.add(StringDecoder.toString(relevants.get(i), constants, types, predicates, functions,
+                new ArrayList<String>(), " "));
         }
 
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(this.codedProblem.toString(codedProblem.getRelevantFacts().get(i)));
+            fluentsNeg.add(StringDecoder.toString(relevants.get(i), constants, types, predicates, functions,
+                new ArrayList<String>(), " "));
         }
 
         fluents.add(fluentsPos);

@@ -30,6 +30,7 @@ import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.ClosedWorldState;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -417,13 +418,12 @@ public final class StringDecoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified operator.
      */
     public static String toString(final Action action, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                           final List<String> tasks, final List<IntExpression> relevants) {
+                                  final List<IntExpression> relevants) {
         StringBuilder str = new StringBuilder();
         str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < action.getArity(); i++) {
@@ -437,9 +437,9 @@ public final class StringDecoder implements Serializable {
             }
         }
         str.append("Preconditions:\n").append(StringDecoder.toString(action.getPreconditions(), constants, types,
-            predicates, functions, tasks, relevants)).append("\n").append("Effects:\n");
+            predicates, functions, relevants)).append("\n").append("Effects:\n");
         for (ConditionalEffect condExp : action.getCondEffects()) {
-            str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, tasks, relevants))
+            str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants))
                 .append("\n");
         }
         return str.toString();
@@ -473,7 +473,7 @@ public final class StringDecoder implements Serializable {
             }
         }
         str.append("Preconditions:\n").append(StringDecoder.toString(method.getPreconditions(), constants, types,
-            predicates, functions, tasks, relevantFacts)).append("\n");
+            predicates, functions, relevantFacts)).append("\n");
         str.append(StringDecoder.toString(method.getTaskNetwork(), constants, types, predicates, functions, tasks,
             relevantTasks));
         return str.toString();
@@ -492,18 +492,18 @@ public final class StringDecoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     public static String toString(State exp, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions, final List<String> tasks,
+                           final List<String> predicates, final List<String> functions,
                            final List<IntExpression> relevants) {
         final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = exp.getPositive();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
-            str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions, tasks))
-                .append("\n");
+            str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                new ArrayList<String>())).append("\n");
         }
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
-                functions, tasks)).append(")\n");
+                functions, new ArrayList<String>())).append(")\n");
         }
         str.append(")");
         return str.toString();
@@ -541,20 +541,19 @@ public final class StringDecoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param tasks      the table of tasks.
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
     public static String toString(ConditionalEffect exp, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions, final List<String> tasks,
+                           final List<String> predicates, final List<String> functions,
                            final List<IntExpression> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions, tasks, relevants));
+            str.append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions, relevants));
         } else {
             str.append("(when ").append(StringDecoder.toString(exp.getCondition(), constants, types, predicates,
-                functions, tasks, relevants)).append("\n").append(StringDecoder.toString(exp.getEffects(), constants, types,
-                predicates, functions, tasks, relevants)).append(")");
+                functions, relevants)).append("\n").append(StringDecoder.toString(exp.getEffects(), constants, types,
+                predicates, functions, relevants)).append(")");
         }
         return str.toString();
     }

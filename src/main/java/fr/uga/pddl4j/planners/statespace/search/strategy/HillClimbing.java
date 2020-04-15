@@ -128,9 +128,10 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
         for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
                 final ClosedWorldState nextState = new ClosedWorldState(parent);
-                nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
-
+                op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
+                        // Apply the effect to the successor node
+                        nextState.apply(ce.getEffects())
+                );
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);
                 this.setCreatedNodes(this.getCreatedNodes() + 1);
