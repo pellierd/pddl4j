@@ -60,7 +60,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     @Override
     public Plan search(Problem problem) {
         // The method to be complete with the TotalOrderSTNPlanner algorithm describes in the book of
-        // automated planning of Ghallab page
+        // automated planning of Ghallab page 239
 
 
         return new SequentialPlan();
