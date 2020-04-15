@@ -228,7 +228,7 @@ public final class Encoder implements Serializable {
     static State goal;
 
     /**
-     * The initial task network..
+     * The initial task network.
      */
     static TaskNetwork initialTaskNetwork;
 
@@ -647,7 +647,8 @@ public final class Encoder implements Serializable {
 
         final Problem codedProblem = new Problem();
         codedProblem.setGoal(Encoder.goal);
-        codedProblem.setInit(Encoder.init);
+        codedProblem.setInitialState(Encoder.init);
+        codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
         codedProblem.setActions(Encoder.actions);
         codedProblem.setMethods(Encoder.methods);
         codedProblem.setConstants(Encoder.tableOfConstants);
@@ -656,7 +657,7 @@ public final class Encoder implements Serializable {
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicates(Encoder.tableOfPredicates);
-        codedProblem.setRelevantFacts(Encoder.tableOfRelevantFacts);
+        codedProblem.setRelevantFluents(Encoder.tableOfRelevantFacts);
         codedProblem.setRelevantTasks(Encoder.tableOfRelevantTasks);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);

@@ -38,7 +38,7 @@ public class PlannersTest {
 
         System.out.println("Encoding problem done successfully ("
             + pb.getActions().size() + " actions, "
-            + pb.getRelevantFacts().size() + " fluents).");
+            + pb.getRelevantFluents().size() + " fluents).");
 
         if (!pb.isSolvable()) {
             System.out.println("Goal can be simplified to FALSE. No search will solve it.");

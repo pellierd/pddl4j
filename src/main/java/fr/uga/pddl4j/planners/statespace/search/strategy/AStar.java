@@ -71,7 +71,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
         final long begin = System.currentTimeMillis();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
         // Get the initial state from the planning problem
-        final ClosedWorldState init = new ClosedWorldState(codedProblem.getInit());
+        final ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)
         final Map<ClosedWorldState, Node> closeSet = new HashMap<>();
         final Map<ClosedWorldState, Node> openSet = new HashMap<>();

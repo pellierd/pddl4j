@@ -77,7 +77,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
         final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = getTimeout();
 
-        ClosedWorldState init = new ClosedWorldState(codedProblem.getInit());
+        ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 

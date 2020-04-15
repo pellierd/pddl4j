@@ -71,7 +71,7 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
         final LinkedList<Node> openList = new LinkedList<>();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
 
-        ClosedWorldState init = new ClosedWorldState(codedProblem.getInit());
+        ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 

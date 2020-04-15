@@ -124,7 +124,7 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
         final long begin = System.currentTimeMillis();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
         // Get the initial state from the planning problem
-        final ClosedWorldState init = new ClosedWorldState(problem.getInit());
+        final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)
         final Map<ClosedWorldState, Node> closeSet = new HashMap<>();
         // Initialize the opened list (store the pending node)

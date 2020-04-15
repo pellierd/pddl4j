@@ -472,7 +472,7 @@ public class StateSpacePlannerFactory implements Serializable {
 
             if (pb != null) {
                 planner.getStatistics().setNumberOfActions(pb.getActions().size());
-                planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFacts().size());
+                planner.getStatistics().setNumberOfRelevantFluents(pb.getRelevantFluents().size());
 
                 if (traceLevel > 0 && traceLevel != 8) {
                     StringBuilder strb = new StringBuilder();

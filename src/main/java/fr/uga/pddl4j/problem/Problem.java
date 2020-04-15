@@ -100,7 +100,7 @@ public class Problem implements Serializable {
     /**
      * The table of the relevant facts.
      */
-    private List<IntExpression> relevantFacts;
+    private List<IntExpression> relevantFluents;
 
     /**
      * The table of the relevant tasks.
@@ -125,7 +125,12 @@ public class Problem implements Serializable {
     /**
      * The initial state.
      */
-    private State init;
+    private State initialState;
+
+    /**
+     * The initial task network
+     */
+    private TaskNetwork initialTaskNetwork;
 
     /**
      * Create a new empty problem. All the attributs of the problem are initialize with null.
@@ -173,8 +178,8 @@ public class Problem implements Serializable {
         }
         this.inertia = new ArrayList<>();
         this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
-        this.relevantFacts = new ArrayList<>();
-        this.relevantFacts.addAll(other.relevantFacts.stream().map(IntExpression::new).collect(Collectors.toList()));
+        this.relevantFluents = new ArrayList<>();
+        this.relevantFluents.addAll(other.relevantFluents.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.relevantTasks = new ArrayList<>();
         this.relevantTasks.addAll(other.relevantTasks.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.actions = new ArrayList<>();
@@ -182,7 +187,8 @@ public class Problem implements Serializable {
         this.methods = new ArrayList<>();
         this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
         this.goal = new State(other.goal);
-        this.init = new State(other.init);
+        this.initialState = new State(other.initialState);
+        this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
     }
 
     /**
@@ -388,21 +394,21 @@ public class Problem implements Serializable {
      *
      * @return the list of relevant facts used the problem.
      */
-    public final List<IntExpression> getRelevantFacts() {
-        return this.relevantFacts;
+    public final List<IntExpression> getRelevantFluents() {
+        return this.relevantFluents;
     }
 
     /**
      * Sets the list of relevant facts used the problem.
      *
-     * @param facts the list of relevant facts to set.
+     * @param fluents the list of relevant facts to set.
      */
-    public final void setRelevantFacts(final List<IntExpression> facts) {
-        this.relevantFacts = facts;
+    public final void setRelevantFluents(final List<IntExpression> fluents) {
+        this.relevantFluents = fluents;
     }
 
     /**
-     * Returns the list of relevant tasks used the problem.
+     * Returns the list of relevant tasks used the problem. The method returns null if the problem is not HTN.
      *
      * @return the list of relevant tasks used the problem.
      */
@@ -420,7 +426,7 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns the list of instantiated actions of the problem.
+     * Returns the list of instantiated actions of the problem. The method returns null if the problem is not HTN.
      *
      * @return the list of instantiated actions of the problem.
      */
@@ -438,7 +444,7 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns the list of instantiated methods of the problem.
+     * Returns the list of instantiated methods of the problem. The method returns null if the problem is not HTN.
      *
      * @return the list of instantiated methods of the problem.
      */
@@ -456,7 +462,8 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns the goal of the problem or null if the goal can is not reachable.
+     * Returns the goal of the problem or null if the goal can is not reachable. The method returns null if the problem
+     * is HTN.
      *
      * @return the goal of the problem.
      */
@@ -488,17 +495,33 @@ public class Problem implements Serializable {
      *
      * @return the initial state of the problem.
      */
-    public final State getInit() {
-        return this.init;
+    public final State getInitialState() {
+        return this.initialState;
     }
 
     /**
      * Sets the initial state of the problem.
      *
-     * @param init the initial state to set.
+     * @param initialState the initial state to set.
      */
-    public final void setInit(final State init) {
-        this.init = init;
+    public final void setInitialState(final State initialState) {
+        this.initialState = initialState;
+    }
+
+    /**
+     * Returns the initial task network. This method returns null if the problem is not a HTN problem.
+     *
+     * @return the initial task network.
+     */
+    public final  TaskNetwork getInitialTaskNetwork() { return this.initialTaskNetwork; }
+
+    /**
+     * Sets the initial task network of the problem.
+     *
+     * @param taskNetwork the initial task network.
+     */
+    public final void  setInitialTaskNetwork(final TaskNetwork taskNetwork) {
+        this.initialTaskNetwork = taskNetwork;
     }
 
     /**
@@ -520,7 +543,7 @@ public class Problem implements Serializable {
      */
     public final String toString(final Action op) {
         return StringDecoder.toString(op, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.relevantFluents);
     }
 
     /**
@@ -554,7 +577,7 @@ public class Problem implements Serializable {
      */
     public final String toString(State exp) {
         return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.relevantFluents);
     }
 
     /**
@@ -565,7 +588,7 @@ public class Problem implements Serializable {
      */
     public final String toString(ClosedWorldState bitState) {
         return StringDecoder.toString(bitState, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantFacts);
+            this.predicates, this.functions, this.tasks, this.relevantFluents);
     }
 
     /**
@@ -576,7 +599,7 @@ public class Problem implements Serializable {
      */
     public final String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFacts);
+            this.predicates, this.functions, this.relevantFluents);
     }
 
     /**

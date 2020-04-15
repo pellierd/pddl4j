@@ -64,7 +64,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
         if (problem == null) {
             throw new NullPointerException("problem == null");
         }
-        this.facts = problem.getRelevantFacts();
+        this.facts = problem.getRelevantFluents();
         this.goal = problem.getGoal();
         this.operators = problem.getActions();
         this.isAdmissible = true;

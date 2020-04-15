@@ -129,7 +129,7 @@ public final class GreedyBestFirstSearchAnytime extends AbstractStateSpaceStrate
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();
 
-        ClosedWorldState init = new ClosedWorldState(problem.getInit());
+        ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         root.setDepth(0);
         openSet.add(root);

@@ -107,7 +107,7 @@ public class CodedProblemTest {
         System.out.println("Problem: Test the size of the fact list from a specified coded problem.");
         final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            Assert.assertTrue(codedProblem.getRelevantFacts().size() == factList.size());
+            Assert.assertTrue(codedProblem.getRelevantFluents().size() == factList.size());
         }
     }
 
@@ -119,7 +119,7 @@ public class CodedProblemTest {
         System.out.println("Problem: Test each fact from a specified coded problem.");
         final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            final List<IntExpression> factListCodedProblem = codedProblem.getRelevantFacts();
+            final List<IntExpression> factListCodedProblem = codedProblem.getRelevantFluents();
             for (int i = 0; i < factList.size(); i++) {
                 Assert.assertTrue(codedProblem.toString(factListCodedProblem.get(i)).equals(factList.get(i)));
             }
@@ -146,7 +146,7 @@ public class CodedProblemTest {
         System.out.println("Problem: Test the init expression from a specified coded problem.");
         final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            Assert.assertTrue(codedProblem.toString(codedProblem.getInit()).equals(init));
+            Assert.assertTrue(codedProblem.toString(codedProblem.getInitialState()).equals(init));
         }
     }
 }

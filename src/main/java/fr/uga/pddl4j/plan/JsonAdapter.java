@@ -192,7 +192,7 @@ public class JsonAdapter implements Serializable {
      */
     private ArrayList<ArrayList<String>> toJsonString(final State exp) {
         return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
-            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFacts());
+            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFluents());
     }
 
     /**

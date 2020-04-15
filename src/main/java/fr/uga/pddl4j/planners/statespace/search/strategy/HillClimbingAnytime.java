@@ -87,7 +87,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
 
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
 
-        ClosedWorldState init = new ClosedWorldState(problem.getInit());
+        ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
         root.setHeuristic(heuristic.estimate(root, problem.getGoal()));
         restartList.add(root);
@@ -137,7 +137,7 @@ public final class HillClimbingAnytime extends AbstractStateSpaceStrategyAnytime
 
         Node root = node;
         if (node == null) {
-            ClosedWorldState init = new ClosedWorldState(problem.getInit());
+            ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
             root = new Node(init, null, 0, 0, heuristic.estimate(init, problem.getGoal()));
             root.setHeuristic(heuristic.estimate(root, problem.getGoal()));
             openList.add(root);

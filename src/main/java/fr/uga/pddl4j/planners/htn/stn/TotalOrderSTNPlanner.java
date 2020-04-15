@@ -53,14 +53,15 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
 
     /**
      * Solves the planning problem and returns the first solution search found.
+     * The  method search is an implementation of the total order STN procedure describes in the book of automated
+     * planning of Ghallab page 239.
      *
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public Plan search(Problem problem) {
-        // The method to be complete with the TotalOrderSTNPlanner algorithm describes in the book of
-        // automated planning of Ghallab page 239
+    public Plan search(final Problem problem) {
+        //TaskNetwork initial = problem.ge
 
 
         return new SequentialPlan();
@@ -128,7 +129,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         System.out.println("\nencoding problem done successfully ("
                 + pb.getActions().size() + " actions, "
                 + pb.getMethods().size() + " methods, "
-                + pb.getRelevantFacts().size() + " fluents, "
+                + pb.getRelevantFluents().size() + " fluents, "
                 + pb.getRelevantTasks().size() + " tasks)\n");
 
         final Plan plan = planner.search(pb);
