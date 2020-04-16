@@ -65,7 +65,6 @@ public final class TaskNetwork implements Serializable {
     public TaskNetwork(final TaskNetwork other) {
         super();
         this.tasks = new LinkedList<Integer>(other.getTasks());
-        this.tasks.addAll(other.getTasks().stream().map(Integer::new).collect(Collectors.toList()));
         this.orderingConstraints = new BitMatrix(other.getOrderingConstraints());
     }
 

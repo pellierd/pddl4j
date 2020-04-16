@@ -86,8 +86,10 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         // Start exploring the search space
         while (!open.isEmpty() && plan == null) {
             STNNode currentNode = open.poll();
-            System.out.println(problem.toString(currentNode.getTaskNetwork()));
-            System.out.println(problem.toString(currentNode.getState()));
+            //System.out.println("*******************************************************");
+            //System.out.println(problem.toString(currentNode.getTaskNetwork()));
+            //System.out.println(problem.toString(currentNode.getState()));
+
 
             if (currentNode.getTaskNetwork().getTasks().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
@@ -96,10 +98,13 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 State state = currentNode.getState();
                 List<Integer> resolvers = problem.getTasksResolvers().get(task);
                 if (problem.getRelevantTasks().get(task).isPrimtive()) {
-                    System.out.println("ACTION");
+                    //System.out.println("PRIMITIVE TASK:");
+                    //System.out.println(problem.toString(problem.getRelevantTasks().get(task)));
                     for (Integer resolver : resolvers) {
                         final Action action = problem.getActions().get(resolver);
                         if (state.satisfy(action.getPreconditions())) {
+                            //System.out.println("ACTION:");
+                            //System.out.println(problem.toString(action));
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(resolver);
@@ -108,21 +113,44 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                                 childNode.getState().apply(ce.getEffects())
                             );
                             open.push(childNode);
+                            //System.out.println("NEW NODE:");
+                            //System.out.println(problem.toString(childNode.getTaskNetwork()));
+                            //System.out.println(problem.toString(childNode.getState()));
+                            /*try {
+                                System.in.read();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }*/
                         }
+
                     }
                 } else {
+                    //System.out.println("COMPOUND TASK:");
+                    //System.out.println(problem.toString(problem.getRelevantTasks().get(task)));
                     for (Integer resolver : resolvers) {
                         final Method method = problem.getMethods().get(resolver);
                         if (state.satisfy(method.getPreconditions())) {
-                            System.out.println("METHOD");
+                            //System.out.println("METHOD:");
+                            //System.out.println(problem.toString(method));
+
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
+
                             childNode.setOperator(problem.getActions().size()+resolver);
                             childNode.getTaskNetwork().getTasks().remove(0);
                             childNode.getTaskNetwork().getTasks().addAll(0, method.getSubTasks());
                             open.push(childNode);
+                            //System.out.println("NEW NODE:");
+                            //System.out.println(problem.toString(childNode.getTaskNetwork()));
+                            //System.out.println(problem.toString(childNode.getState()));
+                            /*try {
+                                System.in.read();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }*/
                         }
                     }
+
                 }
             }
         }
@@ -145,8 +173,8 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 if (n.getOperator() < problem.getActions().size()) {
                     final Action a = problem.getActions().get(n.getOperator());
                     plan.add(0, a);
-                    n = n.getParent();
                 }
+                n = n.getParent();
             }
             return plan;
         } else {
@@ -224,7 +252,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         final Plan plan = planner.search(pb);
         if (plan != null) {
             // Print plan information
-            System.out.println("%nfound plan as follows:%n%n" + pb.toString(plan));
+            System.out.println("found plan as follows:\n\n" + pb.toString(plan));
             System.out.println(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
         } else {
             System.out.println(String.format(String.format("%nno plan found%n%n")));
@@ -270,7 +298,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 if (timeout < 0) return null;
                 arguments.put(Planner.TIMEOUT, timeout);
             } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                final int level = Integer.parseInt(args[i + 1]) * 1000;
+                final int level = Integer.parseInt(args[i + 1]);
                 arguments.put(Planner.TRACE_LEVEL, level);
             } else {
                 return null;
