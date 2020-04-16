@@ -67,11 +67,6 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
 
-        // No task have to be done in the probmem thus the empty plan is returned as solution.
-        if (problem.getInitialTaskNetwork().getTasks().isEmpty()) {
-            return new SequentialPlan();
-        }
-
         // Create the list of pending nodes to explore
         LinkedList<STNNode> open = new LinkedList<STNNode>();
         // Create the root node of the search space
@@ -91,10 +86,10 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
             //System.out.println(problem.toString(currentNode.getState()));
 
 
-            if (currentNode.getTaskNetwork().getTasks().isEmpty()) {
+            if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
             } else {
-                int task = currentNode.getTaskNetwork().getTasks().get(0);
+                int task = currentNode.getTaskNetwork().pop();
                 State state = currentNode.getState();
                 List<Integer> resolvers = problem.getTasksResolvers().get(task);
                 if (problem.getRelevantTasks().get(task).isPrimtive()) {
@@ -108,10 +103,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(resolver);
-                            childNode.getTaskNetwork().getTasks().remove(0);
-                            action.getCondEffects().stream().filter(ce -> state.satisfy(ce.getCondition())).forEach(ce ->
-                                childNode.getState().apply(ce.getEffects())
-                            );
+                            childNode.getState().apply(action.getCondEffects());
                             open.push(childNode);
                             //System.out.println("NEW NODE:");
                             //System.out.println(problem.toString(childNode.getTaskNetwork()));
@@ -137,8 +129,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                             childNode.setParent(currentNode);
 
                             childNode.setOperator(problem.getActions().size()+resolver);
-                            childNode.getTaskNetwork().getTasks().remove(0);
-                            childNode.getTaskNetwork().getTasks().addAll(0, method.getSubTasks());
+                            childNode.getTaskNetwork().push(method.getSubTasks());
                             open.push(childNode);
                             //System.out.println("NEW NODE:");
                             //System.out.println(problem.toString(childNode.getTaskNetwork()));
@@ -166,20 +157,17 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
      * @return the solution plan or null is no solution was found.
      */
     private SequentialPlan extractPlan(final STNNode node, final Problem problem) {
-        if (node != null) {
-            STNNode n = node;
-            final SequentialPlan plan = new SequentialPlan();
-            while (n.getParent() != null) {
-                if (n.getOperator() < problem.getActions().size()) {
-                    final Action a = problem.getActions().get(n.getOperator());
-                    plan.add(0, a);
-                }
-                n = n.getParent();
+        STNNode n = node;
+        final SequentialPlan plan = new SequentialPlan();
+        while (n.getParent() != null) {
+            if (n.getOperator() < problem.getActions().size()) {
+                final Action a = problem.getActions().get(n.getOperator());
+                plan.add(0, a);
             }
-            return plan;
-        } else {
-            return null;
+            n = n.getParent();
         }
+        return plan;
+
     }
 
 

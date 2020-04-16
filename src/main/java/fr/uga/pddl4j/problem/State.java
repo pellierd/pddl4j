@@ -22,6 +22,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * This class implements an state. A bit set expression is used to encode preconditions
@@ -112,16 +113,38 @@ public class State implements Serializable {
     }
 
     /**
-     * Applies a specified <code>state</code> to this state. In other word, the positive facts of
+     * Applies a specified effect to this state. In other word, the positive facts of
      * the specified expression are added to this state and the negative ones are delete.
      *
-     * @param state the expression to apply.
+     * @param effect the effect to apply.
      */
-    public final void apply(final State state) {
-        this.getPositive().or(state.getPositive());
-        this.getPositive().andNot(state.getNegative());
-        this.getNegative().or(state.getNegative());
-        this.getNegative().andNot(state.getPositive());
+    public final void apply(final State effect) {
+        this.getPositive().or(effect.getPositive());
+        this.getPositive().andNot(effect.getNegative());
+        this.getNegative().or(effect.getNegative());
+        this.getNegative().andNot(effect.getPositive());
+    }
+
+    /**
+     * Applies a conditional effects to this state. In other word, the positive fluent of the specified effects are
+     * added to this state and the negative ones are delete. The state is modified if and only if the condition of the
+     * conditional effects hold in the state, otherwise the state stay unchanged.
+     *
+     * @param effects the expression to apply.
+     */
+    public final void apply(final ConditionalEffect effects) {
+        if (this.satisfy(effects.getCondition())) {
+            this.apply(effects.getEffects());
+        }
+    }
+
+    /**
+     * Applies a list of conditional effects to this state.
+     *
+     * @param effects the list of conditional effects to apply.
+     */
+    public final void apply(final List<ConditionalEffect> effects) {
+        effects.stream().forEach(ce -> this.apply(ce.getEffects()));
     }
 
     /**

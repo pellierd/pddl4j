@@ -39,7 +39,7 @@ public final class TaskNetwork implements Serializable {
      * The array that defined the list of task of task network. Each task is defined as an integer. The integer
      * indicates the index of the task in the task table of the planning problem.
      */
-    private List<Integer> tasks;
+    private LinkedList<Integer> tasks;
 
     /**
      * The represents the ordering constraints of the task network.
@@ -76,7 +76,7 @@ public final class TaskNetwork implements Serializable {
      */
     public TaskNetwork(final List<Integer> tasks, final BitMatrix constraints) {
         super();
-        this.tasks = tasks;
+        this.tasks = new LinkedList<Integer>(tasks);
         this.orderingConstraints = constraints;
     }
 
@@ -88,6 +88,7 @@ public final class TaskNetwork implements Serializable {
     public final int size() {
         return this.tasks.size();
     }
+
     /**
      * Returns the tasks of the task network.
      *
@@ -98,12 +99,49 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Set the tasks of the task network.
+     * Pops the first task of the task network. In other words, removes and returns the first task of this task network.
+     *
+     * @returns the first task of task network.
+     */
+    public final Integer pop() {
+        return this.tasks.pop();
+    }
+
+    /**
+     * Pushes a task into the task network. In other words, inserts the task as the first task of the task network.
+     *
+     * @param task the task to push.
+     */
+    public final void push(final int task) {
+        this.tasks.push(task);
+    }
+
+    /**
+     * Pushes a list of tasks into the task network. In other words, inserts the list of tasks as the first tasks of the
+     * task network.
+     *
+     * @param tasks the list of tasks to push.
+     */
+    public final void push(final List<Integer> tasks) {
+        this.tasks.addAll(0, tasks);
+    }
+
+    /**
+     * Sets the tasks of the task network.
      *
      * @param tasks the tasks to set.
      */
     public final void setTasks(final List<Integer> tasks) {
-        this.tasks = tasks;
+        this.tasks = new LinkedList<>(tasks);
+    }
+
+    /**
+     * Returns if the task network is empty, i.e., contains not tasks.
+     *
+     * @return <code>true</code> if the task network is empty, <code>false</code> otherwise.
+     */
+    public final boolean isEmpty() {
+        return this.tasks.isEmpty();
     }
 
     /**
@@ -116,7 +154,7 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Set the new ordering constraints of the method.
+     * Sets the new ordering constraints of the method.
      *
      * @param constraints the orderings constraints to set
      */
