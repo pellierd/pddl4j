@@ -112,6 +112,33 @@ public class State implements Serializable {
     }
 
     /**
+     * Applies a specified <code>state</code> to this state. In other word, the positive facts of
+     * the specified expression are added to this state and the negative ones are delete.
+     *
+     * @param state the expression to apply.
+     */
+    public final void apply(final State state) {
+        this.getPositive().or(state.getPositive());
+        this.getPositive().andNot(state.getNegative());
+        this.getNegative().or(state.getNegative());
+        this.getNegative().andNot(state.getPositive());
+    }
+
+    /**
+     * Returns <code>true</code> if this state satisfy a specified state.
+     *
+     * @param state the state to be tested.
+     * @return <code>true</code> if this state satisfy a specified state; <code>false</code> otherwise.
+     */
+    public final boolean satisfy(final State state) {
+        return this.getPositive().include(state.getPositive())
+            && this.getPositive().exclude(state.getNegative())
+            && this.getNegative().include(state.getNegative())
+            && this.getNegative().exclude(state.getPositive());
+
+    }
+
+    /**
      * Returns the hash code value of the expression.
      *
      * @return the hash code value of the expression.

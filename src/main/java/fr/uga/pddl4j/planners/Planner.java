@@ -75,7 +75,7 @@ public interface Planner extends Serializable {
     /**
      * The default trace level.
      */
-    int DEFAULT_TRACE_LEVEL = 1;
+    int DEFAULT_TRACE_LEVEL = 0;
 
     /**
      * The statistics key for properties.

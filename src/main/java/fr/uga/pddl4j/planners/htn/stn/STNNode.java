@@ -44,6 +44,26 @@ public class STNNode implements Serializable {
      */
     private TaskNetwork taskNetwork;
 
+    private STNNode parent;
+
+    private int operator;
+
+    public STNNode getParent() {
+        return parent;
+    }
+
+    public void setParent(STNNode parent) {
+        this.parent = parent;
+    }
+
+    public int getOperator() {
+        return operator;
+    }
+
+    public void setOperator(int operator) {
+        this.operator = operator;
+    }
+
     /**
      * Creates a new STNNode from an other. This constructor creates a deep copy of the node in parameters.
      *

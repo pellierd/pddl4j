@@ -15,16 +15,17 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.State;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +68,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     public Plan search(final Problem problem) {
 
         // No task have to be done in the probmem thus the empty plan is returned as solution.
-        if (problem.getInitialTaskNetwork().getTasks().length == 0) {
+        if (problem.getInitialTaskNetwork().getTasks().isEmpty()) {
             return new SequentialPlan();
         }
 
@@ -75,7 +76,8 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         LinkedList<STNNode> open = new LinkedList<STNNode>();
         // Create the root node of the search space
         STNNode root = new STNNode(problem.getInitialState(), problem.getInitialTaskNetwork());
-        // Add the root node to the list of the pending node to explore.
+        root.setParent(null);
+        // Add the root node to the list of the pending nodes to explore.
         open.add(root);
 
         // Declare the plan used to store the result of the exploration
@@ -83,29 +85,75 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
 
         // Start exploring the search space
         while (!open.isEmpty() && plan == null) {
-            STNNode current = open.poll();
-            int[] tasks = current.getTaskNetwork().getTasks();
+            STNNode currentNode = open.poll();
+            System.out.println(problem.toString(currentNode.getTaskNetwork()));
+            System.out.println(problem.toString(currentNode.getState()));
 
-
-
+            if (currentNode.getTaskNetwork().getTasks().isEmpty()) {
+                plan = this.extractPlan(currentNode, problem);
+            } else {
+                int task = currentNode.getTaskNetwork().getTasks().get(0);
+                State state = currentNode.getState();
+                List<Integer> resolvers = problem.getTasksResolvers().get(task);
+                if (problem.getRelevantTasks().get(task).isPrimtive()) {
+                    System.out.println("ACTION");
+                    for (Integer resolver : resolvers) {
+                        final Action action = problem.getActions().get(resolver);
+                        if (state.satisfy(action.getPreconditions())) {
+                            STNNode childNode = new STNNode(currentNode);
+                            childNode.setParent(currentNode);
+                            childNode.setOperator(resolver);
+                            childNode.getTaskNetwork().getTasks().remove(0);
+                            action.getCondEffects().stream().filter(ce -> state.satisfy(ce.getCondition())).forEach(ce ->
+                                childNode.getState().apply(ce.getEffects())
+                            );
+                            open.push(childNode);
+                        }
+                    }
+                } else {
+                    for (Integer resolver : resolvers) {
+                        final Method method = problem.getMethods().get(resolver);
+                        if (state.satisfy(method.getPreconditions())) {
+                            System.out.println("METHOD");
+                            STNNode childNode = new STNNode(currentNode);
+                            childNode.setParent(currentNode);
+                            childNode.setOperator(problem.getActions().size()+resolver);
+                            childNode.getTaskNetwork().getTasks().remove(0);
+                            childNode.getTaskNetwork().getTasks().addAll(0, method.getSubTasks());
+                            open.push(childNode);
+                        }
+                    }
+                }
+            }
         }
-
-
-
-
-
-        /*for (IntExpression tasks : problem.getRelevantTasks()) {
-            System.out.println(problem.toString(tasks));
-        }
-
-        System.out.println("ACTIONS");
-        for (Action a : problem.getActions()) {
-            System.out.println(problem.toShortString(a));
-        }*/
-
-        return new SequentialPlan();
+        return plan;
 
     }
+
+    /**
+     * Extract a plan from a solution node for the specified planning problem.
+     *
+     * @param node    the solution node.
+     * @param problem the problem to be solved.
+     * @return the solution plan or null is no solution was found.
+     */
+    private SequentialPlan extractPlan(final STNNode node, final Problem problem) {
+        if (node != null) {
+            STNNode n = node;
+            final SequentialPlan plan = new SequentialPlan();
+            while (n.getParent() != null) {
+                if (n.getOperator() < problem.getActions().size()) {
+                    final Action a = problem.getActions().get(n.getOperator());
+                    plan.add(0, a);
+                    n = n.getParent();
+                }
+            }
+            return plan;
+        } else {
+            return null;
+        }
+    }
+
 
     /**
      * The main method of the <code>TotalOrderSTNPlanner</code> example. The command line syntax is as
@@ -164,7 +212,8 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         }
 
         // Encode the problem into compact representation
-        factory.setTraceLevel(0);
+        final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
+        factory.setTraceLevel(traceLevel);
         final Problem pb = factory.encode();
         System.out.println("\nencoding problem done successfully ("
                 + pb.getActions().size() + " actions, "
@@ -191,6 +240,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 .append("OPTIONS   DESCRIPTIONS\n")
                 .append("-d <str>    hddl domain file name\n")
                 .append("-p <str>    hddl problem file name\n")
+                .append("-l <num>    trace level\n")
                 .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
                 .append("-h          print this message\n\n");
         Planner.getLogger().trace(strb.toString());
@@ -219,6 +269,9 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 final int timeout = Integer.parseInt(args[i + 1]) * 1000;
                 if (timeout < 0) return null;
                 arguments.put(Planner.TIMEOUT, timeout);
+            } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                final int level = Integer.parseInt(args[i + 1]) * 1000;
+                arguments.put(Planner.TRACE_LEVEL, level);
             } else {
                 return null;
             }

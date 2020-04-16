@@ -21,6 +21,8 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.util.BitMatrix;
 
+import java.util.List;
+
 /**
  * This class implements an method. This class is used to store compact representation of a method in a planning
  * problem.
@@ -93,7 +95,7 @@ public final class Method extends AbstractOperator {
      *
      * @return the subtasks of the method.
      */
-    public final int[] getSubTasks() {
+    public final List<Integer> getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
@@ -102,7 +104,7 @@ public final class Method extends AbstractOperator {
      *
      * @param tasks the subtasks to set.
      */
-    public final void setSubTasks(final int[] tasks) {
+    public final void setSubTasks(final List<Integer> tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 

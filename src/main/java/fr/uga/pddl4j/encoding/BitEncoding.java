@@ -27,10 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -238,14 +235,10 @@ final class BitEncoding implements Serializable {
      */
     static TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork, final Map<IntExpression, Integer> map) {
         // We encode first the tasks
-        List<Integer> encodedTasks = new ArrayList<Integer>();
-        BitEncoding.encodeTasks(taskNetwork.getTasks(), map, encodedTasks);
-        int[] tasks = new int[encodedTasks.size()];
-        for (int i = 0 ; i < encodedTasks.size(); i++) {
-            tasks[i] = encodedTasks.get(i);
-        }
+        List<Integer> tasks = new ArrayList<Integer>();
+        BitEncoding.encodeTasks(taskNetwork.getTasks(), map, tasks);
         // We encode then the ordering constraints
-        BitMatrix constraints = new BitMatrix(tasks.length, tasks.length);
+        BitMatrix constraints = new BitMatrix(tasks.size(), tasks.size());
         for (IntExpression c : taskNetwork.getOrderingConstraints().getChildren()) {
             constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
             //constraints.set(c.getChildren().get(1).getTaskID(), c.getChildren().get(0).getTaskID());

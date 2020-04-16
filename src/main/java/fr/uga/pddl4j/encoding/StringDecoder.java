@@ -155,19 +155,19 @@ public final class StringDecoder implements Serializable {
      * @param functions     the table of functions.
      * @param tasks         the table of tasks.
      * @param relevantTasks the table of relevant tasks.
-     * @return a string representation of the specified method.
+     * @return a string representation of the specified task network.
      */
     public static String toString(final TaskNetwork tn, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExpression> relevantTasks) {
         final StringBuilder str = new StringBuilder();
         str.append("Tasks:\n");
-        if (tn.getTasks().length == 0) {
+        if (tn.getTasks().isEmpty()) {
             str.append(" ()\n");
         } else {
-            for (int i = 0; i < tn.getTasks().length; i++) {
+            for (int i = 0; i < tn.getTasks().size(); i++) {
                 str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
-                str.append(StringDecoder.toString(relevantTasks.get(tn.getTasks()[i]), constants, types, predicates,
+                str.append(StringDecoder.toString(relevantTasks.get(tn.getTasks().get(i)), constants, types, predicates,
                     functions, tasks)).append("\n");
             }
         }
@@ -558,12 +558,12 @@ public final class StringDecoder implements Serializable {
     }
 
     /**
-     * Returns a short string representation of the specified operator, i.e., its name and its
+     * Returns a short string representation of the specified method, i.e., its name and its
      * instantiated parameters.
      *
-     * @param action        the operator.
+     * @param action        the action.
      * @param constants the table of constants.
-     * @return a string representation of the specified operator.
+     * @return a string representation of the specified action.
      */
     public static String toShortString(final IntAction action, final List<String> constants) {
         final StringBuilder str = new StringBuilder();
@@ -583,15 +583,15 @@ public final class StringDecoder implements Serializable {
      * Returns a short string representation of the specified operator, i.e., its name and its
      * instantiated parameters.
      *
-     * @param action        the operator.
+     * @param op        the operator.
      * @param constants the table of constants.
      * @return a string representation of the specified operator.
      */
-    public static String toShortString(final Action action, final List<String> constants) {
+    public static String toShortString(final GroundOperator op, final List<String> constants) {
         final StringBuilder str = new StringBuilder();
-        str.append(action.getName());
-        for (int i = 0; i < action.getArity(); i++) {
-            final int index = action.getValueOfParameter(i);
+        str.append(op.getName());
+        for (int i = 0; i < op.getArity(); i++) {
+            final int index = op.getValueOfParameter(i);
             if (index == -1) {
                 str.append(" ?");
             } else {

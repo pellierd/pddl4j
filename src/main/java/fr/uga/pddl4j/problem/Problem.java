@@ -107,9 +107,9 @@ public class Problem implements Serializable {
     private List<IntExpression> relevantTasks;
 
     /**
-     * The table that indicates if a task is primitive or not.
+     * The table gives for each task the list of relevant operators, i.e., action or methods
      */
-    private List<Boolean> primitiveTasks;
+    private List<List<Integer>> taskOResolvers;
 
     /**
      * The list of instantiated actions encoded into bit sets.
@@ -193,6 +193,11 @@ public class Problem implements Serializable {
         this.goal = new State(other.goal);
         this.initialState = new State(other.initialState);
         this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
+        this.taskOResolvers = new ArrayList<>(other.taskOResolvers.size());
+        for (List<Integer> ti : other.taskOResolvers) {
+            final List<Integer> copy = ti.stream().collect(Collectors.toList());
+            this.taskOResolvers.add(copy);
+        }
     }
 
     /**
@@ -412,6 +417,26 @@ public class Problem implements Serializable {
     }
 
     /**
+     * Returns the list of resolvers for each relevant tasks of the problem. A resolver can be a action or method
+     * depending if the task is primitive or not.
+     *
+     * @return the list of resolvers for the relevant tasks of the problem.
+     */
+    public final List<List<Integer>> getTasksResolvers() {
+        return this.taskOResolvers;
+    }
+
+    /**
+     * Sets the list of resolvers for each relevant tasks of the problem. A resolver can be a action or method
+     * depending if the task is primitive or not.
+     *
+     * @param resolvers the list of resolvers for the relevant tasks of the problem.
+     */
+    public final void setTaskResolvers(final List<List<Integer>> resolvers) {
+        this.taskOResolvers = resolvers;
+    }
+
+    /**
      * Returns the list of relevant tasks used the problem. The method returns null if the problem is not HTN.
      *
      * @return the list of relevant tasks used the problem.
@@ -529,25 +554,58 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a short string representation of the specified operator, i.e., only its name and the
+     * Returns a short string representation of the specified action, i.e., only its name and the
      * value of its parameters.
      *
-     * @param op the operator.
-     * @return a string representation of the specified operator.
+     * @param action the action.
+     * @return a string representation of the specified action.
      */
-    public final String toShortString(final Action op) {
-        return StringDecoder.toShortString(op, this.constants);
+    public final String toShortString(final Action action) {
+        return StringDecoder.toShortString(action, this.constants);
     }
 
     /**
-     * Returns a string representation of the specified operator.
+     * Returns a string representation of the specified action.
      *
-     * @param op the operator.
-     * @return a string representation of the specified operator.
+     * @param action the action.
+     * @return a string representation of the specified action.
      */
-    public final String toString(final Action op) {
-        return StringDecoder.toString(op, this.constants, this.types,
+    public final String toString(final Action action) {
+        return StringDecoder.toString(action, this.constants, this.types,
             this.predicates, this.functions, this.relevantFluents);
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param method the method.
+     * @return a string representation of the specified method.
+     */
+    public final String toString(final Method method) {
+        return StringDecoder.toString(method, this.constants, this.types,
+            this.predicates, this.functions, this.tasks, this.relevantFluents, this.relevantTasks);
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param taskNetwork the task network to print.
+     * @return a string representation of the specified task network.
+     */
+    public String toString(final TaskNetwork taskNetwork) {
+        return StringDecoder.toString(taskNetwork,  this.constants, this.types,
+            this.predicates, this.functions, this.tasks, this.relevantTasks);
+    }
+
+    /**
+     * Returns a short string representation of the specified method, i.e., only its name and the
+     * value of its parameters.
+     *
+     * @param method the method.
+     * @return a string representation of the specified method.
+     */
+    public final String toShortString(final Method method) {
+        return StringDecoder.toShortString(method, this.constants);
     }
 
     /**
@@ -574,13 +632,13 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a string representation of a bit expression.
+     * Returns a string representation of a state.
      *
-     * @param exp the expression.
+     * @param state the state.
      * @return a string representation of the specified expression.
      */
-    public final String toString(State exp) {
-        return StringDecoder.toString(exp, this.constants, this.types,
+    public final String toString(State state) {
+        return StringDecoder.toString(state, this.constants, this.types,
             this.predicates, this.functions, this.relevantFluents);
     }
 

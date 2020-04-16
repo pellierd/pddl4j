@@ -22,6 +22,9 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
@@ -36,7 +39,7 @@ public final class TaskNetwork implements Serializable {
      * The array that defined the list of task of task network. Each task is defined as an integer. The integer
      * indicates the index of the task in the task table of the planning problem.
      */
-    private int[] tasks;
+    private List<Integer> tasks;
 
     /**
      * The represents the ordering constraints of the task network.
@@ -49,7 +52,7 @@ public final class TaskNetwork implements Serializable {
      */
     public TaskNetwork() {
         super();
-        this.tasks = new int[0];
+        this.tasks = new LinkedList<Integer>();
         this.orderingConstraints = new BitMatrix(0, 0);
     }
 
@@ -61,7 +64,8 @@ public final class TaskNetwork implements Serializable {
      */
     public TaskNetwork(final TaskNetwork other) {
         super();
-        this.tasks = new int[other.size()];
+        this.tasks = new LinkedList<Integer>(other.getTasks());
+        this.tasks.addAll(other.getTasks().stream().map(Integer::new).collect(Collectors.toList()));
         this.orderingConstraints = new BitMatrix(other.getOrderingConstraints());
     }
 
@@ -71,7 +75,7 @@ public final class TaskNetwork implements Serializable {
      * @param tasks          the tasks of the task network.
      * @param constraints    the orderings constraints of the task network.
      */
-    public TaskNetwork(final int[] tasks, final BitMatrix constraints) {
+    public TaskNetwork(final List<Integer> tasks, final BitMatrix constraints) {
         super();
         this.tasks = tasks;
         this.orderingConstraints = constraints;
@@ -83,14 +87,14 @@ public final class TaskNetwork implements Serializable {
      * @return the size of the task network.
      */
     public final int size() {
-        return this.tasks.length;
+        return this.tasks.size();
     }
     /**
      * Returns the tasks of the task network.
      *
      * @return the tasks of the task network.
      */
-    public final int[] getTasks() {
+    public final  List<Integer> getTasks() {
         return this.tasks;
     }
 
@@ -99,7 +103,7 @@ public final class TaskNetwork implements Serializable {
      *
      * @param tasks the tasks to set.
      */
-    public final void setTasks(final int[] tasks) {
+    public final void setTasks(final List<Integer> tasks) {
         this.tasks = tasks;
     }
 
@@ -130,7 +134,7 @@ public final class TaskNetwork implements Serializable {
     public final boolean isTotallyOrdered() {
         boolean ordered = true;
         int i = 1;
-        while (i < this.tasks.length && ordered) {
+        while (i < this.tasks.size() && ordered) {
             ordered = this.orderingConstraints.get(i - 1, i);
         }
         return ordered;

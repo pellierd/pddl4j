@@ -213,6 +213,11 @@ public final class Encoder implements Serializable {
     static List<IntExpression> tableOfRelevantTasks;
 
     /**
+     * The table containing for each relevant task its set of resolvers, i.e., action or methods
+     */
+    static List<List<Integer>> tableOfTaskResolvers;
+
+    /**
      * The list of instantiated actions encoded into bit sets.
      */
     static List<Action> actions;
@@ -569,7 +574,7 @@ public final class Encoder implements Serializable {
         }
 
         // *****************************************************************************************
-        // Step 6: Finalization and bit set encoding of the problem
+        // Step 6: Bit set encoding of the problem
         // *****************************************************************************************
 
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
@@ -644,6 +649,30 @@ public final class Encoder implements Serializable {
                 stringBuilder.append(Encoder.toString(Encoder.initialTaskNetwork));
             }
             stringBuilder.append("\n\n");
+        }
+
+        // *****************************************************************************************
+        // Step 7: Compute structures to speed up the search
+        // *****************************************************************************************
+
+        PostEncoding.createTableOfTaskResolvers();
+
+        if (Encoder.logLevel == 8) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+                stringBuilder.append("\nTable of task resolvers:\n");
+                for (int ti = 0; ti < Encoder.tableOfTaskResolvers.size(); ti++) {
+                    stringBuilder.append(ti).append(": ");
+                    stringBuilder.append(Encoder.toString(Encoder.tableOfRelevantTasks.get(ti)));
+                    stringBuilder.append(":");
+                    List<Integer> resolvers = Encoder.tableOfTaskResolvers.get(ti);
+                    for (int ri = 0; ri < resolvers.size(); ri++) {
+                        stringBuilder.append(" ").append(resolvers.get(ri));
+                    }
+                    stringBuilder.append("\n");
+                }
+
+            }
+
             LOGGER.trace(stringBuilder);
             stringBuilder.setLength(0);
         }
@@ -663,6 +692,7 @@ public final class Encoder implements Serializable {
         codedProblem.setPredicates(Encoder.tableOfPredicates);
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents);
         codedProblem.setRelevantTasks(Encoder.tableOfRelevantTasks);
+        codedProblem.setTaskResolvers(Encoder.tableOfTaskResolvers);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
         codedProblem.setTypes(Encoder.tableOfTypes);
