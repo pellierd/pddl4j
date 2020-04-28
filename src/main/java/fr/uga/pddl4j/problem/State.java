@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * This class implements an state. A bit set expression is used to encode preconditions
+ * This class implements a state. A bit set expression is used to encode preconditions
  * (negative and positive) but also effects of the instantiated operators.
  *
  * @author D. Pellier

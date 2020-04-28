@@ -596,7 +596,6 @@ public class Problem implements Serializable {
         return StringDecoder.toString(taskNetwork,  this.constants, this.types,
             this.predicates, this.functions, this.tasks, this.relevantTasks);
     }
-
     /**
      * Returns a short string representation of the specified method, i.e., only its name and the
      * value of its parameters.
