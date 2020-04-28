@@ -80,22 +80,28 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
 
         // Start exploring the search space
         while (!open.isEmpty() && plan == null) {
-            STNNode currentNode = open.poll();
-            //System.out.println("*******************************************************");
-            //System.out.println(problem.toString(currentNode.getTaskNetwork()));
-            //System.out.println(problem.toString(currentNode.getState()));
-
-
+            // Get and remove the first node of the pending list of nodes.
+            STNNode currentNode = open.pop();
+            // If the task network is empty we've got a solution
             if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
             } else {
+                // Get and remove the fist task of the task network
                 int task = currentNode.getTaskNetwork().pop();
+                // Get the current state of the search
                 State state = currentNode.getState();
+                // Get the resolvers, i.e., action or method that are relevant for this task.
                 List<Integer> resolvers = problem.getTasksResolvers().get(task);
+                // Case where the task to decompose is primitive
                 if (problem.getRelevantTasks().get(task).isPrimtive()) {
-                    //System.out.println("PRIMITIVE TASK:");
-                    //System.out.println(problem.toString(problem.getRelevantTasks().get(task)));
+
+                    // On peut simplifier a priori une tâche primitive n'a qu'un résolver
+                    // Il faudrait vérifier que la tâche dans une méthode ne peut être choisi comme non d'action
+                    // Ce qui n'est pas vérifié par le parser
+                    // De plus, le terme resolver n'est pas bien choisi. Il faudrait utiliser relevant.
+
                     for (Integer resolver : resolvers) {
+                        // An action is
                         final Action action = problem.getActions().get(resolver);
                         if (state.satisfy(action.getPreconditions())) {
                             //System.out.println("ACTION:");

@@ -1204,6 +1204,7 @@ public final class PDDLParser {
         LinkedList<List<PDDLTypedSymbol>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(context);
+        Set<PDDLExpression> atoms = new HashSet<>();
         while (!stackGD.isEmpty()) {
             PDDLExpression gd = stackGD.poll();
             List<PDDLTypedSymbol> ctx = stackCtx.poll();
@@ -1240,8 +1241,65 @@ public final class PDDLParser {
                 stackGD.add(0, gd.getChildren().get(i));
             }
         }
-        return checked;
+        return checked; //this.checkPDDLExpressionConsistency(exp);
     }
+
+    /**
+     * Checks if a PDDL expression is consistent or not, i.e., contains the atomic formula and it negatation.
+     *
+     * @param exp     The PDDL expression.
+     * @return <code>true</code> if the expression is consistent; <code>false</code> otherwise.
+     */
+    /*private boolean checkPDDLExpressionConsistency(PDDLExpression exp) {
+        boolean checked = true;
+        exp.moveNegationInward();
+        Set<PDDLExpression> positive = new HashSet<>();
+        Set<PDDLExpression> negative = new HashSet<>();
+
+        switch (exp.getConnective()) {
+            case ATOM:
+                PDDLSymbol predicate = exp.getAtom().get(0);
+                if (!positive.add(exp)) {
+                    this.mgr.logParserWarning("atomic formula " + exp
+                        + " is used twice in the same expression",
+                        this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
+                    checked = false;
+                }
+                if (negative.contains(exp)) {
+                    this.mgr.logParserWarning("atomic formula " + exp
+                        + "  and its negation is used in the same expression",
+                        this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
+                    checked = false;
+                }
+                break;
+            case NOT:
+                if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.ATOM)) {
+                    PDDLExpression notExp = exp.getChildren().get(0);
+                    predicate = exp.getAtom().get(0);
+                    if (!negative.add(new PDDLExpression(exp))) {
+                        this.mgr.logParserWarning("atomic formula " + exp
+                                + " is used twice in the same expression",
+                                this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
+                            checked = false;
+                    }
+                    if (positive.contains(exp)) {
+                        this.mgr.logParserWarning("atomic formula " + exp
+                                + "  and its negation is used in the same expression",
+                            this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
+                        checked = false;
+                    }
+                } else {
+                    return this.checkPDDLExpressionConsistency(exp.getChildren().get(0));
+                }
+            break;
+            default:
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    checked = this.checkPDDLExpressionConsistency(exp.getChildren().get(i));
+                }
+        }
+        return checked;
+    }*/
+
 
     /**
      * Check if an atom used is well typed and if it was previously declared in the predicates of
