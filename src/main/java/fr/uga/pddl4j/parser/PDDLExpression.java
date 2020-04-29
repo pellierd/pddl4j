@@ -20,11 +20,7 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -601,7 +597,7 @@ public class PDDLExpression implements Serializable {
         }
     }
 
-    /**
+    /*
      * Return if this expression is equal to another object.
      *
      * @param object the other object.
@@ -611,21 +607,18 @@ public class PDDLExpression implements Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object object) {
-        if (object != null && object instanceof PDDLExpression) {
-            PDDLExpression other = (PDDLExpression) object;
-            return this.connective.equals(other.connective)
-                && ((this.atom == null && other.atom == null)
-                || (this.atom != null && other.atom != null && this.atom.equals(other.atom)))
-                && this.children.equals(other.children)
-                && ((this.prefName == null && other.prefName == null)
-                || (this.prefName != null && other.prefName != null && this.prefName.equals(other.prefName)))
-                && ((this.variables == null && other.variables == null)
-                || (this.variables != null && other.variables != null && this.variables.equals(other.variables)))
-                && ((this.value == null && other.value == null)
-                || (this.value != null && other.value != null && this.value.equals(other.value)))
-                && ((this.taskID == null && other.taskID == null)
-                || (this.taskID != null && other.taskID != null && this.taskID.equals(other.taskID)));
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj != null && obj instanceof PDDLExpression) {
+            PDDLExpression other = (PDDLExpression) obj;
+            return getConnective() == other.getConnective() &&
+                Objects.equals(this.getVariables(), other.getVariables()) &&
+                Objects.equals(this.getAtom(), other.getAtom()) &&
+                Objects.equals(this.getChildren(), other.getChildren()) &&
+                Objects.equals(this.getValue(), other.getValue()) &&
+                Objects.equals(this.getPrefName(), other.getPrefName()) &&
+                Objects.equals(this.getVariable(), other.getVariable()) &&
+                Objects.equals(this.getTaskID(), other.getTaskID());
         }
         return false;
     }
@@ -638,21 +631,10 @@ public class PDDLExpression implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((atom == null) ? 0 : atom.hashCode());
-        result = prime * result + ((children == null) ? 0 : children.hashCode());
-        result = prime * result + ((connective == null) ? 0 : connective.hashCode());
-        result = prime * result + ((prefName == null) ? 0 : prefName.hashCode());
-        result = prime * result + ((taskID == null) ? 0 : taskID.hashCode());
-        long temp;
-        temp = Double.doubleToLongBits(value);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        result = prime * result + ((variable == null) ? 0 : variable.hashCode());
-        result = prime * result + ((variables == null) ? 0 : variables.hashCode());
-        return result;
+        return Objects.hash(this.getConnective(), this.getVariables(), this.getAtom(), this.getChildren(),
+            this.getValue(), this.getPrefName(), this.getVariable(), this.getTaskID());
     }
-
+    
     /**
      * Returns if a specified expression is contains, i.e., is a sub-expression of this expression. More
      * formally, returns <code>true</code> if and only if this expression contains at least one

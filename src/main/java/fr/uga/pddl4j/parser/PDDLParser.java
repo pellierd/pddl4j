@@ -1241,21 +1241,33 @@ public final class PDDLParser {
                 stackGD.add(0, gd.getChildren().get(i));
             }
         }
-        return checked; //this.checkPDDLExpressionConsistency(exp);
+        this.checkPDDLExpressionConsistency(exp);
+        return checked;
+    }
+
+    /**
+     * Checks if a PDDL expression is consistent or not, i.e., contains the atomic formula and it negatation.
+     * This method only produces warnings.
+     *
+     * @param exp  The PDDL expression.
+     * @return <code>true</code> if the expression is consistent; <code>false</code> otherwise.
+     */
+    private boolean checkPDDLExpressionConsistency(final PDDLExpression exp) {
+        exp.moveNegationInward();
+        return this.checkPDDLExpressionConsistency(exp, new HashSet<>(), new HashSet<>());
     }
 
     /**
      * Checks if a PDDL expression is consistent or not, i.e., contains the atomic formula and it negatation.
      *
      * @param exp     The PDDL expression.
+     * @param positive the set of positive atoms previously encoutered.
+     * @param negative the set of negative atoms previously encoutered.
      * @return <code>true</code> if the expression is consistent; <code>false</code> otherwise.
      */
-    /*private boolean checkPDDLExpressionConsistency(PDDLExpression exp) {
+    private boolean checkPDDLExpressionConsistency(final PDDLExpression exp, Set<PDDLExpression> positive,
+                                                   Set<PDDLExpression> negative) {
         boolean checked = true;
-        exp.moveNegationInward();
-        Set<PDDLExpression> positive = new HashSet<>();
-        Set<PDDLExpression> negative = new HashSet<>();
-
         switch (exp.getConnective()) {
             case ATOM:
                 PDDLSymbol predicate = exp.getAtom().get(0);
@@ -1274,31 +1286,31 @@ public final class PDDLParser {
                 break;
             case NOT:
                 if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.ATOM)) {
-                    PDDLExpression notExp = exp.getChildren().get(0);
-                    predicate = exp.getAtom().get(0);
-                    if (!negative.add(new PDDLExpression(exp))) {
-                        this.mgr.logParserWarning("atomic formula " + exp
+                    final PDDLExpression notExp = exp.getChildren().get(0);
+                    predicate = notExp.getAtom().get(0);
+                    if (!negative.add(notExp)) {
+                        this.mgr.logParserWarning("atomic formula " + notExp
                                 + " is used twice in the same expression",
                                 this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
                             checked = false;
                     }
-                    if (positive.contains(exp)) {
-                        this.mgr.logParserWarning("atomic formula " + exp
+                    if (positive.contains(notExp)) {
+                        this.mgr.logParserWarning("atomic formula " + notExp
                                 + "  and its negation is used in the same expression",
                             this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
                         checked = false;
                     }
                 } else {
-                    return this.checkPDDLExpressionConsistency(exp.getChildren().get(0));
+                    checked = this.checkPDDLExpressionConsistency(exp.getChildren().get(0), positive, negative);
                 }
             break;
             default:
                 for (int i = 0; i < exp.getChildren().size(); i++) {
-                    checked = this.checkPDDLExpressionConsistency(exp.getChildren().get(i));
+                    checked &= this.checkPDDLExpressionConsistency(exp.getChildren().get(i), positive, negative);
                 }
         }
         return checked;
-    }*/
+    }
 
 
     /**
