@@ -19,14 +19,10 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.encoding.IntExpression;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.util.ClosedWorldState;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.util.BitVector;
-import fr.uga.pddl4j.problem.ConditionalEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,11 +43,6 @@ import java.util.List;
  * @version 1.0 20.08.2010
  */
 public abstract class GraphHeuristic extends AbstractHeuristic {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The array used to store the apparition level of the propositions.
@@ -170,7 +161,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
             // The array that contains string representation of the problem propositions
             this.propositions = new String[this.nbPropositions];
             for (int i = 0; i < this.negOffset; i++) {
-                IntExpression prop = super.getRevelantFacts().get(i);
+                Fluent prop = super.getRevelantFacts().get(i);
                 this.propositions[i] = problem.toString(prop);
                 this.propositions[i + this.negOffset] = "(not " + this.propositions[i] + ")";
             }
@@ -198,7 +189,7 @@ public abstract class GraphHeuristic extends AbstractHeuristic {
         for (int i = 0; i < this.negOffset; i++) {
 
             // Positive NOOP actions
-            final IntExpression proposition = super.getRevelantFacts().get(i);
+            final Fluent proposition = super.getRevelantFacts().get(i);
             if (debug) {
                 this.operators[i] = "noop(" + problem.toString(proposition) + ")";
             }

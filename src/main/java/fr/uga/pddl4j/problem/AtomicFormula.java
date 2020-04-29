@@ -23,6 +23,7 @@ import java.util.List;
  *
  * @author D. Pellier
  * @version 1.0 - 28.04.2020
+ * @since 4.0
  */
 public interface AtomicFormula extends Serializable {
 
@@ -38,21 +39,21 @@ public interface AtomicFormula extends Serializable {
      *
      * @param symbol the symbol of the atomic fomula.
      */
-    void setSylmbol(final int symbol);
+    void setSymbol(final int symbol);
 
     /**
      * Returns the arguments of the atomic formula.
      *
      * @return the arguments of the atomic formula.
      */
-    List<Integer> getArguments();
+    int[] getArguments();
 
     /**
      * Sets the arguments of the atomic formula.
      *
      * @param arguments the arguments of the atomic formula.
      */
-    void setArguments(final List<Integer> arguments);
+    void setArguments(final int[] arguments);
 
     /**
      * Returns the arity of this atomic formula, i.e., the number of arguments of the atomic formula.

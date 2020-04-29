@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.test.encoding;
 
+import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.test.Tools;
@@ -119,7 +120,7 @@ public class CodedProblemTest {
         System.out.println("Problem: Test each fact from a specified coded problem.");
         final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
         if (codedProblem != null) {
-            final List<IntExpression> factListCodedProblem = codedProblem.getRelevantFluents();
+            final List<Fluent> factListCodedProblem = codedProblem.getRelevantFluents();
             for (int i = 0; i < factList.size(); i++) {
                 Assert.assertTrue(codedProblem.toString(factListCodedProblem.get(i)).equals(factList.get(i)));
             }

@@ -30,6 +30,7 @@ import java.util.List;
  *
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
+ * @since 4.0
  */
 public class State implements Serializable {
 

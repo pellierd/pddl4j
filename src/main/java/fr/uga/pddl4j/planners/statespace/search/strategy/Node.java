@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.util.ClosedWorldState;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 
 /**
  * This class implements a node of the tree search.

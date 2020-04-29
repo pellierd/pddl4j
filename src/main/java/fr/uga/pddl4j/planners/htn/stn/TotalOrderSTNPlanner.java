@@ -21,7 +21,6 @@ import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
@@ -91,9 +90,9 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 // Get the current state of the search
                 State state = currentNode.getState();
                 // Get the resolvers, i.e., action or method that are relevant for this task.
-                List<Integer> resolvers = problem.getTasksResolvers().get(task);
+                List<Integer> resolvers = problem.getRelevantOperators().get(task);
                 // Case where the task to decompose is primitive
-                if (problem.getRelevantTasks().get(task).isPrimtive()) {
+                if (problem.getTasks().get(task).isPrimtive()) {
 
                     // On peut simplifier a priori une tâche primitive n'a qu'un résolver
                     // Il faudrait vérifier que la tâche dans une méthode ne peut être choisi comme non d'action
@@ -124,7 +123,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                     }
                 } else {
                     //System.out.println("COMPOUND TASK:");
-                    //System.out.println(problem.toString(problem.getRelevantTasks().get(task)));
+                    //System.out.println(problem.toString(problem.getTasks().get(task)));
                     for (Integer resolver : resolvers) {
                         final Method method = problem.getMethods().get(resolver);
                         if (state.satisfy(method.getPreconditions())) {
@@ -180,7 +179,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     /**
      * The main method of the <code>TotalOrderSTNPlanner</code> example. The command line syntax is as
      * follow:
-     * <p>
+     *
      * <pre>
      * usage of TotalOrderSTNPlanner:
      *
@@ -192,12 +191,12 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
      * -h              print this message
      *
      * </pre>
-     * </p>
+     *
      *
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-3.8.3.jar fr.uga.pddl4j.planners.htn.stn.TotalOrderSTNPlanner</code><br>
-     * <code><span>-d src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl</code><br>
-     * <code><span>-p src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl</code><br>
+     * <code>  -d src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl</code><br>
+     * <code>  -p src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl</code><br>
      *
      * @param args the arguments of the command line.
      */
@@ -241,7 +240,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 + pb.getActions().size() + " actions, "
                 + pb.getMethods().size() + " methods, "
                 + pb.getRelevantFluents().size() + " fluents, "
-                + pb.getRelevantTasks().size() + " tasks)\n");
+                + pb.getTasks().size() + " tasks)\n");
 
         final Plan plan = planner.search(pb);
         if (plan != null) {

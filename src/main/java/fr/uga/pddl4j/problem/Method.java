@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author D. Pellier
  * @version 1.0 - 31.03.2020
+ * @since 4.0
  */
 public final class Method extends AbstractOperator {
 
@@ -64,7 +65,7 @@ public final class Method extends AbstractOperator {
      * task network is set to an empty task network with no orderings constraints.
      *
      * @param name  the name of the method.
-     * @param arity the arity of the method. The arity must be > 0.
+     * @param arity the arity of the method. The arity cannot be less that 0.
      */
     public Method(final String name, final int arity) {
         super(name, arity);

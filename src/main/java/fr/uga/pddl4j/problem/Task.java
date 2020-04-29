@@ -15,13 +15,12 @@
 
 package fr.uga.pddl4j.problem;
 
-import java.util.List;
-
 /**
  * This class implements a task used in HTN planning.
  *
  * @author D. Pellier
  * @version 1.0 - 28.04.2020
+ * @since 4.0
  */
 public class Task extends AbstractAtomicFormula {
 
@@ -48,7 +47,7 @@ public class Task extends AbstractAtomicFormula {
      * @param arguments the list of arguments of the atomic formula.
      * @param flag the flag used to indicates that the task is primitive or not.
      */
-    public Task(final int symbol, final List<Integer> arguments, final boolean flag) {
+    public Task(final int symbol, final int[] arguments, final boolean flag) {
         super(symbol, arguments);
         this.setPrimtive(flag);
     }

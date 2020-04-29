@@ -66,10 +66,10 @@ public abstract class AbstractGroundOperator implements GroundOperator {
     protected AbstractGroundOperator(final GroundOperator other) {
         super();
         this.setName(other.getName());
-        this.parameters = new int[other.getArity()];
-        System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.getArity());
-        this.instantiations = new int[other.getArity()];
-        System.arraycopy(other.getInstantiations(), 0, this.instantiations, 0, other.getArity());
+        this.parameters = new int[other.arity()];
+        System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.arity());
+        this.instantiations = new int[other.arity()];
+        System.arraycopy(other.getInstantiations(), 0, this.instantiations, 0, other.arity());
         this.dummy = other.isDummy();
     }
 
@@ -178,7 +178,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
      * @return the arity of the operator.
      */
     @Override
-    public final int getArity() {
+    public final int arity() {
         return this.parameters.length;
     }
 

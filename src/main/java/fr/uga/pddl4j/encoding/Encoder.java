@@ -23,24 +23,14 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.TaskNetwork;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -683,19 +673,21 @@ public final class Encoder implements Serializable {
         codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
         codedProblem.setActions(Encoder.actions);
         codedProblem.setMethods(Encoder.methods);
-        codedProblem.setConstants(Encoder.tableOfConstants);
+        codedProblem.setConstantSymbols(Encoder.tableOfConstants);
         codedProblem.setDomains(Encoder.tableOfDomains);
-        codedProblem.setFunctions(Encoder.tableOfFunctions);
-        codedProblem.setTasks(Encoder.tableOfTasks);
+        codedProblem.setFunctionSymbols(Encoder.tableOfFunctions);
+        codedProblem.setTaskSymbols(Encoder.tableOfTasks);
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
-        codedProblem.setPredicates(Encoder.tableOfPredicates);
-        codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents);
-        codedProblem.setRelevantTasks(Encoder.tableOfRelevantTasks);
+        codedProblem.setPredicateSymbols(Encoder.tableOfPredicates);
+        codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
+            fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
+        codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
+            task -> new Task(task.getPredicate(), task.getArguments(), task.isPrimtive())).collect(Collectors.toList()));
         codedProblem.setTaskResolvers(Encoder.tableOfTaskResolvers);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
-        codedProblem.setTypes(Encoder.tableOfTypes);
+        codedProblem.setTypeSymbols(Encoder.tableOfTypes);
         return codedProblem;
 
     }
@@ -707,140 +699,141 @@ public final class Encoder implements Serializable {
     /**
      * Print the table of types.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printTableOfTypes(StringBuilder stringBuilder) {
-        stringBuilder.append("Types table:\n");
+    static void printTableOfTypes(StringBuilder str) {
+        str.append("Types table:\n");
         for (int i = 0; i < Encoder.tableOfTypes.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.tableOfTypes.get(i)).append(":");
+            str.append(i).append(": ").append(Encoder.tableOfTypes.get(i)).append(":");
             Set<Integer> domain = Encoder.tableOfDomains.get(i);
             for (Integer constant : domain) {
-                stringBuilder.append(" ").append(constant);
+                str.append(" ").append(constant);
             }
-            stringBuilder.append("\n");
+            str.append("\n");
         }
     }
 
     /**
      * Print the table of constants.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printTableOfConstants(StringBuilder stringBuilder) {
-        stringBuilder.append("Constants table:\n");
+    static void printTableOfConstants(StringBuilder str) {
+        str.append("Constants table:\n");
         for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.tableOfConstants.get(i)).append("\n");
+            str.append(i).append(": ").append(Encoder.tableOfConstants.get(i)).append("\n");
         }
     }
 
     /**
      * Print the table of predicates.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printTableOfPredicates(StringBuilder stringBuilder) {
-        stringBuilder.append("Predicates table:\n");
+    static void printTableOfPredicates(StringBuilder str) {
+        str.append("Predicates table:\n");
         for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
             String predicate = Encoder.tableOfPredicates.get(i);
-            stringBuilder.append(i).append(": ").append(predicate).append(" :");
+            str.append(i).append(": ").append(predicate).append(" :");
             for (int j = 0; j < Encoder.tableOfTypedPredicates.get(i).size(); j++) {
-                stringBuilder.append(" ")
+                str.append(" ")
                     .append(Encoder.tableOfTypes.get(Encoder.tableOfTypedPredicates.get(i).get(j)));
             }
-            stringBuilder.append("\n");
+            str.append("\n");
         }
     }
 
     /**
      * Print the table of functions.
-     * @param stringBuilder the string builder used to print.
+     *
+     * @param str the string builder used to print.
      */
-    static void printTableOfFunctions(StringBuilder stringBuilder) {
-        stringBuilder.append("Functions table:\n");
+    static void printTableOfFunctions(StringBuilder str) {
+        str.append("Functions table:\n");
         for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
             String predicate = Encoder.tableOfFunctions.get(i);
-            stringBuilder.append(i).append(": ").append(predicate).append(":");
+            str.append(i).append(": ").append(predicate).append(":");
             for (int j = 0; j < Encoder.tableOfTypedFunctions.get(i).size(); j++) {
-                stringBuilder.append(" ").append(Encoder.tableOfTypes.get(Encoder.tableOfTypedFunctions.get(i).get(j)));
+                str.append(" ").append(Encoder.tableOfTypes.get(Encoder.tableOfTypedFunctions.get(i).get(j)));
             }
-            stringBuilder.append("\n");
+            str.append("\n");
         }
     }
 
     /**
      * Print the table of tasks.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printTableOfTasks(StringBuilder stringBuilder) {
-        stringBuilder.append("Tasks table:\n");
+    static void printTableOfTasks(StringBuilder str) {
+        str.append("Tasks table:\n");
         for (int i = 0; i < Encoder.tableOfTasks.size(); i++) {
             String predicate = Encoder.tableOfTasks.get(i);
-            stringBuilder.append(i).append(": ").append(predicate).append(" :");
+            str.append(i).append(": ").append(predicate).append(" :");
             for (int j = 0; j < Encoder.tableOfTypedTasks.get(i).size(); j++) {
-                stringBuilder.append(" ")
+                str.append(" ")
                     .append(Encoder.tableOfTypes.get(Encoder.tableOfTypedTasks.get(i).get(j)));
             }
-            stringBuilder.append("\n");
+            str.append("\n");
         }
     }
 
     /**
      * Print the table of inertia.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printTableOfInertia(StringBuilder stringBuilder) {
-        stringBuilder.append("Inertias table:\n");
+    static void printTableOfInertia(StringBuilder str) {
+        str.append("Inertias table:\n");
         for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
             String predicate = Encoder.tableOfPredicates.get(i);
-            stringBuilder.append(i).append(": ").append(predicate).append(" : ").append(Encoder.tableOfInertia.get(i));
-            stringBuilder.append("\n");
+            str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.tableOfInertia.get(i));
+            str.append("\n");
         }
     }
 
     /**
      * Print the relevant fluents table.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printRelevantFactsTable(StringBuilder stringBuilder) {
-        stringBuilder.append("Relevant fluents:\n");
+    static void printRelevantFactsTable(StringBuilder str) {
+        str.append("Relevant fluents:\n");
         for (int i = 0; i < Encoder.tableOfRelevantFluents.size(); i++) {
-            stringBuilder.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFluents.get(i)));
-            stringBuilder.append("\n");
+            str.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFluents.get(i)));
+            str.append("\n");
         }
     }
 
     /**
      * Print the relevant fluents table.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printRelevantTasksTable(StringBuilder stringBuilder) {
-        stringBuilder.append("Relevant tasks:\n");
+    static void printRelevantTasksTable(StringBuilder str) {
+        str.append("Relevant tasks:\n");
         for (int i = 0; i < Encoder.tableOfRelevantTasks.size(); i++) {
             IntExpression task = Encoder.tableOfRelevantTasks.get(i);
-            stringBuilder.append(i).append(": ").append(Encoder.toString(task));
+            str.append(i).append(": ").append(Encoder.toString(task));
             if (task.isPrimtive()) {
-                stringBuilder.append(" - PRIMITIVE");
+                str.append(" - PRIMITIVE");
             } else {
-                stringBuilder.append(" - COMPOUND");
+                str.append(" - COMPOUND");
             }
-            stringBuilder.append("\n");
+            str.append("\n");
         }
     }
 
     /**
      * Print the goal.
      *
-     * @param stringBuilder the string builder used to print.
+     * @param str the string builder used to print.
      */
-    static void printGoal(StringBuilder stringBuilder) {
-        stringBuilder.append("Goal state is:\n");
+    static void printGoal(StringBuilder str) {
+        str.append("Goal state is:\n");
         for (State exp : Encoder.codedGoal) {
-            stringBuilder.append(Encoder.toString(exp));
-            stringBuilder.append("\n");
+            str.append(Encoder.toString(exp));
+            str.append("\n");
         }
     }
 
@@ -851,7 +844,7 @@ public final class Encoder implements Serializable {
      * @param op the operator.
      * @return a string representation of the specified operator.
      */
-    static String toShortString(final IntAction op) {
+    static String toShortString(final AbstractGroundOperator op) {
         return StringDecoder.toShortString(op, Encoder.tableOfConstants);
     }
 

@@ -399,7 +399,7 @@ final class PreInstantiation implements Serializable {
         for (final IntExpression inertia : unaryInertia) {
             final List<IntAction> newActions = new ArrayList<>();
             for (final IntAction o : actions) {
-                if (o.getArity() > 0) {
+                if (o.arity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
                     // Hack add for constant in predicate
@@ -480,7 +480,7 @@ final class PreInstantiation implements Serializable {
         for (final IntExpression inertia : unaryInertia) {
             final List<IntMethod> newMethods = new ArrayList<>();
             for (final IntMethod m : methods) {
-                if (m.getArity() > 0) {
+                if (m.arity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
                     // Hack add for constant in predicate

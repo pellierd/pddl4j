@@ -22,6 +22,7 @@ import java.util.List;
  *
  * @author D. Pellier
  * @version 1.0 - 28.04.2020
+ * @since 4.0
  */
 public class Fluent extends AbstractAtomicFormula {
 
@@ -40,7 +41,7 @@ public class Fluent extends AbstractAtomicFormula {
      * @param symbol the symbol of the fluent.
      * @param arguments the list of arguments of the fluent.
      */
-    public Fluent(final int symbol, final List<Integer> arguments) {
+    public Fluent(final int symbol, final int[] arguments) {
         super(symbol, arguments);
     }
 

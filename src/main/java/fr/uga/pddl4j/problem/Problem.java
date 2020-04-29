@@ -19,22 +19,24 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.encoding.AbstractGroundOperator;
 import fr.uga.pddl4j.encoding.Inertia;
-import fr.uga.pddl4j.encoding.IntExpression;
-import fr.uga.pddl4j.encoding.StringDecoder;
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.util.ClosedWorldState;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a problem where actions are instantiated and encoded in
- * <code>BitSet</code> representation.
+ * This class implements a problem where operators (actions and methods) are instantiated and encoded into compact
+ * representation.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
@@ -42,9 +44,9 @@ import java.util.stream.Collectors;
 public class Problem implements Serializable {
 
     /**
-     * The table of types.
+     * The table of the type symbols.
      */
-    private List<String> types;
+    private List<String> typeSymbols;
 
     /**
      * The table of inferred domains based on unary inertia encoding.
@@ -57,29 +59,29 @@ public class Problem implements Serializable {
     private List<Set<Integer>> domains;
 
     /**
-     * The table of constants.
+     * The table of the constant symbols.
      */
-    private List<String> constants;
+    private List<String> constantSymbols;
 
     /**
-     * The table of predicates.
+     * The table of the predicate symbols.
      */
-    private List<String> predicates;
+    private List<String> predicateSymbols;
 
     /**
-     * The table that contains the types of the arguments of the predicates.
+     * The table that contains the typeSymbols of the arguments of the predicateSymbols.
      */
     private List<List<Integer>> predicatesSignatures;
 
     /**
-     * The table of the functions.
+     * The table of the function symbols.
      */
-    private List<String> functions;
+    private List<String> functionSymbols;
 
     /**
-     * The table of tasks.
+     * The table of task symbols.
      */
-    private List<String> tasks;
+    private List<String> taskSymbols;
 
     /**
      * The table that contains the types of the arguments of the tasks.
@@ -92,24 +94,19 @@ public class Problem implements Serializable {
     private List<List<Integer>> functionsSignatures;
 
     /**
-     * The table that defines for each predicates its type of inertia.
+     * The table that defines for each predicate its type of inertia.
      */
     private List<Inertia> inertia;
 
     /**
-     * The table of the relevant facts.
+     * The table of the relevant fluents.
      */
-    private List<IntExpression> relevantFluents;
+    private List<Fluent> relevantFluents;
 
     /**
-     * The table of the relevant tasks.
+     * The table gives for each task the list of relevant operators, i.e., action or methods that may achieve it.
      */
-    private List<IntExpression> relevantTasks;
-
-    /**
-     * The table gives for each task the list of relevant operators, i.e., action or methods
-     */
-    private List<List<Integer>> taskOResolvers;
+    private List<List<Integer>> relevantOperators;
 
     /**
      * The list of instantiated actions encoded into bit sets.
@@ -120,6 +117,11 @@ public class Problem implements Serializable {
      * The list of instantiated methods encoded into bit sets.
      */
     private List<Method> methods;
+
+    /**
+     * The table of tasks of the problem.
+     */
+    private List<Task> tasks;
 
     /**
      * The goal.
@@ -150,31 +152,31 @@ public class Problem implements Serializable {
      */
     public Problem(Problem other) {
         super();
-        this.types = new ArrayList<>();
-        this.types.addAll(other.types.stream().collect(Collectors.toList()));
+        this.typeSymbols = new ArrayList<>();
+        this.typeSymbols.addAll(other.typeSymbols.stream().collect(Collectors.toList()));
         this.domains = new ArrayList<>();
         for (Set<Integer> si : other.domains) {
             final Set<Integer> copy = si.stream().collect(Collectors.toCollection(LinkedHashSet::new));
             this.domains.add(copy);
         }
-        this.constants = new ArrayList<>();
-        this.constants.addAll(other.constants.stream().collect(Collectors.toList()));
-        this.predicates = new ArrayList<>();
-        this.predicates.addAll(other.predicates.stream().collect(Collectors.toList()));
+        this.constantSymbols = new ArrayList<>();
+        this.constantSymbols.addAll(other.constantSymbols.stream().collect(Collectors.toList()));
+        this.predicateSymbols = new ArrayList<>();
+        this.predicateSymbols.addAll(other.predicateSymbols.stream().collect(Collectors.toList()));
         this.predicatesSignatures = new ArrayList<>();
         for (List<Integer> si : other.predicatesSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
             this.predicatesSignatures.add(copy);
         }
-        this.tasks = new ArrayList<>();
-        this.tasks.addAll(other.tasks.stream().collect(Collectors.toList()));
+        this.taskSymbols = new ArrayList<>();
+        this.taskSymbols.addAll(other.taskSymbols.stream().collect(Collectors.toList()));
         this.tasksSignatures = new ArrayList<>();
         for (List<Integer> si : other.tasksSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
             this.tasksSignatures.add(copy);
         }
-        this.functions = new ArrayList<>();
-        this.functions.addAll(other.functions.stream().collect(Collectors.toList()));
+        this.functionSymbols = new ArrayList<>();
+        this.functionSymbols.addAll(other.functionSymbols.stream().collect(Collectors.toList()));
         this.functionsSignatures = new ArrayList<>();
         for (List<Integer> si : other.functionsSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
@@ -183,9 +185,9 @@ public class Problem implements Serializable {
         this.inertia = new ArrayList<>();
         this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
         this.relevantFluents = new ArrayList<>();
-        this.relevantFluents.addAll(other.relevantFluents.stream().map(IntExpression::new).collect(Collectors.toList()));
-        this.relevantTasks = new ArrayList<>();
-        this.relevantTasks.addAll(other.relevantTasks.stream().map(IntExpression::new).collect(Collectors.toList()));
+        this.relevantFluents.addAll(other.relevantFluents.stream().map(Fluent::new).collect(Collectors.toList()));
+        this.tasks = new ArrayList<>();
+        this.tasks.addAll(other.tasks.stream().map(Task::new).collect(Collectors.toList()));
         this.actions = new ArrayList<>();
         this.actions.addAll(other.actions.stream().map(Action::new).collect(Collectors.toList()));
         this.methods = new ArrayList<>();
@@ -193,29 +195,29 @@ public class Problem implements Serializable {
         this.goal = new State(other.goal);
         this.initialState = new State(other.initialState);
         this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
-        this.taskOResolvers = new ArrayList<>(other.taskOResolvers.size());
-        for (List<Integer> ti : other.taskOResolvers) {
+        this.relevantOperators = new ArrayList<>(other.relevantOperators.size());
+        for (List<Integer> ti : other.relevantOperators) {
             final List<Integer> copy = ti.stream().collect(Collectors.toList());
-            this.taskOResolvers.add(copy);
+            this.relevantOperators.add(copy);
         }
     }
 
     /**
-     * Returns the types table of the problem.
+     * Returns the list of the type symbols of the problem.
      *
-     * @return the types table of the problem.
+     * @return the list of the type symbols of the problem.
      */
-    public final List<String> getTypes() {
-        return this.types;
+    public final List<String> getTypeSymbols() {
+        return this.typeSymbols;
     }
 
     /**
-     * Sets the table of type of the problem.
+     * Sets the list of type symbols of the problem.
      *
-     * @param types the table of type to set
+     * @param types the list of type symbols to set
      */
-    public final void setTypes(final List<String> types) {
-        this.types = types;
+    public final void setTypeSymbols(final List<String> types) {
+        this.typeSymbols = types;
     }
 
     /**
@@ -246,7 +248,7 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Set the domains corresponding at each types of the problem.
+     * Set the domains corresponding at each typeSymbols of the problem.
      *
      * @param domains the domains to set.
      */
@@ -255,39 +257,39 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns the constants of the problem.
+     * Returns the list of constant symbols of the problem.
      *
-     * @return the constants of the problem.
+     * @return the list of constant symbols of the problem.
      */
-    public final List<String> getConstants() {
-        return this.constants;
+    public final List<String> getConstantSymbols() {
+        return this.constantSymbols;
     }
 
     /**
-     * Sets the constants of the problem.
+     * Sets the list constant symbols of the problem.
      *
-     * @param constants the constants to set
+     * @param constants the list of constant symbols to set
      */
-    public final void setConstants(final List<String> constants) {
-        this.constants = constants;
+    public final void setConstantSymbols(final List<String> constants) {
+        this.constantSymbols = constants;
     }
 
     /**
-     * Returns the predicates of the problem.
+     * Returns the list of predicate symbols of the problem.
      *
-     * @return the predicates of the problem.
+     * @return the list predicate symbols of the problem.
      */
-    public final List<String> getPredicates() {
-        return this.predicates;
+    public final List<String> getPredicateSymbols() {
+        return this.predicateSymbols;
     }
 
     /**
-     * Sets the predicates of the problem.
+     * Sets the list of predicate symbols of the problem.
      *
-     * @param predicates the predicates to set.
+     * @param predicates the list of predicate symbols to set.
      */
-    public final void setPredicates(final List<String> predicates) {
-        this.predicates = predicates;
+    public final void setPredicateSymbols(final List<String> predicates) {
+        this.predicateSymbols = predicates;
     }
 
     /**
@@ -309,57 +311,57 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Sets the tasks of the problem.
+     * Returns the list of task symbols of the problem.
      *
-     * @param tasks the tasks to set.
+     * @return the list of task symbols of the problem.
      */
-    public final void setTasks(final List<String> tasks) {
-        this.tasks = tasks;
+    public final List<String> getTaskSymbols() {
+        return this.taskSymbols;
     }
 
     /**
-     * Returns the tasks of the problem.
+     * Sets the list of task symbols of the problem.
      *
-     * @return the tasks of the problem.
+     * @param tasks the list of task symbols to set.
      */
-    public final List<String> getTasks() {
-        return this.tasks;
+    public final void setTaskSymbols(final List<String> tasks) {
+        this.taskSymbols = tasks;
     }
 
     /**
-     * Returns the signatures of the tasks defined in the problem.
+     * Returns the signatures of the task defined in the problem.
      *
-     * @return the signatures of the tasks defined in the problem.
+     * @return the signatures of the task defined in the problem.
      */
     public final List<List<Integer>> getTasksSignatures() {
         return this.tasksSignatures;
     }
 
     /**
-     * Sets the signatures of the tasks defined in the problem.
+     * Sets the signatures of the task defined in the problem.
      *
-     * @param signatures the signatures of the tasks defined in the problem.
+     * @param signatures the signatures of the task defined in the problem.
      */
     public final void setTasksSignatures(final List<List<Integer>> signatures) {
         this.tasksSignatures = signatures;
     }
 
     /**
-     * Returns the functions of the problem.
+     * Returns the list of function symbols of the problem.
      *
-     * @return the functions of the problem.
+     * @return the list of function symbols of the problem.
      */
-    public final List<String> getFunctions() {
-        return this.functions;
+    public final List<String> getFunctionSymbols() {
+        return this.functionSymbols;
     }
 
     /**
-     * Sets the functions of the problem.
+     * Sets the list of function symbols of the problem.
      *
-     * @param functions the functions to set.
+     * @param functions the list of function symbols to set.
      */
-    public final void setFunctions(final List<String> functions) {
-        this.functions = functions;
+    public final void setFunctionSymbols(final List<String> functions) {
+        this.functionSymbols = functions;
     }
 
     /**
@@ -399,63 +401,63 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns the list of relevant facts used the problem.
+     * Returns the list of relevant fluents used the problem.
      *
-     * @return the list of relevant facts used the problem.
+     * @return the list of relevant fluents used the problem.
      */
-    public final List<IntExpression> getRelevantFluents() {
+    public final List<Fluent> getRelevantFluents() {
         return this.relevantFluents;
     }
 
     /**
-     * Sets the list of relevant facts used the problem.
+     * Sets the list of relevant fluents used the problem.
      *
-     * @param fluents the list of relevant facts to set.
+     * @param fluents the list of relevant fluents to set.
      */
-    public final void setRelevantFluents(final List<IntExpression> fluents) {
+    public final void setRelevantFluents(final List<Fluent> fluents) {
         this.relevantFluents = fluents;
     }
 
     /**
-     * Returns the list of resolvers for each relevant tasks of the problem. A resolver can be a action or method
-     * depending if the task is primitive or not.
+     * Returns the list of relevant operators, i.e., that may achieve it, for each task of the problem. A relevant
+     * operator can be a action or method depending if the task is primitive or not.
      *
-     * @return the list of resolvers for the relevant tasks of the problem.
+     * @return the list of relevant operators for the tasks of the problem.
      */
-    public final List<List<Integer>> getTasksResolvers() {
-        return this.taskOResolvers;
+    public final List<List<Integer>> getRelevantOperators() {
+        return this.relevantOperators;
     }
 
     /**
-     * Sets the list of resolvers for each relevant tasks of the problem. A resolver can be a action or method
-     * depending if the task is primitive or not.
+     * Sets the list of relevant operators, i.e., that may achieve it, for each task of the problem. A relevant
+     * operator can be a action or method depending if the task is primitive or not.
      *
-     * @param resolvers the list of resolvers for the relevant tasks of the problem.
+     * @param operators the list of operators for the relevant tasks of the problem.
      */
-    public final void setTaskResolvers(final List<List<Integer>> resolvers) {
-        this.taskOResolvers = resolvers;
+    public final void setTaskResolvers(final List<List<Integer>> operators) {
+        this.relevantOperators = operators;
     }
 
     /**
-     * Returns the list of relevant tasks used the problem. The method returns null if the problem is not HTN.
+     * Returns the list of tasks of the problem. The method returns null if the problem is not HTN.
      *
-     * @return the list of relevant tasks used the problem.
+     * @return the list of tasks of the problem.
      */
-    public final List<IntExpression> getRelevantTasks() {
-        return this.relevantTasks;
+    public final List<Task> getTasks() {
+        return this.tasks;
     }
 
     /**
-     * Sets the list of relevant tasks used the problem.
+     * Sets the list of tasks used the problem.
      *
-     * @param tasks the list of relevant tasks to set.
+     * @param tasks the list of tasks to set.
      */
-    public final void setRelevantTasks(final List<IntExpression> tasks) {
-        this.relevantTasks = tasks;
+    public final void setTasks(final List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     /**
-     * Returns the list of instantiated actions of the problem. The method returns null if the problem is not HTN.
+     * Returns the list of instantiated actions of the problem.
      *
      * @return the list of instantiated actions of the problem.
      */
@@ -501,13 +503,13 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns <code>true</code> if this problem is solvable, i.e.,
-     * if its goal was not simplified to FALSE during the encoding.
+     * Returns <code>true</code> if this problem is solvable, i.e., if its goal was not simplified to FALSE during the
+     * encoding or if the problem is an HTN problem.
      *
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
      */
     public final boolean isSolvable() {
-        return this.goal != null;
+        return this.goal != null || this.initialTaskNetwork != null;
     }
 
     /**
@@ -554,25 +556,42 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a short string representation of the specified action, i.e., only its name and the
-     * value of its parameters.
+     * Returns a string representation of a specified operator.
      *
-     * @param action the action.
-     * @return a string representation of the specified action.
+     * @param action     the action.
+     * @return a string representation of the specified operator.
      */
-    public final String toShortString(final Action action) {
-        return StringDecoder.toShortString(action, this.constants);
-    }
-
-    /**
-     * Returns a string representation of the specified action.
-     *
-     * @param action the action.
-     * @return a string representation of the specified action.
-     */
-    public final String toString(final Action action) {
-        return StringDecoder.toString(action, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFluents);
+    public String toString(final Action action) {
+        StringBuilder str = new StringBuilder();
+        str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
+        for (int i = 0; i < action.arity(); i++) {
+            final int index = action.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(action.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Preconditions:\n");
+        str.append(this.toString(action.getPreconditions()));
+        str.append("\n");
+        str.append("Effects:\n");
+        for (ConditionalEffect condExp : action.getCondEffects()) {
+            str.append(this.toString(condExp));
+            str.append("\n");
+        }
+        return str.toString();
     }
 
     /**
@@ -581,86 +600,177 @@ public class Problem implements Serializable {
      * @param method the method.
      * @return a string representation of the specified method.
      */
-    public final String toString(final Method method) {
-        return StringDecoder.toString(method, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantFluents, this.relevantTasks);
+    public String toString(final Method method) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Method ");
+        str.append(method.getName());
+        str.append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < method.arity(); i++) {
+            final int index = method.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(method.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i).append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Preconditions:\n");
+        str.append(this.toString(method.getPreconditions()));
+        str.append("\n");
+        str.append(this.toString(method.getTaskNetwork()));
+        return str.toString();
+    }
+
+    /**
+     * Returns a short string representation of the specified operator, i.e., its name and its
+     * instantiated parameters. This method can be used for actions and methods.
+     *
+     * @param operator  the operator.
+     * @return a string representation of the specified operator.
+     */
+    public String toShortString(final AbstractGroundOperator operator) {
+        final StringBuilder str = new StringBuilder();
+        str.append(operator.getName());
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            if (index == -1) {
+                str.append(" ?");
+            } else {
+                str.append(" ");
+                str.append(this.getConstantSymbols().get(index));
+            }
+        }
+        return str.toString();
+    }
+
+
+    /**
+     * Returns a string representation of a conditional effect.
+     *
+     * @param ceffect  the conditional effect.
+     * @return a string representation of the specified condition effect.
+     */
+    public String toString(final ConditionalEffect ceffect) {
+        StringBuilder str = new StringBuilder();
+        if (ceffect.getCondition().isEmpty()) {
+            str.append(this.toString(ceffect.getEffects()));
+        } else {
+            str.append("(when ");
+            str.append(this.toString(ceffect.getCondition()));
+            str.append("\n");
+            str.append(this.toString(ceffect.getEffects()));
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a state
+     *
+     * @param state the state.
+     * @return a string representation of the state.
+     */
+    public String toString(final State state) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = state.getPositive();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append("\n");
+        }
+        final BitSet negative = state.getNegative();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append("(not  ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a closed world state.
+     *
+     * @param state the state.
+     * @return a string representation of the specified expression.
+     */
+    public String toString(final ClosedWorldState state) {
+        final StringBuilder str = new StringBuilder("(and");
+        for (int i = state.nextSetBit(0); i >= 0; i = state.nextSetBit(i + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append("\n");
+        }
+        str.append(")");
+        return str.toString();
     }
 
     /**
      * Returns a string representation of the specified task network.
      *
-     * @param taskNetwork the task network to print.
+     * @param tasknetwork the task network.
      * @return a string representation of the specified task network.
      */
-    public String toString(final TaskNetwork taskNetwork) {
-        return StringDecoder.toString(taskNetwork,  this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantTasks);
+    public String toString(final TaskNetwork tasknetwork) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Tasks:\n");
+        if (tasknetwork.getTasks().isEmpty()) {
+            str.append(" ()\n");
+        } else {
+            for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
+                str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
+                str.append(this.toString(tasks.get(tasknetwork.getTasks().get(i))));
+            }
+        }
+        str.append("Ordering constraints:\n");
+        if (tasknetwork.getOrderingConstraints().cardinality() == 0) {
+            str.append(" ()");
+        } else {
+            BitMatrix constraints = tasknetwork.getOrderingConstraints();
+            int index = 0;
+            for (int r = 0; r < constraints.rows(); r++) {
+                BitSet row = constraints.getRow(r);
+                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
+                    str.append(" C");
+                    str.append(index);
+                    str.append(": ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r);
+                    str.append(" ");
+                    str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage());
+                    str.append(" ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c);
+                    str.append("\n");
+                    index++;
+                }
+            }
+        }
+        return str.toString();
     }
     /**
-     * Returns a short string representation of the specified method, i.e., only its name and the
-     * value of its parameters.
+     * Returns a string representation of a formula.
      *
-     * @param method the method.
-     * @return a string representation of the specified method.
-     */
-    public final String toShortString(final Method method) {
-        return StringDecoder.toShortString(method, this.constants);
-    }
-
-    /**
-     * Returns a string representation of an expression.
-     *
-     * @param exp the expression.
+     * @param formula the formula.
      * @return a string representation of the specified expression.
      */
-    public final String toString(final IntExpression exp) {
-        return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.tasks);
-    }
-
-    /**
-     * Returns a string representation of an expression.
-     *
-     * @param exp the expression.
-     * @param sep the string separator used between the predicate symbol and the arguments.
-     * @return a string representation of the specified expression.
-     */
-    public final String toString(final IntExpression exp, final String sep) {
-        return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, sep);
-    }
-
-    /**
-     * Returns a string representation of a state.
-     *
-     * @param state the state.
-     * @return a string representation of the specified expression.
-     */
-    public final String toString(State state) {
-        return StringDecoder.toString(state, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFluents);
-    }
-
-    /**
-     * Returns a string representation of a bit state.
-     *
-     * @param bitState the state.
-     * @return a string representation of the specified state.
-     */
-    public final String toString(ClosedWorldState bitState) {
-        return StringDecoder.toString(bitState, this.constants, this.types,
-            this.predicates, this.functions, this.tasks, this.relevantFluents);
-    }
-
-    /**
-     * Returns a string representation of a conditional bit expression.
-     *
-     * @param exp the conditional expression.
-     * @return a string representation of the specified expression.
-     */
-    public final String toString(ConditionalEffect exp) {
-        return StringDecoder.toString(exp, this.constants, this.types,
-            this.predicates, this.functions, this.relevantFluents);
+    public String toString(final AtomicFormula formula) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(this.predicateSymbols.get(formula.getSymbol()));
+        for (Integer arg : formula.getArguments()) {
+            str.append(" ");
+            str.append(this.constantSymbols.get(arg));
+        }
+        str.append(")");
+        return str.toString();
     }
 
     /**

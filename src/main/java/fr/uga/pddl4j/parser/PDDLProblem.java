@@ -90,9 +90,6 @@ public class PDDLProblem implements Serializable {
      */
     public PDDLProblem(final PDDLSymbol name) {
         this();
-        if (name == null) {
-            throw new NullPointerException();
-        }
         this.name = name;
         this.requirements = new LinkedHashSet<>();
         this.objects = new ArrayList<>();
@@ -118,9 +115,6 @@ public class PDDLProblem implements Serializable {
      * @param name the name to set.
      */
     public final void setName(final PDDLSymbol name) {
-        if (name == null) {
-            throw new NullPointerException();
-        }
         this.name = name;
     }
 
@@ -139,9 +133,6 @@ public class PDDLProblem implements Serializable {
      * @param domain the domain to set.
      */
     public final void setDomain(final PDDLSymbol domain) {
-        if (domain == null) {
-            throw new NullPointerException();
-        }
         this.domain = domain;
     }
 
@@ -161,9 +152,6 @@ public class PDDLProblem implements Serializable {
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
     public final boolean addRequirement(final PDDLRequireKey requirement) {
-        if (requirement == null) {
-            throw new NullPointerException();
-        }
         return this.requirements.add(requirement);
     }
 
@@ -183,9 +171,6 @@ public class PDDLProblem implements Serializable {
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
      */
     public final boolean addObject(final PDDLTypedSymbol object) {
-        if (object == null) {
-            throw new NullPointerException();
-        }
         return this.objects.add(object);
     }
 
@@ -193,12 +178,8 @@ public class PDDLProblem implements Serializable {
      * Set the initial task network of the problem.
      *
      * @param network The task network to set.
-     * @thows NullPointerException if the task network to set is null.
      */
     public final void setInitialTaskNetwork(final PDDLTaskNetwork network) {
-        if (network == null) {
-           throw new NullPointerException();
-        }
         this.initialTaskNetwork = network;
     }
 
@@ -225,9 +206,6 @@ public class PDDLProblem implements Serializable {
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
      */
     public final boolean addInitialFact(final PDDLExpression fact) {
-        if (fact == null) {
-            throw new NullPointerException();
-        }
         return this.initialFacts.add(fact);
     }
 
@@ -246,9 +224,6 @@ public class PDDLProblem implements Serializable {
      * @param goal the goal to set.
      */
     public final void setGoal(final PDDLExpression goal) {
-        if (goal == null) {
-            throw new NullPointerException();
-        }
         this.goal = goal;
     }
 

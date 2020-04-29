@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.util.ClosedWorldState;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

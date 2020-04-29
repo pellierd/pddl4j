@@ -87,7 +87,7 @@ public interface GroundOperator extends Serializable {
      *
      * @return the arity of the operator.
      */
-    int getArity();
+    int arity();
 
     /**
      * Returns the list of parameters of the operator.

@@ -22,7 +22,7 @@ package fr.uga.pddl4j.heuristics.relaxation;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.util.ClosedWorldState;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 
 /**
  * This heuristic returns the level of the planning graph where all the propositions of the goal are

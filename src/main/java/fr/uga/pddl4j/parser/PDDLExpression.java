@@ -711,7 +711,6 @@ public class PDDLExpression implements Serializable {
      * @param baseOffset the offset white space from the left used for indentation.
      * @return a string representation of this parser node.
      * @throws MalformedExpressionException if the expression is malformed.
-     * @see this#isMalformedExpression
      */
     public String toString(String baseOffset) throws MalformedExpressionException {
         if (this.isMalformedExpression()) {

@@ -17,9 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.util;
+package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.util.BitVector;
 
 /**
  * This class implements a logical state.
@@ -37,17 +37,14 @@ public class ClosedWorldState extends BitVector {
     }
 
     /**
-     * Creates a new state from a specified <code>BitExp</code>.
+     * Creates a new state from a specified state.
      *
-     * @param exp the <code>BitExp</code> that represents the logical state.
+     * @param state the state.
      */
-    public ClosedWorldState(final State exp) {
+    public ClosedWorldState(final State state) {
         this();
-        if (exp == null) {
-            throw new NullPointerException("exp == null");
-        }
-        this.or(exp.getPositive());
-        this.andNot(exp.getNegative());
+        this.or(state.getPositive());
+        this.andNot(state.getNegative());
     }
 
     /**
@@ -57,37 +54,28 @@ public class ClosedWorldState extends BitVector {
      */
     public ClosedWorldState(final ClosedWorldState state) {
         this();
-        if (state == null) {
-            throw new NullPointerException("state == null");
-        }
         this.or(state);
     }
 
     /**
-     * Applies a specified <code>BitExp</code> to this state. In other word, the positive facts of
-     * the specified expression are added to this state and the negative ones are delete.
+     * Applies a specified state to this state. In other word, the positive facts of
+     * the specified state are added to this state and the negative ones are delete.
      *
-     * @param exp the expression to apply.
+     * @param state the state to apply.
      */
-    public final void apply(final State exp) {
-        if (exp == null) {
-            throw new NullPointerException("exp == null");
-        }
-        this.or(exp.getPositive());
-        this.andNot(exp.getNegative());
+    public final void apply(final State state) {
+        this.or(state.getPositive());
+        this.andNot(state.getNegative());
     }
 
     /**
      * Returns <code>true</code> if this state satisfy a specified expression.
      *
-     * @param exp the expression to be tested.
-     * @return <code>true</code> if this state satisfy a specified expression; <code>false</code> otherwise.
+     * @param state the state to be tested.
+     * @return <code>true</code> if this state satisfy a specified state; <code>false</code> otherwise.
      */
-    public final boolean satisfy(final State exp) {
-        if (exp == null) {
-            throw new NullPointerException("exp == null");
-        }
-        return this.include(exp.getPositive()) && this.exclude(exp.getNegative());
+    public final boolean satisfy(final State state) {
+        return this.include(state.getPositive()) && this.exclude(state.getNegative());
 
     }
 

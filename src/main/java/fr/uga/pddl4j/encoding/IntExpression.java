@@ -112,7 +112,7 @@ public class IntExpression implements Serializable {
     private boolean isPrimtive;
 
     /**
-     * Create a new expression from an other one. This constructor make a deep copy of the specified
+     * Creates a new expression from an other one. This constructor make a deep copy of the specified
      * expression.
      *
      * @param other the expression.
@@ -135,7 +135,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Create a new expression with a specified connective.
+     * Creates a new expression with a specified connective.
      *
      * @param connective the connective of the expression.
      */
@@ -152,7 +152,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return the connective of the expression.
+     * Returns the connective of the expression.
      *
      * @return the connective of the expression.
      */
@@ -161,7 +161,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set a new connective to this expression.
+     * Sets a new connective to this expression.
      *
      * @param connective the new connective to set.
      */
@@ -170,8 +170,9 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Add a child to this expression.
+     * Adds a child to this expression.
      *
+     * @param child the child expression to add.
      * @return <code>true</code> if the child was added <code>false</code> otherwise.
      */
     public final boolean addChild(final IntExpression child) {
@@ -179,7 +180,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return the list of children of this expression.
+     * Returns the list of children of this expression.
      *
      * @return the list of children of this expression.
      */
@@ -188,7 +189,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return the predicate of this expression.
+     * Returns the predicate of this expression.
      *
      * @return the predicate
      */
@@ -197,7 +198,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set a new predicate to this expression.
+     * Sets a new predicate to this expression.
      *
      * @param predicate the new predicate to set
      */
@@ -206,7 +207,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return the tasks of this expression.
+     * Returns the tasks of this expression.
      *
      * @return the taskID.
      */
@@ -215,7 +216,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set a new taskID to this expression.
+     * Sets a new taskID to this expression.
      *
      * @param taskID the new predicate to set.
      */
@@ -233,7 +234,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set the arguments of the expression.
+     * Sets the arguments of the expression.
      *
      * @param args the arguments to set.
      */
@@ -242,7 +243,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return the variable of the expression.
+     * Returns the variable of the expression.
      *
      * @return the variable of the expression.
      */
@@ -251,7 +252,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set a new quantified variable to the expression.
+     * Sets a new quantified variable to the expression.
      *
      * @param variable the new quantified variable to set
      */
@@ -287,7 +288,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set a new value to the expression.
+     * Sets a new value to the expression.
      *
      * @param value the new value to set
      */
@@ -305,7 +306,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Set the boolean flag used to specified if the expression is a primitive task to a specified value.
+     * Sets the boolean flag used to specified if the expression is a primitive task to a specified value.
      *
      * @param flag the flag.
      */
@@ -314,7 +315,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Affect this expression to an other. After affectation this expression and the other are
+     * Affects this expression to an other. After affectation this expression and the other are
      * equal. No copy of the content of the other expression is done.
      *
      * @param other expression.
@@ -332,7 +333,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return if the expression is equal to an other object. The primitive flag and the task id are not used for
+     * Returns if the expression is equal to an other object. The primitive flag and the task id are not used for
      * comparison.
      *
      * @param object the other object.
@@ -354,7 +355,7 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Return the hash code value of the expression.
+     * Returns the hash code value of the expression.
      *
      * @return the hash code value of the expression.
      * @see java.lang.Object#hashCode()

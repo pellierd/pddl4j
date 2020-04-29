@@ -15,8 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -24,6 +23,7 @@ import java.util.Objects;
  *
  * @author D. Pellier
  * @version 1.0 - 28.04.2020
+ * @since 4.0
  */
 public abstract class AbstractAtomicFormula implements AtomicFormula {
 
@@ -35,7 +35,7 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
     /**
      * The list of arguments of the atomic formula.
      */
-    private List<Integer> arguments;
+    private int[] arguments;
 
     /**
      * The default constructor set private to stop the heritage of the default constructor.
@@ -52,8 +52,10 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
      */
     public AbstractAtomicFormula(final AbstractAtomicFormula other) {
         super();
-        this.setSylmbol(other.getSymbol());
-        this.setArguments(new ArrayList<>(other.getArguments()));
+        this.setSymbol(other.getSymbol());
+        if (this.getArguments() != null) {
+            this.setArguments(Arrays.copyOf(other.getArguments(), other.getArguments().length));
+        }
     }
 
     /**
@@ -62,9 +64,9 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
      * @param symbol the symbol of the atomic formula.
      * @param arguments the list of arguments of the atomic formula.
      */
-    public AbstractAtomicFormula(final int symbol, final List<Integer> arguments) {
+    public AbstractAtomicFormula(final int symbol, final int[] arguments) {
         super();
-        this.setSylmbol(symbol);
+        this.setSymbol(symbol);
         this.setArguments(arguments);
     }
 
@@ -82,7 +84,7 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
      *
      * @param symbol the symbol of the atomic fomula.
      */
-    public final void setSylmbol(final int symbol) {
+    public final void setSymbol(final int symbol) {
         this.symbol = symbol;
     }
 
@@ -91,7 +93,7 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
      *
      * @return the arguments of the atomic formula.
      */
-    public final List<Integer> getArguments() {
+    public final int[] getArguments() {
         return this.arguments;
     }
 
@@ -100,7 +102,7 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
      *
      * @param arguments the arguments of the atomic formula.
      */
-    public final void setArguments(final List<Integer> arguments) {
+    public final void setArguments(final int[] arguments) {
         this.arguments = arguments;
     }
 
@@ -110,7 +112,7 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
      * @return the arity of this atomic formula.
      */
     public final int arity() {
-        return this.arguments.size();
+        return this.arguments.length;
     }
 
     /**

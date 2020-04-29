@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
  *
  * @author D. Pellier
  * @version 1.0 - 01.03.2020
+ * @since 4.0
  */
 public final class TaskNetwork implements Serializable {
 
@@ -101,7 +102,7 @@ public final class TaskNetwork implements Serializable {
     /**
      * Pops the first task of the task network. In other words, removes and returns the first task of this task network.
      *
-     * @returns the first task of task network.
+     * @return the first task of task network.
      */
     public final Integer pop() {
         return this.tasks.pop();

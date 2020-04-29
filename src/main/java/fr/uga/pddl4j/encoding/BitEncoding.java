@@ -82,7 +82,7 @@ final class BitEncoding implements Serializable {
 
         final List<Action> encodedActions = new ArrayList<>(actions.size());
         for (IntAction intAction : actions) {
-            final int arity = intAction.getArity();
+            final int arity = intAction.arity();
             final Action a = new Action(intAction.getName(), arity);
             a.setCost(intAction.getCost());
 
@@ -151,7 +151,7 @@ final class BitEncoding implements Serializable {
         // Start encoding
         final List<Method> encodedMethods = new ArrayList<>(methods.size());
         for (IntMethod intMethod : methods) {
-            final int arity = intMethod.getArity();
+            final int arity = intMethod.arity();
             final Method m = new Method(intMethod.getName(), arity);
             // Initialize the parameters of the method
             for (int i = 0; i < arity; i++) {
@@ -360,7 +360,7 @@ final class BitEncoding implements Serializable {
             if (precond.getChildren().size() > 0) {
                 for (final IntExpression ei : precond.getChildren()) {
                     final String name = a.getName();
-                    final int arity = a.getArity();
+                    final int arity = a.arity();
                     final IntAction newAction = new IntAction(name, arity);
                     newAction.setCost(a.getCost());
                     for (int i = 0; i < arity; i++) {
@@ -398,7 +398,7 @@ final class BitEncoding implements Serializable {
             if (precond.getChildren().size() > 0) {
                 for (final IntExpression ei : precond.getChildren()) {
                     final String name = m.getName();
-                    final int arity = m.getArity();
+                    final int arity = m.arity();
                     final IntMethod newMethod = new IntMethod(name, arity);
                     for (int i = 0; i < arity; i++) {
                         newMethod.setTypeOfParameter(i, m.getTypeOfParameters(i));

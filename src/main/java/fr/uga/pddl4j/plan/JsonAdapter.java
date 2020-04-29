@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.encoding.IntExpression;
-import fr.uga.pddl4j.encoding.StringDecoder;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Problem;
@@ -107,19 +105,19 @@ public class JsonAdapter implements Serializable {
 
                 List<String> parameters = new ArrayList<>();
                 // Parameters
-                for (int j = 0; j < action.getArity(); j++) {
+                for (int j = 0; j < action.arity(); j++) {
                     final int index = action.getValueOfParameter(j);
                     if (index != -1) {
-                        parameters.add(this.codedProblem.getConstants().get(index));
+                        parameters.add(this.codedProblem.getConstantSymbols().get(index));
                     }
                 }
 
                 // Preconditions
-                ArrayList<ArrayList<String>> preconds = this.toJsonString(action.getPreconditions());
+                List<List<String>> preconds = this.toJsonString(action.getPreconditions());
                 JSONObject precondJson = new JSONObject();
 
-                ArrayList<String> positives = preconds.get(0);
-                ArrayList<String> negatives = preconds.get(1);
+                List<String> positives = preconds.get(0);
+                List<String> negatives = preconds.get(1);
 
                 JSONArray positivesJsonPrecondition = listToJson(positives);
                 JSONArray negativeJsonPrecondition = listToJson(negatives);
@@ -139,7 +137,7 @@ public class JsonAdapter implements Serializable {
                     JSONObject expJsonCondition = new JSONObject();
                     JSONObject expJsonEffects = new JSONObject();
 
-                    ArrayList<ArrayList<String>> condExpElementsCondition =
+                    List<List<String>> condExpElementsCondition =
                         this.toJsonString(condExp.get(k).getCondition());
 
                     JSONArray positivesConditionJson = listToJson(condExpElementsCondition.get(0));
@@ -149,7 +147,7 @@ public class JsonAdapter implements Serializable {
                     expJsonCondition.put("Positives", positivesConditionJson);
                     expJsonCondition.put("Negatives", negativesConditionJson);
 
-                    ArrayList<ArrayList<String>> condExpElementsEffect = this.toJsonString(condExp.get(k).getEffects());
+                    List<List<String>> condExpElementsEffect = this.toJsonString(condExp.get(k).getEffects());
 
                     JSONArray positivesEffectJson = listToJson(condExpElementsEffect.get(0));
                     JSONArray negativesEffectJson = listToJson(condExpElementsEffect.get(1));
@@ -190,42 +188,19 @@ public class JsonAdapter implements Serializable {
      * @param exp the BitExp instance to convert.
      * @return an 2D collection of Strings.
      */
-    private ArrayList<ArrayList<String>> toJsonString(final State exp) {
-        return JsonAdapter.toJsonString(exp, this.codedProblem.getConstants(), this.codedProblem.getTypes(),
-            this.codedProblem.getPredicates(), this.codedProblem.getFunctions(), this.codedProblem.getRelevantFluents());
-    }
-
-    /**
-     * Convert a BitExp into a String collection.
-     *
-     * @param exp        the BitExp instance to convert.
-     * @param constants  the constants of the problem.
-     * @param types      the types of the problem.
-     * @param predicates the predicates of the problem.
-     * @param functions  the functions of the problem.
-     * @param relevants  the facts of the problem.
-     * @return an 2D collection of Strings.
-     */
-    private static ArrayList<ArrayList<String>> toJsonString(final State exp,
-                                                             final List<String> constants,
-                                                             final List<String> types,
-                                                             final List<String> predicates,
-                                                             final List<String> functions,
-                                                             final List<IntExpression> relevants) {
-        ArrayList<String> fluentsPos = new ArrayList<>();
-        ArrayList<String> fluentsNeg = new ArrayList<>();
-        ArrayList<ArrayList<String>> fluents = new ArrayList<>();
+    private List<List<String>> toJsonString(final State exp) {
+        List<String> fluentsPos = new ArrayList<>();
+        List<String> fluentsNeg = new ArrayList<>();
+        List<List<String>> fluents = new ArrayList<>();
 
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(StringDecoder.toString(relevants.get(i), constants, types, predicates, functions,
-                new ArrayList<String>(), " "));
+            fluentsPos.add(this.codedProblem.toString(this.codedProblem.getRelevantFluents().get(i)));
         }
 
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(StringDecoder.toString(relevants.get(i), constants, types, predicates, functions,
-                new ArrayList<String>(), " "));
+            fluentsNeg.add(this.codedProblem.toString(this.codedProblem.getRelevantFluents().get(i)));
         }
 
         fluents.add(fluentsPos);

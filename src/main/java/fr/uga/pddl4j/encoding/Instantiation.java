@@ -58,7 +58,7 @@ final class Instantiation implements Serializable {
             // If an action has a parameter with a empty domain the action must be removed
             boolean toInstantiate = true;
             int i = 0;
-            while (i < a.getArity() && toInstantiate) {
+            while (i < a.arity() && toInstantiate) {
                 toInstantiate = !Encoder.tableOfDomains.get(a.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
@@ -81,7 +81,7 @@ final class Instantiation implements Serializable {
             // If an method has a parameter with a empty domain the method can be removed
             boolean toInstantiate = true;
             int i = 0;
-            while (i < m.getArity() && toInstantiate) {
+            while (i < m.arity() && toInstantiate) {
                 toInstantiate = !Encoder.tableOfDomains.get(m.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
@@ -170,7 +170,7 @@ final class Instantiation implements Serializable {
         if (bound == actions.size()) {
             return;
         }
-        final int arity = action.getArity();
+        final int arity = action.arity();
         if (index == arity) {
             final IntExpression precond = action.getPreconditions();
             Instantiation.simplify(precond);
@@ -230,7 +230,7 @@ final class Instantiation implements Serializable {
         if (bound == methods.size()) {
             return;
         }
-        final int arity = method.getArity();
+        final int arity = method.arity();
         if (index == arity) {
             final IntExpression precond = method.getPreconditions();
             Instantiation.simplify(precond);

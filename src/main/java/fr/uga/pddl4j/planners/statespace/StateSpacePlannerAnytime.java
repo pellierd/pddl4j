@@ -33,9 +33,10 @@ public interface StateSpacePlannerAnytime extends StateSpacePlanner {
     /**
      * Returns the list containing all solution plans found.
      *
+     * @param problem the problem to solve.
      * @return the list containing all solution plans found.
      */
-    Vector<Plan> getSolutionPlans(final Problem codedProblem);
+    Vector<Plan> getSolutionPlans(final Problem problem);
 
     /**
      * Returns the list containing all solution nodes found.

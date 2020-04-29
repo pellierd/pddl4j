@@ -23,7 +23,7 @@ import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.util.ClosedWorldState;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
 

@@ -15,14 +15,10 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
-
-import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.TaskNetwork;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This class implements a node for the TotalOrderSTNPlanner planner of the PDDL4J library.
@@ -44,25 +40,16 @@ public class STNNode implements Serializable {
      */
     private TaskNetwork taskNetwork;
 
-    private STNNode parent;
-
+    /**
+     * The operator used to reach this node.
+     */
     private int operator;
 
-    public STNNode getParent() {
-        return parent;
-    }
+    /**
+     * The parent node of this node.
+     */
+    private STNNode parent;
 
-    public void setParent(STNNode parent) {
-        this.parent = parent;
-    }
-
-    public int getOperator() {
-        return operator;
-    }
-
-    public void setOperator(int operator) {
-        this.operator = operator;
-    }
 
     /**
      * Creates a new STNNode from an other. This constructor creates a deep copy of the node in parameters.
@@ -128,6 +115,47 @@ public class STNNode implements Serializable {
      */
     final public void setTaskNetwork(final TaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
+    }
+
+    /**
+     * Returns the parente node of this node. By convention, a node with a parent node equals to null is considered as
+     * the root node.
+     *
+     * @return the parent node of this node.
+     */
+    public STNNode getParent() {
+        return parent;
+    }
+
+    /**
+     * Sets the parent node of this node.
+     *
+     * @param parent the parent node to set.
+     */
+    public void setParent(STNNode parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * Returns the operator applied to reach this node. The operator can be an action or a method. By convention, the
+     * operator is represented by its index in the action or method tables of the problem. To dissociate actions and
+     * methods, positive indexes are used for actions and negative ones for methods.
+     *
+     * @return the operator applied to reach this node.
+     */
+    public int getOperator() {
+        return operator;
+    }
+
+    /**
+     * Sets the operator applied to reach this node. The operator can be an action or a method. By convention, the
+     * operator is represented by its index in the action or method tables of the problem. To dissociate actions and
+     * methods, positive indexes are used for actions and negative ones for methods.
+     *
+     * @param operator the operator applied to reach this node.
+     */
+    public void setOperator(int operator) {
+        this.operator = operator;
     }
 
     /**
