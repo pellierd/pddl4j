@@ -199,7 +199,7 @@ public final class TaskNetwork implements Serializable {
      * Compute the transitive closure of the ordering constraints. The computation of the transitive closure is based
      * on Warshall algorithm. The complexity is O(n) where n is the number of tasks of the task network.
      */
-    private final void transitiveClosure() {
+    public final void transitiveClosure() {
         final int size = this.orderingConstraints.rows();
         for (int k = 0; k < size; k++) {
             for (int i = 0; i < size; i++) {
