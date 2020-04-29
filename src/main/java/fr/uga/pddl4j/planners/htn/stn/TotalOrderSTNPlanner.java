@@ -103,47 +103,23 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                         // An action is
                         final Action action = problem.getActions().get(resolver);
                         if (state.satisfy(action.getPreconditions())) {
-                            //System.out.println("ACTION:");
-                            //System.out.println(problem.toString(action));
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(resolver);
                             childNode.getState().apply(action.getCondEffects());
                             open.push(childNode);
-                            //System.out.println("NEW NODE:");
-                            //System.out.println(problem.toString(childNode.getTaskNetwork()));
-                            //System.out.println(problem.toString(childNode.getState()));
-                            /*try {
-                                System.in.read();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }*/
                         }
 
                     }
-                } else {
-                    //System.out.println("COMPOUND TASK:");
-                    //System.out.println(problem.toString(problem.getTasks().get(task)));
+                } else { // Case where the task is compound
                     for (Integer resolver : resolvers) {
                         final Method method = problem.getMethods().get(resolver);
                         if (state.satisfy(method.getPreconditions())) {
-                            //System.out.println("METHOD:");
-                            //System.out.println(problem.toString(method));
-
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
-
                             childNode.setOperator(problem.getActions().size()+resolver);
                             childNode.getTaskNetwork().push(method.getSubTasks());
                             open.push(childNode);
-                            //System.out.println("NEW NODE:");
-                            //System.out.println(problem.toString(childNode.getTaskNetwork()));
-                            //System.out.println(problem.toString(childNode.getState()));
-                            /*try {
-                                System.in.read();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }*/
                         }
                     }
 
@@ -174,7 +150,6 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         return plan;
 
     }
-
 
     /**
      * The main method of the <code>TotalOrderSTNPlanner</code> example. The command line syntax is as
