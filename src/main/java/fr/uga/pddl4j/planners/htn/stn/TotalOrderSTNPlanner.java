@@ -90,34 +90,26 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                 // Get the current state of the search
                 State state = currentNode.getState();
                 // Get the resolvers, i.e., action or method that are relevant for this task.
-                List<Integer> resolvers = problem.getRelevantOperators().get(task);
+                List<Integer> relevanteOperators = problem.getRelevantOperators().get(task);
                 // Case where the task to decompose is primitive
                 if (problem.getTasks().get(task).isPrimtive()) {
-
-                    // On peut simplifier a priori une tâche primitive n'a qu'un résolver
-                    // Il faudrait vérifier que la tâche dans une méthode ne peut être choisi comme non d'action
-                    // Ce qui n'est pas vérifié par le parser
-                    // De plus, le terme resolver n'est pas bien choisi. Il faudrait utiliser relevant.
-
-                    for (Integer resolver : resolvers) {
-                        // An action is
-                        final Action action = problem.getActions().get(resolver);
+                    for (Integer operator : relevanteOperators) {
+                        final Action action = problem.getActions().get(operator);
                         if (state.satisfy(action.getPreconditions())) {
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
-                            childNode.setOperator(resolver);
+                            childNode.setOperator(operator);
                             childNode.getState().apply(action.getCondEffects());
                             open.push(childNode);
                         }
-
                     }
                 } else { // Case where the task is compound
-                    for (Integer resolver : resolvers) {
-                        final Method method = problem.getMethods().get(resolver);
+                    for (Integer operator : relevanteOperators) {
+                        final Method method = problem.getMethods().get(operator);
                         if (state.satisfy(method.getPreconditions())) {
                             STNNode childNode = new STNNode(currentNode);
                             childNode.setParent(currentNode);
-                            childNode.setOperator(problem.getActions().size()+resolver);
+                            childNode.setOperator(problem.getActions().size() + operator);
                             childNode.getTaskNetwork().push(method.getSubTasks());
                             open.push(childNode);
                         }

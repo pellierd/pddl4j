@@ -896,7 +896,8 @@ public final class PDDLParser {
      */
     private boolean checkTaskDeclaration() {
         List<PDDLNamedTypedList> tasks = this.domain.getTasks();
-        Set<String> set = new HashSet<>();
+        Set<String> taskSet = new HashSet<>();
+
         boolean checked = true;
         for (PDDLNamedTypedList task : tasks) {
             for (PDDLTypedSymbol variable : task.getArguments()) {
@@ -911,10 +912,10 @@ public final class PDDLParser {
                 }
             }
             PDDLSymbol symbol = task.getName();
-            String str = symbol.getImage() + "/" + task.getArguments().size();
+            String taskSymbol = symbol.getImage() + "/" + task.getArguments().size();
 
-            if (!set.add(str)) {
-                this.mgr.logParserError("task \"" + str + "\" declared twice", this.lexer
+            if (!taskSet.add(taskSymbol)) {
+                this.mgr.logParserError("task \"" + taskSymbol + "\" declared twice", this.lexer
                     .getFile(), symbol.getBeginLine(), symbol
                     .getBeginColumn());
                 checked = false;
@@ -1048,11 +1049,19 @@ public final class PDDLParser {
      * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
      */
     private boolean checkMethodDeclaration() {
+        Set<String> actionSet = this.domain.getActions().stream().map(
+            action -> action.getName().getImage()).collect(Collectors.toSet());
         boolean checked = this.checkMethodsUniqueness();
         for (PDDLMethod meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
+                PDDLSymbol taskSymbol = meth.getTask().getAtom().get(0);
+                if (actionSet.contains(taskSymbol.getImage())) {
+                    this.mgr.logParserError("task symbol \"" + taskSymbol.getImage() + "\" already used as action name",
+                    this.lexer.getFile(), taskSymbol.getBeginLine(), taskSymbol.getBeginColumn());
+                    checked &= false;
+                }
                 checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getLogicalConstraints(), meth.getParameters());
             }

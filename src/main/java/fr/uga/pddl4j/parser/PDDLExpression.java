@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
  * Modifications:
  * </p>
  * <ul>
- * <li>Add method <code>isLiteral()</code> 11.12.2012.</li>
+ * <li>11.12.2012: Add method <code>isLiteral()</code>.</li>
+ * <li>29.04.2020: Fix bug in hashcode method. </li>
  * </ul>
  *
  * @author D. Pellier
@@ -634,7 +635,7 @@ public class PDDLExpression implements Serializable {
         return Objects.hash(this.getConnective(), this.getVariables(), this.getAtom(), this.getChildren(),
             this.getValue(), this.getPrefName(), this.getVariable(), this.getTaskID());
     }
-    
+
     /**
      * Returns if a specified expression is contains, i.e., is a sub-expression of this expression. More
      * formally, returns <code>true</code> if and only if this expression contains at least one
