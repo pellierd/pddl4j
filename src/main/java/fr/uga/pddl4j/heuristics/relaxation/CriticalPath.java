@@ -19,11 +19,12 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
+
 import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
@@ -39,11 +40,6 @@ import java.util.List;
  * @version 1.0 20.08.2010
  */
 public final class CriticalPath extends RelaxedGraphHeuristic {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     private State[] precond;
     private State[] effect;

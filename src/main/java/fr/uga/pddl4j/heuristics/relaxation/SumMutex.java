@@ -19,10 +19,10 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
 
 /**
  * This class implements the SUM_ID mutex heuristic is an adaptation of the sum heuristic where mutual
@@ -36,11 +36,6 @@ import fr.uga.pddl4j.problem.ClosedWorldState;
  * @see Sum
  */
 public final class SumMutex extends GraphHeuristic {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new <code>SUM_MUTEX</code> heuristic for a specified planning problem.

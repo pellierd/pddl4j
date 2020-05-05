@@ -16,12 +16,12 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,11 +35,6 @@ import java.util.Objects;
  * @version 1.0 - 01.06.2018
  */
 public final class HillClimbing extends AbstractStateSpaceStrategy {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new Hill Climbing search with default parameters.
@@ -69,7 +64,8 @@ public final class HillClimbing extends AbstractStateSpaceStrategy {
     public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
+            getHeuristicType(), codedProblem);
 
         ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));

@@ -39,7 +39,7 @@ import java.util.Properties;
  * @version 1.0 - 15.04.2020
  * @since 4.0
  */
-final public class TFDPlanner extends AbstractPlanner {
+public final class TFDPlanner extends AbstractPlanner {
 
     /*
      * The arguments of the planner.
@@ -159,12 +159,12 @@ final public class TFDPlanner extends AbstractPlanner {
      *
      * </pre>
      *
-     *
+     * <p>
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-3.8.3.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner</code><br>
      * <code>  -d src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl</code><br>
      * <code>  -p src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl</code><br>
-     *
+     * </p>
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
@@ -248,14 +248,20 @@ final public class TFDPlanner extends AbstractPlanner {
         // Parse the command line and update the default argument value
         for (int i = 0; i < args.length; i += 2) {
             if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                if (!new File(args[i + 1]).exists()) return null;
+                if (!new File(args[i + 1]).exists()) {
+                    return null;
+                }
                 arguments.put(Planner.DOMAIN, new File(args[i + 1]));
             } else if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                if (!new File(args[i + 1]).exists()) return null;
+                if (!new File(args[i + 1]).exists()) {
+                    return null;
+                }
                 arguments.put(Planner.PROBLEM, new File(args[i + 1]));
             } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                 final int timeout = Integer.parseInt(args[i + 1]) * 1000;
-                if (timeout < 0) return null;
+                if (timeout < 0) {
+                    return null;
+                }
                 arguments.put(Planner.TIMEOUT, timeout);
             } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                 final int level = Integer.parseInt(args[i + 1]);

@@ -15,15 +15,16 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.SolutionEvent;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.util.MemoryAgent;
+
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
@@ -38,11 +39,6 @@ import java.util.PriorityQueue;
  * @version 1.0 - 01.06.2018
  */
 public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The bound cost for strategy search.
@@ -122,7 +118,8 @@ public final class AStarAnytime extends AbstractStateSpaceStrategyAnytime {
         Objects.requireNonNull(problem);
 
         final long begin = System.currentTimeMillis();
-        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
+            this.getHeuristicType(), problem);
         // Get the initial state from the planning problem
         final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)

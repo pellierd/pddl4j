@@ -431,7 +431,8 @@ final class IntEncoding implements Serializable {
         // Encode the tasks of the task network
         final IntExpression tasks = IntEncoding.encodeExp(taskNetwork.getTasks());
         // Encode the ordering constraints of the task network
-        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
+        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(
+            taskNetwork.getOrderingConstraints());
         return new IntTaskNetwork(tasks, orderingConstraints, taskNetwork.isTotallyOrdered());
     }
 
@@ -488,7 +489,8 @@ final class IntEncoding implements Serializable {
         final IntExpression subtasks = IntEncoding.encodeExp(method.getSubTasks(), variables);
         intMeth.setSubTasks(subtasks);
         // Encode the ordering constraints of the method
-        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(method.getOrderingConstraints());
+        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(
+            method.getOrderingConstraints());
         intMeth.setOrderingConstraints(orderingConstraints);
         return intMeth;
     }
@@ -498,8 +500,8 @@ final class IntEncoding implements Serializable {
      * expression returned is the index of the task in the AND expression of the tasks list of a method.
      *
      * @param exp the constraints to encode. The constraints must be an AND expression.
-     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only
-     *  AND and LESS_ORDERING_CONSTRAINTS are expected.
+     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
+     *      LESS_ORDERING_CONSTRAINTS are expected.
      */
     private static IntExpression encodeOrderingConstraints(final PDDLExpression exp) {
         final IntExpression intExp = new IntExpression(exp.getConnective());

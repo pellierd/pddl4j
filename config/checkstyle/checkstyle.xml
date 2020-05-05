@@ -184,6 +184,7 @@
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="3"/>
+            <property name="allowedAbbreviations" value="PDDL"/>
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>
@@ -229,9 +230,9 @@
         </module>
         <module name="JavadocMethod">
             <property name="scope" value="public"/>
-            <property name="allowMissingParamTags" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
-            <property name="allowMissingReturnTag" value="true"/>
+            <property name="allowMissingParamTags" value="false"/>
+            <property name="allowMissingThrowsTags" value="false"/>
+            <property name="allowMissingReturnTag" value="false"/>
             <property name="minLineCount" value="2"/>
             <property name="allowedAnnotations" value="Override, Test"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>

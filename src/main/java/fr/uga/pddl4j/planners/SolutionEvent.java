@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.util.EventObject;
 
@@ -24,15 +24,11 @@ import java.util.EventObject;
  * This class implements a solution event. This event is triggered when a search strategy find a new solution.
  *
  * @author E. Hermellin
+ * @author D. Pellier
  * @version 1.0 - 10.01.2019
  * @since 3.7.3
  */
 public class SolutionEvent extends EventObject {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The solution node of the event.

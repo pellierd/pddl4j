@@ -29,14 +29,15 @@ import java.util.Set;
 
 /**
  * This class contains the methods needed to instantiate the actions and the method.
- *
+ * <p>
  * Revisions:
  * <ul>
  *     <li>30/03/2019: Add method instantiation.</li>
  * </ul>
+ * </p>
  *
  * @author D. Pellier
- * @version 1.0 - 07.04.2010
+ * @version 1.1 - 07.04.2010
  */
 final class Instantiation implements Serializable {
 
@@ -166,7 +167,8 @@ final class Instantiation implements Serializable {
      * @param actions the list of actions already instantiated.
      * @see IntAction
      */
-    private static void instantiate(final IntAction action, final int index, final int bound, final List<IntAction> actions) {
+    private static void instantiate(final IntAction action, final int index, final int bound,
+                                    final List<IntAction> actions) {
         if (bound == actions.size()) {
             return;
         }
@@ -226,7 +228,8 @@ final class Instantiation implements Serializable {
      * @param methods the list of methods already instantiated.
      * @see IntMethod
      */
-    private static void instantiate(final IntMethod method, final int index, final int bound, final List<IntMethod> methods) {
+    private static void instantiate(final IntMethod method, final int index, final int bound,
+                                    final List<IntMethod> methods) {
         if (bound == methods.size()) {
             return;
         }
@@ -235,7 +238,7 @@ final class Instantiation implements Serializable {
             final IntExpression precond = method.getPreconditions();
             Instantiation.simplify(precond);
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
-                    methods.add(method);
+                methods.add(method);
             }
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(method.getTypeOfParameters(index));
@@ -284,8 +287,9 @@ final class Instantiation implements Serializable {
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     final IntExpression ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(PDDLConnective.FORALL) || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
+                    if ((ei.getConnective().equals(PDDLConnective.FORALL)
+                            || ei.getConnective().equals(PDDLConnective.EXISTS))
+                            && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -301,8 +305,9 @@ final class Instantiation implements Serializable {
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     final IntExpression ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(PDDLConnective.FORALL) || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
+                    if ((ei.getConnective().equals(PDDLConnective.FORALL)
+                            || ei.getConnective().equals(PDDLConnective.EXISTS))
+                            && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }

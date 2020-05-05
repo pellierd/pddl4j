@@ -19,13 +19,14 @@
 
 package fr.uga.pddl4j.planners.statespace.hsp;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
-import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.problem.Problem;
+
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
@@ -37,11 +38,6 @@ import java.util.Objects;
  * @version 1.0 - 14.06.2010
  */
 public final class HSP extends AbstractStateSpacePlanner {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The A* strategy.

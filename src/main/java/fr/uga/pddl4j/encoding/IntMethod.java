@@ -54,8 +54,8 @@ final class IntMethod extends AbstractIntOperator {
     }
 
     /**
-     * Create a new method with a specified name. The task is set to a empty IntExpression with TASK as connective and the
-     * task network is set to an empty task network.
+     * Create a new method with a specified name. The task is set to a empty IntExpression with TASK as connective and
+     * the task network is set to an empty task network.
      *
      * @param name  the name of the method.
      * @param arity the arity of the method. The arity must be > 0.

@@ -20,7 +20,12 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -262,8 +267,9 @@ public class PDDLExpression implements Serializable {
      */
     public final boolean isLiteral() {
         return this.getConnective().equals(PDDLConnective.ATOM)
-            || (this.getConnective().equals(PDDLConnective.NOT) && this.getChildren().size() == 1 && this.getChildren()
-            .get(0).getConnective().equals(PDDLConnective.ATOM));
+            || (this.getConnective().equals(PDDLConnective.NOT)
+            && this.getChildren().size() == 1
+            && this.getChildren().get(0).getConnective().equals(PDDLConnective.ATOM));
     }
 
     /**
@@ -609,17 +615,19 @@ public class PDDLExpression implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj) {
+            return true;
+        }
         if (obj != null && obj instanceof PDDLExpression) {
             PDDLExpression other = (PDDLExpression) obj;
-            return getConnective() == other.getConnective() &&
-                Objects.equals(this.getVariables(), other.getVariables()) &&
-                Objects.equals(this.getAtom(), other.getAtom()) &&
-                Objects.equals(this.getChildren(), other.getChildren()) &&
-                Objects.equals(this.getValue(), other.getValue()) &&
-                Objects.equals(this.getPrefName(), other.getPrefName()) &&
-                Objects.equals(this.getVariable(), other.getVariable()) &&
-                Objects.equals(this.getTaskID(), other.getTaskID());
+            return getConnective() == other.getConnective()
+                && Objects.equals(this.getVariables(), other.getVariables())
+                && Objects.equals(this.getAtom(), other.getAtom())
+                && Objects.equals(this.getChildren(), other.getChildren())
+                && Objects.equals(this.getValue(), other.getValue())
+                && Objects.equals(this.getPrefName(), other.getPrefName())
+                && Objects.equals(this.getVariable(), other.getVariable())
+                && Objects.equals(this.getTaskID(), other.getTaskID());
         }
         return false;
     }

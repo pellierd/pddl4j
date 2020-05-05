@@ -66,8 +66,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task, final PDDLExpression preconditions,
-                      final PDDLExpression tasks, final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
+    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+                      final PDDLExpression preconditions, final PDDLExpression tasks, final PDDLExpression ordering,
+                      final PDDLExpression logical, final boolean ordered) {
         super(name, parameters, preconditions);
         this.task = task;
         this.taskNetwork = new PDDLTaskNetwork(tasks, ordering, logical, ordered);
@@ -83,8 +84,8 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param network the task network of the method.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task, final PDDLExpression preconditions,
-                      final PDDLTaskNetwork network) {
+    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+                      final PDDLExpression preconditions, final PDDLTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrderingConstraints(),
             network.getLogicalConstraints(), network.isTotallyOrdered());
     }
@@ -182,9 +183,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
 
     /**
      * Normalizes the method.
-     *
+     * <p>
      * Warning for the moment the logical constraints are not process.
-     *
+     * </p>
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @see PDDLExpression#renameVariables()
      * @see PDDLExpression#moveNegationInward()
@@ -210,7 +211,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
             for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {
                 PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 c.setAtom(new LinkedList<PDDLSymbol>());
-                c.getAtom().add(this.getSubTasks().getChildren().get(j-1).getTaskID());
+                c.getAtom().add(this.getSubTasks().getChildren().get(j - 1).getTaskID());
                 c.getAtom().add(this.getSubTasks().getChildren().get(j).getTaskID());
                 this.getOrderingConstraints().addChild(c);
             }

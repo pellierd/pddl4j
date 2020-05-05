@@ -77,7 +77,8 @@ public final class IntTaskNetwork implements Serializable {
      * @param orderingConstraints the orderings constraints of the task network.
      * @param totallyOrdered the boolean flag to indicate if the task network is totally ordered or not.
      */
-    public IntTaskNetwork(final IntExpression tasks, final IntExpression orderingConstraints, final boolean totallyOrdered) {
+    public IntTaskNetwork(final IntExpression tasks, final IntExpression orderingConstraints,
+                          final boolean totallyOrdered) {
         super();
         this.tasks = tasks;
         this.orderingConstraints = orderingConstraints;
@@ -99,9 +100,9 @@ public final class IntTaskNetwork implements Serializable {
      * @param tasks the tasks to set.
      */
     public final void setTasks(final IntExpression tasks) {
-
         this.tasks = tasks;
     }
+
     /**
      * Return the ordering constraints of the method.
      *

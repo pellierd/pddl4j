@@ -19,11 +19,12 @@
 
 package fr.uga.pddl4j.planners.statespace.generic;
 
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategyAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.problem.Problem;
+
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;

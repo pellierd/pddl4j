@@ -360,7 +360,7 @@ final class BitEncoding implements Serializable {
      *
      * @param actions the list of actions to normalizeActions.
      */
-    private static void normalizeActions(final List<IntAction> actions){
+    private static void normalizeActions(final List<IntAction> actions) {
         final List<IntAction> normalisedActions = new ArrayList<>(actions.size() + 100);
         for (IntAction a : actions) {
             BitEncoding.toCNF(a.getEffects());

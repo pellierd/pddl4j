@@ -19,10 +19,9 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.encoding.IntExpression;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
 
 import java.util.List;

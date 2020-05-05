@@ -33,11 +33,6 @@ import java.io.Serializable;
 public final class RelaxationHeuristicToolKit implements Serializable {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * Private constructor just for prevent user to instantiate this class.
      */
     private RelaxationHeuristicToolKit() {

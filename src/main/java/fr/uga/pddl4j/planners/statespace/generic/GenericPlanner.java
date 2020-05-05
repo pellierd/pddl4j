@@ -19,11 +19,12 @@
 
 package fr.uga.pddl4j.planners.statespace.generic;
 
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
-import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.problem.Problem;
+
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
@@ -36,11 +37,6 @@ import java.util.Objects;
  * @version 1.0 - 28.09.2018
  */
 public final class GenericPlanner extends AbstractStateSpacePlanner {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The search strategy.

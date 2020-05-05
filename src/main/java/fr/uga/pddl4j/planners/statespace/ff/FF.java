@@ -20,12 +20,12 @@
 package fr.uga.pddl4j.planners.statespace.ff;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
-import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.Logger;
@@ -38,14 +38,10 @@ import java.util.Objects;
  *
  * @author Samuel Aaron Boyd
  * @author E. Hermellin
+ * @author D. Pellier
  * @version 2.0 - 24.01.2018
  */
 public final class FF extends AbstractStateSpacePlanner {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The Enforced Hill Climbing strategy.

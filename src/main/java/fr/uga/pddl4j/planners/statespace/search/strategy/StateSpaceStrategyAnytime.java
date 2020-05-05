@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.util.Vector;
 

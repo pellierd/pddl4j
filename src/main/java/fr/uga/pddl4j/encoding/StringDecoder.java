@@ -19,11 +19,15 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLSymbol;
-import fr.uga.pddl4j.util.BitMatrix;
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.Method;
+import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -71,11 +75,12 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n").append(toString(action.getPreconditions(), constants, types, predicates, functions, tasks))
-            .append("\n")
-            .append("Effects:\n")
-            .append(toString(action.getEffects(), constants, types, predicates, functions, tasks))
-            .append("\n");
+        str.append("Preconditions:\n");
+        str.append(toString(action.getPreconditions(), constants, types, predicates, functions, tasks));
+        str.append("\n");
+        str.append("Effects:\n");
+        str.append(toString(action.getEffects(), constants, types, predicates, functions, tasks));
+        str.append("\n");
         return str.toString();
     }
 
@@ -99,10 +104,18 @@ final class StringDecoder implements Serializable {
             final int index = method.getValueOfParameter(i);
             final String type = types.get(method.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
             } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ")
-                    .append(constants.get(index)).append(" \n");
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(constants.get(index));
+                str.append(" \n");
             }
         }
         str.append("Task: ").append(toString(method.getTask(), constants, types, predicates, functions, tasks));
@@ -177,7 +190,8 @@ final class StringDecoder implements Serializable {
             for (int r = 0; r < constraints.rows(); r++) {
                 BitSet row = constraints.getRow(r);
                 for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
-                    str.append(" C").append(index).append(": ").append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r).append(" ");
+                    str.append(" C").append(index).append(": ").append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r);
+                    str.append(" ");
                     str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage()).append(" ");
                     str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c).append("\n");
                     index++;
@@ -316,10 +330,12 @@ final class StringDecoder implements Serializable {
                 break;
             case FORALL:
             case EXISTS:
+                str.append(" (").append(exp.getConnective().getImage());
+                str.append(" (").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(-exp.getVariable() - 1);
+                str.append(" - ");
                 String offsetEx = baseOffset + baseOffset + "  ";
-                str.append(" (").append(exp.getConnective().getImage())
-                    .append(" (").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-exp.getVariable() - 1).append(" - ")
-                    .append(types.get(exp.getType())).append(")\n").append(offsetEx);
+                str.append(types.get(exp.getType())).append(")\n").append(offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(StringDecoder.toString(exp.getChildren().get(0), constants, types, predicates,
                         functions, tasks, offsetEx));

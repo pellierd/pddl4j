@@ -103,6 +103,8 @@ public abstract class Tools {
     /**
      * Parse domain and problem files and return the associated coded problem.
      *
+     * @param domainFile  the domain file to be tested.
+     * @param problemFile the file file to be tested.
      * @return a coded problem from the parsing file
      */
     public static Problem generateCodedProblem(String domainFile, String problemFile) {
@@ -192,6 +194,7 @@ public abstract class Tools {
      * @param path     the path to the file
      * @param encoding encoding of the file
      * @return the content of the file encoded
+     * @throws IOException if an error occurs when reading file from path.
      */
     public static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));

@@ -20,11 +20,10 @@
 package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 
 import java.io.Serializable;
-
 
 /**
  * This interface defines the methods accessible from all heuristics. An heuristic is a function

@@ -19,10 +19,10 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
 
 /**
  * This heuristic returns the level of the planning graph where all the propositions of the goal are
@@ -37,11 +37,6 @@ import fr.uga.pddl4j.problem.ClosedWorldState;
  * @see RelaxedGraphHeuristic
  */
 public final class SetLevel extends GraphHeuristic {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new <code>SET_LEVEL</code> heuristic for a specified planning problem.

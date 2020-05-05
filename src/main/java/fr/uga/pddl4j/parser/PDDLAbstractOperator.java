@@ -78,7 +78,8 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
-    protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconditions) {
+    protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters,
+                                   final PDDLExpression preconditions) {
         this.name = name;
         this.parameters = parameters;
         this.preconditions = preconditions;

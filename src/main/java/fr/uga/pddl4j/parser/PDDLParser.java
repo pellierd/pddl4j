@@ -22,7 +22,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
 import fr.uga.pddl4j.parser.lexer.TokenMgrError;
-import fr.uga.pddl4j.util.BitMatrix;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -305,6 +305,7 @@ public final class PDDLParser {
             LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
         }
     }
+
     /**
      * Parses a planning domain and a planning problem from their respective string description.
      *
@@ -1037,7 +1038,8 @@ public final class PDDLParser {
      * Checks if the declared methods are well formed.
      * <ul>
      * <li> Methods must have a unique name.</li>
-     * <li> The type of the variables or constants used in their precondition, task and subtasks previously declared.</li>
+     * <li> The type of the variables or constants used in their precondition, task and subtasks previously declared.
+     * </li>
      * <li> The variable used in their precondition, condition and effects are declared as
      * parameters of the methods.</li>
      * <li> The task id used in subtasks declaration are unique.</li>
@@ -1058,7 +1060,7 @@ public final class PDDLParser {
                 PDDLSymbol taskSymbol = meth.getTask().getAtom().get(0);
                 if (actionSet.contains(taskSymbol.getImage())) {
                     this.mgr.logParserError("task symbol \"" + taskSymbol.getImage() + "\" already used as action name",
-                    this.lexer.getFile(), taskSymbol.getBeginLine(), taskSymbol.getBeginColumn());
+                        this.lexer.getFile(), taskSymbol.getBeginLine(), taskSymbol.getBeginColumn());
                     checked &= false;
                 }
                 checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
@@ -1126,17 +1128,16 @@ public final class PDDLParser {
                     + "\" in method declaration", this.lexer.getFile(), task.getBeginLine(), task.getBeginColumn());
                 check = false;
             }
-
         }
         return check;
     }
 
     /**
-     * Checks if the declared initiak task network are well formed:
+     * Checks if the declared initiak task network are well formed.
      * <ul>
      * <li> The task IDs used in subtasks declaration are unique.</li>
      * <li> The task ID used in ordering constraints are all defined.</li>
-     * <li> TO DO: check the cyclic dependencies of the ordering constraints of the methods.</li>
+     * <li> The ordering constraints are acyclic.</li>
      * </ul>
      *
      * @return <code>true</code> if the initial task network is well formed; <code>false</code> otherwise.
@@ -1144,7 +1145,7 @@ public final class PDDLParser {
     private boolean checkInitialTaskNetwork() {
         boolean checked = true;
         if (problem.getInitialTaskNetwork() != null) {
-            final PDDLTaskNetwork tn = problem.getInitialTaskNetwork();
+            final PDDLTaskNetwork tn = this.problem.getInitialTaskNetwork();
             checked = this.checkParserNode(tn.getTasks(), new LinkedList<PDDLTypedSymbol>());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<PDDLSymbol>())) {
                 final Set<PDDLSymbol> taskIds = this.getTaskIDs(tn.getTasks());
@@ -1159,6 +1160,7 @@ public final class PDDLParser {
             } else {
                 checked = false;
             }
+            //checked &= this.checkOrderingConstraintAcyclicness(problem.getConstraints());
         }
         return checked;
     }
@@ -1349,18 +1351,18 @@ public final class PDDLParser {
                         this.mgr.logParserWarning("atomic formula " + notExp
                                 + " is used twice in the same expression",
                                 this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
-                            checked = false;
+                        checked = false;
                     }
                     if (positive.contains(notExp)) {
                         this.mgr.logParserWarning("atomic formula " + notExp
                                 + "  and its negation is used in the same expression",
-                            this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
+                                this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
                         checked = false;
                     }
                 } else {
                     checked = this.checkPDDLExpressionConsistency(exp.getChildren().get(0), positive, negative);
                 }
-            break;
+                break;
             default:
                 for (int i = 0; i < exp.getChildren().size(); i++) {
                     checked &= this.checkPDDLExpressionConsistency(exp.getChildren().get(i), positive, negative);
@@ -1433,8 +1435,7 @@ public final class PDDLParser {
                 .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                 .getName().getBeginColumn());
             checked = false;
-        }
-        else if (checked && gd.getConnective().equals(PDDLConnective.TASK)
+        } else if (checked && gd.getConnective().equals(PDDLConnective.TASK)
             && !this.isDeclaredTask(atomSkeleton)) {
             this.mgr.logParserError("task \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer

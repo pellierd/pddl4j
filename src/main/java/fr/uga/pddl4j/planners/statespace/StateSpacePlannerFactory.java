@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
@@ -25,8 +25,8 @@ import fr.uga.pddl4j.planners.statespace.ff.FF;
 import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
 import fr.uga.pddl4j.planners.statespace.hc.HCAnytime;
 import fr.uga.pddl4j.planners.statespace.hsp.HSP;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.plan.Plan;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,11 +45,6 @@ import java.util.Properties;
  * @since 3.0
  */
 public class StateSpacePlannerFactory implements Serializable {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The logger of the class.
@@ -432,7 +427,8 @@ public class StateSpacePlannerFactory implements Serializable {
             final File problem = (File) arguments.get(AbstractStateSpacePlanner.PROBLEM);
             final int traceLevel = (Integer) arguments.get(AbstractStateSpacePlanner.TRACE_LEVEL);
             final int timeout = (Integer) arguments.get(AbstractStateSpacePlanner.TIMEOUT);
-            final RelaxationHeuristic.Type heuristicType = (RelaxationHeuristic.Type) arguments.get(AbstractStateSpacePlanner.HEURISTIC);
+            final RelaxationHeuristic.Type heuristicType = (RelaxationHeuristic.Type)
+                arguments.get(AbstractStateSpacePlanner.HEURISTIC);
             final double weight = (Double) arguments.get(AbstractStateSpacePlanner.WEIGHT);
             final boolean saveStats = (Boolean) arguments.get(AbstractStateSpacePlanner.STATISTICS);
 

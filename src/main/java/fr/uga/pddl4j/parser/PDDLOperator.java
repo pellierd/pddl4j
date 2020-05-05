@@ -72,7 +72,6 @@ public interface PDDLOperator extends Serializable {
      * Sets a new list of parameters to this operator.
      *
      * @param parameters The list of parameters to set.
-     * @throws NullPointerException if the specified parameters is null.
      */
     void setParameters(final List<PDDLTypedSymbol> parameters);
 
@@ -82,12 +81,12 @@ public interface PDDLOperator extends Serializable {
      * @return The goal description that represents the preconditions of the operator.
      */
     PDDLExpression getPreconditions();
+
     /**
      * Sets new preconditions to the operator.
      *
      * @param preconditions The new goal description that represents the preconditions of the
      *                      operator to set.
-     * @throws NullPointerException if the specified preconditions is null.
      */
     void setPreconditions(final PDDLExpression preconditions);
 

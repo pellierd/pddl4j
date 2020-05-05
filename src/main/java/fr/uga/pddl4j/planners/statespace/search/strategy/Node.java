@@ -30,11 +30,6 @@ import fr.uga.pddl4j.problem.ClosedWorldState;
 public final class Node extends ClosedWorldState {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The parent node of this node.
      */
     private Node parent;

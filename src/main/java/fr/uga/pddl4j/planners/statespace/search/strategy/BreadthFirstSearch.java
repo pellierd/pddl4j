@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.planners.SolutionEvent;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,11 +32,6 @@ import java.util.Objects;
  * @version 1.0 - 22.06.2018
  */
 public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new Greedy best First Search search strategy with default parameters.

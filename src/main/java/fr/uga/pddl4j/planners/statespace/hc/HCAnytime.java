@@ -19,21 +19,16 @@
 
 package fr.uga.pddl4j.planners.statespace.hc;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbingAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.Logger;
 
 public class HCAnytime extends AbstractStateSpacePlannerAnytime {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The Enforced Hill Climbing strategy.

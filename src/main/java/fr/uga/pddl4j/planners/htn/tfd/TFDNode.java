@@ -84,7 +84,7 @@ public class TFDNode implements Serializable {
      *
      * @return the state of this node.
      */
-    final public State getState() {
+    public final State getState() {
         return this.state;
     }
 
@@ -93,7 +93,7 @@ public class TFDNode implements Serializable {
      *
      * @param state the state to set.
      */
-    final public void setState(final State state) {
+    public final void setState(final State state) {
         this.state = state;
     }
 
@@ -103,7 +103,7 @@ public class TFDNode implements Serializable {
      *
      * @return the task network of the node.
      */
-    final public TaskNetwork getTaskNetwork() {
+    public final TaskNetwork getTaskNetwork() {
         return this.taskNetwork;
     }
 
@@ -113,7 +113,7 @@ public class TFDNode implements Serializable {
      *
      * @param taskNetwork the task network of the node.
      */
-    final public void setTaskNetwork(final TaskNetwork taskNetwork) {
+    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
     }
 
@@ -123,7 +123,7 @@ public class TFDNode implements Serializable {
      *
      * @return the parent node of this node.
      */
-    public TFDNode getParent() {
+    public final TFDNode getParent() {
         return parent;
     }
 
@@ -132,7 +132,7 @@ public class TFDNode implements Serializable {
      *
      * @param parent the parent node to set.
      */
-    public void setParent(TFDNode parent) {
+    public final void setParent(TFDNode parent) {
         this.parent = parent;
     }
 
@@ -143,7 +143,7 @@ public class TFDNode implements Serializable {
      *
      * @return the operator applied to reach this node.
      */
-    public int getOperator() {
+    public final int getOperator() {
         return operator;
     }
 
@@ -154,7 +154,7 @@ public class TFDNode implements Serializable {
      *
      * @param operator the operator applied to reach this node.
      */
-    public void setOperator(int operator) {
+    public final void setOperator(int operator) {
         this.operator = operator;
     }
 
@@ -167,7 +167,7 @@ public class TFDNode implements Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    final public boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (obj != null && obj instanceof TFDNode) {
             TFDNode other = (TFDNode) obj;
             return this.getState().equals(other.getState()) && this.getTaskNetwork().equals(other.getTaskNetwork());

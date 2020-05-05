@@ -16,12 +16,12 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.util.MemoryAgent;
 import fr.uga.pddl4j.planners.SolutionEvent;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,11 +36,6 @@ import java.util.Set;
  * @version 1.0 - 01.06.2018
  */
 public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new Greedy best First Search search strategy with default parameters.
@@ -72,7 +67,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceStrategy {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
+            getHeuristicType(), codedProblem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();

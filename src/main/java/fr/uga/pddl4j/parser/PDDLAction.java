@@ -68,7 +68,8 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
      */
-    public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconds, final PDDLExpression effects) {
+    public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconds,
+                      final PDDLExpression effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -83,8 +84,8 @@ public class PDDLAction extends PDDLAbstractOperator {
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
-    public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconditions, final PDDLExpression effects,
-                      final PDDLExpression duration) {
+    public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconditions,
+                      final PDDLExpression effects, final PDDLExpression duration) {
         super(name, parameters, preconditions);
         this.effects = effects;
         this.duration = duration;

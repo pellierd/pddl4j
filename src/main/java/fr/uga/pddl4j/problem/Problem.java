@@ -563,7 +563,7 @@ public class Problem implements Serializable {
      * @param action     the action.
      * @return a string representation of the specified operator.
      */
-    public String toString(final Action action) {
+    public final String toString(final Action action) {
         StringBuilder str = new StringBuilder();
         str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < action.arity(); i++) {
@@ -597,34 +597,12 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a short string representation of the specified operator, i.e., its name and its
-     * instantiated parameters. This method can be used for actions and methods.
-     *
-     * @param operator  the operator.
-     * @return a string representation of the specified operator.
-     */
-    public String toShortString(final AbstractGroundOperator operator) {
-        final StringBuilder str = new StringBuilder();
-        str.append(operator.getName());
-        for (int i = 0; i < operator.arity(); i++) {
-            final int index = operator.getValueOfParameter(i);
-            if (index == -1) {
-                str.append(" ?");
-            } else {
-                str.append(" ");
-                str.append(this.getConstantSymbols().get(index));
-            }
-        }
-        return str.toString();
-    }
-
-    /**
      * Returns a string representation of the specified method.
      *
      * @param method the method.
      * @return a string representation of the specified method.
      */
-    public String toString(final Method method) {
+    public final String toString(final Method method) {
         final StringBuilder str = new StringBuilder();
         str.append("Method ");
         str.append(method.getName());
@@ -655,32 +633,12 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a string representation of a conditional effect.
-     *
-     * @param ceffect  the conditional effect.
-     * @return a string representation of the specified condition effect.
-     */
-    public String toString(final ConditionalEffect ceffect) {
-        StringBuilder str = new StringBuilder();
-        if (ceffect.getCondition().isEmpty()) {
-            str.append(this.toString(ceffect.getEffects()));
-        } else {
-            str.append("(when ");
-            str.append(this.toString(ceffect.getCondition()));
-            str.append("\n");
-            str.append(this.toString(ceffect.getEffects()));
-            str.append(")");
-        }
-        return str.toString();
-    }
-
-    /**
      * Returns a string representation of a state.
      *
      * @param state the state.
      * @return a string representation of the state.
      */
-    public String toString(final State state) {
+    public final String toString(final State state) {
         final StringBuilder str = new StringBuilder("(and");
         final BitSet positive = state.getPositive();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
@@ -704,7 +662,7 @@ public class Problem implements Serializable {
      * @param state the state.
      * @return a string representation of the specified expression.
      */
-    public String toString(final ClosedWorldState state) {
+    public final String toString(final ClosedWorldState state) {
         final StringBuilder str = new StringBuilder("(and");
         for (int i = state.nextSetBit(0); i >= 0; i = state.nextSetBit(i + 1)) {
             str.append(" ");
@@ -721,7 +679,7 @@ public class Problem implements Serializable {
      * @param tasknetwork the task network.
      * @return a string representation of the specified task network.
      */
-    public String toString(final TaskNetwork tasknetwork) {
+    public final String toString(final TaskNetwork tasknetwork) {
         final StringBuilder str = new StringBuilder();
         str.append("Tasks:\n");
         if (tasknetwork.getTasks().isEmpty()) {
@@ -756,6 +714,7 @@ public class Problem implements Serializable {
         }
         return str.toString();
     }
+
     /**
      * Returns a string representation of a formula.
      *
@@ -798,6 +757,48 @@ public class Problem implements Serializable {
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%d]%n",
                     time, this.toShortString(a), ((int) a.getDuration())))));
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a conditional effect.
+     *
+     * @param ceffect  the conditional effect.
+     * @return a string representation of the specified condition effect.
+     */
+    public final String toString(final ConditionalEffect ceffect) {
+        StringBuilder str = new StringBuilder();
+        if (ceffect.getCondition().isEmpty()) {
+            str.append(this.toString(ceffect.getEffects()));
+        } else {
+            str.append("(when ");
+            str.append(this.toString(ceffect.getCondition()));
+            str.append("\n");
+            str.append(this.toString(ceffect.getEffects()));
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a short string representation of the specified operator, i.e., its name and its
+     * instantiated parameters. This method can be used for actions and methods.
+     *
+     * @param operator  the operator.
+     * @return a string representation of the specified operator.
+     */
+    public final String toShortString(final AbstractGroundOperator operator) {
+        final StringBuilder str = new StringBuilder();
+        str.append(operator.getName());
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            if (index == -1) {
+                str.append(" ?");
+            } else {
+                str.append(" ");
+                str.append(this.getConstantSymbols().get(index));
+            }
+        }
         return str.toString();
     }
 

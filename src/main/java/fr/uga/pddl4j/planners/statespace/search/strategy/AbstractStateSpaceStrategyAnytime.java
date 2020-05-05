@@ -19,19 +19,14 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.util.Vector;
 
 public abstract class AbstractStateSpaceStrategyAnytime extends AbstractStateSpaceStrategy
     implements StateSpaceStrategyAnytime {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new planner.

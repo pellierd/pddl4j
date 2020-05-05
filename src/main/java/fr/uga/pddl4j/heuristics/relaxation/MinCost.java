@@ -19,11 +19,11 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
 
 import java.util.LinkedList;
 
@@ -34,11 +34,6 @@ import java.util.LinkedList;
  * @version 1.0 - 19.02.2018
  */
 public class MinCost extends AbstractHeuristic {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new <code>Min Cost</code> heuristic for a specified planning problem.

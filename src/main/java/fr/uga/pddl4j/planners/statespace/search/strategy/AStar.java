@@ -15,13 +15,13 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.planners.SolutionEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +69,8 @@ public final class AStar extends AbstractStateSpaceStrategy {
     public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(getHeuristicType(), codedProblem);
+        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
+            getHeuristicType(), codedProblem);
         // Get the initial state from the planning problem
         final ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)

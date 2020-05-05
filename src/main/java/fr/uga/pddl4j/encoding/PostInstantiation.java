@@ -22,7 +22,13 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -70,7 +76,8 @@ final class PostInstantiation implements Serializable {
      * @param methods the list of instantiated methods
      * @param init    the initial state.
      */
-    static void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods, final Set<IntExpression> init) {
+    static void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods,
+                                     final Set<IntExpression> init) {
         final Set<IntExpression> facts = new LinkedHashSet<>(10000);
         for (IntAction a : actions) {
             PostInstantiation.extractRelevantFacts(a.getPreconditions(), facts, init);
@@ -206,7 +213,7 @@ final class PostInstantiation implements Serializable {
     private static void extractRelevantTasks(final IntExpression exp, final Set<IntExpression> tasks) {
         switch (exp.getConnective()) {
             case TASK:
-                    tasks.add(exp);
+                tasks.add(exp);
                 break;
             case AND:
             case OR:

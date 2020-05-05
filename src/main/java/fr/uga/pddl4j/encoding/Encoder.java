@@ -23,13 +23,26 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
-import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.Fluent;
+import fr.uga.pddl4j.problem.Method;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Task;
+import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -104,10 +117,11 @@ import java.util.stream.Collectors;
  * <li>23.01.2013: add of the case when the goal can be simplified to TRUE. The coded problem
  * returned contained in that case an empty goal expression (<code>BitExp.isEmpty()</code>).</li>
  * <li>25.03.2016: Fix bug when the goal contains only one atom.</li>
+ * <li>05.05.2020: Add method encoding.</li>
  * </ul>
  *
  * @author D. Pellier
- * @version 1.0 - 08.06.2010
+ * @version 1.3 - 08.06.2010
  */
 public final class Encoder implements Serializable {
 
@@ -117,7 +131,7 @@ public final class Encoder implements Serializable {
     private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
-     * The set of requirements
+     * The set of requirements£.
      */
     static Set<PDDLRequireKey> requirements;
 
@@ -205,7 +219,7 @@ public final class Encoder implements Serializable {
     /**
      * The table containing for each relevant task its set of resolvers, i.e., action or methods
      */
-    static List<List<Integer>> tableOfTaskResolvers;
+    static List<List<Integer>> tableOfRelevantOperators;
 
     /**
      * The list of instantiated actions encoded into bit sets.
@@ -444,25 +458,32 @@ public final class Encoder implements Serializable {
             Encoder.printTableOfConstants(stringBuilder);
             stringBuilder.append(System.lineSeparator());
             Encoder.printTableOfTypes(stringBuilder);
-            stringBuilder.append(System.lineSeparator()).append("\nPre-instantiation initial state:\n").append("(and");
+            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append("\nPre-instantiation initial state:\n");
+            stringBuilder.append("(and");
             for (IntExpression f : intInitPredicates) {
                 stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
-                stringBuilder.append(")").append("\n\nPre-instantiation goal state:\n").append(Encoder.toString(intGoal));
+                stringBuilder.append(")");
+                stringBuilder.append("\n\nPre-instantiation goal state:\n");
+                stringBuilder.append(Encoder.toString(intGoal));
             }
             if (intTaskNetwork != null) {
-                stringBuilder.append(")").append("\n\nPre-instantiation initial task network:\n")
-                    .append(Encoder.toString(intTaskNetwork));
+                stringBuilder.append(")");
+                stringBuilder.append("\n\nPre-instantiation initial task network:\n");
+                stringBuilder.append(Encoder.toString(intTaskNetwork));
             }
-            stringBuilder.append("\nPre-instantiation actions with inferred types (").append(intActions.size())
-                .append(" actions):\n");
+            stringBuilder.append("\nPre-instantiation actions with inferred types (");
+            stringBuilder.append(intActions.size());
+            stringBuilder.append(" actions):\n");
             for (IntAction a : intActions) {
                 stringBuilder.append(Encoder.toString(a)).append("\n");
             }
             if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                stringBuilder.append("\nPre-instantiation methods with inferred types (").append(intMethods.size())
-                    .append(" methods):\n\n");
+                stringBuilder.append("\nPre-instantiation methods with inferred types (");
+                stringBuilder.append(intMethods.size());
+                stringBuilder.append(" methods):\n\n");
                 for (IntMethod meth : intMethods) {
                     stringBuilder.append(Encoder.toString(meth)).append("\n");
                 }
@@ -588,7 +609,8 @@ public final class Encoder implements Serializable {
         Encoder.methods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
 
         // Encode the goal in bit set representation
-        if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
+        if (intGoal != null && (!intGoal.getChildren().isEmpty()
+                || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
             Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
         } else {
             Encoder.goal = new State();
@@ -645,16 +667,16 @@ public final class Encoder implements Serializable {
         // Step 7: Compute structures to speed up the search
         // *****************************************************************************************
 
-        PostEncoding.createTableOfTaskResolvers();
+        PostEncoding.createTableOfRelevantOperators();
 
         if (Encoder.logLevel == 8) {
             if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 stringBuilder.append("\nTable of task resolvers:\n");
-                for (int ti = 0; ti < Encoder.tableOfTaskResolvers.size(); ti++) {
+                for (int ti = 0; ti < Encoder.tableOfRelevantOperators.size(); ti++) {
                     stringBuilder.append(ti).append(": ");
                     stringBuilder.append(Encoder.toString(Encoder.tableOfRelevantTasks.get(ti)));
                     stringBuilder.append(":");
-                    List<Integer> resolvers = Encoder.tableOfTaskResolvers.get(ti);
+                    List<Integer> resolvers = Encoder.tableOfRelevantOperators.get(ti);
                     for (int ri = 0; ri < resolvers.size(); ri++) {
                         stringBuilder.append(" ").append(resolvers.get(ri));
                     }
@@ -683,8 +705,9 @@ public final class Encoder implements Serializable {
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
         codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
-            task -> new Task(task.getPredicate(), task.getArguments(), task.isPrimtive())).collect(Collectors.toList()));
-        codedProblem.setTaskResolvers(Encoder.tableOfTaskResolvers);
+            task -> new Task(task.getPredicate(), task.getArguments(),
+                task.isPrimtive())).collect(Collectors.toList()));
+        codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
         codedProblem.setTypeSymbols(Encoder.tableOfTypes);

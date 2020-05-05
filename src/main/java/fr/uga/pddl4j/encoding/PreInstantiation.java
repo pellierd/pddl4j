@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * This class contains the methods for the pre instantiation step. In other words, it contains methods in order to:
  * <ul>
@@ -40,16 +40,17 @@ import java.util.Set;
  * <li> infer types from unary inertia information.</li>
  * <li> simplify actions and methods with infer types information.</li>
  * </ul>
- *
+ * <p>
  * Revisions:
  * <ul>
  *     <li> 19/04/13: Add a hack in method simplifiedActionWithInferredType to deal with the problem the constant
  *     in in precondition and effect of in action.</li>
  *     <li> 30/03/19: Add a method to simplify methods.</li>
  * </ul>
+ * </p>
  *
  * @author D. Pellier
- * @version 1.0 - 10.04.2010
+ * @version 1.2 - 10.04.2010
  */
 final class PreInstantiation implements Serializable {
 
@@ -545,8 +546,8 @@ final class PreInstantiation implements Serializable {
      * @param ti         the type intersection.
      * @param ts         the type substract.
      */
-    private static void replace(final IntExpression exp, final IntExpression inertia, final PDDLConnective connective, final int ti,
-                                final int ts) {
+    private static void replace(final IntExpression exp, final IntExpression inertia, final PDDLConnective connective,
+                                final int ti, final int ts) {
         switch (exp.getConnective()) {
             case ATOM:
                 if (exp.equals(inertia)) {

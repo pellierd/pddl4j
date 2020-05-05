@@ -82,7 +82,8 @@ public class PDDLTaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLTaskNetwork(final PDDLExpression tasks, final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
+    public PDDLTaskNetwork(final PDDLExpression tasks, final PDDLExpression ordering, final PDDLExpression logical,
+                           final boolean ordered) {
         super();
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);

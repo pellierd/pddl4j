@@ -15,8 +15,9 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.Problem;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

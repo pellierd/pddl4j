@@ -15,34 +15,33 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 16.04.2020
  */
-final public class PostEncoding implements Serializable {
+public final class PostEncoding implements Serializable {
 
     /**
-     * Creates the table of resolvers for each task.
+     * Creates the table of relevant operators for each task.
      */
-    static void createTableOfTaskResolvers() {
-        Encoder.tableOfTaskResolvers = new ArrayList<>(Encoder.tableOfRelevantTasks.size());
-        for (int ti = 0 ; ti < Encoder.tableOfRelevantTasks.size(); ti++) {
-            IntExpression task = Encoder.tableOfRelevantTasks.get(ti);
-            List<Integer> resolvers = new ArrayList<>();
+    static void createTableOfRelevantOperators() {
+        Encoder.tableOfRelevantOperators = new ArrayList<>(Encoder.tableOfRelevantTasks.size());
+        for (int ti = 0; ti < Encoder.tableOfRelevantTasks.size(); ti++) {
+            final IntExpression task = Encoder.tableOfRelevantTasks.get(ti);
+            final List<Integer> operators = new ArrayList<>();
             if (task.isPrimtive()) {
-                for (int ai = 0 ; ai < Encoder.actions.size(); ai++ ) {
+                for (int ai = 0; ai < Encoder.actions.size(); ai++) {
                     final Action action = Encoder.actions.get(ai);
                     if (action.getName().equals(Encoder.tableOfTasks.get(task.getPredicate()))
-                        && Arrays.equals(action.getInstantiations(), task.getArguments())) {
-                        resolvers.add(ai);
+                            && Arrays.equals(action.getInstantiations(), task.getArguments())) {
+                        operators.add(ai);
                     }
                 }
             } else {
-                for (int mi = 0 ; mi < Encoder.methods.size(); mi++ ) {
+                for (int mi = 0; mi < Encoder.methods.size(); mi++) {
                     final Method method = Encoder.methods.get(mi);
                     if (method.getTask() == ti) {
-                        resolvers.add(mi);
+                        operators.add(mi);
                     }
                 }
             }
-            Encoder.tableOfTaskResolvers.add(resolvers);
-
+            Encoder.tableOfRelevantOperators.add(operators);
         }
 
     }

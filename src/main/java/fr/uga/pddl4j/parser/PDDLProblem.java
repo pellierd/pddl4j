@@ -19,9 +19,14 @@
 
 package fr.uga.pddl4j.parser;
 
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class implements a planning problem read by the parser.
@@ -188,7 +193,9 @@ public class PDDLProblem implements Serializable {
      *
      * @return the task network of the problem. The task network may null if it is not defined.
      */
-    public final PDDLTaskNetwork getInitialTaskNetwork() {return this.initialTaskNetwork; }
+    public final PDDLTaskNetwork getInitialTaskNetwork() {
+        return this.initialTaskNetwork;
+    }
 
     /**
      * Returns the list of initial facts defined in the problem file.
@@ -309,7 +316,7 @@ public class PDDLProblem implements Serializable {
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
                     PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     c.setAtom(new LinkedList<PDDLSymbol>());
-                    c.getAtom().add(tn.getTasks().getChildren().get(i-1).getTaskID());
+                    c.getAtom().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
                     c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
                     tn.getOrderingConstraints().addChild(c);
                 }

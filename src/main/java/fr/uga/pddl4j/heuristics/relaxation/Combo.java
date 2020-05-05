@@ -19,10 +19,10 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
 
 /**
  * This class implement the combo heuristic. This heuristic improves the adjusted sum
@@ -45,11 +45,6 @@ import fr.uga.pddl4j.problem.ClosedWorldState;
  * @see SetLevel
  */
 public final class Combo extends RelaxedGraphHeuristic {
-
-    /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The set level heuristic used to compute the delta function, i.e., the interaction degree

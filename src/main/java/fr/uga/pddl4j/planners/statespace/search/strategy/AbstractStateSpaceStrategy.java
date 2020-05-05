@@ -16,13 +16,13 @@
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.planners.SolutionListener;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.util.Objects;
 
@@ -34,11 +34,6 @@ import java.util.Objects;
  * @since 3.6
  */
 public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
-
-    /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * The heuristic of the planner.

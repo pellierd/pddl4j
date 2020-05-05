@@ -19,10 +19,10 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategyAnytime;
-import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.util.Objects;
 import java.util.Vector;

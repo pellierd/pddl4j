@@ -428,7 +428,8 @@ public class PDDLDomain implements Serializable {
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                t.getTypes().stream().filter(s -> !s.equals(PDDLParser.OBJECT)).forEach(s -> stack.push(this.getType(s)));
+                t.getTypes().stream().filter(s -> !s.equals(PDDLParser.OBJECT))
+                    .forEach(s -> stack.push(this.getType(s)));
             }
         }
         return isSubType;

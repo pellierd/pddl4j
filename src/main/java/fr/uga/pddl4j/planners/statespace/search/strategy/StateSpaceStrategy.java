@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.planners.SolutionListener;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.io.Serializable;
 import javax.swing.event.EventListenerList;
