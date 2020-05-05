@@ -192,9 +192,13 @@ public class Problem implements Serializable {
         this.actions.addAll(other.actions.stream().map(Action::new).collect(Collectors.toList()));
         this.methods = new ArrayList<>();
         this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
-        this.goal = new State(other.goal);
+        if (other.goal != null) {
+            this.goal = new State(other.goal);
+        }
         this.initialState = new State(other.initialState);
-        this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
+        if (other.initialTaskNetwork != null) {
+            this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
+        }
         this.relevantOperators = new ArrayList<>(other.relevantOperators.size());
         for (List<Integer> ti : other.relevantOperators) {
             final List<Integer> copy = ti.stream().collect(Collectors.toList());
@@ -716,16 +720,34 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a string representation of a formula.
+     * Returns a string representation of a fluent.
      *
-     * @param formula the formula.
+     * @param fluent the formula.
      * @return a string representation of the specified expression.
      */
-    public String toString(final AtomicFormula formula) {
+    public String toString(final Fluent fluent) {
         final StringBuffer str = new StringBuffer();
         str.append("(");
-        str.append(this.predicateSymbols.get(formula.getSymbol()));
-        for (Integer arg : formula.getArguments()) {
+        str.append(this.predicateSymbols.get(fluent.getSymbol()));
+        for (Integer arg : fluent.getArguments()) {
+            str.append(" ");
+            str.append(this.constantSymbols.get(arg));
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a task.
+     *
+     * @param task the formula.
+     * @return a string representation of the specified expression.
+     */
+    public String toString(final Task task) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(this.taskSymbols.get(task.getSymbol()));
+        for (Integer arg : task.getArguments()) {
             str.append(" ");
             str.append(this.constantSymbols.get(arg));
         }

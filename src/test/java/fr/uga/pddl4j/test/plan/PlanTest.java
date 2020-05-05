@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.test.util;
+package fr.uga.pddl4j.test.plan;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;

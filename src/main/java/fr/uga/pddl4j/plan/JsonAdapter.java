@@ -50,7 +50,7 @@ public class JsonAdapter implements Serializable {
     /**
      * The current coded problem the plan is based on.
      */
-    private Problem codedProblem;
+    private Problem problem;
 
     /**
      * Plan in its JSON form.
@@ -60,12 +60,11 @@ public class JsonAdapter implements Serializable {
     /**
      * Create a new adapter.
      *
-     * @param codedProblem the pddl4j problem representation.
+     * @param problem the pddl4j problem representation.
      */
-    public JsonAdapter(Problem codedProblem) {
-        this.codedProblem = new Problem(codedProblem);
+    public JsonAdapter(Problem problem) {
+        this.problem = problem;
     }
-
     /**
      * Save the current jsonPlan into a file.
      *
@@ -108,7 +107,7 @@ public class JsonAdapter implements Serializable {
                 for (int j = 0; j < action.arity(); j++) {
                     final int index = action.getValueOfParameter(j);
                     if (index != -1) {
-                        parameters.add(this.codedProblem.getConstantSymbols().get(index));
+                        parameters.add(this.problem.getConstantSymbols().get(index));
                     }
                 }
 
@@ -195,12 +194,12 @@ public class JsonAdapter implements Serializable {
 
         final BitSet positive = exp.getPositive();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(this.codedProblem.toString(this.codedProblem.getRelevantFluents().get(i)));
+            fluentsPos.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
         }
 
         final BitSet negative = exp.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(this.codedProblem.toString(this.codedProblem.getRelevantFluents().get(i)));
+            fluentsNeg.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
         }
 
         fluents.add(fluentsPos);

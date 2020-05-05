@@ -65,7 +65,6 @@ public final class TFDPlanner extends AbstractPlanner {
      */
     @Override
     public Plan search(final Problem problem) {
-
         // Create the list of pending nodes to explore
         LinkedList<TFDNode> open = new LinkedList<TFDNode>();
         // Create the root node of the search space
