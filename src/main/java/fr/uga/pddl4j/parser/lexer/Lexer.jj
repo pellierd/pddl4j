@@ -422,8 +422,28 @@ void domain_and_problem() :
 }
 {
 	try {
-    	//Domain file
-    	domain()
+    	left_bracket() <DEFINE> left_bracket() <DOMAIN>
+            name=domain_name() {
+                this.domain = new PDDLDomain(name);
+            }
+        right_bracket()
+        [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
+        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
+        [LOOKAHEAD(2) constants_def()]
+        [LOOKAHEAD(2) predicates_def()]
+        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.PARTIAL_ORDERED_HTN)
+            || this.isRequirement(PDDLRequireKey.TOTAL_ORDERED_HTN)
+        })
+        tasks_def()]
+        [LOOKAHEAD(2, {
+            this.isRequirement(PDDLRequireKey.FLUENTS)
+            || this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+            || this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
+            || this.isRequirement(PDDLRequireKey.ACTION_COSTS)
+        }) functions_def()]
+        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+        (structure_def())*
+        right_bracket()
     	//Problem file
     	problem()
     } catch(Throwable e) {
