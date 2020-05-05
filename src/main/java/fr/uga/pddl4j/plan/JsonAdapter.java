@@ -65,6 +65,7 @@ public class JsonAdapter implements Serializable {
     public JsonAdapter(Problem problem) {
         this.problem = problem;
     }
+    
     /**
      * Save the current jsonPlan into a file.
      *
