@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.stn;
+package fr.uga.pddl4j.planners.htn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This class implements a node for the TotalOrderSTNPlanner planner of the PDDL4J library.
+ * This class implements a node for the TFDPlanner planner of the PDDL4J library.
  *
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
  */
-final public class TotalOrderSTNPlanner extends AbstractPlanner {
+final public class TFDPlanner extends AbstractPlanner {
 
     /*
      * The arguments of the planner.
@@ -51,7 +51,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
      *
      * @param arguments the arguments of the planner.
      */
-    public TotalOrderSTNPlanner(final Properties arguments) {
+    public TFDPlanner(final Properties arguments) {
         super();
         this.arguments = arguments;
     }
@@ -67,9 +67,9 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     public Plan search(final Problem problem) {
 
         // Create the list of pending nodes to explore
-        LinkedList<STNNode> open = new LinkedList<STNNode>();
+        LinkedList<TFDNode> open = new LinkedList<TFDNode>();
         // Create the root node of the search space
-        STNNode root = new STNNode(problem.getInitialState(), problem.getInitialTaskNetwork());
+        TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
         root.setParent(null);
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
@@ -80,7 +80,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
         // Start exploring the search space
         while (!open.isEmpty() && plan == null) {
             // Get and remove the first node of the pending list of nodes.
-            STNNode currentNode = open.pop();
+            TFDNode currentNode = open.pop();
             // If the task network is empty we've got a solution
             if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
@@ -96,7 +96,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                     for (Integer operator : relevanteOperators) {
                         final Action action = problem.getActions().get(operator);
                         if (state.satisfy(action.getPreconditions())) {
-                            STNNode childNode = new STNNode(currentNode);
+                            TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(operator);
                             childNode.getState().apply(action.getCondEffects());
@@ -107,7 +107,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
                     for (Integer operator : relevanteOperators) {
                         final Method method = problem.getMethods().get(operator);
                         if (state.satisfy(method.getPreconditions())) {
-                            STNNode childNode = new STNNode(currentNode);
+                            TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(problem.getActions().size() + operator);
                             childNode.getTaskNetwork().push(method.getSubTasks());
@@ -129,8 +129,8 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    private SequentialPlan extractPlan(final STNNode node, final Problem problem) {
-        STNNode n = node;
+    private SequentialPlan extractPlan(final TFDNode node, final Problem problem) {
+        TFDNode n = node;
         final SequentialPlan plan = new SequentialPlan();
         while (n.getParent() != null) {
             if (n.getOperator() < problem.getActions().size()) {
@@ -144,11 +144,11 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     }
 
     /**
-     * The main method of the <code>TotalOrderSTNPlanner</code> example. The command line syntax is as
+     * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
      * follow:
      *
      * <pre>
-     * usage of TotalOrderSTNPlanner:
+     * usage of TFDPlanner:
      *
      * OPTIONS   DESCRIPTIONS
      *
@@ -161,7 +161,7 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
      *
      *
      * Commande line example:
-     * <code>java -cp build/libs/pddl4j-3.8.3.jar fr.uga.pddl4j.planners.htn.stn.TotalOrderSTNPlanner</code><br>
+     * <code>java -cp build/libs/pddl4j-3.8.3.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner</code><br>
      * <code>  -d src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/domain.hddl</code><br>
      * <code>  -p src/test/resources/parser/hddl/HDDL-Total-Ordered/rover/pb01.hddl</code><br>
      *
@@ -170,14 +170,14 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     public static void main(final String[] args) {
 
         // Parse the commande line and initialize the arguments of the planner.
-        final Properties arguments = TotalOrderSTNPlanner.parseCommandLine(args);
+        final Properties arguments = TFDPlanner.parseCommandLine(args);
         if (arguments == null) {
-            TotalOrderSTNPlanner.printUsage();
+            TFDPlanner.printUsage();
             System.exit(0);
         }
 
-        // Create an instance of the TotalOrderSTNPlanner Planner
-        final TotalOrderSTNPlanner planner = new TotalOrderSTNPlanner(arguments);
+        // Create an instance of the TFDPlanner Planner
+        final TFDPlanner planner = new TFDPlanner(arguments);
 
         // Create an instance of the problem factory to parse and encode the domain and problem file
         final ProblemFactory factory = ProblemFactory.getInstance();
@@ -220,11 +220,11 @@ final public class TotalOrderSTNPlanner extends AbstractPlanner {
     }
 
     /**
-     * Print the usage of the TotalOrderSTNPlanner planner.
+     * Print the usage of the TFDPlanner planner.
      */
     private static void printUsage() {
         final StringBuilder strb = new StringBuilder();
-        strb.append("\nusage of TotalOrderSTNPlanner:\n")
+        strb.append("\nusage of TFDPlanner:\n")
                 .append("OPTIONS   DESCRIPTIONS\n")
                 .append("-d <str>    hddl domain file name\n")
                 .append("-p <str>    hddl problem file name\n")

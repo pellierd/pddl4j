@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.stn;
+package fr.uga.pddl4j.planners.htn.tfd;
 
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.TaskNetwork;
@@ -21,13 +21,13 @@ import fr.uga.pddl4j.problem.TaskNetwork;
 import java.io.Serializable;
 
 /**
- * This class implements a node for the TotalOrderSTNPlanner planner of the PDDL4J library.
+ * This class implements a node for the TFDPlanner planner of the PDDL4J library.
  *
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
  */
-public class STNNode implements Serializable {
+public class TFDNode implements Serializable {
 
     /**
      * The state that describes the state of the world reached by the search.
@@ -48,32 +48,32 @@ public class STNNode implements Serializable {
     /**
      * The parent node of this node.
      */
-    private STNNode parent;
+    private TFDNode parent;
 
 
     /**
-     * Creates a new STNNode from an other. This constructor creates a deep copy of the node in parameters.
+     * Creates a new TFDNode from an other. This constructor creates a deep copy of the node in parameters.
      *
      * @param other the node to be copied.
      */
-    public STNNode(final STNNode other) {
+    public TFDNode(final TFDNode other) {
         this(new State(other.getState()), new TaskNetwork(other.getTaskNetwork()));
     }
 
     /**
-     * Creates a new exmpty STNNode.
+     * Creates a new exmpty TFDNode.
      */
-    public STNNode() {
+    public TFDNode() {
         this(new State(), new TaskNetwork());
     }
 
     /**
-     * Creates a new STNNode with a specified state and task network.
+     * Creates a new TFDNode with a specified state and task network.
      *
      * @param state the state of the node.
      * @param taskNetwork the tasknetworl of the node.
      */
-    public STNNode(final State state, final TaskNetwork taskNetwork) {
+    public TFDNode(final State state, final TaskNetwork taskNetwork) {
         super();
         this.state = state;
         this.taskNetwork = taskNetwork;
@@ -123,7 +123,7 @@ public class STNNode implements Serializable {
      *
      * @return the parent node of this node.
      */
-    public STNNode getParent() {
+    public TFDNode getParent() {
         return parent;
     }
 
@@ -132,7 +132,7 @@ public class STNNode implements Serializable {
      *
      * @param parent the parent node to set.
      */
-    public void setParent(STNNode parent) {
+    public void setParent(TFDNode parent) {
         this.parent = parent;
     }
 
@@ -160,7 +160,7 @@ public class STNNode implements Serializable {
 
     /**
      * Returns <code>true</code> if a node is equals to an other object. An object is equals to this node if and only
-     * if the other object is an instance of <code>STNNode</code> and have the same state and the same task network.
+     * if the other object is an instance of <code>TFDNode</code> and have the same state and the same task network.
      *
      * @param obj the object to be compared.
      * @return <code>true</code> if a node is equals to an other object, <code>false</code> otherwise.
@@ -168,8 +168,8 @@ public class STNNode implements Serializable {
      */
     @Override
     final public boolean equals(final Object obj) {
-        if (obj != null && obj instanceof STNNode) {
-            STNNode other = (STNNode) obj;
+        if (obj != null && obj instanceof TFDNode) {
+            TFDNode other = (TFDNode) obj;
             return this.getState().equals(other.getState()) && this.getTaskNetwork().equals(other.getTaskNetwork());
         }
         return false;
