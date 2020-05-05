@@ -24,6 +24,7 @@ import fr.uga.pddl4j.util.BitMatrix;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -97,34 +98,6 @@ public final class TaskNetwork implements Serializable {
      */
     public final  List<Integer> getTasks() {
         return this.tasks;
-    }
-
-    /**
-     * Pops the first task of the task network. In other words, removes and returns the first task of this task network.
-     *
-     * @return the first task of task network.
-     */
-    public final Integer pop() {
-        return this.tasks.pop();
-    }
-
-    /**
-     * Pushes a task into the task network. In other words, inserts the task as the first task of the task network.
-     *
-     * @param task the task to push.
-     */
-    public final void push(final int task) {
-        this.tasks.push(task);
-    }
-
-    /**
-     * Pushes a list of tasks into the task network. In other words, inserts the list of tasks as the first tasks of the
-     * task network.
-     *
-     * @param tasks the list of tasks to push.
-     */
-    public final void push(final List<Integer> tasks) {
-        this.tasks.addAll(0, tasks);
     }
 
     /**
@@ -246,6 +219,6 @@ public final class TaskNetwork implements Serializable {
      */
     @Override
     public final int hashCode() {
-        return this.getTasks().hashCode() + this.getOrderingConstraints().hashCode();
+        return Objects.hash(this.getTasks(), this.getOrderingConstraints());
     }
 }

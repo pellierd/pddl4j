@@ -16,9 +16,11 @@
 package fr.uga.pddl4j.planners.htn.tfd;
 
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.TaskNetwork;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class implements a node for the TFDPlanner planner of the PDDL4J library.
@@ -35,10 +37,9 @@ public class TFDNode implements Serializable {
     private State state;
 
     /**
-     * The task network that describes the set of tasks to be accomplished and their constraints that have to be
-     * verified.
+     * The list of tasks to be accomplished.
      */
-    private TaskNetwork taskNetwork;
+    private LinkedList<Integer> tasks;
 
     /**
      * The operator used to reach this node.
@@ -50,33 +51,51 @@ public class TFDNode implements Serializable {
      */
     private TFDNode parent;
 
-
     /**
      * Creates a new TFDNode from an other. This constructor creates a deep copy of the node in parameters.
      *
      * @param other the node to be copied.
      */
     public TFDNode(final TFDNode other) {
-        this(new State(other.getState()), new TaskNetwork(other.getTaskNetwork()));
+        this(new State(other.getState()), other.getTasks(), other.getParent(), other.getOperator());
     }
 
     /**
-     * Creates a new exmpty TFDNode.
+     * Creates a new exmpty TFDNode. The parent node is set to null and the operator to Interger.MAX_VALUE.
      */
     public TFDNode() {
-        this(new State(), new TaskNetwork());
+        this(new State(), new LinkedList<Integer>(), null, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a new TFDNode with a specified state and task network. The parent node is set to null and the operator to
+     * Interger.MAX_VALUE.
+     *
+     * @param state the state of the node.
+     * @param tasks the task network of the node.
+     */
+    public TFDNode(final State state, final List<Integer> tasks) {
+        super();
+        this.setState(state);
+        this.setTasks(tasks);
+        this.setParent(null);
+        this.setOperator(Integer.MAX_VALUE);
     }
 
     /**
      * Creates a new TFDNode with a specified state and task network.
      *
      * @param state the state of the node.
-     * @param taskNetwork the tasknetworl of the node.
+     * @param tasks the task network of the node.
+     * @param parent the parent of the node.
+     * @param operator the index of the operator applied to reach this node.
      */
-    public TFDNode(final State state, final TaskNetwork taskNetwork) {
+    public TFDNode(final State state, final List<Integer> tasks, final TFDNode parent, final int operator) {
         super();
-        this.state = state;
-        this.taskNetwork = taskNetwork;
+        this.setState(state);
+        this.setTasks(tasks);
+        this.setParent(parent);
+        this.setOperator(operator);
     }
 
     /**
@@ -98,23 +117,40 @@ public class TFDNode implements Serializable {
     }
 
     /**
-     * Returns the task network of the node. The task network describes the set of tasks to be accomplished
-     * and their constraints that have to be verified.
+     * Returns the list of tasks the node. The list describes the list of tasks remaining to be accomplished.
      *
-     * @return the task network of the node.
+     * @return the list of tasks of the node.
      */
-    public final TaskNetwork getTaskNetwork() {
-        return this.taskNetwork;
+    public final List<Integer> getTasks() {
+        return this.tasks;
     }
 
     /**
-     * Sets the tasks network of the node. The task network describes the set of tasks to be accomplished
-     * and their constraints that have to be verified.
+     * Sets the list of tasks of the node. The list describes the tasks to be accomplished.
      *
-     * @param taskNetwork the task network of the node.
+     * @param tasks the list of tasks of the node.
      */
-    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
-        this.taskNetwork = taskNetwork;
+    public final void setTasks(final List<Integer> tasks) {
+        this.tasks = new LinkedList<Integer>(tasks);
+    }
+
+    /**
+     * Pops the first task of the node and remove it from the node.
+     *
+     * @return the first task of contained in the node. If the node has no more tasks, the method returns null;
+     */
+    public final Integer popTask() {
+        return this.tasks.isEmpty() ? null : this.tasks.get(0);
+    }
+
+    /**
+     * Pushes a list of tasks at beginning of the task list of the node.
+     *
+     * @param tasks the list of tasks to push.
+     * @return true if the collection was pushed, false otherwise.
+     */
+    public final boolean pushAllTasks(final List<Integer> tasks) {
+        return this.tasks.addAll(0, tasks);
     }
 
     /**
@@ -170,7 +206,7 @@ public class TFDNode implements Serializable {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof TFDNode) {
             TFDNode other = (TFDNode) obj;
-            return this.getState().equals(other.getState()) && this.getTaskNetwork().equals(other.getTaskNetwork());
+            return this.getState().equals(other.getState()) && this.getTasks().equals(other.getTasks());
         }
         return false;
     }
@@ -183,10 +219,6 @@ public class TFDNode implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + this.getState().hashCode();
-        result = prime * result + this.getTaskNetwork().hashCode();
-        return result;
+        return Objects.hash(getState(), getTasks());
     }
 }

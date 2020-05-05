@@ -68,8 +68,7 @@ public final class TFDPlanner extends AbstractPlanner {
         // Create the list of pending nodes to explore
         LinkedList<TFDNode> open = new LinkedList<TFDNode>();
         // Create the root node of the search space
-        TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
-        root.setParent(null);
+        TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork().getTasks());
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
 
@@ -81,11 +80,11 @@ public final class TFDPlanner extends AbstractPlanner {
             // Get and remove the first node of the pending list of nodes.
             TFDNode currentNode = open.pop();
             // If the task network is empty we've got a solution
-            if (currentNode.getTaskNetwork().isEmpty()) {
+            if (currentNode.getTasks().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
             } else {
                 // Get and remove the fist task of the task network
-                int task = currentNode.getTaskNetwork().pop();
+                int task = currentNode.popTask();
                 // Get the current state of the search
                 State state = currentNode.getState();
                 // Get the resolvers, i.e., action or method that are relevant for this task.
@@ -109,7 +108,7 @@ public final class TFDPlanner extends AbstractPlanner {
                             TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(problem.getActions().size() + operator);
-                            childNode.getTaskNetwork().push(method.getSubTasks());
+                            childNode.pushAllTasks(method.getSubTasks());
                             open.push(childNode);
                         }
                     }
