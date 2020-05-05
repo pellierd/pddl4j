@@ -107,7 +107,6 @@ checkstyleMain.onlyIf() { !project.hasProperty('noCheckStyle') }
 
 checkstyleMain.doFirst() {
     excludeLexer(checkstyleMain)
-    checkstyleTest.enabled = false
 }
 
 checkstyleMain.doLast() {

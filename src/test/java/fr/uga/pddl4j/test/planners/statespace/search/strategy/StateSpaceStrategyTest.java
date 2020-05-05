@@ -1,7 +1,7 @@
 package fr.uga.pddl4j.test.planners.statespace.search.strategy;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
@@ -12,8 +12,9 @@ import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAn
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
 import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.plan.Plan;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -353,7 +353,8 @@ public class ParserBenchmarksTest {
                     errors.add(builder.toString());
 
                 } else {
-                    System.out.println("PDDLParser test successful: \n   --" + currentProblem + "\n   --" + currentDomain);
+                    System.out.println("PDDLParser test successful: \n   --"
+                        + currentProblem + "\n   --" + currentDomain);
                 }
 
             } catch (FileNotFoundException fnfException) {

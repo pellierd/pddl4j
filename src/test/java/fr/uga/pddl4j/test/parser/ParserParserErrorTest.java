@@ -18,6 +18,7 @@ package fr.uga.pddl4j.test.parser;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.test.Tools;
+
 import org.junit.Assert;
 import org.junit.Test;
 

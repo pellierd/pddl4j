@@ -15,17 +15,18 @@
 
 package fr.uga.pddl4j.test.planners.statespace.generic;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.generic.GenericAnytimePlanner;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategyAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
 import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbingAnytime;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.plan.Plan;
+
 import org.junit.Assert;
 import org.junit.Test;
 
