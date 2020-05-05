@@ -22,6 +22,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
 import fr.uga.pddl4j.parser.lexer.TokenMgrError;
+import fr.uga.pddl4j.util.BitMatrix;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,13 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -83,12 +78,9 @@ import java.util.stream.Collectors;
  * }
  * </pre>
  *
- * <p>
- *  TO DO: check the cyclic dependencies of the ordering constraints of the methods.
- * </p>
  *
  * @author D Pellier
- * @version 1.0 - 28.01.10
+ * @version 2.0 - 28.01.10
  */
 public final class PDDLParser {
 
@@ -1076,11 +1068,60 @@ public final class PDDLParser {
                         checked = false;
                     }
                 }
+                checked = checkOrderingConstraintAcyclicness(meth.getOrderingConstraints());
             } else {
                 checked = false;
             }
         }
         return checked;
+    }
+
+    /**
+     * Checks that the orderings constraints are acyclic.
+     *
+     * @param constraints the ordering constraints expression. We make the assumption that the constraints are described
+     *                    by an AND PDDLExpression.
+     *
+     * @return true if a set of ordering constraints are acyclic, false otherwise.
+     */
+    private boolean checkOrderingConstraintAcyclicness(final PDDLExpression constraints) {
+        Map<PDDLSymbol, Set<PDDLSymbol>> ordering = new LinkedHashMap<PDDLSymbol, Set<PDDLSymbol>>();
+        for (PDDLExpression constraint : constraints.getChildren()) {
+            PDDLSymbol keyTask = constraint.getAtom().get(0);
+            Set<PDDLSymbol> tasks = ordering.get(keyTask);
+            if (tasks == null) {
+                tasks = new HashSet<PDDLSymbol>();
+                ordering.put(keyTask, tasks);
+            }
+            tasks.add(constraint.getAtom().get(1));
+        }
+        Boolean closure = false;
+        while (!closure) {
+            closure = true;
+            for (Map.Entry<PDDLSymbol, Set<PDDLSymbol>> entry : ordering.entrySet()) {
+                Set<PDDLSymbol> acc = new HashSet<PDDLSymbol>();
+                for (PDDLSymbol task : entry.getValue()) {
+                    Set<PDDLSymbol> sacc = ordering.get(task);
+                    if (sacc != null) {
+                        acc.addAll(sacc);
+                    }
+                }
+                closure &= !entry.getValue().addAll(acc);
+            }
+        }
+        boolean check = true;
+        Iterator<Map.Entry<PDDLSymbol, Set<PDDLSymbol>>> i = ordering.entrySet().iterator();
+        while (i.hasNext() && check) {
+            Map.Entry<PDDLSymbol, Set<PDDLSymbol>> entry = i.next();
+            PDDLSymbol task = entry.getKey();
+            if (entry.getValue().contains(task)) {
+                this.mgr.logParserError("cyclical constraint involving the task \"" + task.getImage()
+                    + "\" in method declaration", this.lexer.getFile(), task.getBeginLine(), task.getBeginColumn());
+                check = false;
+            }
+
+        }
+        return check;
     }
 
     /**
