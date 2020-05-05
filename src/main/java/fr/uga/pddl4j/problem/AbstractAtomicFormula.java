@@ -129,8 +129,8 @@ public abstract class AbstractAtomicFormula implements AtomicFormula {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof AbstractAtomicFormula) {
             final AbstractAtomicFormula other = (AbstractAtomicFormula) obj;
-            return this.symbol == other.symbol &&
-                Objects.equals(this.arguments, other.arguments);
+            return this.symbol == other.symbol
+                && Objects.equals(this.arguments, other.arguments);
         }
         return false;
     }

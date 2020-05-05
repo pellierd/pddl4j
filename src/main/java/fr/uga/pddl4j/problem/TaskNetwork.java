@@ -181,7 +181,8 @@ public final class TaskNetwork implements Serializable {
     /**
      * Returns if this task network contains cyclic ordering constraints.
      *
-     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code> otherwise.
+     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code>
+     *      otherwise.
      */
     public final boolean isAcyclic() {
         this.transitiveClosure();

@@ -134,7 +134,7 @@ public class Problem implements Serializable {
     private State initialState;
 
     /**
-     * The initial task network
+     * The initial task network.
      */
     private TaskNetwork initialTaskNetwork;
 
@@ -544,7 +544,9 @@ public class Problem implements Serializable {
      *
      * @return the initial task network.
      */
-    public final  TaskNetwork getInitialTaskNetwork() { return this.initialTaskNetwork; }
+    public final  TaskNetwork getInitialTaskNetwork() {
+        return this.initialTaskNetwork;
+    }
 
     /**
      * Sets the initial task network of the problem.
@@ -595,6 +597,28 @@ public class Problem implements Serializable {
     }
 
     /**
+     * Returns a short string representation of the specified operator, i.e., its name and its
+     * instantiated parameters. This method can be used for actions and methods.
+     *
+     * @param operator  the operator.
+     * @return a string representation of the specified operator.
+     */
+    public String toShortString(final AbstractGroundOperator operator) {
+        final StringBuilder str = new StringBuilder();
+        str.append(operator.getName());
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            if (index == -1) {
+                str.append(" ?");
+            } else {
+                str.append(" ");
+                str.append(this.getConstantSymbols().get(index));
+            }
+        }
+        return str.toString();
+    }
+
+    /**
      * Returns a string representation of the specified method.
      *
      * @param method the method.
@@ -631,29 +655,6 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a short string representation of the specified operator, i.e., its name and its
-     * instantiated parameters. This method can be used for actions and methods.
-     *
-     * @param operator  the operator.
-     * @return a string representation of the specified operator.
-     */
-    public String toShortString(final AbstractGroundOperator operator) {
-        final StringBuilder str = new StringBuilder();
-        str.append(operator.getName());
-        for (int i = 0; i < operator.arity(); i++) {
-            final int index = operator.getValueOfParameter(i);
-            if (index == -1) {
-                str.append(" ?");
-            } else {
-                str.append(" ");
-                str.append(this.getConstantSymbols().get(index));
-            }
-        }
-        return str.toString();
-    }
-
-
-    /**
      * Returns a string representation of a conditional effect.
      *
      * @param ceffect  the conditional effect.
@@ -674,7 +675,7 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a string representation of a state
+     * Returns a string representation of a state.
      *
      * @param state the state.
      * @return a string representation of the state.

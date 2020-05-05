@@ -19,15 +19,23 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.UnexpectedExpressionException;
-import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.Method;
+import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -179,7 +187,9 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static State encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map) throws UnexpectedExpressionException {
+    static State encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map)
+            throws UnexpectedExpressionException {
+
         if (goal.getConnective().equals(PDDLConnective.FALSE)) {
             return null;
         }

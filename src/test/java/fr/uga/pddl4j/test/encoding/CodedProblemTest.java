@@ -15,11 +15,10 @@
 
 package fr.uga.pddl4j.test.encoding;
 
+import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.encoding.IntExpression;
 import fr.uga.pddl4j.test.Tools;
-import fr.uga.pddl4j.problem.Action;
 import org.junit.Assert;
 import org.junit.Test;
 

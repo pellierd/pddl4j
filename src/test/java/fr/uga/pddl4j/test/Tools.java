@@ -1,9 +1,9 @@
 package fr.uga.pddl4j.test;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.problem.Problem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;

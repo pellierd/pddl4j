@@ -3,7 +3,6 @@ package test.java.fr.uga.pddl4j.test.encoding;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
 
-
 import java.io.File;
 import java.io.IOException;
 

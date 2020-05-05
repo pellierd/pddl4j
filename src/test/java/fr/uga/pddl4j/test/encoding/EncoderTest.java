@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.test.encoding;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
 import org.junit.Assert;
 import org.junit.Test;

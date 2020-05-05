@@ -25,11 +25,12 @@ import java.util.BitSet;
 
 /**
  * This class implements a bit matrix.
- *
+ * <p>
  * Revisions:
  * <ul>
  *     <li>31.03.2020: Add a deep copy constructor.</li>
  * </ul>
+ * </p>
  *
  * @author D. Pellier
  * @version 1.0 - 30.08.2010

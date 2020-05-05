@@ -112,7 +112,7 @@ public class ConditionalEffect implements Serializable {
      * @param effects the effects to set
      */
     public final void setEffects(State effects) {
-       this.effects = effects;
+        this.effects = effects;
     }
 
     /**
