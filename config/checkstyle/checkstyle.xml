@@ -184,7 +184,7 @@
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="3"/>
-            <property name="allowedAbbreviations" value="PDDL"/>
+            <property name="allowedAbbreviations" value="PDDL, HDDL"/>
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>

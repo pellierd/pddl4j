@@ -140,7 +140,7 @@ public class TFDNode implements Serializable {
      * @return the first task of contained in the node. If the node has no more tasks, the method returns null;
      */
     public final Integer popTask() {
-        return this.tasks.isEmpty() ? null : this.tasks.get(0);
+        return this.tasks.pop();
     }
 
     /**

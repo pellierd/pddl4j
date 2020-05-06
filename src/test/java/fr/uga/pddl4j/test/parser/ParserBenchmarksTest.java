@@ -275,11 +275,39 @@ public class ParserBenchmarksTest {
     }
 
     /**
+     * Method that executes benchmarks using HDDL files on the parser to test if its coverage is OK.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void testParserHDDL() throws Exception {
+
+        final String localTestPath = Tools.BENCH_DIR + "hddl" + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark directory: HDDL test skipped !");
+            return;
+        }
+
+        final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
+
+        if (!errors.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Some parsing errors occurred !\n");
+            errors.forEach(err -> {
+                builder.append(err);
+                builder.append("\n-------------------\n");
+            });
+            throw new Exception(builder.toString());
+        }
+    }
+
+    /**
      * Search for all domain file (domain.pddl or xxx-domain.pddl) and parse all domain/problem couple
      * if any.
      *
-     * @param localTestPath the path where to begin research
-     * @return A String stream containing error reports if any
+     * @param localTestPath the path where to begin research.
+     * @return A String stream containing error reports if any.
      */
     private Stream<String> executeTests(String localTestPath) {
 

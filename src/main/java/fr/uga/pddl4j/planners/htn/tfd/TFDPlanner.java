@@ -75,8 +75,13 @@ public final class TFDPlanner extends AbstractPlanner {
         // Declare the plan used to store the result of the exploration
         Plan plan = null;
 
+        // Get the timeout for searching
+        final int timeout = (int) arguments.get(Planner.TIMEOUT);
+        final long start = System.currentTimeMillis();
+        long elapsedTime = 0;
+
         // Start exploring the search space
-        while (!open.isEmpty() && plan == null) {
+        while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
             TFDNode currentNode = open.pop();
             // If the task network is empty we've got a solution
@@ -112,9 +117,9 @@ public final class TFDPlanner extends AbstractPlanner {
                             open.push(childNode);
                         }
                     }
-
                 }
             }
+            elapsedTime = System.currentTimeMillis() - start;
         }
         return plan;
 
@@ -207,11 +212,14 @@ public final class TFDPlanner extends AbstractPlanner {
                 + pb.getRelevantFluents().size() + " fluents, "
                 + pb.getTasks().size() + " tasks)\n");
 
+        final long start = System.currentTimeMillis();
         final Plan plan = planner.search(pb);
+        final long end = System.currentTimeMillis();
         if (plan != null) {
             // Print plan information
-            System.out.println("found plan as follows:\n\n" + pb.toString(plan));
-            System.out.println(String.format("%nplan total cost: %4.2f%n%n", plan.cost()));
+            System.out.println("found plan as follows:\n" + pb.toString(plan));
+            System.out.println(String.format("plan total cost: %4.2f", plan.cost()));
+            System.out.println(String.format("search time: %4.3fs%n%n", ((end - start) / 1000.0)));
         } else {
             System.out.println(String.format(String.format("%nno plan found%n%n")));
         }

@@ -46,7 +46,7 @@ public abstract class Tools {
     /**
      * The path of the benchmarks files.
      */
-    public static final String BENCH_DIR = "benchmarks" + File.separator;
+    public static final String BENCH_DIR = "src/test/resources/benchmarks" + File.separator;
 
     /**
      * PDDL files extension.
