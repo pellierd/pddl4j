@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.tfd;
+package fr.uga.pddl4j.planners.htn.pfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This class implements a node for the TFDPlanner planner of the PDDL4J library.
+ * This class implements a node for the PFDPlanner planner of the PDDL4J library.
  *
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
  */
-public final class TFDPlanner extends AbstractPlanner {
+public final class PFDPlanner extends AbstractPlanner {
 
     /*
      * The arguments of the planner.
@@ -47,18 +47,18 @@ public final class TFDPlanner extends AbstractPlanner {
     private Properties arguments;
 
     /**
-     * Creates a new total order STN planner with the default parameters.
+     * Creates a new partial order STN planner with the default parameters.
      *
      * @param arguments the arguments of the planner.
      */
-    public TFDPlanner(final Properties arguments) {
+    public PFDPlanner(final Properties arguments) {
         super();
         this.arguments = arguments;
     }
 
     /**
      * Solves the planning problem and returns the first solution search found. The search method is an implementation
-     * of the total order STN procedure describes in the book of Automated Planning of Ghallab and al. page 239.
+     * of the total order STN procedure describes in the book of Automated Planning of Ghallab and al. page 243.
      *
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
@@ -66,9 +66,9 @@ public final class TFDPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
         // Create the list of pending nodes to explore
-        final LinkedList<TFDNode> open = new LinkedList<TFDNode>();
+        final LinkedList<PFDNode> open = new LinkedList<PFDNode>();
         // Create the root node of the search space
-        final TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork().getTasks());
+        final PFDNode root = new PFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
 
@@ -83,46 +83,47 @@ public final class TFDPlanner extends AbstractPlanner {
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
-            final TFDNode currentNode = open.pop();
-            // If the task network is empty we've got a solution
-            if (currentNode.getTasks().isEmpty()) {
+            final PFDNode currentNode = open.pop();
+            // If the task network has no more task, a solution is found
+            if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
             } else {
-                // Get and remove the fist task of the task network
-                int task = currentNode.popTask();
+                // Get the list of tasks of the current node with no predecessors
+                final List<Integer> tasks = currentNode.getTaskNetwork().getTasksWithNoPredecessors();
                 // Get the current state of the search
                 final State state = currentNode.getState();
-                // Get the relevant operators, i.e., action or method that are relevant for this task.
-                final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
-                // Case of primitive task
-                if (problem.getTasks().get(task).isPrimtive()) {
-                    for (Integer operator : relevantOperators) {
-                        final Action action = problem.getActions().get(operator);
-                        if (state.satisfy(action.getPreconditions())) {
-                            final TFDNode childNode = new TFDNode(currentNode);
-                            childNode.setParent(currentNode);
-                            childNode.setOperator(operator);
-                            childNode.getState().apply(action.getCondEffects());
-                            open.push(childNode);
+                // For each task with no predecessors
+                for (Integer task : tasks) {
+                    final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
+                    // Case of primitive tasks
+                    if (problem.getTasks().get(task).isPrimtive()) {
+                        for (Integer operator : relevantOperators) {
+                            final Action action = problem.getActions().get(operator);
+                            if (state.satisfy(action.getPreconditions())) {
+                                final PFDNode childNode = new PFDNode(currentNode);
+                                childNode.setParent(currentNode);
+                                childNode.setOperator(operator);
+                                childNode.getState().apply(action.getCondEffects());
+                                childNode.getTaskNetwork().decompose(task, action);
+                                open.push(childNode);
+                            }
                         }
-                    }
-                } else { // Case of the compound task
-                    for (Integer operator : relevantOperators) {
-                        final Method method = problem.getMethods().get(operator);
-                        if (state.satisfy(method.getPreconditions())) {
-                            final TFDNode childNode = new TFDNode(currentNode);
+                    } else { // Case of compund tasks
+                        for (Integer operator : relevantOperators) {
+                            final Method method = problem.getMethods().get(operator);
+                            PFDNode childNode = new PFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(problem.getActions().size() + operator);
-                            childNode.pushAllTasks(method.getSubTasks());
-                            open.push(childNode);
+                            childNode.getTaskNetwork().decompose(task, method);
+
+
                         }
                     }
                 }
+                elapsedTime = System.currentTimeMillis() - start;
             }
-            elapsedTime = System.currentTimeMillis() - start;
         }
         return plan;
-
     }
 
     /**
@@ -132,8 +133,8 @@ public final class TFDPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    private SequentialPlan extractPlan(final TFDNode node, final Problem problem) {
-        TFDNode n = node;
+    private SequentialPlan extractPlan(final PFDNode node, final Problem problem) {
+        PFDNode n = node;
         final SequentialPlan plan = new SequentialPlan();
         while (n.getParent() != null) {
             if (n.getOperator() < problem.getActions().size()) {
@@ -147,7 +148,7 @@ public final class TFDPlanner extends AbstractPlanner {
     }
 
     /**
-     * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
+     * The main method of the <code>PFDPlanner</code> example. The command line syntax is as
      * follow:
      *
      * <pre>
@@ -164,23 +165,23 @@ public final class TFDPlanner extends AbstractPlanner {
      *
      * <p>
      * Commande line example:
-     * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.tfd.TFDPlanner</code><br>
-     * <code>  -d src/test/resources/benchmarks/rover_total_ordered/domain.hddl</code><br>
-     * <code>  -p src/test/resources/benchmarks/rover_total_ordered/pb01.hddl</code><br>
+     * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.pfd.PFDPlanner</code><br>
+     * <code>  -d src/test/resources/benchmarks/rover_partial_ordered/domain.hddl</code><br>
+     * <code>  -p src/test/resources/benchmarks/rover_partial_ordered/pb01.hddl</code><br>
      * </p>
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
 
         // Parse the commande line and initialize the arguments of the planner.
-        final Properties arguments = TFDPlanner.parseCommandLine(args);
+        final Properties arguments = PFDPlanner.parseCommandLine(args);
         if (arguments == null) {
-            TFDPlanner.printUsage();
+            PFDPlanner.printUsage();
             System.exit(0);
         }
 
         // Create an instance of the TFDPlanner Planner
-        final TFDPlanner planner = new TFDPlanner(arguments);
+        final PFDPlanner planner = new PFDPlanner(arguments);
 
         // Create an instance of the problem factory to parse and encode the domain and problem file
         final ProblemFactory factory = ProblemFactory.getInstance();
@@ -207,10 +208,10 @@ public final class TFDPlanner extends AbstractPlanner {
         factory.setTraceLevel(traceLevel);
         final Problem pb = factory.encode();
         System.out.println("\nencoding problem done successfully ("
-                + pb.getActions().size() + " actions, "
-                + pb.getMethods().size() + " methods, "
-                + pb.getRelevantFluents().size() + " fluents, "
-                + pb.getTasks().size() + " tasks)\n");
+            + pb.getActions().size() + " actions, "
+            + pb.getMethods().size() + " methods, "
+            + pb.getRelevantFluents().size() + " fluents, "
+            + pb.getTasks().size() + " tasks)\n");
 
         final long start = System.currentTimeMillis();
         final Plan plan = planner.search(pb);
@@ -231,12 +232,12 @@ public final class TFDPlanner extends AbstractPlanner {
     private static void printUsage() {
         final StringBuilder strb = new StringBuilder();
         strb.append("\nusage of TFDPlanner:\n")
-                .append("OPTIONS   DESCRIPTIONS\n")
-                .append("-d <str>    hddl domain file name\n")
-                .append("-p <str>    hddl problem file name\n")
-                .append("-l <num>    trace level\n")
-                .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
-                .append("-h          print this message\n\n");
+            .append("OPTIONS   DESCRIPTIONS\n")
+            .append("-d <str>    hddl domain file name\n")
+            .append("-p <str>    hddl problem file name\n")
+            .append("-l <num>    trace level\n")
+            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
+            .append("-h          print this message\n\n");
         Planner.getLogger().trace(strb.toString());
     }
 
@@ -278,6 +279,6 @@ public final class TFDPlanner extends AbstractPlanner {
         }
         // Return null if the domain or the problem was not specified
         return (arguments.get(Planner.DOMAIN) == null
-                || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
+            || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
     }
 }

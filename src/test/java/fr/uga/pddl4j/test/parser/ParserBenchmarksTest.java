@@ -275,14 +275,42 @@ public class ParserBenchmarksTest {
     }
 
     /**
-     * Method that executes benchmarks using HDDL files on the parser to test if its coverage is OK.
+     * Method that executes benchmarks using HDDL total ordered files on the parser to test if its coverage is OK.
      *
      * @throws Exception if something went wrong.
      */
     @Test
-    public void testParserHDDL() throws Exception {
+    public void testParserHDDLTotalOrderedDomains() throws Exception {
 
-        final String localTestPath = Tools.BENCH_DIR + "hddl" + File.separator;
+        final String localTestPath = Tools.BENCH_DIR + "hddl_total_ordered" + File.separator;
+
+        if (!Tools.isBenchmarkExist(localTestPath)) {
+            System.out.println("missing Benchmark directory: HDDL test skipped !");
+            return;
+        }
+
+        final ArrayList<String> errors = executeTests(localTestPath).collect(Collectors.toCollection(ArrayList::new));
+
+        if (!errors.isEmpty()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Some parsing errors occurred !\n");
+            errors.forEach(err -> {
+                builder.append(err);
+                builder.append("\n-------------------\n");
+            });
+            throw new Exception(builder.toString());
+        }
+    }
+
+    /**
+     * Method that executes benchmarks using HDDL partial ordered files on the parser to test if its coverage is OK.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void testParserHDDLPartialOrderedDomains() throws Exception {
+
+        final String localTestPath = Tools.BENCH_DIR + "hddl_partial_ordered" + File.separator;
 
         if (!Tools.isBenchmarkExist(localTestPath)) {
             System.out.println("missing Benchmark directory: HDDL test skipped !");

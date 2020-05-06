@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.planners.htn.pfd;
 
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.TaskNetwork;
 
 import java.io.Serializable;
@@ -28,6 +29,11 @@ import java.util.Objects;
  * @since 4.0
  */
 public class PFDNode implements Serializable {
+
+    /**
+     * The state that describes the state of the world reached by the search.
+     */
+    private State state;
 
     /**
      * The task network that describes the set of tasks to be accomplished and their constraints that have to be
@@ -51,28 +57,59 @@ public class PFDNode implements Serializable {
      * @param other the node to be copied.
      */
     public PFDNode(final PFDNode other) {
-        this(new TaskNetwork(other.getTaskNetwork()), other.getParent(), other.getOperator());
+        this(other.getState(), other.getTaskNetwork(), other.getParent(), other.getOperator());
     }
 
     /**
-     * Creates a new empty node. The parent node is set to null and the operator to Integer.MAX_VALUE.
+     * Creates a new empty node with an empty state and an empty task network. The parent node is set to null and the
+     * operator to Integer.MAX_VALUE.
      */
     public PFDNode() {
-        this(new TaskNetwork(), null, Integer.MAX_VALUE);
+        this(new State(), new TaskNetwork(), null, Integer.MAX_VALUE);
     }
 
     /**
      * Creates a new node with a specified state and task network.
      *
+     * @param state srate of this node.
      * @param taskNetwork the tasknetwork of the node.
+     */
+    public PFDNode(final State state, final TaskNetwork taskNetwork) {
+        this(state, new TaskNetwork(taskNetwork), null, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a new node with a specified state and task network.
+     *
+     * @param state srate of this node.
+     * @param taskNetwork the task network of the node.
      * @param parent the parent node of the node.
      * @param operator the index of the operator applied to reach the node.
      */
-    public PFDNode(final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
+    public PFDNode(final State state, final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
         super();
+        this.setState(state);
         this.setTaskNetwork(taskNetwork);
         this.setParent(parent);
         this.setOperator(operator);
+    }
+
+    /**
+     * Returns the state of this node. The state describes the state of the world reached by the search.
+     *
+     * @return the state of this node.
+     */
+    public final State getState() {
+        return this.state;
+    }
+
+    /**
+     * Sets the state of this node. The state describes the state of the world reached by the search.
+     *
+     * @param state the state to set.
+     */
+    public final void setState(final State state) {
+        this.state = state;
     }
 
     /**
@@ -148,7 +185,7 @@ public class PFDNode implements Serializable {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof PFDNode) {
             PFDNode other = (PFDNode) obj;
-            return this.getTaskNetwork().equals(other.getTaskNetwork());
+            return this.getState().equals(other.getState()) && this.getTaskNetwork().equals(other.getTaskNetwork());
         }
         return false;
     }
@@ -161,6 +198,6 @@ public class PFDNode implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.taskNetwork);
+        return Objects.hash(this.getState(), this.getTaskNetwork());
     }
 }

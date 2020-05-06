@@ -22,6 +22,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -137,6 +138,82 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
+     * Decompose a tasks of the network with a specific method.
+     *
+     * @param task the task to decompose.
+     * @param method the method to be used to decompose.
+     */
+    public void decompose(final int task, final Method method) {
+        final int indexNewConstraints = this.size() - 1;
+        final int sizeNewMatrix = this.size() - 1 + method.getSubTasks().size();
+        BitMatrix newOrderingConstraints = new BitMatrix(sizeNewMatrix);
+        for (int i =  0; i < this.orderingConstraints.rows() ; i++) {
+            BitSet row = this.orderingConstraints.getRow(i);
+            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit( j + 1)) {
+                if (i != task) {
+                    if (j < task) {
+                        newOrderingConstraints.set(i, j);
+                    } else if (j == task) {
+                        for (int k = indexNewConstraints; k < newOrderingConstraints.rows(); k++) {
+                            newOrderingConstraints.set(i, k);
+                        }
+                    } else {
+                        newOrderingConstraints.set(i, j - 1);
+                    }
+                } else {
+                    for (int k = indexNewConstraints; k < newOrderingConstraints.rows(); k++) {
+                        if (j < task) {
+                            newOrderingConstraints.set(k, j);
+                        } else if (j > task) {
+                            newOrderingConstraints.set(k, j - 1);
+                        }
+                    }
+                }
+            }
+        }
+        for (int i =  0; i < method.getOrderingConstraints().rows() ; i++) {
+            BitSet row = method.getOrderingConstraints().getRow(i);
+            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit( j + 1)) {
+                newOrderingConstraints.set(i + indexNewConstraints, j + indexNewConstraints);
+            }
+        }
+        this.orderingConstraints = newOrderingConstraints;
+        this.tasks.remove(task);
+        this.tasks.addAll(method.getSubTasks());
+    }
+
+    /**
+     * Decompose a tasks of the network with a specific action.
+     *
+     * @param task the task to decompose.
+     * @param action the action to be used to decompose.
+     */
+    public void decompose(final int task, final Action action) {
+        final int sizeNewMatrix = this.size() - 1;
+        BitMatrix newOrderingConstraints = new BitMatrix(sizeNewMatrix);
+        for (int i =  0; i < this.orderingConstraints.rows() ; i++) {
+            BitSet row = this.orderingConstraints.getRow(i);
+            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit( j + 1)) {
+                if (i < task) {
+                    if (j < task) {
+                        newOrderingConstraints.set(i, j);
+                    } else if (j > task){
+                        newOrderingConstraints.set(i, j - 1);
+                    }
+                } else if (i > task){
+                    if (j < task) {
+                      newOrderingConstraints.set(i - 1, j);
+                    } else if (j > task) {
+                        newOrderingConstraints.set(i - 1, j - 1);
+                    }
+                }
+            }
+        }
+        this.orderingConstraints = newOrderingConstraints;
+        this.tasks.remove(task);
+    }
+
+    /**
      * Returns <code>true</code> if the task network is totally ordered. The return value is computed from the ordering
      * constraints of the task network.
      *
@@ -188,6 +265,22 @@ public final class TaskNetwork implements Serializable {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the list of tasks with no predecessors.
+     *
+     * @return the  list of tasks with no predecessors.
+     */
+    public final List<Integer> getTasksWithNoPredecessors() {
+        this.transitiveClosure();
+        final List<Integer> tasks = new LinkedList<>();
+        for (int i = 0; i < this.getOrderingConstraints().columns(); i++) {
+            if (this.getOrderingConstraints().getColumn(i).cardinality() == 0) {
+                tasks.add(i);
+            }
+        }
+        return tasks;
     }
 
     /**
