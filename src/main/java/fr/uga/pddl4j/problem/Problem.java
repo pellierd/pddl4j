@@ -692,6 +692,7 @@ public class Problem implements Serializable {
             for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
                 str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
                 str.append(this.toString(tasks.get(tasknetwork.getTasks().get(i))));
+                str.append("\n");
             }
         }
         str.append("Ordering constraints:\n");

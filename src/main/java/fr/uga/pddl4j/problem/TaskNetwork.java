@@ -147,9 +147,9 @@ public final class TaskNetwork implements Serializable {
         final int indexNewConstraints = this.size() - 1;
         final int sizeNewMatrix = this.size() - 1 + method.getSubTasks().size();
         BitMatrix newOrderingConstraints = new BitMatrix(sizeNewMatrix);
-        for (int i =  0; i < this.orderingConstraints.rows() ; i++) {
+        for (int i =  0; i < this.orderingConstraints.rows(); i++) {
             BitSet row = this.orderingConstraints.getRow(i);
-            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit( j + 1)) {
+            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit(j + 1)) {
                 if (i != task) {
                     if (j < task) {
                         newOrderingConstraints.set(i, j);
@@ -171,9 +171,9 @@ public final class TaskNetwork implements Serializable {
                 }
             }
         }
-        for (int i =  0; i < method.getOrderingConstraints().rows() ; i++) {
+        for (int i =  0; i < method.getOrderingConstraints().rows(); i++) {
             BitSet row = method.getOrderingConstraints().getRow(i);
-            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit( j + 1)) {
+            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit(j + 1)) {
                 newOrderingConstraints.set(i + indexNewConstraints, j + indexNewConstraints);
             }
         }
@@ -191,18 +191,18 @@ public final class TaskNetwork implements Serializable {
     public void decompose(final int task, final Action action) {
         final int sizeNewMatrix = this.size() - 1;
         BitMatrix newOrderingConstraints = new BitMatrix(sizeNewMatrix);
-        for (int i =  0; i < this.orderingConstraints.rows() ; i++) {
+        for (int i =  0; i < this.orderingConstraints.rows(); i++) {
             BitSet row = this.orderingConstraints.getRow(i);
-            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit( j + 1)) {
+            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit(j + 1)) {
                 if (i < task) {
                     if (j < task) {
                         newOrderingConstraints.set(i, j);
-                    } else if (j > task){
+                    } else if (j > task) {
                         newOrderingConstraints.set(i, j - 1);
                     }
-                } else if (i > task){
+                } else if (i > task) {
                     if (j < task) {
-                      newOrderingConstraints.set(i - 1, j);
+                        newOrderingConstraints.set(i - 1, j);
                     } else if (j > task) {
                         newOrderingConstraints.set(i - 1, j - 1);
                     }

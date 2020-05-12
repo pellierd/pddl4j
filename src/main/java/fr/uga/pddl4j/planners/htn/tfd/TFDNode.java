@@ -18,6 +18,7 @@ package fr.uga.pddl4j.planners.htn.tfd;
 import fr.uga.pddl4j.problem.State;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -29,8 +30,9 @@ import java.util.Objects;
  * @version 1.0 - 15.04.2020
  * @since 4.0
  */
-public class TFDNode implements Serializable {
+public class TFDNode implements Serializable, Comparable<TFDNode> {
 
+    public int level;
     /**
      * The state that describes the state of the world reached by the search.
      */
@@ -194,6 +196,12 @@ public class TFDNode implements Serializable {
         this.operator = operator;
     }
 
+
+    @Override
+    public int compareTo(TFDNode o) {
+        return this.getTasks().size() - o.getTasks().size();
+    }
+
     /**
      * Returns <code>true</code> if a node is equals to an other object. An object is equals to this node if and only
      * if the other object is an instance of <code>TFDNode</code> and have the same state and the same task network.
@@ -221,4 +229,5 @@ public class TFDNode implements Serializable {
     public int hashCode() {
         return Objects.hash(getState(), getTasks());
     }
+
 }

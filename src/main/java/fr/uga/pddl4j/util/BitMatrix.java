@@ -25,6 +25,7 @@ import java.util.BitSet;
 
 /**
  * This class implements a bit matrix.
+ *
  * <p>
  * Revisions:
  * <ul>
