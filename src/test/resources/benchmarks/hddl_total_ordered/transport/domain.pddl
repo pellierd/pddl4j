@@ -3,15 +3,15 @@
   (:types
         location target locatable - object
         vehicle package - locatable
-        capacity-number - object
+        capacity_number - object
   )
 
   (:predicates
      (road ?l1 ?l2 - location)
      (at ?x - locatable ?v - location)
      (in ?x - package ?v - vehicle)
-     (capacity ?v - vehicle ?s1 - capacity-number)
-     (capacity-predecessor ?s1 ?s2 - capacity-number)
+     (capacity ?v - vehicle ?s1 - capacity_number)
+     (capacity_predecessor ?s1 ?s2 - capacity_number)
   )
 
   (:tasks
@@ -32,13 +32,13 @@
   )
 
   (:method m-unload
-    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity-number)
+    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :task (unload ?v ?l ?p)
     :ordered-subtasks (drop ?v ?l ?p ?s1 ?s2)
   )
 
   (:method m-load
-    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity-number)
+    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :task (load  ?v ?l ?p)
     :ordered-subtasks (pick-up ?v ?l ?p ?s1 ?s2)
   )
@@ -82,11 +82,11 @@
   )
 
  (:action pick-up
-    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity-number)
+    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :precondition (and
         (at ?v ?l)
         (at ?p ?l)
-        (capacity-predecessor ?s1 ?s2)
+        (capacity_predecessor ?s1 ?s2)
         (capacity ?v ?s2)
       )
     :effect (and
@@ -98,11 +98,11 @@
   )
 
   (:action drop
-    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity-number)
+    :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :precondition (and
         (at ?v ?l)
         (in ?p ?v)
-        (capacity-predecessor ?s1 ?s2)
+        (capacity_predecessor ?s1 ?s2)
         (capacity ?v ?s1)
       )
     :effect (and

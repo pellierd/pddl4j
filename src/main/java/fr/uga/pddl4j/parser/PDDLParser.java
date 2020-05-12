@@ -1044,7 +1044,6 @@ public final class PDDLParser {
      * parameters of the methods.</li>
      * <li> The task id used in subtasks declaration are unique.</li>
      * <li> The task id used in ordering constraints are all defined.</li>
-     * <li> TO DO: check the cyclic dependencies of the ordering constraints of the methods.</li>
      * </ul>
      *
      * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.

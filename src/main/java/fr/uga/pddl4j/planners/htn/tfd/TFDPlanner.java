@@ -90,12 +90,12 @@ public final class TFDPlanner extends AbstractPlanner {
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
             final TFDNode currentNode = open.poll();
-            System.out.println("*************  CURRENT NODE LEVEL " + currentNode.level + " ***************");
+            //System.out.println("*************  CURRENT NODE LEVEL " + currentNode.level + " ***************");
 
-            System.out.println(problem.toString(currentNode.getState()));
-            for (Integer t : currentNode.getTasks()) {
-                System.out.println(problem.toString(problem.getTasks().get(t)));
-            }
+            //System.out.println(problem.toString(currentNode.getState()));
+            //for (Integer t : currentNode.getTasks()) {
+            //    System.out.println(problem.toString(problem.getTasks().get(t)));
+            //}
             // If the task network is empty we've got a solution
             if (currentNode.getTasks().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
@@ -110,10 +110,10 @@ public final class TFDPlanner extends AbstractPlanner {
                 // Case of primitive task
                 if (problem.getTasks().get(task).isPrimtive()) {
                     for (Integer operator : relevantOperators) {
-                        System.out.println("==> Try to decompose a primitrive task "
-                            + problem.toString(problem.getTasks().get(task)) + " with");
+                        //System.out.println("==> Try to decompose a primitrive task "
+                        //    + problem.toString(problem.getTasks().get(task)) + " with");
                         final Action action = problem.getActions().get(operator);
-                        System.out.println(problem.toString(action));
+                        //System.out.println(problem.toString(action));
                         if (state.satisfy(action.getPreconditions())) {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
@@ -126,17 +126,17 @@ public final class TFDPlanner extends AbstractPlanner {
                             //    open.add(nbNodePushed, childNode);
                             //}
                             open.add(childNode);
-                            System.out.println("==> Decomposition succeeded:");
-                            System.out.println("New node pushed:");
-                            System.out.println(problem.toString(childNode.getState()));
-                            for (Integer t : childNode.getTasks()) {
-                                System.out.println(problem.toString(problem.getTasks().get(t)));
-                            }
-                            nbNodePushed++;
+                            //System.out.println("==> Decomposition succeeded:");
+                            //System.out.println("New node pushed:");
+                            //System.out.println(problem.toString(childNode.getState()));
+                            //for (Integer t : childNode.getTasks()) {
+                            //    System.out.println(problem.toString(problem.getTasks().get(t)));
+                            //}
+                            //nbNodePushed++;
 
-                        } else {
-                            System.out.println("==> Decomposition fails");
-                        }
+                        } //else {
+                         //   System.out.println("==> Decomposition fails");
+                        //}
                         /*try {
                             System.in.read();
                         } catch (IOException e) {
@@ -146,9 +146,9 @@ public final class TFDPlanner extends AbstractPlanner {
                 } else { // Case of the compound task
                     for (Integer operator : relevantOperators) {
                         final Method method = problem.getMethods().get(operator);
-                        System.out.println("==> Try to decompose a compount task "
-                            + problem.toString(problem.getTasks().get(task)) + " with");
-                        System.out.println(problem.toString(method));
+                        //System.out.println("==> Try to decompose a compount task "
+                        //    + problem.toString(problem.getTasks().get(task)) + " with");
+                        //System.out.println(problem.toString(method));
                         if (state.satisfy(method.getPreconditions())) {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
@@ -161,16 +161,16 @@ public final class TFDPlanner extends AbstractPlanner {
                             //    open.add(nbNodePushed, childNode);
                             //}
                             open.add(childNode);
-                            System.out.println("==> Decomposition succeeded:");
-                            System.out.println("New node pushed:");
-                            System.out.println(problem.toString(childNode.getState()));
-                            for (Integer t : childNode.getTasks()) {
-                                System.out.println(problem.toString(problem.getTasks().get(t)));
-                            }
-                            nbNodePushed++;
-                        } else {
-                            System.out.println("==> Decomposition fails");
-                        }
+                            //System.out.println("==> Decomposition succeeded:");
+                            //System.out.println("New node pushed:");
+                            //System.out.println(problem.toString(childNode.getState()));
+                            //for (Integer t : childNode.getTasks()) {
+                            //    System.out.println(problem.toString(problem.getTasks().get(t)));
+                            //}
+                            //nbNodePushed++;
+                        } //else {
+                          //  System.out.println("==> Decomposition fails");
+                        //}
                         /*try {
                             System.in.read();
                         } catch (IOException e) {

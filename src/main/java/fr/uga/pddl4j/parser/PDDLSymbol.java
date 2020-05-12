@@ -24,6 +24,7 @@ import fr.uga.pddl4j.parser.lexer.Token;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -145,12 +146,8 @@ public class PDDLSymbol implements Serializable {
      * Creates a symbol from a specified symbol.
      *
      * @param symbol the symbol.
-     * @throws NullPointerException if the specified symbol is null.
      */
     public PDDLSymbol(final PDDLSymbol symbol) {
-        if (symbol == null) {
-            throw new NullPointerException("symbol == null");
-        }
         this.kind = symbol.getKind();
         this.image = symbol.getImage();
         this.beginLine = symbol.getBeginLine();
@@ -166,9 +163,6 @@ public class PDDLSymbol implements Serializable {
      * @param token the token.
      */
     public PDDLSymbol(final Kind kind, final Token token) {
-        if (token == null || kind == null) {
-            throw new NullPointerException();
-        }
         this.kind = kind;
         this.image = token.image.toLowerCase(Locale.ENGLISH);
         this.beginLine = token.beginLine;
@@ -189,9 +183,6 @@ public class PDDLSymbol implements Serializable {
      */
     public PDDLSymbol(final Kind kind, final String image, final int beginLine, final int beginColumn,
                       final int endLine, final int endColumn) {
-        if (image == null || kind == null) {
-            throw new NullPointerException();
-        }
         this.kind = kind;
         this.image = image.toLowerCase(Locale.ENGLISH);
         this.beginLine = beginLine;
@@ -227,9 +218,6 @@ public class PDDLSymbol implements Serializable {
      * @throws NullPointerException of the specified kind is null.
      */
     public final void setKind(final Kind kind) {
-        if (kind == null) {
-            throw new NullPointerException();
-        }
         this.kind = kind;
     }
 
@@ -248,9 +236,6 @@ public class PDDLSymbol implements Serializable {
      * @param image the new image to set.
      */
     public final void setImage(String image) {
-        if (image == null) {
-            throw new NullPointerException("image == null");
-        }
         this.image = image;
     }
 
@@ -397,7 +382,7 @@ public class PDDLSymbol implements Serializable {
     public boolean equals(final Object object) {
         if (object != null && object instanceof PDDLSymbol) {
             PDDLSymbol other = (PDDLSymbol) object;
-            return other.getImage().equals(this.getImage());
+            return this.getImage().equals(other.getImage());
         }
         return false;
     }
@@ -410,7 +395,7 @@ public class PDDLSymbol implements Serializable {
      */
     @Override
     public int hashCode() {
-        return this.image.hashCode();
+        return Objects.hash(this.getImage());
     }
 
     /**
