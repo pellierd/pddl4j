@@ -1,6 +1,6 @@
 (define
-	(problem pfile13)
-	(:domain  domain_htn)
+	(problem p13)
+	(:domain transport)
 	(:objects
 		package_2 - package
 		package_1 - package
@@ -19,19 +19,12 @@
 		truck_1 - vehicle
 	)
 	(:htn
-		:parameters ()
-		:subtasks (and
-		 (task0 (deliver package_0 city_loc_0))
-		 (task1 (deliver package_1 city_loc_4))
-		 (task2 (deliver package_2 city_loc_4))
-		 (task3 (deliver package_3 city_loc_3))
-		 (task4 (deliver package_4 city_loc_4))
-		)
-		:ordering (and
-			(task1 < task0)
-			(task2 < task1)
-			(task4 < task3)
-			(task0 < task4)
+		:ordered-subtasks (and
+		    (deliver package_2 city_loc_4)
+		    (deliver package_1 city_loc_4)
+		    (deliver package_0 city_loc_0)
+		    (deliver package_4 city_loc_4)
+		    (deliver package_3 city_loc_3)
 		)
 	)
 	(:init

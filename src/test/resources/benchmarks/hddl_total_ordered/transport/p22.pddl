@@ -1,6 +1,6 @@
 (define
-	(problem pfile22)
-	(:domain  domain_htn)
+	(problem p22)
+	(:domain transport)
 	(:objects
 		package_11 - package
 		package_9 - package
@@ -32,33 +32,19 @@
 		truck_2 - vehicle
 	)
 	(:htn
-		:parameters ()
-		:subtasks (and
-		 (task0 (deliver package_0 city_loc_7))
-		 (task1 (deliver package_1 city_loc_2))
-		 (task2 (deliver package_2 city_loc_2))
-		 (task3 (deliver package_3 city_loc_2))
-		 (task4 (deliver package_4 city_loc_8))
-		 (task5 (deliver package_5 city_loc_8))
-		 (task6 (deliver package_6 city_loc_2))
-		 (task7 (deliver package_7 city_loc_8))
-		 (task8 (deliver package_8 city_loc_9))
-		 (task9 (deliver package_9 city_loc_0))
-		 (task10 (deliver package_10 city_loc_2))
-		 (task11 (deliver package_11 city_loc_3))
-		)
-		:ordering (and
-			(task2 < task0)
-			(task7 < task1)
-			(task1 < task2)
-			(task8 < task3)
-			(task3 < task4)
-			(task10 < task5)
-			(task9 < task6)
-			(task11 < task8)
-			(task5 < task9)
-			(task4 < task10)
-			(task0 < task11)
+		:ordered-subtasks (and
+		    (deliver package_7 city_loc_8)
+		    (deliver package_1 city_loc_2)
+		    (deliver package_2 city_loc_2)
+		    (deliver package_0 city_loc_7)
+            (deliver package_11 city_loc_3)
+            (deliver package_8 city_loc_9)
+            (deliver package_3 city_loc_2)
+		    (deliver package_4 city_loc_8)
+		    (deliver package_10 city_loc_2)
+		    (deliver package_5 city_loc_8)
+		    (deliver package_9 city_loc_0)
+		    (deliver package_6 city_loc_2)
 		)
 	)
 	(:init

@@ -22,19 +22,18 @@
 		objective2 - objective
 	)
 	(:htn
-		:ordered-subtasks (and
-             (task0 (get_soil_data waypoint2))
-             (task1 (get_image_data objective2 high_res))
-             (task2 (get_image_data objective0 colour))
-             (task3 (get_soil_data waypoint1))
-             (task4 (get_rock_data waypoint0))
-             (task5 (get_image_data objective0 high_res))
-             (task6 (get_rock_data waypoint1))
+    	:ordered-subtasks (and
+    		(get_soil_data waypoint2)
+    		(get_image_data objective2 high_res)
+    		(get_image_data objective0 colour)
+    		(get_soil_data waypoint1)
+    		(get_rock_data waypoint0)
+            (get_image_data objective0 high_res)
+    		(get_rock_data waypoint1)
         )
-
-	)
-	(:init
-		(visible waypoint0 waypoint2)
+    )
+    (:init
+     	(visible waypoint0 waypoint2)
 		(visible waypoint2 waypoint0)
 		(visible waypoint1 waypoint0)
 		(visible waypoint0 waypoint1)

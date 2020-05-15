@@ -21,13 +21,13 @@
 		objective1 - objective
 		objective2 - objective
 	)
-	(:htn
-		:ordered-subtasks (and
-             (task0 (get_image_data objective0 high_res))
-             (task1 (get_soil_data waypoint3))
-             (task2 (get_rock_data waypoint1))
-		)
-	)
+		(:htn
+    		:ordered-subtasks (and
+    		    (get_image_data objective0 high_res)
+    		    (get_soil_data waypoint3)
+    		    (get_rock_data waypoint1)
+    		)
+    	)
 	(:init
 		(visible waypoint1 waypoint0)
 		(visible waypoint0 waypoint1)

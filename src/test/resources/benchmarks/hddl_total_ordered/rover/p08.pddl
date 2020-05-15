@@ -30,14 +30,14 @@
 	)
 	(:htn
 		:ordered-subtasks (and
-		    (task0 (get_soil_data waypoint3))
-		    (task1 (get_image_data objective2 low_res))
-		    (task2 (get_rock_data waypoint5))
-		    (task3 (get_soil_data waypoint1))
-		    (task4 (get_image_data objective0 low_res))
-		    (task5 (get_image_data objective0 high_res))
-		    (task6 (get_rock_data waypoint4))
-		    (task7 (get_soil_data waypoint4))
+		    (get_soil_data waypoint3)
+		    (get_image_data objective2 low_res)
+		    (get_rock_data waypoint5)
+		    (get_soil_data waypoint1)
+            (get_image_data objective0 low_res)
+            (get_image_data objective0 high_res)
+            (get_rock_data waypoint4)
+            (get_soil_data waypoint4)
         )
 	)
 	(:init
