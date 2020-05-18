@@ -652,7 +652,7 @@ public class Problem implements Serializable {
         }
         final BitSet negative = state.getNegative();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            str.append("(not  ");
+            str.append(" (not ");
             str.append(this.toString(this.getRelevantFluents().get(i)));
             str.append(")\n");
         }

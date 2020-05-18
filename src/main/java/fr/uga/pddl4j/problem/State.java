@@ -90,7 +90,7 @@ public class State implements Serializable {
      * @return the bit set that represents the negative facts of the expression.
      */
     public final BitVector getNegative() {
-        return negative;
+        return this.negative;
     }
 
     /**

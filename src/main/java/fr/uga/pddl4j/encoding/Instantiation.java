@@ -32,7 +32,8 @@ import java.util.Set;
  * <p>
  * Revisions:
  * <ul>
- *     <li>30/03/2019: Add method instantiation.</li>
+ *     <li>30/03/2020: Add method instantiation.</li>
+ *     <li>15/06/2020: allow operator instantiation with same parameter.</li>
  * </ul>
  * </p>
  *
@@ -186,26 +187,24 @@ final class Instantiation implements Serializable {
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(action.getTypeOfParameters(index));
             for (Integer value : values) {
-                if (!action.isAlreadyInstantiatedWith(value)) {
-                    final int varIndex = -index - 1;
-                    final IntExpression precond = new IntExpression(action.getPreconditions());
-                    Instantiation.substitute(precond, varIndex, value);
-                    if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
-                        final IntExpression effects = new IntExpression(action.getEffects());
-                        Instantiation.substitute(effects, varIndex, value);
-                        if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
-                            final IntAction copy = new IntAction(action.getName(), arity);
-                            copy.setPreconditions(precond);
-                            copy.setEffects(effects);
-                            for (int i = 0; i < arity; i++) {
-                                copy.setTypeOfParameter(i, action.getTypeOfParameters(i));
-                            }
-                            for (int i = 0; i < index; i++) {
-                                copy.setValueOfParameter(i, action.getValueOfParameter(i));
-                            }
-                            copy.setValueOfParameter(index, value);
-                            Instantiation.instantiate(copy, index + 1, bound, actions);
+                final int varIndex = -index - 1;
+                final IntExpression precond = new IntExpression(action.getPreconditions());
+                Instantiation.substitute(precond, varIndex, value);
+                if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                    final IntExpression effects = new IntExpression(action.getEffects());
+                    Instantiation.substitute(effects, varIndex, value);
+                    if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
+                        final IntAction copy = new IntAction(action.getName(), arity);
+                        copy.setPreconditions(precond);
+                        copy.setEffects(effects);
+                        for (int i = 0; i < arity; i++) {
+                            copy.setTypeOfParameter(i, action.getTypeOfParameters(i));
                         }
+                        for (int i = 0; i < index; i++) {
+                            copy.setValueOfParameter(i, action.getValueOfParameter(i));
+                        }
+                        copy.setValueOfParameter(index, value);
+                        Instantiation.instantiate(copy, index + 1, bound, actions);
                     }
                 }
             }
@@ -225,7 +224,7 @@ final class Instantiation implements Serializable {
      * @param method    the method.
      * @param index     the index of the parameter to instantiate.
      * @param bound     the bound of methods to instantiate.
-     * @param methods the list of methods already instantiated.
+     * @param methods   the list of methods already instantiated.
      * @see IntMethod
      */
     private static void instantiate(final IntMethod method, final int index, final int bound,
@@ -243,33 +242,31 @@ final class Instantiation implements Serializable {
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(method.getTypeOfParameters(index));
             for (Integer value : values) {
-                if (!method.isAlreadyInstantiatedWith(value)) {
-                    final int varIndex = -index - 1;
-                    final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
+                final int varIndex = -index - 1;
+                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
 
-                    Instantiation.substitute(preconditionCopy, varIndex, value);
-                    if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
-                        final IntMethod copy = new IntMethod(method.getName(), arity);
-                        copy.setPreconditions(preconditionCopy);
-                        copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
+                Instantiation.substitute(preconditionCopy, varIndex, value);
+                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
+                    final IntMethod copy = new IntMethod(method.getName(), arity);
+                    copy.setPreconditions(preconditionCopy);
+                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
 
-                        final IntExpression taskCopy = new IntExpression(method.getTask());
-                        Instantiation.substitute(taskCopy, varIndex, value);
-                        copy.setTask(taskCopy);
+                    final IntExpression taskCopy = new IntExpression(method.getTask());
+                    Instantiation.substitute(taskCopy, varIndex, value);
+                    copy.setTask(taskCopy);
 
-                        final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
-                        Instantiation.substitute(subTasksCopy, varIndex, value);
-                        copy.setSubTasks(subTasksCopy);
+                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
+                    Instantiation.substitute(subTasksCopy, varIndex, value);
+                    copy.setSubTasks(subTasksCopy);
 
-                        for (int i = 0; i < arity; i++) {
-                            copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
-                        }
-                        for (int i = 0; i < index; i++) {
-                            copy.setValueOfParameter(i, method.getValueOfParameter(i));
-                        }
-                        copy.setValueOfParameter(index, value);
-                        Instantiation.instantiate(copy, index + 1, bound, methods);
+                    for (int i = 0; i < arity; i++) {
+                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
                     }
+                    for (int i = 0; i < index; i++) {
+                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
+                    }
+                    copy.setValueOfParameter(index, value);
+                    Instantiation.instantiate(copy, index + 1, bound, methods);
                 }
             }
         }

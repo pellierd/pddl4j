@@ -32,7 +32,6 @@ import java.util.Objects;
  */
 public class TFDNode implements Serializable, Comparable<TFDNode> {
 
-    public int level;
     /**
      * The state that describes the state of the world reached by the search.
      */
@@ -197,9 +196,18 @@ public class TFDNode implements Serializable, Comparable<TFDNode> {
     }
 
 
+    /**
+     * Compares this node with the specified node for order. Returns a negative integer, zero, or a positive integer as
+     * this node is less than, equal to, or greater than the specified node. The comparaison is done using the number of
+     * tasks of of the node.
+     *
+     * @param other the node to be compared.
+     * @return a negative integer, zero, or a positive integer as this node is less than, equal to, or greater than the
+     * specified node.
+     */
     @Override
-    public int compareTo(TFDNode o) {
-        return this.getTasks().size() - o.getTasks().size();
+    public int compareTo(TFDNode other) {
+        return this.getTasks().size() - other.getTasks().size();
     }
 
     /**
