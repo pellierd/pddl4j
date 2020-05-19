@@ -560,14 +560,12 @@ public final class Encoder implements Serializable {
         PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
         // Extract the relevant task for the simplified instantiated methods
         PostInstantiation.extractRelevantTasks(intMethods);
-        // Extract the primitive tasks from the relevant tasks.
-        //PostInstantiation.extractPrimitiveTasks(intActions);
 
         // Simplify the goal with ground inertia information
         if (intGoal != null) {
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
         }
-        // Extract increase and add value to BitOp cost
+        // Extract increase and add value to action cost
         PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
 
         // The table of ground inertia are no more needed
@@ -667,7 +665,7 @@ public final class Encoder implements Serializable {
         // Step 7: Compute structures to speed up the search
         // *****************************************************************************************
 
-        PostEncoding.createTableOfRelevantOperators();
+        PostEncoding.createTableOfRelevantOperatorsbis();
 
         if (Encoder.logLevel == 8) {
             if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
