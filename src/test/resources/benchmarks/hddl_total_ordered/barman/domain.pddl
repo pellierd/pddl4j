@@ -19,7 +19,14 @@
 
 (define (domain barman)
 
-    (:requirements :strips :typing :total-ordered-htn :htn-method-preconditions :negative-preconditions :equality)
+    (:requirements
+        :strips
+        :typing
+        :total-ordered-htn
+        :htn-method-preconditions
+        :negative-preconditions
+        :equality
+    )
 
     (:types hand level beverage dispenser container - object
             ingredient cocktail - beverage
