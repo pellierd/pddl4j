@@ -34,10 +34,10 @@
 		    (deliver package_1 city_loc_13)
 		    (deliver package_5 city_loc_1)
 		    (deliver package_4 city_loc_1)
-            (deliver package_2 city_loc_2)
-            (deliver package_3 city_loc_13)
+		    (deliver package_2 city_loc_2)
+		    (deliver package_3 city_loc_13)
 		    (deliver package_0 city_loc_2)
-		)
+        )
 	)
 	(:init
 		(capacity_predecessor capacity_0 capacity_1)

@@ -108,9 +108,6 @@ public class Message implements Serializable, Comparable<Message> {
      * @param type the type of message to set.
      */
     public final void setType(final Type type) {
-        if (type == null) {
-            throw new NullPointerException();
-        }
         this.type = type;
     }
 
@@ -165,9 +162,6 @@ public class Message implements Serializable, Comparable<Message> {
      * @param file the file to set.
      */
     public final void setFile(File file) {
-        if (file == null) {
-            throw new NullPointerException();
-        }
         this.file = file;
     }
 
@@ -263,9 +257,9 @@ public class Message implements Serializable, Comparable<Message> {
         if (this.type == Type.LEXICAL_ERROR) {
             str.append("Lexical error");
         } else if (this.type == Type.PARSER_ERROR) {
-            str.append("PDDLParser error");
+            str.append("Parser error");
         } else {
-            str.append("PDDLParser warning");
+            str.append("Parser warning");
         }
         str.append(" at line ").append(this.line).append(", column ").append(this.column)
             .append(", file (").append(this.file).append(")")

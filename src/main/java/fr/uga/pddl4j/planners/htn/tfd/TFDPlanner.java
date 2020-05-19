@@ -28,10 +28,7 @@ import fr.uga.pddl4j.problem.State;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * This class implements a node for the TFDPlanner planner of the PDDL4J library.
@@ -67,7 +64,7 @@ public final class TFDPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
         // Create the list of pending nodes to explore
-        final PriorityQueue<TFDNode> open = new PriorityQueue<TFDNode>();
+        final PriorityQueue<TFDNode> open = new PriorityQueue<>();
         // Create the root node of the search space
         final TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork().getTasks());
         root.getState().getNegative().set(0, problem.getRelevantFluents().size());
@@ -84,10 +81,23 @@ public final class TFDPlanner extends AbstractPlanner {
         final long start = System.currentTimeMillis();
         long elapsedTime = 0;
 
+        boolean debug = false;
+
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
             final TFDNode currentNode = open.poll();
+
+            if (debug) {
+                System.out.println("=========> Pop a new node <=========\n");
+                System.out.println("=> Current state:");
+                System.out.println(problem.toString(currentNode.getState()));
+                System.out.println("\n=> Tasks to be excuted:");
+                for (int t : currentNode.getTasks()) {
+                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                }
+            }
+
             // If the task network is empty we've got a solution
             if (currentNode.getTasks().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
@@ -102,27 +112,72 @@ public final class TFDPlanner extends AbstractPlanner {
                 if (problem.getTasks().get(task).isPrimtive()) {
                     for (Integer operator : relevantOperators) {
                         final Action action = problem.getActions().get(operator);
+                        if (debug) {
+                            System.out.println("\n======> Try to decompose primitive tasks "
+                                + problem.toString(problem.getTasks().get(task)) + " with \n\n"
+                                + problem.toString(action));
+                        }
                         if (state.satisfy(action.getPreconditions())) {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(operator);
                             childNode.getState().apply(action.getCondEffects());
                             open.add(childNode);
-
+                            if (debug) {
+                                System.out.println("=====> Decomposition succeeded push node:");
+                                System.out.println(problem.toString(childNode.getState()));
+                                for (int t : childNode.getTasks()) {
+                                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                                }
+                            }
+                        } else {
+                            if (debug) {
+                                System.out.println("=====> Decomposition failed");
+                            }
+                        }
+                        if (debug) {
+                            try {
+                                System.in.read();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 } else { // Case of the compound task
                     for (Integer operator : relevantOperators) {
                         final Method method = problem.getMethods().get(operator);
+                        if (debug) {
+                            System.out.println("\n======> Try to decompose compound tasks "
+                                + problem.toString(problem.getTasks().get(task)) + " with\n\n"
+                                + problem.toString(method));
+                        }
                         if (state.satisfy(method.getPreconditions())) {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(problem.getActions().size() + operator);
                             childNode.pushAllTasks(method.getSubTasks());
                             open.add(childNode);
+                            if (debug) {
+                                System.out.println("=====> Decomposition succeeded push node:");
+                                for (int t : childNode.getTasks()) {
+                                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                                }
+                            }
+                        } else {
+                            if (debug) {
+                                System.out.println("=====> Decomposition failed");
+                            }
+                        }
+                        if (debug) {
+                            try {
+                                System.in.read();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
+
             }
             elapsedTime = System.currentTimeMillis() - start;
         }
@@ -147,7 +202,6 @@ public final class TFDPlanner extends AbstractPlanner {
             n = n.getParent();
         }
         return plan;
-
     }
 
     /**
@@ -200,14 +254,14 @@ public final class TFDPlanner extends AbstractPlanner {
             System.exit(0);
         }
 
-        System.out.println("\nParsing domain (" + domain.getName()
-            + ") and problem (" + problem.getName() + ") done successfully");
-
         // Print the syntax errors if detected
         if (!errorManager.isEmpty()) {
             errorManager.printAll();
             System.exit(0);
         }
+
+        System.out.println("\nParsing domain (" + domain.getName()
+            + ") and problem (" + problem.getName() + ") done successfully");
 
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
@@ -222,21 +276,30 @@ public final class TFDPlanner extends AbstractPlanner {
                 + pb.getRelevantFluents().size() + " fluents, "
                 + pb.getTasks().size() + " tasks)\n");
 
-        System.out.println("Searching a solution plan....");
-        start = System.currentTimeMillis();
-        final Plan plan = planner.search(pb);
-        end = System.currentTimeMillis();
-        final double searchTime = (end - start) / 1000.0;
-        if (plan != null) {
-            // Print plan information
-            System.out.println("Found plan as follows:\n" + pb.toString(plan));
-            System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
-            System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
-            System.out.println(String.format("Searching time       : %4.3fs", searchTime));
-            System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+        try {
+            System.out.println("Searching a solution plan....\n");
+            start = System.currentTimeMillis();
 
-        } else {
-            System.out.println(String.format(String.format("%nno plan found%n%n")));
+            final Plan plan = planner.search(pb);
+            end = System.currentTimeMillis();
+            final double searchTime = (end - start) / 1000.0;
+            if (plan != null) {
+                // Print plan information
+                System.out.println("Found plan as follows:\n" + pb.toString(plan));
+                System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
+                System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+                System.out.println(String.format("Searching time       : %4.3fs", searchTime));
+                System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+
+            } else {
+                System.out.println(String.format(String.format("%nno plan found%n%n")));
+                System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+                System.out.println(String.format("Searching time       : %4.3fs", searchTime));
+                System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+            }
+        } catch (OutOfMemoryError err) {
+            System.out.println("Out of memory !");
+            System.exit(0);
         }
     }
 

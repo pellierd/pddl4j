@@ -65,7 +65,7 @@ public class SolutionEventAndListenerTest {
     /**
      * The path to the p01 problem file.
      */
-    private String p01ProblemFile = "src/test/resources/strategy/p01.pddl";
+    private String p01ProblemFile = "src/test/resources/strategy/p00.pddl";
 
     /**
      * The State Space Stragey used to solve planning problem.

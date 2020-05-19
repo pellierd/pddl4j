@@ -47,7 +47,7 @@ public class ParserTest {
         try {
             System.out.println("PDDLParser: Test parsing from files.");
             final File domain = new File("src/test/resources/encoding/domain.pddl");
-            final File problem = new File("src/test/resources/encoding/p01.pddl");
+            final File problem = new File("src/test/resources/encoding/p00.pddl");
 
             final PDDLParser parser = new PDDLParser();
             parser.parse(domain, problem);
@@ -68,7 +68,7 @@ public class ParserTest {
         try {
             System.out.println("PDDLParser: Test parsing from path files.");
             final String domain = "src/test/resources/encoding/domain.pddl";
-            final String problem = "src/test/resources/encoding/p01.pddl";
+            final String problem = "src/test/resources/encoding/p00.pddl";
 
             final PDDLParser parser = new PDDLParser();
             parser.parse(domain, problem);
@@ -90,7 +90,7 @@ public class ParserTest {
             System.out.println("PDDLParser: Test parsing from string.");
             final String domain = Tools.readFile("src/test/resources/encoding/domain.pddl",
                 StandardCharsets.UTF_8);
-            final String problem = Tools.readFile("src/test/resources/encoding/p01.pddl",
+            final String problem = Tools.readFile("src/test/resources/encoding/p00.pddl",
                 StandardCharsets.UTF_8);
 
             final PDDLParser parser = new PDDLParser();
@@ -199,7 +199,7 @@ public class ParserTest {
             System.out.println("PDDLParser: Test parsing from two streams.");
             final String domain = Tools.readFile("src/test/resources/encoding/domain.pddl",
                 StandardCharsets.UTF_8);
-            final String problem = Tools.readFile("src/test/resources/encoding/p01.pddl",
+            final String problem = Tools.readFile("src/test/resources/encoding/p00.pddl",
                 StandardCharsets.UTF_8);
 
             InputStream isDomain = new ByteArrayInputStream(domain.getBytes("UTF-8"));

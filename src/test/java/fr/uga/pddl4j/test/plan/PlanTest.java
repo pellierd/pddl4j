@@ -76,7 +76,7 @@ public class PlanTest {
     /**
      * The list of problem files.
      */
-    private List<String> problemList = Arrays.asList("src/test/resources/encoding/p01.pddl",
+    private List<String> problemList = Arrays.asList("src/test/resources/encoding/p00.pddl",
         "src/test/resources/encoding/p02.pddl",
         "src/test/resources/encoding/p03.pddl",
         "src/test/resources/encoding/p04.pddl");

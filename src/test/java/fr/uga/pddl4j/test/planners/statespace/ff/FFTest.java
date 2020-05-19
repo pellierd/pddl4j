@@ -842,7 +842,7 @@ public class FFTest {
         System.out.println("FFTest: Test FF planner Json output.");
         final ProblemFactory factory = new ProblemFactory();
         final String domainFile = "pddl/gripper/domain.pddl";
-        final String problemFile = "pddl/gripper/p01.pddl";
+        final String problemFile = "pddl/gripper/p00.pddl";
         String jsonPlan = "";
 
         final ErrorManager errorManager = factory.parse(new File(domainFile), new File(problemFile));

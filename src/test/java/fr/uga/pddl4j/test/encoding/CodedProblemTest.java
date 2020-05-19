@@ -42,7 +42,7 @@ public class CodedProblemTest {
     /**
      * The path to the problem file.
      */
-    private String problemFile = "src/test/resources/encoding/p01.pddl";
+    private String problemFile = "src/test/resources/encoding/p00.pddl";
 
     /**
      * The list containing the encoded operators (operator String version).
