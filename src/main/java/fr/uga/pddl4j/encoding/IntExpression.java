@@ -125,7 +125,7 @@ public class IntExpression implements Serializable {
         if (this.arguments != null) {
             this.arguments = Arrays.copyOf(other.getArguments(), other.getArguments().length);
         }
-        List<IntExpression> otherChildren = other.getChildren();
+        final List<IntExpression> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
         this.children.addAll(otherChildren.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.variable = other.getVariable();

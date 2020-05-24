@@ -33,6 +33,7 @@ import fr.uga.pddl4j.problem.Task;
 import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.impl.ThrowableFormatOptions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -246,11 +247,40 @@ public final class Encoder implements Serializable {
      */
     static List<State> codedGoal;
 
-
     /**
      * The initial state.
      */
     static State init;
+
+    /**
+     * The set primitive task symbols, i.e., the set of action symbol.
+     */
+    static Set<String> primitiveTaskSymbols;
+
+    /**
+     * The set compund task symbols, i.e., the set of task symbols used in methods.
+     */
+    static Set<String> compoundTaskSymbols;
+
+    /**
+     * The list of relevant primitive tasks.
+     */
+    static List<IntExpression> relevantPrimitiveTasks;
+
+    /**
+     * The list of relevant primitive tasks.
+     */
+    static List<IntExpression> tableRelevantCompundTasks;
+
+    /**
+     * The list of relevant methods for a specific task.
+     */
+    static List<List<Integer>> relevantMethods;
+
+    /**
+     * The list of relevant action for a specific task.
+     */
+    static List<Integer> relevantActions;
 
     /**
      * Creates a new planner.
@@ -379,54 +409,54 @@ public final class Encoder implements Serializable {
             intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
         }
 
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder str = new StringBuilder();
 
         // Just for logging
         if (Encoder.logLevel == 1 || Encoder.logLevel == 2) {
-            Encoder.printTableOfConstants(stringBuilder);
-            stringBuilder.append(System.lineSeparator());
-            Encoder.printTableOfPredicates(stringBuilder);
-            stringBuilder.append(System.lineSeparator());
+            Encoder.printTableOfConstants(str);
+            str.append(System.lineSeparator());
+            Encoder.printTableOfPredicates(str);
+            str.append(System.lineSeparator());
             if (!Encoder.tableOfFunctions.isEmpty()) {
-                Encoder.printTableOfFunctions(stringBuilder);
-                stringBuilder.append(System.lineSeparator());
+                Encoder.printTableOfFunctions(str);
+                str.append(System.lineSeparator());
             }
             if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                Encoder.printTableOfTasks(stringBuilder);
-                stringBuilder.append(System.lineSeparator());
+                Encoder.printTableOfTasks(str);
+                str.append(System.lineSeparator());
             }
-            Encoder.printTableOfTypes(stringBuilder);
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
+            Encoder.printTableOfTypes(str);
+            LOGGER.trace(str);
+            str.setLength(0);
         }
 
         // Just for logging
         if (Encoder.logLevel == 2) {
-            stringBuilder.append("\nCoded initial state:\n").append("(and");
+            str.append("\nCoded initial state:\n").append("(and");
             for (IntExpression f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
+                str.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
-                stringBuilder.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
+                str.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
             }
             if (intTaskNetwork != null) {
-                stringBuilder.append(")").append("\n\nCoded initial task network:\n")
+                str.append(")").append("\n\nCoded initial task network:\n")
                     .append(Encoder.toString(intTaskNetwork));
             }
             if (!intActions.isEmpty()) {
-                stringBuilder.append(")").append("\n\nCoded actions:\n\n");
+                str.append(")").append("\n\nCoded actions:\n\n");
                 for (IntAction op : intActions) {
-                    stringBuilder.append(Encoder.toString(op)).append(System.lineSeparator());
+                    str.append(Encoder.toString(op)).append(System.lineSeparator());
                 }
             }
             if (!intMethods.isEmpty()) {
-                stringBuilder.append(")").append("\n\nCoded methods:\n\n");
+                str.append(")").append("\n\nCoded methods:\n\n");
                 for (IntMethod meth : intMethods) {
-                    stringBuilder.append(Encoder.toString(meth)).append(System.lineSeparator());
+                    str.append(Encoder.toString(meth)).append(System.lineSeparator());
                 }
             }
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
+            LOGGER.trace(str);
+            str.setLength(0);
         }
 
         // *****************************************************************************************
@@ -448,143 +478,162 @@ public final class Encoder implements Serializable {
 
         // Just for logging
         if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
-            Encoder.printTableOfInertia(stringBuilder);
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
+            Encoder.printTableOfInertia(str);
+            LOGGER.trace(str);
+            str.setLength(0);
         }
         // Just for logging
         if (Encoder.logLevel == 4) {
-            stringBuilder.append(System.lineSeparator());
-            Encoder.printTableOfConstants(stringBuilder);
-            stringBuilder.append(System.lineSeparator());
-            Encoder.printTableOfTypes(stringBuilder);
-            stringBuilder.append(System.lineSeparator());
-            stringBuilder.append("\nPre-instantiation initial state:\n");
-            stringBuilder.append("(and");
+            str.append(System.lineSeparator());
+            Encoder.printTableOfConstants(str);
+            str.append(System.lineSeparator());
+            Encoder.printTableOfTypes(str);
+            str.append(System.lineSeparator());
+            str.append("\nPre-instantiation initial state:\n");
+            str.append("(and");
             for (IntExpression f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
+                str.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
-                stringBuilder.append(")");
-                stringBuilder.append("\n\nPre-instantiation goal state:\n");
-                stringBuilder.append(Encoder.toString(intGoal));
+                str.append(")");
+                str.append("\n\nPre-instantiation goal state:\n");
+                str.append(Encoder.toString(intGoal));
             }
             if (intTaskNetwork != null) {
-                stringBuilder.append(")");
-                stringBuilder.append("\n\nPre-instantiation initial task network:\n");
-                stringBuilder.append(Encoder.toString(intTaskNetwork));
+                str.append(")");
+                str.append("\n\nPre-instantiation initial task network:\n");
+                str.append(Encoder.toString(intTaskNetwork));
             }
-            stringBuilder.append("\nPre-instantiation actions with inferred types (");
-            stringBuilder.append(intActions.size());
-            stringBuilder.append(" actions):\n");
+            str.append("\nPre-instantiation actions with inferred types (");
+            str.append(intActions.size());
+            str.append(" actions):\n");
             for (IntAction a : intActions) {
-                stringBuilder.append(Encoder.toString(a)).append("\n");
+                str.append(Encoder.toString(a)).append("\n");
             }
             if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                stringBuilder.append("\nPre-instantiation methods with inferred types (");
-                stringBuilder.append(intMethods.size());
-                stringBuilder.append(" methods):\n\n");
+                str.append("\nPre-instantiation methods with inferred types (");
+                str.append(intMethods.size());
+                str.append(" methods):\n\n");
                 for (IntMethod meth : intMethods) {
-                    stringBuilder.append(Encoder.toString(meth)).append("\n");
+                    str.append(Encoder.toString(meth)).append("\n");
                 }
             }
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
+            LOGGER.trace(str);
+            str.setLength(0);
         }
 
         // *****************************************************************************************
-        // Step 4: Instantiation
+        // Step 4: Actions instantiation
         // *****************************************************************************************
 
         // Instantiate the actions
         intActions = Instantiation.instantiateActions(intActions);
-        // Instantiate the methods
-        intMethods = Instantiation.instantiateMethods(intMethods);
-        // Expand the quantified expression in the goal
-        if (intGoal != null) {
-            Instantiation.expandQuantifiedExpression(intGoal);
-        }
-        // The tables of predicates are no more needed
-        Encoder.predicatesTables = null;
-
-        // Just for logging
-        if (Encoder.logLevel == 5) {
-            stringBuilder.append(System.lineSeparator());
-            Encoder.printTableOfConstants(stringBuilder);
-            stringBuilder.append(System.lineSeparator());
-            Encoder.printTableOfTypes(stringBuilder);
-            stringBuilder.append(System.lineSeparator());
-            stringBuilder.append("\nInstantiation initial state:\n").append("(and");
-            for (IntExpression f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
-            }
-            if (intGoal != null) {
-                stringBuilder.append(")").append("\n\nInstantiation goal state:\n").append("(and");
-                for (final IntExpression g : intGoal.getChildren()) {
-                    stringBuilder.append(" ").append(Encoder.toString(g));
-                }
-            }
-            if (intTaskNetwork != null) {
-                stringBuilder.append(")").append("\n\nInstantiation initial task network:\n")
-                    .append(Encoder.toString(intTaskNetwork));
-            }
-            stringBuilder.append("\n\nInstantiation actions with inferred types (").append(intActions.size())
-                .append(" actions):\n\n");
-            for (final IntAction op : intActions) {
-                stringBuilder.append(Encoder.toString(op)).append("\n");
-            }
-            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                stringBuilder.append("\nInstantiation methods with inferred types (").append(intMethods.size())
-                    .append(" methods):\n\n");
-                for (IntMethod meth : intMethods) {
-                    stringBuilder.append(Encoder.toString(meth)).append("\n");
-                }
-            }
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
-        }
-
-
-
-        // *****************************************************************************************
-        // Step 5: PostInstantiation
-        // *****************************************************************************************
-
-        // Extract the ground inertia from the instantiated actions
+        // Extract the ground inertia from the set of instantiated actions
         PostInstantiation.extractGroundInertia(intActions);
-        // Simplify the actions with the ground inertia information previously extracted
+        // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
-        // Simplify the methods with the ground inertia information previously extracted
-        PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
-        // Extract the relevant fluents from the simplified and instantiated actions and methods
-        PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
-        // Extract the relevant task for the simplified instantiated methods
-        PostInstantiation.extractRelevantTasks(intMethods);
-
-        // Simplify the goal with ground inertia information
-        if (intGoal != null) {
+        if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            // Expand the quantified expression in the goal
+            Instantiation.expandQuantifiedExpression(intGoal);
+            // Simplify the goal with ground inertia information
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
+
         }
         // Extract increase and add value to action cost
         PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
+
+        // Just for logging
+        if (Encoder.logLevel == 5) {
+            str.append(System.lineSeparator());
+            Encoder.printTableOfConstants(str);
+            str.append(System.lineSeparator());
+            Encoder.printTableOfTypes(str);
+            str.append(System.lineSeparator());
+            str.append("\nInstantiation initial state:\n").append("(and");
+            for (IntExpression f : intInitPredicates) {
+                str.append(" ").append(Encoder.toString(f));
+                str.append("\n");
+            }
+            str.append("\n\nInstantiation actions with inferred types (");
+            str.append(intActions.size());
+            str.append(" actions):\n\n");
+            for (final IntAction op : intActions) {
+                str.append(Encoder.toString(op));
+                str.append("\n");
+            }
+            if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+                str.append(")");
+                str.append("\n\nInstantiation goal state:\n");
+                str.append("(and");
+                for (final IntExpression g : intGoal.getChildren()) {
+                    str.append(" ");
+                    str.append(Encoder.toString(g));
+                }
+            }
+            LOGGER.trace(str);
+            str.setLength(0);
+        }
+
+        // *****************************************************************************************
+        // Step 5: Instantiation of the methods
+        // *****************************************************************************************
+
+        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
+            // Simplify the methods with the ground inertia information previously extracted
+            PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
+            if (Encoder.logLevel == 5) {
+                str.append(System.lineSeparator());
+                str.append("\nInstantiation methods with inferred types (");
+                str.append(intMethods.size());
+                str.append(" methods):\n\n");
+                for (IntMethod meth : intMethods) {
+                    str.append(Encoder.toString(meth));
+                    str.append("\n");
+                }
+                str.append(")");
+                str.append("\n\nInstantiation initial task network:\n");
+                str.append(Encoder.toString(intTaskNetwork));
+            }
+            LOGGER.trace(str);
+            str.setLength(0);
+        }
+
+
+        // *****************************************************************************************
+        // Step 6: PostInstantiation
+        // *****************************************************************************************
+
+        // Extract the relevant fluents from the simplified and instantiated actions and methods
+        PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
+        // Create the list of relevant tasks
+        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            Encoder.tableOfRelevantTasks = new ArrayList<>();
+            Encoder.tableOfRelevantTasks.addAll(Encoder.relevantPrimitiveTasks);
+            Encoder.tableOfRelevantTasks.addAll(Encoder.tableRelevantCompundTasks);
+        }
 
         // The table of ground inertia are no more needed
         Encoder.tableOfGroundInertia = null;
 
         // Just for logging
         if (Encoder.logLevel == 6) {
-            Encoder.printRelevantFactsTable(stringBuilder);
+            Encoder.printRelevantFactsTable(str);
             if (!Encoder.tableOfRelevantTasks.isEmpty()) {
-                stringBuilder.append("\n");
-                Encoder.printRelevantTasksTable(stringBuilder);
+                str.append("\n");
+                Encoder.printRelevantTasksTable(str);
             }
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
+            LOGGER.trace(str);
+            str.setLength(0);
         }
 
         // *****************************************************************************************
-        // Step 6: Bit set encoding of the problem
+        // Step 7: Bit set encoding of the problem
         // *****************************************************************************************
+
+        // Creates the final list of actions and methods that will be used in the problem
+        Encoder.actions = new ArrayList<>(intActions.size());
+        Encoder.methods = new ArrayList<>(intMethods.size());
 
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
         final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
@@ -594,28 +643,25 @@ public final class Encoder implements Serializable {
             index++;
         }
 
-        // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
-        final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
-        index = 0;
-        for (IntExpression task : Encoder.tableOfRelevantTasks) {
-            taskIndexMap.put(task, index);
-            index++;
-        }
-
-        // Creates the list of actions and methods
-        Encoder.actions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);
-        Encoder.methods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
-
-        // Encode the goal in bit set representation
-        if (intGoal != null && (!intGoal.getChildren().isEmpty()
-                || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
+        if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            // Encode the goal in bit set representation
+            if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM)) {
+                Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
+            } else {
+                Encoder.goal = new State();
+            }
         } else {
-            Encoder.goal = new State();
-        }
-
-        if (intTaskNetwork != null) {
+            // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
+            final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
+            index = 0;
+            for (IntExpression task : Encoder.tableOfRelevantTasks) {
+                taskIndexMap.put(task, index);
+                index++;
+            }
+            // Encode the initial task network
             Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(intTaskNetwork, taskIndexMap);
+            // Encode the methods in bit set representation
+            Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, fluentIndexMap, taskIndexMap));
         }
 
         // Encode the initial state in bit set representation
@@ -624,68 +670,68 @@ public final class Encoder implements Serializable {
         // Encode the actions in bit set representation
         Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
 
-        // Encode the methods in bit set representation
-        Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, fluentIndexMap, taskIndexMap));
+
+        // Creates the list of relevant operators
+        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            Encoder.tableOfRelevantOperators = new ArrayList<>();
+            for (Integer a : Encoder.relevantActions) {
+                List<Integer> l = new ArrayList<>(1);
+                l.add(a);
+                Encoder.tableOfRelevantOperators.add(l);
+            }
+            Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
+        }
 
         // Just for logging
         if (Encoder.logLevel == 7) {
-            stringBuilder.append("\nFinal actions:\n");
+            str.append("\nFinal actions:\n");
             for (Action a : Encoder.actions) {
-                stringBuilder.append(Encoder.toString(a) + "\n");
+                str.append(Encoder.toString(a) + "\n");
             }
             if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                stringBuilder.append("\nFinal methods:\n");
+                str.append("\nFinal methods:\n");
                 for (Method m : Encoder.methods) {
-                    stringBuilder.append(Encoder.toString(m) + "\n");
+                    str.append(Encoder.toString(m) + "\n");
                 }
             }
-            stringBuilder.append("Final initial state:\n").append("(and");
+            str.append("Final initial state:\n").append("(and");
             for (IntExpression f : intInitPredicates) {
-                stringBuilder.append(" ").append(Encoder.toString(f)).append("\n");
+                str.append(" ").append(Encoder.toString(f)).append("\n");
             }
 
 
             if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                stringBuilder.append("\nFinal goal state:\n");
+                str.append("\nFinal goal state:\n");
                 if (Encoder.goal == null) { // Goal null
-                    stringBuilder.append("goal can be simplified to FALSE");
+                    str.append("goal can be simplified to FALSE");
                 } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty
-                    stringBuilder.append(Encoder.toString(Encoder.goal));
+                    str.append(Encoder.toString(Encoder.goal));
                 } else { // Goal not Null and empty
-                    stringBuilder.append("goal can be simplified to TRUE");
+                    str.append("goal can be simplified to TRUE");
                 }
             } else {
-                stringBuilder.append("Final initial task network state:\n");
-                stringBuilder.append(Encoder.toString(Encoder.initialTaskNetwork));
+                str.append("Final initial task network state:\n");
+                str.append(Encoder.toString(Encoder.initialTaskNetwork));
             }
-            stringBuilder.append("\n\n");
-        }
 
-        // *****************************************************************************************
-        // Step 7: Compute structures to speed up the search
-        // *****************************************************************************************
-
-        PostEncoding.createTableOfRelevantOperatorsbis();
-
-        if (Encoder.logLevel == 8) {
             if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-                stringBuilder.append("\nTable of task resolvers:\n");
+                str.append("\nTable of task resolvers:\n");
                 for (int ti = 0; ti < Encoder.tableOfRelevantOperators.size(); ti++) {
-                    stringBuilder.append(ti).append(": ");
-                    stringBuilder.append(Encoder.toString(Encoder.tableOfRelevantTasks.get(ti)));
-                    stringBuilder.append(":");
+                    str.append(ti).append(": ");
+                    str.append(Encoder.toString(Encoder.tableOfRelevantTasks.get(ti)));
+                    str.append(":");
                     List<Integer> resolvers = Encoder.tableOfRelevantOperators.get(ti);
                     for (int ri = 0; ri < resolvers.size(); ri++) {
-                        stringBuilder.append(" ").append(resolvers.get(ri));
+                        str.append(" ").append(resolvers.get(ri));
                     }
-                    stringBuilder.append("\n");
+                    str.append("\n");
                 }
-
             }
-
-            LOGGER.trace(stringBuilder);
-            stringBuilder.setLength(0);
+            str.append("\n\n");
+            LOGGER.trace(str);
+            str.setLength(0);
         }
+
 
         final Problem codedProblem = new Problem();
         codedProblem.setGoal(Encoder.goal);
@@ -702,9 +748,11 @@ public final class Encoder implements Serializable {
         codedProblem.setPredicateSymbols(Encoder.tableOfPredicates);
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
-        codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
-            task -> new Task(task.getPredicate(), task.getArguments(),
-                task.isPrimtive())).collect(Collectors.toList()));
+        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
+                task -> new Task(task.getPredicate(), task.getArguments(),
+                    task.isPrimtive())).collect(Collectors.toList()));
+        }
         codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
         codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);

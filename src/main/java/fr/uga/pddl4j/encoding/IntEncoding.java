@@ -350,6 +350,7 @@ final class IntEncoding implements Serializable {
      * @return encoded the list of actions encoded.
      */
     static List<IntAction> encodeActions(final List<PDDLAction> ops) {
+        Encoder.primitiveTaskSymbols = new LinkedHashSet<>();
         return ops.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
     }
 
@@ -360,6 +361,7 @@ final class IntEncoding implements Serializable {
      * @return encoded the list of methods encoded.
      */
     static List<IntMethod> encodeMethods(final List<PDDLMethod> meths) {
+        Encoder.compoundTaskSymbols = new LinkedHashSet<>();
         return meths.stream().map(IntEncoding::encodeMethod).collect(Collectors.toList());
     }
 
@@ -444,6 +446,7 @@ final class IntEncoding implements Serializable {
      */
     private static IntAction encodeAction(final PDDLAction action) {
         final IntAction intAction = new IntAction(action.getName().getImage(), action.getArity());
+        Encoder.primitiveTaskSymbols.add(action.getName().getImage());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(action.getArity());
         for (int i = 0; i < action.getArity(); i++) {
@@ -470,6 +473,7 @@ final class IntEncoding implements Serializable {
      */
     private static IntMethod encodeMethod(final PDDLMethod method) {
         final IntMethod intMeth = new IntMethod(method.getName().getImage(), method.getArity());
+        Encoder.compoundTaskSymbols.add(method.getTask().getAtom().get(0).getImage());
         // Encode the parameters of the operator
         final List<String> variables = new ArrayList<>(method.getArity());
         for (int i = 0; i < method.getArity(); i++) {
@@ -599,6 +603,7 @@ final class IntEncoding implements Serializable {
             case TASK:
                 final String task = exp.getAtom().get(0).getImage();
                 intExp.setPredicate(Encoder.tableOfTasks.indexOf(task));
+                intExp.setPrimtive(Encoder.primitiveTaskSymbols.contains(task));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
                     final PDDLSymbol argument = exp.getAtom().get(i);

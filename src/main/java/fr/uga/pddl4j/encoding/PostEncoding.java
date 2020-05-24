@@ -52,20 +52,37 @@ public final class PostEncoding implements Serializable {
         LinkedList<Integer> tasks = new LinkedList<Integer>();
         tasks.addAll(Encoder.initialTaskNetwork.getTasks());
 
+        HashSet<Integer> closed = new HashSet<>();
+        closed.addAll(Encoder.initialTaskNetwork.getTasks());
 
         Map<Integer, List<Integer>> operators = new HashMap<Integer, List<Integer>>();
-
+        int nb = 0;
         while (!tasks.isEmpty()) {
             Integer t = tasks.pop();
             List<Integer> relevant = operators.get(t);
             if (relevant == null) {
                 final IntExpression taskExp = Encoder.tableOfRelevantTasks.get(t);
+                relevant = new ArrayList<>();
                 if (taskExp.isPrimtive()) {
-                    relevant = PostEncoding.getRelevantOperatorOfPrimitiveTask(t);
+                    for (int ai = 0; ai < Encoder.actions.size(); ai++) {
+                        final Action action = Encoder.actions.get(ai);
+                        if (action.getName().equals(Encoder.tableOfTasks.get(taskExp.getPredicate()))
+                            && Arrays.equals(action.getInstantiations(), taskExp.getArguments())) {
+                            relevant.add(ai);
+                        }
+                    }
                 } else {
-                    relevant = PostEncoding.getRelevantOperatorOfCompundTask(t);
-                    for (Integer m : relevant) {
-                        tasks.addAll(Encoder.methods.get(m).getSubTasks());
+                    for (int m = 0; m < Encoder.methods.size(); m++) {
+                        final Method method = Encoder.methods.get(m);
+                        if (method.getTask() == t) {
+                            relevant.add(m);
+                            for (Integer st : Encoder.methods.get(m).getSubTasks()) {
+                                if (!closed.contains(st)) {
+                                    tasks.add(st);
+                                    closed.add(st);
+                                }
+                            }
+                        }
                     }
                 }
                 operators.put(t, relevant);
@@ -74,13 +91,19 @@ public final class PostEncoding implements Serializable {
 
         final int numberOfrelevantTasks = Encoder.tableOfRelevantTasks.size();
         Encoder.tableOfRelevantOperators = new ArrayList<>(numberOfrelevantTasks);
+        int norelevant = 0;
         for (int ti = 0; ti < numberOfrelevantTasks; ti++) {
             List<Integer> relevant = operators.get(ti);
+
             if (relevant == null) {
                 relevant = new LinkedList<>();
+                norelevant++;
             }
             Encoder.tableOfRelevantOperators.add(relevant);
         }
+
+        System.out.println(norelevant + "/"+ numberOfrelevantTasks + "/" + nb);
+
     }
 
     static List<Integer> getRelevantOperatorOfPrimitiveTask(final int task) {

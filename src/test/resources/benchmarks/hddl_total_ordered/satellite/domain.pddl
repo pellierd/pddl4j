@@ -115,7 +115,7 @@
     )
 
     (:method do_mission_0
-  	    :parameters (?s - satellite ?i -instrument ?d - direction ?m - mode)
+  	    :parameters (?s - satellite ?m - mode ?i -instrument ?d - direction)
   	    :task (do_mission ?d ?m)
   	    :precondition ()
   	    :ordered-subtasks (and

@@ -21,11 +21,9 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class contains the methods needed to instantiate the actions and the method.
@@ -212,7 +210,7 @@ final class Instantiation implements Serializable {
     }
 
     /**
-     * Instantiates a specified method.
+     * Instantiates a specified method. This method used brut force.
      * <p>
      * The assumption is made that different method parameters are instantiated with different
      * constants, i.e., the planner never generates methods like move(a,a) because we consider this
@@ -228,7 +226,7 @@ final class Instantiation implements Serializable {
      * @see IntMethod
      */
     private static void instantiate(final IntMethod method, final int index, final int bound,
-                                    final List<IntMethod> methods) {
+                                    final List<IntMethod> methods) { //, IntExpression task) {
         if (bound == methods.size()) {
             return;
         }
@@ -266,8 +264,237 @@ final class Instantiation implements Serializable {
                         copy.setValueOfParameter(i, method.getValueOfParameter(i));
                     }
                     copy.setValueOfParameter(index, value);
-                    Instantiation.instantiate(copy, index + 1, bound, methods);
+                    Instantiation.instantiate(copy, index + 1, bound, methods);//, task);
                 }
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private static void instantiate(final IntMethod method, final int index, final int bound,
+                                    final List<IntMethod> methods, IntExpression task) {
+        if (bound == methods.size()) {
+            return;
+        }
+
+        //
+        int j = 0;
+        int[] args1 = task.getArguments();
+        int[] args2 = method.getTask().getArguments();
+        boolean stop = false;
+        while (j < task.getArguments().length && !stop) {
+            stop = args2[j] >= 0 && args2[j] != args1[j];
+            j++;
+        }
+        if (stop) return;
+
+        final int arity = method.arity();
+        if (index == arity) {
+            final IntExpression precond = method.getPreconditions();
+            Instantiation.simplify(precond);
+            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                methods.add(method);
+            }
+        } else {
+            final Set<Integer> values = Encoder.tableOfDomains.get(method.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
+
+                Instantiation.substitute(preconditionCopy, varIndex, value);
+                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
+                    final IntMethod copy = new IntMethod(method.getName(), arity);
+                    copy.setPreconditions(preconditionCopy);
+                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
+
+                    final IntExpression taskCopy = new IntExpression(method.getTask());
+                    Instantiation.substitute(taskCopy, varIndex, value);
+                    copy.setTask(taskCopy);
+
+                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
+                    Instantiation.substitute(subTasksCopy, varIndex, value);
+                    copy.setSubTasks(subTasksCopy);
+
+                    for (int i = 0; i < arity; i++) {
+                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
+                    }
+                    for (int i = 0; i < index; i++) {
+                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
+                    }
+                    copy.setValueOfParameter(index, value);
+                    Instantiation.instantiate(copy, index + 1, bound, methods, task);
+                }
+            }
+        }
+    }
+
+    static List<IntMethod> instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork, List<IntAction> actions) {
+        //System.out.println("method instantiation...");
+
+        // Init the list of instantiated methods or ground methods
+        final List<IntMethod> instMethods = new ArrayList<>(1000);
+
+        // Init the set used to store the compound tasks
+        final Set<IntExpression> compound = new LinkedHashSet<>();
+
+        // Init the set used to store the primtive tasks
+        final Set<IntExpression> primtive = new LinkedHashSet<>();
+
+        // Init the table used to store for each task the list of methods that are relevant
+        Encoder.relevantMethods = new ArrayList<List<Integer>>();
+
+        // Init the list of methods to instantiate
+        List<IntMethod> meths = new ArrayList<>();
+        meths.addAll(methods);
+
+        // Filter methods with a parameter with an empty domain
+        Instantiation.filterMethodWithEmptyDomainParameter(methods);
+
+        // Expand the quantified expression contains in the the method precondition
+        Instantiation.expandQuantifiedExpressionAndSimplyMethods(meths);
+
+        // Compute the set of primitive task from the action already instantiated
+        LinkedHashSet<IntExpression> primitiveTaskSet = Instantiation.computePrimitiveTaskSet(actions);
+
+        // TInit the list of pending tasks to decompose
+        final LinkedList<IntExpression> tasks = new LinkedList<>();
+
+        // Add the task of the initial task network with the compound tasks
+        for (IntExpression subtasks : initialTasksNetwork.getTasks().getChildren()) {
+            if (!subtasks.isPrimtive()) {
+                tasks.add(subtasks);
+                compound.add(subtasks);
+            } else {
+                primtive.add(subtasks);
+            }
+        }
+
+        // Start exploring the task tree
+        int indexMethod = 0;
+        while (!tasks.isEmpty()) {
+            final IntExpression task = tasks.pop();
+            final List<IntMethod> relevant = new ArrayList<>();
+            final List<Integer> relevantIndex = new ArrayList<>();
+            for (IntMethod method : meths) {
+                if (method.getTask().getPredicate() == task.getPredicate()) {
+                    final List<IntMethod> instantiated = new ArrayList<>(100);
+                    Instantiation.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
+                    for (IntMethod instance : instantiated) {
+                        final Iterator<IntExpression> i = instance.getSubTasks().getChildren().iterator();
+                        final Set<IntExpression> primitiveSet = new  LinkedHashSet<>();
+                        final Set<IntExpression> compoundSet = new LinkedHashSet<>();
+                        boolean stop = false;
+                        while (i.hasNext() && !stop) {
+                            final IntExpression subtask = i.next();
+                            if (subtask.isPrimtive()) {
+                                if (!primitiveTaskSet.contains(subtask)) {
+                                    stop = true;
+                                } else {
+                                    primitiveSet.add(subtask);
+                                }
+                            } else {
+                                if (!compound.contains(subtask)) {
+                                    compoundSet.add(subtask);
+                                }
+                            }
+                        }
+                        if (!stop) {
+                            primtive.addAll(primitiveSet);
+                            tasks.addAll(compoundSet);
+                            compound.addAll(compoundSet);
+                            relevant.add(instance);
+                            relevantIndex.add(indexMethod);
+                            indexMethod++;
+                        }
+                    }
+                }
+            }
+            Encoder.relevantMethods.add(relevantIndex);
+            instMethods.addAll(relevant);
+        }
+
+        // Initialize the table of relevant methods for each compund task and the table of relevant compound tasks
+        Encoder.tableRelevantCompundTasks = new ArrayList<>(compound.size());
+        Encoder.tableRelevantCompundTasks.addAll(compound);
+
+        // Initialize the table of relevant actions for each primitive task and the table of relevant primitive tasks
+        Encoder.relevantActions = new ArrayList<Integer>(primitiveTaskSet.size());
+        Encoder.relevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
+        int index = 0;
+        Iterator<IntExpression> i = primitiveTaskSet.iterator();
+        while (i.hasNext()) {
+            // The action at index i can be remove because it not reachable from the initial task network.
+            IntExpression primitiveTask = i.next();
+            if (!primtive.contains(primitiveTask)) {
+                actions.remove(index);
+                i.remove();
+            } else {
+                Encoder.relevantActions.add(index);
+                Encoder.relevantPrimitiveTasks.add(primitiveTask);
+                index++;
+            }
+        }
+
+        return instMethods;
+    }
+
+    /**
+     * Computes the list of possible primitive tasks from the action already instantiated.
+     *
+     * @param actions the list of actions altready instantiated.
+     * @return the list of possible primitive tasks from the action already instantiated.
+     */
+    private static LinkedHashSet<IntExpression> computePrimitiveTaskSet(List<IntAction> actions) {
+        LinkedHashSet<IntExpression> tasks = new LinkedHashSet<>();
+        for (IntAction a : actions) {
+            IntExpression task = new IntExpression(PDDLConnective.TASK);
+            task.setPrimtive(true);
+            task.setPredicate(Encoder.tableOfTasks.indexOf(a.getName()));
+            task.setArguments(a.getInstantiations());
+            tasks.add(task);
+        }
+        return tasks;
+
+    }
+
+    /**
+     * Expands the quantified expression contained in the preconditions of the methods in parameter and simplify the
+     * their precondition. If the preconditions can be simplied to false, the method simplified is removed.
+     *
+     * @param methods the list of methods to process.
+     */
+    private static void expandQuantifiedExpressionAndSimplyMethods(List<IntMethod> methods) {
+        final Iterator<IntMethod> i = methods.iterator();
+        while (i.hasNext()) {
+            final IntMethod method = i.next();
+            Instantiation.expandQuantifiedExpression(method.getPreconditions());
+            Instantiation.simplify(method.getPreconditions());
+            if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+                i.remove();
+            }
+        }
+    }
+
+    /**
+     * Filter methods with a parameter with a empty domain.
+     *
+     * @param methods the list of methods to filter.
+     */
+    private static void filterMethodWithEmptyDomainParameter(List<IntMethod> methods) {
+        Iterator<IntMethod> it =  methods.iterator();
+        while (it.hasNext()) {
+            final IntMethod method = it.next();
+            // If an method has a parameter with a empty domain the method can be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < method.arity() && toInstantiate) {
+                toInstantiate = !Encoder.tableOfDomains.get(method.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (!toInstantiate) {
+                it.remove();
             }
         }
     }

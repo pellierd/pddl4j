@@ -93,8 +93,10 @@ public final class TFDPlanner extends AbstractPlanner {
                 System.out.println("=> Current state:");
                 System.out.println(problem.toString(currentNode.getState()));
                 System.out.println("\n=> Tasks to be excuted:");
-                for (int t : currentNode.getTasks()) {
-                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                System.out.println(currentNode.getTasks());
+                for (int i = 0 ; i< currentNode.getTasks().size(); i++) {
+
+                    System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
             }
 
@@ -103,6 +105,7 @@ public final class TFDPlanner extends AbstractPlanner {
                 plan = this.extractPlan(currentNode, problem);
             } else {
                 // Get and remove the fist task of the task network
+                //System.out.println(currentNode);
                 int task = currentNode.popTask();
                 // Get the current state of the search
                 final State state = currentNode.getState();
@@ -177,7 +180,8 @@ public final class TFDPlanner extends AbstractPlanner {
                         }
                     }
                 }
-
+                //currentNode.setState(null);
+                //currentNode.getTasks().clear();
             }
             elapsedTime = System.currentTimeMillis() - start;
         }

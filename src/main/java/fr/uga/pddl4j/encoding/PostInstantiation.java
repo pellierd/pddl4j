@@ -22,13 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -188,19 +182,24 @@ final class PostInstantiation implements Serializable {
      */
     static void extractRelevantTasks(List<IntMethod> methods) {
         final Set<IntExpression> tasks = new LinkedHashSet<>(1000);
-        final Set<IntExpression> compoundTasks = new LinkedHashSet<>(methods.size());
         for (IntMethod m : methods) {
             tasks.add(m.getTask());
             PostInstantiation.extractRelevantTasks(m.getSubTasks(), tasks);
-            compoundTasks.add(m.getTask());
         }
         Encoder.tableOfRelevantTasks = new ArrayList<>(tasks.size());
+        int primitive = 0;
+        int compound = 0;
         for (IntExpression task : tasks) {
             final IntExpression copy = new IntExpression(task);
-            copy.setPrimtive(!compoundTasks.contains(task));
             copy.setTaskID(IntExpression.DEFAULT_TASK_ID);
             Encoder.tableOfRelevantTasks.add(copy);
+            if (copy.isPrimtive()) {
+                primitive++;
+            } else {
+                compound++;
+            }
         }
+        System.out.println("result extyarct " + methods.size() + " " + primitive +  " " + compound);
     }
 
     /**
@@ -508,7 +507,12 @@ final class PostInstantiation implements Serializable {
      * @param init    the initial state.
      */
     static void simplyActionsWithGroundInertia(final List<IntAction> actions, final Set<IntExpression> init) {
-        final List<IntAction> tmpActions = new ArrayList<>(actions.size());
+    //static void simplyActionsWithGroundInertia(final List<IntAction> actions, final List<IntMethod> methods,
+    //    final Set<IntExpression> init) {
+
+        final List<IntAction> toAdd = new ArrayList<>(actions.size());
+        final Set<Integer> toRemove = new HashSet<>(actions.size());
+        int index = 0;
         for (IntAction a : actions) {
             PostInstantiation.simplifyWithGroundInertia(a.getPreconditions(), false, init);
             PostInstantiation.simplify(a.getPreconditions());
@@ -517,12 +521,130 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplify(a.getEffects());
                 if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)
                     && !a.getEffects().getConnective().equals(PDDLConnective.TRUE)) {
-                    tmpActions.add(a);
+                    toAdd.add(a);
+                } else {
+                    toRemove.add(index);
+                }
+            } else {
+                toRemove.add(index);
+            }
+            index++;
+        }
+        //System.out.println("--" +toAdd.size());
+        //System.out.println("--" +toRemove.size());
+        //System.out.println("--" +actions.size());
+
+
+        // Simplification for HTN
+        if (Encoder.relevantActions != null) {
+            final Set<IntExpression> primitiveTasksNoMoreReachable = new HashSet<IntExpression>();
+            // Update the relevant actions for the tasks
+            for (int i = 0; i < Encoder.relevantActions.size(); i++) {
+                if (toRemove.contains(Encoder.relevantActions.get(i))) {
+                    primitiveTasksNoMoreReachable.add(Encoder.relevantPrimitiveTasks.remove(i));
+                    Encoder.relevantActions.remove(i);
+                    i--;
+                } else {
+                    Encoder.relevantActions.set(i, i);
                 }
             }
         }
+
         actions.clear();
-        actions.addAll(tmpActions);
+        actions.addAll(toAdd);
+    }
+
+
+    /**
+     * Simply recursively the methods by removing unreachable tasks.
+     *
+     * @param methods the list of method to simplify.
+     * @param tasks the set of compound tasks which are no more reachable.
+     * @return the list of task no more reachable.
+     */
+    private static void simplyRecursivelyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
+                                                                   final Set<IntExpression> tasks) {
+
+        while (!tasks.isEmpty()) {
+            PostInstantiation.simplyMethodsWithTasksNoMoreReachable(methods, tasks);
+        }
+    }
+
+    /**
+     * Simply the method by removing unreachable tasks.
+     *
+     * @param methods the list of method to simplify.
+     * @param tasks the set of compound tasks which are no more reachable.
+     * @return the list of task no more reachable.
+     */
+    private static void simplyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
+                                                                    final Set<IntExpression> tasks) {
+        final Set<IntExpression> tasksNoMoreReachable = new LinkedHashSet<>();
+        for (int i = 0 ; i < methods.size(); i++) {
+            final IntMethod method = methods.get(i);
+            if (PostInstantiation.isSimplified(method, tasks)) {
+                methods.remove(i);
+                for (int j = 0; j < Encoder.relevantMethods.size(); j++) {
+                    final List<Integer> relevant = Encoder.relevantMethods.get(j);
+                    if (relevant.remove(new Integer(i))) {
+                        //System.out.println("remove " + i);
+                        PostInstantiation.updateRelevantMethods(i);
+                        // There is no more relevant method for the compound task
+                        if (relevant.isEmpty()) {
+                            tasksNoMoreReachable.add(Encoder.tableRelevantCompundTasks.get(j));
+                            Encoder.tableRelevantCompundTasks.remove(j);
+                            Encoder.relevantMethods.remove(j);
+                            //System.out.println("A task is no more reachable");
+                            j--;
+                        }
+                        break;
+                    }
+                }
+                i--;
+            }
+        }
+        tasks.clear();
+        tasks.addAll(tasksNoMoreReachable);
+    }
+
+    /**
+     * Returns if a method can be simplified. A method can be simplified if it is relevant for a task that is no more
+     * reachable or has a child that is no more reachable. The set of no more reachable set of tasks is given as
+     * parameter of the methods.
+     *
+     * @param method the method to test.
+     * @param tasks the set of tasks that are no more reachable.
+     * @return <code>true</code> if the method is simplified, <code>false</code>
+     */
+    private  static boolean isSimplified(IntMethod method, Set<IntExpression> tasks) {
+        boolean isSimplified = true;
+        if (!tasks.contains(method.getTask())) {
+            final List<IntExpression> subtasks = method.getSubTasks().getChildren();
+            final Iterator<IntExpression> i = subtasks.iterator();
+            isSimplified = false;
+            while (i.hasNext() && !isSimplified) {
+                isSimplified = tasks.contains(i.next());
+            }
+        }
+        return isSimplified;
+    }
+
+    /**
+     * Update the index of the relevant method when a method is removed.
+     *
+     * @param index the index of the method removed.
+     */
+    private static void updateRelevantMethods(final int index) {
+        for (List<Integer> relevant : Encoder.relevantMethods) {
+            int i = 0;
+            for (Integer m : relevant) {
+                if (m > index) {
+                    relevant.set(i,--m);
+                }
+                i++;
+            }
+
+        }
     }
 
     /**
@@ -533,16 +655,21 @@ final class PostInstantiation implements Serializable {
      * @param init    the initial state.
      */
     static void simplyMethodsWithGroundInertia(final List<IntMethod> methods, final Set<IntExpression> init) {
-        final List<IntMethod> tmpMethods = new ArrayList<>(methods.size());
+        final List<IntMethod> toAdd = new ArrayList<>(methods.size());
+        final Set<IntExpression> toRemove = new HashSet<>();
         for (IntMethod m : methods) {
             PostInstantiation.simplifyWithGroundInertia(m.getPreconditions(), false, init);
             PostInstantiation.simplify(m.getPreconditions());
             if (!m.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
-                tmpMethods.add(m);
+                toAdd.add(m);
+            } else {
+                toRemove.add(m.getTask());
             }
         }
-        methods.clear();
-        methods.addAll(tmpMethods);
+        //System.out.println("To remove:" + toRemove.size());// + " " + Encoder.toString(toRemove.iterator().next()));
+        //System.out.println("Methods avant: " + methods.size());
+        PostInstantiation.simplyRecursivelyMethodsWithTasksNoMoreReachable(methods, toRemove);
+        //System.out.println("Methods après: " + methods.size());
     }
 
     /**
