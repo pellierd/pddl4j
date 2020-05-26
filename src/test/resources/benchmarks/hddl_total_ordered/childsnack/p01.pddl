@@ -22,7 +22,8 @@
 ;; random seed: 234324
 
 (define (problem p01)
-    (:domain child-snack)
+
+    (:domain childsnack)
 
     (:objects
         child1 child2 child3 child4 child5 child6 child7 child8 child9 child10 - child
@@ -100,18 +101,18 @@
         (waiting child8 table2)
         (waiting child9 table1)
         (waiting child10 table3)
-        (notexist sandw1)
-        (notexist sandw2)
-        (notexist sandw3)
-        (notexist sandw4)
-        (notexist sandw5)
-        (notexist sandw6)
-        (notexist sandw7)
-        (notexist sandw8)
-        (notexist sandw9)
-        (notexist sandw10)
-        (notexist sandw11)
-        (notexist sandw12)
-        (notexist sandw13)
+        (not_exist sandw1)
+        (not_exist sandw2)
+        (not_exist sandw3)
+        (not_exist sandw4)
+        (not_exist sandw5)
+        (not_exist sandw6)
+        (not_exist sandw7)
+        (not_exist sandw8)
+        (not_exist sandw9)
+        (not_exist sandw10)
+        (not_exist sandw11)
+        (not_exist sandw12)
+        (not_exist sandw13)
   )
 )

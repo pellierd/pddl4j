@@ -17,7 +17,7 @@
 ;; along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
 ;;
 
-(define (domain child-snack)
+(define (domain childsnack)
 
     (:requirements
         :strips
@@ -45,7 +45,7 @@
         (served ?c - child)
         (waiting ?c - child ?p - place)
         (at ?t - tray ?p - place)
-        (notexist ?s - sandwich)
+        (not_exist ?s - sandwich)
     )
 
     (:tasks
@@ -60,14 +60,14 @@
 			(at_kitchen_content ?c)
 			(no_gluten_bread ?b)
 			(no_gluten_content ?c)
-			(notexist ?s)
+			(not_exist ?s)
 		)
 	    :effect (and
 		   (not (at_kitchen_bread ?b))
 		   (not (at_kitchen_content ?c))
 		   (at_kitchen_sandwich ?s)
 		   (no_gluten_sandwich ?s)
-           (not (notexist ?s))
+           (not (not_exist ?s))
         )
     )
 
@@ -76,13 +76,13 @@
 	    :precondition (and
 	        (at_kitchen_bread ?b)
 			(at_kitchen_content ?c)
-            (notexist ?s)
+            (not_exist ?s)
 		)
 	    :effect (and
 		    (not (at_kitchen_bread ?b))
 		    (not (at_kitchen_content ?c))
 		     (at_kitchen_sandwich ?s)
-             (not (notexist ?s))
+             (not (not_exist ?s))
         )
     )
 
@@ -143,7 +143,7 @@
 		:task (serve ?c)
 		:precondition (and
 		    (allergic_gluten ?c)
-		    (notexist ?s)
+		    (not_exist ?s)
 		    (waiting ?c ?p2)
 		    (no_gluten_bread ?b)
 		    (no_gluten_content ?cont)
@@ -162,7 +162,7 @@
 		:task (serve ?c)
 		:precondition (and
 		    (not_allergic_gluten ?c)
-		    (notexist ?s)
+		    (not_exist ?s)
 		    (waiting ?c ?p2)
 		    (not (no_gluten_bread ?b))
 		    (not (no_gluten_content ?cont))
