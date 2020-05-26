@@ -38,12 +38,12 @@
   		:task (serve ?c)
   		:precondition (and
   			(allergic_gluten ?c)
-            (not (served ?c))
+        (not (served ?c))
   		)
   		:ordered-subtasks (and
-            (make_no_gluten_sandwich ?s ?b ?ct)
-            (bring ?s ?c)
-        )
+        (make_no_gluten_sandwich ?s ?b ?ct)
+        (bring ?s ?c)
+      )
   	)
 
     (:method serve_not_allergic_child
@@ -51,36 +51,33 @@
   		:task (serve ?c)
   		:precondition (and
   			(not_allergic_gluten ?c)
-            (not (served ?c))
+        (not (served ?c))
   		)
   		:ordered-subtasks (and
-            (make_sandwich ?s ?b ?ct)
-            (bring ?s ?c)
-        )
+        (make_sandwich ?s ?b ?ct)
+        (bring ?s ?c)
+      )
   	)
 
     (:method bring_on_tray
-  		:parameters (?s - sandwich ?c - child ?p - place ?t - tray)
+  		:parameters (?c - child ?p - place ?s - sandwich ?t - tray)
   		:task (bring ?s ?c)
   		:precondition ()
   		:ordered-subtasks (and
-            (put_on_tray ?s ?t)
-            (move_tray ?t kitchen ?p)
-            (serve_sandwich ?s ?c ?t ?p)
-            (move_tray ?t ?p kitchen)
-        )
+        (put_on_tray ?s ?t)
+        (move_tray ?t kitchen ?p)
+        (serve_sandwich ?s ?c ?t ?p)
+        (move_tray ?t ?p kitchen))
      )
 
     (:action put_on_tray
     	 :parameters (?s - sandwich ?t - tray)
     	 :precondition (and
-            (at_kitchen_sandwich ?s)
-            (at ?t kitchen)
-         )
+          (at_kitchen_sandwich ?s)
+          (at ?t kitchen))
     	 :effect (and
     		   (not (at_kitchen_sandwich ?s))
-    		   (on_tray ?s ?t)
-        )
+    		   (on_tray ?s ?t))
     )
 
    (:action move_tray
@@ -88,9 +85,8 @@
    	 :precondition (and (at ?t ?from))
    	 :effect (and
         (not (at ?t ?from))
-   		  (at ?t ?to)
-   		)
-    )
+   		  (at ?t ?to))
+   )
 
    (:action serve_sandwich
    	:parameters (?s - sandwich ?c - child ?t - tray ?p - place)

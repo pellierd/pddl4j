@@ -50,7 +50,6 @@ final class IntMethod extends AbstractIntOperator {
         super(other);
         this.task = new IntExpression(other.getTask());
         this.taskNetwork = new IntTaskNetwork(other.taskNetwork);
-
     }
 
     /**

@@ -226,10 +226,12 @@ final class Instantiation implements Serializable {
      * @see IntMethod
      */
     private static void instantiate(final IntMethod method, final int index, final int bound,
-                                    final List<IntMethod> methods) { //, IntExpression task) {
+                                    final List<IntMethod> methods) {
+        //System.out.println("instantiate " + Encoder.toShortString(method));
         if (bound == methods.size()) {
             return;
         }
+
         final int arity = method.arity();
         if (index == arity) {
             final IntExpression precond = method.getPreconditions();
@@ -237,6 +239,8 @@ final class Instantiation implements Serializable {
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 methods.add(method);
             }
+        } else if (method.getValueOfParameter(index) >= 0) {
+            Instantiation.instantiate(method, index + 1, bound, methods);
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(method.getTypeOfParameters(index));
             for (Integer value : values) {
@@ -257,24 +261,46 @@ final class Instantiation implements Serializable {
                     Instantiation.substitute(subTasksCopy, varIndex, value);
                     copy.setSubTasks(subTasksCopy);
 
+
                     for (int i = 0; i < arity; i++) {
                         copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
                     }
-                    for (int i = 0; i < index; i++) {
+                    for (int i = 0; i < arity; i++) {
                         copy.setValueOfParameter(i, method.getValueOfParameter(i));
                     }
+
                     copy.setValueOfParameter(index, value);
-                    Instantiation.instantiate(copy, index + 1, bound, methods);//, task);
+                    Instantiation.instantiate(copy, index + 1, bound, methods);
                 }
             }
         }
     }
 
+    private static void instantiate(final IntMethod method, final int index, final int bound,
+                                    final List<IntMethod> methods, final IntExpression task) {
+        final IntExpression t = method.getTask();
+        final IntMethod copy = new IntMethod(method);
+        for (int i =  0; i < t.getArguments().length; i++) {
+            final int var = t.getArguments()[i];
+            final int cons = task.getArguments()[i];
+            Instantiation.substitute(copy.getPreconditions(), var, cons);
+            Instantiation.substitute(copy.getTask(), var, cons);
+            Instantiation.substitute(copy.getSubTasks(), var, cons);
+            copy.setValueOfParameter((-var - 1), cons);
+        }
+        //System.out.println(Encoder.toShortString(copy));
+        Instantiation.instantiate(copy, index, bound, methods);
+
+        //System.exit(0);
+    }
+
     /**
      *
      */
-    private static void instantiate(final IntMethod method, final int index, final int bound,
+    /*private static void instantiate(final IntMethod method, final int index, final int bound,
                                     final List<IntMethod> methods, IntExpression task) {
+        //System.out.println(Encoder.toString(method));
+
         if (bound == methods.size()) {
             return;
         }
@@ -328,10 +354,9 @@ final class Instantiation implements Serializable {
                 }
             }
         }
-    }
+    }*/
 
     static List<IntMethod> instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork, List<IntAction> actions) {
-        //System.out.println("method instantiation...");
 
         // Init the list of instantiated methods or ground methods
         final List<IntMethod> instMethods = new ArrayList<>(1000);

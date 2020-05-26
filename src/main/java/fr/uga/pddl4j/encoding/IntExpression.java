@@ -349,7 +349,8 @@ public class IntExpression implements Serializable {
                 && Double.compare(this.value, other.value) == 0
                 && this.variable == other.variable
                 && this.type == other.type
-                && this.children.equals(other.children);
+                && this.children.equals(other.children)
+                && this.isPrimtive() == other.isPrimtive();
         }
         return false;
     }

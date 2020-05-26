@@ -83,6 +83,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
         this(name, new int[arity], new int[arity]);
         Arrays.fill(this.parameters, -1);
         Arrays.fill(this.instantiations, -1);
+        this.dummy = false;
 
     }
 

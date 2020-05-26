@@ -24,6 +24,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -394,6 +395,7 @@ final class PreInstantiation implements Serializable {
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getPreconditions()));
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getEffects()));
 
+
         List<IntAction> actions = new LinkedList<>();
         actions.add(action);
 
@@ -433,7 +435,6 @@ final class PreInstantiation implements Serializable {
                         dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
                         Encoder.tableOfDomains.add(dt2);
                     }
-
                     final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
                     PreInstantiation.replace(op1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
@@ -447,13 +448,15 @@ final class PreInstantiation implements Serializable {
                     op2.setTypeOfParameter(index, ts);
                     PreInstantiation.replace(op2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
                     PreInstantiation.replace(op2.getEffects(), inertia, PDDLConnective.FALSE, ti, ts);
+
                     if (!op2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
                         && !op2.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                         newActions.add(op2);
                     }
                 }
             }
-            actions = newActions;
+            actions.clear();
+            actions.addAll(newActions);
         }
         return actions;
     }
@@ -521,11 +524,9 @@ final class PreInstantiation implements Serializable {
                     if (!meth1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                         newMethods.add(meth1);
                     }
-
                     final IntMethod meth2 = new IntMethod(m);
                     meth2.setTypeOfParameter(index, ts);
                     PreInstantiation.replace(meth2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
-
                     if (!meth2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                         newMethods.add(meth2);
                     }
