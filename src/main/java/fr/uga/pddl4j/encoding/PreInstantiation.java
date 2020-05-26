@@ -406,9 +406,9 @@ final class PreInstantiation implements Serializable {
 
                     int index = -inertia.getArguments()[0] - 1;
                     // Hack add for constant in predicate
-                    if (index < 0) {
-                        break;
-                    }
+                    //if (index < 0) {
+                    //    break;
+                    //}
 
                     final int dtIndex = action.getTypeOfParameters(index);
 

@@ -1,131 +1,178 @@
-(define (domain childsnack)
+;;
+;; Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+;;
+;; This file is part of PDDL4J library.
+;;
+;; PDDL4J is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; PDDL4J is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+;;
 
-  (:requirements :typing :total-ordered-htn :htn-method-preconditions :negative-preconditions)
+(define (domain child-snack)
 
-  (:types child - object
-          bread-portion - object
-          content-portion - object
-          sandwich - object
-          tray - object
-          place - object
-  )
+    (:requirements
+        :strips
+       :typing
+       :total-ordered-htn
+       :htn-method-preconditions
+       :negative-preconditions
+       :equality
+    )
 
-  (:constants kitchen - place)
+    (:types child bread-portion content-portion sandwich tray place - object)
 
-  (:predicates
-          (at_kitchen_bread ?b - bread-portion)
-          (at_kitchen_content ?c - content-portion)
-          (at_kitchen_sandwich ?s - sandwich)
-          (no_gluten_bread ?b - bread-portion)
-          (no_gluten_content ?c - content-portion)
-          (on_tray ?s - sandwich ?t - tray)
-          (no_gluten_sandwich ?s - sandwich)
-          (allergic_gluten ?c - child)
-          (not_allergic_gluten ?c - child)
-          (served ?c - child)
-          (waiting ?c - child ?p - place)
-          (at ?t - tray ?p - place)
-          (not_exist ?s - sandwich)
+    (:constants kitchen - place)
+
+    (:predicates
+     	(at_kitchen_bread ?b - bread-portion)
+	    (at_kitchen_content ?c - content-portion)
+     	(at_kitchen_sandwich ?s - sandwich)
+     	(no_gluten_bread ?b - bread-portion)
+        (no_gluten_content ?c - content-portion)
+        (ontray ?s - sandwich ?t - tray)
+        (no_gluten_sandwich ?s - sandwich)
+        (allergic_gluten ?c - child)
+        (not_allergic_gluten ?c - child)
+        (served ?c - child)
+        (waiting ?c - child ?p - place)
+        (at ?t - tray ?p - place)
+        (notexist ?s - sandwich)
     )
 
     (:tasks
-          (serve ?c - child)
-          (bring ?s  - sandwich ?c - child)
+        (serve ?c - child)
     )
 
-    (:method serve_allergic_child
-  		:parameters (?c - child ?s - sandwich ?b - bread-portion ?ct - content-portion)
-  		:task (serve ?c)
-  		:precondition (and
-  			(allergic_gluten ?c)
-        (not (served ?c))
-  		)
-  		:ordered-subtasks (and
-        (make_no_gluten_sandwich ?s ?b ?ct)
-        (bring ?s ?c)
-      )
-  	)
 
-    (:method serve_not_allergic_child
-  		:parameters (?c - child ?s - sandwich ?b - bread-portion ?ct - content-portion)
-  		:task (serve ?c)
-  		:precondition (and
-  			(not_allergic_gluten ?c)
-        (not (served ?c))
-  		)
-  		:ordered-subtasks (and
-        (make_sandwich ?s ?b ?ct)
-        (bring ?s ?c)
-      )
-  	)
+    (:action make_sandwich_no_gluten
+	    :parameters (?s - sandwich ?b - bread-portion ?c - content-portion)
+	    :precondition (and
+	        (at_kitchen_bread ?b)
+			(at_kitchen_content ?c)
+			(no_gluten_bread ?b)
+			(no_gluten_content ?c)
+			(notexist ?s)
+		)
+	    :effect (and
+		   (not (at_kitchen_bread ?b))
+		   (not (at_kitchen_content ?c))
+		   (at_kitchen_sandwich ?s)
+		   (no_gluten_sandwich ?s)
+           (not (notexist ?s))
+        )
+    )
 
-    (:method bring_on_tray
-  		:parameters (?c - child ?p - place ?s - sandwich ?t - tray)
-  		:task (bring ?s ?c)
-  		:precondition ()
-  		:ordered-subtasks (and
-        (put_on_tray ?s ?t)
-        (move_tray ?t kitchen ?p)
-        (serve_sandwich ?s ?c ?t ?p)
-        (move_tray ?t ?p kitchen))
-     )
+    (:action make_sandwich
+	    :parameters (?s - sandwich ?b - bread-portion ?c - content-portion)
+	    :precondition (and
+	        (at_kitchen_bread ?b)
+			(at_kitchen_content ?c)
+            (notexist ?s)
+		)
+	    :effect (and
+		    (not (at_kitchen_bread ?b))
+		    (not (at_kitchen_content ?c))
+		     (at_kitchen_sandwich ?s)
+             (not (notexist ?s))
+        )
+    )
 
     (:action put_on_tray
-    	 :parameters (?s - sandwich ?t - tray)
-    	 :precondition (and
-          (at_kitchen_sandwich ?s)
-          (at ?t kitchen))
-    	 :effect (and
-    		   (not (at_kitchen_sandwich ?s))
-    		   (on_tray ?s ?t))
+	    :parameters (?s - sandwich ?t - tray)
+	    :precondition (and
+	        (at_kitchen_sandwich ?s)
+			(at ?t kitchen)
+		)
+	    :effect (and
+		   (not (at_kitchen_sandwich ?s))
+		   (ontray ?s ?t)
+		)
+	)
+
+    (:action serve_sandwich_no_gluten
+ 	    :parameters (?s - sandwich ?c - child ?t - tray ?p - place)
+	    :precondition (and
+		    (allergic_gluten ?c)
+		    (ontray ?s ?t)
+		    (waiting ?c ?p)
+		    (no_gluten_sandwich ?s)
+            (at ?t ?p)
+		)
+	    :effect (and
+		    (not (ontray ?s ?t))
+		    (served ?c)
+		)
     )
 
-   (:action move_tray
-   	 :parameters (?t - tray ?from ?to - place)
-   	 :precondition (and (at ?t ?from))
-   	 :effect (and
-        (not (at ?t ?from))
-   		  (at ?t ?to))
-   )
+    (:action serve_sandwich
+	    :parameters (?s - sandwich ?c - child ?t - tray ?p - place)
+	    :precondition (and
+	        (not_allergic_gluten ?c)
+	        (waiting ?c ?p)
+			(ontray ?s ?t)
+			(at ?t ?p)
+	    )
+	    :effect (and
+	        (not (ontray ?s ?t))
+		    (served ?c)
+		)
+	)
 
-   (:action serve_sandwich
-   	:parameters (?s - sandwich ?c - child ?t - tray ?p - place)
-   	:precondition (and
-        (not_allergic_gluten ?c)
-   	    (waiting ?c ?p)
-   			(on_tray ?s ?t)
-   			(at ?t ?p))
-   	:effect (and
-        (not (on_tray ?s ?t))
-   		  (served ?c))
-   )
+    (:action move_tray
+	    :parameters (?t - tray ?p1 ?p2 - place)
+	    :precondition (and
+	        (at ?t ?p1)
+	    )
+	    :effect (and
+	        (not (at ?t ?p1))
+		    (at ?t ?p2)
+		)
+	)
 
-   (:action make_no_gluten_sandwich
-   	 :parameters (?s - sandwich ?b - bread-portion ?c - content-portion)
-   	 :precondition (and
-            (at_kitchen_bread ?b)
-   			    (at_kitchen_content ?c)
-   			    (no_gluten_bread ?b)
-   			    (no_gluten_content ?c)
-   			    (not_exist ?s))
-   	 :effect (and
-   		   (not (at_kitchen_bread ?b))
-   		   (not (at_kitchen_content ?c))
-   		   (at_kitchen_sandwich ?s)
-   		   (no_gluten_sandwich ?s)
-         (not (not_exist ?s)))
-   )
+    (:method serve_0
+		:parameters	(?c - child ?s - sandwich ?p2 - place ?t - tray ?b - bread-portion ?cont - content-portion)
+		:task (serve ?c)
+		:precondition (and
+		    (allergic_gluten ?c)
+		    (notexist ?s)
+		    (waiting ?c ?p2)
+		    (no_gluten_bread ?b)
+		    (no_gluten_content ?cont)
+		)
+		:ordered-subtasks (and
+            (make_sandwich_no_gluten ?s ?b ?cont)
+            (put_on_tray ?s ?t)
+			(move_tray ?t kitchen ?p2)
+			(serve_sandwich_no_gluten ?s ?c ?t ?p2)
+			(move_tray ?t ?p2 kitchen)
+	    )
+	)
 
-   (:action make_sandwich
-   	 :parameters (?s - sandwich ?b - bread-portion ?c - content-portion)
-   	 :precondition (and
-            (at_kitchen_bread ?b)
-   			    (at_kitchen_content ?c)
-            (not_exist ?s))
-   	 :effect (and
-   		   (not (at_kitchen_bread ?b))
-   		   (not (at_kitchen_content ?c))
-   		   (at_kitchen_sandwich ?s)
-         (not (not_exist ?s)))
-   )
+    (:method serve_1
+		:parameters	(?c - child ?s - sandwich ?p2 - place ?t - tray ?b - bread-portion ?cont - content-portion)
+		:task (serve ?c)
+		:precondition (and
+		    (not_allergic_gluten ?c)
+		    (notexist ?s)
+		    (waiting ?c ?p2)
+		    (not (no_gluten_bread ?b))
+		    (not (no_gluten_content ?cont))
+		)
+		:ordered-subtasks (and
+            (make_sandwich ?s ?b ?cont)
+			(put_on_tray ?s ?t)
+			(move_tray ?t kitchen ?p2)
+			(serve_sandwich ?s ?c ?t ?p2)
+			(move_tray ?t ?p2 kitchen)
+		)
+    )
 )
