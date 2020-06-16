@@ -21,6 +21,7 @@ import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.htn.tfd.TFDNode;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Properties;
 
 /**
@@ -66,9 +68,14 @@ public final class PFDPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
         // Create the list of pending nodes to explore
-        final LinkedList<PFDNode> open = new LinkedList<PFDNode>();
+        final PriorityQueue<PFDNode> open = new PriorityQueue<>();
         // Create the root node of the search space
         final PFDNode root = new PFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
+
+        // Create the root node of the search space
+        root.getState().getNegative().set(0, problem.getRelevantFluents().size());
+        root.getState().getNegative().andNot(root.getState().getPositive());
+
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
 
@@ -85,7 +92,7 @@ public final class PFDPlanner extends AbstractPlanner {
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
-            final PFDNode currentNode = open.pop();
+            final PFDNode currentNode = open.poll();
 
             if (debug) {
                 System.out.println("=========> Pop a new node <=========\n");
@@ -125,7 +132,7 @@ public final class PFDPlanner extends AbstractPlanner {
                                 childNode.setOperator(operator);
                                 childNode.getState().apply(action.getCondEffects());
                                 childNode.getTaskNetwork().decompose(task, action);
-                                open.push(childNode);
+                                open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
                                     System.out.println(problem.toString(childNode.getState()));
@@ -159,7 +166,7 @@ public final class PFDPlanner extends AbstractPlanner {
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(problem.getActions().size() + operator);
                                 childNode.getTaskNetwork().decompose(task, method);
-                                open.push(childNode);
+                                open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
                                     System.out.println(problem.toString(childNode.getTaskNetwork()));

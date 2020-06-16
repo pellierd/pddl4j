@@ -1,8 +1,8 @@
-(define (domain domain_htn)
+(define (domain transport)
 	(:requirements :typing :partial-ordered-htn)
 	(:types
 		package - locatable
-		capacity_number - object
+		capacity-number - object
 		location - object
 		target - object
 		vehicle - locatable
@@ -12,8 +12,8 @@
 		(road ?arg0 - location ?arg1 - location)
 		(at ?arg0 - locatable ?arg1 - location)
 		(in ?arg0 - package ?arg1 - vehicle)
-		(capacity ?arg0 - vehicle ?arg1 - capacity_number)
-		(capacity_predecessor ?arg0 - capacity_number ?arg1 - capacity_number)
+		(capacity ?arg0 - vehicle ?arg1 - capacity-number)
+		(capacity-predecessor ?arg0 - capacity-number ?arg1 - capacity-number)
 	)
 
 	(:tasks
@@ -40,7 +40,7 @@
 	)
 
 	(:method m_unload_ordering_0
-		:parameters (?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number ?v - vehicle)
+		:parameters (?l - location ?p - package ?s1 - capacity-number ?s2 - capacity-number ?v - vehicle)
 		:task (unload ?v ?l ?p)
 		:subtasks (and
 		 (task0 (drop ?v ?l ?p ?s1 ?s2))
@@ -48,7 +48,7 @@
 	)
 
 	(:method m_load_ordering_0
-		:parameters (?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number ?v - vehicle)
+		:parameters (?l - location ?p - package ?s1 - capacity-number ?s2 - capacity-number ?v - vehicle)
 		:task (load ?v ?l ?p)
 		:subtasks (and
 		 (task0 (pick_up ?v ?l ?p ?s1 ?s2))
@@ -107,12 +107,12 @@
 	)
 
 	(:action pick_up
-		:parameters (?v - vehicle ?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number)
+		:parameters (?v - vehicle ?l - location ?p - package ?s1 - capacity-number ?s2 - capacity-number)
 		:precondition
 			(and
 				(at ?v ?l)
 				(at ?p ?l)
-				(capacity_predecessor ?s1 ?s2)
+				(capacity-predecessor ?s1 ?s2)
 				(capacity ?v ?s2)
 			)
 		:effect
@@ -125,12 +125,12 @@
 	)
 
 	(:action drop
-		:parameters (?v - vehicle ?l - location ?p - package ?s1 - capacity_number ?s2 - capacity_number)
+		:parameters (?v - vehicle ?l - location ?p - package ?s1 - capacity-number ?s2 - capacity-number)
 		:precondition
 			(and
 				(at ?v ?l)
 				(in ?p ?v)
-				(capacity_predecessor ?s1 ?s2)
+				(capacity-predecessor ?s1 ?s2)
 				(capacity ?v ?s1)
 			)
 		:effect

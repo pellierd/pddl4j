@@ -1,11 +1,11 @@
 (define
-	(problem pfile01)
-	(:domain  domain_htn)
+	(problem p01)
+	(:domain transport)
 	(:objects
 		package_0 - package
 		package_1 - package
-		capacity_0 - capacity_number
-		capacity_1 - capacity_number
+		capacity_0 - capacity-number
+		capacity_1 - capacity-number
 		city_loc_0 - location
 		city_loc_1 - location
 		city_loc_2 - location
@@ -21,7 +21,7 @@
 		)
 	)
 	(:init
-		(capacity_predecessor capacity_0 capacity_1)
+		(capacity-predecessor capacity_0 capacity_1)
 		(road city_loc_0 city_loc_1)
 		(road city_loc_1 city_loc_0)
 		(road city_loc_1 city_loc_2)

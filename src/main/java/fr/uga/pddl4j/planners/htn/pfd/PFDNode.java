@@ -28,7 +28,7 @@ import java.util.Objects;
  * @version 1.0 - 05.05.2020
  * @since 4.0
  */
-public class PFDNode implements Serializable {
+public class PFDNode implements Serializable, Comparable<PFDNode> {
 
     /**
      * The state that describes the state of the world reached by the search.
@@ -171,6 +171,20 @@ public class PFDNode implements Serializable {
      */
     public final void setOperator(int operator) {
         this.operator = operator;
+    }
+
+    /**
+     * Compares this node with the specified node for order. Returns a negative integer, zero, or a positive integer as
+     * this node is less than, equal to, or greater than the specified node. The comparaison is done using the number of
+     * tasks of of the node.
+     *
+     * @param other the node to be compared.
+     * @return a negative integer, zero, or a positive integer as this node is less than, equal to, or greater than the
+     * specified node.
+     */
+    @Override
+    public int compareTo(PFDNode other) {
+        return this.getTaskNetwork().getTasks().size() - other.getTaskNetwork().getTasks().size();
     }
 
     /**
