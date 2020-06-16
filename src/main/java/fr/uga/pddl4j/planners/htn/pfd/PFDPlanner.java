@@ -80,25 +80,45 @@ public final class PFDPlanner extends AbstractPlanner {
         final long start = System.currentTimeMillis();
         long elapsedTime = 0;
 
+        boolean debug = false;
+
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
             final PFDNode currentNode = open.pop();
+
+            if (debug) {
+                System.out.println("=========> Pop a new node <=========\n");
+                System.out.println("=> Current state:");
+                System.out.println(problem.toString(currentNode.getState()));
+                System.out.println("\n=> Tasks to be executed:");
+                System.out.println(problem.toString(currentNode.getTaskNetwork()));
+            }
+
             // If the task network has no more task, a solution is found
             if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
             } else {
                 // Get the list of tasks of the current node with no predecessors
                 final List<Integer> tasks = currentNode.getTaskNetwork().getTasksWithNoPredecessors();
+                //System.out.println(problem.toString(currentNode.getTaskNetwork()));
                 // Get the current state of the search
                 final State state = currentNode.getState();
+                //System.out.println(tasks);
                 // For each task with no predecessors
                 for (Integer task : tasks) {
-                    final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
+
+                    int taskIndex = currentNode.getTaskNetwork().getTasks().get(task);
+                    final List<Integer> relevantOperators = problem.getRelevantOperators().get(taskIndex);
                     // Case of primitive tasks
-                    if (problem.getTasks().get(task).isPrimtive()) {
+                    if (problem.getTasks().get(taskIndex).isPrimtive()) {
                         for (Integer operator : relevantOperators) {
                             final Action action = problem.getActions().get(operator);
+                            if (debug) {
+                                System.out.println("\n======> Try to decompose primitive tasks "
+                                    + problem.toString(problem.getTasks().get(taskIndex)) + " with \n\n"
+                                    + problem.toString(action));
+                            }
                             if (state.satisfy(action.getPreconditions())) {
                                 final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
@@ -106,17 +126,56 @@ public final class PFDPlanner extends AbstractPlanner {
                                 childNode.getState().apply(action.getCondEffects());
                                 childNode.getTaskNetwork().decompose(task, action);
                                 open.push(childNode);
+                                if (debug) {
+                                    System.out.println("=====> Decomposition succeeded push node:");
+                                    System.out.println(problem.toString(childNode.getState()));
+                                    for (int t : childNode.getTaskNetwork().getTasks()) {
+                                        System.out.println(problem.toString(problem.getTasks().get(t)));
+                                    }
+                                }
+                            } else {
+                            if (debug) {
+                                System.out.println("=====> Decomposition failed");
                             }
+                        }
+                        if (debug) {
+                            try {
+                                System.in.read();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         }
                     } else { // Case of compund tasks
                         for (Integer operator : relevantOperators) {
                             final Method method = problem.getMethods().get(operator);
-                            PFDNode childNode = new PFDNode(currentNode);
-                            childNode.setParent(currentNode);
-                            childNode.setOperator(problem.getActions().size() + operator);
-                            childNode.getTaskNetwork().decompose(task, method);
-
-
+                            if (debug) {
+                                System.out.println("\n======> Try to decompose compound tasks "
+                                    + problem.toString(problem.getTasks().get(taskIndex)) + " with\n\n"
+                                    + problem.toString(method));
+                            }
+                            if (state.satisfy(method.getPreconditions())) {
+                                PFDNode childNode = new PFDNode(currentNode);
+                                childNode.setParent(currentNode);
+                                childNode.setOperator(problem.getActions().size() + operator);
+                                childNode.getTaskNetwork().decompose(task, method);
+                                open.push(childNode);
+                                if (debug) {
+                                    System.out.println("=====> Decomposition succeeded push node:");
+                                    System.out.println(problem.toString(childNode.getTaskNetwork()));
+                                }
+                            } else {
+                                if (debug) {
+                                    System.out.println("=====> Decomposition failed");
+                                }
+                            }
+                            if (debug) {
+                                try {
+                                    System.in.read();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                 }
@@ -205,7 +264,7 @@ public final class PFDPlanner extends AbstractPlanner {
 
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
-        factory.setTraceLevel(traceLevel);
+        factory.setTraceLevel(traceLevel - 1);
         final Problem pb = factory.encode();
         System.out.println("\nencoding problem done successfully ("
             + pb.getActions().size() + " actions, "

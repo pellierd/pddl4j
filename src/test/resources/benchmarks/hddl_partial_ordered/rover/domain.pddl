@@ -1,4 +1,4 @@
-(define (domain rover_domain)
+(define (domain rover)
 	(:requirements :typing :partial-ordered-htn :htn-method-preconditions :negative-preconditions)
 	(:types
 		waypoint - object

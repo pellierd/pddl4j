@@ -1,6 +1,6 @@
 (define
-	(problem p01)
-	(:domain  rover)
+	(problem pfile1)
+	(:domain  rover_domain)
 	(:objects
 		waypoint0 - waypoint
 		waypoint1 - waypoint
@@ -13,7 +13,7 @@
 		rover0 - rover
 		camera0 - camera
 		general - lander
-		objective0 - objective
+;;		objective0 - objective
 		objective1 - objective
 	)
 	(:htn
@@ -22,9 +22,9 @@
 		 (task1 (get_rock_data waypoint3))
 		 (task2 (get_image_data objective1 high_res))
 		)
-		:ordering (and
-			(task2 < task0)
-			(task0 < task1)
+		:ordering (;;and
+			;;(task2 < task0)
+			;;(task0 < task1)
 		)
 	)
 	(:init
@@ -65,10 +65,10 @@
 		(calibration_target camera0 objective1)
 		(supports camera0 colour)
 		(supports camera0 high_res)
-		(visible_from objective0 waypoint0)
-		(visible_from objective0 waypoint1)
-		(visible_from objective0 waypoint2)
-		(visible_from objective0 waypoint3)
+;;		(visible_from objective0 waypoint0)
+;;		(visible_from objective0 waypoint1)
+;;		(visible_from objective0 waypoint2)
+;;		(visible_from objective0 waypoint3)
 		(visible_from objective1 waypoint0)
 		(visible_from objective1 waypoint1)
 		(visible_from objective1 waypoint2)

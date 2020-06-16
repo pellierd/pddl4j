@@ -1337,7 +1337,7 @@ public final class PDDLParser {
                 }
                 if (negative.contains(exp)) {
                     this.mgr.logParserWarning("atomic formula " + exp
-                        + "  and its negation is used in the same expression",
+                        + " and its negation is used in the same expression",
                         this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
                     checked = false;
                 }

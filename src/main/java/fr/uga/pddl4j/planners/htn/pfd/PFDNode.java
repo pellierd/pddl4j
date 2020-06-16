@@ -57,7 +57,7 @@ public class PFDNode implements Serializable {
      * @param other the node to be copied.
      */
     public PFDNode(final PFDNode other) {
-        this(other.getState(), other.getTaskNetwork(), other.getParent(), other.getOperator());
+        this(new State(other.getState()), new TaskNetwork(other.getTaskNetwork()), other.getParent(), other.getOperator());
     }
 
     /**

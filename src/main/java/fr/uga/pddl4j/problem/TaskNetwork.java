@@ -144,42 +144,40 @@ public final class TaskNetwork implements Serializable {
      * @param method the method to be used to decompose.
      */
     public void decompose(final int task, final Method method) {
-        final int indexNewConstraints = this.size() - 1;
-        final int sizeNewMatrix = this.size() - 1 + method.getSubTasks().size();
-        BitMatrix newOrderingConstraints = new BitMatrix(sizeNewMatrix);
-        for (int i =  0; i < this.orderingConstraints.rows(); i++) {
-            BitSet row = this.orderingConstraints.getRow(i);
-            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit(j + 1)) {
-                if (i != task) {
-                    if (j < task) {
-                        newOrderingConstraints.set(i, j);
-                    } else if (j == task) {
-                        for (int k = indexNewConstraints; k < newOrderingConstraints.rows(); k++) {
-                            newOrderingConstraints.set(i, k);
-                        }
-                    } else {
-                        newOrderingConstraints.set(i, j - 1);
-                    }
-                } else {
-                    for (int k = indexNewConstraints; k < newOrderingConstraints.rows(); k++) {
-                        if (j < task) {
-                            newOrderingConstraints.set(k, j);
-                        } else if (j > task) {
-                            newOrderingConstraints.set(k, j - 1);
+        final int numberOfSubtasks = method.getSubTasks().size();
+        final int newSize = this.size() - 1 + numberOfSubtasks;
+
+        final BitMatrix newOrderingConstraints = new BitMatrix(newSize);
+        //System.out.println(newOrderingConstraints);
+        for (int i =  0; i < method.getOrderingConstraints().rows(); i++) {
+            BitSet row = method.getOrderingConstraints().getRow(i);
+            newOrderingConstraints.getRow(i).or(row);
+        }
+        //System.out.println(newOrderingConstraints);
+        //System.out.println(method.getOrderingConstraints());
+        for (int i = 0; i < this.orderingConstraints.rows(); i++) {
+            if (i != task) {
+                for (int j = 0; j < this.orderingConstraints.columns(); j++) {
+                    int row = i < task ? i + numberOfSubtasks : i - 1 + numberOfSubtasks;
+                    int column = j < task ? j + numberOfSubtasks : j - 1 + numberOfSubtasks;
+                    //System.out.print(i + " " + j);
+                    //System.out.println(" -> New index: "  + row + " " + column);
+                    if (j != task && this.orderingConstraints.get(i, j)) {
+                        newOrderingConstraints.set(row, column);
+                        //System.out.println("1 " + newOrderingConstraints);
+                    } else { // j == tasks
+                        if (this.orderingConstraints.get(i, j)) {
+                            newOrderingConstraints.getRow(row).set(0, numberOfSubtasks);
+                            //System.out.println("2 " + newOrderingConstraints);
                         }
                     }
                 }
             }
         }
-        for (int i =  0; i < method.getOrderingConstraints().rows(); i++) {
-            BitSet row = method.getOrderingConstraints().getRow(i);
-            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit(j + 1)) {
-                newOrderingConstraints.set(i + indexNewConstraints, j + indexNewConstraints);
-            }
-        }
         this.orderingConstraints = newOrderingConstraints;
+        this.transitiveClosure();
         this.tasks.remove(task);
-        this.tasks.addAll(method.getSubTasks());
+        this.tasks.addAll(0, method.getSubTasks());
     }
 
     /**
@@ -251,16 +249,13 @@ public final class TaskNetwork implements Serializable {
      * on Warshall algorithm. The complexity is O(n) where n is the number of tasks of the task network.
      */
     public final void transitiveClosure() {
-        final int size = this.orderingConstraints.rows();
-        for (int k = 0; k < size; k++) {
-            for (int i = 0; i < size; i++) {
-                for (int j = 0; j < size; j++) {
-                    if (!this.getOrderingConstraints().get(i, j)
-                            || (!this.getOrderingConstraints().get(i, k)
-                                && !this.getOrderingConstraints().get(k, i))) {
-                        this.orderingConstraints.set(i, j);
-                    } else {
-                        this.orderingConstraints.clear(i, j);
+        for (int k = 0 ; k < this.orderingConstraints.rows() ; k++ ) {
+            for (int i = 0 ; i < this.orderingConstraints.rows() ; i++ ) {
+                if (this.orderingConstraints.get(i,k) ) {
+                    for (int j = 0 ; j < this.orderingConstraints.rows() ; j++ ) {
+                        if (this.orderingConstraints.get(k,j)) {
+                            this.orderingConstraints.set(i,j);
+                        }
                     }
                 }
             }

@@ -103,6 +103,17 @@ public final class BitMatrix implements Serializable {
     }
 
     /**
+     * Sets the bit at a specified row and column position to a specified value.
+     *
+     * @param row the row position.
+     * @param col the column position.
+     * @param value the value to set.
+     */
+    public final void set(final int row, final int col, final boolean value) {
+        this.bitsets[row].set(col, value);
+    }
+
+    /**
      * Sets the bit at a specified row and column position to false.
      *
      * @param row the row position.
