@@ -68,6 +68,7 @@ public final class PFDPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
         // Create the list of pending nodes to explore
+        //final PriorityQueue<PFDNode> open = new PriorityQueue<>();
         final PriorityQueue<PFDNode> open = new PriorityQueue<>();
         // Create the root node of the search space
         final PFDNode root = new PFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
@@ -100,6 +101,8 @@ public final class PFDPlanner extends AbstractPlanner {
                 System.out.println(problem.toString(currentNode.getState()));
                 System.out.println("\n=> Tasks to be executed:");
                 System.out.println(problem.toString(currentNode.getTaskNetwork()));
+
+                System.out.println(currentNode.getTaskNetwork().getOrderingConstraints().toBitString());
             }
 
             // If the task network has no more task, a solution is found
@@ -125,13 +128,16 @@ public final class PFDPlanner extends AbstractPlanner {
                                 System.out.println("\n======> Try to decompose primitive tasks "
                                     + problem.toString(problem.getTasks().get(taskIndex)) + " with \n\n"
                                     + problem.toString(action));
+
+                                System.out.println("=> Current state:");
+                                System.out.println(problem.toString(currentNode.getState()));
                             }
                             if (state.satisfy(action.getPreconditions())) {
                                 final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(operator);
                                 childNode.getState().apply(action.getCondEffects());
-                                childNode.getTaskNetwork().decompose(task, action);
+                                childNode.getTaskNetwork().removeTask(task);
                                 open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
@@ -139,6 +145,8 @@ public final class PFDPlanner extends AbstractPlanner {
                                     for (int t : childNode.getTaskNetwork().getTasks()) {
                                         System.out.println(problem.toString(problem.getTasks().get(t)));
                                     }
+                                    System.out.println("=> New state:");
+                                    System.out.println(problem.toString(childNode.getState()));
                                 }
                             } else {
                             if (debug) {
@@ -157,7 +165,7 @@ public final class PFDPlanner extends AbstractPlanner {
                         for (Integer operator : relevantOperators) {
                             final Method method = problem.getMethods().get(operator);
                             if (debug) {
-                                System.out.println("\n======> Try to decompose compound tasks "
+                                System.out.println("\n======> Try to decompose compound tasks (" + task + ")"
                                     + problem.toString(problem.getTasks().get(taskIndex)) + " with\n\n"
                                     + problem.toString(method));
                             }
@@ -170,6 +178,7 @@ public final class PFDPlanner extends AbstractPlanner {
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
                                     System.out.println(problem.toString(childNode.getTaskNetwork()));
+                                    //System.out.println(childNode.getTaskNetwork().getOrderingConstraints().toBitString());
                                 }
                             } else {
                                 if (debug) {
@@ -269,6 +278,8 @@ public final class PFDPlanner extends AbstractPlanner {
             System.exit(0);
         }
 
+        System.out.println("\nparsing domain " + domain.getName() + "  and problem " + problem.getName() + " done successfully");
+
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
         factory.setTraceLevel(traceLevel - 1);
@@ -286,10 +297,10 @@ public final class PFDPlanner extends AbstractPlanner {
             // Print plan information
             System.out.println("found plan as follows:\n" + pb.toString(plan));
             System.out.println(String.format("plan total cost: %4.2f", plan.cost()));
-            System.out.println(String.format("search time: %4.3fs%n%n", ((end - start) / 1000.0)));
         } else {
             System.out.println(String.format(String.format("%nno plan found%n%n")));
         }
+        System.out.println(String.format("search time: %4.3fs%n%n", ((end - start) / 1000.0)));
     }
 
     /**

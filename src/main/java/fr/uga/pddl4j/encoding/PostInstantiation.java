@@ -199,7 +199,6 @@ final class PostInstantiation implements Serializable {
                 compound++;
             }
         }
-        System.out.println("result extyarct " + methods.size() + " " + primitive +  " " + compound);
     }
 
     /**
@@ -564,7 +563,6 @@ final class PostInstantiation implements Serializable {
      */
     private static void simplyRecursivelyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
                                                                    final Set<IntExpression> tasks) {
-
         while (!tasks.isEmpty()) {
             PostInstantiation.simplyMethodsWithTasksNoMoreReachable(methods, tasks);
         }

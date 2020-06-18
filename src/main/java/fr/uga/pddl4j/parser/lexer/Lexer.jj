@@ -1897,7 +1897,7 @@ PDDLMethod method_def() : // ADD HDDL
 		left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
-			[LOOKAHEAD({ this.isRequirement(PDDLRequireKey.HTN_METHOD_PRECONDITIONS)})
+			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HTN_METHOD_PRECONDITIONS)})
 			    <PRECONDITION> preconditions=pre_gd()
 			]
             tn = task_network()

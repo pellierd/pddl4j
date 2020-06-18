@@ -20,8 +20,7 @@
 package fr.uga.pddl4j.util;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.BitSet;
+import java.util.*;
 
 /**
  * This class implements a bit matrix.
@@ -41,17 +40,17 @@ public final class BitMatrix implements Serializable {
     /**
      * The number of rows.
      */
-    private int rows;
+    public int rows;
 
     /**
      * The number of columns.
      */
-    private int columns;
+    public int columns;
 
     /**
      * The array of bit set used to to store the matrix.
      */
-    private BitSet[] bitsets;
+    private List<BitVector> bitsets;
 
     /**
      * Creates a new bit matrix with a specified number of rows and columns.
@@ -62,24 +61,25 @@ public final class BitMatrix implements Serializable {
     public BitMatrix(final int rows, final int columns) {
         this.rows = rows;
         this.columns = columns;
-        this.bitsets = new BitSet[this.rows];
+        this.bitsets = new ArrayList<BitVector>(this.rows);
         for (int i = 0; i < this.rows; i++) {
-            this.bitsets[i] = new BitSet(this.columns);
+            this.bitsets.add(new BitVector(this.columns));
         }
     }
 
     /**
      * Creates a deep copy from an other matrix.
      *
-     * @param other    The number matrix.
+     * @param other    The other matrix.
      */
     public BitMatrix(final BitMatrix other) {
         this.rows = other.rows();
         this.columns = other.columns();
-        this.bitsets = new BitSet[this.rows];
+        this.bitsets = new ArrayList<BitVector>(this.rows);
         for (int i = 0; i < this.rows; i++) {
-            this.bitsets[i] = new BitSet();
-            this.bitsets[i].or(other.getRow(i));
+            BitVector row = new BitVector();
+            row.or(other.getRow(i));
+            this.bitsets.add(row);
         }
     }
 
@@ -99,7 +99,7 @@ public final class BitMatrix implements Serializable {
      * @param col the column position.
      */
     public final void set(final int row, final int col) {
-        this.bitsets[row].set(col);
+        this.bitsets.get(row).set(col);
     }
 
     /**
@@ -110,7 +110,7 @@ public final class BitMatrix implements Serializable {
      * @param value the value to set.
      */
     public final void set(final int row, final int col, final boolean value) {
-        this.bitsets[row].set(col, value);
+        this.bitsets.get(row).set(col, value);
     }
 
     /**
@@ -120,7 +120,7 @@ public final class BitMatrix implements Serializable {
      * @param col the column position.
      */
     public final void clear(final int row, final int col) {
-        this.bitsets[row].clear(col);
+        this.bitsets.get(row).clear(col);
     }
 
     /**
@@ -129,9 +129,34 @@ public final class BitMatrix implements Serializable {
      * @param row the index of the row.
      * @return the ith row of the matrix.
      */
-    public final BitSet getRow(final int row) {
-        return this.bitsets[row];
+    public final BitVector getRow(final int row) {
+        return this.bitsets.get(row);
     }
+
+    /**
+     * Remove the jth row of the matrix.
+     *
+     * @param row the index of the row to remove.
+     */
+    public final void removeRow(final int row) {
+        this.bitsets.remove(row);
+        this.rows--;
+    }
+
+    /**
+     *
+     */
+    public void addRow(BitVector row) {
+        this.bitsets.add(row);
+    }
+
+    /**
+     *
+     */
+    public void addRow(final int index, final BitVector row) {
+        this.bitsets.add(index, row);
+    }
+
 
     /**
      * Returns the jth column of the matrix.
@@ -139,12 +164,29 @@ public final class BitMatrix implements Serializable {
      * @param col the index of the column.
      * @return the jth column of the matrix.
      */
-    public final BitSet getColumn(final int col) {
-        final BitSet column = new BitSet(this.rows);
+    public final BitVector getColumn(final int col) {
+        final BitVector column = new BitVector(this.rows);
         for (int i = 0; i < this.rows; i++) {
-            column.set(i, this.bitsets[i].get(col));
+            column.set(i, this.bitsets.get(i).get(col));
         }
         return column;
+    }
+
+    /**
+     * Remove a column of the matrix.
+     *
+     * @param column the index of the column to remove.
+     */
+    public final void removeColumn(final int column) {
+        for (int i = 0; i < this.rows; i++) {
+            final BitVector row = this.getRow(i);
+            final BitVector rest = new BitVector(row);
+            rest.clear(0, column);
+            rest.shiftLeft(1);
+            row.clear(column, this.columns);
+            row.or(rest);
+        }
+        this.columns--;
     }
 
     /**
@@ -155,7 +197,7 @@ public final class BitMatrix implements Serializable {
      * @return the value of the bit at a specific position in the matrix.
      */
     public final boolean get(final int row, final int col) {
-        return this.bitsets[row].get(col);
+        return this.bitsets.get(row).get(col);
     }
 
     /**
@@ -167,7 +209,7 @@ public final class BitMatrix implements Serializable {
     public final int cardinality() {
         int cardinality = 0;
         for (int i = 0; i < this.rows; i++) {
-            cardinality += this.bitsets[i].cardinality();
+            cardinality += this.bitsets.get(i).cardinality();
         }
         return cardinality;
     }
@@ -202,7 +244,7 @@ public final class BitMatrix implements Serializable {
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass().equals(this.getClass())) {
             final BitMatrix other = (BitMatrix) obj;
-            return Arrays.equals(this.bitsets, other.bitsets);
+            return this.bitsets.equals(other.bitsets);
         }
         return false;
     }
@@ -215,7 +257,7 @@ public final class BitMatrix implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(this.bitsets);
+        return this.bitsets.hashCode();
     }
 
     /**
@@ -225,6 +267,29 @@ public final class BitMatrix implements Serializable {
      */
     @Override
     public String toString() {
-        return Arrays.toString(this.bitsets);
+        StringBuffer str = new StringBuffer();
+        for (int i = 0; i < this.rows; i++) {
+            str.append(i);
+            str.append(" ");
+            str.append(this.getRow(i).toString());
+            str.append("\n");
+        }
+        return str.toString();
+    }
+
+    public String toBitString() {
+        StringBuffer str = new StringBuffer();
+        for (int i = 0; i < this.rows; i++) {
+            str.append(i + ": ");
+            for (int j = 0; j < this.columns; j++) {
+                if (this.get(i, j)) {
+                    str.append("1 ");
+                } else {
+                    str.append("0 ");
+                }
+            }
+            str.append("\n");
+        }
+        return str.toString();
     }
 }

@@ -92,9 +92,10 @@ public final class TFDPlanner extends AbstractPlanner {
                 System.out.println("=========> Pop a new node <=========\n");
                 System.out.println("=> Current state:");
                 System.out.println(problem.toString(currentNode.getState()));
-                System.out.println("\n=> Tasks to be executed:");
+                System.out.println("\n=> Tasks to be excuted:");
                 System.out.println(currentNode.getTasks());
                 for (int i = 0 ; i< currentNode.getTasks().size(); i++) {
+
                     System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
             }
@@ -268,7 +269,7 @@ public final class TFDPlanner extends AbstractPlanner {
 
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
-        factory.setTraceLevel(2);
+        factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
         final Problem pb = factory.encode();
         long end = System.currentTimeMillis();

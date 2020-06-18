@@ -21,6 +21,7 @@ package fr.uga.pddl4j.util;
 
 import fr.uga.pddl4j.problem.State;
 
+import java.lang.reflect.Field;
 import java.util.BitSet;
 
 /**
@@ -32,12 +33,36 @@ import java.util.BitSet;
 public class BitVector extends BitSet {
 
     /**
+     * The words used to store bitset.
+     */
+    private long[] words;
+
+    /**
+     * The
+     */
+    private static Field wordsField;
+
+    static {
+        try {
+            BitVector.wordsField = BitSet.class.getDeclaredField("words");
+        } catch (NoSuchFieldException e) {
+            throw new IllegalStateException(e);
+        }
+        BitVector.wordsField.setAccessible(true);
+    }
+
+    /**
      * Creates a new <code>BitVector</code> with a specific size.
      *
      * @param size the size of the bit vector.
      */
     public BitVector(final int size) {
         super(size);
+        try {
+            this.words = (long[]) this.wordsField.get(this);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -45,6 +70,11 @@ public class BitVector extends BitSet {
      */
     public BitVector() {
         super();
+        try {
+            this.words = (long[]) this.wordsField.get(this);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -54,9 +84,6 @@ public class BitVector extends BitSet {
      */
     public BitVector(final State exp) {
         this();
-        if (exp == null) {
-            throw new NullPointerException("exp == null");
-        }
         this.or(exp.getPositive());
         this.andNot(exp.getNegative());
     }
@@ -69,9 +96,6 @@ public class BitVector extends BitSet {
      */
     public BitVector(final BitVector vector) {
         this();
-        if (vector == null) {
-            throw new NullPointerException("state == null");
-        }
         this.or(vector);
     }
 
@@ -111,5 +135,54 @@ public class BitVector extends BitSet {
         final BitVector other = new BitVector(this);
         other.and(vector);
         return other;
+    }
+
+    /**
+     *
+     * @param n the number of bit to shift. n must greater or equal 0 and less than 64.
+     */
+    public void shiftRight(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("'n' must be >= 0");
+        if (n >= 64)
+            throw new IllegalArgumentException("'n' must be < 64");
+        if (this.words.length > 0) {
+            this.ensureCapacity(n);
+            // Do the shift
+            for (int i = this.words.length - 1; i > 0; i--) {
+                this.words[i] <<= n; // Shift current word
+                this.words[i] |= this.words[i - 1] >>> (64 - n); // Do the carry
+            }
+            this.words[0] <<= n; // shift [0] separately, since no carry
+        }
+    }
+
+    public void shiftLeft(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("'n' must be >= 0");
+        if (n >= 64)
+            throw new IllegalArgumentException("'n' must be < 64");
+        if (this.words.length > 0) {
+            this.ensureCapacity(n);
+            // Do the shift
+            for (int i = 0; i < this.words.length - 1; i++) {
+                this.words[i] >>>= n; // Shift current word
+                this.words[i] |= this.words[i + 1] << (64 - n); // Do the carry
+            }
+            this.words[this.words.length - 1] >>>= n; // shift [words.length-1] separately, since no carry
+        }
+    }
+
+    private void ensureCapacity(final int n) {
+        if (words[words.length - 1] >>> n > 0) {
+            long[] tmp = new long[words.length + 3];
+            System.arraycopy(words, 0, tmp, 0, words.length);
+            words = tmp;
+            try {
+                wordsField.set(this, tmp);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 }

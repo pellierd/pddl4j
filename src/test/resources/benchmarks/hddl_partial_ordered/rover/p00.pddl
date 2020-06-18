@@ -1,6 +1,6 @@
 (define
-	(problem pfile1)
-	(:domain  rover_domain)
+	(problem p00)
+	(:domain  rover)
 	(:objects
 		waypoint0 - waypoint
 		waypoint1 - waypoint
@@ -18,8 +18,8 @@
 	)
 	(:htn
 		:subtasks (and
-		 (task0 (get_soil_data waypoint2))
-		 (task1 (get_rock_data waypoint3))
+		 ;;(task0 (get_soil_data waypoint2))
+		 ;;(task1 (get_rock_data waypoint3))
 		 (task2 (get_image_data objective1 high_res))
 		)
 		:ordering (;;and

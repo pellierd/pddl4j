@@ -20,7 +20,9 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.util.BitMatrix;
+import fr.uga.pddl4j.util.BitVector;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -147,68 +149,98 @@ public final class TaskNetwork implements Serializable {
         final int numberOfSubtasks = method.getSubTasks().size();
         final int newSize = this.size() - 1 + numberOfSubtasks;
 
-        final BitMatrix newOrderingConstraints = new BitMatrix(newSize);
-        //System.out.println(newOrderingConstraints);
-        for (int i =  0; i < method.getOrderingConstraints().rows(); i++) {
-            BitSet row = method.getOrderingConstraints().getRow(i);
-            newOrderingConstraints.getRow(i).or(row);
+        BitVector row = new BitVector(this.getOrderingConstraints().getRow(task));
+
+        //System.out.println("*******");
+
+        //System.out.println(this.orderingConstraints.toBitString());
+
+        this.removeTask(task);
+
+        //System.out.println(this.orderingConstraints.toBitString());
+
+        for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {
+            BitVector cti = new BitVector(method.getOrderingConstraints().getRow(i));
+            //System.out.println("av " + cti);
+            cti.shiftRight(this.tasks.size());
+            //System.out.println("ap " + cti);
+            this.orderingConstraints.addRow(cti);
         }
-        //System.out.println(newOrderingConstraints);
-        //System.out.println(method.getOrderingConstraints());
-        for (int i = 0; i < this.orderingConstraints.rows(); i++) {
-            if (i != task) {
-                for (int j = 0; j < this.orderingConstraints.columns(); j++) {
-                    int row = i < task ? i + numberOfSubtasks : i - 1 + numberOfSubtasks;
-                    int column = j < task ? j + numberOfSubtasks : j - 1 + numberOfSubtasks;
-                    //System.out.print(i + " " + j);
-                    //System.out.println(" -> New index: "  + row + " " + column);
-                    if (j != task && this.orderingConstraints.get(i, j)) {
-                        newOrderingConstraints.set(row, column);
-                        //System.out.println("1 " + newOrderingConstraints);
-                    } else { // j == tasks
-                        if (this.orderingConstraints.get(i, j)) {
-                            newOrderingConstraints.getRow(row).set(0, numberOfSubtasks);
-                            //System.out.println("2 " + newOrderingConstraints);
+        this.orderingConstraints.rows = newSize;
+        this.orderingConstraints.columns = newSize;
+
+
+
+        //System.out.println(this.orderingConstraints.toBitString());
+
+        for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i+1)) {
+            int rowIndex = i < task ? i : i - 1;
+            for (int j = this.size() ; j < newSize; j++) {
+                this.orderingConstraints.set(j, rowIndex);
+//            System.out.println("i = " + i);
+//            if (i != task) {
+
+//                this.orderingConstraints.getRow(rowIndex).set(this.getTasks().size(), newSize);
+            }
+        }
+        //System.out.println(this.orderingConstraints.toBitString());
+
+        /*try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        this.tasks.addAll(method.getSubTasks());
+        this.transitiveClosure();
+        //System.out.println(this.orderingConstraints.toBitString());
+
+
+        /*if (numberOfSubtasks == 1) {
+            this.tasks.set(task, method.getSubTasks().get(0));
+        } else if (numberOfSubtasks > 1) {
+            final BitMatrix newOrderingConstraints = new BitMatrix(newSize);
+            //System.out.println(newOrderingConstraints);
+            for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {
+                BitSet row = method.getOrderingConstraints().getRow(i);
+                newOrderingConstraints.getRow(i).or(row);
+            }
+            //System.out.println(newOrderingConstraints);
+            //System.out.println(method.getOrderingConstraints());
+            for (int i = 0; i < this.orderingConstraints.rows(); i++) {
+                if (i != task) {
+                    for (int j = 0; j < this.orderingConstraints.columns(); j++) {
+                        int row = i < task ? i + numberOfSubtasks : i - 1 + numberOfSubtasks;
+                        int column = j < task ? j + numberOfSubtasks : j - 1 + numberOfSubtasks;
+                        //System.out.print(i + " " + j);
+                        //System.out.println(" -> New index: "  + row + " " + column);
+                        if (j != task && this.orderingConstraints.get(i, j)) {
+                            newOrderingConstraints.set(row, column);
+                            //System.out.println("1 " + newOrderingConstraints);
+                        } else { // j == tasks
+                            if (this.orderingConstraints.get(i, j)) {
+                                newOrderingConstraints.getRow(row).set(0, numberOfSubtasks);
+                                //System.out.println("2 " + newOrderingConstraints);
+                            }
                         }
                     }
                 }
             }
-        }
-        this.orderingConstraints = newOrderingConstraints;
-        this.transitiveClosure();
-        this.tasks.remove(task);
-        this.tasks.addAll(0, method.getSubTasks());
+            this.orderingConstraints = newOrderingConstraints;
+            this.transitiveClosure();
+            this.tasks.remove(task);
+            this.tasks.addAll(0, method.getSubTasks());
+        }*/
     }
 
     /**
-     * Decompose a tasks of the network with a specific action.
+     * Remove a task for the task network.
      *
-     * @param task the task to decompose.
-     * @param action the action to be used to decompose.
+     * @param task the index of the task to remove.
      */
-    public void decompose(final int task, final Action action) {
-        final int sizeNewMatrix = this.size() - 1;
-        BitMatrix newOrderingConstraints = new BitMatrix(sizeNewMatrix);
-        for (int i =  0; i < this.orderingConstraints.rows(); i++) {
-            BitSet row = this.orderingConstraints.getRow(i);
-            for (int j = row.nextSetBit(0); j >= 0; j = row.nextSetBit(j + 1)) {
-                if (i < task) {
-                    if (j < task) {
-                        newOrderingConstraints.set(i, j);
-                    } else if (j > task) {
-                        newOrderingConstraints.set(i, j - 1);
-                    }
-                } else if (i > task) {
-                    if (j < task) {
-                        newOrderingConstraints.set(i - 1, j);
-                    } else if (j > task) {
-                        newOrderingConstraints.set(i - 1, j - 1);
-                    }
-                }
-            }
-        }
-        this.orderingConstraints = newOrderingConstraints;
+    public final void removeTask(final int task) {
         this.tasks.remove(task);
+        this.orderingConstraints.removeRow(task);
+        this.orderingConstraints.removeColumn(task);
     }
 
     /**
@@ -268,7 +300,7 @@ public final class TaskNetwork implements Serializable {
      * @return the  list of tasks with no predecessors.
      */
     public final List<Integer> getTasksWithNoPredecessors() {
-        this.transitiveClosure();
+        //this.transitiveClosure();
         final List<Integer> tasks = new LinkedList<>();
         for (int i = 0; i < this.getOrderingConstraints().columns(); i++) {
             if (this.getOrderingConstraints().getColumn(i).cardinality() == 0) {
