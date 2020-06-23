@@ -21,7 +21,6 @@ import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.htn.tfd.TFDNode;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
@@ -29,7 +28,12 @@ import fr.uga.pddl4j.problem.State;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * This class implements a node for the PFDPlanner planner of the PDDL4J library.
@@ -45,6 +49,9 @@ public final class PFDPlanner extends AbstractPlanner {
      */
     private Properties arguments;
 
+    /**
+     * The cost of each task of the problem.
+     */
     private int[] costs;
 
     /**
@@ -57,7 +64,6 @@ public final class PFDPlanner extends AbstractPlanner {
         this.arguments = arguments;
     }
 
-
     /**
      * Solves the planning problem and returns the first solution search found. The search method is an implementation
      * of the total order STN procedure describes in the book of Automated Planning of Ghallab and al. page 243.
@@ -68,7 +74,6 @@ public final class PFDPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
         // Create the list of pending nodes to explore
-        //final LinkedList<PFDNode> open = new LinkedList<>();
         final PriorityQueue<PFDNode> open = new PriorityQueue<>();
         // Create the root node of the search space
         final PFDNode root = new PFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
@@ -113,13 +118,10 @@ public final class PFDPlanner extends AbstractPlanner {
                 currentNode.getTaskNetwork().transitiveClosure();
                 final List<Integer> tasks = currentNode.getTaskNetwork().getTasksWithNoPredecessors();
 
-                //System.out.println(problem.toString(currentNode.getTaskNetwork()));
                 // Get the current state of the search
                 final State state = currentNode.getState();
-                //System.out.println(tasks);
                 // For each task with no predecessors
                 for (Integer task : tasks) {
-
                     int taskIndex = currentNode.getTaskNetwork().getTasks().get(task);
                     final List<Integer> relevantOperators = problem.getRelevantOperators().get(taskIndex);
                     // Case of primitive tasks
@@ -152,42 +154,36 @@ public final class PFDPlanner extends AbstractPlanner {
                                     System.out.println(problem.toString(childNode.getState()));
                                 }
                             } else {
+                                if (debug) {
+                                    System.out.println("=====> Decomposition failed");
+                                }
+                            }
                             if (debug) {
-                                System.out.println("=====> Decomposition failed");
+                                try {
+                                    System.in.read();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                        if (debug) {
-                            try {
-                                System.in.read();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
                         }
                     } else { // Case of compund tasks
                         for (Integer operator : relevantOperators) {
                             final Method method = problem.getMethods().get(operator);
                             if (debug) {
-                                System.out.println("\n======> Try to decompose compound tasks (" + task + ")"
+                                System.out.println("\n======> Try to decompose compound tasks "
                                     + problem.toString(problem.getTasks().get(taskIndex)) + " with\n\n"
                                     + problem.toString(method));
                             }
                             if (state.satisfy(method.getPreconditions())) {
-                                PFDNode childNode = new PFDNode(currentNode);
+                                final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(problem.getActions().size() + operator);
                                 childNode.getTaskNetwork().decompose(task, method);
-                                /*childNode.cpt = childNode.cpt - this.costs[taskIndex];
-
-                                for (Integer t : method.getSubTasks()) {
-                                    childNode.cpt = childNode.cpt + this.costs[t];
-                                }*/
-                                    open.add(childNode);
-                                    if (debug) {
-                                        System.out.println("=====> Decomposition succeeded push node:");
-                                        System.out.println(problem.toString(childNode.getTaskNetwork()));
-                                        //System.out.println(childNode.getTaskNetwork().getOrderingConstraints().toBitString());
-                                    }
+                                open.add(childNode);
+                                if (debug) {
+                                    System.out.println("=====> Decomposition succeeded push node:");
+                                    System.out.println(problem.toString(childNode.getTaskNetwork()));
+                                }
                             } else {
                                 if (debug) {
                                     System.out.println("=====> Decomposition failed");
@@ -227,35 +223,50 @@ public final class PFDPlanner extends AbstractPlanner {
             n = n.getParent();
         }
         return plan;
-
     }
 
-
-    private void initTasksCosts(Problem pb) {
-        this.costs = new int[pb.getRelevantOperators().size()];
+    /**
+     * Computes for each tasks of a planning problem the maximum number of primitive tasks needed to accomplish this
+     * task.
+     *
+     * @param problem the planning problem
+     */
+    private void initTasksCosts(Problem problem) {
+        this.costs = new int[problem.getRelevantOperators().size()];
         Arrays.fill(this.costs, -1);
-        for (int i = 0; i < pb.getTasks().size(); i++) {
-            cost(i, pb);
-            //System.out.println(pb.toString(pb.getTasks().get(i)) +  " => " + this.costs[i]);
+        for (int i = 0; i < problem.getTasks().size(); i++) {
+            Set<Integer> closed =  new HashSet<Integer>();
+            cost(i, problem, closed);
         }
     }
 
 
-
-    private int cost(int task, Problem pb) {
+    /**
+     * Computes recursively for a task of a planning problem the maximum number of primitive tasks needed to accomplish
+     * this task.
+     *
+     * @param task the task.
+     * @param problem the planning problem.
+     * @param closed the set of task already encountered.
+     */
+    private int cost(int task, Problem problem, Set<Integer> closed) {
+        closed.add(task);
         if (this.costs[task] != -1) {
             return this.costs[task];
-        } else if (pb.getTasks().get(task).isPrimtive()) {
+        } else if (problem.getTasks().get(task).isPrimtive()) {
             this.costs[task] = 1;
             return 1;
         } else {
-            List<Integer> relevant = pb.getRelevantOperators().get(task);
+            List<Integer> relevant = problem.getRelevantOperators().get(task);
             int max = Integer.MIN_VALUE;
             for (int i = 0; i < relevant.size(); i++) {
-                Method m = pb.getMethods().get(relevant.get(i));
+                Method m = problem.getMethods().get(relevant.get(i));
                 int cost = 0;
                 for (int s = 0; s < m.getSubTasks().size(); s++) {
-                    cost += this.cost(m.getSubTasks().get(s), pb);
+                    final int st = m.getSubTasks().get(s);
+                    if (!closed.contains(st)) {
+                        cost += this.cost(st, problem, closed);
+                    }
                 }
                 if (cost > max) {
                     max = cost;
@@ -264,7 +275,6 @@ public final class PFDPlanner extends AbstractPlanner {
             this.costs[task] = max;
             return max;
         }
-
     }
 
     /**
@@ -323,32 +333,47 @@ public final class PFDPlanner extends AbstractPlanner {
             System.exit(0);
         }
 
-        System.out.println("\nparsing domain file \"" + domain.getName() + "\" and problem \"" + problem.getName() + "\" done successfully");
+        System.out.println("\nparsing domain file \"" + domain.getName() + "\" and problem \"" + problem.getName()
+            + "\" done successfully");
 
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
         factory.setTraceLevel(traceLevel - 1);
+        long start = System.currentTimeMillis();
         final Problem pb = factory.encode();
+        long end = System.currentTimeMillis();
+        final double encodingTime = (end - start) / 1000.0;
         System.out.println("\nencoding problem done successfully ("
             + pb.getActions().size() + " actions, "
             + pb.getMethods().size() + " methods, "
             + pb.getRelevantFluents().size() + " fluents, "
             + pb.getTasks().size() + " tasks)\n");
 
+        try {
+            System.out.println("Searching a solution plan....\n");
+            start = System.currentTimeMillis();
+            final Plan plan = planner.search(pb);
+            end = System.currentTimeMillis();
+            final double searchTime = (end - start) / 1000.0;
+            if (plan != null) {
+                // Print plan information
+                System.out.println("Found plan as follows:\n" + pb.toString(plan));
+                System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
+                System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+                System.out.println(String.format("Searching time       : %4.3fs", searchTime));
+                System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
 
-        //planner.initTasksCosts(pb);
-
-        final long start = System.currentTimeMillis();
-        final Plan plan = planner.search(pb);
-        final long end = System.currentTimeMillis();
-        if (plan != null) {
-            // Print plan information
-            System.out.println("found plan as follows:\n" + pb.toString(plan));
-            System.out.println(String.format("plan total cost: %4.2f", plan.cost()));
-        } else {
-            System.out.println(String.format(String.format("%nno plan found%n%n")));
+            } else {
+                System.out.println(String.format(String.format("%nno plan found%n%n")));
+                System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+                System.out.println(String.format("Searching time       : %4.3fs", searchTime));
+                System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+            }
+        } catch (OutOfMemoryError err) {
+            System.out.println("Out of memory !");
+            System.exit(0);
         }
-        System.out.println(String.format("search time: %4.3fs%n%n", ((end - start) / 1000.0)));
+
     }
 
     /**

@@ -28,7 +28,9 @@ import fr.uga.pddl4j.problem.State;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Properties;
 
 /**
  * This class implements a node for the TFDPlanner planner of the PDDL4J library.
@@ -94,7 +96,7 @@ public final class TFDPlanner extends AbstractPlanner {
                 System.out.println(problem.toString(currentNode.getState()));
                 System.out.println("\n=> Tasks to be excuted:");
                 System.out.println(currentNode.getTasks());
-                for (int i = 0 ; i< currentNode.getTasks().size(); i++) {
+                for (int i = 0; i < currentNode.getTasks().size(); i++) {
 
                     System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
@@ -180,8 +182,6 @@ public final class TFDPlanner extends AbstractPlanner {
                         }
                     }
                 }
-                //currentNode.setState(null);
-                //currentNode.getTasks().clear();
             }
             elapsedTime = System.currentTimeMillis() - start;
         }
@@ -212,7 +212,7 @@ public final class TFDPlanner extends AbstractPlanner {
     /**
      * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
      * follow:
-     *
+     * <p>
      * <pre>
      * usage of TFDPlanner:
      *
@@ -224,13 +224,14 @@ public final class TFDPlanner extends AbstractPlanner {
      * -h              print this message
      *
      * </pre>
-     *
+     * </p>
      * <p>
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.tfd.TFDPlanner</code><br>
      * <code>  -d src/test/resources/benchmarks/rover_total_ordered/domain.hddl</code><br>
      * <code>  -p src/test/resources/benchmarks/rover_total_ordered/pb01.hddl</code><br>
      * </p>
+     *
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
@@ -276,10 +277,10 @@ public final class TFDPlanner extends AbstractPlanner {
         long end = System.currentTimeMillis();
         final double encodingTime = (end - start) / 1000.0;
         System.out.println("\nEncoding problem done successfully ("
-                + pb.getActions().size() + " actions, "
-                + pb.getMethods().size() + " methods, "
-                + pb.getRelevantFluents().size() + " fluents, "
-                + pb.getTasks().size() + " tasks)\n");
+            + pb.getActions().size() + " actions, "
+            + pb.getMethods().size() + " methods, "
+            + pb.getRelevantFluents().size() + " fluents, "
+            + pb.getTasks().size() + " tasks)\n");
 
         try {
             System.out.println("Searching a solution plan....\n");
@@ -314,12 +315,12 @@ public final class TFDPlanner extends AbstractPlanner {
     private static void printUsage() {
         final StringBuilder strb = new StringBuilder();
         strb.append("\nusage of TFDPlanner:\n")
-                .append("OPTIONS   DESCRIPTIONS\n")
-                .append("-d <str>    hddl domain file name\n")
-                .append("-p <str>    hddl problem file name\n")
-                .append("-l <num>    trace level\n")
-                .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
-                .append("-h          print this message\n\n");
+            .append("OPTIONS   DESCRIPTIONS\n")
+            .append("-d <str>    hddl domain file name\n")
+            .append("-p <str>    hddl problem file name\n")
+            .append("-l <num>    trace level\n")
+            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
+            .append("-h          print this message\n\n");
         Planner.getLogger().trace(strb.toString());
     }
 
@@ -361,6 +362,6 @@ public final class TFDPlanner extends AbstractPlanner {
         }
         // Return null if the domain or the problem was not specified
         return (arguments.get(Planner.DOMAIN) == null
-                || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
+            || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
     }
 }

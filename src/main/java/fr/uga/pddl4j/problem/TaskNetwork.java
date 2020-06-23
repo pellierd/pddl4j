@@ -22,13 +22,10 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
@@ -76,8 +73,8 @@ public final class TaskNetwork implements Serializable {
     /**
      * Create a new task network with a set of tasks and orderings constraints.
      *
-     * @param tasks          the tasks of the task network.
-     * @param constraints    the orderings constraints of the task network.
+     * @param tasks       the tasks of the task network.
+     * @param constraints the orderings constraints of the task network.
      */
     public TaskNetwork(final List<Integer> tasks, final BitMatrix constraints) {
         super();
@@ -99,7 +96,7 @@ public final class TaskNetwork implements Serializable {
      *
      * @return the tasks of the task network.
      */
-    public final  List<Integer> getTasks() {
+    public final List<Integer> getTasks() {
         return this.tasks;
     }
 
@@ -142,94 +139,34 @@ public final class TaskNetwork implements Serializable {
     /**
      * Decompose a tasks of the network with a specific method.
      *
-     * @param task the task to decompose.
+     * @param task   the task to decompose.
      * @param method the method to be used to decompose.
      */
     public void decompose(final int task, final Method method) {
         final int numberOfSubtasks = method.getSubTasks().size();
-        final int newSize = this.size() - 1 + numberOfSubtasks;
-
-        BitVector row = new BitVector(this.getOrderingConstraints().getRow(task));
-
-        //System.out.println("*******");
-
-        //System.out.println(this.orderingConstraints.toBitString());
-
+        final int newSize = this.tasks.size() - 1 + numberOfSubtasks;
+        // Make a copy of the constraints of the task to remove
+        final BitVector row = new BitVector(this.getOrderingConstraints().getRow(task));
+        // Remove the task to replace
         this.removeTask(task);
-
-        //System.out.println(this.orderingConstraints.toBitString());
-
+        // Resize the matrix to add the contraints for the method subtasks
+        this.orderingConstraints.resize(newSize, newSize);
+        // Add the subtasks contraints to the tasknetwork
         for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {
-            BitVector cti = new BitVector(method.getOrderingConstraints().getRow(i));
-            //System.out.println("av " + cti);
-            cti.shiftRight(this.tasks.size());
-            //System.out.println("ap " + cti);
-            this.orderingConstraints.addRow(cti);
+            final BitVector cti = method.getOrderingConstraints().getRow(i);
+            final BitVector ri = this.orderingConstraints.getRow(this.tasks.size() + i);
+            ri.or(cti);
+            ri.shiftRight(this.tasks.size());
         }
-        this.orderingConstraints.rows = newSize;
-        this.orderingConstraints.columns = newSize;
-
-
-
-        //System.out.println(this.orderingConstraints.toBitString());
-
-        for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i+1)) {
-            int rowIndex = i < task ? i : i - 1;
-            for (int j = this.size() ; j < newSize; j++) {
+        // Shifts constraints on added subtasks
+        for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i + 1)) {
+            final int rowIndex = i < task ? i : i - 1;
+            for (int j = this.size(); j < newSize; j++) {
                 this.orderingConstraints.set(j, rowIndex);
-//            System.out.println("i = " + i);
-//            if (i != task) {
-
-//                this.orderingConstraints.getRow(rowIndex).set(this.getTasks().size(), newSize);
             }
         }
-        //System.out.println(this.orderingConstraints.toBitString());
-
-        /*try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        // Update the list of task of the task network
         this.tasks.addAll(method.getSubTasks());
-        //this.transitiveClosure();
-        //System.out.println(this.orderingConstraints.toBitString());
-
-
-        /*if (numberOfSubtasks == 1) {
-            this.tasks.set(task, method.getSubTasks().get(0));
-        } else if (numberOfSubtasks > 1) {
-            final BitMatrix newOrderingConstraints = new BitMatrix(newSize);
-            //System.out.println(newOrderingConstraints);
-            for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {
-                BitSet row = method.getOrderingConstraints().getRow(i);
-                newOrderingConstraints.getRow(i).or(row);
-            }
-            //System.out.println(newOrderingConstraints);
-            //System.out.println(method.getOrderingConstraints());
-            for (int i = 0; i < this.orderingConstraints.rows(); i++) {
-                if (i != task) {
-                    for (int j = 0; j < this.orderingConstraints.columns(); j++) {
-                        int row = i < task ? i + numberOfSubtasks : i - 1 + numberOfSubtasks;
-                        int column = j < task ? j + numberOfSubtasks : j - 1 + numberOfSubtasks;
-                        //System.out.print(i + " " + j);
-                        //System.out.println(" -> New index: "  + row + " " + column);
-                        if (j != task && this.orderingConstraints.get(i, j)) {
-                            newOrderingConstraints.set(row, column);
-                            //System.out.println("1 " + newOrderingConstraints);
-                        } else { // j == tasks
-                            if (this.orderingConstraints.get(i, j)) {
-                                newOrderingConstraints.getRow(row).set(0, numberOfSubtasks);
-                                //System.out.println("2 " + newOrderingConstraints);
-                            }
-                        }
-                    }
-                }
-            }
-            this.orderingConstraints = newOrderingConstraints;
-            this.transitiveClosure();
-            this.tasks.remove(task);
-            this.tasks.addAll(0, method.getSubTasks());
-        }*/
     }
 
     /**
@@ -281,12 +218,12 @@ public final class TaskNetwork implements Serializable {
      * on Warshall algorithm. The complexity is O(n^3) where n is the number of tasks of the task network.
      */
     public final void transitiveClosure() {
-        for (int k = 0 ; k < this.orderingConstraints.rows() ; k++ ) {
-            for (int i = 0 ; i < this.orderingConstraints.rows() ; i++ ) {
-                if (this.orderingConstraints.get(i,k) ) {
-                    for (int j = 0 ; j < this.orderingConstraints.rows() ; j++ ) {
-                        if (this.orderingConstraints.get(k,j)) {
-                            this.orderingConstraints.set(i,j);
+        for (int k = 0; k < this.orderingConstraints.rows(); k++) {
+            for (int i = 0; i < this.orderingConstraints.rows(); i++) {
+                if (this.orderingConstraints.get(i, k)) {
+                    for (int j = 0; j < this.orderingConstraints.rows(); j++) {
+                        if (this.orderingConstraints.get(k, j)) {
+                            this.orderingConstraints.set(i, j);
                         }
                     }
                 }

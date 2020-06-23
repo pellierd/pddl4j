@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.encoding;
 
-import java.io.Serializable;
 
 /**
  * This interface defines the constants used during the encoding.

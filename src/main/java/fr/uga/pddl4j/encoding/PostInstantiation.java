@@ -22,7 +22,14 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -95,9 +102,9 @@ final class PostInstantiation implements Serializable {
      * <li>2. it is not an initial fact and not a positive ground inertia.</li>
      * </ul>
      *
-     * @param exp       the expression.
+     * @param exp   the expression.
      * @param facts the set of relevant facts.
-     * @param init      the initial state.
+     * @param init  the initial state.
      */
     private static void extractRelevantFacts(final IntExpression exp, final Set<IntExpression> facts,
                                              final Set<IntExpression> init) {
@@ -205,7 +212,7 @@ final class PostInstantiation implements Serializable {
      * Extracts the tasks from a specified expression. A ground task is relevant if and
      * only if it occurs as a subtask of a instantiated method.
      *
-     * @param exp       the expression.
+     * @param exp   the expression.
      * @param tasks the set of relevant tasks.
      */
     private static void extractRelevantTasks(final IntExpression exp, final Set<IntExpression> tasks) {
@@ -506,8 +513,8 @@ final class PostInstantiation implements Serializable {
      * @param init    the initial state.
      */
     static void simplyActionsWithGroundInertia(final List<IntAction> actions, final Set<IntExpression> init) {
-    //static void simplyActionsWithGroundInertia(final List<IntAction> actions, final List<IntMethod> methods,
-    //    final Set<IntExpression> init) {
+        //static void simplyActionsWithGroundInertia(final List<IntAction> actions, final List<IntMethod> methods,
+        //    final Set<IntExpression> init) {
 
         final List<IntAction> toAdd = new ArrayList<>(actions.size());
         final Set<Integer> toRemove = new HashSet<>(actions.size());
@@ -540,7 +547,7 @@ final class PostInstantiation implements Serializable {
             // Update the relevant actions for the tasks
             for (int i = 0; i < Encoder.relevantActions.size(); i++) {
                 if (toRemove.contains(Encoder.relevantActions.get(i))) {
-                    primitiveTasksNoMoreReachable.add(Encoder.relevantPrimitiveTasks.remove(i));
+                    primitiveTasksNoMoreReachable.add(Encoder.tableOfRelevantPrimitiveTasks.remove(i));
                     Encoder.relevantActions.remove(i);
                     i--;
                 } else {
@@ -558,11 +565,11 @@ final class PostInstantiation implements Serializable {
      * Simply recursively the methods by removing unreachable tasks.
      *
      * @param methods the list of method to simplify.
-     * @param tasks the set of compound tasks which are no more reachable.
+     * @param tasks   the set of compound tasks which are no more reachable.
      * @return the list of task no more reachable.
      */
     private static void simplyRecursivelyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
-                                                                   final Set<IntExpression> tasks) {
+                                                                         final Set<IntExpression> tasks) {
         while (!tasks.isEmpty()) {
             PostInstantiation.simplyMethodsWithTasksNoMoreReachable(methods, tasks);
         }
@@ -572,13 +579,13 @@ final class PostInstantiation implements Serializable {
      * Simply the method by removing unreachable tasks.
      *
      * @param methods the list of method to simplify.
-     * @param tasks the set of compound tasks which are no more reachable.
+     * @param tasks   the set of compound tasks which are no more reachable.
      * @return the list of task no more reachable.
      */
     private static void simplyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
-                                                                    final Set<IntExpression> tasks) {
+                                                              final Set<IntExpression> tasks) {
         final Set<IntExpression> tasksNoMoreReachable = new LinkedHashSet<>();
-        for (int i = 0 ; i < methods.size(); i++) {
+        for (int i = 0; i < methods.size(); i++) {
             final IntMethod method = methods.get(i);
             if (PostInstantiation.isSimplified(method, tasks)) {
                 methods.remove(i);
@@ -589,8 +596,8 @@ final class PostInstantiation implements Serializable {
                         PostInstantiation.updateRelevantMethods(i);
                         // There is no more relevant method for the compound task
                         if (relevant.isEmpty()) {
-                            tasksNoMoreReachable.add(Encoder.tableRelevantCompundTasks.get(j));
-                            Encoder.tableRelevantCompundTasks.remove(j);
+                            tasksNoMoreReachable.add(Encoder.tableOfRelevantCompundTasks.get(j));
+                            Encoder.tableOfRelevantCompundTasks.remove(j);
                             Encoder.relevantMethods.remove(j);
                             //System.out.println("A task is no more reachable");
                             j--;
@@ -611,10 +618,10 @@ final class PostInstantiation implements Serializable {
      * parameter of the methods.
      *
      * @param method the method to test.
-     * @param tasks the set of tasks that are no more reachable.
+     * @param tasks  the set of tasks that are no more reachable.
      * @return <code>true</code> if the method is simplified, <code>false</code>
      */
-    private  static boolean isSimplified(IntMethod method, Set<IntExpression> tasks) {
+    private static boolean isSimplified(IntMethod method, Set<IntExpression> tasks) {
         boolean isSimplified = true;
         if (!tasks.contains(method.getTask())) {
             final List<IntExpression> subtasks = method.getSubTasks().getChildren();
@@ -637,7 +644,7 @@ final class PostInstantiation implements Serializable {
             int i = 0;
             for (Integer m : relevant) {
                 if (m > index) {
-                    relevant.set(i,--m);
+                    relevant.set(i, --m);
                 }
                 i++;
             }
@@ -664,10 +671,7 @@ final class PostInstantiation implements Serializable {
                 toRemove.add(m.getTask());
             }
         }
-        //System.out.println("To remove:" + toRemove.size());// + " " + Encoder.toString(toRemove.iterator().next()));
-        //System.out.println("Methods avant: " + methods.size());
         PostInstantiation.simplyRecursivelyMethodsWithTasksNoMoreReachable(methods, toRemove);
-        //System.out.println("Methods après: " + methods.size());
     }
 
     /**
@@ -848,7 +852,6 @@ final class PostInstantiation implements Serializable {
         for (IntAction a : actions) {
             PostInstantiation.extractGroundInertia(a.getEffects());
         }
-
     }
 
     /**

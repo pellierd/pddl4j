@@ -21,17 +21,21 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains the methods needed to instantiate the actions and the method.
  * <p>
  * Revisions:
  * <ul>
- *     <li>30/03/2020: Add method instantiation.</li>
- *     <li>15/06/2020: allow operator instantiation with same parameter.</li>
+ * <li>30/03/2020: Add method instantiation.</li>
+ * <li>15/06/2020: allow operator instantiation with same parameter.</li>
  * </ul>
  * </p>
  *
@@ -53,7 +57,7 @@ final class Instantiation implements Serializable {
      * @return the list of instantiated actions.
      */
     static List<IntAction> instantiateActions(final List<IntAction> actions) {
-        final List<IntAction> instActions = new ArrayList<>(1000);
+        final List<IntAction> instActions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);
         for (IntAction a : actions) {
             // If an action has a parameter with a empty domain the action must be removed
             boolean toInstantiate = true;
@@ -70,33 +74,10 @@ final class Instantiation implements Serializable {
     }
 
     /**
-     * Instantiates a specified list of methods.
-     *
-     * @param methods the list of methods to instantiate.
-     * @return the list of instantiated methods.
-     */
-    static List<IntMethod> instantiateMethods(final List<IntMethod> methods) {
-        final List<IntMethod> instMethods = new ArrayList<>(1000);
-        for (IntMethod m : methods) {
-            // If an method has a parameter with a empty domain the method can be removed
-            boolean toInstantiate = true;
-            int i = 0;
-            while (i < m.arity() && toInstantiate) {
-                toInstantiate = !Encoder.tableOfDomains.get(m.getTypeOfParameters(i)).isEmpty();
-                i++;
-            }
-            if (toInstantiate) {
-                instMethods.addAll(Instantiation.instantiate(m));
-            }
-        }
-        return instMethods;
-    }
-
-    /**
      * Instantiates a specified action.
      *
      * @param action the action to instantiate.
-     * @param bound    the bound of actions to instantiate.
+     * @param bound  the bound of actions to instantiate.
      * @return the list of actions instantiated corresponding the specified action.
      */
     static List<IntAction> instantiate(final IntAction action, final int bound) {
@@ -114,23 +95,6 @@ final class Instantiation implements Serializable {
     }
 
     /**
-     * Instantiates a specified method.
-     *
-     * @param method the method to instantiate.
-     * @param bound    the bound of methods to instantiate.
-     * @return the list of methods instantiated corresponding the specified method.
-     */
-    static List<IntMethod> instantiate(final IntMethod method, final int bound) {
-        final List<IntMethod> instMethods = new ArrayList<>(100);
-        Instantiation.expandQuantifiedExpression(method.getPreconditions());
-        Instantiation.simplify(method.getPreconditions());
-        if (!method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
-            Instantiation.instantiate(method, 0, bound, instMethods);
-        }
-        return instMethods;
-    }
-
-    /**
      * Instantiates a specified action.
      *
      * @param action the action to instantiate.
@@ -140,15 +104,6 @@ final class Instantiation implements Serializable {
         return Instantiation.instantiate(action, Integer.MAX_VALUE);
     }
 
-    /**
-     * Instantiates a specified method.
-     *
-     * @param method the method to instantiate.
-     * @return the list of methods instantiated corresponding the specified method.
-     */
-    static List<IntMethod> instantiate(final IntMethod method) {
-        return Instantiation.instantiate(method, Integer.MAX_VALUE);
-    }
 
     /**
      * Instantiates a specified action.
@@ -219,19 +174,17 @@ final class Instantiation implements Serializable {
      * representation without loss of information. Warning this assumption make the process no-sound.
      * </p>
      *
-     * @param method    the method.
-     * @param index     the index of the parameter to instantiate.
-     * @param bound     the bound of methods to instantiate.
-     * @param methods   the list of methods already instantiated.
+     * @param method  the method.
+     * @param index   the index of the parameter to instantiate.
+     * @param bound   the bound of methods to instantiate.
+     * @param methods the list of methods already instantiated.
      * @see IntMethod
      */
     private static void instantiate(final IntMethod method, final int index, final int bound,
                                     final List<IntMethod> methods) {
-        //System.out.println("instantiate " + Encoder.toShortString(method));
         if (bound == methods.size()) {
             return;
         }
-
         final int arity = method.arity();
         if (index == arity) {
             final IntExpression precond = method.getPreconditions();
@@ -261,7 +214,6 @@ final class Instantiation implements Serializable {
                     Instantiation.substitute(subTasksCopy, varIndex, value);
                     copy.setSubTasks(subTasksCopy);
 
-
                     for (int i = 0; i < arity; i++) {
                         copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
                     }
@@ -276,11 +228,19 @@ final class Instantiation implements Serializable {
         }
     }
 
+    /**
+     * Make the preinstantion of a method based on the argument used in the tasks accomplish by the method.
+     *
+     * @param method the method to instantiate.
+     * @param index  the index of the parameter to instantiate. Initially, the index is set to 0.
+     * @param bound  a bound on the number of methods to instantiate.
+     * @param task   the tasks that accomplish the method.
+     */
     private static void instantiate(final IntMethod method, final int index, final int bound,
                                     final List<IntMethod> methods, final IntExpression task) {
         final IntExpression t = method.getTask();
         final IntMethod copy = new IntMethod(method);
-        for (int i =  0; i < t.getArguments().length; i++) {
+        for (int i = 0; i < t.getArguments().length; i++) {
             final int var = t.getArguments()[i];
             final int cons = task.getArguments()[i];
             Instantiation.substitute(copy.getPreconditions(), var, cons);
@@ -288,78 +248,21 @@ final class Instantiation implements Serializable {
             Instantiation.substitute(copy.getSubTasks(), var, cons);
             copy.setValueOfParameter((-var - 1), cons);
         }
-        //System.out.println(Encoder.toShortString(copy));
         Instantiation.instantiate(copy, index, bound, methods);
-
-        //System.exit(0);
     }
 
     /**
+     * Make the instantiation of a list of methods.
      *
+     * @param methods             the method to instantiate.
+     * @param initialTasksNetwork the initial tasks network.
+     * @param actions             the list of action already instantiate.
      */
-    /*private static void instantiate(final IntMethod method, final int index, final int bound,
-                                    final List<IntMethod> methods, IntExpression task) {
-        //System.out.println(Encoder.toString(method));
-
-        if (bound == methods.size()) {
-            return;
-        }
-
-        //
-        int j = 0;
-        int[] args1 = task.getArguments();
-        int[] args2 = method.getTask().getArguments();
-        boolean stop = false;
-        while (j < task.getArguments().length && !stop) {
-            stop = args2[j] >= 0 && args2[j] != args1[j];
-            j++;
-        }
-        if (stop) return;
-
-        final int arity = method.arity();
-        if (index == arity) {
-            final IntExpression precond = method.getPreconditions();
-            Instantiation.simplify(precond);
-            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
-                methods.add(method);
-            }
-        } else {
-            final Set<Integer> values = Encoder.tableOfDomains.get(method.getTypeOfParameters(index));
-            for (Integer value : values) {
-                final int varIndex = -index - 1;
-                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
-
-                Instantiation.substitute(preconditionCopy, varIndex, value);
-                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
-                    final IntMethod copy = new IntMethod(method.getName(), arity);
-                    copy.setPreconditions(preconditionCopy);
-                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
-
-                    final IntExpression taskCopy = new IntExpression(method.getTask());
-                    Instantiation.substitute(taskCopy, varIndex, value);
-                    copy.setTask(taskCopy);
-
-                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
-                    Instantiation.substitute(subTasksCopy, varIndex, value);
-                    copy.setSubTasks(subTasksCopy);
-
-                    for (int i = 0; i < arity; i++) {
-                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
-                    }
-                    for (int i = 0; i < index; i++) {
-                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
-                    }
-                    copy.setValueOfParameter(index, value);
-                    Instantiation.instantiate(copy, index + 1, bound, methods, task);
-                }
-            }
-        }
-    }*/
-
-    static List<IntMethod> instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork, List<IntAction> actions) {
+    static List<IntMethod> instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork,
+                                              List<IntAction> actions) {
 
         // Init the list of instantiated methods or ground methods
-        final List<IntMethod> instMethods = new ArrayList<>(1000);
+        final List<IntMethod> instMethods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
 
         // Init the set used to store the compound tasks
         final Set<IntExpression> compound = new LinkedHashSet<>();
@@ -408,7 +311,7 @@ final class Instantiation implements Serializable {
                     Instantiation.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
                     for (IntMethod instance : instantiated) {
                         final Iterator<IntExpression> i = instance.getSubTasks().getChildren().iterator();
-                        final Set<IntExpression> primitiveSet = new  LinkedHashSet<>();
+                        final Set<IntExpression> primitiveSet = new LinkedHashSet<>();
                         final Set<IntExpression> compoundSet = new LinkedHashSet<>();
                         boolean stop = false;
                         while (i.hasNext() && !stop) {
@@ -441,12 +344,12 @@ final class Instantiation implements Serializable {
         }
 
         // Initialize the table of relevant methods for each compund task and the table of relevant compound tasks
-        Encoder.tableRelevantCompundTasks = new ArrayList<>(compound.size());
-        Encoder.tableRelevantCompundTasks.addAll(compound);
+        Encoder.tableOfRelevantCompundTasks = new ArrayList<>(compound.size());
+        Encoder.tableOfRelevantCompundTasks.addAll(compound);
 
         // Initialize the table of relevant actions for each primitive task and the table of relevant primitive tasks
         Encoder.relevantActions = new ArrayList<Integer>(primitiveTaskSet.size());
-        Encoder.relevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
+        Encoder.tableOfRelevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
         int index = 0;
         Iterator<IntExpression> i = primitiveTaskSet.iterator();
         while (i.hasNext()) {
@@ -457,7 +360,7 @@ final class Instantiation implements Serializable {
                 i.remove();
             } else {
                 Encoder.relevantActions.add(index);
-                Encoder.relevantPrimitiveTasks.add(primitiveTask);
+                Encoder.tableOfRelevantPrimitiveTasks.add(primitiveTask);
                 index++;
             }
         }
@@ -508,7 +411,7 @@ final class Instantiation implements Serializable {
      * @param methods the list of methods to filter.
      */
     private static void filterMethodWithEmptyDomainParameter(List<IntMethod> methods) {
-        Iterator<IntMethod> it =  methods.iterator();
+        Iterator<IntMethod> it = methods.iterator();
         while (it.hasNext()) {
             final IntMethod method = it.next();
             // If an method has a parameter with a empty domain the method can be removed
@@ -537,8 +440,8 @@ final class Instantiation implements Serializable {
                     final IntExpression ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
-                            || ei.getConnective().equals(PDDLConnective.EXISTS))
-                            && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
+                        || ei.getConnective().equals(PDDLConnective.EXISTS))
+                        && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -555,8 +458,8 @@ final class Instantiation implements Serializable {
                     final IntExpression ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
-                            || ei.getConnective().equals(PDDLConnective.EXISTS))
-                            && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
+                        || ei.getConnective().equals(PDDLConnective.EXISTS))
+                        && Encoder.tableOfDomains.get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }

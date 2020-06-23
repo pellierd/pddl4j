@@ -26,9 +26,15 @@ import java.util.BitSet;
 
 /**
  * This class implements a bit vector.
+ * <p>
+ * Revisions:
+ * <ul>
+ * <li>26.06.2020: Add shift methods.</li>
+ * </ul>
+ * </p>
  *
  * @author D. Pellier
- * @version 1.1 - 13.04.2010
+ * @version 1.2 - 13.04.2010
  */
 public class BitVector extends BitSet {
 
@@ -38,7 +44,7 @@ public class BitVector extends BitSet {
     private long[] words;
 
     /**
-     * The
+     * The worlds field used to store the value of bit vector.
      */
     private static Field wordsField;
 
@@ -138,14 +144,24 @@ public class BitVector extends BitSet {
     }
 
     /**
+     * Shifts right the bit vector of n bits.
+     *
+     * @param n the number of bit to shift. n must greater or equal 0.
+     */
+    public final void shiftRight(int n) {
+        final int shift = n / 63;
+        for (int i = 0; i < shift; i++) {
+            this.primitiveShiftRight(63);
+        }
+        this.primitiveShiftRight(n % 63);
+    }
+
+    /**
+     * Shifts right the bit vector of n bits.
      *
      * @param n the number of bit to shift. n must greater or equal 0 and less than 64.
      */
-    public void shiftRight(int n) {
-        if (n < 0)
-            throw new IllegalArgumentException("'n' must be >= 0");
-        if (n >= 64)
-            throw new IllegalArgumentException("'n' must be < 64");
+    private void primitiveShiftRight(int n) {
         if (this.words.length > 0) {
             this.ensureCapacity(n);
             // Do the shift
@@ -157,11 +173,25 @@ public class BitVector extends BitSet {
         }
     }
 
-    public void shiftLeft(int n) {
-        if (n < 0)
-            throw new IllegalArgumentException("'n' must be >= 0");
-        if (n >= 64)
-            throw new IllegalArgumentException("'n' must be < 64");
+    /**
+     * Shifts left the bit vector of n bits.
+     *
+     * @param n the number of bit to shift. n must greater of equal to 0.
+     */
+    public final void shiftLeft(int n) {
+        final int shift = n / 63;
+        for (int i = 0; i < shift; i++) {
+            this.primitiveShiftLeft(63);
+        }
+        this.primitiveShiftLeft(n % 63);
+    }
+
+    /**
+     * Shifts left the bit vector of n bits.
+     *
+     * @param n the number of bit to shift. n must greater or equal 0 and less than 64.
+     */
+    private final void primitiveShiftLeft(int n) {
         if (this.words.length > 0) {
             this.ensureCapacity(n);
             // Do the shift
@@ -173,13 +203,18 @@ public class BitVector extends BitSet {
         }
     }
 
+    /**
+     * Updates the capacity of the bit vector of n bits.
+     *
+     * @param n the number of bits to increase.
+     */
     private void ensureCapacity(final int n) {
-        if (words[words.length - 1] >>> n > 0) {
-            long[] tmp = new long[words.length + 3];
-            System.arraycopy(words, 0, tmp, 0, words.length);
-            words = tmp;
+        if (this.words[words.length - 1] >>> n > 0) {
+            final long[] tmp = new long[this.words.length + 3];
+            System.arraycopy(this.words, 0, tmp, 0, this.words.length);
+            this.words = tmp;
             try {
-                wordsField.set(this, tmp);
+                this.wordsField.set(this, tmp);
             } catch (IllegalAccessException e) {
                 throw new IllegalStateException(e);
             }

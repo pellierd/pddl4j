@@ -699,8 +699,7 @@ public class Problem implements Serializable {
         if (tasknetwork.getOrderingConstraints().cardinality() == 0) {
             str.append(" ()");
         } else {
-            str.append(tasknetwork.getOrderingConstraints().toBitString());
-            /*BitMatrix constraints = tasknetwork.getOrderingConstraints();
+            BitMatrix constraints = tasknetwork.getOrderingConstraints();
             int index = 0;
             for (int r = 0; r < constraints.rows(); r++) {
                 BitSet row = constraints.getRow(r);
@@ -716,7 +715,7 @@ public class Problem implements Serializable {
                     str.append("\n");
                     index++;
                 }
-            }*/
+            }
         }
         return str.toString();
     }

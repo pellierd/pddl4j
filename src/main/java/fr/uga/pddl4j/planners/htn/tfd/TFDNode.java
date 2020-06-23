@@ -203,7 +203,7 @@ public class TFDNode implements Serializable, Comparable<TFDNode> {
      *
      * @param other the node to be compared.
      * @return a negative integer, zero, or a positive integer as this node is less than, equal to, or greater than the
-     * specified node.
+     *      specified node.
      */
     @Override
     public int compareTo(TFDNode other) {

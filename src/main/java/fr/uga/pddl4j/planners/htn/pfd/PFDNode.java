@@ -51,15 +51,16 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      */
     private PFDNode parent;
 
-    public int cpt;
-
     /**
      * Creates a new node from an other. This constructor creates a deep copy of the node in parameters.
      *
      * @param other the node to be copied.
      */
     public PFDNode(final PFDNode other) {
-        this(new State(other.getState()), new TaskNetwork(other.getTaskNetwork()), other.getParent(), other.getOperator());
+        this(new State(other.getState()),
+            new TaskNetwork(other.getTaskNetwork()),
+            other.getParent(),
+            other.getOperator());
     }
 
     /**
@@ -73,7 +74,7 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
     /**
      * Creates a new node with a specified state and task network.
      *
-     * @param state srate of this node.
+     * @param state       srate of this node.
      * @param taskNetwork the tasknetwork of the node.
      */
     public PFDNode(final State state, final TaskNetwork taskNetwork) {
@@ -83,10 +84,10 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
     /**
      * Creates a new node with a specified state and task network.
      *
-     * @param state srate of this node.
+     * @param state       srate of this node.
      * @param taskNetwork the task network of the node.
-     * @param parent the parent node of the node.
-     * @param operator the index of the operator applied to reach the node.
+     * @param parent      the parent node of the node.
+     * @param operator    the index of the operator applied to reach the node.
      */
     public PFDNode(final State state, final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
         super();
@@ -182,34 +183,11 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      *
      * @param other the node to be compared.
      * @return a negative integer, zero, or a positive integer as this node is less than, equal to, or greater than the
-     * specified node.
+     *      specified node.
      */
     @Override
     public int compareTo(PFDNode other) {
-        //return this.cpt - other.cpt;
-
         return this.getTaskNetwork().getTasks().size() - other.getTaskNetwork().getTasks().size();
-    }
-    /*    int h1 = this.cpt;
-        int h2 = other.cpt;
-
-        int g1 = this.getTaskNetwork().getTasks().size() - h1;
-        int g2 = other.getTaskNetwork().getTasks().size() - h2;
-
-        double f1 = g1 + 1.5 * h1;
-        double f2 = g2 + 1.5 * h2;
-
-        return (int) (f1 - f2);
-    }*/
-
-   /*     int value = this.getTaskNetwork().getTasks().size() - other.getTaskNetwork().getTasks().size();
-        if (value == 0) {
-            return this.cpt - other.cpt;
-        }
-        return value;
-        //return value != 0 ? value : other.cpt - this.cpt;/
-
-
     }
 
     /**

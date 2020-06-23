@@ -33,7 +33,6 @@ import fr.uga.pddl4j.problem.Task;
 import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.impl.ThrowableFormatOptions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -265,12 +264,12 @@ public final class Encoder implements Serializable {
     /**
      * The list of relevant primitive tasks.
      */
-    static List<IntExpression> relevantPrimitiveTasks;
+    static List<IntExpression> tableOfRelevantPrimitiveTasks;
 
     /**
-     * The list of relevant primitive tasks.
+     * The list of relevant compund tasks.
      */
-    static List<IntExpression> tableRelevantCompundTasks;
+    static List<IntExpression> tableOfRelevantCompundTasks;
 
     /**
      * The list of relevant methods for a specific task.
@@ -609,8 +608,8 @@ public final class Encoder implements Serializable {
         // Create the list of relevant tasks
         if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
             Encoder.tableOfRelevantTasks = new ArrayList<>();
-            Encoder.tableOfRelevantTasks.addAll(Encoder.relevantPrimitiveTasks);
-            Encoder.tableOfRelevantTasks.addAll(Encoder.tableRelevantCompundTasks);
+            Encoder.tableOfRelevantTasks.addAll(Encoder.tableOfRelevantPrimitiveTasks);
+            Encoder.tableOfRelevantTasks.addAll(Encoder.tableOfRelevantCompundTasks);
         }
 
         // The table of ground inertia are no more needed
