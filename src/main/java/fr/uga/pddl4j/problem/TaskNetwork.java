@@ -191,7 +191,7 @@ public final class TaskNetwork implements Serializable {
             e.printStackTrace();
         }*/
         this.tasks.addAll(method.getSubTasks());
-        this.transitiveClosure();
+        //this.transitiveClosure();
         //System.out.println(this.orderingConstraints.toBitString());
 
 
@@ -278,7 +278,7 @@ public final class TaskNetwork implements Serializable {
 
     /**
      * Compute the transitive closure of the ordering constraints. The computation of the transitive closure is based
-     * on Warshall algorithm. The complexity is O(n) where n is the number of tasks of the task network.
+     * on Warshall algorithm. The complexity is O(n^3) where n is the number of tasks of the task network.
      */
     public final void transitiveClosure() {
         for (int k = 0 ; k < this.orderingConstraints.rows() ; k++ ) {

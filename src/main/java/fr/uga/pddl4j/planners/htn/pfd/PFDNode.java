@@ -51,6 +51,8 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      */
     private PFDNode parent;
 
+    public int cpt;
+
     /**
      * Creates a new node from an other. This constructor creates a deep copy of the node in parameters.
      *
@@ -184,7 +186,30 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      */
     @Override
     public int compareTo(PFDNode other) {
+        //return this.cpt - other.cpt;
+
         return this.getTaskNetwork().getTasks().size() - other.getTaskNetwork().getTasks().size();
+    }
+    /*    int h1 = this.cpt;
+        int h2 = other.cpt;
+
+        int g1 = this.getTaskNetwork().getTasks().size() - h1;
+        int g2 = other.getTaskNetwork().getTasks().size() - h2;
+
+        double f1 = g1 + 1.5 * h1;
+        double f2 = g2 + 1.5 * h2;
+
+        return (int) (f1 - f2);
+    }*/
+
+   /*     int value = this.getTaskNetwork().getTasks().size() - other.getTaskNetwork().getTasks().size();
+        if (value == 0) {
+            return this.cpt - other.cpt;
+        }
+        return value;
+        //return value != 0 ? value : other.cpt - this.cpt;/
+
+
     }
 
     /**

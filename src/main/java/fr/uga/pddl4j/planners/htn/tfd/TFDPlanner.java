@@ -203,6 +203,7 @@ public final class TFDPlanner extends AbstractPlanner {
                 final Action a = problem.getActions().get(n.getOperator());
                 plan.add(0, a);
             }
+
             n = n.getParent();
         }
         return plan;
