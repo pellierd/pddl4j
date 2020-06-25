@@ -103,7 +103,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             // If the task network has no more task, a solution is found
             if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
-                //System.out.println(super.createHdDDLCertificate(currentNode, problem));
+                System.out.println(super.createHdDDLCertificate(currentNode, problem));
             } else {
                 // Get the list of tasks of the current node with no predecessors
                 currentNode.getTaskNetwork().transitiveClosure();
