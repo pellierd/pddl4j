@@ -263,7 +263,6 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             + pb.getTasks().size() + " tasks)\n");
 
         if (pb.isSolvable()) {
-            System.out.println(pb.getInitialTaskNetwork().getTasks());
             try {
                 System.out.println("Searching a solution plan....\n");
                 start = System.currentTimeMillis();
