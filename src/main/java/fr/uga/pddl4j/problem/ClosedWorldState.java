@@ -21,6 +21,8 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.util.BitVector;
 
+import java.util.List;
+
 /**
  * This class implements a logical state.
  *
@@ -66,6 +68,28 @@ public class ClosedWorldState extends BitVector {
     public final void apply(final State state) {
         this.or(state.getPositive());
         this.andNot(state.getNegative());
+    }
+
+    /**
+     * Applies a list of conditional effects to this state.
+     *
+     * @param effects the list of conditional effects to apply.
+     */
+    public final void apply(final List<ConditionalEffect> effects) {
+        effects.stream().forEach(ce -> this.apply(ce.getEffects()));
+    }
+
+    /**
+     * Applies a conditional effects to this state. In other word, the positive fluent of the specified effects are
+     * added to this state and the negative ones are delete. The state is modified if and only if the condition of the
+     * conditional effects hold in the state, otherwise the state stay unchanged.
+     *
+     * @param effects the expression to apply.
+     */
+    public final void apply(final ConditionalEffect effects) {
+        if (this.satisfy(effects.getCondition())) {
+            this.apply(effects.getEffects());
+        }
     }
 
     /**

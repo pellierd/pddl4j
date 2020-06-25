@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn.pfd;
 
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.TaskNetwork;
 
@@ -62,7 +63,7 @@ public final class PFDNode extends AbstractSTNNode {
      * @param state       srate of this node.
      * @param taskNetwork the tasknetwork of the node.
      */
-    public PFDNode(final State state, final TaskNetwork taskNetwork) {
+    public PFDNode(final ClosedWorldState state, final TaskNetwork taskNetwork) {
         super(state, null, Integer.MAX_VALUE);
         this.setTaskNetwork(taskNetwork);
     }
@@ -75,7 +76,7 @@ public final class PFDNode extends AbstractSTNNode {
      * @param parent      the parent node of the node.
      * @param operator    the index of the operator applied to reach the node.
      */
-    public PFDNode(final State state, final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
+    public PFDNode(final ClosedWorldState state, final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
         super(state, parent, operator);
         this.setTaskNetwork(taskNetwork);
     }

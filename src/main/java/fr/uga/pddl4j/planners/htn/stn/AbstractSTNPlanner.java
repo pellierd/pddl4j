@@ -1,4 +1,3 @@
-
 /*
 * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
 *
@@ -19,7 +18,6 @@ package fr.uga.pddl4j.planners.htn.stn;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.htn.stn.tfd.TFDNode;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
@@ -140,6 +138,13 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             n = n.getParent();
         }
         return plan;
+    }
+
+    /**
+     * Creates a hddl certificate.
+     */
+    protected HDDLCertificate createHdDDLCertificate(final AbstractSTNNode node, final Problem problem) {
+        return new HDDLCertificate(node, problem);
     }
 
     /**

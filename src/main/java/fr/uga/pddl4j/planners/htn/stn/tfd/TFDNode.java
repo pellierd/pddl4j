@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.State;
 
 import java.util.LinkedList;
@@ -45,7 +46,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param other the node to be copied.
      */
     public TFDNode(final TFDNode other) {
-        super(new State(other.getState()), other.getParent(), other.getOperator());
+        super(new ClosedWorldState(other.getState()), other.getParent(), other.getOperator());
         this.setTasks(new LinkedList<>(other.getTasks()));
     }
 
@@ -53,7 +54,7 @@ public class TFDNode extends AbstractSTNNode {
      * Creates a new empty TFDNode. The parent node is set to null and the operator to Interger.MAX_VALUE.
      */
     public TFDNode() {
-        super(new State(), null, Integer.MAX_VALUE);
+        super(new ClosedWorldState(), null, Integer.MAX_VALUE);
         this.setTasks(new LinkedList<>());
     }
 
@@ -64,7 +65,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param state the state of the node.
      * @param tasks the task network of the node.
      */
-    public TFDNode(final State state, final List<Integer> tasks) {
+    public TFDNode(final ClosedWorldState state, final List<Integer> tasks) {
         super(state, null, Integer.MAX_VALUE);
         this.setTasks(tasks);
     }
@@ -77,7 +78,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param parent the parent of the node.
      * @param operator the index of the operator applied to reach this node.
      */
-    public TFDNode(final State state, final List<Integer> tasks, final TFDNode parent, final int operator) {
+    public TFDNode(final ClosedWorldState state, final List<Integer> tasks, final TFDNode parent, final int operator) {
         super(state, parent, operator);
         this.setTasks(tasks);
     }

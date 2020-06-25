@@ -697,7 +697,6 @@ public final class Encoder implements Serializable {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
 
-
             if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
                 str.append("\nFinal goal state:\n");
                 if (Encoder.goal == null) { // Goal null

@@ -20,10 +20,7 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,11 +65,12 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             }
         });
         // Create the root node of the search space
-        final PFDNode root = new PFDNode(problem.getInitialState(), problem.getInitialTaskNetwork());
+        final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
+        final PFDNode root = new PFDNode(init, problem.getInitialTaskNetwork());
 
         // Create the root node of the search space
-        root.getState().getNegative().set(0, problem.getRelevantFluents().size());
-        root.getState().getNegative().andNot(root.getState().getPositive());
+        //root.getState().getNegative().set(0, problem.getRelevantFluents().size());
+        //root.getState().getNegative().andNot(root.getState().getPositive());
 
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
@@ -105,13 +103,14 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             // If the task network has no more task, a solution is found
             if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
+                //System.out.println(super.createHdDDLCertificate(currentNode, problem));
             } else {
                 // Get the list of tasks of the current node with no predecessors
                 currentNode.getTaskNetwork().transitiveClosure();
                 final List<Integer> tasks = currentNode.getTaskNetwork().getTasksWithNoPredecessors();
 
                 // Get the current state of the search
-                final State state = currentNode.getState();
+                final ClosedWorldState state = currentNode.getState();
                 // For each task with no predecessors
                 for (Integer task : tasks) {
                     int taskIndex = currentNode.getTaskNetwork().getTasks().get(task);

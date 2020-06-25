@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.ClosedWorldState;
 
 import java.io.Serializable;
 
@@ -31,7 +31,7 @@ public abstract class AbstractSTNNode implements Serializable {
     /**
      * The state that describes the state of the world reached by the search.
      */
-    private State state;
+    private ClosedWorldState state;
 
     /**
      * The operator used to reach this node.
@@ -49,7 +49,7 @@ public abstract class AbstractSTNNode implements Serializable {
      * @param other the node to be copied.
      */
     public AbstractSTNNode(final AbstractSTNNode other) {
-        this(new State(other.getState()),
+        this(new ClosedWorldState(other.getState()),
             other.getParent(),
             other.getOperator());
     }
@@ -59,7 +59,7 @@ public abstract class AbstractSTNNode implements Serializable {
      * operator to Integer.MAX_VALUE.
      */
     public AbstractSTNNode() {
-        this(new State(), null, Integer.MAX_VALUE);
+        this(new ClosedWorldState(), null, Integer.MAX_VALUE);
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class AbstractSTNNode implements Serializable {
      * @param parent   the parent node of the node.
      * @param operator the index of the operator applied to reach the node.
      */
-    public AbstractSTNNode(final State state, final AbstractSTNNode parent, final int operator) {
+    public AbstractSTNNode(final ClosedWorldState state, final AbstractSTNNode parent, final int operator) {
         super();
         this.setState(state);
         this.setParent(parent);
@@ -81,7 +81,7 @@ public abstract class AbstractSTNNode implements Serializable {
      *
      * @return the state of this node.
      */
-    public final State getState() {
+    public final ClosedWorldState getState() {
         return this.state;
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractSTNNode implements Serializable {
      *
      * @param state the state to set.
      */
-    public final void setState(final State state) {
+    public final void setState(final ClosedWorldState state) {
         this.state = state;
     }
 

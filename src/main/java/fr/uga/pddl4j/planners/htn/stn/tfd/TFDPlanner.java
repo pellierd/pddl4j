@@ -21,10 +21,7 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,9 +66,10 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             }
         });
         // Create the root node of the search space
-        final TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork().getTasks());
-        root.getState().getNegative().set(0, problem.getRelevantFluents().size());
-        root.getState().getNegative().andNot(root.getState().getPositive());
+        final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
+        final TFDNode root = new TFDNode(init, problem.getInitialTaskNetwork().getTasks());
+        //root.getState().getNegative().set(0, problem.getRelevantFluents().size());
+        //root.getState().getNegative().andNot(root.getState().getPositive());
 
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
@@ -106,12 +104,13 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             // If the task network is empty we've got a solution
             if (currentNode.getTasks().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
+                System.out.println(super.createHdDDLCertificate(currentNode, problem));
             } else {
                 // Get and remove the fist task of the task network
                 //System.out.println(currentNode);
                 int task = currentNode.popTask();
                 // Get the current state of the search
-                final State state = currentNode.getState();
+                final ClosedWorldState state = currentNode.getState();
                 // Get the relevant operators, i.e., action or method that are relevant for this task.
                 final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
                 // Case of primitive task
