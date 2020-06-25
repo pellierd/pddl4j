@@ -49,7 +49,7 @@ public abstract class AbstractSTNNode implements Serializable {
     private int operator;
 
     /**
-     * The task processed in the
+     * The task processed in the node.
      */
     private int task;
 

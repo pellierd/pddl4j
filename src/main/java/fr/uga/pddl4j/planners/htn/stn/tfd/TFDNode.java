@@ -59,8 +59,8 @@ public class TFDNode extends AbstractSTNNode {
     }
 
     /**
-     * Creates a new TFDNode with a specified state and task network. The parent node is set to null, the operator is set
-     * to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
+     * Creates a new TFDNode with a specified state and task network. The parent node is set to null, the operator is
+     * set to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      *
      * @param state the state of the node.
      * @param tasks the task network of the node.

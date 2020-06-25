@@ -20,7 +20,10 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
-import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.Method;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
 import java.io.IOException;
@@ -269,30 +272,36 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             + pb.getRelevantFluents().size() + " fluents, "
             + pb.getTasks().size() + " tasks)\n");
 
-        try {
-            System.out.println("Searching a solution plan....\n");
-            start = System.currentTimeMillis();
-            final Plan plan = planner.search(pb);
-            end = System.currentTimeMillis();
-            final double searchTime = (end - start) / 1000.0;
-            if (plan != null) {
-                // Print plan information
-                System.out.println("Found plan as follows:\n" + pb.toString(plan));
-                System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
-                System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
-                System.out.println(String.format("Searching time       : %4.3fs", searchTime));
-                System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+        if (pb.isSolvable()) {
+            try {
+                System.out.println("Searching a solution plan....\n");
+                start = System.currentTimeMillis();
+                final Plan plan = planner.search(pb);
+                end = System.currentTimeMillis();
+                final double searchTime = (end - start) / 1000.0;
+                if (plan != null) {
+                    // Print plan information
+                    System.out.println("Found plan as follows:\n" + pb.toString(plan));
+                    System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
+                    System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+                    System.out.println(String.format("Searching time       : %4.3fs", searchTime));
+                    System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
 
-            } else {
-                System.out.println(String.format(String.format("%nno plan found%n%n")));
-                System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
-                System.out.println(String.format("Searching time       : %4.3fs", searchTime));
-                System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+                } else {
+                    System.out.println(String.format(String.format("%nno plan found%n%n")));
+                    System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+                    System.out.println(String.format("Searching time       : %4.3fs", searchTime));
+                    System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
+                }
+            } catch (OutOfMemoryError err) {
+                System.out.println("Out of memory !");
+                System.exit(0);
             }
-        } catch (OutOfMemoryError err) {
-            System.out.println("Out of memory !");
-            System.exit(0);
+        } else {
+            System.out.println(String.format(String.format("\n%nproblem with no solution plan found%n%n")));
+            System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
+            System.out.println(String.format("Searching time       : %4.3fs", 0.0));
+            System.out.println(String.format("Total time           : %4.3fs%n", encodingTime));
         }
-
     }
 }

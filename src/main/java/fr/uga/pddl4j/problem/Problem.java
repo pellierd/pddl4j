@@ -30,6 +30,7 @@ import fr.uga.pddl4j.util.BitMatrix;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -531,13 +532,29 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns <code>true</code> if this problem is solvable, i.e., if its goal was not simplified to FALSE during the
-     * encoding or if the problem is an HTN problem.
+     * Returns <code>true</code> if this problem is solvable. In the case of STRIPS planning, the method returns
+     * <code>false</code> if the goal is simplified to <code>false</code> during the encoding process, otherwise the
+     * method returns <code>true</code>. In the case of HTN planning, the method returns <code>false</code> if at least
+     * one of the task of the initial task network is not reachable after the encoding process, i.e., as a task is set
+     * to null in the tasks list of the initial task network, otherwise the method returns <code>true</code>.
+     * <p>
+     * Warning, it is not because the method returns <code>true</code> that the problem is solvable. It just means that
+     * the encoding process can not exclude the fact that the problem is solvable.
+     * </p>
      *
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
      */
     public final boolean isSolvable() {
-        return this.goal != null || this.initialTaskNetwork != null;
+        boolean isSovable = true;
+        if (this.requirements.contains(PDDLRequireKey.HTN)) {
+            Iterator<Integer> i = this.initialTaskNetwork.getTasks().iterator();
+            while (i.hasNext() && isSovable) {
+                isSovable = i.next() != null;
+            }
+        } else {
+            isSovable = this.goal != null;
+        }
+        return isSovable;
     }
 
     /**
