@@ -35,11 +35,6 @@ import java.util.Set;
 public class ParallelPlan extends AbstractPlan {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The list of set of unordered actions contained in the plan.
      */
     private List<HashSet<Action>> actions;

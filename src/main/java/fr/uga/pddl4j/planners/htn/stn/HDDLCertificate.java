@@ -63,7 +63,7 @@ public class HDDLCertificate extends SequentialPlan {
 
             if (operator < nbactions) {
                 final Action a = problem.getActions().get(operator);
-                this.add(0, a);
+                super.add(0, a);
                 // Computes the alias of the primitive tasks
                 if (renames.containsKey(task)) {
                     renames.get(task).add(step);
