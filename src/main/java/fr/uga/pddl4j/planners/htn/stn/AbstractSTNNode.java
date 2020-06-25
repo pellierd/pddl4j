@@ -29,6 +29,16 @@ import java.io.Serializable;
 public abstract class AbstractSTNNode implements Serializable {
 
     /**
+     * The default operator value.
+     */
+    public static int DEFAULT_OPERATOR = -1;
+
+    /**
+     * The default task value.
+     */
+    public static int DEFAULT_TASK = -1;
+
+    /**
      * The state that describes the state of the world reached by the search.
      */
     private ClosedWorldState state;
@@ -37,6 +47,11 @@ public abstract class AbstractSTNNode implements Serializable {
      * The operator used to reach this node.
      */
     private int operator;
+
+    /**
+     * The task processed in the
+     */
+    private int task;
 
     /**
      * The parent node of this node.
@@ -51,15 +66,16 @@ public abstract class AbstractSTNNode implements Serializable {
     public AbstractSTNNode(final AbstractSTNNode other) {
         this(new ClosedWorldState(other.getState()),
             other.getParent(),
-            other.getOperator());
+            other.getOperator(),
+            other.getTask());
     }
 
     /**
-     * Creates a new empty node with an empty state. The parent node is set to null and the
-     * operator to Integer.MAX_VALUE.
+     * Creates a new empty node with an empty state. The parent node is set to null, the
+     * operator to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      */
     public AbstractSTNNode() {
-        this(new ClosedWorldState(), null, Integer.MAX_VALUE);
+        this(new ClosedWorldState(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
     }
 
     /**
@@ -68,12 +84,15 @@ public abstract class AbstractSTNNode implements Serializable {
      * @param state    state of this node.
      * @param parent   the parent node of the node.
      * @param operator the index of the operator applied to reach the node.
+     * @param task     the task processed in this node.
      */
-    public AbstractSTNNode(final ClosedWorldState state, final AbstractSTNNode parent, final int operator) {
+    public AbstractSTNNode(final ClosedWorldState state, final AbstractSTNNode parent, final int operator,
+                           final int task) {
         super();
         this.setState(state);
         this.setParent(parent);
         this.setOperator(operator);
+        this.setTask(task);
     }
 
     /**
@@ -135,4 +154,21 @@ public abstract class AbstractSTNNode implements Serializable {
         this.operator = operator;
     }
 
+    /**
+     * Returns the task process in this node.
+     *
+     * @return the task process in this node.
+     */
+    public int getTask() {
+        return this.task;
+    }
+
+    /**
+     * Sets the task process in this node.
+     *
+     * @param task the task process in this node.
+     */
+    public void setTask(final int task) {
+        this.task = task;
+    }
 }

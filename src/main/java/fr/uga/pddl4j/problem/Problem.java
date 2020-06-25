@@ -513,6 +513,7 @@ public class Problem implements Serializable {
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
      */
     public final boolean isSolvable() {
+        if ()
         return this.goal != null || this.initialTaskNetwork != null;
     }
 

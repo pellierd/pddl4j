@@ -127,6 +127,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             childNode.setParent(currentNode);
                             childNode.setOperator(operator);
                             childNode.getState().apply(action.getCondEffects());
+                            childNode.setTask(task);
                             open.add(childNode);
                             if (debug) {
                                 System.out.println("=====> Decomposition succeeded push node:");
@@ -161,6 +162,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             childNode.setParent(currentNode);
                             childNode.setOperator(problem.getActions().size() + operator);
                             childNode.pushAllTasks(method.getSubTasks());
+                            childNode.setTask(task);
                             open.add(childNode);
                             if (debug) {
                                 System.out.println("=====> Decomposition succeeded push node:");

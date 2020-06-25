@@ -49,8 +49,8 @@ public final class PFDNode extends AbstractSTNNode {
     }
 
     /**
-     * Creates a new empty node with an empty state and an empty task network. The parent node is set to null and the
-     * operator to Integer.MAX_VALUE.
+     * Creates a new empty node with an empty state and an empty task network. The parent node is set to null, the
+     * operator is set to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      */
     public PFDNode() {
         super();
@@ -58,13 +58,14 @@ public final class PFDNode extends AbstractSTNNode {
     }
 
     /**
-     * Creates a new node with a specified state and task network.
+     * Creates a new node with a specified state and task network. The parent node is set to null, the operator is set
+     * to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      *
-     * @param state       srate of this node.
-     * @param taskNetwork the tasknetwork of the node.
+     * @param state       state of this node.
+     * @param taskNetwork the task network of the node.
      */
     public PFDNode(final ClosedWorldState state, final TaskNetwork taskNetwork) {
-        super(state, null, Integer.MAX_VALUE);
+        super(state, null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
         this.setTaskNetwork(taskNetwork);
     }
 
@@ -75,9 +76,11 @@ public final class PFDNode extends AbstractSTNNode {
      * @param taskNetwork the task network of the node.
      * @param parent      the parent node of the node.
      * @param operator    the index of the operator applied to reach the node.
+     * @param task        the task processed in this node.
      */
-    public PFDNode(final ClosedWorldState state, final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
-        super(state, parent, operator);
+    public PFDNode(final ClosedWorldState state, final TaskNetwork taskNetwork, final PFDNode parent,
+                   final int operator, final int task) {
+        super(state, parent, operator, task);
         this.setTaskNetwork(taskNetwork);
     }
 

@@ -133,7 +133,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 childNode.setOperator(operator);
                                 childNode.getState().apply(action.getCondEffects());
                                 childNode.getTaskNetwork().removeTask(task);
-                                //childNode.cpt = currentNode.cpt - 1;
+                                childNode.setTask(task);
                                 open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
@@ -170,6 +170,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(problem.getActions().size() + operator);
                                 childNode.getTaskNetwork().decompose(task, method);
+                                childNode.setTask(task);
                                 open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");

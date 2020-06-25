@@ -17,7 +17,6 @@ package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.State;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,40 +45,43 @@ public class TFDNode extends AbstractSTNNode {
      * @param other the node to be copied.
      */
     public TFDNode(final TFDNode other) {
-        super(new ClosedWorldState(other.getState()), other.getParent(), other.getOperator());
+        super(new ClosedWorldState(other.getState()), other.getParent(), other.getOperator(), other.getTask());
         this.setTasks(new LinkedList<>(other.getTasks()));
     }
 
     /**
-     * Creates a new empty TFDNode. The parent node is set to null and the operator to Interger.MAX_VALUE.
+     * Creates a new empty TFDNode. The parent node is set to null, the operator is set
+     * to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      */
     public TFDNode() {
-        super(new ClosedWorldState(), null, Integer.MAX_VALUE);
+        super(new ClosedWorldState(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
         this.setTasks(new LinkedList<>());
     }
 
     /**
-     * Creates a new TFDNode with a specified state and task network. The parent node is set to null and the operator to
-     * Interger.MAX_VALUE.
+     * Creates a new TFDNode with a specified state and task network. The parent node is set to null, the operator is set
+     * to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      *
      * @param state the state of the node.
      * @param tasks the task network of the node.
      */
     public TFDNode(final ClosedWorldState state, final List<Integer> tasks) {
-        super(state, null, Integer.MAX_VALUE);
+        super(state, null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
         this.setTasks(tasks);
     }
 
     /**
      * Creates a new TFDNode with a specified state and task network.
      *
-     * @param state the state of the node.
-     * @param tasks the task network of the node.
-     * @param parent the parent of the node.
+     * @param state    the state of the node.
+     * @param tasks    the task network of the node.
+     * @param parent   the parent of the node.
      * @param operator the index of the operator applied to reach this node.
+     * @param task     the task processed in this node.
      */
-    public TFDNode(final ClosedWorldState state, final List<Integer> tasks, final TFDNode parent, final int operator) {
-        super(state, parent, operator);
+    public TFDNode(final ClosedWorldState state, final List<Integer> tasks, final TFDNode parent, final int operator,
+                   final int task) {
+        super(state, parent, operator, task);
         this.setTasks(tasks);
     }
 

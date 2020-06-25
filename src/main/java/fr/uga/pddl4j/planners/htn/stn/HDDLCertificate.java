@@ -59,7 +59,7 @@ public class HDDLCertificate extends SequentialPlan {
             // This is the task addressed by n
 
             //final Integer task = n.getAtask();
-            final Integer task = (operator < nbactions)  ? operator : problem.getMethods().get(operator - nbactions).getTask();
+            final Integer task = n.getTask();
 
             if (operator < nbactions) {
                 final Action a = problem.getActions().get(operator);
