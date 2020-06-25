@@ -22,6 +22,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.encoding.AbstractGroundOperator;
 import fr.uga.pddl4j.encoding.Inertia;
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.util.BitMatrix;
@@ -42,6 +43,11 @@ import java.util.stream.Collectors;
  * @version 1.0 - 10.06.2010
  */
 public class Problem implements Serializable {
+
+    /**
+     * The set of requirements.
+     */
+    private Set<PDDLRequireKey> requirements;
 
     /**
      * The table of the type symbols.
@@ -71,7 +77,7 @@ public class Problem implements Serializable {
     /**
      * The table that contains the typeSymbols of the arguments of the predicateSymbols.
      */
-    private List<List<Integer>> predicatesSignatures;
+    private List<List<Integer>> predicateSignatures;
 
     /**
      * The table of the function symbols.
@@ -86,12 +92,12 @@ public class Problem implements Serializable {
     /**
      * The table that contains the types of the arguments of the tasks.
      */
-    private List<List<Integer>> tasksSignatures;
+    private List<List<Integer>> taskSignatures;
 
     /**
      * The table that contains the types of the arguments of the functions.
      */
-    private List<List<Integer>> functionsSignatures;
+    private List<List<Integer>> functionSignatures;
 
     /**
      * The table that defines for each predicate its type of inertia.
@@ -163,24 +169,24 @@ public class Problem implements Serializable {
         this.constantSymbols.addAll(other.constantSymbols.stream().collect(Collectors.toList()));
         this.predicateSymbols = new ArrayList<>();
         this.predicateSymbols.addAll(other.predicateSymbols.stream().collect(Collectors.toList()));
-        this.predicatesSignatures = new ArrayList<>();
-        for (List<Integer> si : other.predicatesSignatures) {
+        this.predicateSignatures = new ArrayList<>();
+        for (List<Integer> si : other.predicateSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
-            this.predicatesSignatures.add(copy);
+            this.predicateSignatures.add(copy);
         }
         this.taskSymbols = new ArrayList<>();
         this.taskSymbols.addAll(other.taskSymbols.stream().collect(Collectors.toList()));
-        this.tasksSignatures = new ArrayList<>();
-        for (List<Integer> si : other.tasksSignatures) {
+        this.taskSignatures = new ArrayList<>();
+        for (List<Integer> si : other.taskSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
-            this.tasksSignatures.add(copy);
+            this.taskSignatures.add(copy);
         }
         this.functionSymbols = new ArrayList<>();
         this.functionSymbols.addAll(other.functionSymbols.stream().collect(Collectors.toList()));
-        this.functionsSignatures = new ArrayList<>();
-        for (List<Integer> si : other.functionsSignatures) {
+        this.functionSignatures = new ArrayList<>();
+        for (List<Integer> si : other.functionSignatures) {
             final List<Integer> copy = si.stream().collect(Collectors.toList());
-            this.functionsSignatures.add(copy);
+            this.functionSignatures.add(copy);
         }
         this.inertia = new ArrayList<>();
         this.inertia.addAll(other.inertia.stream().collect(Collectors.toList()));
@@ -204,6 +210,24 @@ public class Problem implements Serializable {
             final List<Integer> copy = ti.stream().collect(Collectors.toList());
             this.relevantOperators.add(copy);
         }
+    }
+
+    /**
+     * Returns the requirements of the problem.
+     *
+     * @return the requirements of the problem.
+     */
+    public Set<PDDLRequireKey> getRequirements() {
+        return this.requirements;
+    }
+
+    /**
+     * Sets the requirement of the problem.
+     *
+     * @param requirements of the problem.
+     */
+    public void setRequirements(Set<PDDLRequireKey> requirements) {
+        this.requirements = requirements;
     }
 
     /**
@@ -301,8 +325,8 @@ public class Problem implements Serializable {
      *
      * @return the signatures of the predicates defined in the problem.
      */
-    public final List<List<Integer>> getPredicatesSignatures() {
-        return this.predicatesSignatures;
+    public final List<List<Integer>> getPredicateSignatures() {
+        return this.predicateSignatures;
     }
 
     /**
@@ -310,8 +334,8 @@ public class Problem implements Serializable {
      *
      * @param signatures the signatures of the predicates defined in the problem.
      */
-    public final void setPredicatesSignatures(final List<List<Integer>> signatures) {
-        this.predicatesSignatures = signatures;
+    public final void setPredicateSignatures(final List<List<Integer>> signatures) {
+        this.predicateSignatures = signatures;
     }
 
     /**
@@ -337,8 +361,8 @@ public class Problem implements Serializable {
      *
      * @return the signatures of the task defined in the problem.
      */
-    public final List<List<Integer>> getTasksSignatures() {
-        return this.tasksSignatures;
+    public final List<List<Integer>> getTaskSignatures() {
+        return this.taskSignatures;
     }
 
     /**
@@ -346,8 +370,8 @@ public class Problem implements Serializable {
      *
      * @param signatures the signatures of the task defined in the problem.
      */
-    public final void setTasksSignatures(final List<List<Integer>> signatures) {
-        this.tasksSignatures = signatures;
+    public final void setTaskSignatures(final List<List<Integer>> signatures) {
+        this.taskSignatures = signatures;
     }
 
     /**
@@ -373,8 +397,8 @@ public class Problem implements Serializable {
      *
      * @return the signatures of the functions defined in the problem.
      */
-    public final List<List<Integer>> getFunctionsSignatures() {
-        return this.functionsSignatures;
+    public final List<List<Integer>> getFunctionSignatures() {
+        return this.functionSignatures;
     }
 
     /**
@@ -382,8 +406,8 @@ public class Problem implements Serializable {
      *
      * @param signatures the signatures of the function defined in the problem.
      */
-    public final void setFunctionsSignatures(final List<List<Integer>> signatures) {
-        this.functionsSignatures = signatures;
+    public final void setFunctionSignatures(final List<List<Integer>> signatures) {
+        this.functionSignatures = signatures;
     }
 
     /**
@@ -513,7 +537,6 @@ public class Problem implements Serializable {
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
      */
     public final boolean isSolvable() {
-        if ()
         return this.goal != null || this.initialTaskNetwork != null;
     }
 

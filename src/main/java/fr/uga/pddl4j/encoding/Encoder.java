@@ -131,7 +131,7 @@ public final class Encoder implements Serializable {
     private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
-     * The set of requirements£.
+     * The set of requirements.
      */
     static Set<PDDLRequireKey> requirements;
 
@@ -731,6 +731,7 @@ public final class Encoder implements Serializable {
 
 
         final Problem codedProblem = new Problem();
+        codedProblem.setRequirements(Encoder.requirements);
         codedProblem.setGoal(Encoder.goal);
         codedProblem.setInitialState(Encoder.init);
         codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
@@ -751,8 +752,8 @@ public final class Encoder implements Serializable {
                     task.isPrimtive())).collect(Collectors.toList()));
         }
         codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
-        codedProblem.setFunctionsSignatures(Encoder.tableOfTypedFunctions);
-        codedProblem.setPredicatesSignatures(Encoder.tableOfTypedPredicates);
+        codedProblem.setFunctionSignatures(Encoder.tableOfTypedFunctions);
+        codedProblem.setPredicateSignatures(Encoder.tableOfTypedPredicates);
         codedProblem.setTypeSymbols(Encoder.tableOfTypes);
         return codedProblem;
 
