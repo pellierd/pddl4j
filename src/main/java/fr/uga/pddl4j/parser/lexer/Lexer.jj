@@ -1524,7 +1524,6 @@ PDDLExpression atomic_formula(int type) :
 	}
 }
 
-//TODO Gérer les term comme des PDDLExpression et propager les changement partout
 PDDLSymbol term() :
 {
 	PDDLSymbol t = null;
@@ -1532,32 +1531,10 @@ PDDLSymbol term() :
 {
 	(	t=constant()
 	|	t=variable()
-	/*|   LOOKAHEAD({ this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) t=function_term()*/
 	) {
 		return t;
 	}
 }
-
-//TODO PDDLConnective.TERM, créer une expression avec : EXP: TERM
-/*PDDLExpression function_term() :
-{
-	PDDLExpression node = PDDLExpression Exp(PDDLConnective.F_EXP);
-	List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
-	PDDLSymbol t = null;
-}
-{
-	<LEFT_BRACKET> t=functor() {
-		function.add(t);
-	}
-	(t=constant() | t=variable() {
-			function.add(t);
-	})*
-	right_bracket() {
-		node.setAtom();
-		return node;
-	}
-}*/
-
 
 PDDLExpression literal(int type) :
 {
@@ -2465,7 +2442,7 @@ PDDLExpression numeric_term() :
 	PDDLExpression node = null;
 }
 {
-	left_bracket() s=functor() {
+	(left_bracket() s=functor() {
 		tokenList.add(s);
 	} (LOOKAHEAD(2) s=term() {
 		tokenList.add(s);
@@ -2474,9 +2451,9 @@ PDDLExpression numeric_term() :
 		node.setAtom(tokenList);
 		return node;
 	}
-| 	node=number() {
+    | 	node=number() {
 		return node;
-	}
+	})
 }
 
 PDDLExpression assign_op() :

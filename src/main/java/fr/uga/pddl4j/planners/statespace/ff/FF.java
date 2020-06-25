@@ -22,10 +22,7 @@ package fr.uga.pddl4j.planners.statespace.ff;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.search.strategy.*;
 import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.Logger;
@@ -51,7 +48,7 @@ public final class FF extends AbstractStateSpacePlanner {
     /**
      * The Greedy Best First Search strategy.
      */
-    private final StateSpaceStrategy greedyBestFirstSearch;
+    private final StateSpaceStrategy astar;
 
     /**
      * Creates a new planner with default parameters.
@@ -59,11 +56,11 @@ public final class FF extends AbstractStateSpacePlanner {
     public FF() {
         super();
 
-        enforcedHillClimbing = new EnforcedHillClimbing();
-        greedyBestFirstSearch = new GreedyBestFirstSearch();
+        this.enforcedHillClimbing = new EnforcedHillClimbing();
+        this.astar = new AStar();
 
-        this.getStateSpaceStrategies().add(enforcedHillClimbing);
-        this.getStateSpaceStrategies().add(greedyBestFirstSearch);
+        this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(this.astar);
     }
 
     /**
@@ -75,11 +72,11 @@ public final class FF extends AbstractStateSpacePlanner {
     public FF(final boolean statisticState, final int traceLevel) {
         super(statisticState, traceLevel);
 
-        enforcedHillClimbing = new EnforcedHillClimbing();
-        greedyBestFirstSearch = new GreedyBestFirstSearch();
+        this.enforcedHillClimbing = new EnforcedHillClimbing();
+        this.astar = new AStar();
 
-        this.getStateSpaceStrategies().add(enforcedHillClimbing);
-        this.getStateSpaceStrategies().add(greedyBestFirstSearch);
+        this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(this.astar);
     }
 
     /**
@@ -97,11 +94,11 @@ public final class FF extends AbstractStateSpacePlanner {
         this.setSaveState(statisticState);
         this.setTraceLevel(traceLevel);
 
-        enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
-        greedyBestFirstSearch = new GreedyBestFirstSearch(timeout, heuristicType, weight);
+        this.enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
+        this.astar = new GreedyBestFirstSearch(timeout, heuristicType, weight);
 
-        this.getStateSpaceStrategies().add(enforcedHillClimbing);
-        this.getStateSpaceStrategies().add(greedyBestFirstSearch);
+        this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
+        this.getStateSpaceStrategies().add(this.astar);
     }
 
     /**
@@ -115,29 +112,29 @@ public final class FF extends AbstractStateSpacePlanner {
         Objects.requireNonNull(pb);
 
         logger.trace("* starting enforced hill climbing\n");
-        Node solutionNode = enforcedHillClimbing.searchSolutionNode(pb);
+        Node solutionNode = this.enforcedHillClimbing.searchSolutionNode(pb);
 
         if (solutionNode != null) {
             logger.trace("* enforced hill climbing succeeded\n");
             if (isSaveState()) {
-                this.getStatistics().setTimeToSearch(enforcedHillClimbing.getSearchingTime());
-                this.getStatistics().setMemoryUsedToSearch(enforcedHillClimbing.getMemoryUsed());
+                this.getStatistics().setTimeToSearch(this.enforcedHillClimbing.getSearchingTime());
+                this.getStatistics().setMemoryUsedToSearch(this.enforcedHillClimbing.getMemoryUsed());
             }
-            return (SequentialPlan) enforcedHillClimbing.extractPlan(solutionNode, pb);
+            return (SequentialPlan) this.enforcedHillClimbing.extractPlan(solutionNode, pb);
         } else {
             logger.trace("* enforced hill climbing failed\n");
             logger.trace("* starting greedy best first search\n");
-            solutionNode = greedyBestFirstSearch.searchSolutionNode(pb);
+            solutionNode = astar.searchSolutionNode(pb);
             if (isSaveState()) {
-                this.getStatistics().setTimeToSearch(greedyBestFirstSearch.getSearchingTime());
-                this.getStatistics().setMemoryUsedToSearch(greedyBestFirstSearch.getMemoryUsed());
+                this.getStatistics().setTimeToSearch(this.astar.getSearchingTime());
+                this.getStatistics().setMemoryUsedToSearch(this.astar.getMemoryUsed());
             }
             if (solutionNode == null) {
                 logger.trace("* greedy best first search failed\n");
                 return null;
             } else {
                 logger.trace("* greedy best first search succeeded\n");
-                return (SequentialPlan) greedyBestFirstSearch.extractPlan(solutionNode, pb);
+                return (SequentialPlan) this.astar.extractPlan(solutionNode, pb);
             }
         }
     }

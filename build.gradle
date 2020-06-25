@@ -39,6 +39,13 @@ compileJavacc {
     outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
 }
 
+jjdoc {
+    inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
+    outputDirectory = file('build/doc')
+    arguments = [BNF: 'true', TEXT: 'true', ONE_TABLE: 'true']
+
+}
+
 // The following annotation processors were detected on the compile classpath:
 // 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor'.
 // Remove warning about log4j ProcessPlugin raised with --warning-mode=all

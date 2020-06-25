@@ -642,6 +642,17 @@ public final class Encoder implements Serializable {
             index++;
         }
 
+        // Creates the list of relevant operators
+        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            Encoder.tableOfRelevantOperators = new ArrayList<>();
+            for (Integer a : Encoder.relevantActions) {
+                List<Integer> l = new ArrayList<>(1);
+                l.add(a);
+                Encoder.tableOfRelevantOperators.add(l);
+            }
+            Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
+        }
+
         if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
             // Encode the goal in bit set representation
             if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM)) {
@@ -668,19 +679,7 @@ public final class Encoder implements Serializable {
 
         // Encode the actions in bit set representation
         Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
-
-
-        // Creates the list of relevant operators
-        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-            Encoder.tableOfRelevantOperators = new ArrayList<>();
-            for (Integer a : Encoder.relevantActions) {
-                List<Integer> l = new ArrayList<>(1);
-                l.add(a);
-                Encoder.tableOfRelevantOperators.add(l);
-            }
-            Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
-        }
-
+        
         // Just for logging
         if (Encoder.logLevel == 7) {
             str.append("\nFinal actions:\n");

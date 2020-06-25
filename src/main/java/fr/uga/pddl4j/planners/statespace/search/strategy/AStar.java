@@ -37,11 +37,6 @@ import java.util.PriorityQueue;
 public final class AStar extends AbstractStateSpaceStrategy {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * Creates a new AStar search strategy with default parameters.
      *
      */
@@ -81,8 +76,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
         // The list stores the node ordered according to the A* (getFValue = g + h) function
         final PriorityQueue<Node> open = new PriorityQueue<>(100, new NodeComparator(currWeight));
         // Creates the root node of the tree search
-        final Node root = new Node(init, null, -1, 0,
-            heuristic.estimate(init, codedProblem.getGoal()));
+        final Node root = new Node(init, null, -1, 0, heuristic.estimate(init, codedProblem.getGoal()));
         // Adds the root to the list of pending nodes
         open.add(root);
         openSet.put(init, root);

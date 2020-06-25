@@ -39,11 +39,6 @@ import java.util.Objects;
 public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytime {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The search strategy.
      */
     private final AbstractStateSpaceStrategyAnytime searchStrategy;
