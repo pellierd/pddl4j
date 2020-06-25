@@ -82,74 +82,6 @@ final class BitEncoding implements Serializable {
      * @param map     the map that associates to a specified expression its index.
      * @return the list of actions encoded into bit set.
      */
-    static List<Action> encodeActionsbis(final List<IntAction> actions, final Map<IntExpression, Integer> map)
-        throws UnexpectedExpressionException {
-
-        // Normalize the actions
-        BitEncoding.normalizeActions(actions);
-
-        final List<Action> encodedActions = new ArrayList<>(actions.size());
-        for (IntAction intAction : actions) {
-            final int arity = intAction.arity();
-            final Action a = new Action(intAction.getName(), arity);
-            a.setCost(intAction.getCost());
-
-            // Initialize the parameters of the action
-            for (int i = 0; i < arity; i++) {
-                a.setValueOfParameter(i, intAction.getValueOfParameter(i));
-                a.setTypeOfParameter(i, intAction.getTypeOfParameters(i));
-            }
-
-            // Initialize the preconditions of the action
-            a.setPreconditions(BitEncoding.encode(intAction.getPreconditions(), map));
-
-            // Initialize the effects of the action
-            final List<IntExpression> effects = intAction.getEffects().getChildren();
-
-            final ConditionalEffect unCondEffects = new ConditionalEffect();
-            boolean hasUnConditionalEffects = false;
-            for (IntExpression ei : effects) {
-                final PDDLConnective connective = ei.getConnective();
-                final List<IntExpression> children = ei.getChildren();
-                if (connective.equals(PDDLConnective.WHEN)) {
-                    final ConditionalEffect condBitExp = new ConditionalEffect();
-                    condBitExp.setCondition(BitEncoding.encode(children.get(0), map));
-                    condBitExp.setEffects(BitEncoding.encode(children.get(1), map));
-                    a.getCondEffects().add(condBitExp);
-                } else if (connective.equals(PDDLConnective.ATOM)) {
-                    final Integer index = map.get(ei);
-                    if (index != null) {
-                        unCondEffects.getEffects().getPositive().set(index);
-                        hasUnConditionalEffects = true;
-                    }
-                } else if (connective.equals(PDDLConnective.TRUE)) {
-                    // do nothing
-                } else if (connective.equals(PDDLConnective.NOT)) {
-                    final Integer index = map.get(children.get(0));
-                    if (index != null) {
-                        unCondEffects.getEffects().getNegative().set(index);
-                        hasUnConditionalEffects = true;
-                    }
-                } else {
-                    throw new UnexpectedExpressionException(Encoder.toString(ei));
-                }
-            }
-            if (hasUnConditionalEffects) {
-                a.getCondEffects().add(unCondEffects);
-            }
-            encodedActions.add(a);
-        }
-        return encodedActions;
-    }
-
-    /**
-     * Encode a list of specified actions into <code>BitSet</code> representation. The specified
-     * map is used to speed-up the search by mapping the an expression to this index.
-     *
-     * @param actions the list of actions to encode.
-     * @param map     the map that associates to a specified expression its index.
-     * @return the list of actions encoded into bit set.
-     */
     static List<Action> encodeActions(final List<IntAction> actions, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
 
@@ -174,9 +106,10 @@ final class BitEncoding implements Serializable {
     /**
      * Encodes a specified action.
      *
-     * @param action
-     * @param map
-     * @return
+     * @param action the action to be encoded. The precondition of the action must be a simple conjunction of atomic
+     *               formulas
+     * @param map the map that associates to a specified expression its index.
+     * @return the action encoded.
      */
     private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> map) {
         final int arity = action.arity();
@@ -227,41 +160,6 @@ final class BitEncoding implements Serializable {
             encoded.getCondEffects().add(unCondEffects);
         }
         return encoded;
-    }
-
-    /**
-     * Encode a list of specified methods into the final compact representation. The specified
-     * maps are used to speed-up the search by mapping the an expression to this index.
-     *
-     * @param methods the list of methods to encode.
-     * @param factMap the map that associates at a specified fact its index in the table of relevant fluents.
-     * @param taskMap the map that associates at a specified task its index in the table of relevant tasks.
-     * @return the list of methods encoded into final compact representation.
-     */
-    static List<Method> encodeMethodsbis(final List<IntMethod> methods, final Map<IntExpression, Integer> factMap,
-                                      final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
-
-        // Normalize the methods
-        BitEncoding.normalizeMethods(methods);
-        // Start encoding
-        final List<Method> encodedMethods = new ArrayList<>(methods.size());
-        for (IntMethod intMethod : methods) {
-            final int arity = intMethod.arity();
-            final Method m = new Method(intMethod.getName(), arity);
-            // Initialize the parameters of the method
-            for (int i = 0; i < arity; i++) {
-                m.setValueOfParameter(i, intMethod.getValueOfParameter(i));
-                m.setTypeOfParameter(i, intMethod.getTypeOfParameters(i));
-            }
-            // Encode the task carried out by the method
-            m.setTask(taskMap.get(intMethod.getTask()));
-            // Encode the preconditions of the method
-            m.setPreconditions(BitEncoding.encode(intMethod.getPreconditions(), factMap));
-            // Encode the task network of the method
-            m.setTaskNetwork(BitEncoding.encodeTaskNetwork(intMethod.getTaskNetwork(), taskMap));
-            encodedMethods.add(m);
-        }
-        return encodedMethods;
     }
 
     /**

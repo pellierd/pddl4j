@@ -13,14 +13,14 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.tfd;
+package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
+import fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
@@ -28,32 +28,29 @@ import fr.uga.pddl4j.problem.State;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Properties;
 
 /**
- * This class implements a node for the TFDPlanner planner of the PDDL4J library.
+ * This class implements the code of the total ordered simple task network planner. The search method is an
+ * implementation of the total order STN procedure describes in the book of Automated Planning of Ghallab and al.
+ * page 239.
  *
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
  */
-public final class TFDPlanner extends AbstractPlanner {
-
-    /*
-     * The arguments of the planner.
-     */
-    private Properties arguments;
+public final class TFDPlanner extends AbstractSTNPlanner {
 
     /**
-     * Creates a new total order STN planner with the default parameters.
+     * Creates a new abstract STN planner with the default parameters.
      *
      * @param arguments the arguments of the planner.
      */
     public TFDPlanner(final Properties arguments) {
-        super();
-        this.arguments = arguments;
+        super(arguments);
     }
 
     /**
@@ -66,7 +63,11 @@ public final class TFDPlanner extends AbstractPlanner {
     @Override
     public Plan search(final Problem problem) {
         // Create the list of pending nodes to explore
-        final PriorityQueue<TFDNode> open = new PriorityQueue<>();
+        final PriorityQueue<TFDNode> open = new PriorityQueue<>(1000, new Comparator<TFDNode>() {
+            public int compare(TFDNode n1, TFDNode n2) {
+                return n1.getTasks().size() - n2.getTasks().size();
+            }
+        });
         // Create the root node of the search space
         final TFDNode root = new TFDNode(problem.getInitialState(), problem.getInitialTaskNetwork().getTasks());
         root.getState().getNegative().set(0, problem.getRelevantFluents().size());
@@ -79,7 +80,7 @@ public final class TFDPlanner extends AbstractPlanner {
         Plan plan = null;
 
         // Get the timeout for searching
-        final int timeout = (int) arguments.get(Planner.TIMEOUT);
+        final int timeout = (int) super.getArguments().get(Planner.TIMEOUT);
         final long start = System.currentTimeMillis();
         long elapsedTime = 0;
 
@@ -189,27 +190,6 @@ public final class TFDPlanner extends AbstractPlanner {
     }
 
     /**
-     * Extract a plan from a solution node for the specified planning problem.
-     *
-     * @param node    the solution node.
-     * @param problem the problem to be solved.
-     * @return the solution plan or null is no solution was found.
-     */
-    private SequentialPlan extractPlan(final TFDNode node, final Problem problem) {
-        TFDNode n = node;
-        final SequentialPlan plan = new SequentialPlan();
-        while (n.getParent() != null) {
-            if (n.getOperator() < problem.getActions().size()) {
-                final Action a = problem.getActions().get(n.getOperator());
-                plan.add(0, a);
-            }
-
-            n = n.getParent();
-        }
-        return plan;
-    }
-
-    /**
      * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
      * follow:
      * <p>
@@ -227,7 +207,7 @@ public final class TFDPlanner extends AbstractPlanner {
      * </p>
      * <p>
      * Commande line example:
-     * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.tfd.TFDPlanner</code><br>
+     * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner</code><br>
      * <code>  -d src/test/resources/benchmarks/rover_total_ordered/domain.hddl</code><br>
      * <code>  -p src/test/resources/benchmarks/rover_total_ordered/pb01.hddl</code><br>
      * </p>
@@ -237,14 +217,11 @@ public final class TFDPlanner extends AbstractPlanner {
     public static void main(final String[] args) {
 
         // Parse the commande line and initialize the arguments of the planner.
-        final Properties arguments = TFDPlanner.parseCommandLine(args);
+        final Properties arguments = AbstractSTNPlanner.parseCommandLine(args);
         if (arguments == null) {
-            TFDPlanner.printUsage();
+            AbstractSTNPlanner.printUsage();
             System.exit(0);
         }
-
-        // Create an instance of the TFDPlanner Planner
-        final TFDPlanner planner = new TFDPlanner(arguments);
 
         // Create an instance of the problem factory to parse and encode the domain and problem file
         final ProblemFactory factory = ProblemFactory.getInstance();
@@ -285,7 +262,8 @@ public final class TFDPlanner extends AbstractPlanner {
         try {
             System.out.println("Searching a solution plan....\n");
             start = System.currentTimeMillis();
-
+            // Create an instance of the TFDPlanner Planner
+            final AbstractSTNPlanner planner = new TFDPlanner(arguments);
             final Plan plan = planner.search(pb);
             end = System.currentTimeMillis();
             final double searchTime = (end - start) / 1000.0;
@@ -307,61 +285,5 @@ public final class TFDPlanner extends AbstractPlanner {
             System.out.println("Out of memory !");
             System.exit(0);
         }
-    }
-
-    /**
-     * Print the usage of the TFDPlanner planner.
-     */
-    private static void printUsage() {
-        final StringBuilder strb = new StringBuilder();
-        strb.append("\nusage of TFDPlanner:\n")
-            .append("OPTIONS   DESCRIPTIONS\n")
-            .append("-d <str>    hddl domain file name\n")
-            .append("-p <str>    hddl problem file name\n")
-            .append("-l <num>    trace level\n")
-            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
-            .append("-h          print this message\n\n");
-        Planner.getLogger().trace(strb.toString());
-    }
-
-    /**
-     * Parse the command line and return the planner's arguments.
-     *
-     * @param args the command line.
-     * @return the planner arguments or null if an invalid argument is encountered.
-     */
-    private static Properties parseCommandLine(String[] args) {
-
-        // Get the default arguments from the super class
-        final Properties arguments = Planner.getDefaultArguments();
-
-        // Parse the command line and update the default argument value
-        for (int i = 0; i < args.length; i += 2) {
-            if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                if (!new File(args[i + 1]).exists()) {
-                    return null;
-                }
-                arguments.put(Planner.DOMAIN, new File(args[i + 1]));
-            } else if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                if (!new File(args[i + 1]).exists()) {
-                    return null;
-                }
-                arguments.put(Planner.PROBLEM, new File(args[i + 1]));
-            } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                final int timeout = Integer.parseInt(args[i + 1]) * 1000;
-                if (timeout < 0) {
-                    return null;
-                }
-                arguments.put(Planner.TIMEOUT, timeout);
-            } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                final int level = Integer.parseInt(args[i + 1]);
-                arguments.put(Planner.TRACE_LEVEL, level);
-            } else {
-                return null;
-            }
-        }
-        // Return null if the domain or the problem was not specified
-        return (arguments.get(Planner.DOMAIN) == null
-            || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
     }
 }

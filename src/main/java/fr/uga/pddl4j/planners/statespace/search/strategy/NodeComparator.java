@@ -61,8 +61,8 @@ public class NodeComparator implements Comparator<Node>, Serializable {
     /**
      * Compare two nodes' weight.
      *
-     * @param n1 node number 1
-     * @param n2 node number 2
+     * @param n1 node number 1.
+     * @param n2 node number 2.
      */
     @Override
     public int compare(final Node n1, final Node n2) {

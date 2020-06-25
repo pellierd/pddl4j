@@ -679,7 +679,7 @@ public final class Encoder implements Serializable {
 
         // Encode the actions in bit set representation
         Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
-        
+
         // Just for logging
         if (Encoder.logLevel == 7) {
             str.append("\nFinal actions:\n");

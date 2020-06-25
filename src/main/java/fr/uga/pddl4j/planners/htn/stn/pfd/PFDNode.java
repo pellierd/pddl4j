@@ -13,8 +13,9 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.pfd;
+package fr.uga.pddl4j.planners.htn.stn.pfd;
 
+import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.TaskNetwork;
 
@@ -28,12 +29,7 @@ import java.util.Objects;
  * @version 1.0 - 05.05.2020
  * @since 4.0
  */
-public class PFDNode implements Serializable, Comparable<PFDNode> {
-
-    /**
-     * The state that describes the state of the world reached by the search.
-     */
-    private State state;
+public final class PFDNode extends AbstractSTNNode {
 
     /**
      * The task network that describes the set of tasks to be accomplished and their constraints that have to be
@@ -42,25 +38,13 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
     private TaskNetwork taskNetwork;
 
     /**
-     * The operator used to reach this node.
-     */
-    private int operator;
-
-    /**
-     * The parent node of this node.
-     */
-    private PFDNode parent;
-
-    /**
      * Creates a new node from an other. This constructor creates a deep copy of the node in parameters.
      *
      * @param other the node to be copied.
      */
     public PFDNode(final PFDNode other) {
-        this(new State(other.getState()),
-            new TaskNetwork(other.getTaskNetwork()),
-            other.getParent(),
-            other.getOperator());
+        super(other);
+        this.setTaskNetwork(new TaskNetwork(other.getTaskNetwork()));
     }
 
     /**
@@ -68,7 +52,8 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      * operator to Integer.MAX_VALUE.
      */
     public PFDNode() {
-        this(new State(), new TaskNetwork(), null, Integer.MAX_VALUE);
+        super();
+        this.setTaskNetwork(new TaskNetwork());
     }
 
     /**
@@ -78,7 +63,8 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      * @param taskNetwork the tasknetwork of the node.
      */
     public PFDNode(final State state, final TaskNetwork taskNetwork) {
-        this(state, new TaskNetwork(taskNetwork), null, Integer.MAX_VALUE);
+        super(state, null, Integer.MAX_VALUE);
+        this.setTaskNetwork(taskNetwork);
     }
 
     /**
@@ -90,29 +76,8 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      * @param operator    the index of the operator applied to reach the node.
      */
     public PFDNode(final State state, final TaskNetwork taskNetwork, final PFDNode parent, final int operator) {
-        super();
-        this.setState(state);
+        super(state, parent, operator);
         this.setTaskNetwork(taskNetwork);
-        this.setParent(parent);
-        this.setOperator(operator);
-    }
-
-    /**
-     * Returns the state of this node. The state describes the state of the world reached by the search.
-     *
-     * @return the state of this node.
-     */
-    public final State getState() {
-        return this.state;
-    }
-
-    /**
-     * Sets the state of this node. The state describes the state of the world reached by the search.
-     *
-     * @param state the state to set.
-     */
-    public final void setState(final State state) {
-        this.state = state;
     }
 
     /**
@@ -133,61 +98,6 @@ public class PFDNode implements Serializable, Comparable<PFDNode> {
      */
     public final void setTaskNetwork(final TaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
-    }
-
-    /**
-     * Returns the parente node of this node. By convention, a node with a parent node equals to null is considered as
-     * the root node.
-     *
-     * @return the parent node of this node.
-     */
-    public final PFDNode getParent() {
-        return parent;
-    }
-
-    /**
-     * Sets the parent node of this node.
-     *
-     * @param parent the parent node to set.
-     */
-    public final void setParent(final PFDNode parent) {
-        this.parent = parent;
-    }
-
-    /**
-     * Returns the operator applied to reach this node. The operator can be an action or a method. By convention, the
-     * operator is represented by its index in the action or method tables of the problem. To dissociate actions and
-     * methods, positive indexes are used for actions and negative ones for methods.
-     *
-     * @return the operator applied to reach this node.
-     */
-    public final int getOperator() {
-        return operator;
-    }
-
-    /**
-     * Sets the operator applied to reach this node. The operator can be an action or a method. By convention, the
-     * operator is represented by its index in the action or method tables of the problem. To dissociate actions and
-     * methods, positive indexes are used for actions and negative ones for methods.
-     *
-     * @param operator the operator applied to reach this node.
-     */
-    public final void setOperator(int operator) {
-        this.operator = operator;
-    }
-
-    /**
-     * Compares this node with the specified node for order. Returns a negative integer, zero, or a positive integer as
-     * this node is less than, equal to, or greater than the specified node. The comparaison is done using the number of
-     * tasks of of the node.
-     *
-     * @param other the node to be compared.
-     * @return a negative integer, zero, or a positive integer as this node is less than, equal to, or greater than the
-     *      specified node.
-     */
-    @Override
-    public int compareTo(PFDNode other) {
-        return this.getTaskNetwork().getTasks().size() - other.getTaskNetwork().getTasks().size();
     }
 
     /**

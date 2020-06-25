@@ -13,29 +13,26 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.tfd;
+package fr.uga.pddl4j.planners.htn.stn.tfd;
 
+import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
 import fr.uga.pddl4j.problem.State;
 
-import java.io.Serializable;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * This class implements a node for the TFDPlanner planner of the PDDL4J library.
+ * This class implements a node for the TFDPlanner of the PDDL4J library. This class is a simplified version of the
+ * class <tt>PFDNode</tt>. The task network is modeled using a simple task list to speed up searching and optimize
+ * memory size.
  *
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
+ * @see fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode
  */
-public class TFDNode implements Serializable, Comparable<TFDNode> {
-
-    /**
-     * The state that describes the state of the world reached by the search.
-     */
-    private State state;
+public class TFDNode extends AbstractSTNNode {
 
     /**
      * The list of tasks to be accomplished.
@@ -43,29 +40,21 @@ public class TFDNode implements Serializable, Comparable<TFDNode> {
     private LinkedList<Integer> tasks;
 
     /**
-     * The operator used to reach this node.
-     */
-    private int operator;
-
-    /**
-     * The parent node of this node.
-     */
-    private TFDNode parent;
-
-    /**
      * Creates a new TFDNode from an other. This constructor creates a deep copy of the node in parameters.
      *
      * @param other the node to be copied.
      */
     public TFDNode(final TFDNode other) {
-        this(new State(other.getState()), other.getTasks(), other.getParent(), other.getOperator());
+        super(new State(other.getState()), other.getParent(), other.getOperator());
+        this.setTasks(new LinkedList<>(other.getTasks()));
     }
 
     /**
-     * Creates a new exmpty TFDNode. The parent node is set to null and the operator to Interger.MAX_VALUE.
+     * Creates a new empty TFDNode. The parent node is set to null and the operator to Interger.MAX_VALUE.
      */
     public TFDNode() {
-        this(new State(), new LinkedList<Integer>(), null, Integer.MAX_VALUE);
+        super(new State(), null, Integer.MAX_VALUE);
+        this.setTasks(new LinkedList<>());
     }
 
     /**
@@ -76,11 +65,8 @@ public class TFDNode implements Serializable, Comparable<TFDNode> {
      * @param tasks the task network of the node.
      */
     public TFDNode(final State state, final List<Integer> tasks) {
-        super();
-        this.setState(state);
+        super(state, null, Integer.MAX_VALUE);
         this.setTasks(tasks);
-        this.setParent(null);
-        this.setOperator(Integer.MAX_VALUE);
     }
 
     /**
@@ -92,29 +78,8 @@ public class TFDNode implements Serializable, Comparable<TFDNode> {
      * @param operator the index of the operator applied to reach this node.
      */
     public TFDNode(final State state, final List<Integer> tasks, final TFDNode parent, final int operator) {
-        super();
-        this.setState(state);
+        super(state, parent, operator);
         this.setTasks(tasks);
-        this.setParent(parent);
-        this.setOperator(operator);
-    }
-
-    /**
-     * Returns the state of this node. The state describes the state of the world reached by the search.
-     *
-     * @return the state of this node.
-     */
-    public final State getState() {
-        return this.state;
-    }
-
-    /**
-     * Sets the state of this node. The state describes the state of the world reached by the search.
-     *
-     * @param state the state to set.
-     */
-    public final void setState(final State state) {
-        this.state = state;
     }
 
     /**
@@ -152,62 +117,6 @@ public class TFDNode implements Serializable, Comparable<TFDNode> {
      */
     public final boolean pushAllTasks(final List<Integer> tasks) {
         return this.tasks.addAll(0, tasks);
-    }
-
-    /**
-     * Returns the parente node of this node. By convention, a node with a parent node equals to null is considered as
-     * the root node.
-     *
-     * @return the parent node of this node.
-     */
-    public final TFDNode getParent() {
-        return parent;
-    }
-
-    /**
-     * Sets the parent node of this node.
-     *
-     * @param parent the parent node to set.
-     */
-    public final void setParent(TFDNode parent) {
-        this.parent = parent;
-    }
-
-    /**
-     * Returns the operator applied to reach this node. The operator can be an action or a method. By convention, the
-     * operator is represented by its index in the action or method tables of the problem. To dissociate actions and
-     * methods, positive indexes are used for actions and negative ones for methods.
-     *
-     * @return the operator applied to reach this node.
-     */
-    public final int getOperator() {
-        return operator;
-    }
-
-    /**
-     * Sets the operator applied to reach this node. The operator can be an action or a method. By convention, the
-     * operator is represented by its index in the action or method tables of the problem. To dissociate actions and
-     * methods, positive indexes are used for actions and negative ones for methods.
-     *
-     * @param operator the operator applied to reach this node.
-     */
-    public final void setOperator(int operator) {
-        this.operator = operator;
-    }
-
-
-    /**
-     * Compares this node with the specified node for order. Returns a negative integer, zero, or a positive integer as
-     * this node is less than, equal to, or greater than the specified node. The comparaison is done using the number of
-     * tasks of of the node.
-     *
-     * @param other the node to be compared.
-     * @return a negative integer, zero, or a positive integer as this node is less than, equal to, or greater than the
-     *      specified node.
-     */
-    @Override
-    public int compareTo(TFDNode other) {
-        return this.getTasks().size() - other.getTasks().size();
     }
 
     /**
