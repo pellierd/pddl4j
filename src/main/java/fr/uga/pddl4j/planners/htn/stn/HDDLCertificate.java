@@ -80,7 +80,7 @@ public class HDDLCertificate extends SequentialPlan {
             n = n.getParent();
         }
         // Computes the alias of the complex tasks
-        for (Method method : methods) {
+        for (Method method : this.methods) {
             final Integer task = method.getTask();
             if (renames.containsKey(task)) {
                 renames.get(task).add(step);

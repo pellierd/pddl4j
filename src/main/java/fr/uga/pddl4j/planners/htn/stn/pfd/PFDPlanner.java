@@ -20,6 +20,7 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
+import fr.uga.pddl4j.planners.htn.stn.YetAOtherHDDLCertificate;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Method;
@@ -106,7 +107,8 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             // If the task network has no more task, a solution is found
             if (currentNode.getTaskNetwork().isEmpty()) {
                 plan = this.extractPlan(currentNode, problem);
-                System.out.println(super.createHdDDLCertificate(currentNode, problem));
+                //System.out.println(super.createHdDDLCertificate(currentNode, problem));
+                new YetAOtherHDDLCertificate(currentNode, problem);
             } else {
                 // Get the list of tasks of the current node with no predecessors
                 currentNode.getTaskNetwork().transitiveClosure();
@@ -136,7 +138,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 childNode.setOperator(operator);
                                 childNode.getState().apply(action.getCondEffects());
                                 childNode.getTaskNetwork().removeTask(task);
-                                childNode.setTask(task);
+                                childNode.setTask(taskIndex);
                                 open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
@@ -173,7 +175,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(problem.getActions().size() + operator);
                                 childNode.getTaskNetwork().decompose(task, method);
-                                childNode.setTask(task);
+                                childNode.setTask(taskIndex);
                                 open.add(childNode);
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
