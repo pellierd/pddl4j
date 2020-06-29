@@ -1,1 +1,0 @@
-This is a translation of the rover domain deployed with JShop2. The problems are translations form STRIPS problems of the IPC 3.
