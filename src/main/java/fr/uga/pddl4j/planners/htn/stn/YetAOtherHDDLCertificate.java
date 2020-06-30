@@ -16,10 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Task;
+import fr.uga.pddl4j.problem.*;
 
 import java.util.*;
 
@@ -39,6 +36,7 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
      * The methods used i
      */
     private LinkedList<Method> methods = new LinkedList<>();
+    private LinkedList<Action> actions = new LinkedList<>();
 
     private AbstractSTNNode solutionNode;
 
@@ -64,18 +62,98 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
             final Integer task = n.getTask();
             if (operator < nbactions) {
                 super.add(0, problem.getActions().get(operator));
+                this.actions.add(problem.getActions().get(operator));
             } else {
-                this.methods.add(0, problem.getMethods().get(operator - nbactions));
+                this.methods.add(problem.getMethods().get(operator - nbactions));
             }
             n = n.getParent();
         }
         printCertificate();
     }
 
-    /**
-     *
-     */
+
     public void printCertificate() {
+        List<Integer> tasks = new LinkedList<>();
+        List<Integer> operators = new LinkedList<>();
+        final int nbactions = problem.getActions().size();
+        AbstractSTNNode n = this.solutionNode;
+        while (n.getParent() != null) {
+            final int operator = n.getOperator();
+            tasks.add(0, n.getTask());
+            //System.out.println(problem.toString(problem.getTasks().get(tasks.get(0))));
+            if (operator < nbactions) {
+                operators.add(0, operator);
+                //System.out.println("-> " + problem.getActions().get(operators.get(0)).getName());
+            } else {
+                operators.add(0, operator - nbactions);
+                //System.out.println("-> " + problem.getMethods().get(operators.get(0)).getName());
+            }
+            n = n.getParent();
+        }
+
+
+        LinkedHashMap<Integer, LinkedList<Integer>>  taskDictionary = new LinkedHashMap<>();
+        int index = 0;
+        for (Integer t : tasks) {
+            LinkedList<Integer> value = taskDictionary.get(t);
+            if (value == null) {
+                value = new LinkedList<>();
+                taskDictionary.put(t, value);
+            }
+            value.add(index);
+            index++;
+        }
+
+        for (Integer t : tasks) {
+            System.out.println(t + " -> " + taskDictionary.get(t));
+        }
+
+        index = 0;
+        StringBuffer plan = new StringBuffer();
+        for (Integer t : tasks) {
+            if (this.problem.getTasks().get(t).isPrimtive()) {
+                plan.append(index + " " + problem.toString(problem.getTasks().get(t)) + "\n");
+                //Action a = this.problem.getActions().get(operators.get(index));
+                //plan.append("-> " + a.getName() + "\n");
+            }
+            index++;
+        }
+        StringBuffer decomposition = new StringBuffer();
+        index = 0;
+        for (Integer t : tasks) {
+            if (!this.problem.getTasks().get(t).isPrimtive()) {
+                decomposition.append(index + " " + problem.toString(problem.getTasks().get(t)));
+                Method m = this.problem.getMethods().get(operators.get(index));
+                decomposition.append(" -> " + m.getName());
+                for (Integer st : m.getSubTasks()) {
+                    //System.out.print(" " + st +  "(" + taskDictionary.get(st).pop() + ")");
+                    int task  = taskDictionary.get(st).pop();
+                    taskDictionary.get(st).addLast(task);
+                    decomposition.append(" " + task);
+                }
+                decomposition.append("\n");
+            }
+            index++;
+        }
+        StringBuffer root = new StringBuffer();
+        root.append("root");
+        for (Integer t : this.problem.getInitialTaskNetwork().getTasks()) {
+            //root.append(t + " ->" + problem.toString(this.problem.getTasks().get(t)) +  " " + taskDictionary.get(t).pop() + "\n");
+            root.append(" " + taskDictionary.get(t).pop());
+        }
+
+
+        System.out.println("==>");
+        System.out.print(plan);
+        System.out.println(root);
+        System.out.println(decomposition);
+        System.out.println("<==\n");
+
+    }
+        /**
+         *
+         */
+    /*public void printCertificate() {
 
 
 
@@ -85,6 +163,8 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
         // Create the primitive task dictionary
         LinkedHashMap<Integer, LinkedList<Integer>> primitiveTaskDictionnary = new LinkedHashMap<>();
         LinkedHashMap<Integer, LinkedList<Integer>>  compoundTaskDictionary = new LinkedHashMap<>();
+        List<Integer> primitiveTasks = new LinkedList<>();
+        List<Integer> compoundTasks = new LinkedList<>();
         final int nbactions = this.problem.getActions().size();
         AbstractSTNNode n = this.solutionNode;
         int primitiveTaskIndex = 0;
@@ -98,8 +178,9 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
                     value = new LinkedList<Integer>();
                     primitiveTaskDictionnary.put(task, value);
                 }
-                value.add(0, primitiveTaskIndex);
+                value.add(primitiveTaskIndex);
                 primitiveTaskIndex++;
+                primitiveTasks.add(task);
             } else {
                 final Integer task = n.getTask();
                 LinkedList<Integer> value = compoundTaskDictionary.get(task);
@@ -107,8 +188,9 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
                     value = new LinkedList<Integer>();
                     compoundTaskDictionary.put(task, value);
                 }
-                value.add(0, compoundTaskIndex);
+                value.add(compoundTaskIndex);
                 compoundTaskIndex++;
+                compoundTasks.add(task);
             }
             n = n.getParent();
         }
@@ -116,29 +198,43 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
 
 
         // Create the compund task dictionary
-        /*LinkedHashMap<Integer, LinkedList<Integer>>  compoundTaskDictionary = new LinkedHashMap<>();
-        for (Method method : this.methods) {
-            LinkedList<Integer> value = compoundTaskDictionary.get(method.getTask());
-            if (value == null) {
-                value = new LinkedList<Integer>();
-                compoundTaskDictionary.put(method.getTask(), value);
-            }
-            value.add(compoundTaskIndex);
-            compoundTaskIndex++;
+        /*System.out.println(this.problem.getInitialTaskNetwork().getTasks());
+        for (Map.Entry<Integer, LinkedList<Integer>> e : compoundTaskDictionary.entrySet()) {
+            System.out.println(e.getKey() + " " + problem.toString(problem.getTasks().get(e.getKey())) + " -> " + e.getValue());
+        }
+        System.out.println("-------------------");
+        for (Map.Entry<Integer, LinkedList<Integer>> e : primitiveTaskDictionnary.entrySet()) {
+            System.out.println(e.getKey() + " " + problem.toString(problem.getTasks().get(e.getKey())) + " -> " + e.getValue());
+        }
+
+        System.out.println("-------------------");
+
+        // Create the compund task dictionary
+        for (Integer t : compoundTasks) {
+            System.out.println(t + " " + problem.toString(problem.getTasks().get(t)));
+        }
+        System.out.println("+++++++++++++++");
+        // Create the compund task dictionary
+        for (Method m : this.methods) {
+            System.out.println(m.getTask() + " " + problem.toString(problem.getTasks().get(m.getTask())));
+        }
+
+        System.out.println("-------------------");
+        for (Integer t : primitiveTasks) {
+            System.out.println(t + " " + problem.toString(problem.getTasks().get(t)));
         }*/
+
 
         // Rename the primitive task and the compund task
         // Contain the renames subtasks for each method of the solution plan
-        List<Integer> primitiveTasks = new LinkedList<>();
-        List<List<Integer>> compoundTasks = new LinkedList<>();
+        /*List<List<Integer>> decompositions = new LinkedList<>();
         for (Method method : this.methods) {
             List<Integer> subTasks = new LinkedList<>();
-            compoundTasks.add(subTasks);
+            decompositions.add(subTasks);
             for (Integer st : method.getSubTasks()) {
                 if (this.problem.getTasks().get(st).isPrimtive()) {
                     Integer index = primitiveTaskDictionnary.get(st).pop();
-                    subTasks.add(index);
-                    primitiveTasks.add(st);
+                    subTasks.add(primitiveTasks.size() - 1 - index);
                     // just pour éviter de cloner le dictionnaire car j'en ai encore besoin
                     primitiveTaskDictionnary.get(st).addLast(index);
                 } else {
@@ -146,7 +242,6 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
                     subTasks.add(index);
                     // just pour éviter de cloner le dictionnaire car j'en ai encore besoin
                     compoundTaskDictionary.get(st).addLast(index);
-
                 }
             }
         }
@@ -157,7 +252,7 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
             Integer task = root.get(j);
             if (this.problem.getTasks().get(task).isPrimtive()) {
                 Integer index = primitiveTaskDictionnary.get(task).pop();
-                root.set(j, index);
+                root.set(j, primitiveTasks.size() - 1 - index);
             } else {
                 Integer index = compoundTaskDictionary.get(task).pop();
                 root.set(j, index);
@@ -169,30 +264,31 @@ public class YetAOtherHDDLCertificate extends SequentialPlan {
         // Just print.
         // Le print n'est pas tout a fait conforme.
         System.out.println("==>");
-        int i = 0;
-        for (int j = 0 ; j < this.actions().size(); j++) {
-            String task = problem.toString(problem.getTasks().get(primitiveTasks.get(i)));
-            System.out.println(i + " " + task.substring(1, task.length() - 1));
-            i++;
+        int id = 0;
+        for (int i = primitiveTasks.size() - 1; i >= 0; i--) {
+            Integer t = primitiveTasks.get(i);
+            System.out.println(id + " " + problem.toString(problem.getTasks().get(t)));
+            //System.out.println(" " + primitiveTaskDictionnary.get(t));
+            id++;
         }
+
         System.out.print("root ");
-        for (int j = 0; j < root.size(); j++) {
+        for (int j = 0; j < root.size() -1 ; j++) {
             System.out.print(root.get(j) + " ");
         }
-        System.out.print("\n");
-        for (int j = 0 ; j < this.methods.size(); j++) {
-            Method method = this.methods.get(j);
-            Task task = this.problem.getTasks().get(method.getTask());
-            System.out.print(i + " " + this.problem.toString(task));
-            System.out.print(" -> " + method.getName());
-            for (int k = 0; k < compoundTasks.get(j).size(); k++) {
-                System.out.print(" " + compoundTasks.get(j).get(k));
+        System.out.print(root.get(root.size()-1) + "\n");
+        for (int i = 0 ; i < decompositions.size(); i++) {
+            Task task = this.problem.getTasks().get(compoundTasks.get(i));
+            System.out.print(id + " " + this.problem.toString(task));
+            System.out.print(" -> " + this.methods.get(i).getName());
+            for (int j = 0; j < decompositions.get(i).size(); j++) {
+                System.out.print(" " + decompositions.get(i).get(j));
             }
             System.out.println();
-            i++;
+            id++;
         }
         System.out.println("<==\n");
-    }
+    }*/
 
 
     @Override

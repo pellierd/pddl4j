@@ -99,7 +99,6 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 System.out.println("\n=> Tasks to be excuted:");
                 System.out.println(currentNode.getTasks());
                 for (int i = 0; i < currentNode.getTasks().size(); i++) {
-
                     System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
             }
