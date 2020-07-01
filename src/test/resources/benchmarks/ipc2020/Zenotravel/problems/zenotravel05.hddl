@@ -1,0 +1,74 @@
+(define
+	(problem zenotravel05)
+	(:domain  zenotravel)
+	(:objects
+		c1 - City
+		c2 - City
+		c3 - City
+		c4 - City
+		a1 - Aircraft
+		a2 - Aircraft
+		p1 - Person
+		p2 - Person
+		p3 - Person
+		p4 - Person
+		f6 - FLevel
+		f0 - FLevel
+		f4 - FLevel
+		f3 - FLevel
+		f5 - FLevel
+		f2 - FLevel
+		f1 - FLevel
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport-person p1 c3))
+		 (task1 (transport-person p2 c4))
+		 (task2 (transport-person p3 c4))
+		 (task3 (transport-person p4 c4))
+		)
+		:ordering (and
+			(task2 < task1)
+			(task3 < task2)
+			(task0 < task3)
+		)
+	)
+	(:init
+		(next f0 f1)
+		(next f1 f2)
+		(next f2 f3)
+		(next f3 f4)
+		(next f4 f5)
+		(next f5 f6)
+		(next f5 f6)
+		(different c1 c2)
+		(different c1 c3)
+		(different c1 c4)
+		(different c2 c1)
+		(different c2 c3)
+		(different c2 c4)
+		(different c3 c1)
+		(different c3 c2)
+		(different c3 c4)
+		(different c4 c1)
+		(different c4 c2)
+		(different c4 c3)
+		(at a1 c2)
+		(at a2 c3)
+		(at p1 c4)
+		(at p2 c1)
+		(at p3 c1)
+		(at p4 c2)
+		(fuel-level a1 f6)
+		(fuel-level a2 f5)
+	)
+	(:goal
+		(and
+		(at p1 c3)
+		(at p2 c4)
+		(at p3 c4)
+		(at p4 c4)
+		)
+	)
+)

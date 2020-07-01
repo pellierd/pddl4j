@@ -1,0 +1,34 @@
+(define
+	(problem p08_A_HopperTruck)
+	(:domain  UMTranslog)
+	(:objects
+		Ulm - City
+		O27 - Customer_Location
+		O28 - Customer_Location
+		Pferd - Hopper_Truck
+		SandPackage - Sand
+		James_Franck_Ring - Local_Road_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport SandPackage O27 O28))
+		)
+	)
+	(:init
+		(In_City O27 Ulm)
+		(In_City O28 Ulm)
+		(At_Vehicle Pferd O27)
+		(Connects James_Franck_Ring O27 O28)
+		(Available James_Franck_Ring)
+		(Available Pferd)
+		(PV_Compatible SandPackage Pferd)
+		(RV_Compatible James_Franck_Ring Pferd)
+		(At_Package SandPackage O27)
+	)
+	(:goal
+		(and
+		(Delivered SandPackage)
+		)
+	)
+)

@@ -1,0 +1,94 @@
+(define
+	(problem p02__p02_part1)
+	(:domain  woodworking_legal_fewer_htn_groundings)
+	(:objects
+		s0 - aboardsize
+		s1 - aboardsize
+		s2 - aboardsize
+		s3 - aboardsize
+		natural - acolour
+		red - acolour
+		large - apartsize
+		medium - apartsize
+		small - apartsize
+		pine - awood
+		teak - awood
+		b0 - board
+		glazer0 - glazer
+		highspeed_saw0 - highspeed_saw
+		colourfragments - treatmentstatus
+		p0 - part
+		rough - surface
+		untreated - treatmentstatus
+		p1 - part
+		glazed - treatmentstatus
+		verysmooth - surface
+		varnished - treatmentstatus
+		smooth - surface
+		p2 - part
+	)
+	(:htn
+		:parameters (?planstep_2_argument_5_a_grindNplane_newcolor - acolour ?planstep_3_argument_5_b_grindNPlane_newcolor - acolour ?planstep_4_argument_1_c_grindNplane_grindNplane_variable1 - surface ?planstep_4_argument_2_c_grindNplane_grindNplane_variable2 - acolour ?planstep_4_argument_3_c_grindNplane_grindNplane_variable3 - treatmentstatus ?planstep_4_argument_5_c_grindNplane_grindNplane_variable5 - acolour ?planstep_7_argument_1_f_colour_do_colour_variable1 - acolour)
+		:subtasks (and
+		 (task0 (grindNplane p0 smooth red varnished smooth ?planstep_2_argument_5_a_grindNplane_newcolor untreated))
+		 (task1 (grindNplane p1 rough red glazed smooth ?planstep_3_argument_5_b_grindNPlane_newcolor untreated))
+		 (task2 (grindNplane p2 ?planstep_4_argument_1_c_grindNplane_grindNplane_variable1 ?planstep_4_argument_2_c_grindNplane_grindNplane_variable2 ?planstep_4_argument_3_c_grindNplane_grindNplane_variable3 smooth ?planstep_4_argument_5_c_grindNplane_grindNplane_variable5 untreated))
+		 (task3 (do_saw b0 p1 pine rough))
+		 (task4 (do_colour p1 red glazer0 untreated))
+		 (task5 (do_colour p2 ?planstep_7_argument_1_f_colour_do_colour_variable1 glazer0 untreated))
+		)
+		:ordering (and
+			(task4 < task1)
+			(task3 < task2)
+			(task0 < task3)
+			(task2 < task4)
+			(task1 < task5)
+		)
+	)
+	(:init
+		(grind_treatment_change varnished colourfragments)
+		(grind_treatment_change glazed untreated)
+		(grind_treatment_change untreated untreated)
+		(grind_treatment_change colourfragments untreated)
+		(is_smooth smooth)
+		(is_smooth verysmooth)
+		(boardsize_successor s0 s1)
+		(boardsize_successor s1 s2)
+		(boardsize_successor s2 s3)
+		(has_colour glazer0 natural)
+		(has_colour glazer0 red)
+		(empty highspeed_saw0)
+		(available p0)
+		(colour p0 red)
+		(wood p0 pine)
+		(surface_condition p0 smooth)
+		(treatment p0 varnished)
+		(goalsize p0 small)
+		(unused p1)
+		(goalsize p1 medium)
+		(available p2)
+		(colour p2 natural)
+		(wood p2 teak)
+		(surface_condition p2 verysmooth)
+		(treatment p2 varnished)
+		(goalsize p2 large)
+		(boardsize b0 s3)
+		(wood b0 pine)
+		(surface_condition b0 rough)
+		(available b0)
+	)
+	(:goal
+		(and
+		(available p0)
+		(colour p0 natural)
+		(wood p0 pine)
+		(available p1)
+		(colour p1 natural)
+		(wood p1 pine)
+		(surface_condition p1 smooth)
+		(available p2)
+		(colour p2 red)
+		(wood p2 teak)
+		)
+	)
+)

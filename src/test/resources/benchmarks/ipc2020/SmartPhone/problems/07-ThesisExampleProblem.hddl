@@ -1,0 +1,43 @@
+(define
+	(problem p07_ThesisExampleProblem)
+	(:domain  SmartPhone_HierarchicalNoAxioms)
+	(:objects
+		appointmentForMeeting - Appointment
+		call1 - Call
+		greg - Person
+		dave - Person
+		davesEMailAddress - EMailAddress
+		gregsMobileNumber - NumberMobile
+		dateForMeeting - Date
+		email1 - EMail
+		myEMailAccount - EMailAccount
+		locationForMeeting - Location
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (call greg call1))
+		 (task1 (send_EMail dave email1))
+		 (task2 (create_Appointment appointmentForMeeting locationForMeeting dateForMeeting))
+		)
+		:ordering (and
+			(task0 < task1)
+			(task1 < task2)
+		)
+	)
+	(:init
+		(haveInformation_Contactable dave davesEMailAddress)
+		(haveInformation_Contactable greg gregsMobileNumber)
+		(inMode_Home)
+		(selected myEMailAccount)
+		(haveInformation_Regular dateForMeeting)
+		(haveInformation_Regular locationForMeeting)
+	)
+	(:goal
+		(and
+		(created appointmentForMeeting)
+		(hasReceived greg call1)
+		(hasReceived dave email1)
+		)
+	)
+)

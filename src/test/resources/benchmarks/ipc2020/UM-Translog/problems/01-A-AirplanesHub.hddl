@@ -1,0 +1,62 @@
+(define
+	(problem p01_A_AirplanesHub)
+	(:domain  UMTranslog)
+	(:objects
+		Stuttgart_Paris_Air_Route - Air_Route
+		Paris_London_Air_Route - Air_Route
+		FlugzeugLufthansa - Airplane
+		FlugzeugAirFrance - Airplane
+		FlughafenStuttgart - Airport
+		HeathrowAirport - Airport
+		FlughafenParis - Airport_Hub
+		Stuttgart - City
+		London - City
+		Plane_RampStuttgart - Plane_Ramp
+		Plane_RampHeathrow - Plane_Ramp
+		Plane_RampParis - Plane_Ramp
+		BadenWuerttemberg - Region
+		LondonRegion - Region
+		Drucker - Parcels
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Drucker FlughafenStuttgart HeathrowAirport))
+		)
+	)
+	(:init
+		(In_Region Stuttgart BadenWuerttemberg)
+		(In_Region London LondonRegion)
+		(In_City FlughafenStuttgart Stuttgart)
+		(Available FlughafenStuttgart)
+		(At_Equipment Plane_RampStuttgart FlughafenStuttgart)
+		(Available Plane_RampStuttgart)
+		(In_City HeathrowAirport London)
+		(Available HeathrowAirport)
+		(At_Equipment Plane_RampHeathrow HeathrowAirport)
+		(Available Plane_RampHeathrow)
+		(Available FlughafenParis)
+		(At_Equipment Plane_RampParis FlughafenParis)
+		(Available Plane_RampParis)
+		(Serves FlughafenParis BadenWuerttemberg)
+		(Serves FlughafenParis LondonRegion)
+		(At_Vehicle FlugzeugLufthansa FlughafenStuttgart)
+		(At_Vehicle FlugzeugAirFrance FlughafenParis)
+		(Connects Stuttgart_Paris_Air_Route FlughafenStuttgart FlughafenParis)
+		(Connects Paris_London_Air_Route FlughafenParis HeathrowAirport)
+		(Available Stuttgart_Paris_Air_Route)
+		(Available Paris_London_Air_Route)
+		(Available FlugzeugAirFrance)
+		(Available FlugzeugLufthansa)
+		(PV_Compatible Drucker FlugzeugAirFrance)
+		(PV_Compatible Drucker FlugzeugLufthansa)
+		(RV_Compatible Stuttgart_Paris_Air_Route FlugzeugLufthansa)
+		(RV_Compatible Paris_London_Air_Route FlugzeugAirFrance)
+		(At_Package Drucker FlughafenStuttgart)
+	)
+	(:goal
+		(and
+		(Delivered Drucker)
+		)
+	)
+)

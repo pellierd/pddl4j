@@ -1,0 +1,33 @@
+(define
+	(problem p1obs_2sat_1mod)
+	(:domain  satellite2)
+	(:objects
+		star0 - calib_direction
+		star5 - image_direction
+		phenomenon1 - image_direction
+		phenomenon2 - image_direction
+		instrument0 - instrument
+		instrument1 - instrument
+		image1 - mode
+		satellite0 - satellite
+		satellite1 - satellite
+	)
+	(:htn
+		:parameters (?planstep_2_argument_0_direction1 - image_direction)
+		:subtasks (and
+		 (task0 (do_observation ?planstep_2_argument_0_direction1 image1))
+		)
+	)
+	(:init
+		(on_board instrument0 satellite0)
+		(supports instrument0 image1)
+		(calibration_target instrument0 star0)
+		(power_avail satellite0)
+		(pointing satellite0 phenomenon1)
+		(on_board instrument1 satellite1)
+		(supports instrument1 image1)
+		(calibration_target instrument1 star0)
+		(power_avail satellite1)
+		(pointing satellite1 phenomenon2)
+	)
+)

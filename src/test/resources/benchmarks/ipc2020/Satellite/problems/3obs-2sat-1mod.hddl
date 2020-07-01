@@ -1,0 +1,41 @@
+(define
+	(problem p3obs_2sat_1mod)
+	(:domain  satellite2)
+	(:objects
+		GroundStation0 - calib_direction
+		GroundStation1 - calib_direction
+		Phenomenon7 - image_direction
+		Star5 - image_direction
+		Phenomenon4 - image_direction
+		Phenomenon6 - image_direction
+		instrument01 - instrument
+		instrument11 - instrument
+		thermograph - mode
+		satellite0 - satellite
+		satellite1 - satellite
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation Phenomenon4 thermograph))
+		 (task1 (do_observation Star5 thermograph))
+		 (task2 (do_observation Phenomenon6 thermograph))
+		)
+		:ordering (and
+			(task1 < task0)
+			(task2 < task1)
+		)
+	)
+	(:init
+		(on_board instrument01 satellite0)
+		(supports instrument01 thermograph)
+		(calibration_target instrument01 GroundStation0)
+		(power_avail satellite0)
+		(pointing satellite0 Phenomenon6)
+		(on_board instrument11 satellite1)
+		(supports instrument11 thermograph)
+		(calibration_target instrument11 GroundStation1)
+		(power_avail satellite1)
+		(pointing satellite1 Phenomenon7)
+	)
+)

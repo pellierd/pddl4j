@@ -1,0 +1,50 @@
+(define
+	(problem p21_B_ParcelsChemicals)
+	(:domain  UMTranslog)
+	(:objects
+		Tabletten - Chemicals
+		Ulm - City
+		Heidenheim - City
+		Firma - Customer_Location
+		Universitaet - Customer_Location
+		Kuehlwagen - Refrigerated_Tanker_Truck
+		LKW - Regular_Truck
+		James_Franck_Ring - Local_Road_Route
+		Toshiba_Laptops - Parcels
+		Landstrasse10 - Road_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Toshiba_Laptops Firma Universitaet))
+		 (task1 (transport Tabletten Ulm Heidenheim))
+		)
+		:ordering (and
+			(task1 < task0)
+		)
+	)
+	(:init
+		(In_City Firma Ulm)
+		(In_City Universitaet Ulm)
+		(At_Vehicle LKW Firma)
+		(Connects James_Franck_Ring Firma Universitaet)
+		(Available James_Franck_Ring)
+		(Available LKW)
+		(PV_Compatible Toshiba_Laptops LKW)
+		(RV_Compatible James_Franck_Ring LKW)
+		(At_Package Toshiba_Laptops Firma)
+		(At_Vehicle Kuehlwagen Ulm)
+		(Connects Landstrasse10 Ulm Heidenheim)
+		(Available Landstrasse10)
+		(Available Kuehlwagen)
+		(PV_Compatible Tabletten Kuehlwagen)
+		(RV_Compatible Landstrasse10 Kuehlwagen)
+		(At_Package Tabletten Ulm)
+	)
+	(:goal
+		(and
+		(Delivered Toshiba_Laptops)
+		(Delivered Tabletten)
+		)
+	)
+)

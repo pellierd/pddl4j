@@ -1,0 +1,45 @@
+(define
+	(problem p4obs_1sat_3mod)
+	(:domain  satellite2)
+	(:objects
+		star0 - calib_direction
+		groundstation1 - calib_direction
+		planet2 - image_direction
+		planet5 - image_direction
+		star4 - image_direction
+		planet3 - image_direction
+		instrument0 - instrument
+		instrument1 - instrument
+		infrared0 - mode
+		spectrograph1 - mode
+		infrared2 - mode
+		satellite0 - satellite
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation planet2 infrared2))
+		 (task1 (do_observation planet3 infrared2))
+		 (task2 (do_observation star4 infrared0))
+		 (task3 (do_observation planet5 infrared2))
+		)
+		:ordering (and
+			(task1 < task0)
+			(task2 < task1)
+			(task3 < task2)
+		)
+	)
+	(:init
+		(supports instrument0 infrared2)
+		(supports instrument0 spectrograph1)
+		(supports instrument0 infrared0)
+		(calibration_target instrument0 star0)
+		(supports instrument1 infrared2)
+		(supports instrument1 spectrograph1)
+		(calibration_target instrument1 groundstation1)
+		(on_board instrument0 satellite0)
+		(on_board instrument1 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 star0)
+	)
+)

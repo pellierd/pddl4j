@@ -1,0 +1,212 @@
+(define (domain satellite2)
+	(:requirements :typing :hierarchy)
+	(:types
+		calib_direction - direction
+		image_direction - direction
+		instrument
+		mode
+		satellite
+	)
+	(:predicates
+		(calibrated ?arg0 - instrument)
+		(calibration_target ?arg0 - instrument ?arg1 - calib_direction)
+		(have_image ?arg0 - image_direction ?arg1 - mode)
+		(on_board ?arg0 - instrument ?arg1 - satellite)
+		(pointing ?arg0 - satellite ?arg1 - direction)
+		(power_avail ?arg0 - satellite)
+		(power_on ?arg0 - instrument)
+		(supports ?arg0 - instrument ?arg1 - mode)
+	)
+
+	(:task activate_instrument
+		:parameters (?ai_s - satellite ?ai_i - instrument)
+	)
+
+	(:task auto_calibrate
+		:parameters (?ac_s - satellite ?ac_i - instrument)
+	)
+
+	(:task do_observation
+		:parameters (?do_d - image_direction ?do_m - mode)
+	)
+
+	(:method method0
+		:parameters (?take_image_instance_4_argument_6 - image_direction ?take_image_instance_4_argument_7 - instrument ?take_image_instance_4_argument_8 - mode ?turn_to_instance_3_argument_2 - satellite ?turn_to_instance_3_argument_4 - direction)
+		:task (do_observation ?take_image_instance_4_argument_6 ?take_image_instance_4_argument_8)
+		:subtasks (and
+		 (task0 (activate_instrument ?turn_to_instance_3_argument_2 ?take_image_instance_4_argument_7))
+		 (task1 (turn_to ?turn_to_instance_3_argument_2 ?take_image_instance_4_argument_6 ?turn_to_instance_3_argument_4))
+		 (task2 (take_image ?turn_to_instance_3_argument_2 ?take_image_instance_4_argument_6 ?take_image_instance_4_argument_7 ?take_image_instance_4_argument_8))
+		)
+		:ordering (and
+			(task0 < task1)
+			(task1 < task2)
+		)
+		:constraints (and
+			(sortof ?take_image_instance_4_argument_6 - image_direction)
+			(not (= ?take_image_instance_4_argument_6 ?turn_to_instance_3_argument_4))
+		)
+	)
+
+	(:method method1
+		:parameters (?take_image_instance_3_argument_4 - image_direction ?take_image_instance_3_argument_5 - instrument ?take_image_instance_3_argument_6 - mode ?turn_to_instance_2_argument_0 - satellite ?turn_to_instance_2_argument_2 - direction)
+		:task (do_observation ?take_image_instance_3_argument_4 ?take_image_instance_3_argument_6)
+		:subtasks (and
+		 (task0 (turn_to ?turn_to_instance_2_argument_0 ?take_image_instance_3_argument_4 ?turn_to_instance_2_argument_2))
+		 (task1 (take_image ?turn_to_instance_2_argument_0 ?take_image_instance_3_argument_4 ?take_image_instance_3_argument_5 ?take_image_instance_3_argument_6))
+		)
+		:ordering (and
+			(task0 < task1)
+		)
+		:constraints (and
+			(sortof ?take_image_instance_3_argument_4 - image_direction)
+			(not (= ?take_image_instance_3_argument_4 ?turn_to_instance_2_argument_2))
+		)
+	)
+
+	(:method method2
+		:parameters (?take_image_instance_3_argument_2 - satellite ?take_image_instance_3_argument_3 - image_direction ?take_image_instance_3_argument_4 - instrument ?take_image_instance_3_argument_5 - mode)
+		:task (do_observation ?take_image_instance_3_argument_3 ?take_image_instance_3_argument_5)
+		:subtasks (and
+		 (task0 (activate_instrument ?take_image_instance_3_argument_2 ?take_image_instance_3_argument_4))
+		 (task1 (take_image ?take_image_instance_3_argument_2 ?take_image_instance_3_argument_3 ?take_image_instance_3_argument_4 ?take_image_instance_3_argument_5))
+		)
+		:ordering (and
+			(task0 < task1)
+		)
+	)
+
+	(:method method3
+		:parameters (?take_image_instance_2_argument_0 - satellite ?take_image_instance_2_argument_1 - image_direction ?take_image_instance_2_argument_2 - instrument ?take_image_instance_2_argument_3 - mode)
+		:task (do_observation ?take_image_instance_2_argument_1 ?take_image_instance_2_argument_3)
+		:subtasks (and
+		 (task0 (take_image ?take_image_instance_2_argument_0 ?take_image_instance_2_argument_1 ?take_image_instance_2_argument_2 ?take_image_instance_2_argument_3))
+		)
+	)
+
+	(:method method4
+		:parameters (?auto_calibrate_instance_4_argument_4 - satellite ?auto_calibrate_instance_4_argument_5 - instrument ?switch_off_instance_2_argument_0 - instrument)
+		:task (activate_instrument ?auto_calibrate_instance_4_argument_4 ?auto_calibrate_instance_4_argument_5)
+		:subtasks (and
+		 (task0 (switch_off ?switch_off_instance_2_argument_0 ?auto_calibrate_instance_4_argument_4))
+		 (task1 (switch_on ?auto_calibrate_instance_4_argument_5 ?auto_calibrate_instance_4_argument_4))
+		 (task2 (auto_calibrate ?auto_calibrate_instance_4_argument_4 ?auto_calibrate_instance_4_argument_5))
+		)
+		:ordering (and
+			(task0 < task1)
+			(task1 < task2)
+		)
+		:constraints (and
+			(not (= ?switch_off_instance_2_argument_0 ?auto_calibrate_instance_4_argument_5))
+		)
+	)
+
+	(:method method5
+		:parameters (?auto_calibrate_instance_3_argument_2 - satellite ?auto_calibrate_instance_3_argument_3 - instrument)
+		:task (activate_instrument ?auto_calibrate_instance_3_argument_2 ?auto_calibrate_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (switch_on ?auto_calibrate_instance_3_argument_3 ?auto_calibrate_instance_3_argument_2))
+		 (task1 (auto_calibrate ?auto_calibrate_instance_3_argument_2 ?auto_calibrate_instance_3_argument_3))
+		)
+		:ordering (and
+			(task0 < task1)
+		)
+	)
+
+	(:method method6
+		:parameters (?calibrate_instance_3_argument_3 - satellite ?calibrate_instance_3_argument_4 - instrument ?calibrate_instance_3_argument_5 - calib_direction ?turn_to_instance_2_argument_2 - direction)
+		:task (auto_calibrate ?calibrate_instance_3_argument_3 ?calibrate_instance_3_argument_4)
+		:subtasks (and
+		 (task0 (turn_to ?calibrate_instance_3_argument_3 ?calibrate_instance_3_argument_5 ?turn_to_instance_2_argument_2))
+		 (task1 (calibrate ?calibrate_instance_3_argument_3 ?calibrate_instance_3_argument_4 ?calibrate_instance_3_argument_5))
+		)
+		:ordering (and
+			(task0 < task1)
+		)
+		:constraints (and
+			(sortof ?calibrate_instance_3_argument_5 - calib_direction)
+			(not (= ?calibrate_instance_3_argument_5 ?turn_to_instance_2_argument_2))
+		)
+	)
+
+	(:method method7
+		:parameters (?calibrate_instance_2_argument_0 - satellite ?calibrate_instance_2_argument_1 - instrument ?calibrate_instance_2_argument_2 - calib_direction)
+		:task (auto_calibrate ?calibrate_instance_2_argument_0 ?calibrate_instance_2_argument_1)
+		:subtasks (and
+		 (task0 (calibrate ?calibrate_instance_2_argument_0 ?calibrate_instance_2_argument_1 ?calibrate_instance_2_argument_2))
+		)
+	)
+
+	(:action calibrate
+		:parameters (?c_s - satellite ?c_i - instrument ?c_d - calib_direction)
+		:precondition 
+			(and
+				(on_board ?c_i ?c_s)
+				(calibration_target ?c_i ?c_d)
+				(pointing ?c_s ?c_d)
+				(power_on ?c_i)
+			)
+		:effect
+			(and
+				(calibrated ?c_i)
+			)
+	)
+
+	(:action switch_off
+		:parameters (?sof_i - instrument ?sof_s - satellite)
+		:precondition 
+			(and
+				(on_board ?sof_i ?sof_s)
+				(power_on ?sof_i)
+			)
+		:effect
+			(and
+				(not (power_on ?sof_i))
+				(power_avail ?sof_s)
+			)
+	)
+
+	(:action switch_on
+		:parameters (?so_i - instrument ?so_s - satellite)
+		:precondition 
+			(and
+				(on_board ?so_i ?so_s)
+				(power_avail ?so_s)
+			)
+		:effect
+			(and
+				(power_on ?so_i)
+				(not (calibrated ?so_i))
+				(not (power_avail ?so_s))
+			)
+	)
+
+	(:action take_image
+		:parameters (?ti_s - satellite ?ti_d - image_direction ?ti_i - instrument ?ti_m - mode)
+		:precondition 
+			(and
+				(calibrated ?ti_i)
+				(pointing ?ti_s ?ti_d)
+				(on_board ?ti_i ?ti_s)
+				(power_on ?ti_i)
+				(supports ?ti_i ?ti_m)
+			)
+		:effect
+			(and
+				(have_image ?ti_d ?ti_m)
+			)
+	)
+
+	(:action turn_to
+		:parameters (?t_s - satellite ?t_d_new - direction ?t_d_prev - direction)
+		:precondition 
+			(and
+				(pointing ?t_s ?t_d_prev)
+			)
+		:effect
+			(and
+				(pointing ?t_s ?t_d_new)
+				(not (pointing ?t_s ?t_d_prev))
+			)
+	)
+)

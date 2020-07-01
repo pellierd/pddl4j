@@ -1,0 +1,107 @@
+(define (domain miconic)
+	(:requirements :typing :hierarchy)
+	(:types
+		Floor - Object
+		Person - Object
+	)
+	(:predicates
+		(boarded ?arg0 - Person)
+		(goal ?arg0 - Person)
+		(lift_at ?arg0 - Floor)
+		(origin ?arg0 - Person ?arg1 - Floor)
+		(destination ?arg0 - Person ?arg1 - Floor)
+	)
+
+	(:task solve_elevator
+		:parameters ()
+	)
+
+	(:task deliver_person
+		:parameters (?p - Person ?o - Floor ?d - Floor)
+	)
+
+	(:method m1_abort_ordering_0
+		:parameters ()
+		:task (solve_elevator)
+		:precondition (and
+			(forall (?p - Person)
+				(not (goal ?p))
+			)
+		)
+		:subtasks (
+		)
+	)
+
+	(:method m1_go_ordering_0
+		:parameters (?d - Floor ?f - Floor ?o - Floor ?p - Person)
+		:task (solve_elevator)
+		:precondition (and
+			(goal ?p)
+			(lift_at ?f)
+			(origin ?p ?o)
+			(destination ?p ?d)
+		)
+		:subtasks (and
+		 (task0 (deliver_person ?p ?o ?d))
+		 (task1 (solve_elevator))
+		)
+		:ordering (and
+			(task0 < task1)
+		)
+	)
+
+	(:method m2_ordering_0
+		:parameters (?d - Floor ?f - Floor ?o - Floor ?p - Person)
+		:task (deliver_person ?p ?o ?d)
+		:precondition (and
+			(lift_at ?f)
+		)
+		:subtasks (and
+		 (task0 (move ?f ?o))
+		 (task1 (board ?p ?o))
+		 (task2 (move ?o ?d))
+		 (task3 (debark ?p ?d))
+		)
+		:ordering (and
+			(task0 < task1)
+			(task1 < task2)
+			(task2 < task3)
+		)
+	)
+
+	(:action move
+		:parameters (?f1 - Floor ?f2 - Floor)
+		:precondition 
+			(and
+				(lift_at ?f1)
+			)
+		:effect
+			(and
+				(not (lift_at ?f1))
+				(lift_at ?f2)
+			)
+	)
+
+	(:action board
+		:parameters (?p - Person ?f - Floor)
+		:precondition ()
+		:effect
+			(and
+				(boarded ?p)
+			)
+	)
+
+	(:action debark
+		:parameters (?p - Person ?f - Floor)
+		:precondition 
+			(and
+				(boarded ?p)
+				(goal ?p)
+			)
+		:effect
+			(and
+				(not (boarded ?p))
+				(not (goal ?p))
+			)
+	)
+)

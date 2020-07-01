@@ -1,0 +1,70 @@
+(define
+	(problem p8obs_3sat_4mod)
+	(:domain  satellite2)
+	(:objects
+		star0 - calib_direction
+		star1 - calib_direction
+		star3 - image_direction
+		planet9 - image_direction
+		groundstation2 - image_direction
+		planet5 - image_direction
+		phenomenon10 - image_direction
+		planet4 - image_direction
+		star8 - image_direction
+		phenomenon6 - image_direction
+		star7 - image_direction
+		instrument0 - instrument
+		instrument1 - instrument
+		instrument2 - instrument
+		spectrograph2 - mode
+		image0 - mode
+		infrared3 - mode
+		thermograph1 - mode
+		satellite0 - satellite
+		satellite1 - satellite
+		satellite2 - satellite
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation star3 thermograph1))
+		 (task1 (do_observation planet4 thermograph1))
+		 (task2 (do_observation planet5 image0))
+		 (task3 (do_observation phenomenon6 infrared3))
+		 (task4 (do_observation star7 image0))
+		 (task5 (do_observation star8 image0))
+		 (task6 (do_observation planet9 infrared3))
+		 (task7 (do_observation phenomenon10 spectrograph2))
+		)
+		:ordering (and
+			(task5 < task0)
+			(task4 < task1)
+			(task6 < task2)
+			(task2 < task3)
+			(task7 < task4)
+			(task1 < task5)
+			(task3 < task7)
+		)
+	)
+	(:init
+		(supports instrument0 spectrograph2)
+		(supports instrument0 image0)
+		(calibration_target instrument0 star0)
+		(on_board instrument0 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 star1)
+		(supports instrument1 image0)
+		(supports instrument1 spectrograph2)
+		(supports instrument1 thermograph1)
+		(calibration_target instrument1 star1)
+		(on_board instrument1 satellite1)
+		(power_avail satellite1)
+		(pointing satellite1 phenomenon6)
+		(supports instrument2 thermograph1)
+		(supports instrument2 infrared3)
+		(calibration_target instrument2 star1)
+		(on_board instrument2 satellite2)
+		(power_avail satellite2)
+		(pointing satellite2 star7)
+	)
+)

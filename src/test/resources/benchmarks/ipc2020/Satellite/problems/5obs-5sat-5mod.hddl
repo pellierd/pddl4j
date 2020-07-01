@@ -1,0 +1,86 @@
+(define
+	(problem p5obs_5sat_5mod)
+	(:domain  satellite2)
+	(:objects
+		groundstation0 - calib_direction
+		star1 - calib_direction
+		phenomenon5 - image_direction
+		planet2 - image_direction
+		planet6 - image_direction
+		planet4 - image_direction
+		phenomenon3 - image_direction
+		instrument4 - instrument
+		instrument5 - instrument
+		instrument2 - instrument
+		instrument3 - instrument
+		instrument1 - instrument
+		instrument6 - instrument
+		instrument0 - instrument
+		infrared3 - mode
+		infrared2 - mode
+		image1 - mode
+		spectrograph0 - mode
+		image4 - mode
+		satellite2 - satellite
+		satellite1 - satellite
+		satellite4 - satellite
+		satellite0 - satellite
+		satellite3 - satellite
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation planet2 infrared2))
+		 (task1 (do_observation phenomenon3 image1))
+		 (task2 (do_observation planet4 infrared2))
+		 (task3 (do_observation phenomenon5 image4))
+		 (task4 (do_observation planet6 spectrograph0))
+		)
+		:ordering (and
+			(task1 < task0)
+			(task2 < task1)
+			(task3 < task2)
+			(task0 < task4)
+		)
+	)
+	(:init
+		(supports instrument0 image1)
+		(supports instrument0 image4)
+		(calibration_target instrument0 groundstation0)
+		(on_board instrument0 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 groundstation0)
+		(supports instrument1 infrared3)
+		(supports instrument1 image4)
+		(calibration_target instrument1 groundstation0)
+		(supports instrument2 spectrograph0)
+		(supports instrument2 image1)
+		(calibration_target instrument2 star1)
+		(on_board instrument1 satellite1)
+		(on_board instrument2 satellite1)
+		(power_avail satellite1)
+		(pointing satellite1 phenomenon5)
+		(supports instrument3 infrared2)
+		(supports instrument3 image1)
+		(supports instrument3 image4)
+		(calibration_target instrument3 groundstation0)
+		(on_board instrument3 satellite2)
+		(power_avail satellite2)
+		(pointing satellite2 planet6)
+		(supports instrument4 infrared2)
+		(supports instrument4 image4)
+		(calibration_target instrument4 star1)
+		(supports instrument5 image1)
+		(supports instrument5 spectrograph0)
+		(calibration_target instrument5 groundstation0)
+		(on_board instrument4 satellite3)
+		(on_board instrument5 satellite3)
+		(power_avail satellite3)
+		(pointing satellite3 planet2)
+		(supports instrument6 infrared3)
+		(calibration_target instrument6 star1)
+		(on_board instrument6 satellite4)
+		(power_avail satellite4)
+		(pointing satellite4 planet4)
+	)
+)

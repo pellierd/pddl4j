@@ -1,0 +1,14 @@
+9 methods, 4 abstract tasks, 5 primitive tasks
+initial abstract task: __top
+  init method : 1 tasks in tn
+Sorts extracted.
+calib_direction : GroundStation2 
+direction : GroundStation2 Phenomenon4 Phenomenon6 
+image_direction : Phenomenon4 Phenomenon6 
+instrument : instrument0 
+mode : thermograph0 
+satellite : satellite0 
+sort_for_Phenomenon4 : Phenomenon4 
+ORDERING (__top_method ?var_for_Phenomenon4_1 ?var_for_thermograph0_2) < (do_observation ?var_for_Phenomenon4_1 ?var_for_thermograph0_2) >
+ (__top_method ?var_for_Phenomenon4_1 ?var_for_thermograph0_2) : 0 preconditions, 1 subtasks
+treerexx: src/data/htn_instance.cpp:191: Reduction& HtnInstance::createReduction(method&): Assertion `method.constraints.empty()' failed.

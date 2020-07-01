@@ -1,0 +1,48 @@
+(define
+	(problem p22_B_RegularTruck)
+	(:domain  UMTranslog)
+	(:objects
+		Ulm - City
+		O27 - Customer_Location
+		O28 - Customer_Location
+		Bibliothek - Customer_Location
+		Pferd - Regular_Truck
+		James_Franck_Ring - Local_Road_Route
+		Frauen_Strasse - Local_Road_Route
+		Toshiba_Laptops - Parcels
+		Drucker - Parcels
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Toshiba_Laptops O27 O28))
+		 (task1 (transport Drucker O28 Bibliothek))
+		)
+		:ordering (and
+			(task0 < task1)
+		)
+	)
+	(:init
+		(In_City O27 Ulm)
+		(In_City O28 Ulm)
+		(In_City Bibliothek Ulm)
+		(At_Vehicle Pferd O27)
+		(Connects James_Franck_Ring O27 O28)
+		(Connects Frauen_Strasse O28 Bibliothek)
+		(Available James_Franck_Ring)
+		(Available Frauen_Strasse)
+		(Available Pferd)
+		(PV_Compatible Toshiba_Laptops Pferd)
+		(PV_Compatible Drucker Pferd)
+		(RV_Compatible James_Franck_Ring Pferd)
+		(RV_Compatible Frauen_Strasse Pferd)
+		(At_Package Toshiba_Laptops O27)
+		(At_Package Drucker O28)
+	)
+	(:goal
+		(and
+		(Delivered Toshiba_Laptops)
+		(Delivered Drucker)
+		)
+	)
+)
