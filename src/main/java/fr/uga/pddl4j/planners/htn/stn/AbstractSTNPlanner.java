@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
@@ -23,11 +24,7 @@ import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This abstract class implements the common methods of all Simple Task Network planners.
@@ -141,18 +138,87 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
     }
 
     /**
-     * Creates a hddl certificate.
-     */
-    protected HDDLCertificate createHdDDLCertificate(final AbstractSTNNode node, final Problem problem) {
-        return new HDDLCertificate(node, problem);
+     * Print the solution in the validator format.
+     *
+     * @param node    the solution node.
+     * @param problem the problem to be solved.
+    */
+
+    public void printPlanForValidator(final AbstractSTNNode node, final Problem problem) {
+
+        // Extract the list of tasks and operators from the search solution node.
+        final List<Integer> tasks = new LinkedList<>();
+        final List<Integer> operators = new LinkedList<>();
+        final int nbactions = problem.getActions().size();
+        AbstractSTNNode n = node;
+        while (n.getParent() != null) {
+            final int operator = n.getOperator();
+            tasks.add(0, n.getTask());
+            if (operator < nbactions) {
+                operators.add(0, operator);
+            } else {
+                operators.add(0, operator - nbactions);
+            }
+            n = n.getParent();
+        }
+
+        // Create the dictionary to rename tasks with new IDs
+        final LinkedHashMap<Integer, LinkedList<Integer>>  taskDictionary = new LinkedHashMap<>();
+        int index = 0;
+        for (Integer t : tasks) {
+            LinkedList<Integer> value = taskDictionary.get(t);
+            if (value == null) {
+                value = new LinkedList<>();
+                taskDictionary.put(t, value);
+            }
+            value.add(index);
+            index++;
+        }
+
+        // Creates the plan and the decomposition to print
+        index = 0;
+        StringBuffer plan = new StringBuffer();
+        StringBuffer decomposition = new StringBuffer();
+        index = 0;
+        for (Integer t : tasks) {
+            if (problem.getTasks().get(t).isPrimtive()) {
+                plan.append(index + " " + problem.toString(problem.getTasks().get(t)) + "\n");
+            }  else {
+                decomposition.append(index + " " + problem.toString(problem.getTasks().get(t)));
+                Method m = problem.getMethods().get(operators.get(index));
+                decomposition.append(" -> " + m.getName());
+                for (Integer st : m.getSubTasks()) {
+                    int task  = taskDictionary.get(st).pop();
+                    taskDictionary.get(st).addLast(task);
+                    decomposition.append(" " + task);
+                }
+                decomposition.append("\n");
+            }
+            index++;
+        }
+        // Creates the root output
+        StringBuffer root = new StringBuffer();
+        root.append("root");
+        for (Integer t : problem.getInitialTaskNetwork().getTasks()) {
+            root.append(" " + taskDictionary.get(t).pop());
+        }
+        root.append("\n");
+
+        // Finally, print the output solution
+        System.out.println("==>");
+        System.out.print(plan);
+        System.out.print(root);
+        System.out.print(decomposition);
+        System.out.println("<==\n");
+
     }
 
     /**
-     * Print the usage of the TFDPlanner planner.
+     * Print the usage of the AbstractSTNPlanner.
      */
     protected static void printUsage() {
         final StringBuilder strb = new StringBuilder();
-        strb.append("\nusage of TFDPlanner:\n")
+        strb.append("\nusage of the planner:\n")
             .append("OPTIONS   DESCRIPTIONS\n")
             .append("-d <str>    hddl domain file name\n")
             .append("-p <str>    hddl problem file name\n")
@@ -169,37 +235,41 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @return the planner arguments or null if an invalid argument is encountered.
      */
     protected static Properties parseCommandLine(String[] args) {
-
         // Get the default arguments from the super class
         final Properties arguments = Planner.getDefaultArguments();
-
-        // Parse the command line and update the default argument value
-        for (int i = 0; i < args.length; i += 2) {
-            if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                if (!new File(args[i + 1]).exists()) {
+        try {
+            // Parse the command line and update the default argument value
+            for (int i = 0; i < args.length; i += 2) {
+                if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    if (!new File(args[i + 1]).exists()) {
+                        return null;
+                    }
+                    arguments.put(Planner.DOMAIN, new File(args[i + 1]));
+                } else if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    if (!new File(args[i + 1]).exists()) {
+                        return null;
+                    }
+                    arguments.put(Planner.PROBLEM, new File(args[i + 1]));
+                } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    final int timeout = Integer.parseInt(args[i + 1]) * 1000;
+                    if (timeout < 0) {
+                        return null;
+                    }
+                    arguments.put(Planner.TIMEOUT, timeout);
+                } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
+                    final int level = Integer.parseInt(args[i + 1]);
+                    arguments.put(Planner.TRACE_LEVEL, level);
+                } else {
                     return null;
                 }
-                arguments.put(Planner.DOMAIN, new File(args[i + 1]));
-            } else if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                if (!new File(args[i + 1]).exists()) {
-                    return null;
-                }
-                arguments.put(Planner.PROBLEM, new File(args[i + 1]));
-            } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                final int timeout = Integer.parseInt(args[i + 1]) * 1000;
-                if (timeout < 0) {
-                    return null;
-                }
-                arguments.put(Planner.TIMEOUT, timeout);
-            } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                final int level = Integer.parseInt(args[i + 1]);
-                arguments.put(Planner.TRACE_LEVEL, level);
-            } else {
-                return null;
             }
+        } catch (Throwable t) {
+            AbstractSTNPlanner.printUsage();
+            System.exit(0);
         }
         // Return null if the domain or the problem was not specified
         return (arguments.get(Planner.DOMAIN) == null
-            || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
+                || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
+
     }
 }

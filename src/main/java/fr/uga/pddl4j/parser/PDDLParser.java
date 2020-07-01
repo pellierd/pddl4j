@@ -1076,7 +1076,7 @@ public final class PDDLParser {
                         checked = false;
                     }
                 }
-                checked = checkOrderingConstraintAcyclicness(meth.getOrderingConstraints());
+                checked = this.checkOrderingConstraintAcyclicness(meth.getOrderingConstraints());
             } else {
                 checked = false;
             }

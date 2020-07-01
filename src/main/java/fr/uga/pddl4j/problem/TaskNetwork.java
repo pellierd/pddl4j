@@ -23,9 +23,7 @@ import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
@@ -71,7 +69,10 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Create a new task network with a set of tasks and orderings constraints.
+     * Create a new task network with a set of tasks and a set of of orderings constraints. The transitive closure on
+     * the ordering constraints is done by the constructor. Moreover, if the ordering constraints specified a totally
+     * ordered set of tasks. The list of tasks of the task network are ordered to reflect this implicit order.
+     * Warning, the constructor does not check that the ordering constraints are not cyclic.
      *
      * @param tasks       the tasks of the task network.
      * @param constraints the orderings constraints of the task network.
@@ -79,7 +80,21 @@ public final class TaskNetwork implements Serializable {
     public TaskNetwork(final List<Integer> tasks, final BitMatrix constraints) {
         super();
         this.tasks = new LinkedList<Integer>(tasks);
-        this.orderingConstraints = constraints;
+        this.setOrderingConstraints(constraints);
+        this.transitiveClosure();
+        if (this.isTotallyOrdered()) {
+            LinkedList<Integer> orderedTasks = new LinkedList<>();
+            List<Integer> numbeOfConstraints = new ArrayList<>();
+            for (int i = 0; i < constraints.rows(); i++) {
+                numbeOfConstraints.add(constraints.getRow(i).cardinality());
+                constraints.getRow(i).clear(0, i + 1);
+                constraints.getRow(i).set(i + 1, constraints.columns());
+            }
+            for (int i = 0; i < numbeOfConstraints.size(); i++) {
+                orderedTasks.add(this.tasks.get(numbeOfConstraints.indexOf(i)));
+            }
+            this.tasks = orderedTasks;
+        }
     }
 
     /**
@@ -187,10 +202,15 @@ public final class TaskNetwork implements Serializable {
      * @return <code>true</code> if the task network is totally ordered.
      */
     public final boolean isTotallyOrdered() {
+        BitMatrix matrix = new BitMatrix(this.getOrderingConstraints());
         boolean ordered = true;
-        int i = 1;
-        while (i < this.tasks.size() && ordered) {
-            ordered = this.orderingConstraints.get(i - 1, i);
+        while (matrix.rows() >= 0 && ordered) {
+            List<Integer> tasks = this.getTasksWithNoPredecessors(matrix);
+            ordered = tasks.size() == 1;
+            if (ordered) {
+                matrix.removeRow(tasks.get(0));
+                matrix.removeColumn(tasks.get(0));
+            }
         }
         return ordered;
     }
@@ -232,15 +252,52 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Returns the list of tasks with no predecessors.
+     * Returns the list of tasks with no successors. The method works if only if the method
+     * <code>transitiveClosure()</code> was previously called.
+     *
+     *
+     * @return the  list of tasks with no successors.
+     */
+    public final List<Integer> getTasksWithNosSuccessors() {
+       return this.getTasksWithNosSuccessors(this.orderingConstraints);
+    }
+
+    /**
+     * Returns the list of tasks with no successors.  The method works if only if the method
+     * <code>transitiveClosure()</code> was previously called.
+     *
+     * @return the  list of tasks with no successors.
+     */
+    private final List<Integer> getTasksWithNosSuccessors(BitMatrix matrix) {
+        final List<Integer> tasks = new LinkedList<>();
+        for (int i = 0; i < matrix.columns(); i++) {
+            if (matrix.getRow(i).cardinality() == 0) {
+                tasks.add(i);
+            }
+        }
+        return tasks;
+    }
+
+    /**
+     * Returns the list of tasks with no predecessors.  The method works if only if the method
+     * <code>transitiveClosure()</code> was previously called.
      *
      * @return the  list of tasks with no predecessors.
      */
     public final List<Integer> getTasksWithNoPredecessors() {
-        //this.transitiveClosure();
+        return this.getTasksWithNoPredecessors(this.getOrderingConstraints());
+    }
+
+    /**
+     * Returns the list of tasks with no predecessor. The method works if only if the method
+     * <code>transitiveClosure()</code> was previously called.
+     *
+     * @return the  list of tasks with no predecessor.
+     */
+    private final List<Integer> getTasksWithNoPredecessors(BitMatrix matrix) {
         final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < this.getOrderingConstraints().columns(); i++) {
-            if (this.getOrderingConstraints().getColumn(i).cardinality() == 0) {
+        for (int i = 0; i < matrix.columns(); i++) {
+            if (matrix.getColumn(i).cardinality() == 0) {
                 tasks.add(i);
             }
         }

@@ -1,6 +1,6 @@
 (define
 	(problem pfile1)
-	(:domain  rover)
+	(:domain  rover_domain)
 	(:objects
 		waypoint0 - waypoint
 		waypoint1 - waypoint

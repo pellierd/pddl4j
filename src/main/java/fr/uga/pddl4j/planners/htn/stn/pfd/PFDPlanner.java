@@ -20,7 +20,6 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
-import fr.uga.pddl4j.planners.htn.stn.YetAOtherHDDLCertificate;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Method;
@@ -106,9 +105,11 @@ public final class PFDPlanner extends AbstractSTNPlanner {
 
             // If the task network has no more task, a solution is found
             if (currentNode.getTaskNetwork().isEmpty()) {
-                plan = this.extractPlan(currentNode, problem);
-                //System.out.println(super.createHdDDLCertificate(currentNode, problem));
-                new YetAOtherHDDLCertificate(currentNode, problem);
+                int traceLevel = (Integer) this.getArguments().get(Planner.TRACE_LEVEL);
+                if (traceLevel == 9) {
+                    super.printPlanForValidator(currentNode, problem);
+                }
+                return super.extractPlan(currentNode, problem);
             } else {
                 // Get the list of tasks of the current node with no predecessors
                 currentNode.getTaskNetwork().transitiveClosure();

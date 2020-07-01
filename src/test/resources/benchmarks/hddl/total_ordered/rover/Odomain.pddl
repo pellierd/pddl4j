@@ -1,5 +1,5 @@
 (define (domain rover_domain)
-	(:requirements :typing :total-ordered-htn :htn-method-preconditions :negative-preconditions))
+	(:requirements :typing :total-ordered-htn :htn-method-preconditions :negative-preconditions)
 	(:types
 		waypoint - object
 		mode - object
@@ -56,7 +56,7 @@
 		:precondition (and
 			(empty ?s)
 		)
-		:subtasks (
+		:ordered-subtasks (
 		)
 	)
 
@@ -66,7 +66,7 @@
 		:precondition (and
 			(not (empty ?s))
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (drop ?rover ?s))
 		)
 	)
@@ -77,15 +77,12 @@
 		:precondition (and
 			(at ?rover ?from)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (visit ?from))
 		 (task1 (navigate ?rover ?from ?to))
 		 (task2 (unvisit ?from))
 		)
-		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-		)
+
 	)
 
 	(:method m_navigate_abs_2_ordering_0
@@ -94,7 +91,7 @@
 		:precondition (and
 			(at ?rover ?to)
 		)
-		:subtasks (
+		:ordered-subtasks (
 		)
 	)
 
@@ -107,7 +104,7 @@
 				(can_traverse ?rover ?from ?to)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate ?rover ?from ?to))
 		)
 	)
@@ -123,16 +120,11 @@
 				(not (visited ?mid))
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate ?rover ?from ?mid))
 		 (task1 (visit ?mid))
 		 (task2 (navigate ?rover ?mid ?to))
 		 (task3 (unvisit ?mid))
-		)
-		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
 		)
 	)
 
@@ -145,12 +137,9 @@
 				(visible ?x ?y)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate_abs ?rover ?x))
 		 (task1 (communicate_soil_data ?rover ?l ?waypoint ?x ?y))
-		)
-		:ordering (and
-			(task0 < task1)
 		)
 	)
 
@@ -163,17 +152,11 @@
 				(equipped_for_soil_analysis ?rover)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate_abs ?rover ?waypoint))
 		 (task1 (empty_store ?s ?rover))
 		 (task2 (sample_soil ?rover ?s ?waypoint))
-		 (task3 (send_soil_data ?rover ?waypoint))
-		)
-		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
-		)
+		 (task3 (send_soil_data ?rover ?waypoint)))
 	)
 
 	(:method m_send_rock_data_ordering_0
@@ -185,12 +168,9 @@
 				(visible ?x ?y)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate_abs ?rover ?x))
 		 (task1 (communicate_rock_data ?rover ?l ?waypoint ?x ?y))
-		)
-		:ordering (and
-			(task0 < task1)
 		)
 	)
 
@@ -203,16 +183,11 @@
 				(store_of ?s ?rover)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate_abs ?rover ?waypoint))
 		 (task1 (empty_store ?s ?rover))
 		 (task2 (sample_rock ?rover ?s ?waypoint))
 		 (task3 (send_rock_data ?rover ?waypoint))
-		)
-		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
 		)
 	)
 
@@ -225,12 +200,9 @@
 				(visible ?x ?y)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate_abs ?rover ?x))
 		 (task1 (communicate_image_data ?rover ?l ?objective ?mode ?x ?y))
-		)
-		:ordering (and
-			(task0 < task1)
 		)
 	)
 
@@ -245,16 +217,11 @@
 				(visible_from ?objective ?waypoint)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (calibrate_abs ?rover ?camera))
 		 (task1 (navigate_abs ?rover ?waypoint))
 		 (task2 (take_image ?rover ?waypoint ?objective ?camera ?mode))
 		 (task3 (send_image_data ?rover ?objective ?mode))
-		)
-		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
 		)
 	)
 
@@ -267,12 +234,9 @@
 				(visible_from ?objective ?waypoint)
 			)
 		)
-		:subtasks (and
+		:ordered-subtasks (and
 		 (task0 (navigate_abs ?rover ?waypoint))
 		 (task1 (calibrate ?rover ?camera ?objective ?waypoint))
-		)
-		:ordering (and
-			(task0 < task1)
 		)
 	)
 
