@@ -16,10 +16,7 @@
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.encoding.Encoder;
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLParser;
-import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.LogManager;
@@ -129,7 +126,8 @@ public class ProblemFactory {
      * @return the encoded planning problem or null if the problem cannot be encoded.
      */
     public Problem encode() {
-        if (!this.parser.getErrorManager().isEmpty()) {
+        if (!this.parser.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()
+            || !this.parser.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty() ) {
             return null;
         }
         final PDDLDomain domain = this.parser.getDomain();

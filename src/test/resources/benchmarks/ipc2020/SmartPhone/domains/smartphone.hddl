@@ -1,5 +1,5 @@
 (define (domain SmartPhone_HierarchicalNoAxioms)
-	(:requirements :typing :hierarchy)
+	(:requirements :typing :hierarchy :negative-preconditions)
 	(:types
 		Agenda - TransferableByEmailRegular
 		Appointment - Creatable
@@ -1304,7 +1304,7 @@
 
 	(:action activate_Alarm
 		:parameters (?selectAlarm_variable1 - Alarm)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Clock)
 				(inMode_Clock_Alarm)
@@ -1317,7 +1317,7 @@
 
 	(:action attachContactableInformationToCall
 		:parameters (?newObj_variable150 - Call ?newObj_variable151 - TransferableByPhoneContactable ?newObj_variable152 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Contactable ?newObj_variable152 ?newObj_variable151)
 				(not (haveSent ?newObj_variable150))
@@ -1330,7 +1330,7 @@
 
 	(:action attachContactableInformationToEMail
 		:parameters (?newObj_variable153 - EMail ?newObj_variable154 - TransferableByEmailContactable ?newObj_variable155 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Contactable ?newObj_variable155 ?newObj_variable154)
 				(not (haveSent ?newObj_variable153))
@@ -1343,7 +1343,7 @@
 
 	(:action attachContactableInformationToSMS
 		:parameters (?newObj_variable156 - SMS ?newObj_variable157 - TransferableBySMSContactable ?newObj_variable158 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Contactable ?newObj_variable158 ?newObj_variable157)
 				(not (haveSent ?newObj_variable156))
@@ -1356,7 +1356,7 @@
 
 	(:action attachRegularInformationToCall
 		:parameters (?newObj_variable148 - Call ?newObj_variable149 - TransferableByPhoneRegular)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Regular ?newObj_variable149)
 				(not (haveSent ?newObj_variable148))
@@ -1369,7 +1369,7 @@
 
 	(:action attachRegularInformationToEMail
 		:parameters (?newObj_variable159 - EMail ?newObj_variable160 - TransferableByEmailRegular)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Regular ?newObj_variable160)
 				(not (haveSent ?newObj_variable159))
@@ -1382,7 +1382,7 @@
 
 	(:action attachRegularInformationToSMS
 		:parameters (?newObj_variable161 - SMS ?newObj_variable162 - TransferableBySMSRegular)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Regular ?newObj_variable162)
 				(not (haveSent ?newObj_variable161))
@@ -1395,7 +1395,7 @@
 
 	(:action enter_EMailAddress
 		:parameters (?newObj_variable115 - Contactable ?enter_EMailAddress_variable1 - EMailAddress)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Contactable ?newObj_variable115 ?enter_EMailAddress_variable1)
 				(inMode_EMail_NewEMail)
@@ -1408,7 +1408,7 @@
 
 	(:action enter_Number_ForCall_Mobile
 		:parameters (?newObj_variable60 - Contactable ?enter_Number_ForCall_Mobile_variable1 - NumberMobile)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 				(haveInformation_Contactable ?newObj_variable60 ?enter_Number_ForCall_Mobile_variable1)
@@ -1422,7 +1422,7 @@
 
 	(:action enter_Number_ForCall_Office
 		:parameters (?newObj_variable61 - Contactable ?enter_Number_ForCall_Office_variable1 - NumberOffice)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 				(haveInformation_Contactable ?newObj_variable61 ?enter_Number_ForCall_Office_variable1)
@@ -1436,7 +1436,7 @@
 
 	(:action enter_Number_ForSMS_Mobile
 		:parameters (?newObj_variable100 - Contactable ?enter_Number_ForSMS_Mobile_variable1 - NumberMobile)
-		:precondition 
+		:precondition
 			(and
 				(inMode_NewMessage)
 				(haveInformation_Contactable ?newObj_variable100 ?enter_Number_ForSMS_Mobile_variable1)
@@ -1450,7 +1450,7 @@
 
 	(:action enter_Number_ForSMS_Office
 		:parameters (?newObj_variable101 - Contactable ?enter_Number_ForSMS_Office_variable1 - NumberOffice)
-		:precondition 
+		:precondition
 			(and
 				(haveInformation_Contactable ?newObj_variable101 ?enter_Number_ForSMS_Office_variable1)
 				(inMode_NewMessage)
@@ -1464,7 +1464,7 @@
 
 	(:action extractsInformation_Contactable
 		:parameters (?newObj_variable182 - Contactable ?newObj_variable183 - Message ?newObj_variable184 - ContactableInformation ?newObj_variable185 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(hasReceived ?newObj_variable182 ?newObj_variable183)
 				(attached ?newObj_variable183 ?newObj_variable184)
@@ -1477,7 +1477,7 @@
 
 	(:action extractsInformation_Regular
 		:parameters (?newObj_variable186 - Contactable ?newObj_variable187 - Message ?newObj_variable188 - RegularInformation)
-		:precondition 
+		:precondition
 			(and
 				(hasReceived ?newObj_variable186 ?newObj_variable187)
 				(attached ?newObj_variable187 ?newObj_variable188)
@@ -1490,7 +1490,7 @@
 
 	(:action press_Calendar_Menu
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(not (inMode_Calendar_ConfigureAppointment))
@@ -1504,7 +1504,7 @@
 
 	(:action press_Calendar_Menu_NewAppointment
 		:parameters (?press_Calendar_Menu_NewAppointment_variable1 - Appointment)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(inMode_Menu)
@@ -1521,7 +1521,7 @@
 
 	(:action press_Calendar_NewAppointment_OK
 		:parameters (?press_Calendar_NewAppointment_OK_variable1 - Appointment ?press_Calendar_NewAppointment_OK_variable2 - Date)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(inMode_Calendar_ConfigureAppointment)
@@ -1539,7 +1539,7 @@
 
 	(:action press_Clock_Alarm
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Clock)
 			)
@@ -1551,7 +1551,7 @@
 
 	(:action press_Contacts_New
 		:parameters (?press_Contacts_New_variable1 - Contact ?press_Contacts_New_variable2 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts)
 				(not (inMode_Contacts_ConfigureContact))
@@ -1569,7 +1569,7 @@
 
 	(:action press_Contacts_NewContact_OK
 		:parameters (?press_Contacts_NewContact_OK_variable1 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts)
 				(inMode_Contacts_ConfigureContact)
@@ -1586,7 +1586,7 @@
 
 	(:action press_Contacts_NewContact_SelectPicture
 		:parameters (?press_Contacts_NewContact_SelectPicture_variable1 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts)
 				(inMode_Contacts_ConfigureContact)
@@ -1600,7 +1600,7 @@
 
 	(:action press_EMail_NewEMail
 		:parameters (?press_EMail_NewEMail_variable1 - EMailAccount)
-		:precondition 
+		:precondition
 			(and
 				(inMode_EMail)
 				(not (inMode_EMail_NewEMail))
@@ -1615,7 +1615,7 @@
 
 	(:action press_EMail_NewEMail_Send
 		:parameters (?newObj_variable116 - Contactable ?press_EMail_NewEMail_Send_variable1 - EMail)
-		:precondition 
+		:precondition
 			(and
 				(inMode_EMail)
 				(inMode_EMail_NewEMail)
@@ -1634,7 +1634,7 @@
 
 	(:action press_Home_Calendar
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1647,7 +1647,7 @@
 
 	(:action press_Home_Clock
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1660,7 +1660,7 @@
 
 	(:action press_Home_EMail
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1673,7 +1673,7 @@
 
 	(:action press_Home_Messages
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1686,7 +1686,7 @@
 
 	(:action press_Home_People
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1699,7 +1699,7 @@
 
 	(:action press_Home_Programs
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1712,7 +1712,7 @@
 
 	(:action press_Home_Telephone
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Home)
 			)
@@ -1725,7 +1725,7 @@
 
 	(:action press_Home_Default
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(not (inMode_People_AddFavourite))
 				(not (entered_AnyNumber))
@@ -1754,7 +1754,7 @@
 
 	(:action press_Home_From_Add_Favourite
 		:parameters (?newObj_variable69 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People_AddFavourite)
 			)
@@ -1784,7 +1784,7 @@
 
 	(:action press_Home_From_Contacts_Details
 		:parameters (?newObj_variable12 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts_Details)
 				(selected ?newObj_variable12)
@@ -1813,7 +1813,7 @@
 
 	(:action press_Home_From_SMS_Mobile
 		:parameters (?newObj_variable15 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_NewMessage)
 				(entered_NumberMobile ?newObj_variable15)
@@ -1844,7 +1844,7 @@
 
 	(:action press_Home_From_SMS_Office
 		:parameters (?newObj_variable105 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_NewMessage)
 				(entered_NumberOffice ?newObj_variable105)
@@ -1875,7 +1875,7 @@
 
 	(:action press_Home_From_Telephone_Mobile
 		:parameters (?newObj_variable97 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 				(entered_NumberMobile ?newObj_variable97)
@@ -1906,7 +1906,7 @@
 
 	(:action press_Home_From_Telephone_Office
 		:parameters (?newObj_variable98 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 				(entered_NumberOffice ?newObj_variable98)
@@ -1937,7 +1937,7 @@
 
 	(:action press_Messages_NewMessage
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Messages)
 				(not (inMode_NewMessage))
@@ -1950,7 +1950,7 @@
 
 	(:action press_NewMessage_Send_Mobile
 		:parameters (?newObj_variable107 - Contactable ?press_NewMessage_Send_Mobile_variable2 - SMS)
-		:precondition 
+		:precondition
 			(and
 				(entered_NumberMobile ?newObj_variable107)
 				(inMode_NewMessage)
@@ -1969,7 +1969,7 @@
 
 	(:action press_NewMessage_Send_Office
 		:parameters (?newObj_variable108 - Contactable ?press_NewMessage_Send_Office_variable1 - SMS)
-		:precondition 
+		:precondition
 			(and
 				(inMode_NewMessage)
 				(entered_NumberOffice ?newObj_variable108)
@@ -1988,7 +1988,7 @@
 
 	(:action press_People_LargePlus
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_People_ReadyToAddFavourite)
 				(not (inMode_Menu))
@@ -2003,7 +2003,7 @@
 
 	(:action press_People_Menu
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(not (inMode_People_AddFavourite))
@@ -2017,7 +2017,7 @@
 
 	(:action press_People_Menu_AddFavourite
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_Menu)
@@ -2031,7 +2031,7 @@
 
 	(:action press_People_More
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 			)
@@ -2044,7 +2044,7 @@
 
 	(:action press_People_Smallplus_AlreadyPressed
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(not (inMode_Menu))
@@ -2059,7 +2059,7 @@
 
 	(:action press_People_Smallplus_FavouriteSelected
 		:parameters (?newObj_variable94 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(not (inMode_Menu))
@@ -2076,7 +2076,7 @@
 
 	(:action press_Programs_Tasks
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Programs)
 			)
@@ -2089,7 +2089,7 @@
 
 	(:action press_Tasks_Menu
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(not (inMode_Tasks_ConfigureTask))
@@ -2103,7 +2103,7 @@
 
 	(:action press_Tasks_Menu_NewTask
 		:parameters (?press_Tasks_Menu_NewTask_variable2 - Task)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(inMode_Menu)
@@ -2120,7 +2120,7 @@
 
 	(:action press_Tasks_NewTask_OK
 		:parameters (?press_Tasks_NewTask_OK_variable1 - Task)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(inMode_Tasks_ConfigureTask)
@@ -2137,7 +2137,7 @@
 
 	(:action press_Telephone_Call_Mobile
 		:parameters (?newObj_variable73 - Contactable ?press_Call_Mobile_variable1 - Call)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 				(entered_NumberMobile ?newObj_variable73)
@@ -2155,7 +2155,7 @@
 
 	(:action press_Telephone_Call_Office
 		:parameters (?newObj_variable74 - Contactable ?press_Call_Office_variable1 - Call)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 				(entered_NumberOffice ?newObj_variable74)
@@ -2173,7 +2173,7 @@
 
 	(:action press_Telephone_Contacts
 		:parameters ()
-		:precondition 
+		:precondition
 			(and
 				(inMode_Telephone)
 			)
@@ -2186,7 +2186,7 @@
 
 	(:action select_AccountSelection_Account
 		:parameters (?newObj_variable140 - EMailAccount)
-		:precondition 
+		:precondition
 			(and
 				(inMode_AccountSelection)
 			)
@@ -2201,7 +2201,7 @@
 
 	(:action select_Contacts_ContactForContactable
 		:parameters (?newObj_variable78 - Contact ?newObj_variable79 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(associated_Contact ?newObj_variable78 ?newObj_variable79)
 				(inMode_Contacts)
@@ -2217,7 +2217,7 @@
 
 	(:action select_Contacts_Details_Mobile
 		:parameters (?newObj_variable83 - Contact ?select_Contacts_Details_Mobile_variable1 - Call ?select_Contacts_Details_Mobile_variable2 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts)
 				(inMode_Contacts_Details)
@@ -2239,7 +2239,7 @@
 
 	(:action select_Contacts_Details_Office
 		:parameters (?newObj_variable84 - Contact ?select_Contacts_Details_Office_variable1 - Call ?select_Contacts_Details_Office_variable2 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts)
 				(inMode_Contacts_Details)
@@ -2261,7 +2261,7 @@
 
 	(:action select_EMail_EMailAccount_NoOp
 		:parameters (?newObj_variable137 - EMailAccount)
-		:precondition 
+		:precondition
 			(and
 				(inMode_EMail)
 				(not (inMode_EMail_NewEMail))
@@ -2276,7 +2276,7 @@
 
 	(:action select_EMail_EMailAccount_WithPreviousSelection
 		:parameters (?newObj_variable114 - EMailAccount ?select_EMail_EMailAccount_variable1 - EMailAccount)
-		:precondition 
+		:precondition
 			(and
 				(inMode_EMail)
 				(selected ?newObj_variable114)
@@ -2293,7 +2293,7 @@
 
 	(:action select_People_AddFavourite_Contact_withEmail
 		:parameters (?newObj_variable57 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_AddFavourite)
@@ -2312,7 +2312,7 @@
 
 	(:action select_People_AddFavourite_Contact_withMobile
 		:parameters (?newObj_variable53 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_AddFavourite)
@@ -2331,7 +2331,7 @@
 
 	(:action select_People_AddFavourite_Contact_withOffice
 		:parameters (?newObj_variable58 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_AddFavourite)
@@ -2350,7 +2350,7 @@
 
 	(:action select_People_AddFavourite_FavouriteNumber_WithPicture
 		:parameters (?newObj_variable20 - Contact ?newObj_variable22 - Picture)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People_AddFavourite_SelectFavouriteNumber)
 				(inMode_People_AddFavourite)
@@ -2369,7 +2369,7 @@
 
 	(:action select_People_AddFavourite_FavouriteNumber_WithoutPicture
 		:parameters (?newObj_variable33 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(not (isSet_Contact_Picture ?newObj_variable33))
 				(inMode_People_AddFavourite_SelectFavouriteNumber)
@@ -2387,7 +2387,7 @@
 
 	(:action select_People_AddFavourite_Picture
 		:parameters (?newObj_variable62 - Contact ?newObj_variable63 - Picture)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_AddFavourite)
@@ -2410,7 +2410,7 @@
 
 	(:action select_People_FavouriteSelected_EMail
 		:parameters (?newObj_variable135 - Contact ?select_People_FavouriteSelected_EMail_variable1 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_FavouriteSelected)
@@ -2430,7 +2430,7 @@
 
 	(:action select_People_FavouriteSelected_Mobile
 		:parameters (?newObj_variable88 - Contact ?select_People_FavouriteSelected_Mobile_variable1 - Call ?select_People_FavouriteSelected_Mobile_variable2 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_FavouriteSelected)
@@ -2452,7 +2452,7 @@
 
 	(:action select_People_FavouriteSelected_Office
 		:parameters (?newObj_variable89 - Contact ?select_People_FavouriteSelected_Office_variable1 - Call ?select_People_FavouriteSelected_Office_variable2 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_FavouriteSelected)
@@ -2474,7 +2474,7 @@
 
 	(:action select_People_FavouriteSelected_SMS
 		:parameters (?newObj_variable112 - Contact ?newObj_variable113 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(inMode_People_FavouriteSelected)
@@ -2495,7 +2495,7 @@
 
 	(:action select_People_Favourite_FromReadyToAddFavourite
 		:parameters (?newObj_variable123 - Contact ?newObj_variable124 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People_ReadyToAddFavourite)
 				(inMode_People)
@@ -2514,7 +2514,7 @@
 
 	(:action select_People_Favourite_NoOp
 		:parameters (?newObj_variable130 - Contact ?newObj_variable131 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(selected_Favourite ?newObj_variable130)
 				(associated_Contact ?newObj_variable130 ?newObj_variable131)
@@ -2533,7 +2533,7 @@
 
 	(:action select_People_Favourite_WithPreviousSelection
 		:parameters (?newObj_variable120 - Contact ?newObj_variable121 - Contact ?newObj_variable122 - Contactable)
-		:precondition 
+		:precondition
 			(and
 				(inMode_People)
 				(not (inMode_People_AddFavourite))
@@ -2553,7 +2553,7 @@
 
 	(:action select_PictureSelection_PictureForNewContact
 		:parameters (?newObj_variable52 - Picture ?select_PictureSelection_PictureForNewContact_variable2 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_PictureSelection)
 				(inMode_Contacts_ConfigureContact)
@@ -2571,7 +2571,7 @@
 
 	(:action set_Alarm_Days
 		:parameters (?setAlarm_Days_variable1 - Alarm ?set_Alarm_Days_variable1 - Date)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Clock)
 				(inMode_Clock_Alarm)
@@ -2585,7 +2585,7 @@
 
 	(:action set_Alarm_Description
 		:parameters (?newObj_variable6 - Alarm)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Clock)
 				(inMode_Clock_Alarm)
@@ -2598,7 +2598,7 @@
 
 	(:action set_Alarm_Time
 		:parameters (?setAlarm_Time_variable1 - Alarm ?set_Alarm_Time_variable1 - Date)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Clock)
 				(inMode_Clock_Alarm)
@@ -2612,7 +2612,7 @@
 
 	(:action set_Appointment_Location
 		:parameters (?newObj_variable9 - Appointment ?set_Appointment_Location_variable1 - Location)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(inMode_Calendar_ConfigureAppointment)
@@ -2627,7 +2627,7 @@
 
 	(:action set_Appointment_Name
 		:parameters (?newObj_variable8 - Appointment)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(inMode_Calendar_ConfigureAppointment)
@@ -2641,7 +2641,7 @@
 
 	(:action set_Appointment_Reminder
 		:parameters (?newObj_variable10 - Appointment)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(inMode_Calendar_ConfigureAppointment)
@@ -2655,7 +2655,7 @@
 
 	(:action set_Appointment_Time
 		:parameters (?newObj_variable2 - Appointment ?set_Appointment_Time_variable1 - Date)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Calendar)
 				(inMode_Calendar_ConfigureAppointment)
@@ -2670,7 +2670,7 @@
 
 	(:action set_Contact_Email
 		:parameters (?newObj_variable39 - Contact ?set_Contact_Email_variable1 - Contactable ?set_Contact_Email_variable2 - EMailAddress)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts_ConfigureContact)
 				(inMode_Contacts)
@@ -2687,7 +2687,7 @@
 
 	(:action set_Contact_Name
 		:parameters (?newObj_variable44 - Contact)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts_ConfigureContact)
 				(inMode_Contacts)
@@ -2702,7 +2702,7 @@
 
 	(:action set_Contact_NumberMobile
 		:parameters (?newObj_variable37 - Contact ?set_Contact_Mobile_variable1 - Contactable ?set_Contact_Mobile_variable2 - NumberMobile)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts_ConfigureContact)
 				(inMode_Contacts)
@@ -2719,7 +2719,7 @@
 
 	(:action set_Contact_NumberOffice
 		:parameters (?newObj_variable38 - Contact ?set_Contact_Office_variable1 - Contactable ?set_Contact_Office_variable2 - NumberOffice)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Contacts_ConfigureContact)
 				(inMode_Contacts)
@@ -2736,7 +2736,7 @@
 
 	(:action set_Task_Name
 		:parameters (?newObj_variable19 - Task)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(not (inMode_Menu))
@@ -2750,7 +2750,7 @@
 
 	(:action set_Task_Name_Light
 		:parameters (?newObj_variable47 - Task)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(not (inMode_Menu))
@@ -2767,7 +2767,7 @@
 
 	(:action set_Task_Reminder
 		:parameters (?newObj_variable26 - Task)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(inMode_Tasks_ConfigureTask)
@@ -2781,7 +2781,7 @@
 
 	(:action set_Task_Time
 		:parameters (?newObj_variable25 - Task ?set_Task_Time_variable1 - Date)
-		:precondition 
+		:precondition
 			(and
 				(inMode_Tasks)
 				(inMode_Tasks_ConfigureTask)

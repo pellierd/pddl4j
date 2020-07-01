@@ -165,6 +165,57 @@ final class Instantiation implements Serializable {
     }
 
     /**
+     * Instantiates a specified task network.
+     *
+     * @param network the task network to instantiate.
+     * @return the list of task netwok instantiated corresponding the specified network.
+     */
+    static List<IntTaskNetwork> instantiate(final IntTaskNetwork network) {
+        final List<IntTaskNetwork> instNetwork = new ArrayList<>(100);
+        Instantiation.instantiate(network, 0, instNetwork);
+        return instNetwork;
+    }
+
+    /**
+     * Instantiates a specified task network.
+     *
+     * @param network  the action.
+     * @param index   the index of the parameter to instantiate.
+     * @param networks the list of tasknetwork already instantiated.
+     * @see IntAction
+     */
+    private static void instantiate(final IntTaskNetwork network, final int index,
+                                    final List<IntTaskNetwork> networks) {
+
+        final int arity = network.arity();
+        if (index == arity) {
+             networks.add(network);
+        } else {
+            final Set<Integer> values = Encoder.tableOfDomains.get(network.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntTaskNetwork copy = new IntTaskNetwork(arity);
+                copy.setOrderingConstraints(new IntExpression(network.getOrderingConstraints()));
+
+                final IntExpression tasksCopy = new IntExpression(network.getTasks());
+                Instantiation.substitute(tasksCopy, varIndex, value);
+                copy.setTasks(tasksCopy);
+
+                for (int i = 0; i < arity; i++) {
+                    copy.setTypeOfParameter(i, network.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < arity; i++) {
+                    copy.setValueOfParameter(i, network.getValueOfParameter(i));
+                }
+
+                copy.setValueOfParameter(index, value);
+                Instantiation.instantiate(copy, index + 1, networks);
+            }
+        }
+    }
+
+
+    /**
      * Instantiates a specified method. This method used brut force.
      * <p>
      * The assumption is made that different method parameters are instantiated with different

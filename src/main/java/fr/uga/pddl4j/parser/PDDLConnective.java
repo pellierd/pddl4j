@@ -242,7 +242,12 @@ public enum PDDLConnective {
     /**
      * PDDLConnective for ordering constraints used in HDDL fragment.
      */
-    LESS_ORDERING_CONSTRAINT("<");
+    LESS_ORDERING_CONSTRAINT("<"),
+
+    /**
+     * PDDLConnective for sortof constraints used in HDDL fragment.
+     */
+    SORT_OF_CONSTRAINT("sortof");
 
     /**
      * The image associate to the connective in the PDDL language.

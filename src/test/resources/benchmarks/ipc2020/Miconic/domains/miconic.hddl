@@ -1,5 +1,5 @@
 (define (domain miconic)
-	(:requirements :typing :hierarchy)
+	(:requirements :typing :hierarchy :htn-method-prec :universal-preconditions :negative-preconditions)
 	(:types
 		Floor - Object
 		Person - Object
@@ -71,7 +71,7 @@
 
 	(:action move
 		:parameters (?f1 - Floor ?f2 - Floor)
-		:precondition 
+		:precondition
 			(and
 				(lift_at ?f1)
 			)
@@ -93,7 +93,7 @@
 
 	(:action debark
 		:parameters (?p - Person ?f - Floor)
-		:precondition 
+		:precondition
 			(and
 				(boarded ?p)
 				(goal ?p)

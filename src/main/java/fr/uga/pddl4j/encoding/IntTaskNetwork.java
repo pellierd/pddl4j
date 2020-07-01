@@ -22,6 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
@@ -31,6 +32,17 @@ import java.io.Serializable;
  * @version 1.0 - 25.03.2020
  */
 public final class IntTaskNetwork implements Serializable {
+
+    /**
+     * The list of parameters of the operator. The integer value correspond to the type of the
+     * parameters.
+     */
+    private int[] parameters;
+
+    /**
+     * The values that represents the instantiated parameters of the operator.
+     */
+    private int[] instantiations;
 
     /**
      * The expression that represents the list of tasks of the task network.
@@ -49,10 +61,24 @@ public final class IntTaskNetwork implements Serializable {
 
     /**
      * Create a new task network. The tasks and the ordering constraints are empty and expression.
+     *
      */
     public IntTaskNetwork() {
+      this(0);
+    }
+
+    /**
+     * Create a new task network. The tasks and the ordering constraints are empty and expression.
+     *
+     * @param arity the arity of the task network.
+     */
+    public IntTaskNetwork(final int arity) {
         this.tasks = new IntExpression(PDDLConnective.AND);
         this.orderingConstraints = new IntExpression(PDDLConnective.AND);
+        this.parameters =  new int[arity];
+        Arrays.fill(this.parameters, -1);
+        this.instantiations = new int[arity];
+        Arrays.fill(this.instantiations, -1);
     }
 
     /**
@@ -66,6 +92,10 @@ public final class IntTaskNetwork implements Serializable {
         this.tasks = new IntExpression(other.getTasks());
         this.orderingConstraints = new IntExpression(other.getOrderingConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered;
+        this.parameters = new int[other.arity()];
+        System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.arity());
+        this.instantiations = new int[other.arity()];
+        System.arraycopy(other.getInstantiations(), 0, this.instantiations, 0, other.arity());
     }
 
     /**
@@ -83,6 +113,8 @@ public final class IntTaskNetwork implements Serializable {
         this.tasks = tasks;
         this.orderingConstraints = orderingConstraints;
         this.isTotallyOrdered = totallyOrdered;
+        this.parameters =  new int[0];
+        this.instantiations = new int[0];
     }
 
     /**
@@ -138,6 +170,81 @@ public final class IntTaskNetwork implements Serializable {
     public final void setTotallyOrdered(final boolean flag) {
         this.isTotallyOrdered = flag;
     }
+
+    /**
+     * Returns the list of parameters of the task network.
+     *
+     * @return the list of parameters of the task network.
+     */
+    public final int[] getParameters() {
+        return Arrays.copyOf(parameters, parameters.length);
+    }
+
+    /**
+     * Returns the values that represents the instantiated parameters of the task network.
+     *
+     * @return the values that represents the instantiated parameters of the task network.
+     */
+    public int[] getInstantiations() {
+        return Arrays.copyOf(instantiations, instantiations.length);
+    }
+
+    /**
+     * Returns the arity of the task network.
+     *
+     * @return the arity of the task network.
+     */
+    public final int arity() {
+        return this.parameters.length;
+    }
+
+    /**
+        * Returns the type of the parameter at the specified index.
+        *
+        * @param index the index of the parameter.
+        * @return the type of the parameter at the specified index.
+    */
+    public final int getTypeOfParameters(final int index) {
+        return this.parameters[index];
+    }
+
+    /**
+     * Set a new type the parameter at a specified index.
+     *
+     * @param index the index of the parameter. The index must be in [0,arity[.
+     * @param type  the type to set.
+     */
+    public final void setTypeOfParameter(final int index, final int type) {
+        this.parameters[index] = type;
+    }
+
+    /**
+     * Returns the value of the parameter at a specified index.
+     *
+     * @param index the index. The index must be in [0,arity[.
+     * @return the value of the parameter.
+     */
+    public final int getValueOfParameter(final int index) {
+        return this.instantiations[index];
+    }
+
+    /**
+     * Instantiate a parameter of the operator at a specified index with a value.
+     * <p>
+     * The assumption is made that different operator parameters are instantiated with different
+     * constants, i.e., the planner never generates actions like move(a,a) because we consider this
+     * as a bad domain representation that should be revised. In fact, in actions with identical
+     * constant parameters, all but one of the constants are superfluous and can be skipped from the
+     * representation without loss of information.
+     * </p>
+     *
+     * @param index the index of the parameter to instantiate. The index must be in [0,arity[.
+     * @param value the value of instantiation.
+     */
+    public final void setValueOfParameter(final int index, final int value) {
+        this.instantiations[index] = value;
+    }
+
 
     /**
      * Returns <code>true</code> if this task network is equal to an object. This

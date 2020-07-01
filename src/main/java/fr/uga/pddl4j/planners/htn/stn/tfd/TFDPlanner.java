@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -243,7 +244,8 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         }
 
         // Print the syntax errors if detected
-        if (!errorManager.isEmpty()) {
+        if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
+            || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
             errorManager.printAll();
             System.exit(0);
         }

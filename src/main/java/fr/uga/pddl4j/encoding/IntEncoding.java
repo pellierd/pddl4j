@@ -430,12 +430,24 @@ final class IntEncoding implements Serializable {
      * @return the initial task network encoded.
      */
     static IntTaskNetwork encodeInitialTaskNetwork(final PDDLTaskNetwork taskNetwork) {
+        // Encode the parameters of the task network
+        final int numberOfParameters = taskNetwork.getParameters().size();
+        IntTaskNetwork encoded = new IntTaskNetwork(numberOfParameters);
+        final List<String> variables = new ArrayList<>(numberOfParameters);
+        for (int i = 0; i < numberOfParameters; i++) {
+            final PDDLTypedSymbol parameter = taskNetwork.getParameters().get(i);
+            final String typeImage = IntEncoding.toStringType(parameter.getTypes());
+            final int type = Encoder.tableOfTypes.indexOf(typeImage);
+            encoded.setTypeOfParameter(i, type);
+            variables.add(parameter.getImage());
+        }
         // Encode the tasks of the task network
-        final IntExpression tasks = IntEncoding.encodeExp(taskNetwork.getTasks());
+        encoded.setTasks(IntEncoding.encodeExp(taskNetwork.getTasks(), variables));
         // Encode the ordering constraints of the task network
-        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(
-            taskNetwork.getOrderingConstraints());
-        return new IntTaskNetwork(tasks, orderingConstraints, taskNetwork.isTotallyOrdered());
+        encoded.setOrderingConstraints(IntEncoding.encodeOrderingConstraints(
+            taskNetwork.getOrderingConstraints()));
+        encoded.setTotallyOrdered(taskNetwork.isTotallyOrdered());
+        return encoded;
     }
 
     /**

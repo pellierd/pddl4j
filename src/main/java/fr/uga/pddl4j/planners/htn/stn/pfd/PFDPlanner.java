@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn.pfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -253,12 +254,11 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             System.exit(0);
         }
 
-        // Print the syntax errors if detected
-        if (!errorManager.isEmpty()) {
+        if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
+            || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
             errorManager.printAll();
             System.exit(0);
         }
-
         System.out.println("\nparsing domain file \"" + domain.getName() + "\" and problem \"" + problem.getName()
             + "\" done successfully");
 

@@ -546,7 +546,7 @@ public class Problem implements Serializable {
      */
     public final boolean isSolvable() {
         boolean isSovable = true;
-        if (this.requirements.contains(PDDLRequireKey.HTN)) {
+        if (this.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             Iterator<Integer> i = this.initialTaskNetwork.getTasks().iterator();
             while (i.hasNext() && isSovable) {
                 isSovable = i.next() != null;

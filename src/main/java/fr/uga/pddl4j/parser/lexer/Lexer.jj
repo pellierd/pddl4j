@@ -264,16 +264,15 @@ TOKEN : {
 |	< CONSTRAINTS : ":constraints" >
 |	< CONTINUS_EFFECTS : ":continus-effects" >
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
-// Not conform with HDD. HDDL has only HTN requirement
+|	< HIERARCHY : ":hierarchy" > // ADD HDDL
 |	< HTN : ":htn" > // ADD HDDL
-|	< PARTIAL_ORDERED_HTN : ":partial-ordered-htn" > // ADD HDDL
-|	< TOTAL_ORDERED_HTN : ":total-ordered-htn" > // ADD HDDL
-|   < HTN_METHOD_PRECONDITIONS : ":htn-method-preconditions" > // ADD HDDL not conform to HDDL (:htn-method-prec)
+|   < HTN_METHOD_PREC : ":htn-method-prec" > // ADD HDDL not conform to HDDL (:htn-method-prec)
 |   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
 |   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
 |   < TASKS : ":tasks" >
 |   < SUBTASKS : ":subtasks" >// ADD HDDL
 |   < ORDERING : ":ordering" > // ADD HDDL
+|   < SORTOF : "sortof" > // ADD HDDL
 }
 
 TOKEN :
@@ -396,10 +395,6 @@ void domain() :
 		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
 		[LOOKAHEAD(2) constants_def()]
 		[LOOKAHEAD(2) predicates_def()]
-		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.PARTIAL_ORDERED_HTN)
-		    || this.isRequirement(PDDLRequireKey.TOTAL_ORDERED_HTN)
-		})
-		tasks_def()]
 		[LOOKAHEAD(2, {
 			this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
@@ -407,7 +402,7 @@ void domain() :
 			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)
 		}) functions_def()]
 		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
-		(structure_def())*
+		(structure_def())+
 		right_bracket()
 		<EOF>
 	} catch(Throwable e) {
@@ -431,10 +426,6 @@ void domain_and_problem() :
         [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
         [LOOKAHEAD(2) constants_def()]
         [LOOKAHEAD(2) predicates_def()]
-        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.PARTIAL_ORDERED_HTN)
-            || this.isRequirement(PDDLRequireKey.TOTAL_ORDERED_HTN)
-        })
-        tasks_def()]
         [LOOKAHEAD(2, {
             this.isRequirement(PDDLRequireKey.FLUENTS)
             || this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
@@ -442,7 +433,7 @@ void domain_and_problem() :
             || this.isRequirement(PDDLRequireKey.ACTION_COSTS)
         }) functions_def()]
         [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
-        (structure_def())*
+        (structure_def())+
         right_bracket()
     	//Problem file
     	problem()
@@ -673,14 +664,11 @@ Set<PDDLRequireKey> require_key() :
 	|	<DURATION_INEQUALITIES> {
 			requirements.add(PDDLRequireKey.DURATION_INEQUALITIES);
 		}
-	|	<PARTIAL_ORDERED_HTN> { // ADD HDDL
-    		requirements.add(PDDLRequireKey.PARTIAL_ORDERED_HTN);
+	|	<HIERARCHY> { // ADD HDDL
+    		requirements.add(PDDLRequireKey.HIERARCHY);
         }
-    |	<TOTAL_ORDERED_HTN> { // ADD HDDL
-            requirements.add(PDDLRequireKey.TOTAL_ORDERED_HTN);
-        }
-    |   <HTN_METHOD_PRECONDITIONS> { // ADD HDDL
-            requirements.add(PDDLRequireKey.HTN_METHOD_PRECONDITIONS);
+    |   <HTN_METHOD_PREC> { // ADD HDDL
+            requirements.add(PDDLRequireKey.HTN_METHOD_PREC);
     }
 )
 	{ return requirements; }
@@ -866,43 +854,7 @@ void predicates_def() :
 	}
 }
 
-
-void tasks_def() :
-{
-	PDDLNamedTypedList taskID = null;
-}
-{
-	try {
-		left_bracket() <TASKS>
-			(LOOKAHEAD(2) taskID=atomic_formula_skeleton() {
-				this.domain.addTask(taskID);
-			})+
-		right_bracket()
-	} catch(Throwable e) {
-		this.error(e, token.beginLine, token.beginColumn);
-	}
-}
-
-
-PDDLNamedTypedList atomic_task_skeleton() : // ADD HDDL
-{
-	PDDLSymbol symbol = null;
-	List<PDDLTypedSymbol> typedList = null;
-}
-{
-	<LEFT_BRACKET>
-		symbol=task_symbol()
-		typedList=typed_list(Lexer.VARIABLE)
-	right_bracket() {
-		PDDLNamedTypedList l = new PDDLNamedTypedList(symbol);
-		for (PDDLTypedSymbol s : typedList) {
-			l.add(s);
-		}
-		return l;
-	}
-}
-
-/*PDDLNamedTypedList comp_task_def() : // ADD HDDL
+PDDLNamedTypedList comp_task_def() : // ADD HDDL
 {
     PDDLNamedTypedList taskID;
 }
@@ -929,7 +881,7 @@ PDDLNamedTypedList task_def() : // ADD HDDL
         }
         return l;
     }
-}*/
+}
 
 PDDLSymbol task_symbol() : // ADD HDDL
  {
@@ -1833,7 +1785,7 @@ void structure_def() :
 	PDDLAction op = null;
 	PDDLMethod meth = null;
 	PDDLDerivedPredicate dp = null;
-	PDDLNamedTypedList taskID = null;
+	PDDLNamedTypedList task = null;
 }
 {
 	( 	LOOKAHEAD(2)
@@ -1848,13 +1800,12 @@ void structure_def() :
 			dp = derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
-//	|   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HTN)}) // ADD HDDL
-//            taskID = comp_task_def() {
-//                this.domain.addTask(taskID);
-//            }
-    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.TOTAL_ORDERED_HTN)
-                || this.isRequirement(PDDLRequireKey.PARTIAL_ORDERED_HTN)
-            }) // ADD HDDL
+
+    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+            task = comp_task_def() {
+                this.domain.addTask(task);
+            }
+    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
             meth = method_def() {
                 this.domain.addMethod(meth);
             }
@@ -1874,7 +1825,7 @@ PDDLMethod method_def() : // ADD HDDL
 		left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
-			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HTN_METHOD_PRECONDITIONS)})
+			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HTN_METHOD_PREC)})
 			    <PRECONDITION> preconditions=pre_gd()
 			]
             tn = task_network()
@@ -1890,56 +1841,19 @@ PDDLMethod method_def() : // ADD HDDL
 
 PDDLTaskNetwork task_network() : // ADD HDDL
 {
-    PDDLTaskNetwork tn = null;
-}
-{
-    (    LOOKAHEAD ({this.isRequirement(PDDLRequireKey.TOTAL_ORDERED_HTN)})
-            tn = total_ordered_task_network()
-    |   LOOKAHEAD ({this.isRequirement(PDDLRequireKey.PARTIAL_ORDERED_HTN)})
-            tn = partial_ordered_task_network())
-    {
-        return tn;
-    }
-}
-
-PDDLTaskNetwork total_ordered_task_network() : // ADD HDDL
-{
-    PDDLExpression tasks = null;
-    PDDLExpression logical = new PDDLExpression(PDDLConnective.AND);
-}
-{
-
-//    (<ORDERED_SUBTASKS> | <ORDERED_TASKS>) tasks = subtask_def() // remove to simplify
-    <ORDERED_SUBTASKS> tasks = subtask_def()
-	[<CONSTRAINTS> logical = logical_constraint_def()]
-    {
-	    return new PDDLTaskNetwork(tasks, new PDDLExpression(PDDLConnective.AND), logical, true);
-	}
-}
-
-PDDLTaskNetwork partial_ordered_task_network() : // ADD HDDL
-{
     PDDLExpression tasks = null;
     PDDLExpression ordering = new PDDLExpression(PDDLConnective.AND);
     PDDLExpression logical = new PDDLExpression(PDDLConnective.AND);
+    PDDLTaskNetwork tn = null;
 }
 {
-//    (<TASKS> | <SUBTASKS>) tasks = subtask_def() // remove to simplify
-
-       LOOKAHEAD(2)
-            <SUBTASKS> tasks = subtask_def()
-	        [<ORDERING> ordering = ordering_constraint_def()]
-	        [<CONSTRAINTS> logical = logical_constraint_def()]
-	        {
-                return new PDDLTaskNetwork(tasks, ordering, logical, false);
-            }
-	|  LOOKAHEAD(2)
-	        <ORDERED_SUBTASKS> tasks = subtask_def()
-            [<CONSTRAINTS> logical = logical_constraint_def()]
-            {
-                return new PDDLTaskNetwork(tasks, ordering, logical, true);
-            }
-
+    (<TASKS> | <SUBTASKS> | <ORDERED_TASKS> | <ORDERED_SUBTASKS>)
+    tasks = subtask_def()
+   	[<ORDERING> ordering = ordering_constraint_def()]
+   	[<CONSTRAINTS> logical = logical_constraint_def()]
+   	{
+        return new PDDLTaskNetwork(tasks, ordering, logical, false);
+    }
 }
 
 PDDLSymbol method_name() : // ADD HDDL
@@ -1954,20 +1868,20 @@ PDDLSymbol method_name() : // ADD HDDL
 
 PDDLExpression subtask_def() : // ADD HDDL
 {
-    PDDLExpression exp = null;
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
     PDDLExpression taskID = null;
 }
 {
     (   LOOKAHEAD(2)
-            exp=empty_and()
-    |   LOOKAHEAD(2)
             taskID=subtask() {
                 exp = new PDDLExpression(PDDLConnective.AND);
                 exp.addChild(taskID);
             }
     |   LOOKAHEAD(2)
             exp=and_subtask()
-    ) {
+    |   LOOKAHEAD(3)
+            <LEFT_BRACKET> <RIGHT_BRACKET>)
+    {
         return exp;
     }
 }
@@ -1981,7 +1895,7 @@ PDDLExpression and_subtask() : // ADD HDDL
 {
     <LEFT_BRACKET> <AND> (LOOKAHEAD (2) task=subtask() {
         exp.addChild(task);
-    })+ <RIGHT_BRACKET> {
+    })* <RIGHT_BRACKET> {
         return exp;
     }
 }
@@ -2102,7 +2016,8 @@ PDDLExpression logical_constraint_def() : // ADD HDDL
             }
     |   LOOKAHEAD(2)
             node = and_htn_constraint()
-    ) {
+    )
+    {
         return node;
     }
 }
@@ -2122,15 +2037,36 @@ PDDLExpression and_htn_constraint() :  // ADD HDDL
 
 PDDLExpression htn_constraint() : // ADD HDDL
 {
-    PDDLExpression node;
+    PDDLExpression node = null;
 }
 {
     (   LOOKAHEAD(2)
             node = equal_atomic_formula()
     |   LOOKAHEAD(2)
             node = not_equal_atomic_formula()
+    |   LOOKAHEAD(2)
+            node = sortof_constraints()
     ) {
         return node;
+    }
+}
+
+PDDLExpression sortof_constraints() : // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SORT_OF_CONSTRAINT);
+    PDDLSymbol variable = null;
+    List<PDDLSymbol> types = null;
+}
+{
+    <LEFT_BRACKET> <SORTOF> variable=variable() <SUB> types=type() <RIGHT_BRACKET> {
+        PDDLTypedSymbol typedVariable = new PDDLTypedSymbol(variable);
+        for (PDDLSymbol type : types) {
+            typedVariable.addType(type);
+        }
+        List<PDDLTypedSymbol> variables = new ArrayList<PDDLTypedSymbol>();
+        variables.add(typedVariable);
+        exp.setVariables(variables);
+        return exp;
     }
 }
 
@@ -2157,15 +2093,17 @@ PDDLAction action_def() :
 {
 	PDDLSymbol name = null;
 	List<PDDLTypedSymbol> parameters = null;
-	PDDLExpression preconds = null;
-	PDDLExpression effects = null;
+	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
 }
 {
 	try {
 		left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
-			<PRECONDITION> preconds=pre_gd()
-			<EFFECT> effects=effect()
+		    [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HIERARCHY)})
+		        <PRECONDITION> preconds=pre_gd()]
+			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HIERARCHY)})
+			    <EFFECT> effects=effect()]
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -3399,8 +3337,7 @@ void problem() :
 {
 }
 {
-    (   LOOKAHEAD({this.isRequirement(PDDLRequireKey.TOTAL_ORDERED_HTN)
-                || this.isRequirement(PDDLRequireKey.PARTIAL_ORDERED_HTN)})
+    (   LOOKAHEAD({this.isRequirement(PDDLRequireKey.HIERARCHY)})
             htn_problem()
     |    pddl_problem()
     )
@@ -3439,6 +3376,7 @@ void htn_problem() : // ADD HDDL
 {
 	PDDLSymbol name = null;
 	PDDLTaskNetwork taskNetwork = null;
+	List<PDDLTypedSymbol> parameters = new ArrayList<PDDLTypedSymbol>();
 }
 {
 	try {
@@ -3454,8 +3392,9 @@ void htn_problem() : // ADD HDDL
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
         left_bracket() <HTN>
-//            [<PARAMETERS> typed_list(Lexer.VARIABLE)] // Is in HDDL definition but has no sens
+            [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
             taskNetwork = task_network() {
+                taskNetwork.setParameters(parameters);
                 this.problem.setInitialTaskNetwork(taskNetwork);
             }
         right_bracket()

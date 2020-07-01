@@ -1,5 +1,5 @@
 (define (domain UMTranslog)
-	(:requirements :typing :hierarchy)
+	(:requirements :typing :hierarchy :htn-method-prec)
 	(:types
 		Air_Route - Route
 		Airplane - Regular_Vehicle
@@ -1059,7 +1059,7 @@
 
 	(:action affix_warning_signs
 		:parameters (?fws_v - Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(not (Warning_Signs_Affixed ?fws_v))
 			)
@@ -1071,7 +1071,7 @@
 
 	(:action attach_conveyor_ramp
 		:parameters (?acr_ap - Airplane ?acr_pr - Plane_Ramp ?acr_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Available ?acr_pr)
 				(At_Equipment ?acr_pr ?acr_l)
@@ -1086,7 +1086,7 @@
 
 	(:action attach_train_car
 		:parameters (?atc_t - Train ?atc_tc - Traincar ?atc_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Vehicle ?atc_tc ?atc_l)
 				(At_Vehicle ?atc_t ?atc_l)
@@ -1101,7 +1101,7 @@
 
 	(:action close_door
 		:parameters (?cd_rv - Regular_Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(Door_Open ?cd_rv)
 			)
@@ -1113,7 +1113,7 @@
 
 	(:action close_valve
 		:parameters (?cv_tv - Tanker_Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(Valve_Open ?cv_tv)
 			)
@@ -1125,7 +1125,7 @@
 
 	(:action collect_fees
 		:parameters (?cf_p - Package)
-		:precondition 
+		:precondition
 			(and
 				(not (Fees_Collected ?cf_p))
 			)
@@ -1137,7 +1137,7 @@
 
 	(:action collect_insurance
 		:parameters (?ci_v - Valuable)
-		:precondition 
+		:precondition
 			(and
 				(not (Insured ?ci_v))
 			)
@@ -1149,7 +1149,7 @@
 
 	(:action connect_chute
 		:parameters (?cc_h - Hopper_Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(not (Chute_Connected ?cc_h))
 			)
@@ -1161,7 +1161,7 @@
 
 	(:action connect_hose
 		:parameters (?ch_tv - Tanker_Vehicle ?ch_l - Liquid)
-		:precondition 
+		:precondition
 			(and
 				(not (Hose_Connected ?ch_tv ?ch_l))
 			)
@@ -1182,7 +1182,7 @@
 
 	(:action deliver_h
 		:parameters (?dh_h - Hazardous)
-		:precondition 
+		:precondition
 			(and
 				(Fees_Collected ?dh_h)
 				(Have_Permit ?dh_h)
@@ -1197,7 +1197,7 @@
 
 	(:action deliver_p
 		:parameters (?dp_p - Package)
-		:precondition 
+		:precondition
 			(and
 				(Fees_Collected ?dp_p)
 			)
@@ -1210,7 +1210,7 @@
 
 	(:action deliver_v
 		:parameters (?dv_v - Valuable)
-		:precondition 
+		:precondition
 			(and
 				(Fees_Collected ?dv_v)
 				(Insured ?dv_v)
@@ -1225,7 +1225,7 @@
 
 	(:action detach_conveyor_ramp
 		:parameters (?dcr_ap - Airplane ?dcr_pr - Plane_Ramp ?dcr_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Ramp_Connected ?dcr_pr ?dcr_ap)
 				(At_Equipment ?dcr_pr ?dcr_l)
@@ -1240,7 +1240,7 @@
 
 	(:action detach_train_car
 		:parameters (?dtc_t - Train ?dtc_tc - Traincar ?dtc_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Vehicle ?dtc_t ?dtc_l)
 				(Connected_To ?dtc_tc ?dtc_t)
@@ -1254,7 +1254,7 @@
 
 	(:action disconnect_chute
 		:parameters (?dc_h - Hopper_Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(Chute_Connected ?dc_h)
 			)
@@ -1266,7 +1266,7 @@
 
 	(:action disconnect_hose
 		:parameters (?dch_tv - Tanker_Vehicle ?dch_l - Liquid)
-		:precondition 
+		:precondition
 			(and
 				(Hose_Connected ?dch_tv ?dch_l)
 			)
@@ -1287,7 +1287,7 @@
 
 	(:action empty_hopper
 		:parameters (?eh_p - Package ?eh_hv - Hopper_Vehicle ?eh_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Chute_Connected ?eh_hv)
 				(At_Vehicle ?eh_hv ?eh_l)
@@ -1302,7 +1302,7 @@
 
 	(:action empty_tank
 		:parameters (?et_tv - Tanker_Vehicle ?et_li - Liquid ?et_lo - Location)
-		:precondition 
+		:precondition
 			(and
 				(Hose_Connected ?et_tv ?et_li)
 				(Valve_Open ?et_tv)
@@ -1318,7 +1318,7 @@
 
 	(:action fill_hopper
 		:parameters (?fh_p - Package ?fh_hv - Hopper_Vehicle ?fh_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Chute_Connected ?fh_hv)
 				(At_Vehicle ?fh_hv ?fh_l)
@@ -1334,7 +1334,7 @@
 
 	(:action fill_tank
 		:parameters (?ft_tv - Tanker_Vehicle ?ft_li - Liquid ?ft_lo - Location)
-		:precondition 
+		:precondition
 			(and
 				(Hose_Connected ?ft_tv ?ft_li)
 				(Valve_Open ?ft_tv)
@@ -1360,7 +1360,7 @@
 
 	(:action go_through_tcenter_cc
 		:parameters (?gttc_lo - Not_TCenter ?gttc_ld - Not_TCenter ?gttc_co - City ?gttc_cd - City ?gttc_tc - TCenter)
-		:precondition 
+		:precondition
 			(and
 				(In_City ?gttc_lo ?gttc_co)
 				(In_City ?gttc_ld ?gttc_cd)
@@ -1373,7 +1373,7 @@
 
 	(:action go_through_two_tcenters
 		:parameters (?gtttc_to - TCenter ?gtttc_td - TCenter)
-		:precondition 
+		:precondition
 			(and
 				(Available ?gtttc_to)
 				(Available ?gtttc_td)
@@ -1383,7 +1383,7 @@
 
 	(:action go_through_two_tcenters_cities_otd
 		:parameters (?gtttccotd_ld - Not_TCenter ?gtttccotd_co - City ?gtttccotd_cd - City ?gtttccotd_to - TCenter ?gtttccotd_t1 - TCenter)
-		:precondition 
+		:precondition
 			(and
 				(In_City ?gtttccotd_to ?gtttccotd_co)
 				(In_City ?gtttccotd_ld ?gtttccotd_cd)
@@ -1394,7 +1394,7 @@
 
 	(:action go_through_two_tcenters_cities_ott
 		:parameters (?gtttccott_ld - City_Location ?gtttccott_co - City ?gtttccott_cd - City ?gtttccott_to - TCenter ?gtttccott_td - TCenter)
-		:precondition 
+		:precondition
 			(and
 				(In_City ?gtttccott_ld ?gtttccott_co)
 				(In_City ?gtttccott_td ?gtttccott_cd)
@@ -1405,7 +1405,7 @@
 
 	(:action go_through_two_tcenters_cities_ottd
 		:parameters (?gtttcc_lo - Not_TCenter ?gtttcc_ld - Not_TCenter ?gtttcc_co - City ?gtttcc_cd - City ?gtttcc_t1 - TCenter ?gtttcc_t2 - TCenter)
-		:precondition 
+		:precondition
 			(and
 				(In_City ?gtttcc_lo ?gtttcc_co)
 				(In_City ?gtttcc_ld ?gtttcc_cd)
@@ -1417,7 +1417,7 @@
 
 	(:action go_through_two_tcenters_tt
 		:parameters (?gtttctt_to - TCenter ?gtttctt_td - TCenter ?gtttctt_co - City ?gtttctt_cd - City)
-		:precondition 
+		:precondition
 			(and
 				(In_City ?gtttctt_to ?gtttctt_co)
 				(In_City ?gtttctt_td ?gtttctt_cd)
@@ -1427,7 +1427,7 @@
 
 	(:action go_through_two_tcenters_via_hub_hazardous
 		:parameters (?gtttcvhh_to - TCenter ?gtttcvhh_td - TCenter ?gtttcvhh_h - Hub ?gtttcvhh_co - City ?gtttcvhh_ch - City ?gtttcvhh_cd - City ?gtttcvhh_ro - Region ?gtttcvhh_rd - Region)
-		:precondition 
+		:precondition
 			(and
 				(Available ?gtttcvhh_to)
 				(Available ?gtttcvhh_td)
@@ -1446,7 +1446,7 @@
 
 	(:action go_through_two_tcenters_via_hub_not_hazardous
 		:parameters (?gtttcvhnh_to - TCenter ?gtttcvhnh_td - TCenter ?gtttcvhnh_co - City ?gtttcvhnh_cd - City ?gtttcvhnh_ro - Region ?gtttcvhnh_rd - Region ?gtttcvhnh_h - Hub)
-		:precondition 
+		:precondition
 			(and
 				(Available ?gtttcvhnh_to)
 				(Available ?gtttcvhnh_td)
@@ -1463,7 +1463,7 @@
 
 	(:action load_cars
 		:parameters (?lc_c - Cars ?lc_v - Auto_Vehicle ?lc_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Package ?lc_c ?lc_l)
 				(At_Vehicle ?lc_v ?lc_l)
@@ -1479,7 +1479,7 @@
 
 	(:action load_livestock
 		:parameters (?ll_p - Livestock_Package ?ll_v - Livestock_Vehicle ?ll_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Package ?ll_p ?ll_l)
 				(At_Vehicle ?ll_v ?ll_l)
@@ -1496,7 +1496,7 @@
 
 	(:action load_package
 		:parameters (?lp_p - Package ?lp_v - Vehicle ?lp_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Package ?lp_p ?lp_l)
 				(At_Vehicle ?lp_v ?lp_l)
@@ -1511,7 +1511,7 @@
 
 	(:action lower_ramp
 		:parameters (?lr_v - Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(not (Ramp_Down ?lr_v))
 			)
@@ -1523,7 +1523,7 @@
 
 	(:action move_vehicle_no_traincar
 		:parameters (?hmnt_v - Vehicle ?hmnt_o - Location ?hmnt_r - Route ?hmnt_d - Location)
-		:precondition 
+		:precondition
 			(and
 				(Connects ?hmnt_r ?hmnt_o ?hmnt_d)
 				(Available ?hmnt_v)
@@ -1540,7 +1540,7 @@
 
 	(:action obtain_permit
 		:parameters (?op_h - Hazardous)
-		:precondition 
+		:precondition
 			(and
 				(not (Have_Permit ?op_h))
 			)
@@ -1552,7 +1552,7 @@
 
 	(:action open_door
 		:parameters (?od_rv - Regular_Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(not (Door_Open ?od_rv))
 			)
@@ -1564,7 +1564,7 @@
 
 	(:action open_valve
 		:parameters (?ov_tv - Tanker_Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(not (Valve_Open ?ov_tv))
 			)
@@ -1576,7 +1576,7 @@
 
 	(:action pick_up_package_ground
 		:parameters (?pupg_p - Package ?pupg_c - Crane ?pupg_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Empty ?pupg_c)
 				(Available ?pupg_c)
@@ -1593,7 +1593,7 @@
 
 	(:action pick_up_package_vehicle
 		:parameters (?pupv_p - Package ?pupv_c - Crane ?pupv_fv - Flatbed_Vehicle ?pupv_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Empty ?pupv_c)
 				(Available ?pupv_c)
@@ -1631,7 +1631,7 @@
 
 	(:action put_down_package_ground
 		:parameters (?pdpg_p - Package ?pdpg_c - Crane ?pdpg_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Available ?pdpg_c)
 				(At_Equipment ?pdpg_c ?pdpg_l)
@@ -1647,7 +1647,7 @@
 
 	(:action put_down_package_vehicle
 		:parameters (?pdpv_p - Package ?pdpv_c - Crane ?pdpv_fv - Flatbed_Vehicle ?pdpv_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(Available ?pdpv_c)
 				(At_Package ?pdpv_p ?pdpv_c)
@@ -1665,7 +1665,7 @@
 
 	(:action raise_ramp
 		:parameters (?rr_v - Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(Ramp_Down ?rr_v)
 			)
@@ -1687,7 +1687,7 @@
 
 	(:action remove_warning_signs
 		:parameters (?mws_v - Vehicle)
-		:precondition 
+		:precondition
 			(and
 				(Warning_Signs_Affixed ?mws_v)
 			)
@@ -1699,7 +1699,7 @@
 
 	(:action unload_cars
 		:parameters (?uc_c - Cars ?uc_v - Auto_Vehicle ?uc_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Package ?uc_c ?uc_v)
 				(At_Vehicle ?uc_v ?uc_l)
@@ -1714,7 +1714,7 @@
 
 	(:action unload_livestock
 		:parameters (?ull_p - Livestock_Package ?ull_v - Livestock_Vehicle ?ull_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Package ?ull_p ?ull_v)
 				(At_Vehicle ?ull_v ?ull_l)
@@ -1730,7 +1730,7 @@
 
 	(:action unload_package
 		:parameters (?up_p - Package ?up_v - Vehicle ?up_l - Location)
-		:precondition 
+		:precondition
 			(and
 				(At_Package ?up_p ?up_v)
 				(At_Vehicle ?up_v ?up_l)

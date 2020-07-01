@@ -1,5 +1,5 @@
 (define (domain zenotravel)
-	(:requirements :typing :hierarchy)
+	(:requirements :typing :hierarchy :htn-method-prec :negative-preconditions :universal-preconditions)
 	(:types
 		Time - Object
 		City - Object
@@ -144,7 +144,7 @@
 
 	(:action board
 		:parameters (?p - Person ?a - Aircraft ?c - City)
-		:precondition 
+		:precondition
 			(and
 				(at ?p ?c)
 			)
@@ -157,7 +157,7 @@
 
 	(:action debark
 		:parameters (?p - Person ?a - Aircraft ?c - City)
-		:precondition 
+		:precondition
 			(and
 				(in ?p ?a)
 			)
@@ -170,7 +170,7 @@
 
 	(:action refuel
 		:parameters (?a - Aircraft ?l - FLevel ?l1 - FLevel)
-		:precondition 
+		:precondition
 			(and
 				(fuel-level ?a ?l)
 			)
@@ -183,7 +183,7 @@
 
 	(:action fly
 		:parameters (?a - Aircraft ?c1 - City ?c2 - City ?l1 - FLevel ?l2 - FLevel)
-		:precondition 
+		:precondition
 			(and
 				(at ?a ?c1)
 				(fuel-level ?a ?l1)

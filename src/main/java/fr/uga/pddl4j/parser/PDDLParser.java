@@ -194,6 +194,7 @@ public final class PDDLParser {
                 this.checkDerivedPredicateDeclaration();
             } catch (NullPointerException exception) {
                 LOGGER.error("domain file is not valid\n");
+                exception.printStackTrace();
                 this.domain = new PDDLDomain(new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, "domain"));
             } finally {
                 inputStream.close();
@@ -246,6 +247,7 @@ public final class PDDLParser {
                 this.checkProblemConstraints();
                 this.checkMetric();
             } catch (NullPointerException exception) {
+                exception.printStackTrace();
                 LOGGER.error("problem file is not valid\n");
             } finally {
                 inputStream.close();
@@ -475,11 +477,8 @@ public final class PDDLParser {
      * <code>false</code> otherwise.
      */
     private boolean checkRequirements() {
-        return !(this.getDomain().getRequirements().contains(PDDLRequireKey.PARTIAL_ORDERED_HTN)
-            && this.getDomain().getRequirements().contains(PDDLRequireKey.TOTAL_ORDERED_HTN))
-            || (this.getDomain().getRequirements().contains(PDDLRequireKey.HTN_METHOD_PRECONDITIONS)
-                && (this.getDomain().getRequirements().contains(PDDLRequireKey.TOTAL_ORDERED_HTN)
-                    || this.getDomain().getRequirements().contains(PDDLRequireKey.PARTIAL_ORDERED_HTN)));
+        return (this.getDomain().getRequirements().contains(PDDLRequireKey.HTN_METHOD_PREC)
+            && !this.getDomain().getRequirements().contains(PDDLRequireKey.HIERARCHY));
     }
 
     /**
@@ -1145,7 +1144,7 @@ public final class PDDLParser {
         boolean checked = true;
         if (problem.getInitialTaskNetwork() != null) {
             final PDDLTaskNetwork tn = this.problem.getInitialTaskNetwork();
-            checked = this.checkParserNode(tn.getTasks(), new LinkedList<PDDLTypedSymbol>());
+            checked = this.checkParserNode(tn.getTasks(), tn.getParameters());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<PDDLSymbol>())) {
                 final Set<PDDLSymbol> taskIds = this.getTaskIDs(tn.getTasks());
                 final Set<PDDLSymbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
@@ -1282,13 +1281,32 @@ public final class PDDLParser {
                                 this.mgr.logParserError("type \"" + type.getImage()
                                     + "\" used in quantified expression is undefined", this.lexer
                                     .getFile(), type.getBeginLine(), type.getBeginColumn());
-                                error = true;
+                                error |= true;
                             }
                         }
                         checked = !error;
                         if (checked) {
                             newCtx.add(variable);
                         }
+                    }
+                    break;
+                case SORT_OF_CONSTRAINT:
+                    for (PDDLTypedSymbol variable : gd.getVariables()) {
+                        boolean error = false;
+                        for (PDDLSymbol type : variable.getTypes()) {
+                            if (!this.domain.isDeclaredType(type)) {
+                                this.mgr.logParserError("type \"" + type.getImage()
+                                    + "\" used in sort of expression is undefined", this.lexer
+                                    .getFile(), type.getBeginLine(), type.getBeginColumn());
+                                error |= true;
+                            }
+                        }
+                        checked = !error;
+                    }
+                    break;
+                case EQUAL_ATOM:
+                    for (PDDLSymbol term : gd.getAtom()) {
+                        checked = this.checkTerm(term, context);
                     }
                     break;
                 default:
@@ -1445,6 +1463,44 @@ public final class PDDLParser {
         return checked;
     }
 
+
+    /**
+     * `
+     * @param term
+     * @param context
+     * @return
+     */
+    private boolean checkTerm(PDDLSymbol term, List<PDDLTypedSymbol> context) {
+        boolean checked = true;
+        if (term.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+            PDDLTypedSymbol param = null;
+            Iterator<PDDLTypedSymbol> itr = context.iterator();
+            while (itr.hasNext() && param == null) {
+                PDDLTypedSymbol pi = itr.next();
+                if (pi.equals(term)) {
+                    param = pi;
+                }
+            }
+            if (param == null) {
+                this.mgr.logParserError("variable \"" + term.getImage() + "\" is undefined",
+                    this.lexer.getFile(), term.getBeginLine(), term.getBeginColumn());
+                checked = false;
+            }
+        } else {
+            PDDLTypedSymbol constant = this.domain.getConstant(term);
+            if (constant == null) {
+                if (this.problem != null) {
+                    constant = this.problem.getObject(term);
+                }
+            }
+            if (constant == null) {
+                this.mgr.logParserError("constant \"" + term.getImage() + "\" is undefined",
+                    this.lexer.getFile(), term.getBeginLine(), term.getBeginColumn());
+                checked = false;
+            }
+        }
+        return checked;
+    }
     /**
      * Returns if task in parameter was previously declared.
      *
