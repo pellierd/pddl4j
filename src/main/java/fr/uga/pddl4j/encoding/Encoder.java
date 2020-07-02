@@ -575,7 +575,6 @@ public final class Encoder implements Serializable {
             Encoder.tableOfTasks.add("__top");
             Encoder.compoundTaskSymbols.add("__top");
             root.setPrimtive(false);
-            System.out.println(Encoder.toString(root));
             int index = 0;
             for (IntTaskNetwork tn : initialTaskNetworks) {
                 IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
@@ -588,7 +587,6 @@ public final class Encoder implements Serializable {
                 method.setTask(new IntExpression(root));
                 method.setPreconditions(new IntExpression(PDDLConnective.AND));
                 method.setTaskNetwork(tn);
-                System.out.println(Encoder.toString(method));
                 intMethods.add(method);
                 index++;
             }
@@ -596,7 +594,6 @@ public final class Encoder implements Serializable {
             // Creates the abstract initial task network
             intTaskNetwork = new IntTaskNetwork();
             intTaskNetwork.getTasks().addChild(new IntExpression(root));
-            System.out.println(Encoder.toString(intTaskNetwork));
 
             //System.out.println(Encoder.toString(initialTaskNetworks.get(0)));
             intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
