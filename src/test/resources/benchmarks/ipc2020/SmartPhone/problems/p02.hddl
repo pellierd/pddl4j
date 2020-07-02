@@ -1,0 +1,48 @@
+(define
+	(problem p02_OrganizeMeeting_VerySmall)
+	(:domain  SmartPhone_HierarchicalNoAxioms)
+	(:objects
+		agenda - Agenda
+		contact1 - Contact
+		headOfDepartment - Person
+		headOfDepartmentEMailAddress - EMailAddress
+		dateForMeeting - Date
+		email1 - EMail
+		account1 - EMailAccount
+		room101 - Location
+		headOfDepartmentPicture - Picture
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (attachMultipleInformation email1))
+		 (task1 (send_EMail headOfDepartment email1))
+		 (task2 (extractsMultipleInformation headOfDepartment email1))
+		)
+		:ordering (and
+			(task0 < task1)
+			(task1 < task2)
+		)
+	)
+	(:init
+		(associated_Contact contact1 headOfDepartment)
+		(associated_Picture contact1 headOfDepartmentPicture)
+		(created contact1)
+		(haveInformation_Contactable headOfDepartment headOfDepartmentEMailAddress)
+		(haveInformation_Regular agenda)
+		(haveInformation_Regular dateForMeeting)
+		(haveInformation_Regular headOfDepartmentPicture)
+		(haveInformation_Regular room101)
+		(inMode_Home)
+		(inUse contact1)
+		(isFavourite contact1)
+		(selected account1)
+	)
+	(:goal
+		(and
+		(hasInformation_Regular headOfDepartment dateForMeeting)
+		(hasInformation_Regular headOfDepartment room101)
+		(hasInformation_Regular headOfDepartment agenda)
+		)
+	)
+)

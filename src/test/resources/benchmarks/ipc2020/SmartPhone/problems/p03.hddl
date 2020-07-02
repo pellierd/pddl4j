@@ -1,0 +1,77 @@
+(define
+	(problem p03_OrganizeMeeting_Small)
+	(:domain  SmartPhone_HierarchicalNoAxioms)
+	(:objects
+		agenda - Agenda
+		appointmentForMeeting - Appointment
+		contact1 - Contact
+		contact2 - Contact
+		headOfDepartment - Person
+		peer1 - Person
+		headOfDepartmentEMailAddress - EMailAddress
+		peer1EMailAddress - EMailAddress
+		taskCreateHandout - Task
+		dateForMeeting - Date
+		email1 - EMail
+		email2 - EMail
+		account1 - EMailAccount
+		peer1Picture - Picture
+		room101 - Location
+		headOfDepartmentPicture - Picture
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (attachMultipleInformation email1))
+		 (task1 (attachMultipleInformation email2))
+		 (task2 (send_EMail headOfDepartment email1))
+		 (task3 (send_EMail peer1 email2))
+		 (task4 (create_Appointment appointmentForMeeting room101 dateForMeeting))
+		 (task5 (create_Task taskCreateHandout))
+		 (task6 (extractsMultipleInformation headOfDepartment email1))
+		 (task7 (extractsMultipleInformation peer1 email2))
+		)
+		:ordering (and
+			(task4 < task1)
+			(task5 < task2)
+			(task1 < task3)
+			(task2 < task4)
+			(task0 < task5)
+			(task7 < task6)
+			(task3 < task7)
+		)
+	)
+	(:init
+		(associated_Contact contact1 headOfDepartment)
+		(associated_Contact contact2 peer1)
+		(associated_Picture contact1 headOfDepartmentPicture)
+		(associated_Picture contact2 peer1Picture)
+		(created contact1)
+		(haveInformation_Contactable headOfDepartment headOfDepartmentEMailAddress)
+		(haveInformation_Contactable peer1 peer1EMailAddress)
+		(haveInformation_Regular agenda)
+		(haveInformation_Regular dateForMeeting)
+		(haveInformation_Regular headOfDepartmentPicture)
+		(haveInformation_Regular peer1Picture)
+		(haveInformation_Regular room101)
+		(inMode_Home)
+		(inUse contact1)
+		(inUse contact2)
+		(isFavourite contact1)
+		(isFavourite contact2)
+		(selected account1)
+		(created contact2)
+	)
+	(:goal
+		(and
+		(hasInformation_Regular headOfDepartment dateForMeeting)
+		(hasInformation_Regular peer1 dateForMeeting)
+		(hasInformation_Regular headOfDepartment room101)
+		(hasInformation_Regular peer1 room101)
+		(hasInformation_Regular headOfDepartment agenda)
+		(hasInformation_Regular peer1 agenda)
+		(created appointmentForMeeting)
+		(created taskCreateHandout)
+		)
+	)
+)

@@ -1,0 +1,51 @@
+(define
+	(problem p6obs_2sat_2mod)
+	(:domain  satellite2)
+	(:objects
+		star0 - calib_direction
+		star3 - image_direction
+		phenomenon5 - image_direction
+		star1 - image_direction
+		star4 - image_direction
+		phenomenon6 - image_direction
+		star7 - image_direction
+		star2 - image_direction
+		instrument0 - instrument
+		instrument1 - instrument
+		spectrograph0 - mode
+		infrared1 - mode
+		satellite0 - satellite
+		satellite1 - satellite
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation star2 infrared1))
+		 (task1 (do_observation star3 infrared1))
+		 (task2 (do_observation star4 spectrograph0))
+		 (task3 (do_observation phenomenon5 spectrograph0))
+		 (task4 (do_observation phenomenon6 infrared1))
+		 (task5 (do_observation star7 spectrograph0))
+		)
+		:ordering (and
+			(task5 < task0)
+			(task4 < task1)
+			(task3 < task2)
+			(task1 < task3)
+			(task2 < task5)
+		)
+	)
+	(:init
+		(supports instrument0 spectrograph0)
+		(supports instrument0 infrared1)
+		(calibration_target instrument0 star0)
+		(on_board instrument0 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 star3)
+		(supports instrument1 infrared1)
+		(calibration_target instrument1 star0)
+		(on_board instrument1 satellite1)
+		(power_avail satellite1)
+		(pointing satellite1 star2)
+	)
+)

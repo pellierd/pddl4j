@@ -35,14 +35,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.security.spec.ECField;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -345,9 +340,8 @@ public final class Encoder implements Serializable {
         accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
         accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
         accepted.add(PDDLRequireKey.ACTION_COSTS);
-        accepted.add(PDDLRequireKey.TOTAL_ORDERED_HTN);
-        accepted.add(PDDLRequireKey.PARTIAL_ORDERED_HTN);
-        accepted.add(PDDLRequireKey.HTN_METHOD_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.HIERARCHY);
+        accepted.add(PDDLRequireKey.HTN_METHOD_PREC);
 
         Encoder.requirements = new LinkedHashSet<>();
         Encoder.requirements.addAll(domain.getRequirements());
@@ -355,11 +349,6 @@ public final class Encoder implements Serializable {
 
         if (!accepted.containsAll(Encoder.requirements)) {
             throw new IllegalArgumentException("only ADL, ACTION_COSTS or HTN problem can be encoded");
-        }
-
-        if (Encoder.requirements.contains(PDDLRequireKey.PARTIAL_ORDERED_HTN)
-            || Encoder.requirements.contains(PDDLRequireKey.TOTAL_ORDERED_HTN)) {
-            Encoder.requirements.add(PDDLRequireKey.HTN);
         }
 
         // *****************************************************************************************
@@ -402,7 +391,7 @@ public final class Encoder implements Serializable {
         // Encode the goal in integer representation or the initial task network
         IntExpression intGoal =  null;
         IntTaskNetwork intTaskNetwork = null;
-        if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
         } else {
             intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
@@ -420,7 +409,7 @@ public final class Encoder implements Serializable {
                 Encoder.printTableOfFunctions(str);
                 str.append(System.lineSeparator());
             }
-            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            if (!Encoder.tableOfTasks.isEmpty() && Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 Encoder.printTableOfTasks(str);
                 str.append(System.lineSeparator());
             }
@@ -509,7 +498,7 @@ public final class Encoder implements Serializable {
             for (IntAction a : intActions) {
                 str.append(Encoder.toString(a)).append("\n");
             }
-            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nPre-instantiation methods with inferred types (");
                 str.append(intMethods.size());
                 str.append(" methods):\n\n");
@@ -531,7 +520,7 @@ public final class Encoder implements Serializable {
         PostInstantiation.extractGroundInertia(intActions);
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
-        if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Expand the quantified expression in the goal
             Instantiation.expandQuantifiedExpression(intGoal);
             // Simplify the goal with ground inertia information
@@ -560,7 +549,7 @@ public final class Encoder implements Serializable {
                 str.append(Encoder.toString(op));
                 str.append("\n");
             }
-            if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append(")");
                 str.append("\n\nInstantiation goal state:\n");
                 str.append("(and");
@@ -577,8 +566,13 @@ public final class Encoder implements Serializable {
         // Step 5: Instantiation of the methods
         // *****************************************************************************************
 
-        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
-            intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
+        if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+
+            List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(intTaskNetwork);
+            /*for (IntTaskNetwork t : initialTaskNetworks) {
+                System.out.println(Encoder.toString(t));
+            }*/
+            intMethods = Instantiation.instantiateMethods(intMethods, initialTaskNetworks.get(0), intActions);
             // Simplify the methods with the ground inertia information previously extracted
             PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
@@ -606,7 +600,7 @@ public final class Encoder implements Serializable {
         // Extract the relevant fluents from the simplified and instantiated actions and methods
         PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
         // Create the list of relevant tasks
-        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+        if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantTasks = new ArrayList<>();
             Encoder.tableOfRelevantTasks.addAll(Encoder.tableOfRelevantPrimitiveTasks);
             Encoder.tableOfRelevantTasks.addAll(Encoder.tableOfRelevantCompundTasks);
@@ -643,7 +637,7 @@ public final class Encoder implements Serializable {
         }
 
         // Creates the list of relevant operators
-        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+        if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantOperators = new ArrayList<>();
             for (Integer a : Encoder.relevantActions) {
                 List<Integer> l = new ArrayList<>(1);
@@ -653,7 +647,7 @@ public final class Encoder implements Serializable {
             Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
         }
 
-        if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Encode the goal in bit set representation
             if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM)) {
                 Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
@@ -686,7 +680,7 @@ public final class Encoder implements Serializable {
             for (Action a : Encoder.actions) {
                 str.append(Encoder.toString(a) + "\n");
             }
-            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nFinal methods:\n");
                 for (Method m : Encoder.methods) {
                     str.append(Encoder.toString(m) + "\n");
@@ -697,7 +691,7 @@ public final class Encoder implements Serializable {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
 
-            if (!Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nFinal goal state:\n");
                 if (Encoder.goal == null) { // Goal null
                     str.append("goal can be simplified to FALSE");
@@ -711,7 +705,7 @@ public final class Encoder implements Serializable {
                 str.append(Encoder.toString(Encoder.initialTaskNetwork));
             }
 
-            if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+            if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nTable of task resolvers:\n");
                 for (int ti = 0; ti < Encoder.tableOfRelevantOperators.size(); ti++) {
                     str.append(ti).append(": ");
@@ -746,7 +740,7 @@ public final class Encoder implements Serializable {
         codedProblem.setPredicateSymbols(Encoder.tableOfPredicates);
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
-        if (Encoder.requirements.contains(PDDLRequireKey.HTN)) {
+        if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
                 task -> new Task(task.getPredicate(), task.getArguments(),
                     task.isPrimtive())).collect(Collectors.toList()));

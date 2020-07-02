@@ -114,22 +114,16 @@ public enum PDDLRequireKey {
      * The PDDL :duration-inequalities requirement.
      */
     DURATION_INEQUALITIES(":duration-inequalities"),
+
     /**
      * The PDDL :htn requirement for HDDL langage.
      */
-    HTN(":htn"),
-    /**
-     * The PDDL :total-ordered-htn requirement for HDDL langage.
-     */
-    TOTAL_ORDERED_HTN(":total-ordered-htn"),
-    /**
-     * The PDDL :partial-ordered-htn requirement for HDDL langage.
-     */
-    PARTIAL_ORDERED_HTN(":partial-ordered-htn"),
+    HIERARCHY(":hierarchy"),
+
     /**
      * The PDDL :htn-method-prec requirement for HDDL langage.
      */
-    HTN_METHOD_PRECONDITIONS(":htn-method-preconditions");
+    HTN_METHOD_PREC(":htn-method-prec");
 
     /**
      * The image associate to the require key in the PDDL language.

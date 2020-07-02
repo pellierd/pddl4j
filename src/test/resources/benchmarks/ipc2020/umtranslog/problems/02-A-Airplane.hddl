@@ -1,0 +1,41 @@
+(define
+	(problem p02_A_Airplane)
+	(:domain  UMTranslog)
+	(:objects
+		Stuttart_London_Air_Route - Air_Route
+		Flugzeug - Airplane
+		FlughafenStuttgart - Airport
+		HeathrowAirport - Airport
+		Stuttgart - City
+		London - City
+		Plane_RampStuttgart - Plane_Ramp
+		Plane_RampHeathrow - Plane_Ramp
+		Drucker - Parcels
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Drucker FlughafenStuttgart HeathrowAirport))
+		)
+	)
+	(:init
+		(In_City FlughafenStuttgart Stuttgart)
+		(At_Equipment Plane_RampStuttgart FlughafenStuttgart)
+		(Available Plane_RampStuttgart)
+		(In_City HeathrowAirport London)
+		(At_Equipment Plane_RampHeathrow HeathrowAirport)
+		(Available Plane_RampHeathrow)
+		(At_Vehicle Flugzeug FlughafenStuttgart)
+		(Connects Stuttart_London_Air_Route FlughafenStuttgart HeathrowAirport)
+		(Available Stuttart_London_Air_Route)
+		(Available Flugzeug)
+		(PV_Compatible Drucker Flugzeug)
+		(RV_Compatible Stuttart_London_Air_Route Flugzeug)
+		(At_Package Drucker FlughafenStuttgart)
+	)
+	(:goal
+		(and
+		(Delivered Drucker)
+		)
+	)
+)

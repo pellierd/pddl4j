@@ -1,0 +1,31 @@
+(define
+	(problem p14_A_RegularTruck_2Regions)
+	(:domain  UMTranslog)
+	(:objects
+		Vendee - Region
+		FrancheComte - Region
+		LKW - Regular_Truck
+		Tische - Parcels
+		VendeeFrancheComteRoadRoute - Road_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Tische Vendee FrancheComte))
+		)
+	)
+	(:init
+		(Connects VendeeFrancheComteRoadRoute Vendee FrancheComte)
+		(Available VendeeFrancheComteRoadRoute)
+		(At_Vehicle LKW Vendee)
+		(Available LKW)
+		(PV_Compatible Tische LKW)
+		(RV_Compatible VendeeFrancheComteRoadRoute LKW)
+		(At_Package Tische Vendee)
+	)
+	(:goal
+		(and
+		(Delivered Tische)
+		)
+	)
+)

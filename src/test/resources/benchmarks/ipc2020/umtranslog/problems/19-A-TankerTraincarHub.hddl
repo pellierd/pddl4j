@@ -1,0 +1,54 @@
+(define
+	(problem p19_A_TankerTraincarHub)
+	(:domain  UMTranslog)
+	(:objects
+		Stuttgart - City
+		London - City
+		HauptbahnhofStuttgart - Train_Station
+		LondonWaterloo - Train_Station
+		GareParisNord - Train_Station_Hub
+		BadenWuerttemberg - Region
+		Eisenbahnwagen - Tanker_Traincar
+		LokomotiveSNCF - Train
+		LondonRegion - Region
+		LokomotiveDB - Train
+		Wasser - Water
+		Stuttgart_Paris_Rail_Route - Rail_Route
+		Paris_London_Rail_Route - Rail_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Wasser HauptbahnhofStuttgart LondonWaterloo))
+		)
+	)
+	(:init
+		(In_Region Stuttgart BadenWuerttemberg)
+		(In_Region London LondonRegion)
+		(In_City HauptbahnhofStuttgart Stuttgart)
+		(Available HauptbahnhofStuttgart)
+		(In_City LondonWaterloo London)
+		(Available LondonWaterloo)
+		(Available GareParisNord)
+		(Serves GareParisNord BadenWuerttemberg)
+		(Serves GareParisNord LondonRegion)
+		(At_Vehicle LokomotiveDB HauptbahnhofStuttgart)
+		(At_Vehicle LokomotiveSNCF GareParisNord)
+		(At_Vehicle Eisenbahnwagen HauptbahnhofStuttgart)
+		(Connects Stuttgart_Paris_Rail_Route HauptbahnhofStuttgart GareParisNord)
+		(Connects Paris_London_Rail_Route GareParisNord LondonWaterloo)
+		(Available Stuttgart_Paris_Rail_Route)
+		(Available Paris_London_Rail_Route)
+		(Available LokomotiveDB)
+		(Available LokomotiveSNCF)
+		(PV_Compatible Wasser Eisenbahnwagen)
+		(RV_Compatible Stuttgart_Paris_Rail_Route LokomotiveDB)
+		(RV_Compatible Paris_London_Rail_Route LokomotiveSNCF)
+		(At_Package Wasser HauptbahnhofStuttgart)
+	)
+	(:goal
+		(and
+		(Delivered Wasser)
+		)
+	)
+)

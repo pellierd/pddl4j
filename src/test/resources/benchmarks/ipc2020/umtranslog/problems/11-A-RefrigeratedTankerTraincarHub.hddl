@@ -1,0 +1,57 @@
+(define
+	(problem p11_A_RefrigeratedTankerTraincarHub)
+	(:domain  UMTranslog)
+	(:objects
+		Chemicalien - Chemicals
+		Stuttgart - City
+		London - City
+		Paris - City
+		HauptbahnhofStuttgart - Train_Station
+		LondonWaterloo - Train_Station
+		GareParisNord - Train_Station_Hub
+		BadenWuerttemberg - Region
+		Eisenbahnwagen - Refrigerated_Tanker_Traincar
+		LokomotiveSNCF - Train
+		LondonRegion - Region
+		LokomotiveDB - Train
+		Stuttgart_Paris_Rail_Route - Rail_Route
+		Paris_London_Rail_Route - Rail_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Chemicalien HauptbahnhofStuttgart LondonWaterloo))
+		)
+	)
+	(:init
+		(In_Region Stuttgart BadenWuerttemberg)
+		(In_Region London LondonRegion)
+		(In_City HauptbahnhofStuttgart Stuttgart)
+		(Available HauptbahnhofStuttgart)
+		(In_City LondonWaterloo London)
+		(Available LondonWaterloo)
+		(Available GareParisNord)
+		(In_City GareParisNord Paris)
+		(City_Hazardous_Compatible Paris)
+		(Serves GareParisNord BadenWuerttemberg)
+		(Serves GareParisNord LondonRegion)
+		(At_Vehicle LokomotiveDB HauptbahnhofStuttgart)
+		(At_Vehicle LokomotiveSNCF GareParisNord)
+		(At_Vehicle Eisenbahnwagen HauptbahnhofStuttgart)
+		(Connects Stuttgart_Paris_Rail_Route HauptbahnhofStuttgart GareParisNord)
+		(Connects Paris_London_Rail_Route GareParisNord LondonWaterloo)
+		(Available Stuttgart_Paris_Rail_Route)
+		(Available Paris_London_Rail_Route)
+		(Available LokomotiveDB)
+		(Available LokomotiveSNCF)
+		(PV_Compatible Chemicalien Eisenbahnwagen)
+		(RV_Compatible Stuttgart_Paris_Rail_Route LokomotiveDB)
+		(RV_Compatible Paris_London_Rail_Route LokomotiveSNCF)
+		(At_Package Chemicalien HauptbahnhofStuttgart)
+	)
+	(:goal
+		(and
+		(Delivered Chemicalien)
+		)
+	)
+)

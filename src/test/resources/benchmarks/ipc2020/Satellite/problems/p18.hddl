@@ -1,0 +1,79 @@
+(define
+	(problem p4obs_4sat_4mod)
+	(:domain  satellite2)
+	(:objects
+		star1 - calib_direction
+		star0 - calib_direction
+		star5 - image_direction
+		planet2 - image_direction
+		planet4 - image_direction
+		phenomenon3 - image_direction
+		instrument4 - instrument
+		instrument5 - instrument
+		instrument2 - instrument
+		instrument3 - instrument
+		instrument1 - instrument
+		instrument6 - instrument
+		instrument0 - instrument
+		spectrograph2 - mode
+		thermograph1 - mode
+		image0 - mode
+		infrared3 - mode
+		satellite0 - satellite
+		satellite1 - satellite
+		satellite2 - satellite
+		satellite3 - satellite
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation planet2 image0))
+		 (task1 (do_observation phenomenon3 thermograph1))
+		 (task2 (do_observation planet4 thermograph1))
+		 (task3 (do_observation star5 thermograph1))
+		)
+		:ordering (and
+			(task2 < task1)
+			(task3 < task2)
+			(task0 < task3)
+		)
+	)
+	(:init
+		(supports instrument0 infrared3)
+		(supports instrument0 spectrograph2)
+		(supports instrument0 image0)
+		(calibration_target instrument0 star1)
+		(supports instrument1 image0)
+		(calibration_target instrument1 star1)
+		(on_board instrument0 satellite0)
+		(on_board instrument1 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 star1)
+		(supports instrument2 thermograph1)
+		(supports instrument2 infrared3)
+		(calibration_target instrument2 star1)
+		(on_board instrument2 satellite1)
+		(power_avail satellite1)
+		(pointing satellite1 star1)
+		(supports instrument3 infrared3)
+		(supports instrument3 thermograph1)
+		(supports instrument3 image0)
+		(calibration_target instrument3 star1)
+		(supports instrument4 thermograph1)
+		(supports instrument4 image0)
+		(supports instrument4 infrared3)
+		(calibration_target instrument4 star0)
+		(on_board instrument3 satellite2)
+		(on_board instrument4 satellite2)
+		(power_avail satellite2)
+		(pointing satellite2 planet2)
+		(supports instrument5 image0)
+		(calibration_target instrument5 star0)
+		(supports instrument6 infrared3)
+		(calibration_target instrument6 star0)
+		(on_board instrument5 satellite3)
+		(on_board instrument6 satellite3)
+		(power_avail satellite3)
+		(pointing satellite3 star5)
+	)
+)

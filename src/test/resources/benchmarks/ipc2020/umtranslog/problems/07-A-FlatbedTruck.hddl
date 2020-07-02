@@ -1,0 +1,42 @@
+(define
+	(problem p07_A_FlatbedTruck)
+	(:domain  UMTranslog)
+	(:objects
+		Holz - Lumber
+		Ulm - City
+		O27 - Customer_Location
+		O28 - Customer_Location
+		CraneO27 - Crane
+		CraneO28 - Crane
+		Pferd - Flatbed_Truck
+		James_Franck_Ring - Local_Road_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Holz O27 O28))
+		)
+	)
+	(:init
+		(In_City O27 Ulm)
+		(In_City O28 Ulm)
+		(At_Vehicle Pferd O27)
+		(Empty CraneO27)
+		(Available CraneO27)
+		(At_Equipment CraneO27 O27)
+		(Empty CraneO28)
+		(Available CraneO28)
+		(At_Equipment CraneO28 O28)
+		(Connects James_Franck_Ring O27 O28)
+		(Available James_Franck_Ring)
+		(Available Pferd)
+		(PV_Compatible Holz Pferd)
+		(RV_Compatible James_Franck_Ring Pferd)
+		(At_Package Holz O27)
+	)
+	(:goal
+		(and
+		(Delivered Holz)
+		)
+	)
+)

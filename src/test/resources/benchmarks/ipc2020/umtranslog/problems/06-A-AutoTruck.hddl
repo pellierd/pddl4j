@@ -1,0 +1,34 @@
+(define
+	(problem p06_A_AutoTruck)
+	(:domain  UMTranslog)
+	(:objects
+		MaseratiMC12 - Cars
+		Pferd - Auto_Truck
+		Ulm - City
+		O27 - Customer_Location
+		O28 - Customer_Location
+		James_Franck_Ring - Local_Road_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport MaseratiMC12 O27 O28))
+		)
+	)
+	(:init
+		(In_City O27 Ulm)
+		(In_City O28 Ulm)
+		(At_Vehicle Pferd O27)
+		(Connects James_Franck_Ring O27 O28)
+		(Available James_Franck_Ring)
+		(Available Pferd)
+		(PV_Compatible MaseratiMC12 Pferd)
+		(RV_Compatible James_Franck_Ring Pferd)
+		(At_Package MaseratiMC12 O27)
+	)
+	(:goal
+		(and
+		(Delivered MaseratiMC12)
+		)
+	)
+)

@@ -1,0 +1,37 @@
+(define
+	(problem p09_A_MailTraincar)
+	(:domain  UMTranslog)
+	(:objects
+		Ulm - City
+		Muenchen - City
+		HauptbahnhofUlm - Train_Station
+		HauptbahnhofMuenchen - Train_Station
+		Eisenbahnwagen - Mail_Traincar
+		Lokomotive - Train
+		Briefe - Mail_Package
+		UlmMuenchenRailRoute - Rail_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Briefe HauptbahnhofUlm HauptbahnhofMuenchen))
+		)
+	)
+	(:init
+		(In_City HauptbahnhofUlm Ulm)
+		(In_City HauptbahnhofMuenchen Muenchen)
+		(At_Vehicle Eisenbahnwagen HauptbahnhofUlm)
+		(At_Vehicle Lokomotive HauptbahnhofUlm)
+		(Connects UlmMuenchenRailRoute HauptbahnhofUlm HauptbahnhofMuenchen)
+		(Available UlmMuenchenRailRoute)
+		(Available Lokomotive)
+		(PV_Compatible Briefe Eisenbahnwagen)
+		(RV_Compatible UlmMuenchenRailRoute Lokomotive)
+		(At_Package Briefe HauptbahnhofUlm)
+	)
+	(:goal
+		(and
+		(Delivered Briefe)
+		)
+	)
+)

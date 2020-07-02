@@ -1,0 +1,128 @@
+(define
+	(problem p04_OrganizeMeeting_Large)
+	(:domain  SmartPhone_HierarchicalNoAxioms)
+	(:objects
+		agenda - Agenda
+		appointmentForMeeting - Appointment
+		contact1 - Contact
+		contact4 - Contact
+		contact5 - Contact
+		contact2 - Contact
+		contact3 - Contact
+		peer3 - Person
+		peer2 - Person
+		peer4 - Person
+		peer1 - Person
+		headOfDepartment - Person
+		peer1EMailAddress - EMailAddress
+		peer4EMailAddress - EMailAddress
+		peer3EMailAddress - EMailAddress
+		peer2EMailAddress - EMailAddress
+		headOfDepartmentEMailAddress - EMailAddress
+		taskCreateHandout - Task
+		dateForMeeting - Date
+		email1 - EMail
+		email5 - EMail
+		email2 - EMail
+		email3 - EMail
+		email4 - EMail
+		account1 - EMailAccount
+		peer1Picture - Picture
+		room101 - Location
+		headOfDepartmentPicture - Picture
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (attachMultipleInformation email1))
+		 (task1 (attachMultipleInformation email2))
+		 (task2 (attachMultipleInformation email3))
+		 (task3 (attachMultipleInformation email4))
+		 (task4 (attachMultipleInformation email5))
+		 (task5 (send_EMail headOfDepartment email1))
+		 (task6 (send_EMail peer1 email2))
+		 (task7 (send_EMail peer2 email3))
+		 (task8 (send_EMail peer3 email4))
+		 (task9 (send_EMail peer4 email5))
+		 (task10 (create_Appointment appointmentForMeeting room101 dateForMeeting))
+		 (task11 (create_Task taskCreateHandout))
+		 (task12 (extractsMultipleInformation headOfDepartment email1))
+		 (task13 (extractsMultipleInformation peer1 email2))
+		 (task14 (extractsMultipleInformation peer2 email3))
+		 (task15 (extractsMultipleInformation peer3 email4))
+		 (task16 (extractsMultipleInformation peer4 email5))
+		)
+		:ordering (and
+			(task6 < task0)
+			(task7 < task1)
+			(task4 < task2)
+			(task11 < task3)
+			(task10 < task4)
+			(task0 < task5)
+			(task9 < task6)
+			(task8 < task7)
+			(task3 < task8)
+			(task1 < task9)
+			(task2 < task11)
+			(task16 < task12)
+			(task14 < task13)
+			(task15 < task14)
+			(task5 < task15)
+			(task13 < task16)
+		)
+	)
+	(:init
+		(associated_Contact contact1 headOfDepartment)
+		(associated_Contact contact2 peer1)
+		(associated_Contact contact3 peer2)
+		(associated_Contact contact4 peer3)
+		(associated_Contact contact5 peer4)
+		(associated_Picture contact1 headOfDepartmentPicture)
+		(associated_Picture contact2 peer1Picture)
+		(created contact1)
+		(created contact2)
+		(created contact3)
+		(created contact4)
+		(created contact5)
+		(haveInformation_Contactable headOfDepartment headOfDepartmentEMailAddress)
+		(haveInformation_Contactable peer1 peer1EMailAddress)
+		(haveInformation_Contactable peer2 peer2EMailAddress)
+		(haveInformation_Contactable peer3 peer3EMailAddress)
+		(haveInformation_Contactable peer4 peer4EMailAddress)
+		(haveInformation_Regular agenda)
+		(haveInformation_Regular dateForMeeting)
+		(haveInformation_Regular headOfDepartmentPicture)
+		(haveInformation_Regular peer1Picture)
+		(haveInformation_Regular room101)
+		(inMode_Home)
+		(inUse contact1)
+		(inUse contact2)
+		(inUse contact3)
+		(inUse contact4)
+		(inUse contact5)
+		(isFavourite contact1)
+		(isFavourite contact2)
+		(selected account1)
+	)
+	(:goal
+		(and
+		(hasInformation_Regular headOfDepartment dateForMeeting)
+		(hasInformation_Regular peer1 dateForMeeting)
+		(hasInformation_Regular peer2 dateForMeeting)
+		(hasInformation_Regular peer3 dateForMeeting)
+		(hasInformation_Regular peer4 dateForMeeting)
+		(hasInformation_Regular headOfDepartment room101)
+		(hasInformation_Regular peer1 room101)
+		(hasInformation_Regular peer2 room101)
+		(hasInformation_Regular peer3 room101)
+		(hasInformation_Regular peer4 room101)
+		(hasInformation_Regular headOfDepartment agenda)
+		(hasInformation_Regular peer1 agenda)
+		(hasInformation_Regular peer2 agenda)
+		(hasInformation_Regular peer3 agenda)
+		(hasInformation_Regular peer4 agenda)
+		(created appointmentForMeeting)
+		(created taskCreateHandout)
+		)
+	)
+)

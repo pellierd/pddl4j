@@ -1,0 +1,70 @@
+(define
+	(problem p01__p01_complete)
+	(:domain  woodworking_legal_fewer_htn_groundings)
+	(:objects
+		natural - acolour
+		red - acolour
+		black - acolour
+		large - apartsize
+		medium - apartsize
+		small - apartsize
+		pine - awood
+		teak - awood
+		grinder0 - grinder
+		spray_varnisher0 - spray_varnisher
+		planer0 - planer
+		colourfragments - treatmentstatus
+		p0 - part
+		rough - surface
+		untreated - treatmentstatus
+		glazed - treatmentstatus
+		verysmooth - surface
+		varnished - treatmentstatus
+		smooth - surface
+		p2 - part
+	)
+	(:htn
+		:parameters (?planstep_4_argument_0_f_colour_part - part ?planstep_4_argument_1_f_colour_do_colour_variable1 - acolour ?planstep_4_argument_2_f_colour_do_colour_variable2 - machine)
+		:subtasks (and
+		 (task0 (grindNplane p0 smooth red varnished smooth natural untreated))
+		 (task1 (grindNplane p2 verysmooth natural varnished smooth natural untreated))
+		 (task2 (do_colour ?planstep_4_argument_0_f_colour_part ?planstep_4_argument_1_f_colour_do_colour_variable1 ?planstep_4_argument_2_f_colour_do_colour_variable2 untreated))
+		)
+		:ordering (and
+			(task1 < task0)
+			(task0 < task2)
+		)
+	)
+	(:init
+		(grind_treatment_change varnished colourfragments)
+		(grind_treatment_change glazed untreated)
+		(grind_treatment_change untreated untreated)
+		(grind_treatment_change colourfragments untreated)
+		(is_smooth smooth)
+		(is_smooth verysmooth)
+		(has_colour spray_varnisher0 natural)
+		(has_colour spray_varnisher0 red)
+		(available p0)
+		(colour p0 red)
+		(wood p0 pine)
+		(surface_condition p0 smooth)
+		(treatment p0 varnished)
+		(goalsize p0 small)
+		(available p2)
+		(colour p2 natural)
+		(wood p2 teak)
+		(surface_condition p2 verysmooth)
+		(treatment p2 varnished)
+		(goalsize p2 large)
+	)
+	(:goal
+		(and
+		(available p0)
+		(colour p0 natural)
+		(wood p0 pine)
+		(available p2)
+		(colour p2 red)
+		(wood p2 teak)
+		)
+	)
+)

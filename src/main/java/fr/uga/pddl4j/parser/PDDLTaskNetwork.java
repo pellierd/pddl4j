@@ -20,6 +20,8 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,6 +31,11 @@ import java.util.Objects;
  * @version 1.0 - 20.12.2019
  */
 public class PDDLTaskNetwork implements Serializable {
+
+    /**
+     * The parameter of the task network.
+     */
+    private List<PDDLTypedSymbol> parameters;
 
     /**
      * The tasks of the task network.
@@ -55,6 +62,7 @@ public class PDDLTaskNetwork implements Serializable {
      */
     protected PDDLTaskNetwork() {
         super();
+        this.parameters = null;
         this.tasks = null;
         this.orderingConstraints = null;
         this.logicalConstraints = null;
@@ -67,6 +75,10 @@ public class PDDLTaskNetwork implements Serializable {
      * @param other the other task network.
      */
     public PDDLTaskNetwork(final PDDLTaskNetwork other) {
+        this.parameters = new ArrayList<>();
+        for (PDDLTypedSymbol param : other.getParameters()) {
+            this.parameters.add(new PDDLTypedSymbol(param));
+        }
         this.tasks = new PDDLExpression(other.getTasks());
         this.orderingConstraints = new PDDLExpression(other.getOrderingConstraints());
         this.logicalConstraints = new PDDLExpression(other.getLogicalConstraints());
@@ -82,13 +94,52 @@ public class PDDLTaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLTaskNetwork(final PDDLExpression tasks, final PDDLExpression ordering, final PDDLExpression logical,
-                           final boolean ordered) {
+    public PDDLTaskNetwork(final PDDLExpression tasks,
+                           final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
         super();
+        this.setParameters(new ArrayList<>());
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);
         this.setLogicalConstraints(logical);
         this.setTotallyOrdered(ordered);
+    }
+
+    /**
+     * Creates a task network with a specified list of parameters, list of tasks, ordering and logicial constraints.
+     *
+     * @param parameters the parameters of the task network.
+     * @param tasks The tasks of the task network.
+     * @param ordering The ordering constraints between the tasks of the task network.
+     * @param logical The logicial constraint between the tasks of the task network.
+     * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
+     * @throws NullPointerException if one of the specified parameter except the precondition is null.
+     */
+    public PDDLTaskNetwork(final List<PDDLTypedSymbol> parameters, final PDDLExpression tasks,
+                           final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
+        super();
+        this.setParameters(parameters);
+        this.setTasks(tasks);
+        this.setOrderingConstraints(ordering);
+        this.setLogicalConstraints(logical);
+        this.setTotallyOrdered(ordered);
+    }
+
+    /**
+     * Returns the parameters of the task network.
+     *
+     * @return the parameters of the task network.
+     */
+    public final List<PDDLTypedSymbol> getParameters() {
+        return this.parameters;
+    }
+
+    /**
+     * Sets the parameters of the task network.
+     *
+     * @param parameters the parameters to set.
+     */
+    public void setParameters(List<PDDLTypedSymbol> parameters) {
+        this.parameters = parameters;
     }
 
     /**
@@ -203,6 +254,14 @@ public class PDDLTaskNetwork implements Serializable {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
+        str.append("   :parameters (");
+        for (int i = 0; i < this.getParameters().size() - 1; i++) {
+            str.append(this.getParameters().get(i)).append(" ");
+        }
+        if (!this.getParameters().isEmpty()) {
+            str.append(this.getParameters().get(this.getParameters().size() - 1).toString());
+        }
+        str.append(")\n");
         if (this.isTotallyOrdered()) {
             str.append("  :ordered-tasks\n  ");
         } else {

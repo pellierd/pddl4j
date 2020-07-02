@@ -1,0 +1,34 @@
+(define
+	(problem p17_A_RegularTruckCustom)
+	(:domain  UMTranslog)
+	(:objects
+		Ulm - City
+		O27 - Customer_Location
+		O28 - Customer_Location
+		Pferd - Regular_Truck
+		James_Franck_Ring - Local_Road_Route
+		Toshiba_Laptops - Parcels
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Toshiba_Laptops O27 O28))
+		)
+	)
+	(:init
+		(In_City O27 Ulm)
+		(In_City O28 Ulm)
+		(At_Vehicle Pferd O27)
+		(Connects James_Franck_Ring O27 O28)
+		(Available James_Franck_Ring)
+		(Available Pferd)
+		(PV_Compatible Toshiba_Laptops Pferd)
+		(RV_Compatible James_Franck_Ring Pferd)
+		(At_Package Toshiba_Laptops O27)
+	)
+	(:goal
+		(and
+		(Delivered Toshiba_Laptops)
+		)
+	)
+)

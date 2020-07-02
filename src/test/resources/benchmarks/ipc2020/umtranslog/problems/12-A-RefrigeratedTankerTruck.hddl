@@ -1,0 +1,34 @@
+(define
+	(problem p12_A_RefrigeratedTankerTruck)
+	(:domain  UMTranslog)
+	(:objects
+		Chemicalien - Chemicals
+		Ulm - City
+		O27 - Customer_Location
+		O28 - Customer_Location
+		Pferd - Refrigerated_Tanker_Truck
+		James_Franck_Ring - Local_Road_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Chemicalien O27 O28))
+		)
+	)
+	(:init
+		(In_City O27 Ulm)
+		(In_City O28 Ulm)
+		(At_Vehicle Pferd O27)
+		(Connects James_Franck_Ring O27 O28)
+		(Available James_Franck_Ring)
+		(Available Pferd)
+		(PV_Compatible Chemicalien Pferd)
+		(RV_Compatible James_Franck_Ring Pferd)
+		(At_Package Chemicalien O27)
+	)
+	(:goal
+		(and
+		(Delivered Chemicalien)
+		)
+	)
+)

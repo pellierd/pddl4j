@@ -146,6 +146,25 @@ final class StringDecoder implements Serializable {
     static String toString(final IntTaskNetwork tn, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks) {
         final StringBuilder str = new StringBuilder();
+        str.append("Parameters:\n");
+        for (int i = 0; i < tn.arity(); i++) {
+            final int index = tn.getValueOfParameter(i);
+            final String type = types.get(tn.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(constants.get(index));
+                str.append(" \n");
+            }
+        }
         str.append("Tasks:\n");
         str.append(toString(tn.getTasks(), constants, types, predicates, functions, tasks));
         str.append("\n");

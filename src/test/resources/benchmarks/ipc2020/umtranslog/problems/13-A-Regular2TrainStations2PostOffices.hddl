@@ -1,0 +1,59 @@
+(define
+	(problem p13_A_Regular2TrainStations2PostOffices)
+	(:domain  UMTranslog)
+	(:objects
+		Ulm - City
+		Muenchen - City
+		HauptbahnhofMuenchen - Train_Station
+		HauptbahnhofUlm - Train_Station
+		FrauenStrassePost - Post_Office
+		MuenchnerStrassePost - Post_Office
+		LKW_Ulm - Regular_Truck
+		Eisenbahnwagen - Regular_Traincar
+		Lokomotive - Train
+		LKW_Muenchen - Regular_Truck
+		James_Franck_Ring - Local_Road_Route
+		BlumenStrasse - Local_Road_Route
+		Stuehle - Parcels
+		UlmMuenchenRailRoute - Rail_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Stuehle FrauenStrassePost MuenchnerStrassePost))
+		)
+	)
+	(:init
+		(In_City FrauenStrassePost Ulm)
+		(In_City MuenchnerStrassePost Muenchen)
+		(At_Vehicle LKW_Ulm FrauenStrassePost)
+		(At_Vehicle LKW_Muenchen HauptbahnhofMuenchen)
+		(At_Vehicle Eisenbahnwagen HauptbahnhofUlm)
+		(Serves HauptbahnhofUlm Ulm)
+		(Serves HauptbahnhofMuenchen Muenchen)
+		(Available HauptbahnhofUlm)
+		(Available HauptbahnhofMuenchen)
+		(At_Vehicle Lokomotive HauptbahnhofUlm)
+		(Connects James_Franck_Ring FrauenStrassePost HauptbahnhofUlm)
+		(Connects UlmMuenchenRailRoute HauptbahnhofUlm HauptbahnhofMuenchen)
+		(Connects BlumenStrasse HauptbahnhofMuenchen MuenchnerStrassePost)
+		(Available James_Franck_Ring)
+		(Available UlmMuenchenRailRoute)
+		(Available BlumenStrasse)
+		(Available LKW_Ulm)
+		(Available Lokomotive)
+		(Available LKW_Muenchen)
+		(PV_Compatible Stuehle LKW_Ulm)
+		(PV_Compatible Stuehle Eisenbahnwagen)
+		(PV_Compatible Stuehle LKW_Muenchen)
+		(RV_Compatible James_Franck_Ring LKW_Ulm)
+		(RV_Compatible UlmMuenchenRailRoute Lokomotive)
+		(RV_Compatible BlumenStrasse LKW_Muenchen)
+		(At_Package Stuehle FrauenStrassePost)
+	)
+	(:goal
+		(and
+		(Delivered Stuehle)
+		)
+	)
+)

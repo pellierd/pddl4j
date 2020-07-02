@@ -128,7 +128,7 @@ public final class FFAnytime extends AbstractStateSpacePlannerAnytime {
      * @param pb the problem to solve.
      */
     @Override
-    public SequentialPlan search(final Problem pb) {
+    public Plan search(final Problem pb) {
         final Logger logger = this.getLogger();
         Objects.requireNonNull(pb);
 

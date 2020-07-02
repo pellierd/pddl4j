@@ -1,0 +1,37 @@
+(define
+	(problem p10_A_RefrigeratedRegularTraincar)
+	(:domain  UMTranslog)
+	(:objects
+		Ulm - City
+		Muenchen - City
+		HauptbahnhofUlm - Train_Station
+		HauptbahnhofMuenchen - Train_Station
+		Eisenbahnwagen - Refrigerated_Regular_Traincar
+		Lokomotive - Train
+		Essen - Food
+		UlmMuenchenRailRoute - Rail_Route
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (transport Essen HauptbahnhofUlm HauptbahnhofMuenchen))
+		)
+	)
+	(:init
+		(In_City HauptbahnhofUlm Ulm)
+		(In_City HauptbahnhofMuenchen Muenchen)
+		(At_Vehicle Eisenbahnwagen HauptbahnhofUlm)
+		(At_Vehicle Lokomotive HauptbahnhofUlm)
+		(Connects UlmMuenchenRailRoute HauptbahnhofUlm HauptbahnhofMuenchen)
+		(Available UlmMuenchenRailRoute)
+		(Available Lokomotive)
+		(PV_Compatible Essen Eisenbahnwagen)
+		(RV_Compatible UlmMuenchenRailRoute Lokomotive)
+		(At_Package Essen HauptbahnhofUlm)
+	)
+	(:goal
+		(and
+		(Delivered Essen)
+		)
+	)
+)

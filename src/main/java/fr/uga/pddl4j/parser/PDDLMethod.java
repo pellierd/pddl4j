@@ -184,7 +184,6 @@ public class PDDLMethod extends PDDLAbstractOperator {
     /**
      * Normalizes the method.
      * <p>
-     * Warning for the moment the logical constraints are not process.
      * </p>
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @see PDDLExpression#renameVariables()
@@ -215,6 +214,24 @@ public class PDDLMethod extends PDDLAbstractOperator {
                 c.getAtom().add(this.getSubTasks().getChildren().get(j).getTaskID());
                 this.getOrderingConstraints().addChild(c);
             }
+        }
+        // Rename the logical constraits
+        this.getLogicalConstraints().renameVariables(varCtx);
+        if (this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
+            for (PDDLExpression constraint : this.getLogicalConstraints().getChildren()) {
+                if (constraint.getConnective().equals(PDDLConnective.EQUAL)
+                    || constraint.getConnective().equals(PDDLConnective.NOT)) {
+                    this.getPreconditions().addChild(constraint);
+                }
+            }
+        } else {
+            PDDLExpression preconditions = new PDDLExpression(PDDLConnective.AND);
+            for (PDDLExpression constraint : this.getLogicalConstraints().getChildren()) {
+                preconditions.addChild(constraint);
+            }
+            preconditions.addChild(this.getPreconditions());
+            this.setPreconditions(preconditions);
+            this.getPreconditions().moveNegationInward();
         }
         return varCtx;
     }

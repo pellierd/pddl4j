@@ -525,8 +525,8 @@ final class PostInstantiation implements Serializable {
             if (!a.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 PostInstantiation.simplifyWithGroundInertia(a.getEffects(), true, init);
                 PostInstantiation.simplify(a.getEffects());
-                if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)
-                    && !a.getEffects().getConnective().equals(PDDLConnective.TRUE)) {
+                if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                    //&& !a.getEffects().getConnective().equals(PDDLConnective.TRUE)) {
                     toAdd.add(a);
                 } else {
                     toRemove.add(index);

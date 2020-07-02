@@ -395,9 +395,12 @@ final class PreInstantiation implements Serializable {
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getPreconditions()));
         unaryInertia.addAll(PreInstantiation.collectUnaryInertia(action.getEffects()));
 
-
         List<IntAction> actions = new LinkedList<>();
         actions.add(action);
+
+        if (action.arity() == 0) {
+            return actions;
+        }
 
         for (final IntExpression inertia : unaryInertia) {
             final List<IntAction> newActions = new ArrayList<>();
@@ -480,6 +483,10 @@ final class PreInstantiation implements Serializable {
 
         List<IntMethod> methods = new LinkedList<>();
         methods.add(meth);
+
+        if (meth.arity() == 0) {
+            return methods;
+        }
 
         for (final IntExpression inertia : unaryInertia) {
             final List<IntMethod> newMethods = new ArrayList<>();
