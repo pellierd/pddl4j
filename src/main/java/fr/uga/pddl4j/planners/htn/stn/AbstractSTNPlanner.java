@@ -162,11 +162,26 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             n = n.getParent();
         }
 
+        /*for (int i = 0; i < tasks.size(); i++) {
+            if (problem.getTasks().get(tasks.get(i)).isPrimtive()) {
+                System.out.println(i + " Primitive "
+                    + problem.toString(problem.getTasks().get(tasks.get(i)))
+                    + " -> Action "
+                    + problem.toShortString(problem.getActions().get(operators.get(i))));
+            } else {
+                System.out.println(i + " Compound "
+                    + problem.toString(problem.getTasks().get(tasks.get(i)))
+                    + " -> Method "
+                    + problem.toShortString(problem.getMethods().get(operators.get(i))));
+            }
+
+        }*/
+
         // Create the dictionary to rename tasks with new IDs
         final LinkedHashMap<Integer, LinkedList<Integer>>  taskDictionary = new LinkedHashMap<>();
         int index = 0;
         for (Integer t : tasks) {
-            LinkedList<Integer> value = taskDictionary.get(t);
+            LinkedList<Integer> value = taskDictionary.get(problem.getTasks().get(t));
             if (value == null) {
                 value = new LinkedList<>();
                 taskDictionary.put(t, value);
@@ -174,6 +189,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             value.add(index);
             index++;
         }
+
 
         // Creates the plan and the decomposition to print
         index = 0;

@@ -295,6 +295,10 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                     System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
 
                 } else {
+                    if (traceLevel == 9) {
+                        System.out.println("==>");
+                        System.out.println("<==\n");
+                    }
                     System.out.println(String.format(String.format("\n%nno plan found%n%n")));
                     System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
                     System.out.println(String.format("Searching time       : %4.3fs", searchTime));

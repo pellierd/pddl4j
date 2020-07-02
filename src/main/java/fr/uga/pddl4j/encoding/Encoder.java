@@ -570,30 +570,34 @@ public final class Encoder implements Serializable {
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
 
             List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(intTaskNetwork);
-            IntExpression root =  new IntExpression(PDDLConnective.TASK);
-            root.setPredicate(Encoder.tableOfTasks.size());
-            Encoder.tableOfTasks.add("__top");
-            Encoder.compoundTaskSymbols.add("__top");
-            root.setPrimtive(false);
-            int index = 0;
-            for (IntTaskNetwork tn : initialTaskNetworks) {
-                IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
-                for (int i = 0; i < tn.arity(); i++) {
-                    method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
+            if (initialTaskNetworks.size() > 1) {
+                IntExpression root = new IntExpression(PDDLConnective.TASK);
+                root.setPredicate(Encoder.tableOfTasks.size());
+                Encoder.tableOfTasks.add("__top");
+                Encoder.compoundTaskSymbols.add("__top");
+                root.setPrimtive(false);
+                int index = 0;
+                for (IntTaskNetwork tn : initialTaskNetworks) {
+                    IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
+                    for (int i = 0; i < tn.arity(); i++) {
+                        method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
+                    }
+                    for (int i = 0; i < tn.arity(); i++) {
+                        method.setValueOfParameter(i, tn.getValueOfParameter(i));
+                    }
+                    method.setTask(new IntExpression(root));
+                    method.setPreconditions(new IntExpression(PDDLConnective.AND));
+                    method.setTaskNetwork(tn);
+                    intMethods.add(method);
+                    index++;
                 }
-                for (int i = 0; i < tn.arity(); i++) {
-                    method.setValueOfParameter(i, tn.getValueOfParameter(i));
-                }
-                method.setTask(new IntExpression(root));
-                method.setPreconditions(new IntExpression(PDDLConnective.AND));
-                method.setTaskNetwork(tn);
-                intMethods.add(method);
-                index++;
-            }
 
-            // Creates the abstract initial task network
-            intTaskNetwork = new IntTaskNetwork();
-            intTaskNetwork.getTasks().addChild(new IntExpression(root));
+                // Creates the abstract initial task network
+                intTaskNetwork = new IntTaskNetwork();
+                intTaskNetwork.getTasks().addChild(new IntExpression(root));
+            } else {
+                intTaskNetwork = initialTaskNetworks.get(0);
+            }
 
             //System.out.println(Encoder.toString(initialTaskNetworks.get(0)));
             intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
