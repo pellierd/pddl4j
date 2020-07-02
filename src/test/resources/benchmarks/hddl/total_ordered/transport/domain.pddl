@@ -16,51 +16,51 @@
 
   (:tasks
     (deliver ?p - package ?l - location)
-    (get-to ?v - vehicle ?l - location)
+    (get_to ?v - vehicle ?l - location)
     (load ?v - vehicle ?l - location ?p - package)
     (unload ?v - vehicle ?l - location ?p - package)
   )
 
-  (:method m-deliver
+  (:method m_deliver
     :parameters (?p - package ?l1 ?l2 - location ?v - vehicle)
     :task (deliver ?p ?l2)
     :ordered-subtasks (and
-      (get-to ?v ?l1)
+      (get_to ?v ?l1)
       (load ?v ?l1 ?p)
-      (get-to ?v ?l2)
+      (get_to ?v ?l2)
       (unload ?v ?l2 ?p))
   )
 
-  (:method m-unload
+  (:method m_unload
     :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :task (unload ?v ?l ?p)
     :ordered-subtasks (drop ?v ?l ?p ?s1 ?s2)
   )
 
-  (:method m-load
+  (:method m_load
     :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :task (load  ?v ?l ?p)
-    :ordered-subtasks (pick-up ?v ?l ?p ?s1 ?s2)
+    :ordered-subtasks (pick_up ?v ?l ?p ?s1 ?s2)
   )
 
-  (:method m-drive-to
+  (:method m_drive-to
     :parameters (?v - vehicle ?l1 ?l2 - location)
-    :task (get-to ?v ?l2)
+    :task (get_to ?v ?l2)
     :ordered-subtasks (and
         (drive ?v ?l1 ?l2))
   )
 
-  (:method m-drive-to-via
+  (:method m_drive_to_via
     :parameters (?v - vehicle ?l2 ?l3 - location)
-    :task (get-to  ?v ?l3)
+    :task (get_to  ?v ?l3)
     :ordered-subtasks (and
-        (get-to ?v ?l2)
+        (get_to ?v ?l2)
         (drive ?v ?l2 ?l3))
   )
 
-  (:method m-i-am-there
+  (:method m_i_am_there
     :parameters (?v - vehicle ?l - location)
-    :task (get-to  ?v ?l)
+    :task (get_to  ?v ?l)
     :ordered-subtasks (and
         (noop ?v ?l))
   )
@@ -81,7 +81,7 @@
     :effect ()
   )
 
- (:action pick-up
+ (:action pick_up
     :parameters (?v - vehicle ?l - location ?p - package ?s1 ?s2 - capacity_number)
     :precondition (and
         (at ?v ?l)
