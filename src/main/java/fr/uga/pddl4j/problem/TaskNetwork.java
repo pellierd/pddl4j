@@ -22,6 +22,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -82,16 +83,17 @@ public final class TaskNetwork implements Serializable {
         this.tasks = new LinkedList<Integer>(tasks);
         this.setOrderingConstraints(constraints);
         this.transitiveClosure();
+
         if (this.isTotallyOrdered()) {
             LinkedList<Integer> orderedTasks = new LinkedList<>();
-            List<Integer> numbeOfConstraints = new ArrayList<>();
+            List<Integer> numberOfConstraints = new ArrayList<>();
             for (int i = 0; i < constraints.rows(); i++) {
-                numbeOfConstraints.add(constraints.getRow(i).cardinality());
+                numberOfConstraints.add(constraints.getRow(i).cardinality());
                 constraints.getRow(i).clear(0, i + 1);
                 constraints.getRow(i).set(i + 1, constraints.columns());
             }
-            for (int i = 0; i < numbeOfConstraints.size(); i++) {
-                orderedTasks.add(this.tasks.get(numbeOfConstraints.indexOf(i)));
+            for (int i = 0; i < numberOfConstraints.size(); i++) {
+                orderedTasks.add(0, this.tasks.get(numberOfConstraints.indexOf(i)));
             }
             this.tasks = orderedTasks;
         }
@@ -204,14 +206,20 @@ public final class TaskNetwork implements Serializable {
     public final boolean isTotallyOrdered() {
         BitMatrix matrix = new BitMatrix(this.getOrderingConstraints());
         boolean ordered = true;
-        while (matrix.rows() >= 0 && ordered) {
+        //System.out.println("AVANT -------\n" + matrix.toBitString());
+        int index = 0;
+        while (matrix.rows() > 1 && ordered) {
             List<Integer> tasks = this.getTasksWithNoPredecessors(matrix);
+            //System.out.println(tasks.size());
             ordered = tasks.size() == 1;
             if (ordered) {
                 matrix.removeRow(tasks.get(0));
                 matrix.removeColumn(tasks.get(0));
             }
+            //System.out.println(index + " PENDANT ------- \n" + matrix.toBitString());
+            index++;
         }
+        //System.out.println("ordered=" + ordered);
         return ordered;
     }
 

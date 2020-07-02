@@ -260,11 +260,22 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         final Problem pb = factory.encode();
         long end = System.currentTimeMillis();
         final double encodingTime = (end - start) / 1000.0;
-        System.out.println("\nEncoding problem done successfully ("
+        System.out.print("\nEncoding ");
+            if (pb.isTotallyOrederd()) {
+                System.out.print("totaly ordered ");
+            } else {
+                System.out.print("partially ordered ");
+            }
+            System.out.println("problem done successfully ("
             + pb.getActions().size() + " actions, "
             + pb.getMethods().size() + " methods, "
             + pb.getRelevantFluents().size() + " fluents, "
             + pb.getTasks().size() + " tasks)\n");
+
+        if (!pb.isTotallyOrederd()) {
+            System.out.println("Unable to solve a problem that isn't totally ordered.\n");
+        }
+
 
         if (pb.isSolvable()) {
             try {
