@@ -162,26 +162,11 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             n = n.getParent();
         }
 
-        /*for (int i = 0; i < tasks.size(); i++) {
-            if (problem.getTasks().get(tasks.get(i)).isPrimtive()) {
-                System.out.println(i + " Primitive "
-                    + problem.toString(problem.getTasks().get(tasks.get(i)))
-                    + " -> Action "
-                    + problem.toShortString(problem.getActions().get(operators.get(i))));
-            } else {
-                System.out.println(i + " Compound "
-                    + problem.toString(problem.getTasks().get(tasks.get(i)))
-                    + " -> Method "
-                    + problem.toShortString(problem.getMethods().get(operators.get(i))));
-            }
-
-        }*/
-
         // Create the dictionary to rename tasks with new IDs
         final LinkedHashMap<Integer, LinkedList<Integer>>  taskDictionary = new LinkedHashMap<>();
         int index = 0;
         for (Integer t : tasks) {
-            LinkedList<Integer> value = taskDictionary.get(problem.getTasks().get(t));
+            LinkedList<Integer> value = taskDictionary.get(t);
             if (value == null) {
                 value = new LinkedList<>();
                 taskDictionary.put(t, value);
@@ -197,9 +182,12 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         StringBuffer decomposition = new StringBuffer();
         index = 0;
         for (Integer t : tasks) {
+
             if (problem.getTasks().get(t).isPrimtive()) {
                 plan.append(index + " " + problem.toString(problem.getTasks().get(t)) + "\n");
             }  else {
+                taskDictionary.get(t).pop();
+                taskDictionary.get(t).addLast(t);
                 decomposition.append(index + " " + problem.toString(problem.getTasks().get(t)));
                 Method m = problem.getMethods().get(operators.get(index));
                 decomposition.append(" -> " + m.getName());
@@ -229,6 +217,14 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
     }
 
+    private int indexOf(int from, int task, List<Integer> tasks) {
+        for (int i = from; i < tasks.size(); i++) {
+            if (tasks.get(i) == task) {
+                return i;
+            }
+        }
+        return -1;
+    }
     /**
      * Print the usage of the AbstractSTNPlanner.
      */
