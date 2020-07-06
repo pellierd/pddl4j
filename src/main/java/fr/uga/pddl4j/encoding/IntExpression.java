@@ -143,7 +143,7 @@ public class IntExpression implements Serializable {
         this.connective = connective;
         this.predicate = IntExpression.DEFAULT_PREDICATE;
         this.taskID = IntExpression.DEFAULT_TASK_ID;
-        this.arguments = null;
+        this.arguments = new int[0];
         this.children = new ArrayList<>();
         this.variable = IntExpression.DEFAULT_VARIABLE;
         this.type = IntExpression.DEFAULT_TYPE;

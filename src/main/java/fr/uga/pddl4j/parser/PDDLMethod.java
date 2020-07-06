@@ -19,10 +19,7 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class implements a method for htn planning operator parsed.
@@ -217,22 +214,32 @@ public class PDDLMethod extends PDDLAbstractOperator {
         }
         // Rename the logical constraits
         this.getLogicalConstraints().renameVariables(varCtx);
-        if (this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
-            for (PDDLExpression constraint : this.getLogicalConstraints().getChildren()) {
-                if (constraint.getConnective().equals(PDDLConnective.EQUAL)
-                    || constraint.getConnective().equals(PDDLConnective.NOT)) {
-                    this.getPreconditions().addChild(constraint);
-                }
-            }
+        PDDLExpression preconditions = null;
+        if (!this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
+            preconditions = this.getPreconditions();
         } else {
-            PDDLExpression preconditions = new PDDLExpression(PDDLConnective.AND);
-            for (PDDLExpression constraint : this.getLogicalConstraints().getChildren()) {
-                preconditions.addChild(constraint);
-            }
+            preconditions = new PDDLExpression(PDDLConnective.AND);
             preconditions.addChild(this.getPreconditions());
-            this.setPreconditions(preconditions);
-            this.getPreconditions().moveNegationInward();
         }
+        Iterator<PDDLExpression> i = this.getLogicalConstraints().getChildren().iterator();
+        while (i.hasNext()) {
+            final PDDLExpression constraint = i.next();
+            switch (constraint.getConnective()) {
+                case EQUAL:
+                    preconditions.addChild(constraint);
+                    i.remove();
+                    break;
+                case NOT:
+                    if (constraint.getChildren().get(0).equals(PDDLConnective.EQUAL)) {
+                        preconditions.addChild(constraint);
+                        i.remove();
+                    }
+                    break;
+                default:
+            }
+        }
+        this.setPreconditions(preconditions);
+        this.getPreconditions().moveNegationInward();
         return varCtx;
     }
 

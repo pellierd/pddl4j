@@ -175,15 +175,19 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             index++;
         }
 
+
         // Creates the plan and the decomposition to print
         index = 0;
         StringBuffer plan = new StringBuffer();
         StringBuffer decomposition = new StringBuffer();
         index = 0;
         for (Integer t : tasks) {
+
             if (problem.getTasks().get(t).isPrimtive()) {
                 plan.append(index + " " + problem.toString(problem.getTasks().get(t)) + "\n");
             }  else {
+                taskDictionary.get(t).pop();
+                taskDictionary.get(t).addLast(t);
                 decomposition.append(index + " " + problem.toString(problem.getTasks().get(t)));
                 Method m = problem.getMethods().get(operators.get(index));
                 decomposition.append(" -> " + m.getName());
@@ -213,6 +217,14 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
     }
 
+    private int indexOf(int from, int task, List<Integer> tasks) {
+        for (int i = from; i < tasks.size(); i++) {
+            if (tasks.get(i) == task) {
+                return i;
+            }
+        }
+        return -1;
+    }
     /**
      * Print the usage of the AbstractSTNPlanner.
      */

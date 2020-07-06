@@ -145,6 +145,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
                                     System.out.println(problem.toString(childNode.getState()));
+                                    System.out.println(problem.toString(problem.getTasks().get(childNode.getTask())));
                                     for (int t : childNode.getTaskNetwork().getTasks()) {
                                         System.out.println(problem.toString(problem.getTasks().get(t)));
                                     }
@@ -182,6 +183,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 if (debug) {
                                     System.out.println("=====> Decomposition succeeded push node:");
                                     System.out.println(problem.toString(childNode.getTaskNetwork()));
+                                    System.out.println(problem.toString(problem.getTasks().get(childNode.getTask())));
                                 }
                             } else {
                                 if (debug) {
@@ -297,6 +299,10 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                     System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
 
                 } else {
+                    if (traceLevel == 9) {
+                        System.out.println("==>");
+                        System.out.println("<==\n");
+                    }
                     System.out.println(String.format(String.format("%nno plan found%n%n")));
                     System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
                     System.out.println(String.format("Searching time       : %4.3fs", searchTime));
