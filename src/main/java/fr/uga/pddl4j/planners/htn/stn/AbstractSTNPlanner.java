@@ -15,7 +15,6 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
@@ -97,7 +96,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             return 1;
         } else {
             List<Integer> relevant = problem.getRelevantOperators().get(task);
-            int max = Integer.MIN_VALUE;
+            int max = java.lang.Integer.MIN_VALUE;
             for (int i = 0; i < relevant.size(); i++) {
                 Method m = problem.getMethods().get(relevant.get(i));
                 int cost = 0;
@@ -146,74 +145,125 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
     public void printPlanForValidator(final AbstractSTNNode node, final Problem problem) {
 
-        // Extract the list of tasks and operators from the search solution node.
-        final List<Integer> tasks = new LinkedList<>();
-        final List<Integer> operators = new LinkedList<>();
+        final LinkedList<Integer> operators = new LinkedList<>();
+        final LinkedList<Method> methods = new LinkedList<>();
+        final LinkedList<Integer> tasks = new LinkedList<>();
+        final LinkedHashMap<Integer, LinkedList<Integer>> taskDictionary = new LinkedHashMap<>();
+
         final int nbactions = problem.getActions().size();
+
+        // Extract lists of tasks and operators (actions or methods)
         AbstractSTNNode n = node;
         while (n.getParent() != null) {
             final int operator = n.getOperator();
-            tasks.add(0, n.getTask());
-            if (operator < nbactions) {
-                operators.add(0, operator);
-            } else {
-                operators.add(0, operator - nbactions);
+            final Integer task = n.getTask();
+            operators.add(0, operator);
+            tasks.add(0, task);
+            if (operator >= nbactions) {
+                final Method method = problem.getMethods().get(operator - nbactions);
+                methods.add(0, method);
             }
             n = n.getParent();
         }
 
-        // Create the dictionary to rename tasks with new IDs
-        final LinkedHashMap<Integer, LinkedList<Integer>>  taskDictionary = new LinkedHashMap<>();
-        int index = 0;
-        for (Integer t : tasks) {
-            LinkedList<Integer> value = taskDictionary.get(t);
-            if (value == null) {
-                value = new LinkedList<>();
-                taskDictionary.put(t, value);
-            }
-            value.add(index);
-            index++;
-        }
-
-
-        // Creates the plan and the decomposition to print
-        index = 0;
         StringBuffer plan = new StringBuffer();
-        StringBuffer decomposition = new StringBuffer();
-        index = 0;
-        for (Integer t : tasks) {
-
-            if (problem.getTasks().get(t).isPrimtive()) {
-                plan.append(index + " " + problem.toString(problem.getTasks().get(t)) + "\n");
-            }  else {
-                taskDictionary.get(t).pop();
-                taskDictionary.get(t).addLast(t);
-                decomposition.append(index + " " + problem.toString(problem.getTasks().get(t)));
-                Method m = problem.getMethods().get(operators.get(index));
-                decomposition.append(" -> " + m.getName());
-                for (Integer st : m.getSubTasks()) {
-                    int task  = taskDictionary.get(st).pop();
-                    taskDictionary.get(st).addLast(task);
-                    decomposition.append(" " + task);
+        int indexOfActions = 0;
+        int indexOfMethods = 0;
+        for (int i = 0; i < tasks.size(); i++) {
+            Integer operator = operators.get(i);
+            final Integer task = tasks.get(i);
+            // Rename primitive tasks
+            if (operator < nbactions) {
+                if (taskDictionary.containsKey(task)) {
+                    taskDictionary.get(task).add(indexOfActions);
+                } else {
+                    final LinkedList<Integer> alias = new LinkedList<Integer>();
+                    alias.add(indexOfActions);
+                    taskDictionary.put(task, alias);
                 }
-                decomposition.append("\n");
+                // Format plan
+                final Action action = problem.getActions().get(operator);
+                plan.append(String.format("%d %s%n", indexOfActions, problem.toShortString(action)));
+                indexOfActions++;
+            } else {
+                // Rename abstract tasks
+                if (taskDictionary.containsKey(task)) {
+                    taskDictionary.get(task).add(indexOfMethods + nbactions);
+                } else {
+                    final LinkedList<Integer> alias = new LinkedList<Integer>();
+                    alias.add(indexOfMethods + nbactions);
+                    taskDictionary.put(task, alias);
+                }
+                // Method decomposition cannot be formatted here
+                indexOfMethods++;
             }
-            index++;
         }
-        // Creates the root output
-        StringBuffer root = new StringBuffer();
+
+        // Builds the decomposition tree
+        int id = 0;
+        LinkedList<Node> open = new LinkedList<Node>();
+        List<Node> children = new LinkedList<Node>();
+        final Node top = new Node(id++, null, null);
+        top.taskname = "root";
+        for (Integer task : problem.getInitialTaskNetwork().getTasks()) {
+            final Node tmpn = new Node(id++, top, task);
+            children.add(tmpn);
+        }
+        open.addAll(0, children);
+        top.addChildren(children);
+        children.clear();
+
+        while (!open.isEmpty()) {
+            final Node tmpn = open.removeFirst();
+            if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
+                final Method method = methods.removeFirst();
+                final Integer task = method.getTask();
+                tmpn.tasksynonym = taskDictionary.get(task).removeFirst();
+                tmpn.methodname = method.getName();
+                tmpn.taskname = problem.toString(problem.getTasks().get(task));
+                final List<Integer> subtasks = method.getSubTasks();
+                for (Integer subtask : subtasks) {
+                    final Node child = new Node(id++, tmpn, subtask);
+                    children.add(child);
+                }
+                open.addAll(0, children);
+                tmpn.addChildren(children);
+                children.clear();
+            } else {
+                tmpn.tasksynonym = taskDictionary.get(tmpn.task).removeFirst();
+            }
+        }
+
+        open.add(top);
+        final StringBuffer root = new StringBuffer();
         root.append("root");
-        for (Integer t : problem.getInitialTaskNetwork().getTasks()) {
-            root.append(" " + taskDictionary.get(t).pop());
+        final StringBuffer decomposition = new StringBuffer();
+        while(!open.isEmpty()) {
+            final Node tmpn = open.removeFirst();
+            children = tmpn.getChildren();
+            open.addAll(0, children);
+            if (tmpn.parent == null) {
+                for (Node child : children) {
+                    root.append(" " + child.tasksynonym);
+                }
+                root.append("\n");
+            } else {
+                if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
+                    decomposition.append(tmpn.tasksynonym + " " + tmpn.taskname + " -> " + tmpn.methodname);
+                    for (Node child : children) {
+                        decomposition.append(" " + child.tasksynonym);
+                    }
+                    decomposition.append("\n");
+                }
+            }
         }
-        root.append("\n");
 
         // Finally, print the output solution
         System.out.println("==>");
         System.out.print(plan);
         System.out.print(root);
         System.out.print(decomposition);
-        System.out.println("<==\n");
+        System.out.println("<==");
 
     }
 
@@ -263,13 +313,13 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
                     }
                     arguments.put(Planner.PROBLEM, new File(args[i + 1]));
                 } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    final int timeout = Integer.parseInt(args[i + 1]) * 1000;
+                    final int timeout = java.lang.Integer.parseInt(args[i + 1]) * 1000;
                     if (timeout < 0) {
                         return null;
                     }
                     arguments.put(Planner.TIMEOUT, timeout);
                 } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    final int level = Integer.parseInt(args[i + 1]);
+                    final int level = java.lang.Integer.parseInt(args[i + 1]);
                     arguments.put(Planner.TRACE_LEVEL, level);
                 } else {
                     return null;
@@ -283,5 +333,34 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         return (arguments.get(Planner.DOMAIN) == null
                 || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
 
+    }
+
+    public class Node {
+        private Integer id;
+        private Integer task;
+        private Integer tasksynonym;
+        private String taskname;
+        private String methodname;
+        private Node parent;
+        private List<Node> children = new LinkedList<Node>();
+
+        public Node (final Integer id, final Node parent, final Integer data) {
+            this.task = data;
+            this.id = id;
+            this.parent = parent;
+        }
+
+        public List<Node> getChildren() {
+            return children;
+        }
+
+        public void addChildren(List<Node> children) {
+            this.children.addAll(0, children);
+        }
+
+        public String toString() {
+            return "Node [id = " + id + ", task = " + task + ", children = "
+                + children + "]";
+        }
     }
 }
