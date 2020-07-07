@@ -200,13 +200,11 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         }
 
         // Builds the decomposition tree
-        int id = 0;
         LinkedList<Node> open = new LinkedList<Node>();
         List<Node> children = new LinkedList<Node>();
-        final Node top = new Node(id++, null, null);
-        top.taskname = "root";
+        final Node top = new Node(null, null);
         for (Integer task : problem.getInitialTaskNetwork().getTasks()) {
-            final Node tmpn = new Node(id++, top, task);
+            final Node tmpn = new Node(top, task);
             children.add(tmpn);
         }
         open.addAll(0, children);
@@ -223,7 +221,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
                 tmpn.taskname = problem.toString(problem.getTasks().get(task));
                 final List<Integer> subtasks = method.getSubTasks();
                 for (Integer subtask : subtasks) {
-                    final Node child = new Node(id++, tmpn, subtask);
+                    final Node child = new Node(tmpn, subtask);
                     children.add(child);
                 }
                 open.addAll(0, children);
@@ -336,7 +334,6 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
     }
 
     public class Node {
-        private Integer id;
         private Integer task;
         private Integer tasksynonym;
         private String taskname;
@@ -344,9 +341,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         private Node parent;
         private List<Node> children = new LinkedList<Node>();
 
-        public Node (final Integer id, final Node parent, final Integer data) {
+        public Node (final Node parent, final Integer data) {
             this.task = data;
-            this.id = id;
             this.parent = parent;
         }
 
@@ -359,7 +355,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         }
 
         public String toString() {
-            return "Node [id = " + id + ", task = " + task + ", children = "
+            return "Node [task = " + task + ", children = "
                 + children + "]";
         }
     }
