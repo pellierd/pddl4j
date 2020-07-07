@@ -159,6 +159,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             final Integer task = n.getTask();
             operators.add(0, operator);
             tasks.add(0, task);
+            // Operator is a method
             if (operator >= nbactions) {
                 final Method method = problem.getMethods().get(operator - nbactions);
                 methods.add(0, method);
@@ -342,8 +343,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         private Node parent;
         private List<Node> children = new LinkedList<Node>();
 
-        public Node (final Node parent, final Integer data) {
-            this.task = data;
+        public Node (final Node parent, final Integer task) {
+            this.task = task;
             this.parent = parent;
         }
 
