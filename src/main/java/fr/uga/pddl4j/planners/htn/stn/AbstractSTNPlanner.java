@@ -333,6 +333,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
     }
 
+    // Node of the task decomposition
     public class Node {
         private Integer task;
         private Integer tasksynonym;
