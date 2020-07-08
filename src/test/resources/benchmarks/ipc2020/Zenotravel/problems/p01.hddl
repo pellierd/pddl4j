@@ -24,8 +24,8 @@
 		 (task2 (transport-aircraft a1 c2))
 		)
 		:ordering (and
-			(task2 < task1)
-			(task0 < task2)
+			(< task2 task1)
+			(< task0 task2)
 		)
 	)
 	(:init

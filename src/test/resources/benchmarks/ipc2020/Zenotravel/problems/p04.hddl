@@ -30,10 +30,10 @@
 		 (task4 (transport-aircraft a1 c1))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task2 < task1)
-			(task0 < task3)
-			(task3 < task4)
+			(< task1 task0)
+			(< task2 task1)
+			(< task0 task3)
+			(< task3 task4)
 		)
 	)
 	(:init

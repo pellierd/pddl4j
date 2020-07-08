@@ -29,9 +29,9 @@
 		 (task3 (transport-person p4 c4))
 		)
 		:ordering (and
-			(task2 < task1)
-			(task3 < task2)
-			(task0 < task3)
+			(< task2 task1)
+			(< task3 task2)
+			(< task0 task3)
 		)
 	)
 	(:init

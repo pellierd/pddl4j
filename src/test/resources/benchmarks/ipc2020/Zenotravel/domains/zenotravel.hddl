@@ -55,8 +55,8 @@
 		 (task2 (debark ?p ?a ?c2))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
+			(< task0 task1)
+			(< task1 task2)
 		)
 	)
 
@@ -75,9 +75,9 @@
 		 (task3 (debark ?p ?a ?c2))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
 		)
 	)
 
@@ -130,7 +130,7 @@
 		 (task1 (fly ?a ?c1 ?c2 ?l1 ?l))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
