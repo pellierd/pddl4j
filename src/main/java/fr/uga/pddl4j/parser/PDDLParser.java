@@ -1290,7 +1290,7 @@ public final class PDDLParser {
                         }
                     }
                     break;
-                case SORT_OF_CONSTRAINT:
+/*                case SORT_OF_CONSTRAINT:
                     for (PDDLTypedSymbol variable : gd.getVariables()) {
                         boolean error = false;
                         for (PDDLSymbol type : variable.getTypes()) {
@@ -1303,7 +1303,7 @@ public final class PDDLParser {
                         }
                         checked = !error;
                     }
-                    break;
+                    break;*/
                 case EQUAL_ATOM:
                     for (PDDLSymbol term : gd.getAtom()) {
                         checked = this.checkTerm(term, context);

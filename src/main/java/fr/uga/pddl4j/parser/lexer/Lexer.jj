@@ -2044,16 +2044,16 @@ PDDLExpression htn_constraint() : // ADD HDDL
             node = equal_atomic_formula()
     |   LOOKAHEAD(4)
             node = not_equal_atomic_formula()
-    |   LOOKAHEAD(4)
-            node = sortof_constraints()
-    |   LOOKAHEAD(4)
-          node = not_sortof_constraints()
+//    |   LOOKAHEAD(4)
+//            node = sortof_constraints()
+//    |   LOOKAHEAD(4)
+//          node = not_sortof_constraints()
     ) {
         return node;
     }
 }
 
-PDDLExpression sortof_constraints() : // ADD HDDL
+/*PDDLExpression sortof_constraints() : // ADD HDDL
 {
     PDDLExpression exp = new PDDLExpression(PDDLConnective.SORT_OF_CONSTRAINT);
     PDDLSymbol variable = null;
@@ -2080,7 +2080,7 @@ PDDLExpression not_sortof_constraints() : // ADD HDDL
     <LEFT_BRACKET> <NOT> exp=sortof_constraints() <RIGHT_BRACKET> {
         return exp;
     }
-}
+}*/
 
 
 PDDLDerivedPredicate derived_def() :
