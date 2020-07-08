@@ -1,5 +1,11 @@
 (define (domain miconic)
-	(:requirements :typing :hierarchy :htn-method-prec :universal-preconditions :negative-preconditions)
+	(:requirements
+	:hierarchy
+	:typing
+	:universal-preconditions
+	:htn-method-prec
+	:negative-preconditions
+    )
 	(:types
 		Floor - Object
 		Person - Object
@@ -46,7 +52,7 @@
 		 (task1 (solve_elevator))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
@@ -63,9 +69,9 @@
 		 (task3 (debark ?p ?d))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
 		)
 	)
 

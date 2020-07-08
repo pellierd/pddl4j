@@ -1993,7 +1993,7 @@ PDDLExpression ordering_constraint() : // ADD HDDL
     PDDLSymbol id2 = null;
 }
 {
-    <LEFT_BRACKET> id1=subtask_id() <LESS> id2=subtask_id() <RIGHT_BRACKET> {
+    <LEFT_BRACKET> <LESS> id1=subtask_id() id2=subtask_id() <RIGHT_BRACKET> {
         tasks.add(id1);
         tasks.add(id2);
         node.setAtom(tasks);

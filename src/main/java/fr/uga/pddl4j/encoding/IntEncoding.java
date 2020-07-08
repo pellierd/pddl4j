@@ -32,7 +32,9 @@ import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
+import javax.swing.*;
 import java.io.Serializable;
+import java.lang.management.PlatformLoggingMXBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -508,6 +510,7 @@ final class IntEncoding implements Serializable {
         final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(
             method.getOrderingConstraints());
         intMeth.setOrderingConstraints(orderingConstraints);
+
         return intMeth;
     }
 
