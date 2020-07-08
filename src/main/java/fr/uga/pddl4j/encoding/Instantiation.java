@@ -21,6 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -299,7 +300,10 @@ final class Instantiation implements Serializable {
             Instantiation.substitute(copy.getSubTasks(), var, cons);
             copy.setValueOfParameter((-var - 1), cons);
         }
-        Instantiation.instantiate(copy, index, bound, methods);
+        // This case may occur when variables are identical in the tasks
+        if (copy.getTask().equals(task)) {
+            Instantiation.instantiate(copy, index, bound, methods);
+        }
     }
 
     /**
@@ -390,6 +394,7 @@ final class Instantiation implements Serializable {
                     }
                 }
             }
+
             Encoder.relevantMethods.add(relevantIndex);
             instMethods.addAll(relevant);
         }

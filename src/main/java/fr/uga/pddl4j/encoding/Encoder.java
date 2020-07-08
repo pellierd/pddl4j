@@ -688,6 +688,7 @@ public final class Encoder implements Serializable {
             for (IntExpression task : Encoder.tableOfRelevantTasks) {
                 taskIndexMap.put(task, index);
                 index++;
+
             }
             // Encode the initial task network
             Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(intTaskNetwork, taskIndexMap);
