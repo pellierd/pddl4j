@@ -18,7 +18,7 @@
 		 (task1 (deliver package_1 city_loc_2))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 	(:init

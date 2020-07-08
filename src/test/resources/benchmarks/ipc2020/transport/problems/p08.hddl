@@ -31,11 +31,11 @@
 		 (task5 (deliver package_5 city_loc_5))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task5 < task1)
-			(task4 < task2)
-			(task3 < task4)
-			(task2 < task5)
+			(< task1 task0)
+			(< task5 task1)
+			(< task4 task2)
+			(< task3 task4)
+			(< task2 task5)
 		)
 	)
 	(:init

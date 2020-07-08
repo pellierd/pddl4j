@@ -1,5 +1,5 @@
 (define (domain SmartPhone_HierarchicalNoAxioms)
-	(:requirements :typing :hierarchy :negative-preconditions)
+	(:requirements :typing :hierarchy)
 	(:types
 		Agenda - TransferableByEmailRegular
 		Appointment - Creatable
