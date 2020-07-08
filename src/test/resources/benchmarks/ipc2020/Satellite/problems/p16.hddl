@@ -24,9 +24,9 @@
 		 (task3 (do_observation planet5 infrared2))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task2 < task1)
-			(task3 < task2)
+			(< task1 task0)
+			(< task2 task1)
+			(< task3 task2)
 		)
 	)
 	(:init

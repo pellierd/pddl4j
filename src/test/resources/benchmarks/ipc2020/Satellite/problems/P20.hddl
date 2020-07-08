@@ -37,10 +37,10 @@
 		 (task4 (do_observation planet6 spectrograph0))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task2 < task1)
-			(task3 < task2)
-			(task0 < task4)
+			(< task1 task0)
+			(< task2 task1)
+			(< task3 task2)
+			(< task0 task4)
 		)
 	)
 	(:init

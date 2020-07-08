@@ -22,8 +22,8 @@
 		 (task2 (do_observation Phenomenon6 x_ray))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task0 < task2)
+			(< task1 task0)
+			(< task0 task2)
 		)
 	)
 	(:init

@@ -23,7 +23,7 @@
 		 (task1 (do_observation Star5 x_ray))
 		)
 		:ordering (and
-			(task1 < task0)
+			(< task1 task0)
 		)
 	)
 	(:init

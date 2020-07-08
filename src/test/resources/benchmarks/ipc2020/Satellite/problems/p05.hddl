@@ -21,7 +21,7 @@
 		 (task1 (do_observation Star5 thermograph))
 		)
 		:ordering (and
-			(task1 < task0)
+			(< task1 task0)
 		)
 	)
 	(:init

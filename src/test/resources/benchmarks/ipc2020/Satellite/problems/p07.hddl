@@ -18,8 +18,8 @@
 		 (task2 (do_observation Phenomenon6 thermograph0))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task2 < task1)
+			(< task1 task0)
+			(< task2 task1)
 		)
 	)
 	(:init

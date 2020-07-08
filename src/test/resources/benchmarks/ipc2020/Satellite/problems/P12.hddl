@@ -27,8 +27,8 @@
 		 (task2 (do_observation Phenomenon6 hd_video))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task2 < task1)
+			(< task1 task0)
+			(< task2 task1)
 		)
 	)
 	(:init

@@ -1,10 +1,11 @@
 (define
-	(problem sat_A)
+	(problem sat_C)
 	(:domain  satellite2)
 	(:objects
 		GroundStation2 - calib_direction
 		Phenomenon6 - image_direction
 		Phenomenon4 - image_direction
+		Star5 - image_direction
 		instrument0 - instrument
 		thermograph0 - mode
 		satellite0 - satellite
@@ -13,6 +14,10 @@
 		:parameters ()
 		:subtasks (and
 		 (task0 (do_observation Phenomenon4 thermograph0))
+		 (task1 (do_observation Star5 thermograph0))
+		)
+		:ordering (and
+			(< task1 task0)
 		)
 	)
 	(:init
