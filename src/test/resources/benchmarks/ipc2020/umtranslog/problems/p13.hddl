@@ -24,6 +24,8 @@
 		)
 	)
 	(:init
+		(IsTraincar Eisenbahnwagen)
+
 		(In_City FrauenStrassePost Ulm)
 		(In_City MuenchnerStrassePost Muenchen)
 		(At_Vehicle LKW_Ulm FrauenStrassePost)

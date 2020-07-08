@@ -19,7 +19,7 @@
 		 (task1 (transport Drucker O28 Bibliothek))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 	(:init

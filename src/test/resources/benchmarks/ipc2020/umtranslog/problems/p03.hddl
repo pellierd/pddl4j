@@ -16,6 +16,8 @@
 		)
 	)
 	(:init
+		(ValuableOrHazardous Gemaelde)
+
 		(In_City O27 Ulm)
 		(In_City O28 Ulm)
 		(At_Vehicle Pferd O27)

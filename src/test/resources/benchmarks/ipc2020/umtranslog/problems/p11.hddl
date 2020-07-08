@@ -24,6 +24,11 @@
 		)
 	)
 	(:init
+		(IsTraincar Eisenbahnwagen)
+		(IsHub GareParisNord)
+		(ValuableOrHazardous Chemicalien)
+		(IsHazardous Chemicalien)
+
 		(In_Region Stuttgart BadenWuerttemberg)
 		(In_Region London LondonRegion)
 		(In_City HauptbahnhofStuttgart Stuttgart)

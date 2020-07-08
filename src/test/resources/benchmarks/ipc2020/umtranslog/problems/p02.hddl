@@ -19,6 +19,8 @@
 		)
 	)
 	(:init
+		(IsAirplain Flugzeug)	
+	
 		(In_City FlughafenStuttgart Stuttgart)
 		(At_Equipment Plane_RampStuttgart FlughafenStuttgart)
 		(Available Plane_RampStuttgart)

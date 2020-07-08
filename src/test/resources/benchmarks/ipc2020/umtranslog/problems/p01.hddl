@@ -25,6 +25,10 @@
 		)
 	)
 	(:init
+		(IsAirplain FlugzeugLufthansa)
+		(IsAirplain FlugzeugAirFrance)
+		(IsHub FlughafenParis)
+
 		(In_Region Stuttgart BadenWuerttemberg)
 		(In_Region London LondonRegion)
 		(In_City FlughafenStuttgart Stuttgart)

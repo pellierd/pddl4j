@@ -21,6 +21,8 @@
 		)
 	)
 	(:init
+		(IsTraincar Eisenbahnwagen)
+
 		(In_City HauptbahnhofUlm Ulm)
 		(In_City HauptbahnhofMuenchen Muenchen)
 		(In_City HauptbahnhofRegensburg Regensburg)
