@@ -477,7 +477,7 @@ public final class PDDLParser {
      * <code>false</code> otherwise.
      */
     private boolean checkRequirements() {
-        return (this.getDomain().getRequirements().contains(PDDLRequireKey.HTN_METHOD_PREC)
+        return (this.getDomain().getRequirements().contains(PDDLRequireKey.METHOD_PRECONDITIONS)
             && !this.getDomain().getRequirements().contains(PDDLRequireKey.HIERARCHY));
     }
 

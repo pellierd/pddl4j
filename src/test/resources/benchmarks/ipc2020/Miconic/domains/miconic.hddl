@@ -3,7 +3,7 @@
 	:hierarchy
 	:typing
 	:universal-preconditions
-	:htn-method-prec
+	:method-preconditions
 	:negative-preconditions
     )
 	(:types

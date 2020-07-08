@@ -1,5 +1,5 @@
 (define (domain woodworking_legal_fewer_htn_groundings)
-	(:requirements :typing :hierarchy :htn-method-prec :equality)
+	(:requirements :typing :hierarchy :method-preconditions :equality)
 	(:types
 		aboardsize - object
 		acolour - object

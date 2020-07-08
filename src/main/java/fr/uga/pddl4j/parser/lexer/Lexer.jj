@@ -266,7 +266,7 @@ TOKEN : {
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HIERARCHY : ":hierarchy" > // ADD HDDL
 |	< HTN : ":htn" > // ADD HDDL
-|   < HTN_METHOD_PREC : ":htn-method-prec" > // ADD HDDL not conform to HDDL (:htn-method-prec)
+|   < METHOD_PRECONDITIONS : ":method-preconditions" > // ADD HDDL
 |   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
 |   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
 |   < TASKS : ":tasks" >
@@ -667,8 +667,8 @@ Set<PDDLRequireKey> require_key() :
 	|	<HIERARCHY> { // ADD HDDL
     		requirements.add(PDDLRequireKey.HIERARCHY);
         }
-    |   <HTN_METHOD_PREC> { // ADD HDDL
-            requirements.add(PDDLRequireKey.HTN_METHOD_PREC);
+    |   <METHOD_PRECONDITIONS> { // ADD HDDL
+            requirements.add(PDDLRequireKey.METHOD_PRECONDITIONS);
     }
 )
 	{ return requirements; }
@@ -1825,7 +1825,7 @@ PDDLMethod method_def() : // ADD HDDL
 		left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
-			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HTN_METHOD_PREC)})
+			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
 			    <PRECONDITION> preconditions=pre_gd()
 			]
             tn = task_network()

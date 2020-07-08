@@ -121,9 +121,9 @@ public enum PDDLRequireKey {
     HIERARCHY(":hierarchy"),
 
     /**
-     * The PDDL :htn-method-prec requirement for HDDL langage.
+     * The PDDL :method-preconditions requirement for HDDL langage.
      */
-    HTN_METHOD_PREC(":htn-method-prec");
+    METHOD_PRECONDITIONS(":method-preconditions");
 
     /**
      * The image associate to the require key in the PDDL language.
