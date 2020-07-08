@@ -2,12 +2,8 @@
 	(problem p01__p01_complete)
 	(:domain  woodworking_legal_fewer_htn_groundings)
 	(:objects
-		natural - acolour
 		red - acolour
 		black - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		pine - awood
 		teak - awood
 		grinder0 - grinder
@@ -15,12 +11,6 @@
 		planer0 - planer
 		colourfragments - treatmentstatus
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
-		glazed - treatmentstatus
-		verysmooth - surface
-		varnished - treatmentstatus
-		smooth - surface
 		p2 - part
 	)
 	(:htn
@@ -31,8 +21,8 @@
 		 (task2 (do_colour ?planstep_4_argument_0_f_colour_part ?planstep_4_argument_1_f_colour_do_colour_variable1 ?planstep_4_argument_2_f_colour_do_colour_variable2 untreated))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task0 < task2)
+			(< task1 task0)
+			(< task0 task2)
 		)
 	)
 	(:init

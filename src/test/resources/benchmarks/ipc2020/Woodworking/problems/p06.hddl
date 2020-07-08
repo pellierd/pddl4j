@@ -4,24 +4,14 @@
 	(:objects
 		s5 - aboardsize
 		s6 - aboardsize
-		natural - acolour
 		blue - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		walnut - awood
 		b0 - board
 		glazer0 - glazer
 		spray_varnisher0 - spray_varnisher
 		colourfragments - treatmentstatus
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
 		p1 - part
-		glazed - treatmentstatus
-		verysmooth - surface
-		varnished - treatmentstatus
-		smooth - surface
 		p2 - part
 	)
 	(:htn
@@ -32,8 +22,8 @@
 		 (task2 (process p2 blue rough smooth))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task0 < task2)
+			(< task1 task0)
+			(< task0 task2)
 		)
 	)
 	(:init

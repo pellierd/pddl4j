@@ -5,23 +5,13 @@
 		s4 - aboardsize
 		s5 - aboardsize
 		s6 - aboardsize
-		natural - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		walnut - awood
 		b0 - board
 		highspeed_saw0 - highspeed_saw
 		spray_varnisher0 - spray_varnisher
 		colourfragments - treatmentstatus
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
 		p1 - part
-		glazed - treatmentstatus
-		verysmooth - surface
-		varnished - treatmentstatus
-		smooth - surface
 	)
 	(:htn
 		:parameters (?planstep_2_argument_1_a_process_color - acolour ?planstep_3_argument_2_b_process_oldsurface - surface)
@@ -30,7 +20,7 @@
 		 (task1 (process p1 natural ?planstep_3_argument_2_b_process_oldsurface smooth))
 		)
 		:ordering (and
-			(task1 < task0)
+			(< task1 task0)
 		)
 	)
 	(:init

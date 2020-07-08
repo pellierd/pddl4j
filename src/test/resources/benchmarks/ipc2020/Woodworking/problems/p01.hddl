@@ -6,12 +6,8 @@
 		s1 - aboardsize
 		s2 - aboardsize
 		s3 - aboardsize
-		natural - acolour
 		red - acolour
 		black - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		pine - awood
 		teak - awood
 		b0 - board
@@ -22,13 +18,7 @@
 		spray_varnisher0 - spray_varnisher
 		colourfragments - treatmentstatus
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
 		p1 - part
-		glazed - treatmentstatus
-		verysmooth - surface
-		varnished - treatmentstatus
-		smooth - surface
 		p2 - part
 	)
 	(:htn
@@ -39,8 +29,8 @@
 		 (task2 (process p0 red ?planstep_4_argument_2_process_p0_process_oldSurfaceVar ?planstep_4_argument_3_process_p0_process_newSurfaceVar))
 		)
 		:ordering (and
-			(task2 < task1)
-			(task0 < task2)
+			(< task2 task1)
+			(< task0 task2)
 		)
 	)
 	(:init

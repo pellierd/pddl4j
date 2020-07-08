@@ -14,13 +14,9 @@
 		s7 - aboardsize
 		s4 - aboardsize
 		blue - acolour
-		natural - acolour
 		green - acolour
 		black - acolour
 		mauve - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		teak - awood
 		mahogany - awood
 		b0 - board
@@ -36,18 +32,12 @@
 		colourfragments - treatmentstatus
 		p4 - part
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
 		p1 - part
 		p6 - part
 		p7 - part
-		glazed - treatmentstatus
-		verysmooth - surface
 		p5 - part
 		p8 - part
-		varnished - treatmentstatus
 		p3 - part
-		smooth - surface
 		p2 - part
 	)
 	(:htn
@@ -61,11 +51,11 @@
 		 (task5 (process p1 black ?planstep_7_argument_2_p1_process_process_oldSurfaceVar verysmooth))
 		)
 		:ordering (and
-			(task3 < task0)
-			(task2 < task1)
-			(task5 < task2)
-			(task0 < task4)
-			(task4 < task5)
+			(< task3 task0)
+			(< task2 task1)
+			(< task5 task2)
+			(< task0 task4)
+			(< task4 task5)
 		)
 	)
 	(:init

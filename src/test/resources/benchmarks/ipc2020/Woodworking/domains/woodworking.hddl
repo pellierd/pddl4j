@@ -19,6 +19,21 @@
 		treatmentstatus - object
 		woodobj - object
 	)
+	(:constants
+		large - apartsize
+		medium - apartsize
+		small - apartsize
+
+		natural - acolour
+
+		verysmooth - surface
+		smooth - surface
+		rough - surface
+
+		untreated - treatmentstatus
+		glazed - treatmentstatus
+		varnished - treatmentstatus
+	)
 	(:predicates
 		(available ?arg0 - woodobj)
 		(boardsize ?arg0 - board ?arg1 - aboardsize)
@@ -63,7 +78,7 @@
 	)
 
 	(:method method0
-		:parameters (?ConstantVariable634079668 - treatmentstatus ?do_colour_variable1 - acolour ?do_colour_variable2 - machine ?do_immersion_varnish_instance_2_argument_1 - immersion_varnisher ?do_immersion_varnish_instance_2_argument_3 - surface ?newObj_variable1 - part)
+		:parameters (?ConstantVariable634079668 - treatmentstatus ?do_colour_variable1 - acolour ?do_colour_variable2 - immersion_varnisher ?do_immersion_varnish_instance_2_argument_1 - immersion_varnisher ?do_immersion_varnish_instance_2_argument_3 - surface ?newObj_variable1 - part)
 		:task (do_colour ?newObj_variable1 ?do_colour_variable1 ?do_colour_variable2 ?ConstantVariable634079668)
 		:precondition (and
 			(= ?ConstantVariable634079668 untreated)
@@ -71,13 +86,10 @@
 		:subtasks (and
 		 (task0 (do_immersion_varnish ?newObj_variable1 ?do_immersion_varnish_instance_2_argument_1 ?do_colour_variable1 ?do_immersion_varnish_instance_2_argument_3 untreated untreated varnished natural))
 		)
-		:constraints (and
-			(sortof ?do_colour_variable2 - immersion_varnisher)
-		)
 	)
 
 	(:method method1
-		:parameters (?ConstantVariable634079668 - treatmentstatus ?do_colour_variable1 - acolour ?do_colour_variable2 - machine ?do_spray_varnish_instance_2_argument_1 - spray_varnisher ?do_spray_varnish_instance_2_argument_3 - surface ?newObj_variable1 - part)
+		:parameters (?ConstantVariable634079668 - treatmentstatus ?do_colour_variable1 - acolour ?do_colour_variable2 - spray_varnisher ?do_spray_varnish_instance_2_argument_1 - spray_varnisher ?do_spray_varnish_instance_2_argument_3 - surface ?newObj_variable1 - part)
 		:task (do_colour ?newObj_variable1 ?do_colour_variable1 ?do_colour_variable2 ?ConstantVariable634079668)
 		:precondition (and
 			(= ?ConstantVariable634079668 untreated)
@@ -85,22 +97,16 @@
 		:subtasks (and
 		 (task0 (do_spray_varnish ?newObj_variable1 ?do_spray_varnish_instance_2_argument_1 ?do_colour_variable1 ?do_spray_varnish_instance_2_argument_3 untreated untreated varnished natural))
 		)
-		:constraints (and
-			(sortof ?do_colour_variable2 - spray_varnisher)
-		)
 	)
 
 	(:method method2
-		:parameters (?ConstantVariable634079668 - treatmentstatus ?do_colour_variable1 - acolour ?do_colour_variable2 - machine ?do_glaze_instance_2_argument_1 - glazer ?newObj_variable1 - part)
+		:parameters (?ConstantVariable634079668 - treatmentstatus ?do_colour_variable1 - acolour ?do_colour_variable2 - glazer ?do_glaze_instance_2_argument_1 - glazer ?newObj_variable1 - part)
 		:task (do_colour ?newObj_variable1 ?do_colour_variable1 ?do_colour_variable2 ?ConstantVariable634079668)
 		:precondition (and
 			(= ?ConstantVariable634079668 untreated)
 		)
 		:subtasks (and
 		 (task0 (do_glaze ?newObj_variable1 ?do_glaze_instance_2_argument_1 ?do_colour_variable1 untreated untreated glazed natural))
-		)
-		:constraints (and
-			(sortof ?do_colour_variable2 - glazer)
 		)
 	)
 
@@ -141,8 +147,8 @@
 		 (task2 (unload_highspeed_saw ?cut_board_instance_2_argument_0 ?load_highspeed_saw_instance_3_argument_6))
 		)
 		:ordering (and
-			(task1 < task0)
-			(task0 < task2)
+			(< task1 task0)
+			(< task0 task2)
 		)
 	)
 
@@ -191,7 +197,7 @@
 		 (task1 (do_colour ?do_colour_instance_3_argument_4 ?do_colour_instance_3_argument_5 ?do_colour_instance_3_argument_6 untreated))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
@@ -203,7 +209,7 @@
 		 (task1 (do_colour ?grindNplane_instance_2_argument_0 ?do_colour_instance_3_argument_8 ?do_colour_instance_3_argument_9 untreated))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
@@ -230,8 +236,8 @@
 		 (task2 (do_colour ?process_partVar ?process_colourVar ?do_colour_instance_4_argument_13 untreated))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
+			(< task0 task1)
+			(< task1 task2)
 		)
 	)
 
@@ -261,11 +267,8 @@
 		 (task2 (grindNplane ?do_grind_untreated_instance_2_argument_0 ?process_oldSurfaceVar ?grindNplane_instance_4_argument_17 ?grindNplane_instance_4_argument_18 ?grindNplane_instance_4_argument_19 ?grindNplane_instance_4_argument_20 untreated))
 		)
 		:ordering (and
-			(task2 < task0)
-			(task0 < task1)
-		)
-		:constraints (and
-			(sortof ?do_grind_untreated_instance_2_argument_1 - grinder)
+			(< task2 task0)
+			(< task0 task1)
 		)
 	)
 

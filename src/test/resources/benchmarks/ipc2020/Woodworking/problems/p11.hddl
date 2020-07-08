@@ -15,14 +15,10 @@
 		s4 - aboardsize
 		blue - acolour
 		white - acolour
-		natural - acolour
 		green - acolour
 		red - acolour
 		black - acolour
 		mauve - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		oak - awood
 		pine - awood
 		beech - awood
@@ -39,18 +35,12 @@
 		colourfragments - treatmentstatus
 		p4 - part
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
 		p1 - part
 		p6 - part
 		p7 - part
-		glazed - treatmentstatus
-		verysmooth - surface
 		p5 - part
 		p8 - part
-		varnished - treatmentstatus
 		p3 - part
-		smooth - surface
 		p2 - part
 	)
 	(:htn
@@ -63,10 +53,10 @@
 		 (task4 (process ?planstep_6_argument_0_p4_process_process_partVar ?planstep_6_argument_1_p4_process_process_colourVar ?planstep_6_argument_2_p4_process_process_oldSurfaceVar ?planstep_6_argument_3_p4_process_process_newSurfaceVar))
 		)
 		:ordering (and
-			(task3 < task0)
-			(task0 < task1)
-			(task4 < task3)
-			(task2 < task4)
+			(< task3 task0)
+			(< task0 task1)
+			(< task4 task3)
+			(< task2 task4)
 		)
 	)
 	(:init

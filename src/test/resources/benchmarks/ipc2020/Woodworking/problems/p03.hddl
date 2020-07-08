@@ -6,11 +6,7 @@
 		s1 - aboardsize
 		s2 - aboardsize
 		s3 - aboardsize
-		natural - acolour
 		red - acolour
-		large - apartsize
-		medium - apartsize
-		small - apartsize
 		pine - awood
 		teak - awood
 		b0 - board
@@ -18,13 +14,7 @@
 		highspeed_saw0 - highspeed_saw
 		colourfragments - treatmentstatus
 		p0 - part
-		rough - surface
-		untreated - treatmentstatus
 		p1 - part
-		glazed - treatmentstatus
-		verysmooth - surface
-		varnished - treatmentstatus
-		smooth - surface
 		p2 - part
 	)
 	(:htn
@@ -38,11 +28,11 @@
 		 (task5 (do_colour p2 ?planstep_7_argument_1_f_colour_do_colour_variable1 glazer0 untreated))
 		)
 		:ordering (and
-			(task4 < task1)
-			(task3 < task2)
-			(task0 < task3)
-			(task2 < task4)
-			(task1 < task5)
+			(< task4 task1)
+			(< task3 task2)
+			(< task0 task3)
+			(< task2 task4)
+			(< task1 task5)
 		)
 	)
 	(:init
