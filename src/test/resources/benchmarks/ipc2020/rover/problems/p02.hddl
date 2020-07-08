@@ -25,8 +25,8 @@
 		 (task2 (get_image_data objective1 low_res))
 		)
 		:ordering (and
-			(task2 < task0)
-			(task0 < task1)
+			(< task2 task0)
+			(< task0 task1)
 		)
 	)
 	(:init

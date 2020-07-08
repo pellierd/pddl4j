@@ -33,12 +33,12 @@
 		 (task6 (get_image_data objective0 colour))
 		)
 		:ordering (and
-			(task6 < task0)
-			(task0 < task2)
-			(task4 < task3)
-			(task2 < task4)
-			(task1 < task5)
-			(task5 < task6)
+			(< task6 task0)
+			(< task0 task2)
+			(< task4 task3)
+			(< task2 task4)
+			(< task1 task5)
+			(< task5 task6)
 		)
 	)
 	(:init

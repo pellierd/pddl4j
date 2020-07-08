@@ -1,6 +1,6 @@
 (define (domain rover_domain)
 	(:requirements :typing :hierarchy :htn-method-prec :negative-preconditions)
-	(:types
+    (:types
 		waypoint - object
 		mode - object
 		store - object
@@ -107,8 +107,8 @@
 		 (task2 (unvisit ?from))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
+			(< task0 task1)
+			(< task1 task2)
 		)
 	)
 
@@ -150,9 +150,9 @@
 		 (task3 (unvisit ?mid))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
 		)
 	)
 
@@ -168,7 +168,7 @@
 		 (task1 (communicate_soil_data ?rover ?l ?waypoint ?x ?y))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
@@ -186,9 +186,9 @@
 		 (task3 (send_soil_data ?rover ?waypoint))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
 		)
 	)
 
@@ -204,7 +204,7 @@
 		 (task1 (communicate_rock_data ?rover ?l ?waypoint ?x ?y))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
@@ -222,9 +222,9 @@
 		 (task3 (send_rock_data ?rover ?waypoint))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
 		)
 	)
 
@@ -240,7 +240,7 @@
 		 (task1 (communicate_image_data ?rover ?l ?objective ?mode ?x ?y))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 
@@ -260,9 +260,9 @@
 		 (task3 (send_image_data ?rover ?objective ?mode))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
-			(task2 < task3)
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
 		)
 	)
 
@@ -278,7 +278,7 @@
 		 (task1 (calibrate ?rover ?camera ?objective ?waypoint))
 		)
 		:ordering (and
-			(task0 < task1)
+			(< task0 task1)
 		)
 	)
 

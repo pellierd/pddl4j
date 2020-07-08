@@ -34,11 +34,11 @@
 		 (task5 (get_image_data objective0 high_res))
 		)
 		:ordering (and
-			(task3 < task0)
-			(task5 < task1)
-			(task1 < task3)
-			(task0 < task4)
-			(task2 < task5)
+			(< task3 task0)
+			(< task5 task1)
+			(< task1 task3)
+			(< task0 task4)
+			(< task2 task5)
 		)
 	)
 	(:init
