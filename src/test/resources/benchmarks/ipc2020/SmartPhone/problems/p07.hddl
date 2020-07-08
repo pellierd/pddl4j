@@ -21,8 +21,8 @@
 		 (task2 (create_Appointment appointmentForMeeting locationForMeeting dateForMeeting))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
+			(< task0 task1)
+			(< task1 task2)
 		)
 	)
 	(:init

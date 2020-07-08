@@ -23,8 +23,8 @@
 		 (task2 (extractsInformation Biundo ?planstep_4_argument_1_extractsInformation_Biundo_message dateForMeeting))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
+			(< task0 task1)
+			(< task1 task2)
 		)
 	)
 	(:init

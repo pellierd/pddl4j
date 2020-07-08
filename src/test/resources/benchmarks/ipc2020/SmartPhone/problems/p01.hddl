@@ -20,8 +20,8 @@
 		 (task2 (extractsInformation headOfDepartment email1 dateForMeeting))
 		)
 		:ordering (and
-			(task0 < task1)
-			(task1 < task2)
+			(< task0 task1)
+			(< task1 task2)
 		)
 	)
 	(:init
