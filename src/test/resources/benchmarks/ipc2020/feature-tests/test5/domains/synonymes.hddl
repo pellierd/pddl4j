@@ -1,0 +1,64 @@
+(define (domain test-domain)
+	(:requirements :typing :hierarchy)
+
+	(:types A)
+	
+	(:predicates
+    	(foo ?a - A)
+	)
+
+	(:task task1 :parameters ())
+	(:task task2 :parameters ())
+	(:task task3 :parameters ())
+	(:task task4 :parameters ())
+
+	(:method sequence1
+		:parameters ()
+		:task (task1)
+		:subtasks (and
+			(t1 (noop1))
+			(t2 (noop2))
+		)
+		:ordering (and
+			(< t1 t2)
+		)
+	)
+
+	(:method sequence2
+		:parameters ()
+		:task (task2)
+		:tasks (and
+			(t1 (noop1))
+			(t2 (noop2))
+		)
+		:ordering (and
+			(< t1 t2)
+		)
+	)
+
+	(:method sequence3
+		:parameters ()
+		:task (task3)
+		:ordered-subtasks (and
+			(noop1)
+			(noop2)
+		)
+	)
+
+	(:method sequence4
+		:parameters ()
+		:task (task4)
+		:ordered-tasks (and
+			(noop1)
+			(noop2)
+		)
+	)
+
+	(:action noop1
+		:parameters ()
+	)
+	
+	(:action noop2
+		:parameters ()
+	)
+)
