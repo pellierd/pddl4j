@@ -226,7 +226,32 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
                     children.add(child);
                 }
                 open.addAll(0, children);
-                tmpn.addChildren(children);
+                // Dumb method treatment
+                if (tmpn.methodname.startsWith("__to_method_")) {
+                    // All children of the current node are connected to the node's parent
+                    for (Node child : children) {
+                        child.parent = tmpn.parent;
+                    }
+                    // Current node is disconnected of the decomposition tree
+                    List<Node> descendants = tmpn.parent.getChildren();
+                    List<Node> newList = new LinkedList<Node>();
+                    // children must be final in the upcoming lambda
+                    final List<Node> fchildren = new LinkedList<Node>(children);
+                    Spliterator<Node> iterator = descendants.spliterator();
+                    iterator.forEachRemaining(
+                        (d) -> {
+                            if (d.equals(tmpn)) {
+                                newList.addAll(fchildren);
+                            } else {
+                                newList.add(d);
+                            }
+                        }
+                    );
+                    tmpn.parent.children = newList;
+                    tmpn.parent = null;
+                } else {
+                    tmpn.addChildren(children);
+                }
                 children.clear();
             } else {
                 tmpn.tasksynonym = taskDictionary.get(tmpn.task).removeFirst();
