@@ -105,11 +105,18 @@ public final class TFDPlanner extends AbstractSTNPlanner {
 
             // If the task network is empty we've got a solution
             if (currentNode.getTasks().isEmpty()) {
-                int traceLevel = (Integer) this.getArguments().get(Planner.TRACE_LEVEL);
-                if (traceLevel == 9) {
-                    super.printPlanForValidator(currentNode, problem);
+                if (currentNode.getState().satisfy(problem.getGoal())) {
+                    int traceLevel = (Integer) this.getArguments().get(Planner.TRACE_LEVEL);
+                    if (traceLevel == 9) {
+                        super.printPlanForValidator(currentNode, problem);
+                    }
+                    return super.extractPlan(currentNode, problem);
+                }  else {
+                    Plan p = super.extractPlan(currentNode, problem);
+                    System.out.println("\nFound plan as follows:\n" + problem.toString(p));
+                    System.out.println(" But plan does does not reach the goal:\n");
+                    System.out.println(problem.toString(problem.getGoal()) + "\n");
                 }
-                return super.extractPlan(currentNode, problem);
             } else {
                 // Get and remove the fist task of the task network
                 //System.out.println(currentNode);
