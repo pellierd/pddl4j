@@ -389,12 +389,15 @@ public final class Encoder implements Serializable {
         // Create Set containing integer representation of initial state without functions and associed cost
         final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
-        // Encode the goal in integer representation or the initial task network
+        // Encode the goal in integer representation
         IntExpression intGoal =  null;
-        IntTaskNetwork intTaskNetwork = null;
-        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+        if (problem.getGoal() != null) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
-        } else {
+        }
+
+        // Encode the initial task network in integer representation
+        IntTaskNetwork intTaskNetwork = null;
+        if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
         }
 
@@ -521,7 +524,7 @@ public final class Encoder implements Serializable {
         PostInstantiation.extractGroundInertia(intActions);
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
-        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+        if (intGoal != null) {
             // Expand the quantified expression in the goal
             Instantiation.expandQuantifiedExpression(intGoal);
             // Simplify the goal with ground inertia information
@@ -550,7 +553,7 @@ public final class Encoder implements Serializable {
                 str.append(Encoder.toString(op));
                 str.append("\n");
             }
-            if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+            if (intGoal != null) {
                 str.append(")");
                 str.append("\n\nInstantiation goal state:\n");
                 str.append("(and");
@@ -674,14 +677,15 @@ public final class Encoder implements Serializable {
             Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
         }
 
-        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+        if (intGoal != null) {
             // Encode the goal in bit set representation
             if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM)) {
                 Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
             } else {
                 Encoder.goal = new State();
             }
-        } else {
+        }
+        if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
             final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
             index = 0;
@@ -719,7 +723,7 @@ public final class Encoder implements Serializable {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
 
-            if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+            if (Encoder.goal !=  null) {
                 str.append("\nFinal goal state:\n");
                 if (Encoder.goal == null) { // Goal null
                     str.append("goal can be simplified to FALSE");
@@ -728,7 +732,9 @@ public final class Encoder implements Serializable {
                 } else { // Goal not Null and empty
                     str.append("goal can be simplified to TRUE");
                 }
-            } else {
+                str.append("\n\n");
+            }
+            if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("Final initial task network state:\n");
                 str.append(Encoder.toString(Encoder.initialTaskNetwork));
             }

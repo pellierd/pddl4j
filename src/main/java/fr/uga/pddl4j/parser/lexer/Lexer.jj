@@ -2114,9 +2114,11 @@ PDDLAction action_def() :
 		left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 		    [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HIERARCHY)})
-		        <PRECONDITION> preconds=pre_gd()]
+		        <PRECONDITION> preconds=pre_gd()
+		    ]
 			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HIERARCHY)})
-			    <EFFECT> effects=effect()]
+			    <EFFECT> effects=effect()
+			]
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
