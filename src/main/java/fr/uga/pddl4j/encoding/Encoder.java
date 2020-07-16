@@ -677,13 +677,10 @@ public final class Encoder implements Serializable {
             Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
         }
 
-        if (intGoal != null) {
-            // Encode the goal in bit set representation
-            if (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM)) {
+        if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
                 Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
-            } else {
+        } else {
                 Encoder.goal = new State();
-            }
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
