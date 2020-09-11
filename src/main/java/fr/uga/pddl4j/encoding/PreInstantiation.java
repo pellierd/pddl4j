@@ -24,6 +24,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.sound.midi.SysexMessage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -573,6 +574,9 @@ final class PreInstantiation implements Serializable {
                         i.remove();
                     }
                 }
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
@@ -584,6 +588,9 @@ final class PreInstantiation implements Serializable {
                     } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         i.remove();
                     }
+                }
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.FALSE);
                 }
                 break;
             case FORALL:
@@ -607,9 +614,16 @@ final class PreInstantiation implements Serializable {
                     PreInstantiation.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
                 }
                 break;
+            case NOT:
+                PreInstantiation.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
+                if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else {
+                    exp.setConnective(PDDLConnective.TRUE);
+                }
+                break;
             case AT_START:
             case AT_END:
-            case NOT:
             case ALWAYS:
             case OVER_ALL:
             case SOMETIME:

@@ -459,10 +459,12 @@ public final class Encoder implements Serializable {
         PreInstantiation.extractInertia(intActions);
         // Infer the type from the unary inertia
         PreInstantiation.inferTypesFromInertia(intInitPredicates);
-        // Simply the encoded action with the inferred types.
-        intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
-        // Simply the encoded methods with the inferred types.
-        intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
+        if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+            // Simply the encoded action with the inferred types.
+            intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
+            // Simply the encoded methods with the inferred types.
+        //    intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
+        }
 
         // Create the predicates tables used to count the occurrences of the predicates in the
         // initial state
@@ -602,10 +604,9 @@ public final class Encoder implements Serializable {
                 intTaskNetwork = initialTaskNetworks.get(0);
             }
 
-            //System.out.println(Encoder.toString(initialTaskNetworks.get(0)));
             intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
             // Simplify the methods with the ground inertia information previously extracted
-            PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
+            //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
                 str.append(System.lineSeparator());
                 str.append("\nInstantiation methods with inferred types (");
