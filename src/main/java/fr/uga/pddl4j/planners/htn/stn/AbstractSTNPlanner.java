@@ -166,39 +166,45 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             }
             n = n.getParent();
         }
+        System.out.println(tasks.toString());
+        System.out.println(operators.toString());
+        System.out.println(nbactions);
 
         StringBuffer plan = new StringBuffer();
-        int indexOfActions = 0;
-        int indexOfMethods = 0;
+        //int indexOfActions = 0;
+        //int indexOfMethods = 0;
+        int indexOfSynonyms = 0;
         for (int i = 0; i < tasks.size(); i++) {
-            Integer operator = operators.get(i);
+            final Integer operator = operators.get(i);
             final Integer task = tasks.get(i);
             // Rename primitive tasks
             if (operator < nbactions) {
                 if (taskDictionary.containsKey(task)) {
-                    taskDictionary.get(task).add(indexOfActions);
+                    taskDictionary.get(task).add(indexOfSynonyms);
                 } else {
                     final LinkedList<Integer> alias = new LinkedList<Integer>();
-                    alias.add(indexOfActions);
+                    alias.add(indexOfSynonyms);
                     taskDictionary.put(task, alias);
                 }
                 // Format plan
                 final Action action = problem.getActions().get(operator);
-                plan.append(String.format("%d %s%n", indexOfActions, problem.toShortString(action)));
-                indexOfActions++;
+                plan.append(String.format("%d %s%n", indexOfSynonyms, problem.toShortString(action)));
+                indexOfSynonyms++;
             } else {
                 // Rename abstract tasks
                 if (taskDictionary.containsKey(task)) {
-                    taskDictionary.get(task).add(indexOfMethods + nbactions);
+                    taskDictionary.get(task).add(indexOfSynonyms++);
                 } else {
                     final LinkedList<Integer> alias = new LinkedList<Integer>();
-                    alias.add(indexOfMethods + nbactions);
+                    alias.add(indexOfSynonyms++);
                     taskDictionary.put(task, alias);
                 }
                 // Method decomposition cannot be formatted here
-                indexOfMethods++;
+                //indexOfMethods++;
             }
         }
+
+        System.out.println(taskDictionary.toString());
 
         // Builds the decomposition tree
         LinkedList<Node> open = new LinkedList<Node>();
