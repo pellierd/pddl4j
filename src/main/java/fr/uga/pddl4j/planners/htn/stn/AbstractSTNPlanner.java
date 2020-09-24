@@ -166,13 +166,9 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             }
             n = n.getParent();
         }
-        System.out.println(tasks.toString());
-        System.out.println(operators.toString());
-        System.out.println(nbactions);
 
         StringBuffer plan = new StringBuffer();
-        //int indexOfActions = 0;
-        //int indexOfMethods = 0;
+
         int indexOfSynonyms = 0;
         for (int i = 0; i < tasks.size(); i++) {
             final Integer operator = operators.get(i);
@@ -199,12 +195,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
                     alias.add(indexOfSynonyms++);
                     taskDictionary.put(task, alias);
                 }
-                // Method decomposition cannot be formatted here
-                //indexOfMethods++;
             }
         }
-
-        System.out.println(taskDictionary.toString());
 
         // Builds the decomposition tree
         LinkedList<Node> open = new LinkedList<Node>();
