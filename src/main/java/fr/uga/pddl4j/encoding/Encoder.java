@@ -606,7 +606,7 @@ public final class Encoder implements Serializable {
 
             intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
             // Simplify the methods with the ground inertia information previously extracted
-            //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
+            PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
                 str.append(System.lineSeparator());
                 str.append("\nInstantiation methods with inferred types (");

@@ -66,8 +66,8 @@ public class ClosedWorldState extends BitVector {
      * @param state the state to apply.
      */
     public final void apply(final State state) {
-        this.or(state.getPositive());
         this.andNot(state.getNegative());
+        this.or(state.getPositive());
     }
 
     /**

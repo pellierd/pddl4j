@@ -115,7 +115,9 @@ public class BitVector extends BitSet {
      * <code>BitVector</code>; <code>false</code> otherwise.
      */
     public final boolean include(final BitVector vector) {
-        return this.getIntersection(vector).equals(vector);
+        final BitVector copy = new BitVector(this);
+        copy.or(vector);
+        return copy.equals(this);
     }
 
     /**

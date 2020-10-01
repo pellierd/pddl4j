@@ -280,7 +280,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         final double encodingTime = (end - start) / 1000.0;
         System.out.print("\nEncoding ");
         if (pb.isTotallyOrederd()) {
-            System.out.print("totaly ordered ");
+            System.out.print("totally ordered ");
         } else {
             System.out.print("partially ordered ");
         }
