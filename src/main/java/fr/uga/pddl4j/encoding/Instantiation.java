@@ -330,7 +330,18 @@ final class Instantiation implements Serializable {
 
         // Init the list of methods to instantiate
         List<IntMethod> meths = new ArrayList<>();
-        meths.addAll(methods);
+        for (IntMethod m : methods) {
+            // If a method has a parameter with a empty domain the method must be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < m.arity() && toInstantiate) {
+                toInstantiate = !Encoder.tableOfDomains.get(m.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (toInstantiate) {
+                meths.add(m);
+            }
+        }
 
         // Filter methods with a parameter with an empty domain
         Instantiation.filterMethodWithEmptyDomainParameter(methods);
