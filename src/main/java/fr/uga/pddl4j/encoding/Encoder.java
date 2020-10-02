@@ -34,6 +34,7 @@ import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.spec.ECField;
@@ -606,10 +607,10 @@ public final class Encoder implements Serializable {
 
             intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
             // Simplify the methods with the ground inertia information previously extracted
-            PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
+            //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
                 str.append(System.lineSeparator());
-                str.append("\nInstantiation methods with inferred types (");
+                str.append("\nInstantiation methods (");
                 str.append(intMethods.size());
                 str.append(" methods):\n\n");
                 for (IntMethod meth : intMethods) {

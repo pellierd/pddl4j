@@ -23,12 +23,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class contains the methods needed to instantiate the actions and the method.
@@ -357,11 +352,13 @@ final class Instantiation implements Serializable {
 
         // Add the task of the initial task network with the compound tasks
         for (IntExpression subtasks : initialTasksNetwork.getTasks().getChildren()) {
-            if (!subtasks.isPrimtive()) {
-                tasks.add(subtasks);
-                compound.add(subtasks);
-            } else {
-                primtive.add(subtasks);
+            if (!tasks.contains(subtasks)) {
+                if (!subtasks.isPrimtive()) {
+                    tasks.add(subtasks);
+                    compound.add(subtasks);
+                } else {
+                    primtive.add(subtasks);
+                }
             }
         }
 

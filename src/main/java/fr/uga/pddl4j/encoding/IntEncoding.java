@@ -31,8 +31,11 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.util.BitMatrix;
+import fr.uga.pddl4j.util.SquareBitMatrix;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.PlatformLoggingMXBean;
 import java.util.ArrayList;
@@ -446,9 +449,53 @@ final class IntEncoding implements Serializable {
         // Encode the tasks of the task network
         encoded.setTasks(IntEncoding.encodeExp(taskNetwork.getTasks(), variables));
         // Encode the ordering constraints of the task network
-        encoded.setOrderingConstraints(IntEncoding.encodeOrderingConstraints(
-            taskNetwork.getOrderingConstraints()));
-        encoded.setTotallyOrdered(taskNetwork.isTotallyOrdered());
+        IntExpression orderingConstraints = null;
+        IntExpression subtasks = encoded.getTasks();
+        if (taskNetwork.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
+            orderingConstraints = new IntExpression(PDDLConnective.AND);
+            for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
+                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                t1.setTaskID(new Integer(i));
+                constraint.addChild(t1);
+                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                t2.setTaskID(new Integer(i + 1));
+                constraint.addChild(t2);
+                orderingConstraints.addChild(constraint);
+            }
+        } else {
+            final int size = subtasks.getChildren().size();
+            final SquareBitMatrix constraints = new SquareBitMatrix(size);
+            orderingConstraints = IntEncoding.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
+            for (IntExpression c : orderingConstraints.getChildren()) {
+                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
+            }
+            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
+                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
+                for (int i = 0; i < size; i++) {
+                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
+                    constraints.removeRow(subtaskIndex);
+                    constraints.removeColumn(subtaskIndex);
+                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
+                    subtasks.getChildren().remove(subtaskIndex);
+                    st.setTaskID(i);
+                    orderedSubtasks.addChild(st);
+                }
+                encoded.setTasks(orderedSubtasks);
+                orderingConstraints = new IntExpression(PDDLConnective.AND);
+                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
+                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                    t1.setTaskID(new Integer(i));
+                    constraint.addChild(t1);
+                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                    t2.setTaskID(new Integer(i + 1));
+                    constraint.addChild(t2);
+                    orderingConstraints.addChild(constraint);
+                }
+            }
+        }
+        encoded.setOrderingConstraints(orderingConstraints);
         return encoded;
     }
 
@@ -507,10 +554,54 @@ final class IntEncoding implements Serializable {
         final IntExpression subtasks = IntEncoding.encodeExp(method.getSubTasks(), variables);
         intMeth.setSubTasks(subtasks);
         // Encode the ordering constraints of the method
-        final IntExpression orderingConstraints = IntEncoding.encodeOrderingConstraints(
-            method.getOrderingConstraints());
+        IntExpression orderingConstraints = null;
+        // Express the total ordering into explicites constraints
+        if (method.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
+            orderingConstraints = new IntExpression(PDDLConnective.AND);
+            for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
+                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                t1.setTaskID(new Integer(i));
+                constraint.addChild(t1);
+                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                t2.setTaskID(new Integer(i + 1));
+                constraint.addChild(t2);
+                orderingConstraints.addChild(constraint);
+            }
+        } else {
+            final int size = subtasks.getChildren().size();
+            final SquareBitMatrix constraints = new SquareBitMatrix(size);
+            orderingConstraints = IntEncoding.encodeOrderingConstraints(method.getOrderingConstraints());
+            for (IntExpression c : orderingConstraints.getChildren()) {
+                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
+            }
+            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
+                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
+                for (int i = 0; i < size; i++) {
+                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
+                    constraints.removeRow(subtaskIndex);
+                    constraints.removeColumn(subtaskIndex);
+                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
+                    subtasks.getChildren().remove(subtaskIndex);
+                    st.setTaskID(i);
+                    orderedSubtasks.addChild(st);
+                    //System.out.println(subtaskIndex + " " + i + " "+ Encoder.toString(st));
+                }
+                intMeth.setSubTasks(orderedSubtasks);
+                orderingConstraints = new IntExpression(PDDLConnective.AND);
+                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
+                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                    t1.setTaskID(new Integer(i));
+                    constraint.addChild(t1);
+                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                    t2.setTaskID(new Integer(i + 1));
+                    constraint.addChild(t2);
+                    orderingConstraints.addChild(constraint);
+                }
+            }
+        }
         intMeth.setOrderingConstraints(orderingConstraints);
-
         return intMeth;
     }
 

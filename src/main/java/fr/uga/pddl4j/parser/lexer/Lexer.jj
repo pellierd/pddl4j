@@ -1847,13 +1847,22 @@ PDDLTaskNetwork task_network() : // ADD HDDL
     PDDLTaskNetwork tn = null;
 }
 {
-    (<TASKS> | <SUBTASKS> | <ORDERED_TASKS> | <ORDERED_SUBTASKS>)
-    tasks = subtask_def()
-   	[<ORDERING> ordering = ordering_constraint_def()]
-   	[<CONSTRAINTS> logical = logical_constraint_def()]
-   	{
-        return new PDDLTaskNetwork(tasks, ordering, logical, false);
-    }
+    LOOKAHEAD (1)
+        (<TASKS> | <SUBTASKS>)
+        tasks = subtask_def()
+   	    [<ORDERING> ordering = ordering_constraint_def()]
+   	    [<CONSTRAINTS> logical = logical_constraint_def()]
+   	    {
+            return new PDDLTaskNetwork(tasks, ordering, logical, false);
+        }
+    | LOOKAHEAD (1)
+        (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
+        tasks = subtask_def()
+        [<ORDERING> ordering = ordering_constraint_def()]
+        [<CONSTRAINTS> logical = logical_constraint_def()]
+        {
+            return new PDDLTaskNetwork(tasks, ordering, logical, true);
+        }
 }
 
 PDDLSymbol method_name() : // ADD HDDL

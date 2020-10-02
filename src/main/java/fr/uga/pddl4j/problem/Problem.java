@@ -686,6 +686,7 @@ public class Problem implements Serializable {
                 str.append(" \n");
             }
         }
+        str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
         str.append("Preconditions:\n");
         str.append(this.toString(method.getPreconditions()));
         str.append("\n");

@@ -178,6 +178,8 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             open.add(childNode);
                             if (debug) {
                                 System.out.println("=====> Decomposition succeeded push node:");
+                                System.out.println("=====>\n" +problem.toString(childNode.getState()));
+                                System.out.println("=====>\n");
                                 for (int t : childNode.getTasks()) {
                                     System.out.println(problem.toString(problem.getTasks().get(t)));
                                 }

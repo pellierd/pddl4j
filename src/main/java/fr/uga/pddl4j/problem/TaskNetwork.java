@@ -199,11 +199,13 @@ public final class TaskNetwork implements Serializable {
 
     /**
      * Returns <code>true</code> if the task network is totally ordered. The return value is computed from the ordering
-     * constraints of the task network.
+     * constraints of the task network. A task network with an empty set of constraints or only one constraint is
+     * totally ordered.
      *
      * @return <code>true</code> if the task network is totally ordered.
      */
     public final boolean isTotallyOrdered() {
+        if (this.tasks.size() < 2) return true;
         BitMatrix matrix = new BitMatrix(this.getOrderingConstraints());
         boolean ordered = true;
         //System.out.println("AVANT -------\n" + matrix.toBitString());

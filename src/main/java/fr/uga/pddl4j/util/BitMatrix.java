@@ -36,7 +36,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.2 - 30.08.2010
  */
-public final class BitMatrix implements Serializable {
+public class BitMatrix implements Serializable {
 
     /**
      * The number of columns.
