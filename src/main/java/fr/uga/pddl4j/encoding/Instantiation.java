@@ -287,16 +287,25 @@ final class Instantiation implements Serializable {
                                     final List<IntMethod> methods, final IntExpression task) {
         final IntExpression t = method.getTask();
         final IntMethod copy = new IntMethod(method);
-        for (int i = 0; i < t.getArguments().length; i++) {
+        boolean instantiable = true;
+        int i = 0;
+        while (i < t.getArguments().length && instantiable) {
             final int var = t.getArguments()[i];
             final int cons = task.getArguments()[i];
-            Instantiation.substitute(copy.getPreconditions(), var, cons);
-            Instantiation.substitute(copy.getTask(), var, cons);
-            Instantiation.substitute(copy.getSubTasks(), var, cons);
-            copy.setValueOfParameter((-var - 1), cons);
+            final int type = copy.getTypeOfParameters((-var - 1));
+            final Set<Integer> domain = Encoder.tableOfDomains.get(type);
+            if (domain.contains(cons)) {
+                Instantiation.substitute(copy.getPreconditions(), var, cons);
+                Instantiation.substitute(copy.getTask(), var, cons);
+                Instantiation.substitute(copy.getSubTasks(), var, cons);
+                copy.setValueOfParameter((-var - 1), cons);
+            } else {
+                instantiable = false;
+            }
+            i++;
         }
         // This case may occur when variables are identical in the tasks
-        if (copy.getTask().equals(task)) {
+        if (copy.getTask().equals(task) && instantiable) {
             Instantiation.instantiate(copy, index, bound, methods);
         }
     }
@@ -369,7 +378,8 @@ final class Instantiation implements Serializable {
             final List<IntMethod> relevant = new ArrayList<>();
             final List<Integer> relevantIndex = new ArrayList<>();
             for (IntMethod method : meths) {
-                if (method.getTask().getPredicate() == task.getPredicate()) {
+                if (method.getTask().getPredicate() == task.getPredicate()
+                    && method.getTask().getArguments().length == task.getArguments().length) {
                     final List<IntMethod> instantiated = new ArrayList<>(100);
                     Instantiation.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
                     for (IntMethod instance : instantiated) {
