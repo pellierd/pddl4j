@@ -275,7 +275,13 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
         factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
-        final Problem pb = factory.encode();
+        Problem pb =  null;
+        try {
+            pb = factory.encode();
+        } catch (OutOfMemoryError err) {
+            System.out.println("Out of memory during problem instantiation !");
+            System.exit(0);
+        }
         long end = System.currentTimeMillis();
         final double encodingTime = (end - start) / 1000.0;
         System.out.print("\nEncoding ");
@@ -316,7 +322,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                     System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
                 }
             } catch (OutOfMemoryError err) {
-                System.out.println("Out of memory !");
+                System.out.println("Out of memory during search !");
                 System.exit(0);
             }
         } else {

@@ -28,10 +28,7 @@ import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * This class implements the code of the total ordered simple task network planner. The search method is an
@@ -90,6 +87,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
+            //final TFDNode currentNode = open.poll();
             final TFDNode currentNode = open.poll();
 
             if (debug) {
@@ -102,7 +100,6 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                     System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
             }
-
             // If the task network is empty we've got a solution
             if (currentNode.getTasks().isEmpty()) {
                 if (currentNode.getState().satisfy(problem.getGoal())) {
@@ -178,7 +175,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             open.add(childNode);
                             if (debug) {
                                 System.out.println("=====> Decomposition succeeded push node:");
-                                System.out.println("=====>\n" +problem.toString(childNode.getState()));
+                                System.out.println("=====>\n" + problem.toString(childNode.getState()));
                                 System.out.println("=====>\n");
                                 for (int t : childNode.getTasks()) {
                                     System.out.println(problem.toString(problem.getTasks().get(t)));
@@ -262,11 +259,18 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         System.out.println("\nParsing domain (" + domain.getName()
             + ") and problem (" + problem.getName() + ") done successfully");
 
+
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
         factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
-        final Problem pb = factory.encode();
+        Problem pb =  null;
+        try {
+            pb = factory.encode();
+        } catch (OutOfMemoryError err) {
+            System.out.println("Out of memory during problem instantiation !");
+            System.exit(0);
+        }
         long end = System.currentTimeMillis();
         final double encodingTime = (end - start) / 1000.0;
         System.out.print("\nEncoding ");
@@ -284,6 +288,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         if (!pb.isTotallyOrederd()) {
             System.out.println("Unable to solve a problem that isn't totally ordered.\n");
         }
+
 
 
         if (pb.isSolvable()) {
@@ -314,7 +319,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                     System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
                 }
             } catch (OutOfMemoryError err) {
-                System.out.println("Out of memory !");
+                System.out.println("Out of memory during search !");
                 System.exit(0);
             }
         } else {
