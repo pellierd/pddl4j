@@ -114,7 +114,7 @@ public final class Method extends AbstractOperator {
      *
      * @return the ordering constraints of the method.
      */
-    public final BitMatrix getOrderingConstraints() {
+    public final OrderingConstraintSet getOrderingConstraints() {
         return this.taskNetwork.getOrderingConstraints();
     }
 
