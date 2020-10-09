@@ -31,6 +31,7 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.problem.OrderingConstraintSet;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.SquareBitMatrix;
 
@@ -465,7 +466,7 @@ final class IntEncoding implements Serializable {
             }
         } else {
             final int size = subtasks.getChildren().size();
-            final SquareBitMatrix constraints = new SquareBitMatrix(size);
+            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
             orderingConstraints = IntEncoding.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
             for (IntExpression c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
@@ -570,7 +571,7 @@ final class IntEncoding implements Serializable {
             }
         } else {
             final int size = subtasks.getChildren().size();
-            final SquareBitMatrix constraints = new SquareBitMatrix(size);
+            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
             orderingConstraints = IntEncoding.encodeOrderingConstraints(method.getOrderingConstraints());
             for (IntExpression c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
@@ -585,7 +586,6 @@ final class IntEncoding implements Serializable {
                     subtasks.getChildren().remove(subtaskIndex);
                     st.setTaskID(i);
                     orderedSubtasks.addChild(st);
-                    //System.out.println(subtaskIndex + " " + i + " "+ Encoder.toString(st));
                 }
                 intMeth.setSubTasks(orderedSubtasks);
                 orderingConstraints = new IntExpression(PDDLConnective.AND);

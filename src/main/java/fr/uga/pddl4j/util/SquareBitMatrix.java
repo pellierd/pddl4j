@@ -1,16 +1,40 @@
+/*
+ * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.util;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by pellier on 02/10/2020.
+ * This class implements a square bit matrix.
+ * <p>
+ * This class introspection mechanism not more allowed with jre version superior to 1.8.
+ * </p>
+ *
+ * @author D. Pellier
+ * @version 1.0 - 09.09.2020
  */
 public class SquareBitMatrix extends BitMatrix {
 
     /**
-     * Creates a deep copy from an other matrix.
+     * Creates a deep copy from an other Square Bit Matrix.
      *
      * @param other The other matrix.
      */
@@ -44,102 +68,4 @@ public class SquareBitMatrix extends BitMatrix {
             }
         }
     }
-
-    /**
-     * Returns <code>true</code> if the task network is totally ordered. The return value is computed from the ordering
-     * constraints of the task network. A task network with an empty set of constraints is totally ordered.
-     *
-     * @return <code>true</code> if the task network is totally ordered.
-     */
-    public final boolean isTotallyOrdered() {
-        if (this.rows() < 2) return true;
-        BitMatrix matrix = new BitMatrix(this);
-        boolean ordered = true;
-        //System.out.println("AVANT -------\n" + matrix.toBitString());
-        int index = 0;
-        while (matrix.rows() > 1 && ordered) {
-            List<Integer> tasks = this.getTasksWithNoPredecessors(matrix);
-            //System.out.println(tasks.size());
-            ordered = tasks.size() == 1;
-            if (ordered) {
-                matrix.removeRow(tasks.get(0));
-                matrix.removeColumn(tasks.get(0));
-            }
-            //System.out.println(index + " PENDANT ------- \n" + matrix.toBitString());
-            index++;
-        }
-        //System.out.println("ordered=" + ordered);
-        return ordered;
-    }
-
-    /**
-     * Returns the list of tasks with no successors. The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     *
-     * @return the  list of tasks with no successors.
-     */
-    public final List<Integer> getTasksWithNosSuccessors() {
-        return this.getTasksWithNosSuccessors(this);
-    }
-
-    /**
-     * Returns the list of tasks with no successors.  The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     * @return the  list of tasks with no successors.
-     */
-    private final List<Integer> getTasksWithNosSuccessors(BitMatrix matrix) {
-        final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < matrix.columns(); i++) {
-            if (matrix.getRow(i).cardinality() == 0) {
-                tasks.add(i);
-            }
-        }
-        return tasks;
-    }
-    /**
-     * Returns the list of tasks with no predecessors.  The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     * @return the  list of tasks with no predecessors.
-     */
-    public final List<Integer> getTasksWithNoPredecessors() {
-        return this.getTasksWithNoPredecessors(this);
-    }
-
-    /**
-     * Returns the list of tasks with no predecessor. The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     * @return the  list of tasks with no predecessor.
-     */
-    private final List<Integer> getTasksWithNoPredecessors(BitMatrix matrix) {
-        final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < matrix.columns(); i++) {
-            if (matrix.getColumn(i).cardinality() == 0) {
-                tasks.add(i);
-            }
-        }
-        return tasks;
-    }
-
-    /**
-     * Returns if this task network contains cyclic ordering constraints.
-     *
-     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code>
-     *      otherwise.
-     */
-    public final boolean isAcyclic() {
-        this.transitiveClosure();
-        final int size = this.rows();
-        boolean acyclic = true;
-        int i = 0;
-        while (i < size && acyclic) {
-            acyclic &= !this.get(i, i);
-            i++;
-        }
-        return acyclic;
-    }
-
 }
