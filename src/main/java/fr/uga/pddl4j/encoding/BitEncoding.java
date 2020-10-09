@@ -21,11 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import org.apache.logging.log4j.LogManager;
@@ -291,7 +287,7 @@ final class BitEncoding implements Serializable {
         final List<Integer> tasks = new ArrayList<Integer>();
         BitEncoding.encodeTasks(taskNetwork.getTasks(), map, tasks);
         // We encode then the ordering constraints
-        final BitMatrix constraints = new BitMatrix(tasks.size(), tasks.size());
+        final OrderingConstraintSet constraints = new OrderingConstraintSet(tasks.size());
         for (IntExpression c : taskNetwork.getOrderingConstraints().getChildren()) {
             constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
         }

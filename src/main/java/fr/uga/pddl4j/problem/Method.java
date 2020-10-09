@@ -123,7 +123,7 @@ public final class Method extends AbstractOperator {
      *
      * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final BitMatrix constraints) {
+    public final void setOrderingConstraints(final OrderingConstraintSet constraints) {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 

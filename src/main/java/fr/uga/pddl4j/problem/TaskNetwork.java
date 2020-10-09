@@ -45,7 +45,7 @@ public final class TaskNetwork implements Serializable {
     /**
      * The represents the ordering constraints of the task network.
      */
-    private BitMatrix orderingConstraints;
+    private OrderingConstraintSet orderingConstraints;
 
     /**
      * Create a new task network. The list of task is set to an empty set with no ordering constraints and not totally
@@ -54,7 +54,7 @@ public final class TaskNetwork implements Serializable {
     public TaskNetwork() {
         super();
         this.tasks = new LinkedList<Integer>();
-        this.orderingConstraints = new BitMatrix(0, 0);
+        this.orderingConstraints = new OrderingConstraintSet(0);
     }
 
     /**
@@ -66,7 +66,7 @@ public final class TaskNetwork implements Serializable {
     public TaskNetwork(final TaskNetwork other) {
         super();
         this.tasks = new LinkedList<Integer>(other.getTasks());
-        this.orderingConstraints = new BitMatrix(other.getOrderingConstraints());
+        this.orderingConstraints = new OrderingConstraintSet(other.getOrderingConstraints());
     }
 
     /**
@@ -78,7 +78,7 @@ public final class TaskNetwork implements Serializable {
      * @param tasks       the tasks of the task network.
      * @param constraints the orderings constraints of the task network.
      */
-    public TaskNetwork(final List<Integer> tasks, final BitMatrix constraints) {
+    public TaskNetwork(final List<Integer> tasks, final OrderingConstraintSet constraints) {
         super();
         this.tasks = new LinkedList<Integer>(tasks);
         this.setOrderingConstraints(constraints);
@@ -140,7 +140,7 @@ public final class TaskNetwork implements Serializable {
      *
      * @return the ordering constraints of the method.
      */
-    public final BitMatrix getOrderingConstraints() {
+    public final OrderingConstraintSet getOrderingConstraints() {
         return this.orderingConstraints;
     }
 
@@ -149,7 +149,7 @@ public final class TaskNetwork implements Serializable {
      *
      * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final BitMatrix constraints) {
+    public final void setOrderingConstraints(final OrderingConstraintSet constraints) {
         this.orderingConstraints = constraints;
     }
 
@@ -205,24 +205,7 @@ public final class TaskNetwork implements Serializable {
      * @return <code>true</code> if the task network is totally ordered.
      */
     public final boolean isTotallyOrdered() {
-        if (this.tasks.size() < 2) return true;
-        BitMatrix matrix = new BitMatrix(this.getOrderingConstraints());
-        boolean ordered = true;
-        //System.out.println("AVANT -------\n" + matrix.toBitString());
-        int index = 0;
-        while (matrix.rows() > 1 && ordered) {
-            List<Integer> tasks = this.getTasksWithNoPredecessors(matrix);
-            //System.out.println(tasks.size());
-            ordered = tasks.size() == 1;
-            if (ordered) {
-                matrix.removeRow(tasks.get(0));
-                matrix.removeColumn(tasks.get(0));
-            }
-            //System.out.println(index + " PENDANT ------- \n" + matrix.toBitString());
-            index++;
-        }
-        //System.out.println("ordered=" + ordered);
-        return ordered;
+        return this.orderingConstraints.isTotallyOrdered();
     }
 
     /**
@@ -232,15 +215,7 @@ public final class TaskNetwork implements Serializable {
      *      otherwise.
      */
     public final boolean isAcyclic() {
-        this.transitiveClosure();
-        final int size = this.orderingConstraints.rows();
-        boolean acyclic = true;
-        int i = 0;
-        while (i < size && acyclic) {
-            acyclic &= !this.getOrderingConstraints().get(i, i);
-            i++;
-        }
-        return acyclic;
+        return this.orderingConstraints.isAcyclic();
     }
 
     /**
@@ -248,17 +223,7 @@ public final class TaskNetwork implements Serializable {
      * on Warshall algorithm. The complexity is O(n^3) where n is the number of tasks of the task network.
      */
     public final void transitiveClosure() {
-        for (int k = 0; k < this.orderingConstraints.rows(); k++) {
-            for (int i = 0; i < this.orderingConstraints.rows(); i++) {
-                if (this.orderingConstraints.get(i, k)) {
-                    for (int j = 0; j < this.orderingConstraints.rows(); j++) {
-                        if (this.orderingConstraints.get(k, j)) {
-                            this.orderingConstraints.set(i, j);
-                        }
-                    }
-                }
-            }
-        }
+        this.orderingConstraints.transitiveClosure();
     }
 
     /**
@@ -269,23 +234,7 @@ public final class TaskNetwork implements Serializable {
      * @return the  list of tasks with no successors.
      */
     public final List<Integer> getTasksWithNosSuccessors() {
-       return this.getTasksWithNosSuccessors(this.orderingConstraints);
-    }
-
-    /**
-     * Returns the list of tasks with no successors.  The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     * @return the  list of tasks with no successors.
-     */
-    private final List<Integer> getTasksWithNosSuccessors(BitMatrix matrix) {
-        final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < matrix.columns(); i++) {
-            if (matrix.getRow(i).cardinality() == 0) {
-                tasks.add(i);
-            }
-        }
-        return tasks;
+       return this.orderingConstraints.getTasksWithNoSuccessors();
     }
 
     /**
@@ -295,23 +244,7 @@ public final class TaskNetwork implements Serializable {
      * @return the  list of tasks with no predecessors.
      */
     public final List<Integer> getTasksWithNoPredecessors() {
-        return this.getTasksWithNoPredecessors(this.getOrderingConstraints());
-    }
-
-    /**
-     * Returns the list of tasks with no predecessor. The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     * @return the  list of tasks with no predecessor.
-     */
-    private final List<Integer> getTasksWithNoPredecessors(BitMatrix matrix) {
-        final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < matrix.columns(); i++) {
-            if (matrix.getColumn(i).cardinality() == 0) {
-                tasks.add(i);
-            }
-        }
-        return tasks;
+        return this.orderingConstraints.getTasksWithNoPredecessors();
     }
 
     /**
