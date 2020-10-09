@@ -64,7 +64,7 @@ public final class IntTaskNetwork implements Serializable {
      *
      */
     public IntTaskNetwork() {
-      this(0);
+        this(0);
     }
 
     /**

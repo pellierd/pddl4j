@@ -32,13 +32,8 @@ import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.OrderingConstraintSet;
-import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.util.SquareBitMatrix;
 
-import javax.swing.*;
-import java.io.IOException;
 import java.io.Serializable;
-import java.lang.management.PlatformLoggingMXBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;

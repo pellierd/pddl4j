@@ -28,7 +28,10 @@ import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Properties;
 
 /**
  * This class implements the code of the total ordered simple task network planner. The search method is an

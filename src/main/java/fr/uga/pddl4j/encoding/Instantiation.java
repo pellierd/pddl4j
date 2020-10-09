@@ -21,9 +21,13 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class contains the methods needed to instantiate the actions and the method.
@@ -185,7 +189,7 @@ final class Instantiation implements Serializable {
 
         final int arity = network.arity();
         if (index == arity) {
-             networks.add(network);
+            networks.add(network);
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(network.getTypeOfParameters(index));
             for (Integer value : values) {

@@ -58,7 +58,9 @@ public class OrderingConstraintSet extends SquareBitMatrix {
      * @return <code>true</code> if the ordering constraints set is totally ordered; <code>false</code> otherwise.
      */
     public final boolean isTotallyOrdered() {
-        if (this.rows() < 2) return true;
+        if (this.rows() < 2) {
+            return true;
+        }
         final OrderingConstraintSet ordering = new OrderingConstraintSet(this);
         boolean ordered = true;
         int index = 0;
@@ -100,6 +102,7 @@ public class OrderingConstraintSet extends SquareBitMatrix {
         }
         return tasks;
     }
+
     /**
      * Returns the list of tasks with no predecessors.  The method works if only if the method
      * <code>transitiveClosure()</code> was previously called.

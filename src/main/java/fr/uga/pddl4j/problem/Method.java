@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.util.BitMatrix;
-
 import java.util.List;
 
 /**

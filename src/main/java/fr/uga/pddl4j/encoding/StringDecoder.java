@@ -505,9 +505,13 @@ final class StringDecoder implements Serializable {
             }
         }
         IntExpression task = relevantTasks.get(method.getTask());
-        str.append("task: ").append(StringDecoder.toString(task, constants, types, predicates, functions, tasks)).append("\n");
-        str.append("Preconditions:\n").append(StringDecoder.toString(method.getPreconditions(), constants, types,
-            predicates, functions, relevantFacts)).append("\n");
+        str.append("task: ");
+        str.append(StringDecoder.toString(task, constants, types, predicates, functions, tasks));
+        str.append("\n");
+        str.append("Preconditions:\n");
+        str.append(StringDecoder.toString(method.getPreconditions(), constants, types, predicates, functions,
+            relevantFacts));
+        str.append("\n");
         str.append(StringDecoder.toString(method.getTaskNetwork(), constants, types, predicates, functions, tasks,
             relevantTasks));
         return str.toString();

@@ -34,12 +34,15 @@ import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
-import java.io.IOException;
 import java.io.Serializable;
-import java.security.spec.ECField;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -463,8 +466,9 @@ public final class Encoder implements Serializable {
         if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Simply the encoded action with the inferred types.
             intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
-            // Simply the encoded methods with the inferred types.
-        //    intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
+            // Simply the encoded methods with the inferred types
+            // Does not work with methods
+            // intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
         }
 
         // Create the predicates tables used to count the occurrences of the predicates in the
@@ -679,10 +683,11 @@ public final class Encoder implements Serializable {
             Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
         }
 
-        if (intGoal != null && (!intGoal.getChildren().isEmpty() || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-                Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
+        if (intGoal != null && (!intGoal.getChildren().isEmpty()
+                || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
         } else {
-                Encoder.goal = new State();
+            Encoder.goal = new State();
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods

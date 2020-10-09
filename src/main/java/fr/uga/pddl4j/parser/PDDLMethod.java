@@ -19,7 +19,11 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class implements a method for htn planning operator parsed.

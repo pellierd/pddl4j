@@ -618,6 +618,7 @@ public class Problem implements Serializable {
         }
         return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
     }
+
     /**
      * Returns a string representation of a specified operator.
      *

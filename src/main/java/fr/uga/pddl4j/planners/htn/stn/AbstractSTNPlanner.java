@@ -23,7 +23,14 @@ import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Spliterator;
 
 /**
  * This abstract class implements the common methods of all Simple Task Network planners.
@@ -77,7 +84,6 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
             cost(i, problem, closed);
         }
     }
-
 
     /**
      * Computes recursively for a task of a planning problem the maximum number of primitive tasks needed to accomplish
@@ -142,7 +148,6 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param node    the solution node.
      * @param problem the problem to be solved.
     */
-
     public void printPlanForValidator(final AbstractSTNNode node, final Problem problem) {
 
         final LinkedList<Integer> operators = new LinkedList<>();
@@ -260,7 +265,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         final StringBuffer root = new StringBuffer();
         root.append("root");
         final StringBuffer decomposition = new StringBuffer();
-        while(!open.isEmpty()) {
+        while (!open.isEmpty()) {
             final Node tmpn = open.removeFirst();
             children = tmpn.getChildren();
             open.addAll(0, children);
@@ -297,6 +302,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         }
         return -1;
     }
+
     /**
      * Print the usage of the AbstractSTNPlanner.
      */
@@ -366,7 +372,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         private Node parent;
         private List<Node> children = new LinkedList<Node>();
 
-        public Node (final Node parent, final Integer task) {
+        public Node(final Node parent, final Integer task) {
             this.task = task;
             this.parent = parent;
         }

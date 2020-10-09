@@ -1290,7 +1290,7 @@ public final class PDDLParser {
                         }
                     }
                     break;
-/*                case SORT_OF_CONSTRAINT:
+                /* case SORT_OF_CONSTRAINT:
                     for (PDDLTypedSymbol variable : gd.getVariables()) {
                         boolean error = false;
                         for (PDDLSymbol type : variable.getTypes()) {
@@ -1465,10 +1465,11 @@ public final class PDDLParser {
 
 
     /**
-     * `
-     * @param term
-     * @param context
-     * @return
+     * Checks is a term is well defined in a specific context.
+     *
+     * @param term the term.
+     * @param context the context.
+     * @return <code>true</code> if the term is well defined; <code>false</code> otherwise.
      */
     private boolean checkTerm(PDDLSymbol term, List<PDDLTypedSymbol> context) {
         boolean checked = true;
@@ -1501,6 +1502,7 @@ public final class PDDLParser {
         }
         return checked;
     }
+
     /**
      * Returns if task in parameter was previously declared.
      *

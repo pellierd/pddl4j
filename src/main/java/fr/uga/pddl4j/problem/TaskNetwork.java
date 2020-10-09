@@ -19,12 +19,13 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
@@ -234,7 +235,7 @@ public final class TaskNetwork implements Serializable {
      * @return the  list of tasks with no successors.
      */
     public final List<Integer> getTasksWithNosSuccessors() {
-       return this.orderingConstraints.getTasksWithNoSuccessors();
+        return this.orderingConstraints.getTasksWithNoSuccessors();
     }
 
     /**
