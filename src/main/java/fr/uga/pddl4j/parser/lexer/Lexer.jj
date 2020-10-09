@@ -1800,7 +1800,10 @@ void structure_def() :
 			dp = derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
-
+    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+            op = htn_action_def() {
+                this.domain.addAction(op);
+            }
     |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
             task = comp_task_def() {
                 this.domain.addTask(task);
@@ -2122,12 +2125,30 @@ PDDLAction action_def() :
 	try {
 		left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
-		    [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HIERARCHY)})
-		        <PRECONDITION> preconds=pre_gd()
-		    ]
-			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.HIERARCHY)})
-			    <EFFECT> effects=effect()
-			]
+		    <PRECONDITION> preconds=pre_gd()
+		    <EFFECT> effects=effect()
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new PDDLAction(name, parameters, preconds, effects);
+	}
+}
+
+PDDLAction htn_action_def() :
+{
+	PDDLSymbol name = null;
+	List<PDDLTypedSymbol> parameters = null;
+	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+}
+{
+	try {
+		left_bracket() <ACTION> name=action_name()
+			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+		    [LOOKAHEAD(2) <PRECONDITION> preconds=pre_gd()]
+			[LOOKAHEAD(2) <EFFECT> effects=effect()]
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
