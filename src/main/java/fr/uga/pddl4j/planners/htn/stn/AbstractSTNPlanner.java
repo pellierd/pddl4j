@@ -294,14 +294,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
     }
 
-    private int indexOf(int from, int task, List<Integer> tasks) {
-        for (int i = from; i < tasks.size(); i++) {
-            if (tasks.get(i) == task) {
-                return i;
-            }
-        }
-        return -1;
-    }
+
 
     /**
      * Print the usage of the AbstractSTNPlanner.
@@ -363,8 +356,11 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
     }
 
-    // Node of the task decomposition
-    public class Node {
+    /**
+     * Node of the task decomposition. This inner class is use to produce the output of the plan in the hierarchical
+     * plan validator.
+     */
+    private class Node {
         private Integer task;
         private Integer tasksynonym;
         private String taskname;
@@ -372,19 +368,40 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         private Node parent;
         private List<Node> children = new LinkedList<Node>();
 
+        /**
+         * Create a new node with a specified parent node and task.
+         *
+         * @param parent the parent node.
+         * @param task the tasks.
+         */
         public Node(final Node parent, final Integer task) {
             this.task = task;
             this.parent = parent;
         }
 
+        /**
+         * Returns the list of children of the node.
+         *
+         * @return the list of children of the node.
+         */
         public List<Node> getChildren() {
-            return children;
+            return this.children;
         }
 
+        /**
+         * Adds a list of children to the node.
+         *
+         * @param children the children to add.
+         */
         public void addChildren(List<Node> children) {
             this.children.addAll(0, children);
         }
 
+        /**
+         * Returns a string of representation of the node.
+         *
+         * @return the string representation of this node.
+         */
         public String toString() {
             return "Node [task = " + task + ", children = "
                 + children + "]";
