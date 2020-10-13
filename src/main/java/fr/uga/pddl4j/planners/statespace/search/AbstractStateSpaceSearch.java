@@ -13,13 +13,11 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.SolutionEvent;
-import fr.uga.pddl4j.planners.SolutionListener;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Problem;
@@ -29,11 +27,11 @@ import java.util.Objects;
 /**
  * This abstract class defines the main methods for search strategies.
  *
- * @author E. Hermellin
+ * @author E. Hermellin, D. Pellier
  * @version 1.0 - 11.06.2018
  * @since 3.6
  */
-public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
+public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
 
     /**
      * The heuristic of the planner.
@@ -239,7 +237,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
     /**
      * Create a new search strategy.
      */
-    public AbstractStateSpaceStrategy() {
+    public AbstractStateSpaceSearch() {
         super();
         this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
         this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
@@ -254,7 +252,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      *
      * @param timeout   the time out of the planner.
      */
-    public AbstractStateSpaceStrategy(int timeout) {
+    public AbstractStateSpaceSearch(int timeout) {
         super();
         this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
         this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
@@ -271,7 +269,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
      * @param timeout   the time out of the planner.
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceStrategy(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
+    public AbstractStateSpaceSearch(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super();
         this.timeout = timeout;
         this.heuristic = heuristic;
@@ -323,7 +321,7 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
             Node n = node;
             final SequentialPlan plan = new SequentialPlan();
             while (n.getParent() != null) {
-                final Action op = problem.getActions().get(n.getOperator());
+                final Action op = problem.getActions().get(n.getAction());
                 plan.add(0, op);
                 n = n.getParent();
             }
@@ -342,38 +340,4 @@ public abstract class AbstractStateSpaceStrategy implements StateSpaceStrategy {
         this.createdNodes = 0;
     }
 
-    /**
-     * Adds SolutionListener to the list of SolutionListener.
-     *
-     * @param listener the SolutionListener to add.
-     */
-    @Override
-    public void addSolutionListener(SolutionListener listener) {
-        solutionListenerList.add(SolutionListener.class, listener);
-    }
-
-    /**
-     * Removes SolutionListener to the list of SolutionListener.
-     *
-     * @param listener the SolutionListener to remove.
-     */
-    @Override
-    public void removeSolutionListener(SolutionListener listener) {
-        solutionListenerList.remove(SolutionListener.class, listener);
-    }
-
-    /**
-     * Processes SolutionEvent when one is fired.
-     *
-     * @param evt the solution event to process.
-     */
-    @Override
-    public void fireSolution(SolutionEvent evt) {
-        Object[] listeners = solutionListenerList.getListenerList();
-        for (int i = 0; i < listeners.length; i = i + 2) {
-            if (listeners[i] == SolutionListener.class) {
-                ((SolutionListener) listeners[i + 1]).newSolutionFound(evt);
-            }
-        }
-    }
 }

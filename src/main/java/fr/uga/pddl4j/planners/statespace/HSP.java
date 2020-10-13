@@ -17,15 +17,15 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.hsp;
+package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.search.AStar;
+import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.Logger;

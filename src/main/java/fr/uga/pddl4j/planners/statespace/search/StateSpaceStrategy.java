@@ -13,12 +13,10 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.SolutionEvent;
-import fr.uga.pddl4j.planners.SolutionListener;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.io.Serializable;
@@ -27,16 +25,11 @@ import javax.swing.event.EventListenerList;
 /**
  * This interface defines the main methods for search strategies.
  *
- * @author E. Hermellin
+ * @author E. Hermellin, D. Pellier
  * @version 1.0 - 11.06.2018
  * @since 3.6
  */
 public interface StateSpaceStrategy extends Serializable {
-
-    /**
-     * The list of SolutionListener.
-     */
-    EventListenerList solutionListenerList = new EventListenerList();
 
     /**
      * Returns the heuristicType to use to solve the planning problem.
@@ -183,24 +176,4 @@ public interface StateSpaceStrategy extends Serializable {
      */
     Plan extractPlan(final Node solutionNode, final Problem codedProblem);
 
-    /**
-     * Adds SolutionListener to the list of SolutionListener.
-     *
-     * @param listener the SolutionListener to add.
-     */
-    void addSolutionListener(SolutionListener listener);
-
-    /**
-     * Removes SolutionListener to the list of SolutionListener.
-     *
-     * @param listener the SolutionListener to remove.
-     */
-    void removeSolutionListener(SolutionListener listener);
-
-    /**
-     * Processes SolutionEvent when one is fired.
-     *
-     * @param evt the solution event to process.
-     */
-    void fireSolution(SolutionEvent evt);
 }

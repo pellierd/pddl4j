@@ -17,17 +17,17 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.ff;
+package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
-import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.search.AStar;
+import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.Logger;
@@ -43,7 +43,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 2.0 - 24.01.2018
  */
-public final class FF extends AbstractStateSpacePlanner {
+public final class FastForward extends AbstractStateSpacePlanner {
 
     /**
      * The Enforced Hill Climbing strategy.
@@ -58,7 +58,7 @@ public final class FF extends AbstractStateSpacePlanner {
     /**
      * Creates a new planner with default parameters.
      */
-    public FF() {
+    public FastForward() {
         super();
 
         this.enforcedHillClimbing = new EnforcedHillClimbing();
@@ -74,7 +74,7 @@ public final class FF extends AbstractStateSpacePlanner {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      */
-    public FF(final boolean statisticState, final int traceLevel) {
+    public FastForward(final boolean statisticState, final int traceLevel) {
         super(statisticState, traceLevel);
 
         this.enforcedHillClimbing = new EnforcedHillClimbing();
@@ -93,8 +93,8 @@ public final class FF extends AbstractStateSpacePlanner {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      */
-    public FF(final int timeout, final RelaxationHeuristic.Type heuristicType, final double weight,
-              final boolean statisticState, final int traceLevel) {
+    public FastForward(final int timeout, final RelaxationHeuristic.Type heuristicType, final double weight,
+                       final boolean statisticState, final int traceLevel) {
         super();
         this.setSaveState(statisticState);
         this.setTraceLevel(traceLevel);

@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
 import java.io.Serializable;
 import java.util.Comparator;

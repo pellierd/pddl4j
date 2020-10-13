@@ -20,7 +20,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.JsonAdapter;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.statespace.hsp.HSP;
+import fr.uga.pddl4j.planners.statespace.HSP;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
 

@@ -34,7 +34,7 @@ import java.util.List;
  * of a relaxed planning graph ignoring negative effects. This implementation is based on the
  * implementation of the fast forward planner proposed by J. Hoffmann. The relaxed planning computed
  * does not compute mutual exclusion. To have more information about this implementation see
- * Hoffmann, J. and Nebel, B. (2001). The FF Planning System: Fast Plan Generation Through Heuristic
+ * Hoffmann, J. and Nebel, B. (2001). The FastForward Planning System: Fast Plan Generation Through Heuristic
  * Search. Journal of Artificial Intelligence Research, 14(1):253-302.
  *
  * @author Damien Pellier
@@ -127,7 +127,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
         // Get the number of relevant facts of the problem
         final int nbRelevantFacts = super.getRevelantFacts().size();
         // Get the number of operators of the problem
-        final int nbOperators = super.getOperators().size();
+        final int nbOperators = super.getActions().size();
         // Compute the number of unconditional operators
         int nbUncondOperators = 0;
         final List<Action> operators = problem.getActions();
@@ -524,7 +524,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                     pGk.andNot(pEffect);
                     nGk.andNot(nEffect);
                     // We increment the number of action of the relaxed plan
-                    value += this.getOperators().get(resolverIndex).getCost();
+                    value += this.getActions().get(resolverIndex).getCost();
                 } else { // NOOP case
                     pGk1.clear(pg);
                     pGk.clear(pg);
@@ -558,7 +558,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractHeuristic {
                     pGk.andNot(pEffect);
                     nGk.andNot(nEffect);
                     // We increment the number of action of the relaxed plan
-                    value += this.getOperators().get(resolverIndex).getCost();
+                    value += this.getActions().get(resolverIndex).getCost();
                 } else { // NOOP case
                     nGk1.set(ng);
                     nGk.clear(ng);

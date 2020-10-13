@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -99,7 +99,7 @@ public class MinCost extends AbstractHeuristic {
             Node nextNode = null;
             double cost = Double.MAX_VALUE;
 
-            for (Action op : getOperators()) {
+            for (Action op : getActions()) {
                 if (op.isApplicable(current)) {
                     if (op.getCost() <= cost) { //TODO take into account = or not
                         final ClosedWorldState nextState = new ClosedWorldState(current);
@@ -109,7 +109,7 @@ public class MinCost extends AbstractHeuristic {
                         final Node successor = new Node(nextState);
                         successor.setCost(current.getCost() + op.getCost());
                         successor.setParent(current);
-                        successor.setOperator(index);
+                        successor.setAction(index);
                         successor.setDepth(current.getDepth() + 1);
 
                         cost = op.getCost();

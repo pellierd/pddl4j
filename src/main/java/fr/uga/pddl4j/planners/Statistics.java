@@ -27,11 +27,6 @@ import java.io.Serializable;
 public class Statistics implements Serializable {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The encoding time in ms.
      */
     private long timeToEncode;

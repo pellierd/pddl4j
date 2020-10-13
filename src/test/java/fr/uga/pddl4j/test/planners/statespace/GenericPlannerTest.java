@@ -13,20 +13,20 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.test.planners.statespace.generic;
+package fr.uga.pddl4j.test.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.planners.statespace.generic.GenericPlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
-import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.DepthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.GenericPlanner;
+import fr.uga.pddl4j.planners.statespace.search.AStar;
+import fr.uga.pddl4j.planners.statespace.search.BreadthFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.DepthFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.HillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
 
@@ -80,7 +80,7 @@ public class GenericPlannerTest {
     private static final boolean STATISTICS = false;
 
     /**
-     * The FF planner reference.
+     * The FastForward planner reference.
      */
     private GenericPlanner planner = null;
 

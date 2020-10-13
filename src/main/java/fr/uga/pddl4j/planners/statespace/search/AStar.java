@@ -13,11 +13,10 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -34,7 +33,7 @@ import java.util.PriorityQueue;
  * @author D. Pellier
  * @version 1.0 - 01.06.2018
  */
-public final class AStar extends AbstractStateSpaceStrategy {
+public final class AStar extends AbstractStateSpaceSearch {
 
     /**
      * Creates a new AStar search strategy with default parameters.
@@ -94,7 +93,6 @@ public final class AStar extends AbstractStateSpaceStrategy {
             // If the goal is satisfy in the current node then extract the search and return it
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
-                fireSolution(new SolutionEvent(this, solution, codedProblem));
             } else {
                 // Try to apply the operators of the problem to this node
                 int index = 0;
@@ -121,7 +119,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                                 if (g < result.getCost()) {
                                     result.setCost(g);
                                     result.setParent(current);
-                                    result.setOperator(index);
+                                    result.setAction(index);
                                     result.setDepth(current.getDepth() + 1);
                                     open.add(result);
                                     openSet.put(result, result);
@@ -130,7 +128,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                             } else {
                                 state.setCost(g);
                                 state.setParent(current);
-                                state.setOperator(index);
+                                state.setAction(index);
                                 state.setHeuristic(heuristic.estimate(state, codedProblem.getGoal()));
                                 state.setDepth(current.getDepth() + 1);
                                 open.add(state);
@@ -139,7 +137,7 @@ public final class AStar extends AbstractStateSpaceStrategy {
                         } else if (g < result.getCost()) {
                             result.setCost(g);
                             result.setParent(current);
-                            result.setOperator(index);
+                            result.setAction(index);
                             result.setDepth(current.getDepth() + 1);
                         }
                     }

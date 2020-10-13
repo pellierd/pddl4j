@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

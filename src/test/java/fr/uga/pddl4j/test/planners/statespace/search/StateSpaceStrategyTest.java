@@ -1,17 +1,15 @@
-package fr.uga.pddl4j.test.planners.statespace.search.strategy;
+package fr.uga.pddl4j.test.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStar;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AStarAnytime;
-import fr.uga.pddl4j.planners.statespace.search.strategy.BreadthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.DepthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.strategy.GreedyBestFirstSearchAnytime;
-import fr.uga.pddl4j.planners.statespace.search.strategy.HillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
-import fr.uga.pddl4j.planners.statespace.search.strategy.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.statespace.search.AStar;
+import fr.uga.pddl4j.planners.statespace.search.BreadthFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.DepthFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.HillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
 
@@ -307,60 +305,6 @@ public class StateSpaceStrategyTest {
         final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
         Assert.assertTrue(plan.cost() == DEPTH_SOLUTION_COST);
         Assert.assertTrue(plan.size() == DEPTH_SOLUTION_SIZE);
-    }
-
-    /**
-     * Method that tests solution node (cost and size) for Astar Anytime search strategy.
-     */
-    @Test
-    public void testAstarAnytimeSolutionNode() {
-        System.out.println("StateSpaceStrategy: Test solution node from Astar Search Anytime.");
-        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
-        stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
-        Assert.assertTrue(solutionNode.getCost() == ASTAR_ANYTIME_SOLUTION_COST);
-        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == ASTAR_ANYTIME_SOLUTION_COST);
-    }
-
-    /**
-     * Method that tests solution plan (cost and size) for Astar Anytime search strategy.
-     */
-    @Test
-    public void testAstarAnytimePlan() {
-        System.out.println("StateSpaceStrategy: Test solution plan from Astar Search Anytime.");
-        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
-        stateSpaceStrategy = new AStarAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
-        Assert.assertTrue(plan.cost() == ASTAR_ANYTIME_SOLUTION_COST);
-        Assert.assertTrue(plan.size() == ASTAR_ANYTIME_SOLUTION_SIZE);
-    }
-
-    /**
-     * Method that tests solution node (cost and size) for Greedy Best First Search Anytime search strategy.
-     */
-    @Test
-    public void testGreedyAnytimeSolutionNode() {
-        System.out.println("StateSpaceStrategy: Test solution node from Greedy Best First Search Anytime.");
-        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
-        stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        final Node solutionNode = stateSpaceStrategy.searchSolutionNode(codedProblem);
-        Assert.assertTrue(solutionNode.getCost() == GREEDY_ANYTIME_SOLUTION_COST);
-        Assert.assertTrue(stateSpaceStrategy.extractPlan(solutionNode,
-            codedProblem).size() == GREEDY_ANYTIME_SOLUTION_COST);
-    }
-
-    /**
-     * Method that tests solution plan (cost and size) for Greedy Best First Search Anytime search strategy.
-     */
-    @Test
-    public void testGreedyAnytimePlan() {
-        System.out.println("StateSpaceStrategy: Test solution plan from Greedy Best First Search Anytime.");
-        final Problem codedProblem = Tools.generateCodedProblem(domainFile, problemFile);
-        stateSpaceStrategy = new GreedyBestFirstSearchAnytime(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT);
-        final Plan plan = stateSpaceStrategy.searchPlan(codedProblem);
-        Assert.assertTrue(plan.cost() == GREEDY_ANYTIME_SOLUTION_COST);
-        Assert.assertTrue(plan.size() == GREEDY_ANYTIME_SOLUTION_SIZE);
     }
 
     /**

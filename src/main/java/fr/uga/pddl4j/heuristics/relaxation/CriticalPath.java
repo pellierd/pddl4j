@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.relaxation;
 
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -60,7 +60,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
-        final List<Action> operator = this.getOperators();
+        final List<Action> operator = this.getActions();
         int startPoint = 0;
         for (Action op : operator) {
             startPoint += op.getCondEffects().size();
@@ -89,7 +89,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
                 nGoalBitVector.set(p);
             }
             //Compute the positive preconditions
-            for (Action op : this.getOperators()) {
+            for (Action op : this.getActions()) {
                 final State pre = new State(op.getPreconditions());
                 final State npre = new State(op.getPreconditions());
                 BitVector nprecon = npre.getNegative();

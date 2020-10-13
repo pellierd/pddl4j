@@ -97,11 +97,11 @@ public interface Planner extends Serializable {
          */
         HSP,
         /**
-         * The FF (Fast Forward Planner).
+         * The FastForward (Fast Forward Planner).
          */
         FF,
         /**
-         * The FF Anytime (Fast Forward Anytime Planner).
+         * The FastForward Anytime (Fast Forward Anytime Planner).
          */
         FFAnytime,
         /**

@@ -45,9 +45,9 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     private List<Fluent> facts;
 
     /**
-     * The lists of operators of the relaxed problem.
+     * The lists of actions of the relaxed problem.
      */
-    private List<Action> operators;
+    private List<Action> actions;
 
     /**
      * The boolean flag used to indicate if the heuristic is admissible.
@@ -66,7 +66,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
         }
         this.facts = problem.getRelevantFluents();
         this.goal = problem.getGoal();
-        this.operators = problem.getActions();
+        this.actions = problem.getActions();
         this.isAdmissible = true;
     }
 
@@ -119,12 +119,12 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     }
 
     /**
-     * Returns the operators of the relaxed problem to solve in order to compute the heuristic.
+     * Returns the actions of the relaxed problem to solve in order to compute the heuristic.
      *
-     * @return the operators.
+     * @return the actions.
      */
-    protected final List<Action> getOperators() {
-        return this.operators;
+    protected final List<Action> getActions() {
+        return this.actions;
     }
 
 }

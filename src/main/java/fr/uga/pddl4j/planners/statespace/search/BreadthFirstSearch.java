@@ -13,9 +13,8 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -31,7 +30,7 @@ import java.util.Objects;
  * @author E. Hermellin
  * @version 1.0 - 22.06.2018
  */
-public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
+public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
 
     /**
      * Creates a new Greedy best First Search search strategy with default parameters.
@@ -78,7 +77,6 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
 
             if (current.satisfy(codedProblem.getGoal())) {
                 solution = current;
-                fireSolution(new SolutionEvent(this, solution, codedProblem));
             } else {
                 closeSet.add(current);
                 int index = 0;
@@ -104,7 +102,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceStrategy {
                         successor.setCost(current.getCost() + op.getCost());
                         successor.setHeuristic(0);
                         successor.setParent(current);
-                        successor.setOperator(index);
+                        successor.setAction(index);
                         successor.setDepth(current.getDepth() + 1);
 
                         if (!closeSet.contains(successor) && !openSet.contains(successor)) {

@@ -1,111 +1,101 @@
 /*
- * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2016 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License along with PDDL4J.  If not, see
+ * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
-import fr.uga.pddl4j.planners.SolutionEvent;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 
 /**
- * This class implements Enforced Hill Climbing search strategy.
+ * This class implements Hill Climnbing search strategy.
  *
- * @author Samuel Aaron Boyd
  * @author E. Hermellin
- * @version 2.0 - 24.01.2018
+ * @version 1.0 - 01.06.2018
  */
-public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
+public final class HillClimbing extends AbstractStateSpaceSearch {
 
     /**
-     * Creates a new Enforced Hill Climbing search strategy with default parameters.
+     * Creates a new Hill Climbing search with default parameters.
      *
      */
-    public EnforcedHillClimbing() {
+    public HillClimbing() {
         super();
     }
 
     /**
-     * Creates a new Enforced Hill Climbing search strategy.
+     * Creates a new Hill Climbing search strategy.
      *
      * @param timeout   the time out of the planner.
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public EnforcedHillClimbing(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
+    public HillClimbing(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
     /**
-     * The enforced hill climbing algorithm. Solves the planning problem and returns the solution's node.
+     * The hill climbing algorithm. Solves the planning problem and returns the solution's node.
      *
      * @param codedProblem the problem to be solved. The problem cannot be null.
-     * @return the solution node or null.
+     * @return the solution node.
      */
     public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
-        final long begin = System.currentTimeMillis();
-
+        final LinkedList<Node> openList = new LinkedList<>();
         final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
             getHeuristicType(), codedProblem);
-        final LinkedList<Node> openList = new LinkedList<>();
-        final int timeout = getTimeout();
 
         ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 
-        double bestHeuristic = root.getHeuristic();
-
         Node solution = null;
         boolean deadEndFree = true;
 
         this.resetNodesStatistics();
+        final int timeout = getTimeout();
+        final long begin = System.currentTimeMillis();
         long searchingTime = 0;
-        while (!openList.isEmpty() && solution == null && deadEndFree && searchingTime < timeout) {
+        while (!openList.isEmpty() && solution == null
+            && deadEndFree && searchingTime < timeout) {
+
             final Node currentState = openList.pop();
             final LinkedList<Node> successors = getSuccessors(currentState, codedProblem, heuristic);
             deadEndFree = !successors.isEmpty();
 
-            while (!successors.isEmpty() && solution == null) {
-                final Node successor = successors.pop();
+            if (deadEndFree) {
+                final Node successor = popBestNode(successors);
                 this.setExploredNodes(this.getExploredNodes() + 1);
-                final double heuristicSuccessor = successor.getHeuristic();
-                if (heuristicSuccessor == 0.0) {
+                if (successor.satisfy(codedProblem.getGoal())) {
                     solution = successor;
-                    fireSolution(new SolutionEvent(this, solution, codedProblem));
-                }
-                if (heuristicSuccessor < bestHeuristic) {
+                } else {
                     successors.clear();
                     openList.clear();
-                    bestHeuristic = heuristicSuccessor;
+                    openList.addLast(successor);
                 }
-                openList.addLast(successor);
             }
 
-            // Take time to compute the searching time
             long end = System.currentTimeMillis();
             searchingTime = end - begin;
         }
@@ -124,12 +114,12 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, Problem problem, RelaxationHeuristic heuristic) {
+    private LinkedList<Node> getSuccessors(final Node parent, final Problem problem,
+                                           final RelaxationHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;
         for (Action op : problem.getActions()) {
-            // Test if a specified operator is applicable in the current state
             if (op.isApplicable(parent)) {
                 final ClosedWorldState nextState = new ClosedWorldState(parent);
                 op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
@@ -142,7 +132,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
                 successor.setCost(parent.getCost() + op.getCost());
                 successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
                 successor.setParent(parent);
-                successor.setOperator(index);
+                successor.setAction(index);
                 successor.setDepth(parent.getDepth() + 1);
                 successors.add(successor);
             }
@@ -150,5 +140,27 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceStrategy {
         }
 
         return successors;
+    }
+
+    /**
+     * Return the best node from a list according to the heuristic value.
+     *
+     * @param nodes the list containing nodes.
+     * @return the best node from the nodes' list.
+     */
+    private Node popBestNode(Collection<Node> nodes) {
+        Node node = null;
+        if (!nodes.isEmpty()) {
+            final Iterator<Node> i = nodes.iterator();
+            node = i.next();
+            while (i.hasNext()) {
+                final Node next = i.next();
+                if (next.getHeuristic() < node.getHeuristic()) {
+                    node = next;
+                }
+            }
+            nodes.remove(node);
+        }
+        return node;
     }
 }

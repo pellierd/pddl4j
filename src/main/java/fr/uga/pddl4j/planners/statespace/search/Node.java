@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.search.strategy;
+package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.problem.ClosedWorldState;
 
@@ -35,9 +35,9 @@ public final class Node extends ClosedWorldState {
     private Node parent;
 
     /**
-     * The operator apply to reach this node.
+     * The action apply to reach this node.
      */
-    private int operator;
+    private int action;
 
     /**
      * The cost to reach this node from the root node.
@@ -68,14 +68,14 @@ public final class Node extends ClosedWorldState {
      *
      * @param state     the logical state of the node.
      * @param parent    the parent node of the node.
-     * @param operator  the operator applied to reached the node from its parent.
+     * @param action   the action applied to reached the node from its parent.
      * @param cost      the cost to reach the node from the root node.
      * @param heuristic the estimated distance to reach the goal from the node.
      */
-    public Node(ClosedWorldState state, Node parent, int operator, double cost, double heuristic) {
+    public Node(ClosedWorldState state, Node parent, int action, double cost, double heuristic) {
         super(state);
         this.parent = parent;
-        this.operator = operator;
+        this.action = action;
         this.cost = cost;
         this.heuristic = heuristic;
         this.depth = -1;
@@ -86,38 +86,37 @@ public final class Node extends ClosedWorldState {
      *
      * @param state     the logical state of the node.
      * @param parent    the parent node of the node.
-     * @param operator  the operator applied to reached the node from its parent.
+     * @param action    the action applied to reached the node from its parent.
      * @param cost      the cost to reach the node from the root node.
      * @param depth     the depth of the node.
      * @param heuristic the estimated distance to reach the goal from the node.
      */
-    public Node(ClosedWorldState state, Node parent, int operator, double cost, int depth, double heuristic) {
+    public Node(ClosedWorldState state, Node parent, int action, double cost, int depth, double heuristic) {
         super(state);
         this.parent = parent;
-        this.operator = operator;
+        this.action = action;
         this.cost = cost;
         this.depth = depth;
         this.heuristic = heuristic;
     }
 
     /**
-     * Returns the operator applied to reach the node.
+     * Returns the action applied to reach the node.
      *
-     * @return the operator applied to reach the node.
+     * @return the action applied to reach the node.
      */
-    public final int getOperator() {
-        return operator;
+    public final int getAction() {
+        return this.action;
     }
 
     /**
-     * Sets the operator applied to reach the node.
+     * Sets the action applied to reach the node.
      *
-     * @param operator the operator to set.
+     * @param action the action to set.
      */
-    public final void setOperator(int operator) {
-        this.operator = operator;
+    public final void setAction(final int action) {
+        this.action = action;
     }
-
 
     /**
      * Returns the parent node of the node.

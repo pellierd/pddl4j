@@ -21,10 +21,6 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
-import fr.uga.pddl4j.planners.statespace.ff.FF;
-import fr.uga.pddl4j.planners.statespace.ff.FFAnytime;
-import fr.uga.pddl4j.planners.statespace.hc.HCAnytime;
-import fr.uga.pddl4j.planners.statespace.hsp.HSP;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
 import org.apache.logging.log4j.LogManager;
@@ -92,15 +88,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FF:
-                planner = new FF();
-                break;
-
-            case FFAnytime:
-                planner = new FFAnytime();
-                break;
-
-            case HCAnytime:
-                planner = new HCAnytime();
+                planner = new FastForward();
                 break;
 
             default:
@@ -128,15 +116,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FF:
-                planner = new FF(statisticState, traceLevel);
-                break;
-
-            case FFAnytime:
-                planner = new FFAnytime(statisticState, traceLevel);
-                break;
-
-            case HCAnytime:
-                planner = new HCAnytime(statisticState, traceLevel);
+                planner = new FastForward(statisticState, traceLevel);
                 break;
 
             default:
@@ -168,15 +148,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FF:
-                planner = new FF(timeout, heuristicType, weight, statisticState, traceLevel);
-                break;
-
-            case FFAnytime:
-                planner = new FFAnytime(timeout, heuristicType, weight, statisticState, traceLevel);
-                break;
-
-            case HCAnytime:
-                planner = new HCAnytime(timeout, heuristicType, weight, statisticState, traceLevel);
+                planner = new FastForward(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
             default:
@@ -201,8 +173,8 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
             .append("-p <num>    specifies the state based planner to use (preset: 0)\n")
             .append("     0      HSP planner\n")
-            .append("     1      FF planner\n")
-            .append("     2      FF Anytime planner\n")
+            .append("     1      FastForward planner\n")
+            .append("     2      FastForward Anytime planner\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
             .append("     0      ff heuristic\n")
             .append("     1      sum heuristic\n")
@@ -372,8 +344,8 @@ public class StateSpacePlannerFactory implements Serializable {
      * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 300)
      * -u <i>num</i>   specifies the state based planner to use (preset: 0)
      *      0      HSP planner
-     *      1      FF planner
-     *      2      FF Anytime planner
+     *      1      FastForward planner
+     *      2      FastForward Anytime planner
      * -u <i>num</i>   specifies the heuristic to use (preset: 0)
      *      0      ff heuristic
      *      1      sum heuristic

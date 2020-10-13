@@ -17,12 +17,13 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.statespace.generic;
+package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlannerAnytime;
-import fr.uga.pddl4j.planners.statespace.search.strategy.AbstractStateSpaceStrategyAnytime;
-import fr.uga.pddl4j.planners.statespace.search.strategy.Node;
+import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
 
 import org.apache.logging.log4j.Logger;
@@ -30,25 +31,25 @@ import org.apache.logging.log4j.Logger;
 import java.util.Objects;
 
 /**
- * This class implements a simple generic anytime planner.
- * This planner is generic, you need to give him an anytime StateSpaceStrategy of your choice to solve the problem.
+ * This class implements a simple generic planner.
+ * This planner is generic, you need to give him a StateSpaceStrategy of your choice to solve the problem.
  *
  * @author E. Hermellin
  * @version 1.0 - 28.09.2018
  */
-public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytime {
+public final class GenericPlanner extends AbstractStateSpacePlanner {
 
     /**
      * The search strategy.
      */
-    private final AbstractStateSpaceStrategyAnytime searchStrategy;
+    private final StateSpaceStrategy searchStrategy;
 
     /**
      * Creates a new planner with default parameters.
      *
      * @param searchStrategy the search strategy to use to solve the problem.
      */
-    public GenericAnytimePlanner(final AbstractStateSpaceStrategyAnytime searchStrategy) {
+    public GenericPlanner(final StateSpaceStrategy searchStrategy) {
         Objects.requireNonNull(searchStrategy);
         this.searchStrategy = searchStrategy;
         this.getStateSpaceStrategies().add(this.searchStrategy);
@@ -61,8 +62,8 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
      * @param traceLevel     the trace level of the planner.
      * @param searchStrategy the search strategy to use to solve the problem.
      */
-    public GenericAnytimePlanner(final boolean statisticState, final int traceLevel,
-                                 final AbstractStateSpaceStrategyAnytime searchStrategy) {
+    public GenericPlanner(final boolean statisticState, final int traceLevel,
+                          final StateSpaceStrategy searchStrategy) {
         super(statisticState, traceLevel);
         Objects.requireNonNull(searchStrategy);
 
@@ -81,18 +82,17 @@ public final class GenericAnytimePlanner extends AbstractStateSpacePlannerAnytim
         final Logger logger = this.getLogger();
         Objects.requireNonNull(problem);
 
-        logger.trace("* starting anytime search strategy\n");
-
+        logger.trace("* starting search strategy\n");
         final Node solutionNode = this.searchStrategy.searchSolutionNode(problem);
         if (isSaveState()) {
             this.getStatistics().setTimeToSearch(this.searchStrategy.getSearchingTime());
             this.getStatistics().setMemoryUsedToSearch(this.searchStrategy.getMemoryUsed());
         }
         if (solutionNode != null) {
-            logger.trace("* anytime search strategy succeeded\n");
-            return this.searchStrategy.extractPlan(solutionNode, problem);
+            logger.trace("* search strategy succeeded\n");
+            return (SequentialPlan) this.searchStrategy.extractPlan(solutionNode, problem);
         } else {
-            logger.trace("* anytime search strategy failed\n");
+            logger.trace("* search strategy failed\n");
             return null;
         }
     }
