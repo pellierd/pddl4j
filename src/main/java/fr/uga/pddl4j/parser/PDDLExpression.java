@@ -913,7 +913,6 @@ public class PDDLExpression implements Serializable {
                     && this.children.get(2).isMalformedExpression();
                 break;
             case FN_ATOM:
-            case WHEN:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -934,7 +933,13 @@ public class PDDLExpression implements Serializable {
             case HOLD_AFTER:
             case WITHIN:
             case LESS_ORDERING_CONSTRAINT:
+                System.out.println(this.getConnective());
                 malformed = this.atom.size() != 2;
+                break;
+            case WHEN:
+                malformed = this.children.size() != 2
+                    && this.children.get(0).isMalformedExpression()
+                    && this.children.get(1).isMalformedExpression();
                 break;
             case NOT:
             case UMINUS:

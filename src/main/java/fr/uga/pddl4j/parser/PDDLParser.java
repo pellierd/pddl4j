@@ -227,7 +227,7 @@ public final class PDDLParser {
             throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.");
         }
         try {
-            // Parse and check the domain
+            // Parse and check the problem
             FileInputStream inputStream = new FileInputStream(problem);
             if (this.lexer == null) {
                 this.lexer = new Lexer(inputStream);
@@ -440,11 +440,11 @@ public final class PDDLParser {
         }
         try {
             // Parse and check the domain
-            parseDomain(domain);
+            this.parseDomain(domain);
             // Parse and check the problem
-            parseProblem(problem);
-        } catch (RuntimeException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+            this.parseProblem(problem);
+        } catch (Throwable t) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, t);
         }
     }
 
@@ -741,7 +741,10 @@ public final class PDDLParser {
      */
     private boolean checkDomainName() {
         boolean checked = true;
-        if (this.domain.getName() != null && !this.domain.getName().equals(this.problem.getDomain())) {
+
+        if (this.domain.getName() != null
+            && this.problem.getName() != null
+            && !this.domain.getName().equals(this.problem.getDomain())) {
             this.mgr.logParserWarning("domain name \"" + this.problem.getDomain()
                 + "\" used in problem doest not match.", this.lexer.getFile(), this.problem
                 .getDomain().getBeginLine(), this.problem.getDomain().getBeginColumn());
@@ -1270,7 +1273,7 @@ public final class PDDLParser {
                 case ATOM:
                 case FN_HEAD:
                 case TASK:
-                    checked = this.checkAtom(gd, ctx);
+                    checked = this.checkAtom(gd, newCtx);
                     break;
                 case EXISTS:
                 case FORALL:
@@ -1290,23 +1293,9 @@ public final class PDDLParser {
                         }
                     }
                     break;
-                /* case SORT_OF_CONSTRAINT:
-                    for (PDDLTypedSymbol variable : gd.getVariables()) {
-                        boolean error = false;
-                        for (PDDLSymbol type : variable.getTypes()) {
-                            if (!this.domain.isDeclaredType(type)) {
-                                this.mgr.logParserError("type \"" + type.getImage()
-                                    + "\" used in sort of expression is undefined", this.lexer
-                                    .getFile(), type.getBeginLine(), type.getBeginColumn());
-                                error |= true;
-                            }
-                        }
-                        checked = !error;
-                    }
-                    break;*/
                 case EQUAL_ATOM:
                     for (PDDLSymbol term : gd.getAtom()) {
-                        checked = this.checkTerm(term, context);
+                        checked = this.checkTerm(term, newCtx);
                     }
                     break;
                 default:

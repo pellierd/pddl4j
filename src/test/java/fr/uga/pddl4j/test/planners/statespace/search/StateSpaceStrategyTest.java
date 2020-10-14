@@ -48,7 +48,7 @@ public class StateSpaceStrategyTest {
     /**
      * The path to the problem file.
      */
-    private String problemFile = "src/test/resources/strategy/p00.pddl";
+    private String problemFile = "src/test/resources/strategy/p01.pddl";
 
     /**
      * The State Space Stragey used to solve planning problem.
