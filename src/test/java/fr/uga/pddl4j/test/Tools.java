@@ -6,11 +6,7 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.problem.Problem;
 import org.junit.Assert;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -24,8 +20,9 @@ import java.util.regex.Pattern;
  * Static class that contains all shared method for manipulate the benchmark
  * directory structure.
  *
- * @author Cédric Gerard
- * @version 0.1 - 23.06.16
+ * @author C. Gerard
+ * @author D. Pellier
+ * @version 1.1 - 23.06.16
  */
 public abstract class Tools {
 
@@ -46,7 +43,7 @@ public abstract class Tools {
     /**
      * The path of the benchmarks files.
      */
-    public static final String BENCH_DIR = "src/test/resources/benchmarks" + File.separator;
+    public static final String PDDL_BENCH_DIR = "src/test/resources/benchmarks/pddl" + File.separator;
 
     /**
      * PDDL files extension.
@@ -66,7 +63,7 @@ public abstract class Tools {
     /**
      * The path to VAL.
      */
-    public static final String VAL = "src/test/resources/validate";
+    public static final String VAL = "src/test/resources/validators/validate";
 
     /**
      * Check if benchmark are already here.
@@ -120,34 +117,6 @@ public abstract class Tools {
             System.err.println(ioExcepion + " test files not found !");
         }
         return null;
-    }
-
-    /**
-     * Instantiate the PDDLParser and parse domain file specified in the given path.
-     *
-     * @param path        the path to the pddl file to test
-     * @param errorToTest the type of issue to test
-     * @param fileType    the type of file to test (DOMAIN or PROBLEM)
-     * @return an ErrorManager from the parsing file
-     */
-    public static ErrorManager generateErrorMessages(String path, String errorToTest, Tools.FileType fileType) {
-        final PDDLParser parser = new PDDLParser();
-        ErrorManager errManager = new ErrorManager();
-        final File file = new File(path);
-        try {
-            if (fileType == Tools.FileType.DOMAIN_FILE) {
-                parser.parseDomain(file);
-                errManager = parser.getErrorManager();
-            } else if (fileType == Tools.FileType.PROBLEM_FILE) {
-                final File domain = new File("src/test/resources/encoding/domain.pddl");
-                parser.parse(domain, file);
-                errManager = parser.getErrorManager();
-            }
-        } catch (FileNotFoundException fnfExcepion) {
-            System.err.println(errorToTest + " test file not found !");
-            System.err.println("  -- " + file);
-        }
-        return errManager;
     }
 
     /**
@@ -206,8 +175,7 @@ public abstract class Tools {
      *
      * @param currentTestPath the current sub dir to test
      */
-    public static void validatePlans(String currentTestPath) {
-        try {
+    public static void validatePlans(String currentTestPath) throws Exception {
             final String domain = currentTestPath + "domain.pddl";
             File dir = new File(currentTestPath);
             File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
@@ -219,9 +187,11 @@ public abstract class Tools {
                     final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
                     String target;
                     if (isWindows()) {
-                        target = Tools.VAL + ".exe " + domain + " " + problem + " " + valfile;
+                        target = Tools.VAL + "-win.exe -v " + domain + " " + problem + " " + valfile;
+                    } else if (isMac()) {
+                        target = Tools.VAL + "-osx -v " + domain + " " + problem + " " + valfile;
                     } else {
-                        target = Tools.VAL + " " + domain + " " + problem + " " + valfile;
+                        target = Tools.VAL + "-nux -v " + domain + " " + problem + " " + valfile;
                     }
 
                     final Runtime rt = Runtime.getRuntime();
@@ -246,7 +216,7 @@ public abstract class Tools {
                 }
 
                 final int number = Tools.numberValidatedPlans(output.toString());
-                System.out.println("-- VAL on " + currentTestPath);
+                System.out.println("\n-- VAL on " + currentTestPath);
                 System.out.println("   Plans found: " + files.length);
                 System.out.println("   Plans validated: " + number);
                 System.out.println("--");
@@ -254,9 +224,7 @@ public abstract class Tools {
             }
 
             Tools.cleanValPlan(currentTestPath);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+
     }
 
     /**

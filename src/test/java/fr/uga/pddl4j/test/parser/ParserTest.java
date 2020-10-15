@@ -23,75 +23,300 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.test.Tools;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+import org.junit.Assert;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 /**
- * Implements the <tt>ParserTest</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
- * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
- * <p>
- * This class will test the parser on benchmark domain and problem from International planning contest.
- * The goal here is to test the PDDL4J 3.0 language coverage using all the file used in the competition.
- * </p>
- * <p>
- * Note that IPC benchmark files are note delivered with the source code because of their 3GB size.
- * It suppose benchmark directory is a the root of your project.
- * If no test files are provided all test will pass the validation.
+ * Implements the <tt>ParserTest</tt> of the PDD4L library. The parser is tested on IPC benchmarks. The IPC benchmarks
+ * used for testing are available in <code>test/ressources/benchmarks</code> directory.
  * </p>
  *
  * @author C. Gerard
  * @author D. Pellier
- * @version 0.1 - 16.02.16
+ * @version 1.1 - 16.02.16
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ParserTest {
 
     /**
-     * Method that executes benchmarks using IPC 1998 files on the parser to test.
+     * Method that executes tests using IPC 1998 Assembly ADL benchmarks.
      *
      * @throws Exception if something went wrong.
      */
     @Test
-    public void testParserIPC1998() throws Exception {
-        final String localTestPath = Tools.BENCH_DIR + "ipc1998" + File.separator;
-
-        if (!Tools.isBenchmarkExist(localTestPath)) {
-            System.out.println("missing benchmark directory: IPC1998 test skipped !");
-            return;
-        }
-        this.validate(localTestPath + "assembly/adl/");
-        this.validate(localTestPath + "grid/strips-untyped/");
-        this.validate(localTestPath + "gripper/adl/");
-        this.validate(localTestPath + "gripper/strips/");
-        this.validate(localTestPath + "logistics/adl/");
-        this.validate(localTestPath + "logistics/strips-round1/");
-        this.validate(localTestPath + "logistics/strips-round2/");
-        this.validate(localTestPath + "movie/adl/");
-        this.validate(localTestPath + "movie/strips/");
+    public void test_Parser_IPC1998_Assembly_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
     }
 
     /**
-     * Search for all domain file (domain.pddl or xxx-domain.pddl) and parse all domain/problem couple
-     * if any.
+     * Method that executes tests using IPC 1998 Grid STRIPS untyped benchmarks.
      *
-     * @param localTestPath the path where to begin research.
-     * @return A String stream containing error reports if any.
+     * @throws Exception if something went wrong.
      */
-    private Stream<String> executeTests(String localTestPath) {
+    @Test
+    public void test_Parser_IPC1998_Grid_STRIPS_Untyped() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
 
-        // Go into subdirectories
-        Stream<String> results =
-            Stream.of(new File(localTestPath).list((dir, name) -> new File(localTestPath + name).isDirectory()))
-                .map((subDir) -> localTestPath + subDir + File.separator)
-                .flatMap(this::executeTests);
+    /**
+     * Method that executes tests using IPC 1998 gripper ADL benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Gripper_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
 
-        // Validate current tests if any and returns errors from all tests that failed
-        return Stream.concat(validate(localTestPath).stream(), results);
+    /**
+     * Method that executes tests using IPC 1998 Gripper STRIPS benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Gripper_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 1998 Logistics ADL benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Logistics_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/adl" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 1998 Logistics STRIPS Round1 benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Logistics_STRIPS_Round1() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     *  Method that executes tests using IPC 1998 Logistics STRIPS Round2 benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Logistics_STRIPS_Round2() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round2" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     *  Method that executes tests using IPC 1998 Movie ADL benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Movie_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     *  Method that executes tests using IPC 1998 Movie STRIPS benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC1998_Movie_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Blocks STRIPS typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Blocks_STRIPS_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Blocks STRIPS untyped benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Blocks_STRIPS_Untyped() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Elevator ADL full typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Elevator ADL simple typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Elevator STRIPS simple typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Elevator_STRIPS_Simple_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Elevator STRIPS simple untyped benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Elevator_STRIPS_Simple_Untyped() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Freecell STRIPS  typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Freecell_STRIPS_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Freecell STRIPS untyped benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Freecell_STRIPS_Untyped() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Logistics STRIPS typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Logistics_STRIPS_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Logistics STRIPS untyped benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Logistics_STRIPS_Untyped() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Schedule ADL typed benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Schedule_ADL_Typed() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-typed" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2000 Schedule ADL untyped benchmarks.
+     *
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2000_Schedule_ADL_Untyped() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.validate(localTestPath);
     }
 
     /**
@@ -100,7 +325,7 @@ public class ParserTest {
      * @param currentTestPath the path where try to find domain and problems pddl files
      * @return all issues report as a ArrayList of String
      */
-    private ArrayList<String> validate(String currentTestPath) {
+    private ArrayList<String> validate(String currentTestPath) throws Exception {
 
         if (!Tools.isBenchmarkExist(currentTestPath)) {
             System.out.println("missing benchmark directory + \"" + currentTestPath + "\" test skipped !");
@@ -132,7 +357,17 @@ public class ParserTest {
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
-                problemFile = "p0" + i + Tools.PDDL_EXT;
+                if (nbTest < 100) {
+                    problemFile = "p0" + i + Tools.PDDL_EXT;
+                } else {
+                    problemFile = "p00" + i + Tools.PDDL_EXT;
+                }
+            } else if (i < 100) {
+                if (nbTest < 100) {
+                    problemFile = "p" + i + Tools.PDDL_EXT;
+                } else {
+                    problemFile = "p0" + i + Tools.PDDL_EXT;
+                }
             } else {
                 problemFile = "p" + i + Tools.PDDL_EXT;
             }
@@ -163,9 +398,10 @@ public class ParserTest {
                     System.out.println("   * " + currentDomain);
                     System.out.println("   * Errors:");
                     System.out.println(builder.toString());
+                    throw new Exception(builder.toString());
 
                 } else {
-                    System.out.println("PDDLParser test: [SUCCESS]");
+                    System.out.println("PDDLParser test: [PASSED]");
                     System.out.println("   * " + currentProblem);
                     System.out.println("   * " + currentDomain);
                     if (!parser.getErrorManager().getMessages(Message.Type.PARSER_WARNING).isEmpty()) {

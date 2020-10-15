@@ -141,16 +141,15 @@ test {
     forkEvery = 1 // One new JVM for each test
 
     testLogging {
-        showStandardStreams = true // Set to false to hid test output
+        showStandardStreams = false // Set to false to hid test output
+        exceptionFormat "full" // full to print stack
+        events "skipped", "failed", "passed"
     }
 
     // The set of Junit tests
     scanForTestClasses = false
-    includes = ['**/ParserLexicalErrorTest.class', '**/ParserTest.class', ]
+    includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FastForwardTest.class']
 
-    afterTest { desc, result ->
-        println "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-    }
 }
 
 defaultTasks 'clean', 'build', 'test'

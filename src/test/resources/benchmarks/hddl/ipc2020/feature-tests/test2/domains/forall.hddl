@@ -1,0 +1,24 @@
+(define (domain test-domain)
+	(:requirements :typing :hierarchy :universal-preconditions)
+
+	(:types A)
+
+    	(:predicates
+        	(foo ?a - A)
+    	)
+
+    	(:task task1 :parameters ())
+
+    	(:method donothing
+    		:parameters ()
+    		:task (task1)
+    		:subtasks (and
+    			(noop)
+    		)
+    	)
+
+    	(:action noop
+    		:parameters ()
+    		:precondition (forall (?a - A) (foo ?a))
+    	)
+)

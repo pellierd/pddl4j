@@ -1,0 +1,19 @@
+(define
+	(problem p1)
+	(:domain  test-domain)
+	(:objects
+		a b c d - A
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (task1))
+		)
+	)
+	(:init
+		(foo a)
+		(foo b)
+		(foo c)
+		(foo d)
+	)
+)

@@ -128,17 +128,17 @@ public final class FastForward extends AbstractStateSpacePlanner {
             return (SequentialPlan) this.enforcedHillClimbing.extractPlan(solutionNode, pb);
         } else {
             logger.trace("* enforced hill climbing failed\n");
-            logger.trace("* starting greedy best first search\n");
+            logger.trace("* starting A* first search\n");
             solutionNode = astar.searchSolutionNode(pb);
             if (isSaveState()) {
                 this.getStatistics().setTimeToSearch(this.astar.getSearchingTime());
                 this.getStatistics().setMemoryUsedToSearch(this.astar.getMemoryUsed());
             }
             if (solutionNode == null) {
-                logger.trace("* greedy best first search failed\n");
+                logger.trace("* A* search failed\n");
                 return null;
             } else {
-                logger.trace("* greedy best first search succeeded\n");
+                logger.trace("* A* search succeeded\n");
                 return (SequentialPlan) this.astar.extractPlan(solutionNode, pb);
             }
         }

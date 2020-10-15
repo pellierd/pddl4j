@@ -1,0 +1,12 @@
+(define (domain test-domain)
+	(:requirements :typing :hierarchy)
+
+	(:task task1 :parameters ())
+
+	(:method donothing
+		:parameters ()
+		:task (task1)
+		:subtasks (and
+		)
+	)
+)

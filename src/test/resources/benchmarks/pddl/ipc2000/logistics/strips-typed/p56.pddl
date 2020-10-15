@@ -1,0 +1,166 @@
+(define (problem logistics-27-1)
+(:domain logistics)
+(:objects
+    APN3
+    APN2
+    APN1
+ - AIRPLANE
+    APT9
+    APT8
+    APT7
+    APT6
+    APT5
+    APT4
+    APT3
+    APT2
+    APT1
+ - AIRPORT
+    POS9
+    POS8
+    POS7
+    POS6
+    POS5
+    POS4
+    POS3
+    POS2
+    POS1
+ - LOCATION
+    CIT9
+    CIT8
+    CIT7
+    CIT6
+    CIT5
+    CIT4
+    CIT3
+    CIT2
+    CIT1
+ - CITY
+    TRU9
+    TRU8
+    TRU7
+    TRU6
+    TRU5
+    TRU4
+    TRU3
+    TRU2
+    TRU1
+ - TRUCK
+    OBJ93
+    OBJ92
+    OBJ91
+    OBJ83
+    OBJ82
+    OBJ81
+    OBJ73
+    OBJ72
+    OBJ71
+    OBJ63
+    OBJ62
+    OBJ61
+    OBJ53
+    OBJ52
+    OBJ51
+    OBJ43
+    OBJ42
+    OBJ41
+    OBJ33
+    OBJ32
+    OBJ31
+    OBJ23
+    OBJ22
+    OBJ21
+    OBJ13
+    OBJ12
+    OBJ11
+ - PACKAGE
+)
+(:init
+    (AT APN1 APT9)
+    (AT APN2 APT5)
+    (AT APN3 APT6)
+    (AT TRU1 POS1)
+    (AT OBJ11 POS1)
+    (AT OBJ12 POS1)
+    (AT OBJ13 POS1)
+    (AT TRU2 POS2)
+    (AT OBJ21 POS2)
+    (AT OBJ22 POS2)
+    (AT OBJ23 POS2)
+    (AT TRU3 POS3)
+    (AT OBJ31 POS3)
+    (AT OBJ32 POS3)
+    (AT OBJ33 POS3)
+    (AT TRU4 POS4)
+    (AT OBJ41 POS4)
+    (AT OBJ42 POS4)
+    (AT OBJ43 POS4)
+    (AT TRU5 POS5)
+    (AT OBJ51 POS5)
+    (AT OBJ52 POS5)
+    (AT OBJ53 POS5)
+    (AT TRU6 POS6)
+    (AT OBJ61 POS6)
+    (AT OBJ62 POS6)
+    (AT OBJ63 POS6)
+    (AT TRU7 POS7)
+    (AT OBJ71 POS7)
+    (AT OBJ72 POS7)
+    (AT OBJ73 POS7)
+    (AT TRU8 POS8)
+    (AT OBJ81 POS8)
+    (AT OBJ82 POS8)
+    (AT OBJ83 POS8)
+    (AT TRU9 POS9)
+    (AT OBJ91 POS9)
+    (AT OBJ92 POS9)
+    (AT OBJ93 POS9)
+    (IN-CITY POS1 CIT1)
+    (IN-CITY APT1 CIT1)
+    (IN-CITY POS2 CIT2)
+    (IN-CITY APT2 CIT2)
+    (IN-CITY POS3 CIT3)
+    (IN-CITY APT3 CIT3)
+    (IN-CITY POS4 CIT4)
+    (IN-CITY APT4 CIT4)
+    (IN-CITY POS5 CIT5)
+    (IN-CITY APT5 CIT5)
+    (IN-CITY POS6 CIT6)
+    (IN-CITY APT6 CIT6)
+    (IN-CITY POS7 CIT7)
+    (IN-CITY APT7 CIT7)
+    (IN-CITY POS8 CIT8)
+    (IN-CITY APT8 CIT8)
+    (IN-CITY POS9 CIT9)
+    (IN-CITY APT9 CIT9)
+)
+(:goal (and
+    (AT OBJ23 APT6)
+    (AT OBJ93 APT3)
+    (AT OBJ92 APT6)
+    (AT OBJ53 POS1)
+    (AT OBJ52 POS1)
+    (AT OBJ71 POS4)
+    (AT OBJ31 APT3)
+    (AT OBJ41 POS4)
+    (AT OBJ11 APT1)
+    (AT OBJ33 POS3)
+    (AT OBJ12 POS2)
+    (AT OBJ51 POS7)
+    (AT OBJ32 APT8)
+    (AT OBJ72 APT8)
+    (AT OBJ63 APT1)
+    (AT OBJ73 APT2)
+    (AT OBJ81 POS9)
+    (AT OBJ82 APT2)
+    (AT OBJ83 POS5)
+    (AT OBJ22 APT8)
+    (AT OBJ62 APT6)
+    (AT OBJ43 POS2)
+    (AT OBJ42 POS8)
+    (AT OBJ13 APT7)
+    (AT OBJ91 APT5)
+    (AT OBJ61 APT4)
+    (AT OBJ21 POS2)
+)
+)
+)
