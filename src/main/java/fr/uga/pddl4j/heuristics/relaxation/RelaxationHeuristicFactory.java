@@ -27,15 +27,15 @@ import java.io.Serializable;
  * This classes implements useful methods to manipulate the heuristics.
  *
  * @author D. Pellier
- * @version 1.0 - 09.02.2011
+ * @version 1.1 - 09.02.2011
  * @see RelaxationHeuristic
  */
-public final class RelaxationHeuristicToolKit implements Serializable {
+public class RelaxationHeuristicFactory implements Serializable {
 
     /**
      * Private constructor just for prevent user to instantiate this class.
      */
-    private RelaxationHeuristicToolKit() {
+    public RelaxationHeuristicFactory() {
     }
 
     /**
@@ -46,7 +46,7 @@ public final class RelaxationHeuristicToolKit implements Serializable {
      * @return the heuristic created.
      * @throws NullPointerException if <code>type == null || problem == null</code>.
      */
-    public static RelaxationHeuristic createHeuristic(final RelaxationHeuristic.Type type, final Problem problem) {
+    public RelaxationHeuristic createRelaxtionHeuristic(final RelaxationHeuristic.Type type, final Problem problem) {
         RelaxationHeuristic heuristic = null;
         if (type.equals(RelaxationHeuristic.Type.FAST_FORWARD)) {
             heuristic = new FastForward(problem);

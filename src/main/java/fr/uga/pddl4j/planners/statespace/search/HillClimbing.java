@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -63,7 +63,8 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
     public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
+        final RelaxationHeuristicFactory factory = new RelaxationHeuristicFactory();
+        final RelaxationHeuristic heuristic = factory.createRelaxtionHeuristic(
             getHeuristicType(), codedProblem);
 
         ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());

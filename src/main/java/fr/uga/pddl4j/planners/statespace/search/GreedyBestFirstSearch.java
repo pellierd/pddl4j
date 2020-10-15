@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicToolKit;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -66,7 +66,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final RelaxationHeuristic heuristic = RelaxationHeuristicToolKit.createHeuristic(
+        final RelaxationHeuristicFactory factory = new RelaxationHeuristicFactory();
+        final RelaxationHeuristic heuristic = factory.createRelaxtionHeuristic(
             getHeuristicType(), codedProblem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
