@@ -1,0 +1,364 @@
+;;
+;; Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+;;
+;; This file is part of PDDL4J library.
+;;
+;; PDDL4J is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; PDDL4J is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+;;
+
+(define (domain barman)
+
+    (:requirements
+        :strips
+        :typing
+        :hierarchy
+        :method-preconditions
+        :negative-preconditions
+        :equality
+    )
+
+    (:types hand level beverage dispenser container - object
+            ingredient cocktail - beverage
+            shot shaker - container
+    )
+
+    (:predicates
+        (ontable ?c - container)
+        (holding ?h - hand ?c - container)
+        (handempty ?h - hand)
+        (empty ?c - container)
+        (contains ?c - container ?b - beverage)
+        (clean ?c - container)
+        (used ?c - container ?b - beverage)
+        (dispenses ?d - dispenser ?i - ingredient)
+        (shaker-empty-level ?s - shaker ?l - level)
+        (shaker-level ?s - shaker ?l - level)
+        (next ?l1 ?l2 - level)
+        (unshaked ?s - shaker)
+        (shaked ?s - shaker)
+        (cocktail-part1 ?c - cocktail ?i - ingredient)
+        (cocktail-part2 ?c - cocktail ?i - ingredient)
+    )
+
+    (:task serve_cocktail
+		:parameters (?s - shot ?c - cocktail)
+	)
+
+	(:task serve_shot
+    	:parameters (?s - shot  ?i - ingredient)
+    )
+
+    (:task get_first_ingredient
+        :parameters (?s - shot ?c - cocktail  ?h - hand)
+    )
+
+    (:task get_second_ingredient
+        :parameters (?s - shot ?c - cocktail ?h - hand)
+    )
+
+    (:task shake_cocktail
+        :parameters (?s - container ?c - cocktail ?h - hand)
+    )
+
+    (:action grasp
+        :parameters (?h - hand ?c - container)
+        :precondition (and
+            (ontable ?c)
+            (handempty ?h)
+        )
+        :effect (and
+            (not (ontable ?c))
+            (not (handempty ?h))
+            (holding ?h ?c)
+        )
+    )
+
+    (:action leave
+        :parameters (?h - hand ?c - container)
+        :precondition (and
+            (holding ?h ?c)
+        )
+        :effect (and
+            (not (holding ?h ?c))
+            (handempty ?h)
+            (ontable ?c)
+        )
+    )
+
+    (:action fill-shot
+        :parameters (?s - shot ?i - ingredient ?h1 ?h2 - hand ?d - dispenser)
+        :precondition (and
+            (holding ?h1 ?s)
+            (handempty ?h2)
+            (dispenses ?d ?i)
+            (empty ?s)
+            (clean ?s)
+        )
+        :effect (and
+            (not (empty ?s))
+            (contains ?s ?i)
+            (not (clean ?s))
+            (used ?s ?i)
+        )
+    )
+
+    (:action refill-shot
+        :parameters (?s - shot ?i - ingredient ?h1 ?h2 - hand ?d - dispenser)
+        :precondition (and
+            (holding ?h1 ?s)
+            (handempty ?h2)
+            (dispenses ?d ?i)
+            (empty ?s)
+            (used ?s ?i)
+        )
+        :effect (and
+            (not (empty ?s))
+            (contains ?s ?i)
+        )
+    )
+
+    (:action empty-shot
+        :parameters (?h - hand ?p - shot ?b - beverage)
+        :precondition (and
+            (holding ?h ?p)
+            (contains ?p ?b)
+        )
+        :effect (and
+            (not (contains ?p ?b))
+	   	   	(empty ?p)
+	   	)
+	)
+
+    (:action clean-shot
+        :parameters (?s - shot ?b - beverage ?h1 ?h2 - hand)
+        :precondition (and
+            (holding ?h1 ?s)
+            (handempty ?h2)
+            (empty ?s)
+            (used ?s ?b)
+        )
+        :effect (and
+            (not(used ?s ?b))
+            (clean ?s)
+        )
+    )
+
+    (:action pour-shot-to-clean-shaker
+        :parameters (?s - shot ?i - ingredient ?d - shaker ?h1 - hand ?l ?l1 - level)
+        :precondition (and
+            (holding ?h1 ?s)
+            (contains ?s ?i)
+            (empty ?d)
+            (clean ?d)
+            (shaker-level ?d ?l)
+            (next ?l ?l1)
+        )
+        :effect (and
+            (not (contains ?s ?i))
+            (empty ?s)
+            (contains ?d ?i)
+            (not (empty ?d))
+            (not (clean ?d))
+            (unshaked ?d)
+            (not (shaker-level ?d ?l))
+            (shaker-level ?d ?l1)))
+
+
+    (:action pour-shot-to-used-shaker
+        :parameters (?s - shot ?i - ingredient ?d - shaker ?h1 - hand ?l ?l1 - level)
+        :precondition (and
+            (holding ?h1 ?s)
+            (contains ?s ?i)
+            (unshaked ?d)
+            (shaker-level ?d ?l)
+            (next ?l ?l1)
+        )
+        :effect (and
+            (not (contains ?s ?i))
+            (contains ?d ?i)
+            (empty ?s)
+            (not (shaker-level ?d ?l))
+            (shaker-level ?d ?l1)
+        )
+    )
+
+    (:action empty-shaker
+        :parameters (?h - hand ?s - shaker ?b - cocktail ?l ?l1 - level)
+        :precondition (and
+             (holding ?h ?s)
+             (contains ?s ?b)
+             (shaked ?s)
+             (shaker-level ?s ?l)
+             (shaker-empty-level ?s ?l1))
+        :effect (and
+            (not (shaked ?s))
+            (not (shaker-level ?s ?l))
+            (shaker-level ?s ?l1)
+            (not (contains ?s ?b))
+            (empty ?s)
+        )
+    )
+
+    (:action clean-shaker
+        :parameters (?h1 ?h2 - hand ?s - shaker)
+        :precondition (and
+            (holding ?h1 ?s)
+            (handempty ?h2)
+            (empty ?s)
+        )
+        :effect (and
+            (clean ?s)
+        )
+    )
+
+    (:action shake
+        :parameters (?b - cocktail ?d1 ?d2 - ingredient ?s - shaker ?h1 ?h2 - hand)
+        :precondition (and
+            (holding ?h1 ?s)
+            (handempty ?h2)
+            (contains ?s ?d1)
+            (contains ?s ?d2)
+            (cocktail-part1 ?b ?d1)
+            (cocktail-part2 ?b ?d2)
+            (unshaked ?s)
+        )
+        :effect (and
+            (not (unshaked ?s))
+            (not (contains ?s ?d1))
+            (not (contains ?s ?d2))
+            (shaked ?s)
+            (contains ?s ?b)
+        )
+    )
+
+    (:action pour-shaker-to-shot
+        :parameters (?b - beverage ?d - shot ?h - hand ?s - shaker ?l ?l1 - level)
+        :precondition (and
+            (holding ?h ?s)
+            (shaked ?s)
+            (empty ?d)
+            (clean ?d)
+            (contains ?s ?b)
+            (shaker-level ?s ?l)
+            (next ?l1 ?l)
+        )
+        :effect (and
+            (not (clean ?d))
+            (not (empty ?d))
+            (contains ?d ?b)
+            (shaker-level ?s ?l1)
+            (not (shaker-level ?s ?l))
+        )
+    )
+
+    (:action nop
+        :parameters ()
+        :precondition ()
+        :effect ()
+    )
+
+;------------------------------------------------------------------
+;                               Methods
+;------------------------------------------------------------------
+
+
+    (:method serve_cocktail_0
+        :parameters (?s - shot ?c - cocktail ?h - hand)
+        :task (serve_cocktail ?s ?c)
+        :precondition (and
+            (ontable ?s)
+            (clean ?s)
+            (handempty ?h)
+        )
+        :ordered-subtasks (and
+            (grasp ?h ?s)
+            (get_first_ingredient ?s ?c ?h)
+            (get_second_ingredient ?s ?c ?h)
+            (shake_cocktail ?s ?c ?h)
+        )
+    )
+
+    (:method serve_shot_0
+        :parameters (?sh - shot ?i - ingredient ?h ?h1 - hand ?d - dispenser)
+        :task (serve_shot ?sh ?i)
+        :precondition (and
+            (dispenses ?d ?i)
+        )
+        :ordered-subtasks (and
+              (grasp ?h ?sh)
+              (fill-shot ?sh ?i ?h ?h1 ?d)
+              (leave ?h ?sh)
+        )
+    )
+
+    (:method get_first_ingredient
+        :parameters (?s - shot ?c - cocktail ?i - ingredient ?h1 ?h2 - hand ?d - dispenser ?sk - shaker ?l1 ?l2 - level)
+        :task (get_first_ingredient ?s ?c ?h1)
+        :precondition (and
+            (cocktail-part1 ?c ?i)
+            (not (= ?l1 ?l2))
+            (not (= ?h1 ?h2))
+            (next ?l1 ?l2)
+            (shaker-level ?sk ?l1)
+        )
+        :ordered-subtasks (and
+            (fill-shot ?s ?i ?h1 ?h2 ?d)
+            (pour-shot-to-clean-shaker ?s ?i ?sk ?h1 ?l1 ?l2)
+            (clean-shot ?s ?i ?h1 ?h2)
+        )
+    )
+
+    (:method get_second_ingredient
+        :parameters (?s - shot ?c - cocktail ?i - ingredient ?h1 ?h2 - hand ?d - dispenser ?sk - shaker ?l1 ?l2 - level)
+        :task (get_second_ingredient ?s ?c ?h1)
+        :precondition (and
+            (cocktail-part2 ?c ?i)
+            (not (= ?h1 ?h2))
+            (not (= ?l1 ?l2))
+            (next ?l1 ?l2)
+            (shaker-level ?sk ?l1)
+        )
+        :ordered-subtasks (and
+            (fill-shot ?s ?i ?h1 ?h2 ?d)
+            (pour-shot-to-used-shaker ?s ?i ?sk ?h1 ?l1 ?l2)
+            (clean-shot ?s ?i ?h1 ?h2)
+        )
+    )
+
+    (:method shake_cocktail_0
+        :parameters (?h ?h1 - hand ?sh - shot ?s - shaker ?c - cocktail ?i1 ?i2 - ingredient ?l2 ?l1 ?l0 - level)
+        :task (shake_cocktail ?sh ?c ?h)
+        :precondition (and
+            (cocktail-part1 ?c ?i1)
+            (cocktail-part2 ?c ?i2)
+            (next ?l0 ?l1)
+            (next ?l1 ?l2)
+            (shaker-level ?s ?l2)
+            (not (= ?i1 ?i2))
+            (not (= ?h ?h1))
+            (not (= ?l0 ?l1))
+            (not (= ?l1 ?l2))
+            (not (= ?l0 ?l2))
+        )
+        :ordered-subtasks (and
+            (leave ?h ?sh)
+            (grasp ?h1 ?s)
+            (shake ?c ?i1 ?i2 ?s ?h1 ?h)
+            (pour-shaker-to-shot ?c ?sh ?h1 ?s ?l2 ?l1)
+            (empty-shaker ?h1 ?s ?c ?l1 ?l0)
+            (clean-shaker ?h1 ?h ?s)
+            (leave ?h1 ?s)
+        )
+    )
+)

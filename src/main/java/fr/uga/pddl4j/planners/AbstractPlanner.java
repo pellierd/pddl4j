@@ -46,8 +46,8 @@ public abstract class AbstractPlanner implements Planner {
      */
     public AbstractPlanner() {
         super();
-        this.traceLevel = Planner.DEFAULT_TRACE_LEVEL;
-        this.saveState = Planner.DEFAULT_STATISTICS;
+        this.traceLevel = DEFAULT_TRACE_LEVEL;
+        this.saveState = DEFAULT_STATISTICS;
         this.statistics = new Statistics();
     }
 

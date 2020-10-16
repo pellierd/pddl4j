@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import fr.uga.pddl4j.parser.PDDLExpression;
-
 /**
  * Thrown to indicate that a malformed expression has occurred. An expression is malformed when an expression has wrong
  * number of arguments and when connective is not

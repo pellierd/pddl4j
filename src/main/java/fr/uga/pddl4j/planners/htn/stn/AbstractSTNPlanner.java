@@ -15,6 +15,8 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.plan.Hierarchy;
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
@@ -23,14 +25,7 @@ import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 
 /**
  * This abstract class implements the common methods of all Simple Task Network planners.
@@ -128,9 +123,9 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    protected SequentialPlan extractPlan(final AbstractSTNNode node, final Problem problem) {
+    protected Plan extractPlan(final AbstractSTNNode node, final Problem problem) {
         AbstractSTNNode n = node;
-        final SequentialPlan plan = new SequentialPlan();
+        final Plan plan = new SequentialPlan();
         while (n.getParent() != null) {
             if (n.getOperator() < problem.getActions().size()) {
                 final Action a = problem.getActions().get(n.getOperator());
@@ -139,7 +134,152 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
 
             n = n.getParent();
         }
+        plan.setHierarchy(this.extractHierarchy(node, problem));
         return plan;
+    }
+
+
+    /**
+     * Extract a hierarchy from a solution node for the specified planning problem.
+     *
+     * @param node    the solution node.
+     * @param problem the problem to be solved.
+     * @return the hierarchy of the solution plan.
+     */
+    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final Problem problem) {
+
+        // Extract hierarchy of the plan
+        final LinkedList<Integer> operators = new LinkedList<>();
+        final LinkedList<Method> methods = new LinkedList<>();
+        final LinkedList<Integer> tasks = new LinkedList<>();
+        final LinkedHashMap<Integer, LinkedList<Integer>> taskDictionary = new LinkedHashMap<>();
+        final Hierarchy hierarchy = new Hierarchy();
+        final int nbactions = problem.getActions().size();
+
+        // Extract lists of tasks and operators (actions or methods)
+        AbstractSTNNode n = node;
+        while (n.getParent() != null) {
+            final int operator = n.getOperator();
+            final Integer task = n.getTask();
+            operators.add(0, operator);
+            tasks.add(0, task);
+            // Operator is a method
+            if (operator >= nbactions) {
+                final Method method = problem.getMethods().get(operator - nbactions);
+                methods.add(0, method);
+            }
+            n = n.getParent();
+        }
+
+        int indexOfSynonyms = 0;
+        for (int i = 0; i < tasks.size(); i++) {
+            final Integer operator = operators.get(i);
+            final Integer task = tasks.get(i);
+            // Rename primitive tasks
+            if (operator < nbactions) {
+                if (taskDictionary.containsKey(task)) {
+                    taskDictionary.get(task).add(indexOfSynonyms);
+                } else {
+                    final LinkedList<Integer> alias = new LinkedList<Integer>();
+                    alias.add(indexOfSynonyms);
+                    taskDictionary.put(task, alias);
+                }
+                // Format plan
+                final Action action = problem.getActions().get(operator);
+                //plan.append(String.format("%d %s%n", indexOfSynonyms, problem.toShortString(action)));
+                hierarchy.getPrimtiveTasks().put(indexOfSynonyms, action);
+                indexOfSynonyms++;
+            } else {
+                // Rename abstract tasks
+                if (taskDictionary.containsKey(task)) {
+                    taskDictionary.get(task).add(indexOfSynonyms++);
+                } else {
+                    final LinkedList<Integer> alias = new LinkedList<Integer>();
+                    alias.add(indexOfSynonyms++);
+                    taskDictionary.put(task, alias);
+                }
+            }
+        }
+
+        // Builds the decomposition tree
+        LinkedList<Node> open = new LinkedList<Node>();
+        List<Node> children = new LinkedList<Node>();
+        final Node top = new Node(null, null);
+        for (Integer task : problem.getInitialTaskNetwork().getTasks()) {
+            final Node tmpn = new Node(top, task);
+            children.add(tmpn);
+        }
+        open.addAll(0, children);
+        top.addChildren(children);
+        children.clear();
+
+        while (!open.isEmpty()) {
+            final Node tmpn = open.removeFirst();
+            if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
+                final Method method = methods.removeFirst();
+                final Integer task = method.getTask();
+                tmpn.tasksynonym = taskDictionary.get(task).removeFirst();
+                tmpn.method = method;
+                final List<Integer> subtasks = method.getSubTasks();
+                for (Integer subtask : subtasks) {
+                    final Node child = new Node(tmpn, subtask);
+                    children.add(child);
+                }
+                open.addAll(0, children);
+                // Dumb method treatment
+                if (tmpn.method.getName().startsWith("__to_method_")) {
+                    // All children of the current node are connected to the node's parent
+                    for (Node child : children) {
+                        child.parent = tmpn.parent;
+                    }
+                    // Current node is disconnected of the decomposition tree
+                    List<Node> descendants = tmpn.parent.getChildren();
+                    List<Node> newList = new LinkedList<Node>();
+                    // children must be final in the upcoming lambda
+                    final List<Node> fchildren = new LinkedList<Node>(children);
+                    Spliterator<Node> iterator = descendants.spliterator();
+                    iterator.forEachRemaining(
+                        (d) -> {
+                            if (d.equals(tmpn)) {
+                                newList.addAll(fchildren);
+                            } else {
+                                newList.add(d);
+                            }
+                        }
+                    );
+                    tmpn.parent.children = newList;
+                    tmpn.parent = null;
+                } else {
+                    tmpn.addChildren(children);
+                }
+                children.clear();
+            } else {
+                tmpn.tasksynonym = taskDictionary.get(tmpn.task).removeFirst();
+            }
+        }
+
+        open.add(top);
+        while (!open.isEmpty()) {
+            final Node tmpn = open.removeFirst();
+            children = tmpn.getChildren();
+            open.addAll(0, children);
+            if (tmpn.parent == null) {
+                for (Node child : children) {
+                    hierarchy.getRootTasks().add(child.tasksynonym);
+                }
+            } else {
+                if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
+                    hierarchy.getCounpoudTasks().put(tmpn.tasksynonym, tmpn.method);
+                    List<Integer> decomposition = new ArrayList<>();
+                    hierarchy.getDecomposition().put(tmpn.tasksynonym, decomposition);
+                    for (Node child : children) {
+                        decomposition.add(child.tasksynonym);
+                    }
+                }
+            }
+        }
+
+        return hierarchy;
     }
 
     /**
@@ -365,6 +505,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
         private Integer tasksynonym;
         private String taskname;
         private String methodname;
+        private Method method;
         private Node parent;
         private List<Node> children = new LinkedList<Node>();
 

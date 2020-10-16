@@ -933,7 +933,6 @@ public class PDDLExpression implements Serializable {
             case HOLD_AFTER:
             case WITHIN:
             case LESS_ORDERING_CONSTRAINT:
-                System.out.println(this.getConnective());
                 malformed = this.atom.size() != 2;
                 break;
             case WHEN:

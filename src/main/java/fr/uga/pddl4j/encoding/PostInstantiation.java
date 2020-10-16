@@ -81,11 +81,11 @@ final class PostInstantiation implements Serializable {
                                      final Set<IntExpression> init) {
         final Set<IntExpression> facts = new LinkedHashSet<>(10000);
         for (IntAction a : actions) {
-            PostInstantiation.extractRelevantFacts(a.getPreconditions(), facts, init);
-            PostInstantiation.extractRelevantFacts(a.getEffects(), facts, init);
+            extractRelevantFacts(a.getPreconditions(), facts, init);
+            extractRelevantFacts(a.getEffects(), facts, init);
         }
         for (IntMethod m : methods) {
-            PostInstantiation.extractRelevantFacts(m.getPreconditions(), facts, init);
+            extractRelevantFacts(m.getPreconditions(), facts, init);
         }
         Encoder.tableOfRelevantFluents = new ArrayList<>(facts.size());
         for (IntExpression exp : facts) {
@@ -132,7 +132,7 @@ final class PostInstantiation implements Serializable {
             case SOMETIME:
             case AT_MOST_ONCE:
             case NOT:
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 break;
             case WHEN:
             case LESS:
@@ -154,19 +154,19 @@ final class PostInstantiation implements Serializable {
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
                 break;
             case F_EXP_T:
                 if (!exp.getChildren().isEmpty()) {
-                    PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                    extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 }
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(0), facts, init);
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(1), facts, init);
-                PostInstantiation.extractRelevantFacts(exp.getChildren().get(3), facts, init);
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                extractRelevantFacts(exp.getChildren().get(3), facts, init);
                 break;
             case FN_ATOM:
             case NUMBER:
@@ -850,7 +850,7 @@ final class PostInstantiation implements Serializable {
     static void extractGroundInertia(final List<IntAction> actions) {
         Encoder.tableOfGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
         for (IntAction a : actions) {
-            PostInstantiation.extractGroundInertia(a.getEffects());
+            extractGroundInertia(a.getEffects());
         }
     }
 
@@ -885,10 +885,10 @@ final class PostInstantiation implements Serializable {
             case EXISTS:
             case AT_START:
             case AT_END:
-                PostInstantiation.extractGroundInertia(exp.getChildren().get(0));
+                extractGroundInertia(exp.getChildren().get(0));
                 break;
             case WHEN:
-                PostInstantiation.extractGroundInertia(exp.getChildren().get(1));
+                extractGroundInertia(exp.getChildren().get(1));
                 break;
             case NOT:
                 final IntExpression neg = exp.getChildren().get(0);

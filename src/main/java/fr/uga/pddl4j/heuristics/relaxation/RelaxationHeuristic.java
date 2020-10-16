@@ -103,7 +103,7 @@ public interface RelaxationHeuristic extends Serializable {
          */
         MIN_COST,
         /**
-         * The type for the <code>FastForward</code> heuristic.
+         * The type for the <code>FF</code> heuristic.
          */
         FAST_FORWARD,
         /**

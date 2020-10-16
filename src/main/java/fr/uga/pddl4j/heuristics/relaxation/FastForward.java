@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Problem;
 
 /**
  * This class implements the heuristics of the fast forward planner. For more about this
@@ -56,7 +56,7 @@ import fr.uga.pddl4j.problem.State;
 public final class FastForward extends RelaxedGraphHeuristic {
 
     /**
-     * Creates a new <code>FastForward</code> heuristic for a specified planning problem.
+     * Creates a new <code>FF</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.

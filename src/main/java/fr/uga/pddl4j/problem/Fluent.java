@@ -15,8 +15,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import java.util.List;
-
 /**
  * This class implements a fluent, i.e., a proposition whose truth value changes during planning process.
  *

@@ -27,10 +27,16 @@ import fr.uga.pddl4j.problem.Action;
 public abstract class AbstractPlan implements Plan {
 
     /**
-     * Creates a new empty search.
+     * The hierarchical decomposition of this plan.
+     */
+    private Hierarchy hierarchy;
+
+    /**
+     * Creates a new empty search. The plan created is noy hierarchical.
      */
     protected AbstractPlan() {
         super();
+        this.hierarchy = null;
     }
 
     /**
@@ -73,5 +79,38 @@ public abstract class AbstractPlan implements Plan {
     @Override
     public final boolean isEmpty() {
         return this.size() == 0;
+    }
+
+    /**
+     * Returns if this plan is hierarchical.
+     *
+     * @return <code>true</code> if this plan is hierarchical; <code>false</code> otherwise.
+     */
+    @Override
+    public final boolean isHierarchical() {
+        return this.hierarchy != null;
+    }
+
+    /**
+     * Returns the hierarchy of this plan. The hierarchy is additional information produced by HTN planners to specified
+     * the hierarchical decomposition of the initial task networks into primitive tasks applied to produce a plan.
+     *
+     * @return the hierarchical decomposition of this plan or null is this plan is not hierarchical.
+     * @see Plan#isHierarchical()
+     */
+    public final Hierarchy getHierarchy() {
+        return this.hierarchy;
+    }
+
+    /**
+     * Sets the hierarchy of this plan. The hierarchy is additional information produced by HTN planners to specified
+     * the hierarchical decomposition of the initial task networks into primitive tasks applied to produce a plan.
+     *
+     * @param hierarchy the hierarchical decomposition of this plan.
+     * @see Plan#isHierarchical()
+     */
+    @Override
+    public final void setHierarchy(final Hierarchy hierarchy) {
+        this.hierarchy = hierarchy;
     }
 }

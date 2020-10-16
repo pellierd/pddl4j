@@ -15,11 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
@@ -78,7 +78,7 @@ public class StateSpacePlannerFactory implements Serializable {
      *
      * @param name           the name of the state based planner.
      * @return an instance of the specified planner.
-     * @see fr.uga.pddl4j.planners.Planner.Name
+     * @see Planner.Name
      */
     public AbstractStateSpacePlanner getPlanner(final Planner.Name name) {
         AbstractStateSpacePlanner planner = null;
@@ -88,7 +88,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FF:
-                planner = new FastForward();
+                planner = new FF();
                 break;
 
             default:
@@ -105,7 +105,7 @@ public class StateSpacePlannerFactory implements Serializable {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      * @return an instance of the specified planner.
-     * @see fr.uga.pddl4j.planners.Planner.Name
+     * @see Planner.Name
      */
     public AbstractStateSpacePlanner getPlanner(final Planner.Name name, final boolean statisticState,
                                                 final int traceLevel) {
@@ -116,7 +116,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FF:
-                planner = new FastForward(statisticState, traceLevel);
+                planner = new FF(statisticState, traceLevel);
                 break;
 
             default:
@@ -136,7 +136,7 @@ public class StateSpacePlannerFactory implements Serializable {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      * @return an instance of the specified planner.
-     * @see fr.uga.pddl4j.planners.Planner.Name
+     * @see Planner.Name
      */
     public AbstractStateSpacePlanner getPlanner(final Planner.Name name, final int timeout,
                                                 final RelaxationHeuristic.Type heuristicType, final double weight,
@@ -148,7 +148,7 @@ public class StateSpacePlannerFactory implements Serializable {
                 break;
 
             case FF:
-                planner = new FastForward(timeout, heuristicType, weight, statisticState, traceLevel);
+                planner = new FF(timeout, heuristicType, weight, statisticState, traceLevel);
                 break;
 
             default:
@@ -173,8 +173,8 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
             .append("-p <num>    specifies the state based planner to use (preset: 0)\n")
             .append("     0      HSP planner\n")
-            .append("     1      FastForward planner\n")
-            .append("     2      FastForward Anytime planner\n")
+            .append("     1      FF planner\n")
+            .append("     2      FF Anytime planner\n")
             .append("-u <num>    specifies the heuristic to used (preset: 0)\n")
             .append("     0      ff heuristic\n")
             .append("     1      sum heuristic\n")
@@ -344,8 +344,8 @@ public class StateSpacePlannerFactory implements Serializable {
      * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 300)
      * -u <i>num</i>   specifies the state based planner to use (preset: 0)
      *      0      HSP planner
-     *      1      FastForward planner
-     *      2      FastForward Anytime planner
+     *      1      FF planner
+     *      2      FF Anytime planner
      * -u <i>num</i>   specifies the heuristic to use (preset: 0)
      *      0      ff heuristic
      *      1      sum heuristic

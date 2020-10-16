@@ -137,15 +137,15 @@ test {
     forkEvery = 1 // One new JVM for each test
 
     testLogging {
-        showStandardStreams = false // Set to false to hid test output
+        showStandardStreams = true // Set to false to hid test output
         exceptionFormat "full" // full to print stack
         events "skipped", "failed", "passed"
     }
 
     // The set of Junit tests
     scanForTestClasses = false
-    includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FastForwardTest.class']
-
+    //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
+    includes = ['**/PFDPlannerTest.class']
 }
 
 defaultTasks 'clean', 'build', 'test'

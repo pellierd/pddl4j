@@ -123,6 +123,30 @@ public interface Plan extends Serializable {
      */
     boolean contains(final int time, final Action action);
 
+    /**
+     * Returns if this plan is hierarchical.
+     *
+     * @return <code>true</code> if this plan is hierarchical; <code>false</code> otherwise.
+     */
+    boolean isHierarchical();
+
+    /**
+     * Returns the hierarchy of this plan. The hierarchy is additional information produced by HTN planners to specified
+     * the hierarchical decomposition of the initial task networks into primitive tasks applied to produce this plan.
+     *
+     * @return the hierarchical decomposition of this plan or null is this plan is not hierarchical.
+     * @see this#isHierarchical()
+     */
+    Hierarchy getHierarchy();
+
+    /**
+     * Sets the hierarchy of this plan. The hierarchy is additional information produced by HTN planners to specified
+     * the hierarchical decomposition of the initial task networks into primitive tasks applied to produce this plan.
+     *
+     * @param hierarchy the hierarchical decomposition of this plan.
+     * @see this#isHierarchical()
+     */
+    void setHierarchy(final Hierarchy hierarchy);
 
 }
 

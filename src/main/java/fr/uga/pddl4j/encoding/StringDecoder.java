@@ -339,10 +339,10 @@ final class StringDecoder implements Serializable {
                 str.append(" ");
                 if (!exp.getChildren().isEmpty()) {
                     for (int i = 0; i < exp.getChildren().size() - 1; i++) {
-                        str.append(StringDecoder.toString(exp.getChildren().get(i), constants, types, predicates,
+                        str.append(toString(exp.getChildren().get(i), constants, types, predicates,
                             functions, tasks, offsetOr)).append("\n").append(offsetOr);
                     }
-                    str.append(StringDecoder.toString(exp.getChildren().get(
+                    str.append(toString(exp.getChildren().get(
                         exp.getChildren().size() - 1), constants, types, predicates, functions, tasks, offsetOr));
                 }
                 str.append(")");
@@ -356,7 +356,7 @@ final class StringDecoder implements Serializable {
                 String offsetEx = baseOffset + baseOffset + "  ";
                 str.append(types.get(exp.getType())).append(")\n").append(offsetEx);
                 if (exp.getChildren().size() == 1) {
-                    str.append(StringDecoder.toString(exp.getChildren().get(0), constants, types, predicates,
+                    str.append(toString(exp.getChildren().get(0), constants, types, predicates,
                         functions, tasks, offsetEx));
                 }
                 str.append(")");
@@ -365,7 +365,7 @@ final class StringDecoder implements Serializable {
                 str.append(exp.getValue());
                 break;
             case F_EXP:
-                str.append(StringDecoder.toString(exp.getChildren().get(0), constants, types, predicates,
+                str.append(toString(exp.getChildren().get(0), constants, types, predicates,
                     functions, tasks, baseOffset));
                 break;
             case F_EXP_T:
@@ -397,10 +397,10 @@ final class StringDecoder implements Serializable {
                 str.append("(");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
-                str.append(StringDecoder.toString(exp.getChildren().get(0), constants, types, predicates,
+                str.append(toString(exp.getChildren().get(0), constants, types, predicates,
                     functions, tasks, baseOffset));
                 str.append(" ");
-                str.append(StringDecoder.toString(exp.getChildren().get(1), constants, types, predicates,
+                str.append(toString(exp.getChildren().get(1), constants, types, predicates,
                     functions, tasks, baseOffset));
                 str.append(")");
                 break;
@@ -415,7 +415,7 @@ final class StringDecoder implements Serializable {
                 str.append("(");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
-                str.append(StringDecoder.toString(exp.getChildren().get(0), constants, types, predicates,
+                str.append(toString(exp.getChildren().get(0), constants, types, predicates,
                     functions, tasks, baseOffset));
                 str.append(")");
                 break;
@@ -455,7 +455,7 @@ final class StringDecoder implements Serializable {
      */
     static String toString(final Action action, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                                  final List<IntExpression> relevants) {
+                           final List<IntExpression> relevants) {
         StringBuilder str = new StringBuilder();
         str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < action.arity(); i++) {

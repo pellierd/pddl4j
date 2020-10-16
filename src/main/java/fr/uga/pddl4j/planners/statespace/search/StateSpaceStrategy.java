@@ -20,7 +20,6 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.io.Serializable;
-import javax.swing.event.EventListenerList;
 
 /**
  * This interface defines the main methods for search strategies.

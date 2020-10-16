@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
+import fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 
 import java.util.LinkedList;
@@ -30,7 +31,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
- * @see fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode
+ * @see PFDNode
  */
 public class TFDNode extends AbstractSTNNode {
 

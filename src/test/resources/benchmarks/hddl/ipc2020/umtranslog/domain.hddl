@@ -1,0 +1,1727 @@
+(define (domain UMTranslog)
+	(:requirements :typing :hierarchy :method-preconditions :negative-preconditions)
+	(:types
+		Air_Route - Route
+		Airplane - Regular_Vehicle
+		Airport - TCenter
+		Airport_Hub - Airport
+		Airport_Hub - Hub
+		Armored - Speciality
+		Armored_Flatbed_Traincar - Traincar
+		Armored_Flatbed_Traincar - Flatbed_Vehicle
+		Armored_Flatbed_Traincar - Armored_Vehicle
+		Armored_Flatbed_Truck - Flatbed_Vehicle
+		Armored_Flatbed_Truck - Armored_Vehicle
+		Armored_Flatbed_Truck - Truck
+		Armored_Hopper_Traincar - Traincar
+		Armored_Hopper_Traincar - Armored_Vehicle
+		Armored_Hopper_Traincar - Hopper_Vehicle
+		Armored_Hopper_Truck - Armored_Vehicle
+		Armored_Hopper_Truck - Truck
+		Armored_Hopper_Truck - Hopper_Vehicle
+		Armored_Regular_Traincar - Regular_Vehicle
+		Armored_Regular_Traincar - Traincar
+		Armored_Regular_Traincar - Armored_Vehicle
+		Armored_Regular_Truck - Regular_Vehicle
+		Armored_Regular_Truck - Armored_Vehicle
+		Armored_Regular_Truck - Truck
+		Armored_Tanker_Traincar - Traincar
+		Armored_Tanker_Traincar - Tanker_Vehicle
+		Armored_Tanker_Traincar - Armored_Vehicle
+		Armored_Tanker_Truck - Tanker_Vehicle
+		Armored_Tanker_Truck - Armored_Vehicle
+		Armored_Tanker_Truck - Truck
+		Armored_Vehicle - Armored
+		Armored_Vehicle - Vehicle
+		Auto - Physical
+		Auto_Traincar - Traincar
+		Auto_Traincar - Auto_Vehicle
+		Auto_Truck - Truck
+		Auto_Truck - Auto_Vehicle
+		Auto_Vehicle - Auto
+		Auto_Vehicle - Vehicle
+		Bulky - Physical
+		Cars - Package
+		Cars - Auto
+		Chemicals - Hazardous
+		Chemicals - Perishable
+		Chemicals - Liquid
+		City - Location
+		City_Location - Location
+		Crane - Package_Storage_Position
+		Crane - Equipment
+		Customer_Location - Not_TCenter
+		Equipment - PhysicalObject
+		Flatbed - Physical
+		Flatbed_Traincar - Traincar
+		Flatbed_Traincar - Flatbed_Vehicle
+		Flatbed_Truck - Flatbed_Vehicle
+		Flatbed_Truck - Truck
+		Flatbed_Vehicle - Vehicle
+		Flatbed_Vehicle - Flatbed
+		Food - Regular_Package
+		Regular_Package - Package
+		Regular_Package - Regular
+		Food - Perishable
+		Granular - Physical
+		Hazardous - Package
+		Hopper - Physical
+		Hopper_Traincar - Traincar
+		Hopper_Traincar - Hopper_Vehicle
+		Hopper_Truck - Truck
+		Hopper_Truck - Hopper_Vehicle
+		Hopper_Vehicle - Hopper
+		Hopper_Vehicle - Vehicle
+		Hub - TCenter
+		Liquid - Package
+		Liquid - Physical
+		Livestock - Physical
+		Livestock_Package - Package
+		Livestock_Package - Livestock
+		Livestock_Traincar - Traincar
+		Livestock_Traincar - Livestock_Vehicle
+		Livestock_Truck - Livestock_Vehicle
+		Livestock_Truck - Truck
+		Livestock_Vehicle - Livestock
+		Livestock_Vehicle - Vehicle
+		Local_Road_Route - Road_Route
+		Location - Vehicle_Position
+		Location - Equipment_Position
+		Location - Package_Storage_Position
+		Location - Thing
+		Lumber - Bulky
+		Bulky - Package
+		Mail - Physical
+		Mail_Package - Mail
+		Mail_Package - Regular_Package
+		Mail_Traincar - Traincar
+		Mail_Traincar - Mail_Vehicle
+		Mail_Truck - Mail_Vehicle
+		Mail_Truck - Truck
+		Mail_Vehicle - Regular_Vehicle
+		Mail_Vehicle - Mail
+		Money_Art - Valuable
+		Money_Art - Regular_Package
+		Not_TCenter - City_Location
+		PhysicalObject - Thing
+		Ore - Granular
+		Ore - Package
+		Package - PhysicalObject
+		Parcels - Regular_Package
+		Perishable - Package
+		Physical - PhysicalObject
+		Plane_Ramp - Equipment
+		Post_Office - Not_TCenter
+		Rail_Route - Route
+		Refrigerated - Speciality
+		Refrigerated_Regular_Traincar - Regular_Vehicle
+		Refrigerated_Regular_Traincar - Traincar
+		Refrigerated_Regular_Traincar - Refrigerated_Vehicle
+		Refrigerated_Regular_Truck - Regular_Vehicle
+		Refrigerated_Regular_Truck - Truck
+		Refrigerated_Regular_Truck - Refrigerated_Vehicle
+		Refrigerated_Tanker_Traincar - Traincar
+		Refrigerated_Tanker_Traincar - Tanker_Vehicle
+		Refrigerated_Tanker_Traincar - Refrigerated_Vehicle
+		Refrigerated_Tanker_Truck - Tanker_Vehicle
+		Refrigerated_Tanker_Truck - Truck
+		Refrigerated_Tanker_Truck - Refrigerated_Vehicle
+		Refrigerated_Vehicle - Refrigerated
+		Refrigerated_Vehicle - Vehicle
+		Region - Location
+		Regular - Physical
+		Regular_Traincar - Regular_Vehicle
+		Regular_Traincar - Traincar
+		Regular_Truck - Regular_Vehicle
+		Regular_Truck - Truck
+		Regular_Vehicle - Regular
+		Regular_Vehicle - Vehicle
+		Road_Route - Route
+		Route - Thing
+		Sand - Granular
+		Sand - Package
+		Speciality - PhysicalObject
+		Steel - Bulky
+		Steel - Package
+		TCenter - City_Location
+		Tanker - Physical
+		Tanker_Traincar - Traincar
+		Tanker_Traincar - Tanker_Vehicle
+		Tanker_Truck - Tanker_Vehicle
+		Tanker_Truck - Truck
+		Tanker_Vehicle - Tanker
+		Tanker_Vehicle - Vehicle
+		Train - Vehicle
+		Train_Station - TCenter
+		Train_Station_Hub - Hub
+		Train_Station_Hub - Train_Station
+		Traincar - Vehicle_Position
+		Traincar - Vehicle
+		Truck - Vehicle
+		Valuable - Package
+		Vehicle - Equipment_Position
+		Vehicle - Package_Storage_Position
+		Vehicle - PhysicalObject
+		Water - Package
+		Water - Liquid
+	)
+	(:predicates
+		(At_Equipment ?arg0 - Equipment ?arg1 - Equipment_Position)
+		(At_Package ?arg0 - Package ?arg1 - Package_Storage_Position)
+		(At_Vehicle ?arg0 - Vehicle ?arg1 - Vehicle_Position)
+		(Available ?arg0 - Thing)
+		(Chute_Connected ?arg0 - Hopper_Vehicle)
+		(City_Hazardous_Compatible ?arg0 - City)
+		(Clean_Interior ?arg0 - Vehicle)
+		(Connected_To ?arg0 - Traincar ?arg1 - Train)
+		(Connects ?arg0 - Route ?arg1 - Location ?arg2 - Location)
+		(Decontaminated_Interior ?arg0 - Vehicle)
+		(Delivered ?arg0 - Package)
+		(Door_Open ?arg0 - Vehicle)
+		(Empty ?arg0 - Crane)
+		(Fees_Collected ?arg0 - Package)
+		(Guard_Inside ?arg0 - Armored)
+		(Guard_Outside ?arg0 - Armored)
+		(Have_Permit ?arg0 - Hazardous)
+		(Hose_Connected ?arg0 - Tanker_Vehicle ?arg1 - Liquid)
+		(In_City ?arg0 - City_Location ?arg1 - City)
+		(In_Region ?arg0 - City ?arg1 - Region)
+		(Insured ?arg0 - Valuable)
+		(PV_Compatible ?arg0 - Package ?arg1 - Vehicle)
+		(RV_Compatible ?arg0 - Route ?arg1 - Vehicle)
+		(Ramp_Connected ?arg0 - Plane_Ramp ?arg1 - Airplane)
+		(Ramp_Down ?arg0 - Vehicle)
+		(Serves ?arg0 - TCenter ?arg1 - Location)
+		(Trough_Full ?arg0 - Livestock)
+		(Valve_Open ?arg0 - Tanker)
+		(Warning_Signs_Affixed ?arg0 - Vehicle)
+
+		(ValuableOrHazardous ?p - Package)
+		(IsHazardous ?p - Package)
+		(IsAirplain ?v - Vehicle)
+		(IsTraincar ?v - Vehicle)
+		(IsHub ?h - TCenter)
+	)
+
+	(:task carry
+		:parameters (?c_p - Package ?c_lo - Location ?c_ld - Location)
+	)
+
+	(:task carry_between_tcenters
+		:parameters (?cbt_p - Package ?cbt_tco - TCenter ?cbt_tcd - TCenter)
+	)
+
+	(:task carry_direct
+		:parameters (?cd_p - Package ?cd_lo - Location ?cd_ld - Location)
+	)
+
+	(:task carry_via_hub
+		:parameters (?tch_p - Package ?tch_tco - TCenter ?tch_tcd - TCenter)
+	)
+
+	(:task deliver
+		:parameters (?d_p - Package)
+	)
+
+	(:task helper_carry_cc
+		:parameters (?hccc_p - Package ?hccc_o - Not_TCenter ?hccc_co - City ?hccc_t - TCenter ?hccc_d - Not_TCenter ?hccc_cd - City)
+	)
+
+	(:task helper_carry_direct
+		:parameters (?hcd_v - Vehicle ?hcd_p - Package ?hcd_o - Location ?hcd_d - Location)
+	)
+
+	(:task helper_carry_otd
+		:parameters (?hcotd_p - Package ?hcotd_o - TCenter ?hcotd_co - City ?hcotd_t1 - TCenter ?hcotd_d - Not_TCenter ?hcotd_cd - City)
+	)
+
+	(:task helper_carry_ott
+		:parameters (?hcott_p - Package ?hcott_o - City_Location ?hcott_co - City ?hcott_t1 - TCenter ?hcott_d - TCenter ?hcott_cd - City)
+	)
+
+	(:task helper_carry_ottd
+		:parameters (?hcottd_p - Package ?hcottd_o - Not_TCenter ?hcottd_co - City ?hcottd_t1 - TCenter ?hcottd_t2 - TCenter ?hcottd_d - Not_TCenter ?hcottd_cd - City)
+	)
+
+	(:task helper_carry_tt
+		:parameters (?hctt_p - Package ?hctt_o - TCenter ?hctt_co - City ?hctt_d - TCenter ?hctt_cd - City)
+	)
+
+	(:task helper_carry_via_hub_hazardous
+		:parameters (?hcvhh_p - Package ?hcvhh_tco - TCenter ?hcvhh_ctco - City ?hcvhh_rctco - Region ?hcvhh_h - Hub ?hcvhh_ch - City ?hcvhh_tcd - TCenter ?hcvhh_ctcd - City ?hcvhh_rctcd - Region)
+	)
+
+	(:task helper_carry_via_hub_not_hazardous
+		:parameters (?hcvhn_p - Package ?hcvhn_tco - TCenter ?hcvhn_ctco - City ?hcvhn_rctco - Region ?hcvhn_h - Hub ?hcvhn_tcd - TCenter ?hcvhn_ctcd - City ?hcvhn_rctcd - Region)
+	)
+
+	(:task helper_move_traincar
+		:parameters (?hmt_v - Traincar ?hmt_t - Train ?hmt_o - Location ?hmt_d - Location)
+	)
+
+	(:task load
+		:parameters (?l_p - Package ?l_v - Vehicle ?l_l - Location)
+	)
+
+	(:task load_top
+		:parameters (?lt_p - Package ?lt_v - Vehicle ?lt_l - Location)
+	)
+
+	(:task move
+		:parameters (?m_v - Vehicle ?m_lo - Location ?m_ld - Location)
+	)
+
+	(:task pickup
+		:parameters (?p_p - Package)
+	)
+
+	(:task transport
+		:parameters (?t_p - Package ?t_lo - Location ?t_ld - Location)
+	)
+
+	(:task unload
+		:parameters (?ul_p - Package ?ul_v - Vehicle ?ul_l - Location)
+	)
+
+	(:task unload_top
+		:parameters (?ult_p - Package ?ult_v - Vehicle ?ult_l - Location)
+	)
+
+	(:method method0
+		:parameters (?carry_instance_3_argument_2 - Location ?carry_instance_3_argument_3 - Location ?deliver_instance_4_argument_4 - Package)
+		:task (transport ?deliver_instance_4_argument_4 ?carry_instance_3_argument_2 ?carry_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (pickup ?deliver_instance_4_argument_4))
+		 (task1 (carry ?deliver_instance_4_argument_4 ?carry_instance_3_argument_2 ?carry_instance_3_argument_3))
+		 (task2 (deliver ?deliver_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?carry_instance_3_argument_2 ?carry_instance_3_argument_3))
+		)
+	)
+
+	(:method method1
+		:parameters (?collect_fees_instance_2_argument_0 - Package)
+		:task (pickup ?collect_fees_instance_2_argument_0)
+		:precondition (and
+			(not (ValuableOrHazardous ?collect_fees_instance_2_argument_0))
+		)
+		:subtasks (and
+		 (task0 (collect_fees ?collect_fees_instance_2_argument_0))
+		)
+	)
+
+	(:method method2
+		:parameters (?obtain_permit_instance_3_argument_1 - Hazardous)
+		:task (pickup ?obtain_permit_instance_3_argument_1)
+		:subtasks (and
+		 (task0 (collect_fees ?obtain_permit_instance_3_argument_1))
+		 (task1 (obtain_permit ?obtain_permit_instance_3_argument_1))
+		)
+		:ordering (and
+			(< task0 task1)
+		)
+	)
+
+	(:method method3
+		:parameters (?collect_insurance_instance_3_argument_1 - Valuable)
+		:task (pickup ?collect_insurance_instance_3_argument_1)
+		:subtasks (and
+		 (task0 (collect_fees ?collect_insurance_instance_3_argument_1))
+		 (task1 (collect_insurance ?collect_insurance_instance_3_argument_1))
+		)
+		:ordering (and
+			(< task0 task1)
+		)
+	)
+
+	(:method method4
+		:parameters (?deliver_p_instance_2_argument_0 - Package)
+		:task (deliver ?deliver_p_instance_2_argument_0)
+		:precondition (and
+			(not (ValuableOrHazardous ?deliver_p_instance_2_argument_0))
+		)
+		:subtasks (and
+		 (task0 (deliver_p ?deliver_p_instance_2_argument_0))
+		)
+	)
+
+	(:method method5
+		:parameters (?deliver_v_instance_2_argument_0 - Valuable)
+		:task (deliver ?deliver_v_instance_2_argument_0)
+		:subtasks (and
+		 (task0 (deliver_v ?deliver_v_instance_2_argument_0))
+		)
+	)
+
+	(:method method6
+		:parameters (?deliver_h_instance_2_argument_0 - Hazardous)
+		:task (deliver ?deliver_h_instance_2_argument_0)
+		:subtasks (and
+		 (task0 (deliver_h ?deliver_h_instance_2_argument_0))
+		)
+	)
+
+	(:method method7
+		:parameters (?carry_direct_instance_2_argument_0 - Package ?carry_direct_instance_2_argument_1 - Location ?carry_direct_instance_2_argument_2 - Location)
+		:task (carry ?carry_direct_instance_2_argument_0 ?carry_direct_instance_2_argument_1 ?carry_direct_instance_2_argument_2)
+		:subtasks (and
+		 (task0 (carry_direct ?carry_direct_instance_2_argument_0 ?carry_direct_instance_2_argument_1 ?carry_direct_instance_2_argument_2))
+		)
+		:constraints (and
+			(not (= ?carry_direct_instance_2_argument_1 ?carry_direct_instance_2_argument_2))
+		)
+	)
+
+	(:method method8
+		:parameters (?helper_carry_tt_instance_2_argument_0 - Package ?helper_carry_tt_instance_2_argument_1 - TCenter ?helper_carry_tt_instance_2_argument_2 - City ?helper_carry_tt_instance_2_argument_3 - TCenter ?helper_carry_tt_instance_2_argument_4 - City)
+		:task (carry ?helper_carry_tt_instance_2_argument_0 ?helper_carry_tt_instance_2_argument_1 ?helper_carry_tt_instance_2_argument_3)
+		:precondition (and
+			(not (IsHub ?helper_carry_tt_instance_2_argument_1))
+			(not (IsHub ?helper_carry_tt_instance_2_argument_3))
+		)
+		:subtasks (and
+		 (task0 (helper_carry_tt ?helper_carry_tt_instance_2_argument_0 ?helper_carry_tt_instance_2_argument_1 ?helper_carry_tt_instance_2_argument_2 ?helper_carry_tt_instance_2_argument_3 ?helper_carry_tt_instance_2_argument_4))
+		)
+		:constraints (and
+			(not (= ?helper_carry_tt_instance_2_argument_1 ?helper_carry_tt_instance_2_argument_3))
+		)
+	)
+
+	(:method method9
+		:parameters (?carry_via_hub_instance_2_argument_0 - Package ?go_through_two_tcenters_tt_instance_3_argument_3 - TCenter ?go_through_two_tcenters_tt_instance_3_argument_4 - TCenter ?go_through_two_tcenters_tt_instance_3_argument_5 - City ?go_through_two_tcenters_tt_instance_3_argument_6 - City)
+		:task (helper_carry_tt ?carry_via_hub_instance_2_argument_0 ?go_through_two_tcenters_tt_instance_3_argument_3 ?go_through_two_tcenters_tt_instance_3_argument_5 ?go_through_two_tcenters_tt_instance_3_argument_4 ?go_through_two_tcenters_tt_instance_3_argument_6)
+		:subtasks (and
+		 (task0 (carry_via_hub ?carry_via_hub_instance_2_argument_0 ?go_through_two_tcenters_tt_instance_3_argument_3 ?go_through_two_tcenters_tt_instance_3_argument_4))
+		 (task1 (go_through_two_tcenters_tt ?go_through_two_tcenters_tt_instance_3_argument_3 ?go_through_two_tcenters_tt_instance_3_argument_4 ?go_through_two_tcenters_tt_instance_3_argument_5 ?go_through_two_tcenters_tt_instance_3_argument_6))
+		)
+		:ordering (and
+			(< task0 task1)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_tt_instance_3_argument_3 ?go_through_two_tcenters_tt_instance_3_argument_4))
+			(not (= ?go_through_two_tcenters_tt_instance_3_argument_5 ?go_through_two_tcenters_tt_instance_3_argument_6))
+		)
+	)
+
+	(:method method10
+		:parameters (?helper_carry_ott_instance_2_argument_0 - Package ?helper_carry_ott_instance_2_argument_1 - Not_TCenter ?helper_carry_ott_instance_2_argument_2 - City ?helper_carry_ott_instance_2_argument_3 - TCenter ?helper_carry_ott_instance_2_argument_4 - TCenter ?helper_carry_ott_instance_2_argument_5 - City)
+		:task (carry ?helper_carry_ott_instance_2_argument_0 ?helper_carry_ott_instance_2_argument_1 ?helper_carry_ott_instance_2_argument_4)
+		:subtasks (and
+		 (task0 (helper_carry_ott ?helper_carry_ott_instance_2_argument_0 ?helper_carry_ott_instance_2_argument_1 ?helper_carry_ott_instance_2_argument_2 ?helper_carry_ott_instance_2_argument_3 ?helper_carry_ott_instance_2_argument_4 ?helper_carry_ott_instance_2_argument_5))
+		)
+		:constraints (and
+			(not (= ?helper_carry_ott_instance_2_argument_2 ?helper_carry_ott_instance_2_argument_5))
+			(not (= ?helper_carry_ott_instance_2_argument_1 ?helper_carry_ott_instance_2_argument_4))
+		)
+	)
+
+	(:method method11
+		:parameters (?carry_between_tcenters_instance_4_argument_8 - Package ?go_through_two_tcenters_cities_ott_instance_3_argument_3 - City_Location ?go_through_two_tcenters_cities_ott_instance_3_argument_4 - City ?go_through_two_tcenters_cities_ott_instance_3_argument_5 - City ?go_through_two_tcenters_cities_ott_instance_3_argument_6 - TCenter ?go_through_two_tcenters_cities_ott_instance_3_argument_7 - TCenter)
+		:task (helper_carry_ott ?carry_between_tcenters_instance_4_argument_8 ?go_through_two_tcenters_cities_ott_instance_3_argument_3 ?go_through_two_tcenters_cities_ott_instance_3_argument_4 ?go_through_two_tcenters_cities_ott_instance_3_argument_6 ?go_through_two_tcenters_cities_ott_instance_3_argument_7 ?go_through_two_tcenters_cities_ott_instance_3_argument_5)
+		:subtasks (and
+		 (task0 (carry_direct ?carry_between_tcenters_instance_4_argument_8 ?go_through_two_tcenters_cities_ott_instance_3_argument_3 ?go_through_two_tcenters_cities_ott_instance_3_argument_6))
+		 (task1 (go_through_two_tcenters_cities_ott ?go_through_two_tcenters_cities_ott_instance_3_argument_3 ?go_through_two_tcenters_cities_ott_instance_3_argument_4 ?go_through_two_tcenters_cities_ott_instance_3_argument_5 ?go_through_two_tcenters_cities_ott_instance_3_argument_6 ?go_through_two_tcenters_cities_ott_instance_3_argument_7))
+		 (task2 (carry_between_tcenters ?carry_between_tcenters_instance_4_argument_8 ?go_through_two_tcenters_cities_ott_instance_3_argument_6 ?go_through_two_tcenters_cities_ott_instance_3_argument_7))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_cities_ott_instance_3_argument_4 ?go_through_two_tcenters_cities_ott_instance_3_argument_5))
+		)
+	)
+
+	(:method method12
+		:parameters (?helper_carry_otd_instance_2_argument_0 - Package ?helper_carry_otd_instance_2_argument_1 - TCenter ?helper_carry_otd_instance_2_argument_2 - City ?helper_carry_otd_instance_2_argument_3 - TCenter ?helper_carry_otd_instance_2_argument_4 - Not_TCenter ?helper_carry_otd_instance_2_argument_5 - City)
+		:task (carry ?helper_carry_otd_instance_2_argument_0 ?helper_carry_otd_instance_2_argument_1 ?helper_carry_otd_instance_2_argument_4)
+		:subtasks (and
+		 (task0 (helper_carry_otd ?helper_carry_otd_instance_2_argument_0 ?helper_carry_otd_instance_2_argument_1 ?helper_carry_otd_instance_2_argument_2 ?helper_carry_otd_instance_2_argument_3 ?helper_carry_otd_instance_2_argument_4 ?helper_carry_otd_instance_2_argument_5))
+		)
+		:constraints (and
+			(not (= ?helper_carry_otd_instance_2_argument_1 ?helper_carry_otd_instance_2_argument_4))
+			(not (= ?helper_carry_otd_instance_2_argument_1 ?helper_carry_otd_instance_2_argument_3))
+			(not (= ?helper_carry_otd_instance_2_argument_4 ?helper_carry_otd_instance_2_argument_3))
+		)
+	)
+
+	(:method method13
+		:parameters (?carry_direct_instance_4_argument_8 - Package ?go_through_two_tcenters_cities_otd_instance_3_argument_3 - Not_TCenter ?go_through_two_tcenters_cities_otd_instance_3_argument_4 - City ?go_through_two_tcenters_cities_otd_instance_3_argument_5 - City ?go_through_two_tcenters_cities_otd_instance_3_argument_6 - TCenter ?go_through_two_tcenters_cities_otd_instance_3_argument_7 - TCenter)
+		:task (helper_carry_otd ?carry_direct_instance_4_argument_8 ?go_through_two_tcenters_cities_otd_instance_3_argument_6 ?go_through_two_tcenters_cities_otd_instance_3_argument_4 ?go_through_two_tcenters_cities_otd_instance_3_argument_7 ?go_through_two_tcenters_cities_otd_instance_3_argument_3 ?go_through_two_tcenters_cities_otd_instance_3_argument_5)
+		:subtasks (and
+		 (task0 (carry_between_tcenters ?carry_direct_instance_4_argument_8 ?go_through_two_tcenters_cities_otd_instance_3_argument_6 ?go_through_two_tcenters_cities_otd_instance_3_argument_7))
+		 (task1 (go_through_two_tcenters_cities_otd ?go_through_two_tcenters_cities_otd_instance_3_argument_3 ?go_through_two_tcenters_cities_otd_instance_3_argument_4 ?go_through_two_tcenters_cities_otd_instance_3_argument_5 ?go_through_two_tcenters_cities_otd_instance_3_argument_6 ?go_through_two_tcenters_cities_otd_instance_3_argument_7))
+		 (task2 (carry_direct ?carry_direct_instance_4_argument_8 ?go_through_two_tcenters_cities_otd_instance_3_argument_7 ?go_through_two_tcenters_cities_otd_instance_3_argument_3))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_cities_otd_instance_3_argument_4 ?go_through_two_tcenters_cities_otd_instance_3_argument_5))
+			(not (= ?go_through_two_tcenters_cities_otd_instance_3_argument_6 ?go_through_two_tcenters_cities_otd_instance_3_argument_7))
+		)
+	)
+
+	(:method method14
+		:parameters (?helper_carry_ottd_instance_2_argument_0 - Package ?helper_carry_ottd_instance_2_argument_1 - Not_TCenter ?helper_carry_ottd_instance_2_argument_2 - City ?helper_carry_ottd_instance_2_argument_3 - TCenter ?helper_carry_ottd_instance_2_argument_4 - TCenter ?helper_carry_ottd_instance_2_argument_5 - Not_TCenter ?helper_carry_ottd_instance_2_argument_6 - City)
+		:task (carry ?helper_carry_ottd_instance_2_argument_0 ?helper_carry_ottd_instance_2_argument_1 ?helper_carry_ottd_instance_2_argument_5)
+		:subtasks (and
+		 (task0 (helper_carry_ottd ?helper_carry_ottd_instance_2_argument_0 ?helper_carry_ottd_instance_2_argument_1 ?helper_carry_ottd_instance_2_argument_2 ?helper_carry_ottd_instance_2_argument_3 ?helper_carry_ottd_instance_2_argument_4 ?helper_carry_ottd_instance_2_argument_5 ?helper_carry_ottd_instance_2_argument_6))
+		)
+		:constraints (and
+			(not (= ?helper_carry_ottd_instance_2_argument_1 ?helper_carry_ottd_instance_2_argument_5))
+			(not (= ?helper_carry_ottd_instance_2_argument_1 ?helper_carry_ottd_instance_2_argument_3))
+			(not (= ?helper_carry_ottd_instance_2_argument_5 ?helper_carry_ottd_instance_2_argument_3))
+			(not (= ?helper_carry_ottd_instance_2_argument_1 ?helper_carry_ottd_instance_2_argument_4))
+			(not (= ?helper_carry_ottd_instance_2_argument_5 ?helper_carry_ottd_instance_2_argument_4))
+		)
+	)
+
+	(:method method15
+		:parameters (?carry_direct_instance_5_argument_12 - Package ?go_through_two_tcenters_cities_ottd_instance_3_argument_3 - Not_TCenter ?go_through_two_tcenters_cities_ottd_instance_3_argument_4 - Not_TCenter ?go_through_two_tcenters_cities_ottd_instance_3_argument_5 - City ?go_through_two_tcenters_cities_ottd_instance_3_argument_6 - City ?go_through_two_tcenters_cities_ottd_instance_3_argument_7 - TCenter ?go_through_two_tcenters_cities_ottd_instance_3_argument_8 - TCenter)
+		:task (helper_carry_ottd ?carry_direct_instance_5_argument_12 ?go_through_two_tcenters_cities_ottd_instance_3_argument_3 ?go_through_two_tcenters_cities_ottd_instance_3_argument_5 ?go_through_two_tcenters_cities_ottd_instance_3_argument_7 ?go_through_two_tcenters_cities_ottd_instance_3_argument_8 ?go_through_two_tcenters_cities_ottd_instance_3_argument_4 ?go_through_two_tcenters_cities_ottd_instance_3_argument_6)
+		:subtasks (and
+		 (task0 (carry_direct ?carry_direct_instance_5_argument_12 ?go_through_two_tcenters_cities_ottd_instance_3_argument_3 ?go_through_two_tcenters_cities_ottd_instance_3_argument_7))
+		 (task1 (go_through_two_tcenters_cities_ottd ?go_through_two_tcenters_cities_ottd_instance_3_argument_3 ?go_through_two_tcenters_cities_ottd_instance_3_argument_4 ?go_through_two_tcenters_cities_ottd_instance_3_argument_5 ?go_through_two_tcenters_cities_ottd_instance_3_argument_6 ?go_through_two_tcenters_cities_ottd_instance_3_argument_7 ?go_through_two_tcenters_cities_ottd_instance_3_argument_8))
+		 (task2 (carry_between_tcenters ?carry_direct_instance_5_argument_12 ?go_through_two_tcenters_cities_ottd_instance_3_argument_7 ?go_through_two_tcenters_cities_ottd_instance_3_argument_8))
+		 (task3 (carry_direct ?carry_direct_instance_5_argument_12 ?go_through_two_tcenters_cities_ottd_instance_3_argument_8 ?go_through_two_tcenters_cities_ottd_instance_3_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_cities_ottd_instance_3_argument_3 ?go_through_two_tcenters_cities_ottd_instance_3_argument_4))
+			(not (= ?go_through_two_tcenters_cities_ottd_instance_3_argument_7 ?go_through_two_tcenters_cities_ottd_instance_3_argument_8))
+			(not (= ?go_through_two_tcenters_cities_ottd_instance_3_argument_5 ?go_through_two_tcenters_cities_ottd_instance_3_argument_6))
+		)
+	)
+
+	(:method method16
+		:parameters (?helper_carry_cc_instance_2_argument_0 - Package ?helper_carry_cc_instance_2_argument_1 - Not_TCenter ?helper_carry_cc_instance_2_argument_2 - City ?helper_carry_cc_instance_2_argument_3 - TCenter ?helper_carry_cc_instance_2_argument_4 - Not_TCenter ?helper_carry_cc_instance_2_argument_5 - City)
+		:task (carry ?helper_carry_cc_instance_2_argument_0 ?helper_carry_cc_instance_2_argument_1 ?helper_carry_cc_instance_2_argument_4)
+		:subtasks (and
+		 (task0 (helper_carry_cc ?helper_carry_cc_instance_2_argument_0 ?helper_carry_cc_instance_2_argument_1 ?helper_carry_cc_instance_2_argument_2 ?helper_carry_cc_instance_2_argument_3 ?helper_carry_cc_instance_2_argument_4 ?helper_carry_cc_instance_2_argument_5))
+		)
+		:constraints (and
+			(not (= ?helper_carry_cc_instance_2_argument_1 ?helper_carry_cc_instance_2_argument_4))
+		)
+	)
+
+	(:method method17
+		:parameters (?carry_direct_instance_4_argument_8 - Package ?go_through_tcenter_cc_instance_3_argument_3 - Not_TCenter ?go_through_tcenter_cc_instance_3_argument_4 - Not_TCenter ?go_through_tcenter_cc_instance_3_argument_5 - City ?go_through_tcenter_cc_instance_3_argument_6 - City ?go_through_tcenter_cc_instance_3_argument_7 - TCenter)
+		:task (helper_carry_cc ?carry_direct_instance_4_argument_8 ?go_through_tcenter_cc_instance_3_argument_3 ?go_through_tcenter_cc_instance_3_argument_5 ?go_through_tcenter_cc_instance_3_argument_7 ?go_through_tcenter_cc_instance_3_argument_4 ?go_through_tcenter_cc_instance_3_argument_6)
+		:subtasks (and
+		 (task0 (carry_direct ?carry_direct_instance_4_argument_8 ?go_through_tcenter_cc_instance_3_argument_3 ?go_through_tcenter_cc_instance_3_argument_7))
+		 (task1 (go_through_tcenter_cc ?go_through_tcenter_cc_instance_3_argument_3 ?go_through_tcenter_cc_instance_3_argument_4 ?go_through_tcenter_cc_instance_3_argument_5 ?go_through_tcenter_cc_instance_3_argument_6 ?go_through_tcenter_cc_instance_3_argument_7))
+		 (task2 (carry_direct ?carry_direct_instance_4_argument_8 ?go_through_tcenter_cc_instance_3_argument_7 ?go_through_tcenter_cc_instance_3_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?go_through_tcenter_cc_instance_3_argument_3 ?go_through_tcenter_cc_instance_3_argument_4))
+			(not (= ?go_through_tcenter_cc_instance_3_argument_5 ?go_through_tcenter_cc_instance_3_argument_6))
+		)
+	)
+
+	(:method method18
+		:parameters (?carry_direct_instance_3_argument_2 - Package ?go_through_two_tcenters_instance_2_argument_0 - TCenter ?go_through_two_tcenters_instance_2_argument_1 - TCenter)
+		:task (carry_between_tcenters ?carry_direct_instance_3_argument_2 ?go_through_two_tcenters_instance_2_argument_0 ?go_through_two_tcenters_instance_2_argument_1)
+		:subtasks (and
+		 (task0 (go_through_two_tcenters ?go_through_two_tcenters_instance_2_argument_0 ?go_through_two_tcenters_instance_2_argument_1))
+		 (task1 (carry_direct ?carry_direct_instance_3_argument_2 ?go_through_two_tcenters_instance_2_argument_0 ?go_through_two_tcenters_instance_2_argument_1))
+		)
+		:ordering (and
+			(< task1 task0)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_instance_2_argument_0 ?go_through_two_tcenters_instance_2_argument_1))
+		)
+	)
+
+	(:method method19
+		:parameters (?carry_via_hub_instance_2_argument_0 - Package ?carry_via_hub_instance_2_argument_1 - TCenter ?carry_via_hub_instance_2_argument_2 - TCenter)
+		:task (carry_between_tcenters ?carry_via_hub_instance_2_argument_0 ?carry_via_hub_instance_2_argument_1 ?carry_via_hub_instance_2_argument_2)
+		:precondition (and
+			(not (IsHub ?carry_via_hub_instance_2_argument_1))
+			(not (IsHub ?carry_via_hub_instance_2_argument_2))
+		)
+		:subtasks (and
+		 (task0 (carry_via_hub ?carry_via_hub_instance_2_argument_0 ?carry_via_hub_instance_2_argument_1 ?carry_via_hub_instance_2_argument_2))
+		)
+		:constraints (and
+			(not (= ?carry_via_hub_instance_2_argument_1 ?carry_via_hub_instance_2_argument_2))
+		)
+	)
+
+	(:method method20
+		:parameters (?helper_carry_via_hub_not_hazardous_instance_2_argument_0 - Package ?helper_carry_via_hub_not_hazardous_instance_2_argument_1 - TCenter ?helper_carry_via_hub_not_hazardous_instance_2_argument_2 - City ?helper_carry_via_hub_not_hazardous_instance_2_argument_3 - Region ?helper_carry_via_hub_not_hazardous_instance_2_argument_4 - Hub ?helper_carry_via_hub_not_hazardous_instance_2_argument_5 - TCenter ?helper_carry_via_hub_not_hazardous_instance_2_argument_6 - City ?helper_carry_via_hub_not_hazardous_instance_2_argument_7 - Region)
+		:task (carry_via_hub ?helper_carry_via_hub_not_hazardous_instance_2_argument_0 ?helper_carry_via_hub_not_hazardous_instance_2_argument_1 ?helper_carry_via_hub_not_hazardous_instance_2_argument_5)
+		:precondition (and
+			(not (IsHazardous ?helper_carry_via_hub_not_hazardous_instance_2_argument_0))
+		)
+		:subtasks (and
+		 (task0 (helper_carry_via_hub_not_hazardous ?helper_carry_via_hub_not_hazardous_instance_2_argument_0 ?helper_carry_via_hub_not_hazardous_instance_2_argument_1 ?helper_carry_via_hub_not_hazardous_instance_2_argument_2 ?helper_carry_via_hub_not_hazardous_instance_2_argument_3 ?helper_carry_via_hub_not_hazardous_instance_2_argument_4 ?helper_carry_via_hub_not_hazardous_instance_2_argument_5 ?helper_carry_via_hub_not_hazardous_instance_2_argument_6 ?helper_carry_via_hub_not_hazardous_instance_2_argument_7))
+		)
+		:constraints (and
+			(not (= ?helper_carry_via_hub_not_hazardous_instance_2_argument_1 ?helper_carry_via_hub_not_hazardous_instance_2_argument_5))
+			(not (= ?helper_carry_via_hub_not_hazardous_instance_2_argument_1 ?helper_carry_via_hub_not_hazardous_instance_2_argument_4))
+			(not (= ?helper_carry_via_hub_not_hazardous_instance_2_argument_5 ?helper_carry_via_hub_not_hazardous_instance_2_argument_4))
+		)
+	)
+
+	(:method method21
+		:parameters (?carry_direct_instance_4_argument_10 - Package ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_3 - TCenter ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_4 - TCenter ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_5 - City ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_6 - City ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_7 - Region ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_8 - Region ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9 - Hub)
+		:task (helper_carry_via_hub_not_hazardous ?carry_direct_instance_4_argument_10 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_7 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_4 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_6 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_8)
+		:subtasks (and
+		 (task0 (carry_direct ?carry_direct_instance_4_argument_10 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9))
+		 (task1 (go_through_two_tcenters_via_hub_not_hazardous ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_4 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_6 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_7 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_8 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9))
+		 (task2 (carry_direct ?carry_direct_instance_4_argument_10 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_4))
+			(not (= ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9))
+			(not (= ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_9 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_4))
+			(not (= ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_6))
+			(not (= ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_7 ?go_through_two_tcenters_via_hub_not_hazardous_instance_3_argument_8))
+		)
+	)
+
+	(:method method22
+		:parameters (?helper_carry_via_hub_hazardous_instance_2_argument_0 - Hazardous ?helper_carry_via_hub_hazardous_instance_2_argument_1 - TCenter ?helper_carry_via_hub_hazardous_instance_2_argument_2 - City ?helper_carry_via_hub_hazardous_instance_2_argument_3 - Region ?helper_carry_via_hub_hazardous_instance_2_argument_4 - Hub ?helper_carry_via_hub_hazardous_instance_2_argument_5 - City ?helper_carry_via_hub_hazardous_instance_2_argument_6 - TCenter ?helper_carry_via_hub_hazardous_instance_2_argument_7 - City ?helper_carry_via_hub_hazardous_instance_2_argument_8 - Region)
+		:task (carry_via_hub ?helper_carry_via_hub_hazardous_instance_2_argument_0 ?helper_carry_via_hub_hazardous_instance_2_argument_1 ?helper_carry_via_hub_hazardous_instance_2_argument_6)
+		:subtasks (and
+		 (task0 (helper_carry_via_hub_hazardous ?helper_carry_via_hub_hazardous_instance_2_argument_0 ?helper_carry_via_hub_hazardous_instance_2_argument_1 ?helper_carry_via_hub_hazardous_instance_2_argument_2 ?helper_carry_via_hub_hazardous_instance_2_argument_3 ?helper_carry_via_hub_hazardous_instance_2_argument_4 ?helper_carry_via_hub_hazardous_instance_2_argument_5 ?helper_carry_via_hub_hazardous_instance_2_argument_6 ?helper_carry_via_hub_hazardous_instance_2_argument_7 ?helper_carry_via_hub_hazardous_instance_2_argument_8))
+		)
+		:constraints (and
+			(not (= ?helper_carry_via_hub_hazardous_instance_2_argument_1 ?helper_carry_via_hub_hazardous_instance_2_argument_6))
+			(not (= ?helper_carry_via_hub_hazardous_instance_2_argument_1 ?helper_carry_via_hub_hazardous_instance_2_argument_4))
+			(not (= ?helper_carry_via_hub_hazardous_instance_2_argument_6 ?helper_carry_via_hub_hazardous_instance_2_argument_4))
+		)
+	)
+
+	(:method method23
+		:parameters (?carry_direct_instance_4_argument_11 - Package ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_10 - Region ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_3 - TCenter ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_4 - TCenter ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5 - Hub ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_6 - City ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_7 - City ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_8 - City ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_9 - Region)
+		:task (helper_carry_via_hub_hazardous ?carry_direct_instance_4_argument_11 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_6 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_9 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_7 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_4 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_8 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_10)
+		:subtasks (and
+		 (task0 (carry_direct ?carry_direct_instance_4_argument_11 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5))
+		 (task1 (go_through_two_tcenters_via_hub_hazardous ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_4 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_6 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_7 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_8 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_9 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_10))
+		 (task2 (carry_direct ?carry_direct_instance_4_argument_11 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_4))
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_3 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5))
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_5 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_4))
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_6 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_7))
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_6 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_8))
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_7 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_8))
+			(not (= ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_9 ?go_through_two_tcenters_via_hub_hazardous_instance_3_argument_10))
+		)
+	)
+
+	(:method method24
+		:parameters (?helper_carry_direct_instance_2_argument_0 - Vehicle ?helper_carry_direct_instance_2_argument_1 - Package ?helper_carry_direct_instance_2_argument_2 - Location ?helper_carry_direct_instance_2_argument_3 - Location)
+		:task (carry_direct ?helper_carry_direct_instance_2_argument_1 ?helper_carry_direct_instance_2_argument_2 ?helper_carry_direct_instance_2_argument_3)
+		:subtasks (and
+		 (task0 (helper_carry_direct ?helper_carry_direct_instance_2_argument_0 ?helper_carry_direct_instance_2_argument_1 ?helper_carry_direct_instance_2_argument_2 ?helper_carry_direct_instance_2_argument_3))
+		)
+		:constraints (and
+			(not (= ?helper_carry_direct_instance_2_argument_2 ?helper_carry_direct_instance_2_argument_3))
+		)
+	)
+
+	(:method method25
+		:parameters (?move_instance_2_argument_1 - Location ?move_instance_4_argument_7 - Location ?unload_top_instance_5_argument_10 - Vehicle ?unload_top_instance_5_argument_11 - Location ?unload_top_instance_5_argument_9 - Package)
+		:task (helper_carry_direct ?unload_top_instance_5_argument_10 ?unload_top_instance_5_argument_9 ?move_instance_4_argument_7 ?unload_top_instance_5_argument_11)
+		:subtasks (and
+		 (task0 (move ?unload_top_instance_5_argument_10 ?move_instance_2_argument_1 ?move_instance_4_argument_7))
+		 (task1 (load_top ?unload_top_instance_5_argument_9 ?unload_top_instance_5_argument_10 ?move_instance_4_argument_7))
+		 (task2 (move ?unload_top_instance_5_argument_10 ?move_instance_4_argument_7 ?unload_top_instance_5_argument_11))
+		 (task3 (unload_top ?unload_top_instance_5_argument_9 ?unload_top_instance_5_argument_10 ?unload_top_instance_5_argument_11))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+		)
+		:constraints (and
+			(not (= ?move_instance_2_argument_1 ?move_instance_4_argument_7))
+			(not (= ?move_instance_4_argument_7 ?unload_top_instance_5_argument_11))
+		)
+	)
+
+	(:method method26
+		:parameters (?move_instance_3_argument_4 - Location ?unload_top_instance_4_argument_6 - Package ?unload_top_instance_4_argument_7 - Vehicle ?unload_top_instance_4_argument_8 - Location)
+		:task (helper_carry_direct ?unload_top_instance_4_argument_7 ?unload_top_instance_4_argument_6 ?move_instance_3_argument_4 ?unload_top_instance_4_argument_8)
+		:subtasks (and
+		 (task0 (load_top ?unload_top_instance_4_argument_6 ?unload_top_instance_4_argument_7 ?move_instance_3_argument_4))
+		 (task1 (move ?unload_top_instance_4_argument_7 ?move_instance_3_argument_4 ?unload_top_instance_4_argument_8))
+		 (task2 (unload_top ?unload_top_instance_4_argument_6 ?unload_top_instance_4_argument_7 ?unload_top_instance_4_argument_8))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?move_instance_3_argument_4 ?unload_top_instance_4_argument_8))
+		)
+	)
+
+	(:method method27
+		:parameters (?move_vehicle_no_traincar_instance_2_argument_0 - Vehicle ?move_vehicle_no_traincar_instance_2_argument_1 - Location ?move_vehicle_no_traincar_instance_2_argument_2 - Route ?move_vehicle_no_traincar_instance_2_argument_3 - Location)
+		:task (move ?move_vehicle_no_traincar_instance_2_argument_0 ?move_vehicle_no_traincar_instance_2_argument_1 ?move_vehicle_no_traincar_instance_2_argument_3)
+		:precondition (and
+			(not (IsTraincar ?move_vehicle_no_traincar_instance_2_argument_0))
+		)
+		:subtasks (and
+		 (task0 (move_vehicle_no_traincar ?move_vehicle_no_traincar_instance_2_argument_0 ?move_vehicle_no_traincar_instance_2_argument_1 ?move_vehicle_no_traincar_instance_2_argument_2 ?move_vehicle_no_traincar_instance_2_argument_3))
+		)
+		:constraints (and
+			(not (= ?move_vehicle_no_traincar_instance_2_argument_1 ?move_vehicle_no_traincar_instance_2_argument_3))
+		)
+	)
+
+	(:method method28
+		:parameters (?helper_move_traincar_instance_2_argument_0 - Traincar ?helper_move_traincar_instance_2_argument_1 - Train ?helper_move_traincar_instance_2_argument_2 - Location ?helper_move_traincar_instance_2_argument_3 - Location)
+		:task (move ?helper_move_traincar_instance_2_argument_0 ?helper_move_traincar_instance_2_argument_2 ?helper_move_traincar_instance_2_argument_3)
+		:subtasks (and
+		 (task0 (helper_move_traincar ?helper_move_traincar_instance_2_argument_0 ?helper_move_traincar_instance_2_argument_1 ?helper_move_traincar_instance_2_argument_2 ?helper_move_traincar_instance_2_argument_3))
+		)
+		:constraints (and
+			(not (= ?helper_move_traincar_instance_2_argument_2 ?helper_move_traincar_instance_2_argument_3))
+		)
+	)
+
+	(:method method29
+		:parameters (?detach_train_car_instance_5_argument_10 - Traincar ?detach_train_car_instance_5_argument_11 - Location ?detach_train_car_instance_5_argument_9 - Train ?move_instance_2_argument_1 - Location ?move_instance_4_argument_7 - Location)
+		:task (helper_move_traincar ?detach_train_car_instance_5_argument_10 ?detach_train_car_instance_5_argument_9 ?move_instance_4_argument_7 ?detach_train_car_instance_5_argument_11)
+		:subtasks (and
+		 (task0 (move ?detach_train_car_instance_5_argument_9 ?move_instance_2_argument_1 ?move_instance_4_argument_7))
+		 (task1 (attach_train_car ?detach_train_car_instance_5_argument_9 ?detach_train_car_instance_5_argument_10 ?move_instance_4_argument_7))
+		 (task2 (move ?detach_train_car_instance_5_argument_9 ?move_instance_4_argument_7 ?detach_train_car_instance_5_argument_11))
+		 (task3 (detach_train_car ?detach_train_car_instance_5_argument_9 ?detach_train_car_instance_5_argument_10 ?detach_train_car_instance_5_argument_11))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+		)
+		:constraints (and
+			(not (= ?move_instance_4_argument_7 ?detach_train_car_instance_5_argument_11))
+			(not (= ?move_instance_2_argument_1 ?move_instance_4_argument_7))
+		)
+	)
+
+	(:method method30
+		:parameters (?detach_train_car_instance_4_argument_6 - Train ?detach_train_car_instance_4_argument_7 - Traincar ?detach_train_car_instance_4_argument_8 - Location ?move_instance_3_argument_4 - Location)
+		:task (helper_move_traincar ?detach_train_car_instance_4_argument_7 ?detach_train_car_instance_4_argument_6 ?move_instance_3_argument_4 ?detach_train_car_instance_4_argument_8)
+		:subtasks (and
+		 (task0 (attach_train_car ?detach_train_car_instance_4_argument_6 ?detach_train_car_instance_4_argument_7 ?move_instance_3_argument_4))
+		 (task1 (move ?detach_train_car_instance_4_argument_6 ?move_instance_3_argument_4 ?detach_train_car_instance_4_argument_8))
+		 (task2 (detach_train_car ?detach_train_car_instance_4_argument_6 ?detach_train_car_instance_4_argument_7 ?detach_train_car_instance_4_argument_8))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+		:constraints (and
+			(not (= ?move_instance_3_argument_4 ?detach_train_car_instance_4_argument_8))
+		)
+	)
+
+	(:method method31
+		:parameters (?close_door_instance_4_argument_4 - Regular_Vehicle ?unload_package_instance_3_argument_1 - Regular_Package ?unload_package_instance_3_argument_3 - Location)
+		:task (unload ?unload_package_instance_3_argument_1 ?close_door_instance_4_argument_4 ?unload_package_instance_3_argument_3)
+		:precondition (and
+			(not (IsAirplain ?close_door_instance_4_argument_4))
+		)
+		:subtasks (and
+		 (task0 (open_door ?close_door_instance_4_argument_4))
+		 (task1 (unload_package ?unload_package_instance_3_argument_1 ?close_door_instance_4_argument_4 ?unload_package_instance_3_argument_3))
+		 (task2 (close_door ?close_door_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method32
+		:parameters (?pick_up_package_vehicle_instance_2_argument_2 - Flatbed_Vehicle ?put_down_package_ground_instance_3_argument_4 - Bulky ?put_down_package_ground_instance_3_argument_5 - Crane ?put_down_package_ground_instance_3_argument_6 - Location)
+		:task (unload ?put_down_package_ground_instance_3_argument_4 ?pick_up_package_vehicle_instance_2_argument_2 ?put_down_package_ground_instance_3_argument_6)
+		:subtasks (and
+		 (task0 (pick_up_package_vehicle ?put_down_package_ground_instance_3_argument_4 ?put_down_package_ground_instance_3_argument_5 ?pick_up_package_vehicle_instance_2_argument_2 ?put_down_package_ground_instance_3_argument_6))
+		 (task1 (put_down_package_ground ?put_down_package_ground_instance_3_argument_4 ?put_down_package_ground_instance_3_argument_5 ?put_down_package_ground_instance_3_argument_6))
+		)
+		:ordering (and
+			(< task0 task1)
+		)
+	)
+
+	(:method method33
+		:parameters (?disconnect_chute_instance_4_argument_4 - Hopper_Vehicle ?empty_hopper_instance_3_argument_1 - Package ?empty_hopper_instance_3_argument_3 - Location)
+		:task (unload ?empty_hopper_instance_3_argument_1 ?disconnect_chute_instance_4_argument_4 ?empty_hopper_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (connect_chute ?disconnect_chute_instance_4_argument_4))
+		 (task1 (empty_hopper ?empty_hopper_instance_3_argument_1 ?disconnect_chute_instance_4_argument_4 ?empty_hopper_instance_3_argument_3))
+		 (task2 (disconnect_chute ?disconnect_chute_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method34
+		:parameters (?disconnect_hose_instance_6_argument_7 - Tanker_Vehicle ?disconnect_hose_instance_6_argument_8 - Liquid ?empty_tank_instance_4_argument_5 - Location)
+		:task (unload ?disconnect_hose_instance_6_argument_8 ?disconnect_hose_instance_6_argument_7 ?empty_tank_instance_4_argument_5)
+		:subtasks (and
+		 (task0 (connect_hose ?disconnect_hose_instance_6_argument_7 ?disconnect_hose_instance_6_argument_8))
+		 (task1 (open_valve ?disconnect_hose_instance_6_argument_7))
+		 (task2 (empty_tank ?disconnect_hose_instance_6_argument_7 ?disconnect_hose_instance_6_argument_8 ?empty_tank_instance_4_argument_5))
+		 (task3 (close_valve ?disconnect_hose_instance_6_argument_7))
+		 (task4 (disconnect_hose ?disconnect_hose_instance_6_argument_7 ?disconnect_hose_instance_6_argument_8))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+			(< task3 task4)
+		)
+	)
+
+	(:method method35
+		:parameters (?raise_ramp_instance_5_argument_5 - Livestock_Vehicle ?unload_livestock_instance_3_argument_1 - Livestock_Package ?unload_livestock_instance_3_argument_3 - Location)
+		:task (unload ?unload_livestock_instance_3_argument_1 ?raise_ramp_instance_5_argument_5 ?unload_livestock_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (lower_ramp ?raise_ramp_instance_5_argument_5))
+		 (task1 (unload_livestock ?unload_livestock_instance_3_argument_1 ?raise_ramp_instance_5_argument_5 ?unload_livestock_instance_3_argument_3))
+		 (task2 (do_clean_interior ?raise_ramp_instance_5_argument_5))
+		 (task3 (raise_ramp ?raise_ramp_instance_5_argument_5))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+		)
+	)
+
+	(:method method36
+		:parameters (?raise_ramp_instance_4_argument_4 - Auto_Vehicle ?unload_cars_instance_3_argument_1 - Cars ?unload_cars_instance_3_argument_3 - Location)
+		:task (unload ?unload_cars_instance_3_argument_1 ?raise_ramp_instance_4_argument_4 ?unload_cars_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (lower_ramp ?raise_ramp_instance_4_argument_4))
+		 (task1 (unload_cars ?unload_cars_instance_3_argument_1 ?raise_ramp_instance_4_argument_4 ?unload_cars_instance_3_argument_3))
+		 (task2 (raise_ramp ?raise_ramp_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method37
+		:parameters (?detach_conveyor_ramp_instance_6_argument_10 - Location ?detach_conveyor_ramp_instance_6_argument_8 - Airplane ?detach_conveyor_ramp_instance_6_argument_9 - Plane_Ramp ?unload_package_instance_4_argument_4 - Package)
+		:task (unload ?unload_package_instance_4_argument_4 ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_10)
+		:subtasks (and
+		 (task0 (attach_conveyor_ramp ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_9 ?detach_conveyor_ramp_instance_6_argument_10))
+		 (task1 (open_door ?detach_conveyor_ramp_instance_6_argument_8))
+		 (task2 (unload_package ?unload_package_instance_4_argument_4 ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_10))
+		 (task3 (close_door ?detach_conveyor_ramp_instance_6_argument_8))
+		 (task4 (detach_conveyor_ramp ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_9 ?detach_conveyor_ramp_instance_6_argument_10))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+			(< task3 task4)
+		)
+	)
+
+	(:method method38
+		:parameters (?load_instance_2_argument_0 - Package ?load_instance_2_argument_1 - Vehicle ?load_instance_2_argument_2 - Location)
+		:task (load_top ?load_instance_2_argument_0 ?load_instance_2_argument_1 ?load_instance_2_argument_2)
+		:precondition (and
+			(not (ValuableOrHazardous ?load_instance_2_argument_0))
+		)
+		:subtasks (and
+		 (task0 (load ?load_instance_2_argument_0 ?load_instance_2_argument_1 ?load_instance_2_argument_2))
+		)
+	)
+
+	(:method method39
+		:parameters (?load_instance_3_argument_1 - Hazardous ?load_instance_3_argument_2 - Vehicle ?load_instance_3_argument_3 - Location)
+		:task (load_top ?load_instance_3_argument_1 ?load_instance_3_argument_2 ?load_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (affix_warning_signs ?load_instance_3_argument_2))
+		 (task1 (load ?load_instance_3_argument_1 ?load_instance_3_argument_2 ?load_instance_3_argument_3))
+		)
+		:ordering (and
+			(< task0 task1)
+		)
+	)
+
+	(:method method40
+		:parameters (?load_instance_3_argument_1 - Valuable ?load_instance_3_argument_3 - Location ?post_guard_inside_instance_4_argument_4 - Armored_Vehicle)
+		:task (load_top ?load_instance_3_argument_1 ?post_guard_inside_instance_4_argument_4 ?load_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (post_guard_outside ?post_guard_inside_instance_4_argument_4))
+		 (task1 (load ?load_instance_3_argument_1 ?post_guard_inside_instance_4_argument_4 ?load_instance_3_argument_3))
+		 (task2 (post_guard_inside ?post_guard_inside_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method41
+		:parameters (?unload_instance_2_argument_0 - Package ?unload_instance_2_argument_1 - Vehicle ?unload_instance_2_argument_2 - Location)
+		:task (unload_top ?unload_instance_2_argument_0 ?unload_instance_2_argument_1 ?unload_instance_2_argument_2)
+		:precondition (and
+			(not (ValuableOrHazardous ?unload_instance_2_argument_0))
+		)
+		:subtasks (and
+		 (task0 (unload ?unload_instance_2_argument_0 ?unload_instance_2_argument_1 ?unload_instance_2_argument_2))
+		)
+	)
+
+	(:method method42
+		:parameters (?unload_instance_2_argument_0 - Hazardous ?unload_instance_2_argument_1 - Vehicle ?unload_instance_2_argument_2 - Location)
+		:task (unload_top ?unload_instance_2_argument_0 ?unload_instance_2_argument_1 ?unload_instance_2_argument_2)
+		:subtasks (and
+		 (task0 (unload ?unload_instance_2_argument_0 ?unload_instance_2_argument_1 ?unload_instance_2_argument_2))
+		 (task1 (decontaminate_interior ?unload_instance_2_argument_1))
+		 (task2 (remove_warning_signs ?unload_instance_2_argument_1))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method43
+		:parameters (?unload_instance_3_argument_1 - Valuable ?unload_instance_3_argument_2 - Armored_Vehicle ?unload_instance_3_argument_3 - Location)
+		:task (unload_top ?unload_instance_3_argument_1 ?unload_instance_3_argument_2 ?unload_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (post_guard_outside ?unload_instance_3_argument_2))
+		 (task1 (unload ?unload_instance_3_argument_1 ?unload_instance_3_argument_2 ?unload_instance_3_argument_3))
+		 (task2 (remove_guard ?unload_instance_3_argument_2))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method44
+		:parameters (?close_door_instance_4_argument_4 - Regular_Vehicle ?load_package_instance_3_argument_1 - Regular_Package ?load_package_instance_3_argument_3 - Location)
+		:task (load ?load_package_instance_3_argument_1 ?close_door_instance_4_argument_4 ?load_package_instance_3_argument_3)
+		:precondition (and
+			(not (IsAirplain ?close_door_instance_4_argument_4))
+		)
+		:subtasks (and
+		 (task0 (open_door ?close_door_instance_4_argument_4))
+		 (task1 (load_package ?load_package_instance_3_argument_1 ?close_door_instance_4_argument_4 ?load_package_instance_3_argument_3))
+		 (task2 (close_door ?close_door_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method45
+		:parameters (?put_down_package_vehicle_instance_3_argument_3 - Bulky ?put_down_package_vehicle_instance_3_argument_4 - Crane ?put_down_package_vehicle_instance_3_argument_5 - Flatbed_Vehicle ?put_down_package_vehicle_instance_3_argument_6 - Location)
+		:task (load ?put_down_package_vehicle_instance_3_argument_3 ?put_down_package_vehicle_instance_3_argument_5 ?put_down_package_vehicle_instance_3_argument_6)
+		:subtasks (and
+		 (task0 (pick_up_package_ground ?put_down_package_vehicle_instance_3_argument_3 ?put_down_package_vehicle_instance_3_argument_4 ?put_down_package_vehicle_instance_3_argument_6))
+		 (task1 (put_down_package_vehicle ?put_down_package_vehicle_instance_3_argument_3 ?put_down_package_vehicle_instance_3_argument_4 ?put_down_package_vehicle_instance_3_argument_5 ?put_down_package_vehicle_instance_3_argument_6))
+		)
+		:ordering (and
+			(< task0 task1)
+		)
+	)
+
+	(:method method46
+		:parameters (?disconnect_chute_instance_4_argument_4 - Hopper_Vehicle ?fill_hopper_instance_3_argument_1 - Package ?fill_hopper_instance_3_argument_3 - Location)
+		:task (load ?fill_hopper_instance_3_argument_1 ?disconnect_chute_instance_4_argument_4 ?fill_hopper_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (connect_chute ?disconnect_chute_instance_4_argument_4))
+		 (task1 (fill_hopper ?fill_hopper_instance_3_argument_1 ?disconnect_chute_instance_4_argument_4 ?fill_hopper_instance_3_argument_3))
+		 (task2 (disconnect_chute ?disconnect_chute_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method47
+		:parameters (?disconnect_hose_instance_6_argument_7 - Tanker_Vehicle ?disconnect_hose_instance_6_argument_8 - Liquid ?fill_tank_instance_4_argument_5 - Location)
+		:task (load ?disconnect_hose_instance_6_argument_8 ?disconnect_hose_instance_6_argument_7 ?fill_tank_instance_4_argument_5)
+		:subtasks (and
+		 (task0 (connect_hose ?disconnect_hose_instance_6_argument_7 ?disconnect_hose_instance_6_argument_8))
+		 (task1 (open_valve ?disconnect_hose_instance_6_argument_7))
+		 (task2 (fill_tank ?disconnect_hose_instance_6_argument_7 ?disconnect_hose_instance_6_argument_8 ?fill_tank_instance_4_argument_5))
+		 (task3 (close_valve ?disconnect_hose_instance_6_argument_7))
+		 (task4 (disconnect_hose ?disconnect_hose_instance_6_argument_7 ?disconnect_hose_instance_6_argument_8))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+			(< task3 task4)
+		)
+	)
+
+	(:method method48
+		:parameters (?load_livestock_instance_4_argument_2 - Livestock_Package ?load_livestock_instance_4_argument_4 - Location ?raise_ramp_instance_5_argument_5 - Livestock_Vehicle)
+		:task (load ?load_livestock_instance_4_argument_2 ?raise_ramp_instance_5_argument_5 ?load_livestock_instance_4_argument_4)
+		:subtasks (and
+		 (task0 (lower_ramp ?raise_ramp_instance_5_argument_5))
+		 (task1 (fill_trough ?raise_ramp_instance_5_argument_5))
+		 (task2 (load_livestock ?load_livestock_instance_4_argument_2 ?raise_ramp_instance_5_argument_5 ?load_livestock_instance_4_argument_4))
+		 (task3 (raise_ramp ?raise_ramp_instance_5_argument_5))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+		)
+	)
+
+	(:method method49
+		:parameters (?load_cars_instance_3_argument_1 - Cars ?load_cars_instance_3_argument_3 - Location ?raise_ramp_instance_4_argument_4 - Auto_Vehicle)
+		:task (load ?load_cars_instance_3_argument_1 ?raise_ramp_instance_4_argument_4 ?load_cars_instance_3_argument_3)
+		:subtasks (and
+		 (task0 (lower_ramp ?raise_ramp_instance_4_argument_4))
+		 (task1 (load_cars ?load_cars_instance_3_argument_1 ?raise_ramp_instance_4_argument_4 ?load_cars_instance_3_argument_3))
+		 (task2 (raise_ramp ?raise_ramp_instance_4_argument_4))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+		)
+	)
+
+	(:method method50
+		:parameters (?detach_conveyor_ramp_instance_6_argument_10 - Location ?detach_conveyor_ramp_instance_6_argument_8 - Airplane ?detach_conveyor_ramp_instance_6_argument_9 - Plane_Ramp ?load_package_instance_4_argument_4 - Regular_Package)
+		:task (load ?load_package_instance_4_argument_4 ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_10)
+		:subtasks (and
+		 (task0 (attach_conveyor_ramp ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_9 ?detach_conveyor_ramp_instance_6_argument_10))
+		 (task1 (open_door ?detach_conveyor_ramp_instance_6_argument_8))
+		 (task2 (load_package ?load_package_instance_4_argument_4 ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_10))
+		 (task3 (close_door ?detach_conveyor_ramp_instance_6_argument_8))
+		 (task4 (detach_conveyor_ramp ?detach_conveyor_ramp_instance_6_argument_8 ?detach_conveyor_ramp_instance_6_argument_9 ?detach_conveyor_ramp_instance_6_argument_10))
+		)
+		:ordering (and
+			(< task0 task1)
+			(< task1 task2)
+			(< task2 task3)
+			(< task3 task4)
+		)
+	)
+
+	(:action affix_warning_signs
+		:parameters (?fws_v - Vehicle)
+		:precondition
+			(and
+				(not (Warning_Signs_Affixed ?fws_v))
+			)
+		:effect
+			(and
+				(Warning_Signs_Affixed ?fws_v)
+			)
+	)
+
+	(:action attach_conveyor_ramp
+		:parameters (?acr_ap - Airplane ?acr_pr - Plane_Ramp ?acr_l - Location)
+		:precondition
+			(and
+				(Available ?acr_pr)
+				(At_Equipment ?acr_pr ?acr_l)
+				(At_Vehicle ?acr_ap ?acr_l)
+			)
+		:effect
+			(and
+				(Ramp_Connected ?acr_pr ?acr_ap)
+				(not (Available ?acr_pr))
+			)
+	)
+
+	(:action attach_train_car
+		:parameters (?atc_t - Train ?atc_tc - Traincar ?atc_l - Location)
+		:precondition
+			(and
+				(At_Vehicle ?atc_tc ?atc_l)
+				(At_Vehicle ?atc_t ?atc_l)
+				(not (Connected_To ?atc_tc ?atc_t))
+			)
+		:effect
+			(and
+				(Connected_To ?atc_tc ?atc_t)
+				(not (At_Vehicle ?atc_tc ?atc_l))
+			)
+	)
+
+	(:action close_door
+		:parameters (?cd_rv - Regular_Vehicle)
+		:precondition
+			(and
+				(Door_Open ?cd_rv)
+			)
+		:effect
+			(and
+				(not (Door_Open ?cd_rv))
+			)
+	)
+
+	(:action close_valve
+		:parameters (?cv_tv - Tanker_Vehicle)
+		:precondition
+			(and
+				(Valve_Open ?cv_tv)
+			)
+		:effect
+			(and
+				(not (Valve_Open ?cv_tv))
+			)
+	)
+
+	(:action collect_fees
+		:parameters (?cf_p - Package)
+		:precondition
+			(and
+				(not (Fees_Collected ?cf_p))
+			)
+		:effect
+			(and
+				(Fees_Collected ?cf_p)
+			)
+	)
+
+	(:action collect_insurance
+		:parameters (?ci_v - Valuable)
+		:precondition
+			(and
+				(not (Insured ?ci_v))
+			)
+		:effect
+			(and
+				(Insured ?ci_v)
+			)
+	)
+
+	(:action connect_chute
+		:parameters (?cc_h - Hopper_Vehicle)
+		:precondition
+			(and
+				(not (Chute_Connected ?cc_h))
+			)
+		:effect
+			(and
+				(Chute_Connected ?cc_h)
+			)
+	)
+
+	(:action connect_hose
+		:parameters (?ch_tv - Tanker_Vehicle ?ch_l - Liquid)
+		:precondition
+			(and
+				(not (Hose_Connected ?ch_tv ?ch_l))
+			)
+		:effect
+			(and
+				(Hose_Connected ?ch_tv ?ch_l)
+			)
+	)
+
+	(:action decontaminate_interior
+		:parameters (?di_v - Vehicle)
+		:precondition ()
+		:effect
+			(and
+				(Decontaminated_Interior ?di_v)
+			)
+	)
+
+	(:action deliver_h
+		:parameters (?dh_h - Hazardous)
+		:precondition
+			(and
+				(Fees_Collected ?dh_h)
+				(Have_Permit ?dh_h)
+			)
+		:effect
+			(and
+				(not (Have_Permit ?dh_h))
+				(not (Fees_Collected ?dh_h))
+				(Delivered ?dh_h)
+			)
+	)
+
+	(:action deliver_p
+		:parameters (?dp_p - Package)
+		:precondition
+			(and
+				(Fees_Collected ?dp_p)
+			)
+		:effect
+			(and
+				(not (Fees_Collected ?dp_p))
+				(Delivered ?dp_p)
+			)
+	)
+
+	(:action deliver_v
+		:parameters (?dv_v - Valuable)
+		:precondition
+			(and
+				(Fees_Collected ?dv_v)
+				(Insured ?dv_v)
+			)
+		:effect
+			(and
+				(not (Fees_Collected ?dv_v))
+				(not (Insured ?dv_v))
+				(Delivered ?dv_v)
+			)
+	)
+
+	(:action detach_conveyor_ramp
+		:parameters (?dcr_ap - Airplane ?dcr_pr - Plane_Ramp ?dcr_l - Location)
+		:precondition
+			(and
+				(Ramp_Connected ?dcr_pr ?dcr_ap)
+				(At_Equipment ?dcr_pr ?dcr_l)
+				(At_Vehicle ?dcr_ap ?dcr_l)
+			)
+		:effect
+			(and
+				(Available ?dcr_pr)
+				(not (Ramp_Connected ?dcr_pr ?dcr_ap))
+			)
+	)
+
+	(:action detach_train_car
+		:parameters (?dtc_t - Train ?dtc_tc - Traincar ?dtc_l - Location)
+		:precondition
+			(and
+				(At_Vehicle ?dtc_t ?dtc_l)
+				(Connected_To ?dtc_tc ?dtc_t)
+			)
+		:effect
+			(and
+				(At_Vehicle ?dtc_tc ?dtc_l)
+				(not (Connected_To ?dtc_tc ?dtc_t))
+			)
+	)
+
+	(:action disconnect_chute
+		:parameters (?dc_h - Hopper_Vehicle)
+		:precondition
+			(and
+				(Chute_Connected ?dc_h)
+			)
+		:effect
+			(and
+				(not (Chute_Connected ?dc_h))
+			)
+	)
+
+	(:action disconnect_hose
+		:parameters (?dch_tv - Tanker_Vehicle ?dch_l - Liquid)
+		:precondition
+			(and
+				(Hose_Connected ?dch_tv ?dch_l)
+			)
+		:effect
+			(and
+				(not (Hose_Connected ?dch_tv ?dch_l))
+			)
+	)
+
+	(:action do_clean_interior
+		:parameters (?cli_v - Vehicle)
+		:precondition ()
+		:effect
+			(and
+				(Clean_Interior ?cli_v)
+			)
+	)
+
+	(:action empty_hopper
+		:parameters (?eh_p - Package ?eh_hv - Hopper_Vehicle ?eh_l - Location)
+		:precondition
+			(and
+				(Chute_Connected ?eh_hv)
+				(At_Vehicle ?eh_hv ?eh_l)
+				(At_Package ?eh_p ?eh_hv)
+			)
+		:effect
+			(and
+				(At_Package ?eh_p ?eh_l)
+				(not (At_Package ?eh_p ?eh_hv))
+			)
+	)
+
+	(:action empty_tank
+		:parameters (?et_tv - Tanker_Vehicle ?et_li - Liquid ?et_lo - Location)
+		:precondition
+			(and
+				(Hose_Connected ?et_tv ?et_li)
+				(Valve_Open ?et_tv)
+				(At_Package ?et_li ?et_tv)
+				(At_Vehicle ?et_tv ?et_lo)
+			)
+		:effect
+			(and
+				(At_Package ?et_li ?et_lo)
+				(not (At_Package ?et_li ?et_tv))
+			)
+	)
+
+	(:action fill_hopper
+		:parameters (?fh_p - Package ?fh_hv - Hopper_Vehicle ?fh_l - Location)
+		:precondition
+			(and
+				(Chute_Connected ?fh_hv)
+				(At_Vehicle ?fh_hv ?fh_l)
+				(At_Package ?fh_p ?fh_l)
+				(PV_Compatible ?fh_p ?fh_hv)
+			)
+		:effect
+			(and
+				(At_Package ?fh_p ?fh_hv)
+				(not (At_Package ?fh_p ?fh_l))
+			)
+	)
+
+	(:action fill_tank
+		:parameters (?ft_tv - Tanker_Vehicle ?ft_li - Liquid ?ft_lo - Location)
+		:precondition
+			(and
+				(Hose_Connected ?ft_tv ?ft_li)
+				(Valve_Open ?ft_tv)
+				(At_Package ?ft_li ?ft_lo)
+				(At_Vehicle ?ft_tv ?ft_lo)
+				(PV_Compatible ?ft_li ?ft_tv)
+			)
+		:effect
+			(and
+				(At_Package ?ft_li ?ft_tv)
+				(not (At_Package ?ft_li ?ft_lo))
+			)
+	)
+
+	(:action fill_trough
+		:parameters (?ftr_v - Livestock_Vehicle)
+		:precondition ()
+		:effect
+			(and
+				(Trough_Full ?ftr_v)
+			)
+	)
+
+	(:action go_through_tcenter_cc
+		:parameters (?gttc_lo - Not_TCenter ?gttc_ld - Not_TCenter ?gttc_co - City ?gttc_cd - City ?gttc_tc - TCenter)
+		:precondition
+			(and
+				(In_City ?gttc_lo ?gttc_co)
+				(In_City ?gttc_ld ?gttc_cd)
+				(Serves ?gttc_tc ?gttc_co)
+				(Serves ?gttc_tc ?gttc_cd)
+				(Available ?gttc_tc)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters
+		:parameters (?gtttc_to - TCenter ?gtttc_td - TCenter)
+		:precondition
+			(and
+				(Available ?gtttc_to)
+				(Available ?gtttc_td)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters_cities_otd
+		:parameters (?gtttccotd_ld - Not_TCenter ?gtttccotd_co - City ?gtttccotd_cd - City ?gtttccotd_to - TCenter ?gtttccotd_t1 - TCenter)
+		:precondition
+			(and
+				(In_City ?gtttccotd_to ?gtttccotd_co)
+				(In_City ?gtttccotd_ld ?gtttccotd_cd)
+				(Serves ?gtttccotd_t1 ?gtttccotd_cd)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters_cities_ott
+		:parameters (?gtttccott_ld - City_Location ?gtttccott_co - City ?gtttccott_cd - City ?gtttccott_to - TCenter ?gtttccott_td - TCenter)
+		:precondition
+			(and
+				(In_City ?gtttccott_ld ?gtttccott_co)
+				(In_City ?gtttccott_td ?gtttccott_cd)
+				(Serves ?gtttccott_to ?gtttccott_co)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters_cities_ottd
+		:parameters (?gtttcc_lo - Not_TCenter ?gtttcc_ld - Not_TCenter ?gtttcc_co - City ?gtttcc_cd - City ?gtttcc_t1 - TCenter ?gtttcc_t2 - TCenter)
+		:precondition
+			(and
+				(In_City ?gtttcc_lo ?gtttcc_co)
+				(In_City ?gtttcc_ld ?gtttcc_cd)
+				(Serves ?gtttcc_t1 ?gtttcc_co)
+				(Serves ?gtttcc_t2 ?gtttcc_cd)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters_tt
+		:parameters (?gtttctt_to - TCenter ?gtttctt_td - TCenter ?gtttctt_co - City ?gtttctt_cd - City)
+		:precondition
+			(and
+				(In_City ?gtttctt_to ?gtttctt_co)
+				(In_City ?gtttctt_td ?gtttctt_cd)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters_via_hub_hazardous
+		:parameters (?gtttcvhh_to - TCenter ?gtttcvhh_td - TCenter ?gtttcvhh_h - Hub ?gtttcvhh_co - City ?gtttcvhh_ch - City ?gtttcvhh_cd - City ?gtttcvhh_ro - Region ?gtttcvhh_rd - Region)
+		:precondition
+			(and
+				(Available ?gtttcvhh_to)
+				(Available ?gtttcvhh_td)
+				(In_City ?gtttcvhh_h ?gtttcvhh_ch)
+				(City_Hazardous_Compatible ?gtttcvhh_ch)
+				(In_City ?gtttcvhh_to ?gtttcvhh_co)
+				(In_City ?gtttcvhh_td ?gtttcvhh_cd)
+				(In_Region ?gtttcvhh_co ?gtttcvhh_ro)
+				(In_Region ?gtttcvhh_cd ?gtttcvhh_rd)
+				(Serves ?gtttcvhh_h ?gtttcvhh_ro)
+				(Serves ?gtttcvhh_h ?gtttcvhh_rd)
+				(Available ?gtttcvhh_h)
+			)
+		:effect ()
+	)
+
+	(:action go_through_two_tcenters_via_hub_not_hazardous
+		:parameters (?gtttcvhnh_to - TCenter ?gtttcvhnh_td - TCenter ?gtttcvhnh_co - City ?gtttcvhnh_cd - City ?gtttcvhnh_ro - Region ?gtttcvhnh_rd - Region ?gtttcvhnh_h - Hub)
+		:precondition
+			(and
+				(Available ?gtttcvhnh_to)
+				(Available ?gtttcvhnh_td)
+				(In_City ?gtttcvhnh_to ?gtttcvhnh_co)
+				(In_City ?gtttcvhnh_td ?gtttcvhnh_cd)
+				(In_Region ?gtttcvhnh_co ?gtttcvhnh_ro)
+				(In_Region ?gtttcvhnh_cd ?gtttcvhnh_rd)
+				(Serves ?gtttcvhnh_h ?gtttcvhnh_ro)
+				(Serves ?gtttcvhnh_h ?gtttcvhnh_rd)
+				(Available ?gtttcvhnh_h)
+			)
+		:effect ()
+	)
+
+	(:action load_cars
+		:parameters (?lc_c - Cars ?lc_v - Auto_Vehicle ?lc_l - Location)
+		:precondition
+			(and
+				(At_Package ?lc_c ?lc_l)
+				(At_Vehicle ?lc_v ?lc_l)
+				(Ramp_Down ?lc_v)
+				(PV_Compatible ?lc_c ?lc_v)
+			)
+		:effect
+			(and
+				(At_Package ?lc_c ?lc_v)
+				(not (At_Package ?lc_c ?lc_l))
+			)
+	)
+
+	(:action load_livestock
+		:parameters (?ll_p - Livestock_Package ?ll_v - Livestock_Vehicle ?ll_l - Location)
+		:precondition
+			(and
+				(At_Package ?ll_p ?ll_l)
+				(At_Vehicle ?ll_v ?ll_l)
+				(Ramp_Down ?ll_v)
+				(PV_Compatible ?ll_p ?ll_v)
+			)
+		:effect
+			(and
+				(At_Package ?ll_p ?ll_v)
+				(not (At_Package ?ll_p ?ll_l))
+				(not (Clean_Interior ?ll_v))
+			)
+	)
+
+	(:action load_package
+		:parameters (?lp_p - Package ?lp_v - Vehicle ?lp_l - Location)
+		:precondition
+			(and
+				(At_Package ?lp_p ?lp_l)
+				(At_Vehicle ?lp_v ?lp_l)
+				(PV_Compatible ?lp_p ?lp_v)
+			)
+		:effect
+			(and
+				(At_Package ?lp_p ?lp_v)
+				(not (At_Package ?lp_p ?lp_l))
+			)
+	)
+
+	(:action lower_ramp
+		:parameters (?lr_v - Vehicle)
+		:precondition
+			(and
+				(not (Ramp_Down ?lr_v))
+			)
+		:effect
+			(and
+				(Ramp_Down ?lr_v)
+			)
+	)
+
+	(:action move_vehicle_no_traincar
+		:parameters (?hmnt_v - Vehicle ?hmnt_o - Location ?hmnt_r - Route ?hmnt_d - Location)
+		:precondition
+			(and
+				(Connects ?hmnt_r ?hmnt_o ?hmnt_d)
+				(Available ?hmnt_v)
+				(Available ?hmnt_r)
+				(RV_Compatible ?hmnt_r ?hmnt_v)
+				(At_Vehicle ?hmnt_v ?hmnt_o)
+			)
+		:effect
+			(and
+				(At_Vehicle ?hmnt_v ?hmnt_d)
+				(not (At_Vehicle ?hmnt_v ?hmnt_o))
+			)
+	)
+
+	(:action obtain_permit
+		:parameters (?op_h - Hazardous)
+		:precondition
+			(and
+				(not (Have_Permit ?op_h))
+			)
+		:effect
+			(and
+				(Have_Permit ?op_h)
+			)
+	)
+
+	(:action open_door
+		:parameters (?od_rv - Regular_Vehicle)
+		:precondition
+			(and
+				(not (Door_Open ?od_rv))
+			)
+		:effect
+			(and
+				(Door_Open ?od_rv)
+			)
+	)
+
+	(:action open_valve
+		:parameters (?ov_tv - Tanker_Vehicle)
+		:precondition
+			(and
+				(not (Valve_Open ?ov_tv))
+			)
+		:effect
+			(and
+				(Valve_Open ?ov_tv)
+			)
+	)
+
+	(:action pick_up_package_ground
+		:parameters (?pupg_p - Package ?pupg_c - Crane ?pupg_l - Location)
+		:precondition
+			(and
+				(Empty ?pupg_c)
+				(Available ?pupg_c)
+				(At_Equipment ?pupg_c ?pupg_l)
+				(At_Package ?pupg_p ?pupg_l)
+			)
+		:effect
+			(and
+				(At_Package ?pupg_p ?pupg_c)
+				(not (Empty ?pupg_c))
+				(not (At_Package ?pupg_p ?pupg_l))
+			)
+	)
+
+	(:action pick_up_package_vehicle
+		:parameters (?pupv_p - Package ?pupv_c - Crane ?pupv_fv - Flatbed_Vehicle ?pupv_l - Location)
+		:precondition
+			(and
+				(Empty ?pupv_c)
+				(Available ?pupv_c)
+				(At_Equipment ?pupv_c ?pupv_l)
+				(At_Package ?pupv_p ?pupv_fv)
+				(At_Vehicle ?pupv_fv ?pupv_l)
+			)
+		:effect
+			(and
+				(At_Package ?pupv_p ?pupv_c)
+				(not (Empty ?pupv_c))
+				(not (At_Package ?pupv_p ?pupv_fv))
+			)
+	)
+
+	(:action post_guard_inside
+		:parameters (?pci_a - Armored)
+		:precondition ()
+		:effect
+			(and
+				(Guard_Inside ?pci_a)
+				(not (Guard_Outside ?pci_a))
+			)
+	)
+
+	(:action post_guard_outside
+		:parameters (?pco_a - Armored)
+		:precondition ()
+		:effect
+			(and
+				(Guard_Outside ?pco_a)
+				(not (Guard_Inside ?pco_a))
+			)
+	)
+
+	(:action put_down_package_ground
+		:parameters (?pdpg_p - Package ?pdpg_c - Crane ?pdpg_l - Location)
+		:precondition
+			(and
+				(Available ?pdpg_c)
+				(At_Equipment ?pdpg_c ?pdpg_l)
+				(At_Package ?pdpg_p ?pdpg_c)
+			)
+		:effect
+			(and
+				(At_Package ?pdpg_p ?pdpg_l)
+				(Empty ?pdpg_c)
+				(not (At_Package ?pdpg_p ?pdpg_c))
+			)
+	)
+
+	(:action put_down_package_vehicle
+		:parameters (?pdpv_p - Package ?pdpv_c - Crane ?pdpv_fv - Flatbed_Vehicle ?pdpv_l - Location)
+		:precondition
+			(and
+				(Available ?pdpv_c)
+				(At_Package ?pdpv_p ?pdpv_c)
+				(At_Equipment ?pdpv_c ?pdpv_l)
+				(At_Vehicle ?pdpv_fv ?pdpv_l)
+				(PV_Compatible ?pdpv_p ?pdpv_fv)
+			)
+		:effect
+			(and
+				(Empty ?pdpv_c)
+				(At_Package ?pdpv_p ?pdpv_fv)
+				(not (At_Package ?pdpv_p ?pdpv_c))
+			)
+	)
+
+	(:action raise_ramp
+		:parameters (?rr_v - Vehicle)
+		:precondition
+			(and
+				(Ramp_Down ?rr_v)
+			)
+		:effect
+			(and
+				(not (Ramp_Down ?rr_v))
+			)
+	)
+
+	(:action remove_guard
+		:parameters (?mc_a - Armored)
+		:precondition ()
+		:effect
+			(and
+				(not (Guard_Outside ?mc_a))
+				(not (Guard_Inside ?mc_a))
+			)
+	)
+
+	(:action remove_warning_signs
+		:parameters (?mws_v - Vehicle)
+		:precondition
+			(and
+				(Warning_Signs_Affixed ?mws_v)
+			)
+		:effect
+			(and
+				(not (Warning_Signs_Affixed ?mws_v))
+			)
+	)
+
+	(:action unload_cars
+		:parameters (?uc_c - Cars ?uc_v - Auto_Vehicle ?uc_l - Location)
+		:precondition
+			(and
+				(At_Package ?uc_c ?uc_v)
+				(At_Vehicle ?uc_v ?uc_l)
+				(Ramp_Down ?uc_v)
+			)
+		:effect
+			(and
+				(At_Package ?uc_c ?uc_l)
+				(not (At_Package ?uc_c ?uc_v))
+			)
+	)
+
+	(:action unload_livestock
+		:parameters (?ull_p - Livestock_Package ?ull_v - Livestock_Vehicle ?ull_l - Location)
+		:precondition
+			(and
+				(At_Package ?ull_p ?ull_v)
+				(At_Vehicle ?ull_v ?ull_l)
+				(Ramp_Down ?ull_v)
+			)
+		:effect
+			(and
+				(At_Package ?ull_p ?ull_l)
+				(not (At_Package ?ull_p ?ull_v))
+				(not (Trough_Full ?ull_v))
+			)
+	)
+
+	(:action unload_package
+		:parameters (?up_p - Package ?up_v - Vehicle ?up_l - Location)
+		:precondition
+			(and
+				(At_Package ?up_p ?up_v)
+				(At_Vehicle ?up_v ?up_l)
+			)
+		:effect
+			(and
+				(At_Package ?up_p ?up_l)
+				(not (At_Package ?up_p ?up_v))
+			)
+	)
+)

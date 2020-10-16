@@ -1,0 +1,124 @@
+(define (domain gripper)
+
+    (:requirements
+          :strips
+          :typing
+          :hierarchy
+          :method-preconditions
+          :negative-preconditions
+          :equality
+    )
+
+   (:types room ball gripper)
+
+   (:constants left right - gripper)
+
+   (:predicates (at-robby ?r - room)
+		(at ?b - ball ?r - room)
+		(free ?g - gripper)
+		(carry ?o - ball ?g - gripper))
+
+   (:task move_two_balls
+        :parameters (?b1 ?b2 - ball ?r)
+   )
+
+   (:task move_one_ball
+      :parameters (?b - ball ?r - room)
+   )
+
+   (:task goto
+        :parameters (?r - room)
+   )
+
+   (:action move
+       :parameters  (?from ?to - room)
+       :precondition (at-robby ?from)
+       :effect (and  (at-robby ?to)
+		     (not (at-robby ?from))))
+
+   (:action pick
+       :parameters (?obj - ball ?room - room ?gripper - gripper)
+       :precondition  (and  (at ?obj ?room) (at-robby ?room) (free ?gripper))
+       :effect (and (carry ?obj ?gripper)
+		    (not (at ?obj ?room))
+		    (not (free ?gripper))))
+
+
+   (:action drop
+       :parameters  (?obj - ball ?room - room ?gripper - gripper)
+       :precondition  (and  (carry ?obj ?gripper) (at-robby ?room))
+       :effect (and (at ?obj ?room)
+		    (free ?gripper)
+		    (not (carry ?obj ?gripper))))
+
+
+
+;------------------------------------------------------------------
+;                               Methods
+;------------------------------------------------------------------
+;                             Move balls
+;------------------------------------------------------------------
+
+    (:method move_two_balls_0
+        :parameters   (?b1 ?b2 - ball ?r ?rb - room ?g1 ?g2 - gripper)
+        :task (move_two_balls ?b1 ?b2 ?r)
+        :precondition (and
+            (at ?b1 ?rb)
+            (at ?b2 ?rb)
+        )
+        :ordered-subtasks (and
+            (goto ?rb)
+            (pick ?b1 ?rb ?g1)
+            (pick ?b2 ?rb ?g2)
+            (move ?rb ?r)
+            (drop ?b1 ?r ?g1)
+            (drop ?b2 ?r ?g2)
+        )
+    )
+
+
+
+;------------------------------------------------------------------
+;                             Move one ball
+;------------------------------------------------------------------
+
+    (:method move_one_ball_0
+        :parameters   (?b - ball ?r ?rb - room ?g - gripper)
+        :task (move_one_ball ?b ?r)
+        :precondition (and
+                    (at ?b ?rb)
+                )
+        :ordered-subtasks (and
+             (goto ?rb)
+             (pick ?b ?rb ?g)
+             (move ?rb ?r)
+             (drop ?b ?r ?g)
+        )
+    )
+
+;------------------------------------------------------------------
+;                        Go to a specific room
+;------------------------------------------------------------------
+    (:method goto_0
+        :parameters (?r - room)
+        :task (goto ?r)
+        :precondition (and
+            (at-robby ?r)
+        )
+        :ordered-subtasks ()
+    )
+
+    (:method goto_1
+        :parameters (?r ?from - room)
+        :task (goto ?r)
+        :precondition (and
+             (at-robby ?from)
+             (not (= ?from ?r))
+        )
+        :ordered-subtasks (and
+            (move ?from ?r)
+        )
+
+    )
+
+)

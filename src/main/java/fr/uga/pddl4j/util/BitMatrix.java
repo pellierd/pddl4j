@@ -34,7 +34,7 @@ import java.util.List;
  * <li>26.06.2020: Change for bit vector intern representation.</li>
  * </ul>
  * </p>
- * 
+ *
  * @author D. Pellier
  * @version 1.0 - 09.09.2020
  */

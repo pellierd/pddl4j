@@ -113,10 +113,12 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                     }
                     return super.extractPlan(currentNode, problem);
                 }  else {
-                    Plan p = super.extractPlan(currentNode, problem);
-                    System.out.println("\nFound plan as follows:\n" + problem.toString(p));
-                    System.out.println(" But plan does does not reach the goal:\n");
-                    System.out.println(problem.toString(problem.getGoal()) + "\n");
+                    if (this.getTraceLevel() == 10) {
+                        Plan p = super.extractPlan(currentNode, problem);
+                        System.out.println("\nFound plan as follows:\n" + problem.toString(p));
+                        System.out.println(" But plan does does not reach the goal:\n");
+                        System.out.println(problem.toString(problem.getGoal()) + "\n");
+                    }
                 }
             } else {
                 // Get the list of tasks of the current node with no predecessors
@@ -232,8 +234,8 @@ public final class PFDPlanner extends AbstractSTNPlanner {
      * <p>
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.pfd.PFDPlanner</code><br>
-     * <code>  -d src/test/resources/benchmarks/hddl/partial_ordered/rover/domain.hddl</code><br>
-     * <code>  -p src/test/resources/benchmarks/hddl/partial_ordered/rover/pb01.hddl</code><br>
+     * <code>  -d src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl</code><br>
+     * <code>  -p src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl</code><br>
      * </p>
      * @param args the arguments of the command line.
      */
@@ -305,7 +307,11 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                 final double searchTime = (end - start) / 1000.0;
                 if (plan != null) {
                     // Print plan information
-                    System.out.println("Found plan as follows:\n" + pb.toString(plan));
+                    if (traceLevel == 9) {
+                        System.out.println(pb.toString(plan.getHierarchy()));
+                    } else {
+                        System.out.println("Found plan as follows:\n" + pb.toString(plan));
+                    }
                     System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
                     System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
                     System.out.println(String.format("Searching time       : %4.3fs", searchTime));
@@ -315,8 +321,9 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                     if (traceLevel == 9) {
                         System.out.println("==>");
                         System.out.println("<==\n");
+                    } else {
+                        System.out.println(String.format(String.format("\n%nno plan found%n%n")));
                     }
-                    System.out.println(String.format(String.format("%nno plan found%n%n")));
                     System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
                     System.out.println(String.format("Searching time       : %4.3fs", searchTime));
                     System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));

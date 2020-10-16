@@ -17,6 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -107,15 +108,14 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             if (currentNode.getTasks().isEmpty()) {
                 if (currentNode.getState().satisfy(problem.getGoal())) {
                     int traceLevel = (Integer) this.getArguments().get(Planner.TRACE_LEVEL);
-                    if (traceLevel == 9) {
-                        super.printPlanForValidator(currentNode, problem);
-                    }
                     return super.extractPlan(currentNode, problem);
                 }  else {
-                    Plan p = super.extractPlan(currentNode, problem);
-                    System.out.println("\nFound plan as follows:\n" + problem.toString(p));
-                    System.out.println(" But plan does does not reach the goal:\n");
-                    System.out.println(problem.toString(problem.getGoal()) + "\n");
+                    if (this.getTraceLevel() == 10) {
+                        Plan p = super.extractPlan(currentNode, problem);
+                        System.out.println("\nFound plan as follows:\n" + problem.toString(p));
+                        System.out.println(" But plan does does not reach the goal:\n");
+                        System.out.println(problem.toString(problem.getGoal()) + "\n");
+                    }
                 }
             } else {
                 // Get and remove the fist task of the task network
@@ -223,8 +223,8 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * <p>
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner</code><br>
-     * <code>  -d src/test/resources/benchmarks/rover_total_ordered/domain.hddl</code><br>
-     * <code>  -p src/test/resources/benchmarks/rover_total_ordered/pb01.hddl</code><br>
+     * <code>  -d src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl</code><br>
+     * <code>  -p src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl</code><br>
      * </p>
      *
      * @param args the arguments of the command line.
@@ -292,20 +292,22 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             System.out.println("Unable to solve a problem that isn't totally ordered.\n");
         }
 
-
-
         if (pb.isSolvable()) {
             try {
                 System.out.println("Searching a solution plan....\n");
                 start = System.currentTimeMillis();
                 // Create an instance of the TFDPlanner Planner
-                final AbstractSTNPlanner planner = new TFDPlanner(arguments);
+                final Planner planner = new TFDPlanner(arguments);
                 final Plan plan = planner.search(pb);
                 end = System.currentTimeMillis();
                 final double searchTime = (end - start) / 1000.0;
                 if (plan != null) {
                     // Print plan information
-                    System.out.println("\nFound plan as follows:\n" + pb.toString(plan));
+                    if (traceLevel == 9) {
+                        System.out.println(pb.toString(plan.getHierarchy()));
+                    } else {
+                        System.out.println("Found plan as follows:\n" + pb.toString(plan));
+                    }
                     System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
                     System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
                     System.out.println(String.format("Searching time       : %4.3fs", searchTime));
@@ -315,8 +317,9 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                     if (traceLevel == 9) {
                         System.out.println("==>");
                         System.out.println("<==\n");
+                    } else {
+                        System.out.println(String.format(String.format("\n%nno plan found%n%n")));
                     }
-                    System.out.println(String.format(String.format("\n%nno plan found%n%n")));
                     System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
                     System.out.println(String.format("Searching time       : %4.3fs", searchTime));
                     System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));

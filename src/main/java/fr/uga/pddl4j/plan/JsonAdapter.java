@@ -20,9 +20,9 @@
 package fr.uga.pddl4j.plan;
 
 import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

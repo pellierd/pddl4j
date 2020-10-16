@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.SquareBitMatrix;
 
 import java.util.LinkedList;

@@ -1,7 +1,6 @@
 package fr.uga.pddl4j.test;
 
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.problem.Problem;
 import org.junit.Assert;
@@ -41,9 +40,14 @@ public abstract class Tools {
     }
 
     /**
-     * The path of the benchmarks files.
+     * The path of the pddl benchmarks files.
      */
     public static final String PDDL_BENCH_DIR = "src/test/resources/benchmarks/pddl" + File.separator;
+
+    /**
+     * The path of the HDDL benchmarks files.
+     */
+    public static final String HDDL_BENCH_DIR = "src/test/resources/benchmarks/hddl" + File.separator;
 
     /**
      * PDDL files extension.
@@ -51,19 +55,34 @@ public abstract class Tools {
     public static final String PDDL_EXT = ".pddl";
 
     /**
+     * PDDL files extension.
+     */
+    public static final String HDDL_EXT = ".hddl";
+
+    /**
      * PDDL4J output plan extension for KCL validator format.
      */
-    public static final String PLAN_EXT = ".val";
+    public static final String VAL_EXT = ".val";
 
     /**
-     * The domain file name.
+     * The PDDL domain file name.
      */
-    public static final String DOMAIN = "domain" + PDDL_EXT;
+    public static final String PDDL_DOMAIN = "domain" + Tools.PDDL_EXT;
 
     /**
-     * The path to VAL.
+     * The HDDL domain file name.
      */
-    public static final String VAL = "src/test/resources/validators/validate";
+    public static final String HDDL_DOMAIN = "domain" + Tools.HDDL_EXT;
+
+    /**
+     * The path to PDDL_VAL.
+     */
+    public static final String PDDL_VAL = "src/test/resources/validators/validate";
+
+    /**
+     * The path to HDDL_VAL.
+     */
+    public static final String HDDL_VAL = "src/test/resources/validators/pandaPIParser";
 
     /**
      * Check if benchmark are already here.
@@ -120,11 +139,11 @@ public abstract class Tools {
     }
 
     /**
-     * Change the permissions for VAL file (add read, write and execute).
+     * Change the permissions for PDDL_VAL file (add read, write and execute).
      */
     public static void changeVALPerm() {
-        final File val = new File(Tools.VAL);
-        if (val.exists() && (isUnix() || isMac())) {
+        final File val = new File(Tools.PDDL_VAL);
+        if (val.exists() && (Tools.isUnix() || Tools.isMac())) {
             val.setReadable(true);
             val.setExecutable(true);
         }
@@ -144,7 +163,7 @@ public abstract class Tools {
     /**
      * Count the number of validated plans.
      *
-     * @param outputVal the output of VAL
+     * @param outputVal the output of PDDL_VAL
      * @return the number of validated plans
      */
     public static int numberValidatedPlans(String outputVal) {
@@ -175,7 +194,7 @@ public abstract class Tools {
      *
      * @param currentTestPath the current sub dir to test
      */
-    public static void validatePlans(String currentTestPath) throws Exception {
+    public static void validatePDDLPlans(String currentTestPath) throws Exception {
             final String domain = currentTestPath + "domain.pddl";
             File dir = new File(currentTestPath);
             File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
@@ -187,11 +206,11 @@ public abstract class Tools {
                     final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
                     String target;
                     if (isWindows()) {
-                        target = Tools.VAL + "-win.exe -v " + domain + " " + problem + " " + valfile;
+                        target = Tools.PDDL_VAL + "-win.exe -v " + domain + " " + problem + " " + valfile;
                     } else if (isMac()) {
-                        target = Tools.VAL + "-osx -v " + domain + " " + problem + " " + valfile;
+                        target = Tools.PDDL_VAL + "-osx -v " + domain + " " + problem + " " + valfile;
                     } else {
-                        target = Tools.VAL + "-nux -v " + domain + " " + problem + " " + valfile;
+                        target = Tools.PDDL_VAL + "-nux -v " + domain + " " + problem + " " + valfile;
                     }
 
                     final Runtime rt = Runtime.getRuntime();
@@ -216,7 +235,7 @@ public abstract class Tools {
                 }
 
                 final int number = Tools.numberValidatedPlans(output.toString());
-                System.out.println("\n-- VAL on " + currentTestPath);
+                System.out.println("\n-- PDDL_VAL on " + currentTestPath);
                 System.out.println("   Plans found: " + files.length);
                 System.out.println("   Plans validated: " + number);
                 System.out.println("--");
@@ -224,6 +243,68 @@ public abstract class Tools {
             }
 
             Tools.cleanValPlan(currentTestPath);
+
+    }
+
+
+    /**
+     * Validate HDDL output plans.
+     *
+     * @param currentTestPath the current sub dir to test
+     */
+    public static void validateHDDLPlans(String currentTestPath) throws Exception {
+        final String domain = currentTestPath + Tools.HDDL_DOMAIN;
+        File dir = new File(currentTestPath);
+        File[] files = dir.listFiles((dir1, name) -> name.endsWith(Tools.VAL_EXT));
+
+        if (files != null) {
+            final StringBuilder output = new StringBuilder();
+            int nbValidated = 0;
+            for (File valfile : files) {
+                final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + Tools.HDDL_EXT;
+                String target;
+                if (Tools.isWindows()) {
+                    target = Tools.HDDL_VAL + "-win.exe -v " + domain + " " + problem + " " + valfile;
+                } else if (Tools.isMac()) {
+                    target = Tools.HDDL_VAL + "-osx -v " + domain + " " + problem + " " + valfile;
+                } else {
+                    target = Tools.HDDL_VAL + "-nux -v " + domain + " " + problem + " " + valfile;
+                }
+                final Runtime rt = Runtime.getRuntime();
+                final Process process = rt.exec(target);
+                process.waitFor();
+
+                String line;
+                final InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(),
+                    StandardCharsets.UTF_8);
+                final BufferedReader reader = new BufferedReader(inputStreamReader);
+                boolean validated = true;
+                try {
+                    while ((line = reader.readLine()) != null && validated) {
+                        validated = line.indexOf("false") != 1;
+                        output.append(line + "\n");
+                    }
+                    if (validated) {
+                        nbValidated++;
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                } finally {
+                    reader.close();
+                    inputStreamReader.close();
+                    process.getInputStream().close();
+                }
+            }
+
+            final int number = Tools.numberValidatedPlans(output.toString());
+            System.out.println("\n-- HDDL Plan Validator on " + currentTestPath);
+            System.out.println("   Plans found: " + files.length);
+            System.out.println("   Plans validated: " + nbValidated);
+            System.out.println("--");
+            Assert.assertEquals(files.length,nbValidated);
+        }
+
+        Tools.cleanValPlan(currentTestPath);
 
     }
 

@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;

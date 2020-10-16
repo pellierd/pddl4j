@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Problem;
 
 /**
  * This class implement the adjusted sum 2 heuristic. This heuristic improves the adjusted sum

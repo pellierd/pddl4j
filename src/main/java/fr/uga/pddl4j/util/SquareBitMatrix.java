@@ -19,9 +19,6 @@
 
 package fr.uga.pddl4j.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * This class implements a square bit matrix.
  * <p>

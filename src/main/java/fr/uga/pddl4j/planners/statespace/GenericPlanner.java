@@ -21,7 +21,6 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
