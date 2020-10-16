@@ -25,7 +25,15 @@ import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Spliterator;
 
 /**
  * This abstract class implements the common methods of all Simple Task Network planners.

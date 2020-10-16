@@ -107,7 +107,7 @@ javadoc.doFirst() {
     failOnError false
 }
 
-checkstyleMain.onlyIf() { project.hasProperty('CheckStyle') }
+checkstyleMain.onlyIf() { !project.hasProperty('noCheckStyle') }
 
 checkstyleMain.doFirst() {
     excludeLexer(checkstyleMain)
@@ -117,7 +117,7 @@ checkstyleMain.doLast() {
     printCheckstyleVersion()
 }
 
-checkstyleTest.onlyIf() { project.hasProperty('CheckStyle') }
+checkstyleTest.onlyIf() { !project.hasProperty('noCheckStyle') }
 
 checkstyleTest.doFirst(){
     excludeLexer(checkstyleTest)

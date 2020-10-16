@@ -15,7 +15,6 @@
 
 package fr.uga.pddl4j.plan;
 
-
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
 
@@ -26,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This abstract class implements the main methods of a hierarchical sequential plan.
+ * This abstract class implements the main methods to manipulate the hierarchical information of a plan.
  *
  * @author D. Pellier
  * @version 1.0 - 16.10.2020
@@ -34,11 +33,29 @@ import java.util.Map;
  */
 public class Hierarchy implements Serializable {
 
+    /**
+     * The list of root task of the hierachy.
+     */
     private List<Integer> rootTasks;
+
+    /**
+     * The list of primitive tasks of the hierarchy and their task ID.
+     */
     private Map<Integer, Action> primtiveTasks;
+
+    /**
+     * The list of compound tasks of the hierarchy and their task ID.
+     */
     private Map<Integer, Method> counpoudTasks;
+
+    /**
+     * The decomposition of each compund tasks into sub-tasks.
+     */
     private Map<Integer, List<Integer>> decomposition;
 
+    /**
+     * Creates a new empty hierarchy.
+     */
     public Hierarchy() {
         super();
         this.rootTasks = new ArrayList<>();
@@ -47,9 +64,27 @@ public class Hierarchy implements Serializable {
         this.decomposition = new LinkedHashMap<>();
     }
 
+    /**
+     * Creates a deep copy of a existing hierarchy.
+     *
+     * @param other the existing hierarchy.
+     */
     public Hierarchy(final Hierarchy other) {
-        // TODO
-
+        this();
+        for (Integer rootTask : other.getRootTasks()) {
+            this.rootTasks.add(rootTask);
+        }
+        for (Map.Entry<Integer, Action> a : other.getPrimtiveTasks().entrySet()) {
+            this.primtiveTasks.put(a.getKey(), new Action(a.getValue()));
+        }
+        for (Map.Entry<Integer, Method> m : other.getCounpoudTasks().entrySet()) {
+            this.counpoudTasks.put(m.getKey(), new Method(m.getValue()));
+        }
+        for (Map.Entry<Integer, List<Integer>> m : other.getDecomposition().entrySet()) {
+            List<Integer> copy = new ArrayList<>();
+            copy.addAll(m.getValue());
+            this.decomposition.put(m.getKey(), copy);
+        }
     }
 
     public List<Integer> getRootTasks() {

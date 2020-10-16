@@ -23,16 +23,16 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.test.Tools;
+
+import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.junit.Assert;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Set;
-
 
 /**
  * Implements the <tt>ParserTest</tt> of the PDD4L library. The parser is tested on IPC benchmarks. The IPC benchmarks

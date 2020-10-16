@@ -15,14 +15,14 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.planners.statespace.HSP;
-import fr.uga.pddl4j.test.Tools;
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.planners.statespace.HSP;
 import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -5,7 +5,10 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.problem.Problem;
 import org.junit.Assert;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -192,57 +195,58 @@ public abstract class Tools {
     /**
      * Validate output plans.
      *
-     * @param currentTestPath the current sub dir to test
+     * @param currentTestPath the current sub dir to test.
+     * @throws Exception if something wrong.
      */
     public static void validatePDDLPlans(String currentTestPath) throws Exception {
-            final String domain = currentTestPath + "domain.pddl";
-            File dir = new File(currentTestPath);
-            File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
+        final String domain = currentTestPath + "domain.pddl";
+        File dir = new File(currentTestPath);
+        File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
 
-            if (files != null) {
-                final StringBuilder output = new StringBuilder();
+        if (files != null) {
+            final StringBuilder output = new StringBuilder();
 
-                for (File valfile : files) {
-                    final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
-                    String target;
-                    if (isWindows()) {
-                        target = Tools.PDDL_VAL + "-win.exe -v " + domain + " " + problem + " " + valfile;
-                    } else if (isMac()) {
-                        target = Tools.PDDL_VAL + "-osx -v " + domain + " " + problem + " " + valfile;
-                    } else {
-                        target = Tools.PDDL_VAL + "-nux -v " + domain + " " + problem + " " + valfile;
-                    }
-
-                    final Runtime rt = Runtime.getRuntime();
-                    final Process proc = rt.exec(target);
-                    proc.waitFor();
-
-                    String line;
-                    final InputStreamReader inputStreamReader = new InputStreamReader(proc.getInputStream(),
-                        StandardCharsets.UTF_8);
-                    final BufferedReader reader = new BufferedReader(inputStreamReader);
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            output.append(line + "\n");
-                        }
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    } finally {
-                        reader.close();
-                        inputStreamReader.close();
-                        proc.getInputStream().close();
-                    }
+            for (File valfile : files) {
+                final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + ".pddl";
+                String target;
+                if (isWindows()) {
+                    target = Tools.PDDL_VAL + "-win.exe -v " + domain + " " + problem + " " + valfile;
+                } else if (isMac()) {
+                    target = Tools.PDDL_VAL + "-osx -v " + domain + " " + problem + " " + valfile;
+                } else {
+                    target = Tools.PDDL_VAL + "-nux -v " + domain + " " + problem + " " + valfile;
                 }
 
-                final int number = Tools.numberValidatedPlans(output.toString());
-                System.out.println("\n-- PDDL_VAL on " + currentTestPath);
-                System.out.println("   Plans found: " + files.length);
-                System.out.println("   Plans validated: " + number);
-                System.out.println("--");
-                Assert.assertEquals(files.length,number);
+                final Runtime rt = Runtime.getRuntime();
+                final Process proc = rt.exec(target);
+                proc.waitFor();
+
+                String line;
+                final InputStreamReader inputStreamReader = new InputStreamReader(proc.getInputStream(),
+                    StandardCharsets.UTF_8);
+                final BufferedReader reader = new BufferedReader(inputStreamReader);
+                try {
+                    while ((line = reader.readLine()) != null) {
+                        output.append(line + "\n");
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                } finally {
+                    reader.close();
+                    inputStreamReader.close();
+                    proc.getInputStream().close();
+                }
             }
 
-            Tools.cleanValPlan(currentTestPath);
+            final int number = Tools.numberValidatedPlans(output.toString());
+            System.out.println("\n-- PDDL_VAL on " + currentTestPath);
+            System.out.println("   Plans found: " + files.length);
+            System.out.println("   Plans validated: " + number);
+            System.out.println("--");
+            Assert.assertEquals(files.length, number);
+        }
+
+        Tools.cleanValPlan(currentTestPath);
 
     }
 
@@ -250,7 +254,8 @@ public abstract class Tools {
     /**
      * Validate HDDL output plans.
      *
-     * @param currentTestPath the current sub dir to test
+     * @param currentTestPath the current sub dir to test.
+     * @throws Exception if something wrong.
      */
     public static void validateHDDLPlans(String currentTestPath) throws Exception {
         final String domain = currentTestPath + Tools.HDDL_DOMAIN;
@@ -301,7 +306,7 @@ public abstract class Tools {
             System.out.println("   Plans found: " + files.length);
             System.out.println("   Plans validated: " + nbValidated);
             System.out.println("--");
-            Assert.assertEquals(files.length,nbValidated);
+            Assert.assertEquals(files.length, nbValidated);
         }
 
         Tools.cleanValPlan(currentTestPath);

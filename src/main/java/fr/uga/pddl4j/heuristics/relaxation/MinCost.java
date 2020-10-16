@@ -22,8 +22,8 @@ package fr.uga.pddl4j.heuristics.relaxation;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.State;
 
 import java.util.LinkedList;
 

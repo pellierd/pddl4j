@@ -19,9 +19,9 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;

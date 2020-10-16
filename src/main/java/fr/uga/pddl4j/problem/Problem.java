@@ -20,16 +20,22 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.encoding.AbstractGroundOperator;
+import fr.uga.pddl4j.encoding.Inertia;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.encoding.Inertia;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -859,6 +865,44 @@ public class Problem implements Serializable {
     }
 
     /**
+     * Returns a string representation of a hierarchical decomposition of plan.
+     *
+     * @param hierarchy the hierarchical decomposition to convert into string represention.
+     * @return the string representation of the he hierarchical decomposition in parameter.
+     */
+    public String toString(final Hierarchy hierarchy) {
+        StringBuilder str = new StringBuilder();
+        str.append("==>\n");
+        for (Map.Entry<Integer, Action> a : hierarchy.getPrimtiveTasks().entrySet()) {
+            str.append(a.getKey());
+            str.append(" ");
+            str.append(this.toShortString(a.getValue()));
+            str.append("\n");
+        }
+        str.append("root");
+        for (Integer rootTask : hierarchy.getRootTasks()) {
+            str.append(" ");
+            str.append(rootTask);
+        }
+        str.append("\n");
+        for (Map.Entry<Integer, Method> m : hierarchy.getCounpoudTasks().entrySet()) {
+            str.append(m.getKey());
+            str.append(" ");
+            str.append(this.toString(this.getTasks().get(m.getValue().getTask())));
+            str.append(" -> ");
+            str.append(m.getValue().getName());
+            for (Integer t : hierarchy.getDecomposition().get(m.getKey())) {
+                str.append(" ");
+                str.append(t);
+            }
+            str.append("\n");
+        }
+        str.append("<==\n");
+        return str.toString();
+
+    }
+
+    /**
      * Returns a short string representation of the specified operator, i.e., its name and its
      * instantiated parameters. This method can be used for actions and methods.
      *
@@ -905,43 +949,5 @@ public class Problem implements Serializable {
                 str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%4.2f]%n",
                     time, this.toShortString(a), ((float) a.getCost())))));
         return str.toString();
-    }
-
-    /**
-     * Returns a string representation of a hierarchical decomposition of plan.
-     *
-     * @param hierarchy the hierarchical decomposition to convert into string represention.
-     * @return the string representation of the he hierarchical decomposition in parameter.
-     */
-    public String toString(final Hierarchy hierarchy) {
-        StringBuilder str = new StringBuilder();
-        str.append("==>\n");
-        for (Map.Entry<Integer, Action> a : hierarchy.getPrimtiveTasks().entrySet()) {
-            str.append(a.getKey());
-            str.append(" ");
-            str.append(this.toShortString(a.getValue()));
-            str.append("\n");
-        }
-        str.append("root");
-        for (Integer rootTask : hierarchy.getRootTasks()) {
-            str.append(" ");
-            str.append(rootTask);
-        }
-        str.append("\n");
-        for (Map.Entry<Integer, Method> m : hierarchy.getCounpoudTasks().entrySet()) {
-            str.append(m.getKey());
-            str.append(" ");
-            str.append(this.toString(this.getTasks().get(m.getValue().getTask())));
-            str.append(" -> ");
-            str.append(m.getValue().getName());
-            for (Integer t : hierarchy.getDecomposition().get(m.getKey())) {
-                str.append(" ");
-                str.append(t);
-            }
-            str.append("\n");
-            }
-        str.append("<==\n");
-        return str.toString();
-
     }
 }

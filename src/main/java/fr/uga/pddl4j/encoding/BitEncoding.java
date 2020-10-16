@@ -19,15 +19,15 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.TaskNetwork;
-import fr.uga.pddl4j.parser.PDDLConnective;
-
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.OrderingConstraintSet;
+import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.TaskNetwork;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

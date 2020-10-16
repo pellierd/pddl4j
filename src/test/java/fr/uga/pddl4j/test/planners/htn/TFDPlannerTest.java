@@ -15,14 +15,14 @@
 
 package fr.uga.pddl4j.test.planners.htn;
 
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.test.Tools;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner;
 import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +37,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import java.util.Properties;
-
 
 /**
  * Implements the <tt>TFDPlannerTest</tt> of the PDD4L library. The class executes the junit tests with TFDPlanner on

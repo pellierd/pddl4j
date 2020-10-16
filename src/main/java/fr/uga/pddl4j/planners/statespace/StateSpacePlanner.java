@@ -15,9 +15,10 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;

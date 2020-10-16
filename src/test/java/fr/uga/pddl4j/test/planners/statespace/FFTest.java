@@ -37,8 +37,8 @@ import java.nio.file.Paths;
 
 /**
  * Implements the <tt>FFTest</tt> of the PDD4L library. The class executes the junit tests with FF on
- * ADL and STRIPS planning domain of IPC. A bound of 60 seconds is allocated to the search. The plan returns for each test is tested
- * with the KCL-Planning validator: https://github.com/KCL-Planning/VAL.
+ * ADL and STRIPS planning domain of IPC. A bound of 60 seconds is allocated to the search. The plan returns for each
+ * test is tested with the KCL-Planning validator: https://github.com/KCL-Planning/VAL.
  *
  * @author E. Hermellin
  * @author C. Gerard
