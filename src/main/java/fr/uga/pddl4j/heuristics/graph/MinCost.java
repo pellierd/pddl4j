@@ -107,8 +107,12 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
                 if (op.isApplicable(current)) {
                     if (op.getCost() <= cost) { //TODO take into account = or not
                         final ClosedWorldState nextState = new ClosedWorldState(current);
-                        nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                        nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+
+                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                            // Apply the effect to the successor node
+                            nextState.apply(ce.getEffects())
+                        );
+
 
                         final Node successor = new Node(nextState);
                         successor.setCost(current.getCost() + op.getCost());
