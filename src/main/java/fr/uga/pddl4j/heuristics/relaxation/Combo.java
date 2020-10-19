@@ -26,7 +26,7 @@ import fr.uga.pddl4j.problem.State;
 
 /**
  * This class implement the combo heuristic. This heuristic improves the adjusted sum
- * heuristic by replacing the computation of the interaction degree of the of the adjusted sum
+ * heuristic by replacing the computation of the interaction degree of the adjusted sum
  * heuristic. Now, we have the following heuristic:
  * <pre>
  * combo(S) := hsum(S) + hlvel(S)

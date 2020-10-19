@@ -60,9 +60,9 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
-        final List<Action> operator = this.getActions();
+        final List<Action> actions = this.getActions();
         int startPoint = 0;
-        for (Action op : operator) {
+        for (Action op : actions) {
             startPoint += op.getCondEffects().size();
         }
         int nbRelevantFacts = super.getRevelantFacts().size();

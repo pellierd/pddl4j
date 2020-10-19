@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This abstract class implements the main methods to manipulate the hierarchical information of a plan.
@@ -65,7 +66,7 @@ public class Hierarchy implements Serializable {
     }
 
     /**
-     * Creates a deep copy of a existing hierarchy.
+     * Creates a deep copy of an existing hierarchy.
      *
      * @param other the existing hierarchy.
      */
@@ -87,21 +88,76 @@ public class Hierarchy implements Serializable {
         }
     }
 
-    public List<Integer> getRootTasks() {
+    /**
+     * Returns the root tasks of the hierarchy.
+     *
+     * @return the root tasks of the hierarchy.
+     */
+    public final List<Integer> getRootTasks() {
         return this.rootTasks;
     }
 
+    /**
+     * Returns the list of primitive tasks of the hierarchy and corresponding task IDs.
+     *
+     * @return the list of primitive tasks of the hierarchy and corresponding task IDs.
+     */
     public Map<Integer, Action> getPrimtiveTasks() {
         return this.primtiveTasks;
     }
 
+    /**
+     * Returns the list of compound tasks of the hierarchy and corresponding task IDs.
+     *
+     * @return the list of compound tasks of the hierarchy and corresponding task IDs.
+     */
     public Map<Integer, Method> getCounpoudTasks() {
         return this.counpoudTasks;
     }
 
+    /**
+     * Returns the decomposition of the compound task. Task IDs are used as key of the map return. Only cooumpund task
+     * has a entry in the map.
+     *
+     * @return the decomposition of the compound task.
+     */
     public Map<Integer, List<Integer>> getDecomposition() {
         return this.decomposition;
     }
 
+    /**
+     * Returns if a hierarchy is equals to an other object. The method returns <code>true</code> if the other object is
+     * an instance of the class hierarchy and has the same root tasks, primitives and compund tasks set and
+     * decomposition.
+     *
+     * @param other the other object to be compared.
+     * @return <code>true</code> if this hierarchy is equal to the object in parameter; <code>false</code> otherwise.
+     */
+    @Override
+    public boolean equals(Object other) {
+        boolean equal = true;
+        if (this == other) {
+            equal = true;
+        } else if (!(other instanceof Hierarchy)) {
+            equal = false;
+        } else {
+            Hierarchy hierarchy = (Hierarchy) other;
+            equal = Objects.equals(getRootTasks(), hierarchy.getRootTasks())
+                && Objects.equals(getPrimtiveTasks(), hierarchy.getPrimtiveTasks())
+                && Objects.equals(getCounpoudTasks(), hierarchy.getCounpoudTasks())
+                && Objects.equals(getDecomposition(), hierarchy.getDecomposition());
+        }
+        return equal;
+    }
+
+    /**
+     * Returns the hashcode value of this hierarchy.
+     *
+     * @return the hashcode value of this hierarchy.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRootTasks(), getPrimtiveTasks(), getCounpoudTasks(), getDecomposition());
+    }
 
 }
