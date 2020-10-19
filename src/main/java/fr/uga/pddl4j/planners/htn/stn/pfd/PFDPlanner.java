@@ -108,9 +108,6 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             if (currentNode.getTaskNetwork().isEmpty()) {
                 if (currentNode.getState().satisfy(problem.getGoal())) {
                     int traceLevel = (Integer) this.getArguments().get(Planner.TRACE_LEVEL);
-                    if (traceLevel == 9) {
-                        super.printPlanForValidator(currentNode, problem);
-                    }
                     return super.extractPlan(currentNode, problem);
                 }  else {
                     if (this.getTraceLevel() == 10) {

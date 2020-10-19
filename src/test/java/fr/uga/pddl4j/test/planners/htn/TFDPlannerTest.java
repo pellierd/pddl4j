@@ -300,7 +300,6 @@ public class TFDPlannerTest {
         Tools.validateHDDLPlans(localTestPath);
     }
 
-
     /**
      * Generate output plan KLC-planning validator formatted.
      *

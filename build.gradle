@@ -127,7 +127,7 @@ checkstyleTest.doLast(){
     printCheckstyleVersion()
 }
 
-test.onlyIf() { project.hasProperty('Test') }
+test.onlyIf() { !project.hasProperty('noTest') }
 
 test {
     useJUnit()
@@ -145,7 +145,7 @@ test {
     // The set of Junit tests
     scanForTestClasses = false
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
-    includes = ['**/PFDPlannerTest.class']
+    includes = ['**/HDDLEncoderTest.class', '**/PDDLEncoderTest.class']
 }
 
 defaultTasks 'clean', 'build', 'test'
