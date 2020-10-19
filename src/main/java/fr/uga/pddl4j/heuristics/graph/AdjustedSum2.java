@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.relaxation;
+package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
@@ -25,43 +25,35 @@ import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 
 /**
- * This class implements the heuristics of the fast forward planner. For more about this
- * heuristic see J. Hoffmann, A Heuristic for DOMAIN Independent Planning and its Use in an Enforced
- * Hill-climbing Algorithm, in: Proceedings of the 12th International Symposium on Methodologies for
- * Intelligent Systems, Charlotte, North Carolina, USA, October 2000.
- * <p>
- * The computation of the value returned by the heuristics is based on the extraction of a relaxed
- * plan to the planning graph ignoring negative effects according to the difficulty heuristic. The
- * heuristic value is the number of actions of the relaxed plan extracted. To select an effect
- * according to the unconditional operators difficulty heuristic, the question is, which achiever
- * should be choose when no NOOP is available ? It is certainly a good idea to select an achiever
- * whose preconditions seems to be "easy". From the graph building phase, we can obtain a simple
- * measure for the operators_difficulty of an action's preconditions as follows:
- * </p>
+ * This class implement the adjusted sum 2 heuristic. This heuristic improves the adjusted sum
+ * heuristic by replacing the computation of the <code>cost(S)</code> by the used the relaxed plan
+ * heuristic. Now, we have the following heuristic:
  * <pre>
- * difficulty(o) := SUM_ID(min { i | p is member of the fact layer at time i }) with p in pre(o)
+ * hadjsum2(S) := cost(S) + delta(S)
  * </pre>
- * <p>
- * The operators_difficulty of each action can be set when it is first inserted into the graph.
- * During plan extraction, facing a fact for which no NOOP is available, we then simply selected an
- * achieving action with minimal operators_difficulty. This heuristic works well in situation where
- * there are severals ways to achieve one fact. but some ways need less effort than others.
- * </p>
- * <b>Warning:</b> The relaxed plan heuristic is not admissible.
+ * where
+ * <ul>
+ * <li> <code>cost(S) := 1 +  cost(S + prec(a) - add(a))</code>
+ * <li> <code>delta(S) := lev(S) - max(lev(p))</code> for all <code>p</code> in <code>S</code>
+ * </ul>
+ * <b>Warning:</b> The adjusted sum heuristic is not admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 20.08.2010
- * @see RelaxedGraphHeuristic
+ * @version 1.0 - 10.06.2010
+ * @see AdjustedSum
+ * @see Max
+ * @see FastForward
+ * @see Sum
  */
-public final class FastForward extends RelaxedGraphHeuristic {
+public final class AdjustedSum2 extends RelaxedGraphHeuristic {
 
     /**
-     * Creates a new <code>FF</code> heuristic for a specified planning problem.
+     * Creates a new <code>AdjustedSum2</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public FastForward(Problem problem) {
+    public AdjustedSum2(Problem problem) {
         super(problem);
         super.setAdmissible(false);
     }
@@ -74,13 +66,13 @@ public final class FastForward extends RelaxedGraphHeuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
-     * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
     public int estimate(final ClosedWorldState state, final State goal) {
         super.setGoal(goal);
-        super.expandRelaxedPlanningGraph(state);
-        return super.isGoalReachable() ? super.getRelaxedPlanValue() : Integer.MAX_VALUE;
+        final int level = super.expandRelaxedPlanningGraph(state);
+        return super.isGoalReachable() ? super.getRelaxedPlanValue() + (level - super.getMaxValue())
+            : Integer.MAX_VALUE;
     }
 
     /**

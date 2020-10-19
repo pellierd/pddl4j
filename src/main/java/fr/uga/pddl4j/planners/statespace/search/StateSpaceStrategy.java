@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
 
@@ -35,14 +35,14 @@ public interface StateSpaceStrategy extends Serializable {
      *
      * @return the heuristicType to use to solve the planning problem.
      */
-    RelaxationHeuristic.Type getHeuristicType();
+    PlanningGraphHeuristic.Type getHeuristicType();
 
     /**
      * Sets the heuristicType to use to solved the problem.
      *
      * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
      */
-    void setHeuristicType(final RelaxationHeuristic.Type heuristicType);
+    void setHeuristicType(final PlanningGraphHeuristic.Type heuristicType);
 
     /**
      * Returns the weight set to the heuristic.

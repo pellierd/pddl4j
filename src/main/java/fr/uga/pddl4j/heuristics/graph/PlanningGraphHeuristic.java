@@ -17,11 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.relaxation;
+package fr.uga.pddl4j.heuristics.graph;
 
-import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 
 import java.io.Serializable;
 
@@ -37,38 +35,9 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public interface RelaxationHeuristic extends Serializable {
+public interface PlanningGraphHeuristic extends GoalCostHeuristic {
 
     //TODO work on that part to make more generic the addition of MIN_COST
-
-    /**
-     * Return the estimated distance to the goal to reach the specified state. If the return value is
-     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-     * state.
-     *
-     * @param state the state from which the distance to the goal must be estimated.
-     * @param goal  the goal expression.
-     * @return the distance to the goal state from the specified state.
-     */
-    int estimate(final ClosedWorldState state, final State goal);
-
-    /**
-     * Return the estimated distance to the goal to reach the specified state. If the return value is
-     * <code>Integer.MAX_VALUE</code>, it means that the goal is unreachable from the specified
-     * state.
-     *
-     * @param node the ndoe from which the distance to the goal must be estimated.
-     * @param goal the goal expression.
-     * @return the distance to the goal state from the specified state.
-     */
-    double estimate(final Node node, final State goal);
-
-    /**
-     * Returns <code>true</code> if this heuristic is admissible.
-     *
-     * @return <code>true</code> if this heuristic is admissible.
-     */
-    boolean isAdmissible();
 
     /**
      * The type of heuristic implemented.

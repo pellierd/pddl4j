@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.relaxation;
+package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
@@ -25,43 +25,48 @@ import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 
 /**
- * This class implement the combo heuristic. This heuristic improves the adjusted sum
- * heuristic by replacing the computation of the interaction degree of the adjusted sum
- * heuristic. Now, we have the following heuristic:
- * <pre>
- * combo(S) := hsum(S) + hlvel(S)
- * </pre>
- * where
+ * This class implements the MAX heuristic. (for more details on this heuristic see Blai Bonet and
+ * Hector Geffner, Planning as Heuristic Search, Artificial Intelligence 129, 2001, Elsevier)
+ * <p>
+ * The principle of this heuristics function <i>h</i> is to resolved a relaxed the planning problem
+ * <i>P'</i> in which all delete list are ignored. The cost of achieving an atom <i>p</i> form the
+ * state <i>s</i> is noted <i>gs(p)</i>. These estimates can be defined recursively as:
+ * </p>
  * <ul>
- * <li> <tt>hsum(S)</tt> is the sum heuristic value and</li>
- * <li> <tt>hlev(S)</tt> the set-level heuristic value.</li>
+ * <li> <i>gs(p)</i> = 0, if <i>p</i> is in <i>s</i>,
+ * <li> <i>gs(p)</i> = min[1 + <i>gs(Prec(op))]</i> for each <i>op</i> in <i>O(p)</i>, otherwise
  * </ul>
- * <b>Warning:</b> The combo heuristic is not admissible.
+ * <p>where <i>O(p)</i> stands for the actions <i>op</i> that add <i>p</i>, i.e., with <i>p</i> in
+ * <i>Add(op)</i>, and <i>gs(Prec(op))</i>, to be defined below, stands for the estimated cost of
+ * achieving the preconditions of action <i>op</i> from <i>s</i>. The cost <i>gs(C)</i> of a sets
+ * of atoms is defined as the max costs of individual atoms:
+ * </p>
+ * <ul>
+ * <li> <i>hmax(C)</i> = max <i>gs(r)</i> for all <i>r</i> in <i>C</i> (max costs)
+ * </ul>
+ * <p> The max heuristic unlike the additive heuristic SUM_ID is admissible as the cost of achieving a
+ * set of atoms cannot be lower than the cost of achieving each of the atoms in the set. On the other
+ * hand, the max heuristic is often less informative. In fact, while the additive heuristic combines
+ * the costs of all subgoals, the max heuristic focuses only on the most difficult subgoals ignoring
+ * all others.
+ * </p>
+ * <b>Warning:</b> The max heuristic is admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 01.09.2010
- * @see AdjustedSum
- * @see Sum
- * @see SetLevel
+ * @version 1.0 - 11.06.2010
+ * @see RelaxedGraphHeuristic
  */
-public final class Combo extends RelaxedGraphHeuristic {
+public final class Max extends RelaxedGraphHeuristic {
 
     /**
-     * The set level heuristic used to compute the delta function, i.e., the interaction degree
-     * among propositions of the goal.
-     */
-    private SetLevel delta;
-
-    /**
-     * Creates a new <code>COMBO</code> heuristic for a specified planning problem.
+     * Creates a new <code>MAX</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public Combo(Problem problem) {
+    public Max(final Problem problem) {
         super(problem);
-        this.delta = new SetLevel(problem);
-        super.setAdmissible(false);
+        super.setAdmissible(true);
     }
 
     /**
@@ -72,15 +77,13 @@ public final class Combo extends RelaxedGraphHeuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
     public int estimate(final ClosedWorldState state, final State goal) {
         super.setGoal(goal);
-        // First, we expand the relaxed planing graph to compute the sum heuristic
         super.expandRelaxedPlanningGraph(state);
-        // Second, we expand the relaxed planning graph with mutex to compute the set level heuristic
-        this.delta.expandPlanningGraph(state);
-        return super.isGoalReachable() ? this.getSumValue() + this.delta.estimate(state, goal) : Integer.MAX_VALUE;
+        return super.isGoalReachable() ? super.getMaxValue() : Integer.MAX_VALUE;
     }
 
     /**

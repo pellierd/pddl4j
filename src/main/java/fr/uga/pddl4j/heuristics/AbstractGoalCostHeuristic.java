@@ -1,23 +1,19 @@
 /*
- * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
- *
- * This file is part of PDDL4J library.
- *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
- */
+* Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+*
+* This file is part of PDDL4J library.
+*
+* PDDL4J is free software: you can redistribute it and/or modify * it under the terms of the GNU General Public License
+* as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+*
+* PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+* of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License * along with PDDL4J.  If not,
+* see <http://www.gnu.org/licenses/>
+*/
 
-package fr.uga.pddl4j.heuristics.relaxation;
+package fr.uga.pddl4j.heuristics;
 
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Fluent;
@@ -27,12 +23,12 @@ import fr.uga.pddl4j.problem.State;
 import java.util.List;
 
 /**
- * This abstract class implements the basic methods of all heuristics.
+ * This abstract class implements the basic methods of goal cost heuristics.
  *
  * @author D. Pellier
- * @version 1.0 - 10.06.2010
+ * @version 1.0 - 19.10.2020
  */
-public abstract class AbstractHeuristic implements RelaxationHeuristic {
+public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
 
     /**
      * The goal to reached.
@@ -55,15 +51,12 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     private boolean isAdmissible;
 
     /**
-     * Create a new heuristic for a specified planning problem. By default the heuristic is
+     * Create a new goal cost heuristic for a specified planning problem. By default the heuristic is
      * considered as admissible.
      *
      * @param problem the problem to solve.
      */
-    protected AbstractHeuristic(final Problem problem) {
-        if (problem == null) {
-            throw new NullPointerException("problem == null");
-        }
+    protected AbstractGoalCostHeuristic(final Problem problem) {
         this.facts = problem.getRelevantFluents();
         this.goal = problem.getGoal();
         this.actions = problem.getActions();
@@ -81,7 +74,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     }
 
     /**
-     * Marks the heuristic as admissible or not.
+     * Marks the cost cost heuristic as admissible or not.
      *
      * @param isAdmissible the admissible flag.
      */
@@ -90,7 +83,7 @@ public abstract class AbstractHeuristic implements RelaxationHeuristic {
     }
 
     /**
-     * Returns the goal of the relaxed problem to solve in order to compute the heuristic.
+     * Returns the goal of the problem to solve in order to compute the heuristic.
      *
      * @return the goal.
      */

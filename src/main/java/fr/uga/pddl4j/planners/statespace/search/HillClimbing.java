@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristicFactory;
+import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
+import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
@@ -50,7 +50,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public HillClimbing(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
+    public HillClimbing(int timeout, PlanningGraphHeuristic.Type heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -63,8 +63,8 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
     public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final RelaxationHeuristicFactory factory = new RelaxationHeuristicFactory();
-        final RelaxationHeuristic heuristic = factory.createRelaxtionHeuristic(
+        final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
+        final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
             getHeuristicType(), codedProblem);
 
         ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
@@ -116,7 +116,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @return the list of successors from the parent node.
      */
     private LinkedList<Node> getSuccessors(final Node parent, final Problem problem,
-                                           final RelaxationHeuristic heuristic) {
+                                           final PlanningGraphHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

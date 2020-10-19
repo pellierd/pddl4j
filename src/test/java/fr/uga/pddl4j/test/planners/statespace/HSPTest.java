@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
@@ -56,7 +56,7 @@ public class HSPTest {
     /**
      * Default Heuristic Type.
      */
-    private static final RelaxationHeuristic.Type HEURISTIC_TYPE = RelaxationHeuristic.Type.FAST_FORWARD;
+    private static final PlanningGraphHeuristic.Type HEURISTIC_TYPE = PlanningGraphHeuristic.Type.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.

@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
@@ -74,7 +74,7 @@ public final class HSP extends AbstractStateSpacePlanner {
      * @param statisticState the statistics generation value.
      * @param traceLevel     the trace level of the planner.
      */
-    public HSP(final int timeout, final RelaxationHeuristic.Type heuristicType, final double weight,
+    public HSP(final int timeout, final PlanningGraphHeuristic.Type heuristicType, final double weight,
                final boolean statisticState, final int traceLevel) {
         super(statisticState, traceLevel);
 

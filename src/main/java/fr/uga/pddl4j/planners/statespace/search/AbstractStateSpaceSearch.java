@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.relaxation.RelaxationHeuristic;
+import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
@@ -36,7 +36,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
     /**
      * The heuristic of the planner.
      */
-    private RelaxationHeuristic.Type heuristic;
+    private PlanningGraphHeuristic.Type heuristic;
 
     /**
      * The heuristic weight.
@@ -79,7 +79,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @return the heuristicType to use to solve the planning problem.
      */
     @Override
-    public final RelaxationHeuristic.Type getHeuristicType() {
+    public final PlanningGraphHeuristic.Type getHeuristicType() {
         return this.heuristic;
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
      */
     @Override
-    public final void setHeuristicType(final RelaxationHeuristic.Type heuristicType) {
+    public final void setHeuristicType(final PlanningGraphHeuristic.Type heuristicType) {
         Objects.requireNonNull(heuristicType);
         this.heuristic = heuristicType;
     }
@@ -269,7 +269,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @param timeout   the time out of the planner.
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceSearch(int timeout, RelaxationHeuristic.Type heuristic, double weight) {
+    public AbstractStateSpaceSearch(int timeout, PlanningGraphHeuristic.Type heuristic, double weight) {
         super();
         this.timeout = timeout;
         this.heuristic = heuristic;

@@ -17,8 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.relaxation;
+package fr.uga.pddl4j.heuristics.graph;
 
+import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
@@ -28,12 +29,15 @@ import fr.uga.pddl4j.problem.State;
 import java.util.LinkedList;
 
 /**
+ *
+ *
  * <b>Warning:</b> The Min Cost heuristic is not admissible.
  *
  * @author E. Hermellin
+ * @author D. Pellier
  * @version 1.0 - 19.02.2018
  */
-public class MinCost extends AbstractHeuristic {
+public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphHeuristic {
 
     /**
      * Creates a new <code>Min Cost</code> heuristic for a specified planning problem.
