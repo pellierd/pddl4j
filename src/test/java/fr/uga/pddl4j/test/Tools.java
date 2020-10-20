@@ -7,7 +7,11 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.problem.Problem;
 import org.junit.Assert;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -497,6 +501,7 @@ public abstract class Tools {
      *
      * @param currentTestPath the path where try to find domain and problems pddl files
      * @return all issues report as a ArrayList of String
+     * @throws Exception if something wrong.
      */
     public static ArrayList<String> parsePDDL(String currentTestPath) throws Exception {
 
@@ -602,8 +607,9 @@ public abstract class Tools {
     /**
      * Instantiate the PDDLParser and parse all domains and problems in the specified test path.
      *
-     * @param currentTestPath the path where try to find domain and problems pddl files
-     * @return all issues report as a ArrayList of String
+     * @param currentTestPath the path where try to find domain and problems pddl files.
+     * @return all issues report as a ArrayList of String.
+     * @throws Exception if something wrong.
      */
     public static ArrayList<String> parseHDDL(String currentTestPath) throws Exception {
 
