@@ -25,9 +25,9 @@ import java.util.List;
 
 /**
  * This class implements a bit matrix. This class introspection mechanism not more allowed with jre version superior to
- * 1.8.<br>
+ * 1.8.
  *
- * Revisions:
+ * <p>Revisions:
  * <ul>
  * <li>31.03.2020: Add a deep copy constructor.</li>
  * <li>26.06.2020: Change for bit vector intern representation.</li>

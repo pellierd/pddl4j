@@ -146,8 +146,8 @@ test {
     scanForTestClasses = false
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
     //includes = ['**/TimeEncoderTest.class']
-    //includes = ['**/TimeParserTest.class']
-    includes = ['**/HSPTest.class']
+    includes = ['**/TimeParserTest.class']
+    //includes = ['**/HSPTest.class']
 }
 
 defaultTasks 'clean', 'build', 'test'

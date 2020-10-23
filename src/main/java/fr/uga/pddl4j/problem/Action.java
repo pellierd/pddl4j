@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a compact representation for action of the planning problem.<br>
+ * This class implements a compact representation for action of the planning problem.
  *
- * Revisions:
+ * <p>Revisions:
  * <ul>
  * <li>21.10.2020: change the duration attribute to encode temporal problem.</li>
  * </ul>

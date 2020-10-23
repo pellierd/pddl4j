@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains the methods needed to instantiate the actions and the method.<br>
+ * This class contains the methods needed to instantiate the actions and the method.
  *
- * Revisions:
+ * <p>Revisions:
  * <ul>
  * <li>30/03/2020: Add method instantiation.</li>
  * <li>15/06/2020: allow operator instantiation with same parameter.</li>

@@ -23,9 +23,9 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
  * This class implements an action. This class is used to store compact representation of an action
- * during the instantiation process.<br>
+ * during the instantiation process.
  *
- * Revisions:
+ * <p>Revisions:
  * <ul>
  * <li>20.10.2020: change the duration attribute to encode temporal problem.</li>
  * </ul>
