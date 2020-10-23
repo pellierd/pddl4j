@@ -131,10 +131,8 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
             // Test if a specified operator is applicable in the current state
             if (op.isApplicable(parent)) {
                 final ClosedWorldState nextState = new ClosedWorldState(parent);
-                op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
-                        // Apply the effect to the successor node
-                        nextState.apply(ce.getEffects())
-                );
+                op.getConditionalEffects().stream().filter(ce -> parent.satisfy(ce.getCondition()))
+                    .forEach(ce -> nextState.apply(ce.getEffects()));
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);
                 this.setCreatedNodes(this.getCreatedNodes() + 1);

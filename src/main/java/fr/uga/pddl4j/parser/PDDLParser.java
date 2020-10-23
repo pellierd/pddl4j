@@ -1269,6 +1269,7 @@ public final class PDDLParser {
             PDDLExpression gd = stackGD.poll();
             List<PDDLTypedSymbol> ctx = stackCtx.poll();
             List<PDDLTypedSymbol> newCtx = new LinkedList<>(ctx);
+
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_HEAD:

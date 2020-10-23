@@ -24,8 +24,8 @@ import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Fluent;
+import fr.uga.pddl4j.problem.GoalDescription;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 
@@ -176,7 +176,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
         this.nbOperators = this.nbPropositions;
         final List<Action> pbOperators = problem.getActions();
         for (Action op : pbOperators) {
-            this.nbOperators += op.getCondEffects().size();
+            this.nbOperators += op.getConditionalEffects().size();
         }
 
         // If debug flag is true we create the array that contains the string representation of the
@@ -221,7 +221,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
         // Start enumerating the unconditional opsLayer
         int uncondOpIndex = this.nbPropositions;
         for (final Action op : pbOperators) {
-            final List<ConditionalEffect> condEffects = op.getCondEffects();
+            final List<ConditionalEffect> condEffects = op.getConditionalEffects();
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
                 final ConditionalEffect cEffect = condEffects.get(ceIndex);
@@ -229,20 +229,20 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
                     this.operators[uncondOpIndex] = "(" + problem.toShortString(op) + ")_" + ceIndex;
                 }
                 final BitVector precond = new BitVector();
-                precond.or(op.getPreconditions().getPositive());
-                precond.or(cEffect.getCondition().getPositive());
-                BitVector neg = op.getPreconditions().getNegative();
+                precond.or(op.getPreconditions().getPositiveFluents());
+                precond.or(cEffect.getCondition().getPositiveFluents());
+                BitVector neg = op.getPreconditions().getNegativeFluents();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     precond.set(p + this.negOffset);
                 }
-                neg = cEffect.getCondition().getNegative();
+                neg = cEffect.getCondition().getNegativeFluents();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     precond.set(p + this.negOffset);
                 }
                 this.preconditions[uncondOpIndex] = precond;
                 final BitVector effect = new BitVector();
-                effect.or(cEffect.getEffects().getPositive());
-                neg = cEffect.getEffects().getNegative();
+                effect.or(cEffect.getEffects().getPositiveFluents());
+                neg = cEffect.getEffects().getNegativeFluents();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     effect.set(p + this.negOffset);
                 }
@@ -253,8 +253,8 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
 
         // Set the goal to the state representation
         this.bvgoal = new BitVector();
-        this.bvgoal.or(super.getGoal().getPositive());
-        final BitVector neg = super.getGoal().getNegative();
+        this.bvgoal.or(super.getGoal().getPositiveFluents());
+        final BitVector neg = super.getGoal().getNegativeFluents();
         for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
             this.bvgoal.set(p + this.negOffset);
         }
@@ -288,12 +288,12 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
      * @param goal the goal.
      */
     @Override
-    protected final void setGoal(final State goal) {
+    protected final void setGoal(final GoalDescription goal) {
         super.setGoal(goal);
         // Set the goal to the state representation
         this.bvgoal = new BitVector();
-        this.bvgoal.or(super.getGoal().getPositive());
-        final BitVector neg = goal.getNegative();
+        this.bvgoal.or(super.getGoal().getPositiveFluents());
+        final BitVector neg = goal.getNegativeFluents();
         for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
             this.bvgoal.set(p + this.negOffset);
         }

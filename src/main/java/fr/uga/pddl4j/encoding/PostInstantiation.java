@@ -434,13 +434,25 @@ final class PostInstantiation implements Serializable {
                     }
                 }
                 break;
-            case FORALL:
-            case EXISTS:
             case AT_START:
             case AT_END:
+            case OVER_ALL:
+                switch (exp.getChildren().get(0).getConnective()) {
+                    case TRUE:
+                        exp.setConnective(PDDLConnective.TRUE);
+                        break;
+                    case FALSE:
+                        exp.setConnective(PDDLConnective.FALSE);
+                        break;
+                    default:
+                        PostInstantiation.simplify(exp.getChildren().get(0));
+                        break;
+                }
+                break;
+            case FORALL:
+            case EXISTS:
             case UMINUS:
             case ALWAYS:
-            case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
                 PostInstantiation.simplify(exp.getChildren().get(0));
@@ -526,7 +538,7 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplifyWithGroundInertia(a.getEffects(), true, init);
                 PostInstantiation.simplify(a.getEffects());
                 if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                    //&& !a.getEffects().getConnective().equals(PDDLConnective.TRUE)) {
+                    //&& !a.getConditionalEffects().getConnective().equals(PDDLConnective.TRUE)) {
                     toAdd.add(a);
                 } else {
                     toRemove.add(index);

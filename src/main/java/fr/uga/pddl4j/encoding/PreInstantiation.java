@@ -40,14 +40,13 @@ import java.util.Set;
  * <li> infer types from unary inertia information.</li>
  * <li> simplify actions and methods with infer types information.</li>
  * </ul>
- * <p>
+ * <br>
  * Revisions:
  * <ul>
  *     <li> 19/04/13: Add a hack in method simplifiedActionWithInferredType to deal with the problem the constant
  *     in in precondition and effect of in action.</li>
  *     <li> 30/03/19: Add a method to simplify methods.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.2 - 10.04.2010

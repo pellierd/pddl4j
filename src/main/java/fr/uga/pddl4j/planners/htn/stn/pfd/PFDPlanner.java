@@ -73,8 +73,8 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         final PFDNode root = new PFDNode(init, problem.getInitialTaskNetwork());
 
         // Create the root node of the search space
-        //root.getState().getNegative().set(0, problem.getRelevantFluents().size());
-        //root.getState().getNegative().andNot(root.getState().getPositive());
+        //root.getState().getNegativeFluents().set(0, problem.getRelevantFluents().size());
+        //root.getState().getNegativeFluents().andNot(root.getState().getPositiveFluents());
 
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
@@ -144,7 +144,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(operator);
-                                childNode.getState().apply(action.getCondEffects());
+                                childNode.getState().apply(action.getConditionalEffects());
                                 childNode.getTaskNetwork().removeTask(task);
                                 childNode.setTask(taskIndex);
                                 open.add(childNode);

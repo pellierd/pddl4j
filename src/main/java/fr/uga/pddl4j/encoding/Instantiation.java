@@ -30,14 +30,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains the methods needed to instantiate the actions and the method.
- * <p>
+ * This class contains the methods needed to instantiate the actions and the method.<br>
+ *
  * Revisions:
  * <ul>
  * <li>30/03/2020: Add method instantiation.</li>
  * <li>15/06/2020: allow operator instantiation with same parameter.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.1 - 07.04.2010
@@ -81,17 +80,17 @@ final class Instantiation implements Serializable {
      * @return the list of actions instantiated corresponding the specified action.
      */
     static List<IntAction> instantiate(final IntAction action, final int bound) {
-        final List<IntAction> instOps = new ArrayList<>(100);
+        final List<IntAction> intActions = new ArrayList<>(100);
         Instantiation.expandQuantifiedExpression(action.getPreconditions());
         Instantiation.simplify(action.getPreconditions());
         if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
             Instantiation.expandQuantifiedExpression(action.getEffects());
             Instantiation.simplify(action.getEffects());
             if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                Instantiation.instantiate(action, 0, bound, instOps);
+                Instantiation.instantiate(action, 0, bound, intActions);
             }
         }
-        return instOps;
+        return intActions;
     }
 
     /**
@@ -150,6 +149,11 @@ final class Instantiation implements Serializable {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
                         copy.setEffects(effects);
+                        if (action.isDurative()) {
+                            final IntExpression duration = new IntExpression(action.getDuration());
+                            Instantiation.substitute(duration, varIndex, value);
+                            copy.setDuration(duration);
+                        }
                         for (int i = 0; i < arity; i++) {
                             copy.setTypeOfParameter(i, action.getTypeOfParameters(i));
                         }

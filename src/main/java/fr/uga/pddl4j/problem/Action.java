@@ -24,10 +24,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a compact representation for action of the planning problem.
+ * This class implements a compact representation for action of the planning problem.<br>
+ *
+ * Revisions:
+ * <ul>
+ * <li>21.10.2020: change the duration attribute to encode temporal problem.</li>
+ * </ul>
  *
  * @author D. Pellier
- * @version 1.1 - 08.04.2010
+ * @version 1.2 - 08.04.2010
  */
 public class Action extends AbstractOperator {
 
@@ -47,6 +52,11 @@ public class Action extends AbstractOperator {
     private double duration;
 
     /**
+     *
+     */
+    public static final double DEFAULT_DURATION = -1.0;
+
+    /**
      * Creates a new action from an other. This constructor is the copy constructor.
      *
      * @param other the other action.
@@ -54,7 +64,9 @@ public class Action extends AbstractOperator {
     public Action(final Action other) {
         super(other);
         this.effects = new ArrayList<>();
-        this.effects.addAll(other.getCondEffects().stream().map(ConditionalEffect::new).collect(Collectors.toList()));
+        this.effects.addAll(other.getConditionalEffects().stream().map(ConditionalEffect::new)
+            .collect(Collectors.toList()));
+        this.duration = this.getDuration();
     }
 
     /**
@@ -66,6 +78,7 @@ public class Action extends AbstractOperator {
     public Action(final String name, final int arity) {
         super(name, arity);
         this.effects = new ArrayList<>();
+        this.duration = Action.DEFAULT_DURATION;
     }
 
     /**
@@ -76,13 +89,14 @@ public class Action extends AbstractOperator {
      * @param preconditions the precondition of the action.
      * @param effects       the effects of the action.
      */
-    public Action(final String name, final int arity, final State preconditions, final State effects) {
+    public Action(final String name, final int arity, final GoalDescription preconditions,
+                  final GoalDescription effects) {
         this(name, arity);
         this.setPreconditions(preconditions);
         ConditionalEffect cexp = new ConditionalEffect();
-        cexp.setCondition(new State());
+        cexp.setCondition(new GoalDescription());
         cexp.setEffects(effects);
-        this.addCondBitEffect(cexp);
+        this.addConditionalEffect(cexp);
     }
 
     /**
@@ -90,8 +104,17 @@ public class Action extends AbstractOperator {
      *
      * @return the effects of the action.
      */
-    public final List<ConditionalEffect> getCondEffects() {
+    public final List<ConditionalEffect> getConditionalEffects() {
         return this.effects;
+    }
+
+    /**
+     * Returns the conditional effects to the action.
+     *
+     * @param effects the conditional effects of the action.
+     */
+    public final void setConditionalEffects(List<ConditionalEffect> effects) {
+        this.effects = effects;
     }
 
     /**
@@ -99,7 +122,7 @@ public class Action extends AbstractOperator {
      *
      * @param effect the conditional effect to add.
      */
-    public final void addCondBitEffect(ConditionalEffect effect) {
+    public final void addConditionalEffect(ConditionalEffect effect) {
         this.effects.add(effect);
     }
 
@@ -119,14 +142,23 @@ public class Action extends AbstractOperator {
      *
      * @return the unconditional effects of the action.
      */
-    public State getUnconditionalEffects() {
-        final State ucEffect = new State();
+    public final GoalDescription getUnconditionalEffects() {
+        final GoalDescription ucEffect = new GoalDescription();
         this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
-            final State condEff = cEffect.getEffects();
-            ucEffect.getPositive().or(condEff.getPositive());
-            ucEffect.getNegative().or(condEff.getNegative());
+            final GoalDescription condEff = cEffect.getEffects();
+            ucEffect.getPositiveFluents().or(condEff.getPositiveFluents());
+            ucEffect.getNegativeFluents().or(condEff.getNegativeFluents());
         });
         return ucEffect;
+    }
+
+    /**
+     * Returns if this action is durative.
+     *
+     * @return <code>true</code> if this action is durative or <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.duration != DEFAULT_DURATION;
     }
 
     /**

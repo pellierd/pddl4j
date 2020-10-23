@@ -19,19 +19,17 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.GoalDescription;
 
 import java.lang.reflect.Field;
 import java.util.BitSet;
 
 /**
- * This class implements a bit vector.
- * <p>
+ * This class implements a bit vector.<br>
  * Revisions:
  * <ul>
  * <li>26.06.2020: Add shift methods.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.2 - 13.04.2010
@@ -88,10 +86,10 @@ public class BitVector extends BitSet {
      *
      * @param exp the <code>BitExp</code> that represents <code>BitVector</code>.
      */
-    public BitVector(final State exp) {
+    public BitVector(final GoalDescription exp) {
         this();
-        this.or(exp.getPositive());
-        this.andNot(exp.getNegative());
+        this.or(exp.getPositiveFluents());
+        this.andNot(exp.getNegativeFluents());
     }
 
     /**

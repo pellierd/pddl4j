@@ -17,7 +17,6 @@ package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -72,8 +71,8 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         // Create the root node of the search space
         final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
         final TFDNode root = new TFDNode(init, problem.getInitialTaskNetwork().getTasks());
-        //root.getState().getNegative().set(0, problem.getRelevantFluents().size());
-        //root.getState().getNegative().andNot(root.getState().getPositive());
+        //root.getState().getNegativeFluents().set(0, problem.getRelevantFluents().size());
+        //root.getState().getNegativeFluents().andNot(root.getState().getPositiveFluents());
 
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
@@ -138,7 +137,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(operator);
-                            childNode.getState().apply(action.getCondEffects());
+                            childNode.getState().apply(action.getConditionalEffects());
                             childNode.setTask(task);
                             open.add(childNode);
                             if (debug) {
@@ -207,7 +206,6 @@ public final class TFDPlanner extends AbstractSTNPlanner {
     /**
      * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
      * follow:
-     * <p>
      * <pre>
      * usage of TFDPlanner:
      *
@@ -219,7 +217,6 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * -h              print this message
      *
      * </pre>
-     * </p>
      * <p>
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner</code><br>

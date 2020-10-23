@@ -24,8 +24,9 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.GoalDescription;
 import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
 
@@ -75,11 +76,20 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n");
-        str.append(toString(action.getPreconditions(), constants, types, predicates, functions, tasks));
+        if (action.isDurative()) {
+            str.append("Duration:\n");
+            str.append(StringDecoder.toString(action.getDuration(), constants, types, predicates, functions, tasks));
+            str.append("\n");
+        }
+        if (action.isDurative()) {
+            str.append("Condition:\n");
+        } else {
+            str.append("Precondition:\n");
+        }
+        str.append(StringDecoder.toString(action.getPreconditions(), constants, types, predicates, functions, tasks));
         str.append("\n");
-        str.append("Effects:\n");
-        str.append(toString(action.getEffects(), constants, types, predicates, functions, tasks));
+        str.append("Effect:\n");
+        str.append(StringDecoder.toString(action.getEffects(), constants, types, predicates, functions, tasks));
         str.append("\n");
         return str.toString();
     }
@@ -374,6 +384,7 @@ final class StringDecoder implements Serializable {
                 str.append(exp.getConnective());
                 break;
             case TIME_VAR:
+                str.append(PDDLConnective.TIME_VAR);
                 break;
             case FN_ATOM:
             case WHEN:
@@ -468,11 +479,25 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n").append(StringDecoder.toString(action.getPreconditions(), constants, types,
-            predicates, functions, relevants)).append("\n").append("Effects:\n");
-        for (ConditionalEffect condExp : action.getCondEffects()) {
-            str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants))
-                .append("\n");
+        if (action.isDurative()) {
+            str.append("Duration: ");
+            str.append(action.getDuration());
+            str.append("\n");
+            str.append("Condition:\n");
+            str.append(StringDecoder.toString(action.getPreconditions(), constants, types, predicates, functions,
+                relevants, true));
+            str.append("\n");
+            str.append("Effect:\n");
+        } else {
+            str.append("Precondition:\n");
+            str.append(StringDecoder.toString(action.getPreconditions(), constants, types, predicates, functions,
+                relevants));
+            str.append("\n");
+            str.append("Effect:\n");
+            for (ConditionalEffect condExp : action.getConditionalEffects()) {
+                str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants));
+                str.append("\n");
+            }
         }
         return str.toString();
     }
@@ -518,9 +543,9 @@ final class StringDecoder implements Serializable {
     }
 
     /**
-     * Returns a string representation of a state.
+     * Returns a string representation of a goal description.
      *
-     * @param state      the state.
+     * @param gd         the goal description.
      * @param constants  the table of constants.
      * @param types      the table of types.
      * @param predicates the table of predicates.
@@ -528,21 +553,89 @@ final class StringDecoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(State state, final List<String> constants, final List<String> types,
+    static String toString(GoalDescription gd, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<IntExpression> relevants) {
+        return StringDecoder.toString(gd, constants, types, predicates, functions, relevants, false);
+    }
+
+    /**
+     * Returns a string representation of a goal description.
+     *
+     * @param gd         the goal description.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param relevants  the table of relevant facts.
+     * @param durative   the flag to indicate of the goal description is temporal or not.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(GoalDescription gd, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions,
+                           final List<IntExpression> relevants, boolean durative) {
         final StringBuilder str = new StringBuilder("(and");
-        final BitSet positive = state.getPositive();
-        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
-            str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
-                new ArrayList<String>())).append("\n");
+        if (durative) {
+            final BitSet atStart = gd.getPositiveTimedGoalDescription().getAtStartFluents();
+            for (int j = atStart.nextSetBit(0); j >= 0; j = atStart.nextSetBit(j + 1)) {
+                str.append(" (at start ");
+                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                    new ArrayList<String>()));
+                str.append(")\n");
+            }
+            final BitSet overAll = gd.getPositiveTimedGoalDescription().getOverAllFluents();
+            for (int j = overAll.nextSetBit(0); j >= 0; j = overAll.nextSetBit(j + 1)) {
+                str.append(" (over all ");
+                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                    new ArrayList<String>()));
+                str.append(")\n");
+            }
+            final BitSet atEnd = gd.getPositiveTimedGoalDescription().getAtEndFluents();
+            for (int j = atEnd.nextSetBit(0); j >= 0; j = atEnd.nextSetBit(j + 1)) {
+                str.append(" (at end ");
+                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                    new ArrayList<String>()));
+                str.append(")\n");
+            }
+            final BitSet negAtSTart = gd.getNegativeTimedGoalDescription().getAtStartFluents();
+            for (int i = negAtSTart.nextSetBit(0); i >= 0; i = negAtSTart.nextSetBit(i + 1)) {
+                str.append(" (at start (not ");
+                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                    functions, new ArrayList<String>()));
+                str.append("))\n");
+            }
+            final BitSet negOverAll = gd.getNegativeTimedGoalDescription().getOverAllFluents();
+            for (int i = negOverAll.nextSetBit(0); i >= 0; i = negOverAll.nextSetBit(i + 1)) {
+                str.append(" (over all (not ");
+                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                    functions, new ArrayList<String>()));
+                str.append("))\n");
+            }
+            final BitSet negAtEnd = gd.getNegativeTimedGoalDescription().getAtEndFluents();
+            for (int i = negOverAll.nextSetBit(0); i >= 0; i = negAtEnd.nextSetBit(i + 1)) {
+                str.append(" (at end (not ");
+                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                    functions, new ArrayList<String>()));
+                str.append("))\n");
+            }
+            str.append(")");
+        } else {
+            final BitSet positive = gd.getPositiveFluents();
+            for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                str.append(" ");
+                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                    new ArrayList<String>()));
+                str.append("\n");
+            }
+            final BitSet negative = gd.getNegativeFluents();
+            for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                str.append(" (not ");
+                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                    functions, new ArrayList<String>()));
+                str.append(")\n");
+            }
+            str.append(")");
         }
-        final BitSet negative = state.getNegative();
-        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
-                functions, new ArrayList<String>())).append(")\n");
-        }
-        str.append(")");
         return str.toString();
     }
 

@@ -916,7 +916,6 @@ public class PDDLExpression implements Serializable {
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
-            case EQUAL:
             case GREATER:
             case GREATER_OR_EQUAL:
             case ASSIGN:
@@ -936,6 +935,7 @@ public class PDDLExpression implements Serializable {
                 malformed = this.atom.size() != 2;
                 break;
             case WHEN:
+            case EQUAL:
                 malformed = this.children.size() != 2
                     && this.children.get(0).isMalformedExpression()
                     && this.children.get(1).isMalformedExpression();

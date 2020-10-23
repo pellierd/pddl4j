@@ -55,7 +55,7 @@ public class PDDLAction extends PDDLAbstractOperator {
     public PDDLAction(final PDDLAction other) {
         super(other);
         this.effects = new PDDLExpression(other.getEffects());
-        if (this.duration != null) {
+        if (other.getDuration() != null) {
             this.duration = new PDDLExpression(other.getDuration());
         }
     }
@@ -112,6 +112,15 @@ public class PDDLAction extends PDDLAbstractOperator {
             throw new NullPointerException();
         }
         this.effects = effects;
+    }
+
+    /**
+     * Returns if this action is a durative action.
+     *
+     * @return <code>true</code> if this action is durative; <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.duration != null;
     }
 
     /**

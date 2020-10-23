@@ -184,8 +184,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
 
     /**
      * Normalizes the method.
-     * <p>
-     * </p>
+     *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @see PDDLExpression#renameVariables()
      * @see PDDLExpression#moveNegationInward()

@@ -21,8 +21,8 @@ package fr.uga.pddl4j.plan;
 
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ConditionalEffect;
+import fr.uga.pddl4j.problem.GoalDescription;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -126,7 +126,7 @@ public class JsonAdapter implements Serializable {
                 precondJson.put("Negatives", negativeJsonPrecondition);
 
                 //CondExp
-                List<ConditionalEffect> condExp = action.getCondEffects();
+                List<ConditionalEffect> condExp = action.getConditionalEffects();
 
                 // Condition object
                 JSONArray condExpJsonArray = new JSONArray();
@@ -188,17 +188,17 @@ public class JsonAdapter implements Serializable {
      * @param exp the BitExp instance to convert.
      * @return an 2D collection of Strings.
      */
-    private List<List<String>> toJsonString(final State exp) {
+    private List<List<String>> toJsonString(final GoalDescription exp) {
         List<String> fluentsPos = new ArrayList<>();
         List<String> fluentsNeg = new ArrayList<>();
         List<List<String>> fluents = new ArrayList<>();
 
-        final BitSet positive = exp.getPositive();
+        final BitSet positive = exp.getPositiveFluents();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
             fluentsPos.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
         }
 
-        final BitSet negative = exp.getNegative();
+        final BitSet negative = exp.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             fluentsNeg.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
         }

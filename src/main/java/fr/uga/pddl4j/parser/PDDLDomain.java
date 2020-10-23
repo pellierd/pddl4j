@@ -514,7 +514,7 @@ public class PDDLDomain implements Serializable {
             }
             str.append("\n  )\n");
         }
-        if (!this.tasks.isEmpty()) {
+        if (!this.tasks.isEmpty() && this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             str.append("(:tasks ");
             for (PDDLNamedTypedList p : this.tasks) {
                 str.append("\n  ").append(p);

@@ -100,7 +100,6 @@ final class IntEncoding implements Serializable {
         if (problem.getGoal() != null) {
             IntEncoding.encodeTypes(problem.getGoal());
         }
-
     }
 
     /**
@@ -496,10 +495,10 @@ final class IntEncoding implements Serializable {
     }
 
     /**
-     * Encode an operator into its integer representation.
+     * Encode an action into its integer representation.
      *
-     * @param action the operator to encode.
-     * @return encoded operator.
+     * @param action the action to encode.
+     * @return encoded action.
      */
     private static IntAction encodeAction(final PDDLAction action) {
         final IntAction intAction = new IntAction(action.getName().getImage(), action.getArity());
@@ -513,10 +512,15 @@ final class IntEncoding implements Serializable {
             intAction.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
-        // Encode the preconditions of the operator
+        // Encode the duration of the action
+        if (action.isDurative()) {
+            final IntExpression duration = IntEncoding.encodeExp(action.getDuration(), variables);
+            intAction.setDuration(duration);
+        }
+        // Encode the preconditions of the action
         final IntExpression preconditions = IntEncoding.encodeExp(action.getPreconditions(), variables);
         intAction.setPreconditions(preconditions);
-        // Encode the effects of the operator
+        // Encode the effects of the action
         final IntExpression effects = IntEncoding.encodeExp(action.getEffects(), variables);
         intAction.setEffects(effects);
         return intAction;

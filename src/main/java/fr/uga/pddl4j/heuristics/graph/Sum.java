@@ -21,8 +21,8 @@ package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.GoalDescription;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
 
 /**
  * This class implements the SUM_ID heuristic. (for more details on this heuristic see Blai Bonet and
@@ -82,7 +82,7 @@ public final class Sum extends RelaxedGraphHeuristic {
      * @throws NullPointerException if <code>state == null</code>.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final State goal) {
+    public int estimate(final ClosedWorldState state, final GoalDescription goal) {
         super.setGoal(goal);
         this.expandRelaxedPlanningGraph(state);
         return super.isGoalReachable() ? super.getSumValue() : Integer.MAX_VALUE;
@@ -98,7 +98,7 @@ public final class Sum extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final State goal) {
+    public double estimate(final Node node, final GoalDescription goal) {
         return estimate((ClosedWorldState) node, goal);
     }
 

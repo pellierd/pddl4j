@@ -40,6 +40,7 @@ public class PDDLEncoderTest {
      */
     private static final int TRACE_LEVEL = 0;
 
+
     /**
      * Method that executes tests using IPC 1998 Assembly ADL benchmarks.
      *

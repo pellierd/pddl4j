@@ -19,21 +19,26 @@
 
 package fr.uga.pddl4j.encoding;
 
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Fluent;
+import fr.uga.pddl4j.problem.GoalDescription;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Task;
 import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -219,7 +224,7 @@ public final class Encoder implements Serializable {
     /**
      * The table containing for each relevant task its set of resolvers, i.e., action or methods
      */
-    static List<List<Integer>> tableOfRelevantOperators;
+    static List<List<Integer>> tableOfRelevantActions;
 
     /**
      * The list of instantiated actions encoded into bit sets.
@@ -234,7 +239,7 @@ public final class Encoder implements Serializable {
     /**
      * The goal.
      */
-    static State goal;
+    static GoalDescription goal;
 
     /**
      * The initial task network.
@@ -244,12 +249,12 @@ public final class Encoder implements Serializable {
     /**
      * The encoded goal.
      */
-    static List<State> codedGoal;
+    static List<GoalDescription> codedGoal;
 
     /**
      * The initial state.
      */
-    static State init;
+    static GoalDescription init;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
@@ -347,6 +352,8 @@ public final class Encoder implements Serializable {
         accepted.add(PDDLRequireKey.ACTION_COSTS);
         accepted.add(PDDLRequireKey.HIERARCHY);
         accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
+        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
 
         Encoder.requirements = new LinkedHashSet<>();
         Encoder.requirements.addAll(domain.getRequirements());
@@ -441,8 +448,8 @@ public final class Encoder implements Serializable {
             }
             if (!intActions.isEmpty()) {
                 str.append(")").append("\n\nCoded actions:\n\n");
-                for (IntAction op : intActions) {
-                    str.append(Encoder.toString(op)).append(System.lineSeparator());
+                for (IntAction action : intActions) {
+                    str.append(Encoder.toString(action)).append(System.lineSeparator());
                 }
             }
             if (!intMethods.isEmpty()) {
@@ -556,8 +563,8 @@ public final class Encoder implements Serializable {
             str.append("\n\nInstantiation actions with inferred types (");
             str.append(intActions.size());
             str.append(" actions):\n\n");
-            for (final IntAction op : intActions) {
-                str.append(Encoder.toString(op));
+            for (final IntAction action : intActions) {
+                str.append(Encoder.toString(action));
                 str.append("\n");
             }
             if (intGoal != null) {
@@ -674,20 +681,20 @@ public final class Encoder implements Serializable {
 
         // Creates the list of relevant operators
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
-            Encoder.tableOfRelevantOperators = new ArrayList<>();
+            Encoder.tableOfRelevantActions = new ArrayList<>();
             for (Integer a : Encoder.relevantActions) {
                 List<Integer> l = new ArrayList<>(1);
                 l.add(a);
-                Encoder.tableOfRelevantOperators.add(l);
+                Encoder.tableOfRelevantActions.add(l);
             }
-            Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
+            Encoder.tableOfRelevantActions.addAll(Encoder.relevantMethods);
         }
 
         if (intGoal != null && (!intGoal.getChildren().isEmpty()
                 || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
             Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
         } else {
-            Encoder.goal = new State();
+            Encoder.goal = new GoalDescription();
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
@@ -708,7 +715,8 @@ public final class Encoder implements Serializable {
         Encoder.init = BitEncoding.encodeInit(intInitPredicates, fluentIndexMap);
 
         // Encode the actions in bit set representation
-        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
+        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap,
+            Encoder.tableOfRelevantFluents.size()));
 
         // Just for logging
         if (Encoder.logLevel == 7) {
@@ -745,11 +753,11 @@ public final class Encoder implements Serializable {
 
             if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nTable of task resolvers:\n");
-                for (int ti = 0; ti < Encoder.tableOfRelevantOperators.size(); ti++) {
+                for (int ti = 0; ti < Encoder.tableOfRelevantActions.size(); ti++) {
                     str.append(ti).append(": ");
                     str.append(Encoder.toString(Encoder.tableOfRelevantTasks.get(ti)));
                     str.append(":");
-                    List<Integer> resolvers = Encoder.tableOfRelevantOperators.get(ti);
+                    List<Integer> resolvers = Encoder.tableOfRelevantActions.get(ti);
                     for (int ri = 0; ri < resolvers.size(); ri++) {
                         str.append(" ").append(resolvers.get(ri));
                     }
@@ -783,7 +791,7 @@ public final class Encoder implements Serializable {
                 task -> new Task(task.getPredicate(), task.getArguments(),
                     task.isPrimtive())).collect(Collectors.toList()));
         }
-        codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
+        codedProblem.setTaskResolvers(Encoder.tableOfRelevantActions);
         codedProblem.setFunctionSignatures(Encoder.tableOfTypedFunctions);
         codedProblem.setPredicateSignatures(Encoder.tableOfTypedPredicates);
         codedProblem.setTypeSymbols(Encoder.tableOfTypes);
@@ -930,7 +938,7 @@ public final class Encoder implements Serializable {
      */
     static void printGoal(StringBuilder str) {
         str.append("Goal state is:\n");
-        for (State exp : Encoder.codedGoal) {
+        for (GoalDescription exp : Encoder.codedGoal) {
             str.append(Encoder.toString(exp));
             str.append("\n");
         }
@@ -950,11 +958,11 @@ public final class Encoder implements Serializable {
     /**
      * Returns a string representation of the specified operator.
      *
-     * @param op the operator to print.
+     * @param action the operator to print.
      * @return a string representation of the specified operator.
      */
-    static String toString(final IntAction op) {
-        return StringDecoder.toString(op, Encoder.tableOfConstants,
+    static String toString(final IntAction action) {
+        return StringDecoder.toString(action, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
@@ -1039,7 +1047,7 @@ public final class Encoder implements Serializable {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(State exp) {
+    static String toString(GoalDescription exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
@@ -1064,6 +1072,72 @@ public final class Encoder implements Serializable {
         stringBuilder.append("Ground inertia table:");
         for (Entry<IntExpression, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
             stringBuilder.append(Encoder.toString(e.getKey())).append(": ").append(e.getValue());
+        }
+    }
+
+    /**
+     * This method is used to make quick test to encoder class. Command line example:
+     * <ul>
+     *     <li>java -cp build/libs/pddl4j-3.8.3.jar fr.uga.pddl4j.encoding.Encoder \\
+     *     src/test/resources/benchmarks/pddl/ipc2002/depots//time-simple-automatic/domain.pddl\\
+     *     src/test/resources/benchmarks/pddl/ipc2002/depots/time-simple-automatic/p01.pddl
+     *     </li>
+     * </ul>
+     *
+     * @param args the arguments of the command line (args[0] the path to the domain file and args[1] the path to the
+     *             problem file).
+     */
+    public static void main(String[] args) {
+
+        if (args.length != 2) {
+            System.out.println("invalide arguments");
+            System.exit(0);
+        }
+
+        final String domain = args[0];
+        final String problem = args[1];
+        final int traceLevel = 0;
+
+        final ProblemFactory factory = new ProblemFactory();
+        factory.setTraceLevel(traceLevel);
+
+        try {
+            // Parses the PDDL domain and problem description
+            ErrorManager errorManager = factory.parse(new File(domain), new File(problem));
+            if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+                && !errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
+                System.out.println(errorManager.getMessages());
+                System.exit(0);
+            }
+            if (!errorManager.getMessages(Message.Type.PARSER_WARNING).isEmpty()) {
+                System.out.println(errorManager.getMessages());
+            }
+
+            // Encodes and instantiates the problem in a compact representation
+            final Problem pb;
+            try {
+                System.out.println(" * Encoding [" + problem + "]" + "...");
+                pb = factory.encode();
+                if (pb.isSolvable()) {
+                    System.out.println(" * Problem encoded (" + pb.getActions().size() + " actions, "
+                        + pb.getRelevantFluents().size() + " fluents) is solvable.");
+                } else {
+                    System.out.println(" * Problem encoded (" + pb.getActions().size() + " actions, "
+                        + pb.getRelevantFluents().size() + " fluents) is not solvable.");
+                }
+            } catch (OutOfMemoryError err) {
+                System.err.println("ERR: " + err.getMessage() + " - test aborted");
+                return;
+            } catch (IllegalArgumentException iaex) {
+                if (iaex.getMessage().equalsIgnoreCase("type of the problem to encode not ADL")) {
+                    System.err.println("[" + problem + "]: Not ADL problem!");
+                } else {
+                    throw iaex;
+                }
+            }
+
+        } catch (IOException ioEx) {
+            ioEx.printStackTrace();
         }
     }
 

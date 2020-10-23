@@ -32,7 +32,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     /**
      * The preconditions of the operator.
      */
-    private State preconditions;
+    private GoalDescription preconditions;
 
     /*
     * Creates a new operator from an other.
@@ -52,7 +52,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      */
     protected AbstractOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new State();
+        this.preconditions = new GoalDescription();
     }
 
     /**
@@ -62,9 +62,10 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      * @param parameters     the types of the parameters.
      * @param instantiations the values of the parameters.
      * @param preconditions  the preconditions of the operator.
+     * @param size           the size of the operator in term of fluents used in preconditions or effects.
      */
     protected AbstractOperator(final String name, final int[] parameters, final int[] instantiations,
-                               final State preconditions) {
+                               final GoalDescription preconditions, final int size) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
     }
@@ -74,7 +75,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final State getPreconditions() {
+    public final GoalDescription getPreconditions() {
         return this.preconditions;
     }
 
@@ -83,9 +84,10 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final State preconditions) {
+    public final void setPreconditions(final GoalDescription preconditions) {
         this.preconditions = preconditions;
     }
+
 }
 
 
