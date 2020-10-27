@@ -77,7 +77,7 @@ public final class PDDLTypedSymbol extends PDDLSymbol {
     /**
      * Adds a type to this typed token.
      *
-     * @param type the type to add.
+     * @param type the type to addValue.
      */
     public void addType(final PDDLSymbol type) {
         if (type == null) {

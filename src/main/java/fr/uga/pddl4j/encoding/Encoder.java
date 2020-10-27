@@ -26,14 +26,7 @@ import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.GoalDescription;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Task;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -114,15 +107,35 @@ import java.util.stream.Collectors;
  * in disjunctive and conjunctive normal form, before being encoding in a compact bit set
  * representation.
  * </p>
- * <b>Warning:</b> the encoding is only implemented for ADL problems.
+ * <b>Warning:</b> The encoder accepts the problem with
+ * the following requirements:
+ * <ul>
+ *     <li>:adl</li>
+ *     <li>:strips</li>
+ *     <li>:typing</li>
+ *     <li>:equalityY</li>
+ *     <li>:negative-preconditions</li>
+ *     <li>:disjunctive-preconditions</li>
+ *     <li>:existential-preconditions</li>
+ *     <li>:universal-preconditions</li>
+ *     <li>:quantified-preconditions</li>
+ *     <li>:conditional-effects</li>
+ *     <li>:action-costs</li>
+ *     <li>:hierarchy</li>
+ *     <li>:method-preconditions</li>
+ *     <li>:durative-actions</li>
+ *     <li>:durative-inequalities</li>
+ *     <li>:numeric-fluents</li>
+ * </ul>
  * <p>
  * Revisions:
  * </p>
  * <ul>
- * <li>23.01.2013: add of the case when the goal can be simplified to TRUE. The coded problem
- * returned contained in that case an empty goal expression (<code>BitExp.isEmpty()</code>).</li>
+ * <li>23.01.2013: addValue of the case when the goal can be simplified to TRUE. The coded problem
+ * returned contained in that case an empty goal expression.</li>
  * <li>25.03.2016: Fix bug when the goal contains only one atom.</li>
  * <li>05.05.2020: Add method encoding.</li>
+ * <li>20.10.2020: Add time encoding.</li>
  * </ul>
  *
  * @author D. Pellier
@@ -217,6 +230,22 @@ public final class Encoder implements Serializable {
     static List<IntExpression> tableOfRelevantFluents;
 
     /**
+     * The table of fluent index used to speedup the bit encoding.
+     */
+    static Map<IntExpression, Integer> tableOfFluentIndex;
+
+
+    /**
+     * The table of the relevant numeric fluents.
+     */
+    static List<IntExpression> tableOfRelevantNumericFluents;
+
+    /**
+     * The table of numeric fluent index used to speedup the bit encoding.
+     */
+    static Map<IntExpression, Integer> tableOfNumericFluentIndex;
+
+    /**
      * The table of the relevant task.
      */
     static List<IntExpression> tableOfRelevantTasks;
@@ -287,6 +316,11 @@ public final class Encoder implements Serializable {
     static List<Integer> relevantActions;
 
     /**
+     * The values of the numeric fluents defined in the initial state.
+     */
+    static Map<IntExpression, Double> NumericFluentValues;
+
+    /**
      * Creates a new planner.
      */
     private Encoder() {
@@ -326,15 +360,34 @@ public final class Encoder implements Serializable {
     }
 
     /**
-     * Instantiate, simplify and encode the problem in a compact representation. (see On the
-     * Instantiation of ADL action and methid involving arbitrary first-order formulas.
+     * Instantiate, simplify and encode the problem in a compact representation. The encoder accepts the problem with
+     * the following requirements:
+     * <ul>
+     *     <li>:adl</li>
+     *     <li>:strips</li>
+     *     <li>:typing</li>
+     *     <li>:equalityY</li>
+     *     <li>:negative-preconditions</li>
+     *     <li>:disjunctive-preconditions</li>
+     *     <li>:existential-preconditions</li>
+     *     <li>:universal-preconditions</li>
+     *     <li>:quantified-preconditions</li>
+     *     <li>:conditional-effects</li>
+     *     <li>:action-costs</li>
+     *     <li>:hierarchy</li>
+     *     <li>:method-preconditions</li>
+     *     <li>:durative-actions</li>
+     *     <li>:durative-inequalities</li>
+     *     <li>:numeric-fluents</li>
+     * </ul>
      *
      * @param domain  the domain to encode.
      * @param problem the problem to encode.
      * @return the problem encoded.
-     * @throws IllegalArgumentException if the problem to encode is not ADL or ACTION_COSTS or HTN.
+     * @throws UnsupportedRequirementException if the problem to encode has requirements that are not supported.
      */
-    public static Problem encode(final PDDLDomain domain, final PDDLProblem problem) {
+    public static Problem encode(final PDDLDomain domain, final PDDLProblem problem)
+            throws UnsupportedRequirementException {
 
         // Check that the domain and the problem are ADL otherwise the encoding is not
         // implemented for the moment.
@@ -354,13 +407,17 @@ public final class Encoder implements Serializable {
         accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
         accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
         accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
+        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
 
         Encoder.requirements = new LinkedHashSet<>();
         Encoder.requirements.addAll(domain.getRequirements());
         Encoder.requirements.addAll(problem.getRequirements());
 
         if (!accepted.containsAll(Encoder.requirements)) {
-            throw new IllegalArgumentException("only ADL, ACTION_COSTS or HTN problem can be encoded");
+            Set<PDDLRequireKey> notSupported = new LinkedHashSet<>();
+            notSupported.addAll(Encoder.requirements);
+            notSupported.removeAll(accepted);
+            throw new UnsupportedRequirementException("Requirement not supported: " + notSupported);
         }
 
         // *****************************************************************************************
@@ -395,10 +452,8 @@ public final class Encoder implements Serializable {
 
         // Encode the initial state in integer representation
         final Set<IntExpression> intInit = IntEncoding.encodeInit(problem.getInit());
-        // Create Map containing functions and associed cost from encoded initial state
-        final Map<IntExpression, Double> intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
-        // Create Set containing integer representation of initial state without functions and associed cost
-        final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
+        // Create Map containing numeric fluent and the value associated in the initial state
+        Encoder.NumericFluentValues = IntEncoding.extractNumericFluentValues(intInit);
 
         // Encode the goal in integer representation
         IntExpression intGoal =  null;
@@ -436,7 +491,7 @@ public final class Encoder implements Serializable {
         // Just for logging
         if (Encoder.logLevel == 2) {
             str.append("\nCoded initial state:\n").append("(and");
-            for (IntExpression f : intInitPredicates) {
+            for (IntExpression f : intInit) {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
@@ -462,6 +517,8 @@ public final class Encoder implements Serializable {
             str.setLength(0);
         }
 
+
+
         // *****************************************************************************************
         // Step 3: PreInstantiation
         // *****************************************************************************************
@@ -469,18 +526,15 @@ public final class Encoder implements Serializable {
         // Computed inertia from the encode actions
         PreInstantiation.extractInertia(intActions);
         // Infer the type from the unary inertia
-        PreInstantiation.inferTypesFromInertia(intInitPredicates);
+        PreInstantiation.inferTypesFromInertia(intInit);
         if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Simply the encoded action with the inferred types.
             intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
-            // Simply the encoded methods with the inferred types
-            // Does not work with methods
-            // intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
         }
 
         // Create the predicates tables used to count the occurrences of the predicates in the
         // initial state
-        PreInstantiation.createPredicatesTables(intInitPredicates);
+        PreInstantiation.createPredicatesTables(intInit);
 
         // Just for logging
         if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
@@ -497,7 +551,7 @@ public final class Encoder implements Serializable {
             str.append(System.lineSeparator());
             str.append("\nPre-instantiation initial state:\n");
             str.append("(and");
-            for (IntExpression f : intInitPredicates) {
+            for (IntExpression f : intInit) {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
             if (intGoal != null) {
@@ -537,16 +591,17 @@ public final class Encoder implements Serializable {
         // Extract the ground inertia from the set of instantiated actions
         PostInstantiation.extractGroundInertia(intActions);
         // Simplify the actions based in the ground inertia
-        PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
+        PostInstantiation.simplyActionsWithGroundInertia(intActions, intInit);
         if (intGoal != null) {
             // Expand the quantified expression in the goal
             Instantiation.expandQuantifiedExpression(intGoal);
             // Simplify the goal with ground inertia information
-            PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
+            PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInit);
 
         }
-        // Extract increase and add value to action cost
-        PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
+
+        // Extract increase and addValue value to action cost
+        //PostInstantiation.simplifyIncrease(intActions, Encoder.NumericFluentValues);
 
         // Just for logging
         if (Encoder.logLevel == 5) {
@@ -556,7 +611,7 @@ public final class Encoder implements Serializable {
             Encoder.printTableOfTypes(str);
             str.append(System.lineSeparator());
             str.append("\nInstantiation initial state:\n").append("(and");
-            for (IntExpression f : intInitPredicates) {
+            for (IntExpression f : intInit) {
                 str.append(" ").append(Encoder.toString(f));
                 str.append("\n");
             }
@@ -641,7 +696,9 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Extract the relevant fluents from the simplified and instantiated actions and methods
-        PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
+        PostInstantiation.extractRelevantFluents(intActions, intMethods, intInit);
+        // Extract the relevant numeric fluent form the simplified and instantiated actions and methods
+        PostInstantiation.extractRelevantNumericFluents(intActions, intMethods);
         // Create the list of relevant tasks
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantTasks = new ArrayList<>();
@@ -671,14 +728,6 @@ public final class Encoder implements Serializable {
         Encoder.actions = new ArrayList<>(intActions.size());
         Encoder.methods = new ArrayList<>(intMethods.size());
 
-        // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
-        final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
-        int index = 0;
-        for (IntExpression fluent : Encoder.tableOfRelevantFluents) {
-            fluentIndexMap.put(fluent, index);
-            index++;
-        }
-
         // Creates the list of relevant operators
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantActions = new ArrayList<>();
@@ -692,14 +741,14 @@ public final class Encoder implements Serializable {
 
         if (intGoal != null && (!intGoal.getChildren().isEmpty()
                 || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, Encoder.tableOfFluentIndex);
         } else {
             Encoder.goal = new GoalDescription();
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
             final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
-            index = 0;
+            int index = 0;
             for (IntExpression task : Encoder.tableOfRelevantTasks) {
                 taskIndexMap.put(task, index);
                 index++;
@@ -708,30 +757,34 @@ public final class Encoder implements Serializable {
             // Encode the initial task network
             Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(intTaskNetwork, taskIndexMap);
             // Encode the methods in bit set representation
-            Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, fluentIndexMap, taskIndexMap));
+            Encoder.methods.addAll(0, BitEncoding.encodeMethods(intMethods, Encoder.tableOfFluentIndex,
+                Encoder.tableOfNumericFluentIndex, taskIndexMap));
         }
 
         // Encode the initial state in bit set representation
-        Encoder.init = BitEncoding.encodeInit(intInitPredicates, fluentIndexMap);
+        Encoder.init = BitEncoding.encodeInit(intInit, Encoder.tableOfFluentIndex);
 
         // Encode the actions in bit set representation
-        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap,
-            Encoder.tableOfRelevantFluents.size()));
+        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, Encoder.tableOfFluentIndex,
+            Encoder.tableOfNumericFluentIndex));
 
         // Just for logging
         if (Encoder.logLevel == 7) {
             str.append("\nFinal actions:\n");
             for (Action a : Encoder.actions) {
-                str.append(Encoder.toString(a) + "\n");
+                str.append(Encoder.toString(a));
+                str.append("\n");
             }
             if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nFinal methods:\n");
                 for (Method m : Encoder.methods) {
-                    str.append(Encoder.toString(m) + "\n");
+                    str.append(Encoder.toString(m));
+                    str.append("\n");
                 }
             }
-            str.append("Final initial state:\n").append("(and");
-            for (IntExpression f : intInitPredicates) {
+            str.append("Final initial state:\n");
+            str.append("(and");
+            for (IntExpression f : intInit) {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
 
@@ -1000,7 +1053,41 @@ public final class Encoder implements Serializable {
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents,
+            Encoder.tableOfRelevantNumericFluents);
+    }
+
+    /**
+     * Returns a string representation of a specified list of numeric constraints.
+     *
+     * @param constraints the constraints.
+     * @return a string representation of the specified list of numeric constraints.
+     */
+    static String toString(final List<NumericConstraint> constraints) {
+        return StringDecoder.toString(constraints, Encoder.tableOfConstants,
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantNumericFluents);
+    }
+
+    /**
+     * Returns a string representation of a specified numeric constraints.
+     *
+     * @param constraint the constraint.
+     * @return a string representation of the specified numeric constraint.
+     */
+    static String toString(final NumericConstraint constraint) {
+        return StringDecoder.toString(constraint, Encoder.tableOfConstants,
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantNumericFluents);
+    }
+
+    /**
+     * Returns a string representation of a specified arithmetic expression.
+     *
+     * @param exp the arithmetic expression.
+     * @return a string representation of the specified arithmetic expression.
+     */
+    static String toString(final ArithmeticExpression exp) {
+        return StringDecoder.toString(exp, Encoder.tableOfConstants,
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantNumericFluents);
     }
 
     /**
@@ -1013,7 +1100,8 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(m, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfTasks,
-            Encoder.tableOfRelevantFluents, Encoder.tableOfRelevantTasks);
+            Encoder.tableOfRelevantFluents, Encoder.tableOfRelevantNumericFluents,
+            Encoder.tableOfRelevantTasks);
     }
 
     /**
@@ -1042,15 +1130,16 @@ public final class Encoder implements Serializable {
     }
 
     /**
-     * Returns a string representation of a bit expression.
+     * Returns a string representation of a goal description
      *
-     * @param exp the expression.
+     * @param gd the expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(GoalDescription exp) {
-        return StringDecoder.toString(exp, Encoder.tableOfConstants,
+    static String toString(GoalDescription gd) {
+        return StringDecoder.toString(gd, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents,
+            Encoder.tableOfRelevantNumericFluents);
     }
 
     /**
@@ -1062,7 +1151,8 @@ public final class Encoder implements Serializable {
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
-            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents,
+            Encoder.tableOfRelevantNumericFluents);
     }
 
     /**

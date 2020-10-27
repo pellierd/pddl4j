@@ -150,7 +150,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a requirements to the domain.
      *
-     * @param requirement the requirement to add.
+     * @param requirement the requirement to addValue.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
     public final boolean addRequirement(final PDDLRequireKey requirement) {
@@ -169,7 +169,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a type to the domain.
      *
-     * @param type the type to add.
+     * @param type the type to addValue.
      * @return <code>true</code> if the type was added; <code>false</code> otherwise.
      */
     public final boolean addType(final PDDLTypedSymbol type) {
@@ -188,7 +188,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a constant to the domain.
      *
-     * @param constant the constant to add.
+     * @param constant the constant to addValue.
      * @return <code>true</code> if the constant was added; <code>false</code> otherwise.
      */
     public final boolean addConstant(final PDDLTypedSymbol constant) {
@@ -207,7 +207,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a predicate to the domain.
      *
-     * @param predicate the predicate to add.
+     * @param predicate the predicate to addValue.
      * @return <code>true</code> if the predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */
@@ -230,7 +230,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a function to the domain.
      *
-     * @param function the function to add.
+     * @param function the function to addValue.
      * @return <code>true</code> if the function was added; <code>false</code> otherwise.
      */
     public final boolean addFunction(final PDDLNamedTypedList function) {
@@ -249,7 +249,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a task to the domain.
      *
-     * @param task the task to add.
+     * @param task the task to addValue.
      * @return <code>true</code> if the task was added; <code>false</code> otherwise.
      */
     public final boolean addTask(final PDDLNamedTypedList task) {
@@ -286,7 +286,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds an action to the domain.
      *
-     * @param action the action to add.
+     * @param action the action to addValue.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */
     public final boolean addAction(final PDDLAction action) {
@@ -306,7 +306,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a method to the domain.
      *
-     * @param method the method to add.
+     * @param method the method to addValue.
      * @return <code>true</code> if the method was added; <code>false</code> otherwise.
      */
     public final boolean addMethod(final PDDLMethod method) {
@@ -325,7 +325,7 @@ public class PDDLDomain implements Serializable {
     /**
      * Adds a derived predicate to the domain.
      *
-     * @param predicate the derived predicate to add.
+     * @param predicate the derived predicate to addValue.
      * @return <code>true</code> if the derived predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */

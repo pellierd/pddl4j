@@ -36,7 +36,7 @@ import fr.uga.pddl4j.problem.Problem;
  * <li> <i>gs(p)</i> = 0, if <i>p</i> is in <i>s</i>,
  * <li> <i>gs(p)</i> = min[1 + <i>gs(Prec(op))]</i> for each <i>op</i> in <i>O(p)</i>, otherwise
  * </ul>
- * <p>where <i>O(p)</i> stands for the actions <i>op</i> that add <i>p</i>, i.e., with <i>p</i> in
+ * <p>where <i>O(p)</i> stands for the actions <i>op</i> that addValue <i>p</i>, i.e., with <i>p</i> in
  * <i>Add(op)</i>, and <i>gs(Prec(op))</i>, to be defined below, stands for the estimated cost of
  * achieving the preconditions of action <i>op</i> from <i>s</i>. The cost <i>gs(C)</i> of a sets
  * of atoms is defined as the max costs of individual atoms:

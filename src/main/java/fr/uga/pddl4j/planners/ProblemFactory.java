@@ -23,6 +23,7 @@ import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.problem.Problem;
 
+import fr.uga.pddl4j.encoding.UnsupportedRequirementException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -139,8 +140,8 @@ public class ProblemFactory {
         Encoder.setLogLevel(this.getTraceLevel());
         try {
             return Encoder.encode(domain, problem);
-        } catch (IllegalArgumentException ilException) {
-            LOGGER.error("The problem to encode is not ADL, \":requirements\" not supported at this time\n");
+        } catch (UnsupportedRequirementException ure) {
+            LOGGER.error(ure.getMessage() + "\n");
             return null;
         }
     }

@@ -21,13 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLSymbol;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.GoalDescription;
-import fr.uga.pddl4j.problem.GoalDescription;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
@@ -384,9 +378,9 @@ final class StringDecoder implements Serializable {
                 str.append(exp.getConnective());
                 break;
             case TIME_VAR:
-                str.append(PDDLConnective.TIME_VAR);
+            case TOTAL_COST_VAR:
+                str.append(exp.getConnective().getImage());
                 break;
-            case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
             case LESS:
@@ -466,9 +460,12 @@ final class StringDecoder implements Serializable {
      */
     static String toString(final Action action, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                           final List<IntExpression> relevants) {
+                           final List<IntExpression> relevants, List<IntExpression> numericFluents) {
         StringBuilder str = new StringBuilder();
-        str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
+        str.append("Action ");
+        str.append(action.getName());
+        str.append("\n");
+        str.append("Instantiations:\n");
         for (int i = 0; i < action.arity(); i++) {
             final int index = action.getValueOfParameter(i);
             final String type = types.get(action.getTypeOfParameters(i));
@@ -479,25 +476,181 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
+        if (!action.getNumericVariables().isEmpty()) {
+            str.append("Numeric variables:\n");
+            for (NumericVariable var : action.getNumericVariables()) {
+                str.append(numericFluents.get(var.getNumericFluents()));
+                str.append(" - ");
+                str.append(" number : ");
+                str.append(var.getValue());
+            }
+        }
         if (action.isDurative()) {
             str.append("Duration: ");
-            str.append(action.getDuration());
-            str.append("\n");
+            str.append(StringDecoder.toString(action.getDurationConstraints(), constants, functions, numericFluents));
             str.append("Condition:\n");
             str.append(StringDecoder.toString(action.getPreconditions(), constants, types, predicates, functions,
-                relevants, true));
+                relevants, numericFluents));
             str.append("\n");
-            str.append("Effect:\n");
         } else {
             str.append("Precondition:\n");
             str.append(StringDecoder.toString(action.getPreconditions(), constants, types, predicates, functions,
-                relevants));
+                relevants, numericFluents));
             str.append("\n");
-            str.append("Effect:\n");
-            for (ConditionalEffect condExp : action.getConditionalEffects()) {
-                str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants));
-                str.append("\n");
+        }
+        str.append("Effect:\n");
+        for (ConditionalEffect condExp : action.getConditionalEffects()) {
+            str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants, numericFluents));
+            str.append("\n");
+        }
+        return str.toString();
+    }
+
+    /**
+     *
+     */
+    static String toString(final List<NumericConstraint> constraints, final List<String> constants,
+            final List<String> functions, final List<IntExpression> numericFluents) {
+
+        final StringBuilder str = new StringBuilder();
+        str.append("(and ");
+        if (!constraints.isEmpty()) {
+            str.append(StringDecoder.toString(constraints.get(0), constants, functions, numericFluents));
+            for (int i = 1; i < constraints.size(); i++) {
+                str.append("\n  ");
+                str.append(StringDecoder.toString(constraints.get(i), constants, functions, numericFluents));
             }
+        }
+        str.append(")\n");
+        return str.toString();
+    }
+
+    /**
+     *
+     * @param constraint
+     * @param constants
+     * @param functions
+     * @param numericFluents
+     * @return
+     */
+    static String toString(final NumericConstraint constraint, final List<String> constants,
+            final List<String> functions, final List<IntExpression> numericFluents) {
+
+        final StringBuilder str = new StringBuilder();
+
+        switch (constraint.getTimeSpecifier()) {
+            case AT_START:
+                str.append("(at start ");
+                break;
+            case AT_END:
+                str.append("(at end ");
+                break;
+        }
+
+        switch (constraint.getComparator()) {
+            case EQUAL:
+                str.append("(= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case LESS:
+                str.append("(< ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case LESS_OR_EQUAL:
+                str.append("(<= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case GREATER:
+                str.append("(> ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case GREATER_OR_EQUAL:
+                str.append("(>= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+        }
+
+        if (constraint.isDurative()) {
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    /**
+     *
+     * @param exp
+     * @param constants
+     * @param functions
+     * @param numericFluents
+     * @return
+     */
+    static String toString(final ArithmeticExpression exp, final List<String> constants, final List<String> functions,
+                           final List<IntExpression> numericFluents) {
+
+        StringBuilder str = new StringBuilder();
+        switch (exp.getType()) {
+            case NUMBER:
+                str.append(exp.getValue());
+                break;
+            case VARIABLE:
+                str.append("(");
+                str.append(StringDecoder.toString(numericFluents.get(exp.getNumericFluents()), constants, null, null,
+                    functions, null));
+                str.append("/");
+                str.append(exp.getValue());
+                str.append(")");
+                break;
+            case OPERATOR:
+                switch (exp.getArithmeticOperator()) {
+                    case PLUS:
+                        str.append("(+ ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case MINUS:
+                        str.append("(- ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case DIV:
+                        str.append("(/ ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case MUL:
+                        str.append("(* ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case UMINUS:
+                        str.append("(- ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                }
         }
         return str.toString();
     }
@@ -516,7 +669,8 @@ final class StringDecoder implements Serializable {
      */
     static String toString(final Method method, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
-                           final  List<IntExpression> relevantFacts, final List<IntExpression> relevantTasks) {
+                           final  List<IntExpression> fluents, final  List<IntExpression> numericFluents,
+                           final List<IntExpression> relevantTasks) {
         final StringBuilder str = new StringBuilder();
         str.append("Method ").append(method.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < method.arity(); i++) {
@@ -535,7 +689,7 @@ final class StringDecoder implements Serializable {
         str.append("\n");
         str.append("Preconditions:\n");
         str.append(StringDecoder.toString(method.getPreconditions(), constants, types, predicates, functions,
-            relevantFacts));
+            fluents, numericFluents));
         str.append("\n");
         str.append(StringDecoder.toString(method.getTaskNetwork(), constants, types, predicates, functions, tasks,
             relevantTasks));
@@ -550,92 +704,80 @@ final class StringDecoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param relevants  the table of relevant facts.
+     * @param fluents  the table of relevant facts.
+     * @param numericFluents the numeric fluents.
      * @return a string representation of the specified expression.
      */
     static String toString(GoalDescription gd, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                           final List<IntExpression> relevants) {
-        return StringDecoder.toString(gd, constants, types, predicates, functions, relevants, false);
-    }
-
-    /**
-     * Returns a string representation of a goal description.
-     *
-     * @param gd         the goal description.
-     * @param constants  the table of constants.
-     * @param types      the table of types.
-     * @param predicates the table of predicates.
-     * @param functions  the table of functions.
-     * @param relevants  the table of relevant facts.
-     * @param durative   the flag to indicate of the goal description is temporal or not.
-     * @return a string representation of the specified expression.
-     */
-    static String toString(GoalDescription gd, final List<String> constants, final List<String> types,
-                           final List<String> predicates, final List<String> functions,
-                           final List<IntExpression> relevants, boolean durative) {
+                           final List<IntExpression> fluents, final List<IntExpression> numericFluents) {
         final StringBuilder str = new StringBuilder("(and");
-        if (durative) {
+        if (gd.isDurative()) {
             final BitSet atStart = gd.getPositiveTimedGoalDescription().getAtStartFluents();
             for (int j = atStart.nextSetBit(0); j >= 0; j = atStart.nextSetBit(j + 1)) {
                 str.append(" (at start ");
-                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                str.append(StringDecoder.toString(fluents.get(j), constants, types, predicates, functions,
                     new ArrayList<String>()));
                 str.append(")\n");
             }
             final BitSet overAll = gd.getPositiveTimedGoalDescription().getOverAllFluents();
             for (int j = overAll.nextSetBit(0); j >= 0; j = overAll.nextSetBit(j + 1)) {
                 str.append(" (over all ");
-                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                str.append(StringDecoder.toString(fluents.get(j), constants, types, predicates, functions,
                     new ArrayList<String>()));
                 str.append(")\n");
             }
             final BitSet atEnd = gd.getPositiveTimedGoalDescription().getAtEndFluents();
             for (int j = atEnd.nextSetBit(0); j >= 0; j = atEnd.nextSetBit(j + 1)) {
                 str.append(" (at end ");
-                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                str.append(StringDecoder.toString(fluents.get(j), constants, types, predicates, functions,
                     new ArrayList<String>()));
                 str.append(")\n");
             }
             final BitSet negAtSTart = gd.getNegativeTimedGoalDescription().getAtStartFluents();
             for (int i = negAtSTart.nextSetBit(0); i >= 0; i = negAtSTart.nextSetBit(i + 1)) {
                 str.append(" (at start (not ");
-                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                str.append(StringDecoder.toString(fluents.get(i), constants, types, predicates,
                     functions, new ArrayList<String>()));
                 str.append("))\n");
             }
             final BitSet negOverAll = gd.getNegativeTimedGoalDescription().getOverAllFluents();
             for (int i = negOverAll.nextSetBit(0); i >= 0; i = negOverAll.nextSetBit(i + 1)) {
                 str.append(" (over all (not ");
-                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                str.append(StringDecoder.toString(fluents.get(i), constants, types, predicates,
                     functions, new ArrayList<String>()));
                 str.append("))\n");
             }
             final BitSet negAtEnd = gd.getNegativeTimedGoalDescription().getAtEndFluents();
             for (int i = negOverAll.nextSetBit(0); i >= 0; i = negAtEnd.nextSetBit(i + 1)) {
                 str.append(" (at end (not ");
-                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                str.append(StringDecoder.toString(fluents.get(i), constants, types, predicates,
                     functions, new ArrayList<String>()));
                 str.append("))\n");
             }
-            str.append(")");
         } else {
             final BitSet positive = gd.getPositiveFluents();
             for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
                 str.append(" ");
-                str.append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                str.append(StringDecoder.toString(fluents.get(j), constants, types, predicates, functions,
                     new ArrayList<String>()));
                 str.append("\n");
             }
             final BitSet negative = gd.getNegativeFluents();
             for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
                 str.append(" (not ");
-                str.append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                str.append(StringDecoder.toString(fluents.get(i), constants, types, predicates,
                     functions, new ArrayList<String>()));
                 str.append(")\n");
             }
-            str.append(")");
         }
+
+        for (NumericConstraint constraint : gd.getNumericConstraints()) {
+            str.append(" ");
+            str.append(StringDecoder.toString(constraint, constants, functions, numericFluents));
+            str.append("\n");
+        }
+        str.append(")");
         return str.toString();
     }
 
@@ -672,24 +814,27 @@ final class StringDecoder implements Serializable {
      * @param types      the table of types.
      * @param predicates the table of predicates.
      * @param functions  the table of functions.
-     * @param relevants  the table of relevant facts.
+     * @param fluents  the table of relevant facts.
+     * @param numericFluents the table of numeric fluents
      * @return a string representation of the specified expression.
      */
     static String toString(ConditionalEffect exp, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                           final List<IntExpression> relevants) {
+                           final List<IntExpression> fluents, final List<IntExpression> numericFluents) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions, relevants));
+            str.append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions, fluents, numericFluents));
         } else {
             str.append("(when ");
-            str.append(StringDecoder.toString(exp.getCondition(), constants, types, predicates, functions, relevants));
-            str.append("\n").append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions,
-                relevants));
+            str.append(StringDecoder.toString(exp.getCondition(), constants, types, predicates, functions, fluents, numericFluents));
+            str.append("\n");
+            str.append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions,
+                fluents, numericFluents));
             str.append(")");
         }
         return str.toString();
     }
+
 
     /**
      * Returns a short string representation of the specified operator, i.e., its name and its

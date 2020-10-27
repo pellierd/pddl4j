@@ -145,8 +145,9 @@ test {
     // The set of Junit tests
     scanForTestClasses = false
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
-    //includes = ['**/TimeEncoderTest.class']
-    includes = ['**/TimeParserTest.class']
+    //includes = ['**/TimeParserTest.class']
+    includes = ['**/TimeEncoderTest.class']
+    //includes = ['**/PFDPlannerTest.class']
     //includes = ['**/HSPTest.class']
 }
 

@@ -398,7 +398,6 @@ void domain() :
 		[LOOKAHEAD(2, {
 			this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)
 		}) functions_def()]
 		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
@@ -429,7 +428,6 @@ void domain_and_problem() :
         [LOOKAHEAD(2, {
             this.isRequirement(PDDLRequireKey.FLUENTS)
             || this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-            || this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
             || this.isRequirement(PDDLRequireKey.ACTION_COSTS)
         }) functions_def()]
         [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
@@ -2580,16 +2578,25 @@ PDDLSymbol da_symbol() :
 	}
 }
 
+/**
+ * Returns a AND PDDLExpression.
+ */
 PDDLExpression duration_constraint() :
 {
-	PDDLExpression node = null;
+    PDDLExpression constraints =  null;
+	PDDLExpression constraint =  null;
 }
 {
-	(	LOOKAHEAD(2) node=empty_or()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) node=and_simple_duration_constraint()
-	|	LOOKAHEAD(2) node=simple_duration_constraint()
+	(	LOOKAHEAD(2)
+	        constraints=empty_and()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+	        constraints=and_simple_duration_constraint()
+	|	LOOKAHEAD(2) constraint=simple_duration_constraint() {
+	        constraints = new PDDLExpression(PDDLConnective.AND);
+	        constraints.addChild(constraint);
+	    }
 	) {
-		return node;
+		return constraints;
 	}
 }
 
@@ -2600,7 +2607,7 @@ PDDLExpression and_simple_duration_constraint() :
 }
 {
 	left_bracket() <AND>
-		(LOOKAHEAD(2) child=simple_duration_constraint(){
+		(LOOKAHEAD(2) child=simple_duration_constraint() {
 			node.addChild(child);
 		})+
 	right_bracket() {
@@ -3529,7 +3536,7 @@ PDDLExpression init_el() :
 
 PDDLExpression equal_init_el() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_ATOM);
+	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
 }

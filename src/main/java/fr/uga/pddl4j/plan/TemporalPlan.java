@@ -72,8 +72,8 @@ public class TemporalPlan extends AbstractPlan {
             final int start = this.actions.firstKey();
             final int last = this.actions.lastKey();
             final Action action = this.actions.lastEntry().getValue().stream().max(
-                Comparator.comparing(a -> a.getDuration())).get();
-            makespan = last + action.getDuration() - start;
+                Comparator.comparing(a -> a.getDuration().getValue())).get();
+            makespan = last + action.getDuration().getValue() - start;
         }
         return makespan;
     }
@@ -118,7 +118,7 @@ public class TemporalPlan extends AbstractPlan {
     /**
      * Adds an action at a specified time specifier in the plan.
      *
-     * @param action the action to add.
+     * @param action the action to addValue.
      * @param time   the time specifier of the action in the plan.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      * @see Plan#add(int, Action)

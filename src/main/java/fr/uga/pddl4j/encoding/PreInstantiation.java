@@ -24,6 +24,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -153,7 +154,6 @@ final class PreInstantiation implements Serializable {
             case F_EXP_T:
             case EQUAL_ATOM:
             case FN_HEAD:
-            case FN_ATOM:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -406,7 +406,7 @@ final class PreInstantiation implements Serializable {
                 if (o.arity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
-                    // Hack add for constant in predicate
+                    // Hack addValue for constant in predicate
                     //if (index < 0) {
                     //    break;
                     //}
@@ -444,7 +444,6 @@ final class PreInstantiation implements Serializable {
                         && !op1.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                         newActions.add(op1);
                     }
-
                     final IntAction op2 = new IntAction(o);
                     op2.setTypeOfParameter(index, ts);
                     PreInstantiation.replace(op2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
@@ -492,7 +491,7 @@ final class PreInstantiation implements Serializable {
                 if (m.arity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
-                    // Hack add for constant in predicate
+                    // Hack addValue for constant in predicate
                     if (index < 0) {
                         break;
                     }
@@ -640,7 +639,6 @@ final class PreInstantiation implements Serializable {
                 break;
             case EQUAL_ATOM:
             case FN_HEAD:
-            case FN_ATOM:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -718,7 +716,6 @@ final class PreInstantiation implements Serializable {
                 break;
             case EQUAL_ATOM:
             case FN_HEAD:
-            case FN_ATOM:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:

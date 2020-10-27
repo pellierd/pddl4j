@@ -90,7 +90,7 @@ public interface Plan extends Serializable {
     /**
      * Adds an action at a specified time specifier in the search.
      *
-     * @param action the action to add.
+     * @param action the action to addValue.
      * @param time   the time specifier of the action in the search.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */

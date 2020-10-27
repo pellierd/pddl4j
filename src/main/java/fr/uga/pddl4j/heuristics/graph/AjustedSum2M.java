@@ -33,7 +33,7 @@ import fr.uga.pddl4j.problem.Problem;
  * </pre>
  * where
  * <ul>
- * <li> <tt>cost(S) := 1 +  cost(S + prec(a) - add(a))</tt></li>
+ * <li> <tt>cost(S) := 1 +  cost(S + prec(a) - addValue(a))</tt></li>
  * <li> <tt>delta(S) := max(lev({p, q} - max{levl(p), level(q)})</tt>for all <tt>p</tt> in
  * <tt>S</tt></li>
  * </ul>

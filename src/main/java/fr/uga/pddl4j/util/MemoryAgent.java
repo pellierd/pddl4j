@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  * This class implements memory agent enable to compute approximation of the size of java objects.
- * In order to start this agent you must add the following option to the command-line:
+ * In order to start this agent you must addValue the following option to the command-line:
  * <pre>
  * -javaagent:pddl4j.jar
  * </pre>

@@ -153,7 +153,7 @@ public class PDDLProblem implements Serializable {
     /**
      * Adds a requirement to the problem.
      *
-     * @param requirement the requirement to add.
+     * @param requirement the requirement to addValue.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
     public final boolean addRequirement(final PDDLRequireKey requirement) {
@@ -172,7 +172,7 @@ public class PDDLProblem implements Serializable {
     /**
      * Adds an object to the problem.
      *
-     * @param object the object to add.
+     * @param object the object to addValue.
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
      */
     public final boolean addObject(final PDDLTypedSymbol object) {
@@ -209,7 +209,7 @@ public class PDDLProblem implements Serializable {
     /**
      * Adds an initial fact to the problem.
      *
-     * @param fact the fact to add.
+     * @param fact the fact to addValue.
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
      */
     public final boolean addInitialFact(final PDDLExpression fact) {

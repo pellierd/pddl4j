@@ -117,7 +117,7 @@ public class ParallelPlan extends AbstractPlan {
     /**
      * Adds an action at a specified time specifier in the plan.
      *
-     * @param action the action to add.
+     * @param action the action to addValue.
      * @param time   the time specifier of the action in the plan.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      * @see Plan#add(int, Action)

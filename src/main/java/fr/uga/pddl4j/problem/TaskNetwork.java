@@ -167,7 +167,7 @@ public final class TaskNetwork implements Serializable {
         final BitVector row = new BitVector(this.getOrderingConstraints().getRow(task));
         // Remove the task to replace
         this.removeTask(task);
-        // Resize the matrix to add the contraints for the method subtasks
+        // Resize the matrix to addValue the contraints for the method subtasks
         this.orderingConstraints.resize(newSize, newSize);
         // Add the subtasks contraints to the tasknetwork
         for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {

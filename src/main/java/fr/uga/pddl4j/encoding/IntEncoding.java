@@ -34,13 +34,7 @@ import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.OrderingConstraintSet;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -171,7 +165,6 @@ final class IntEncoding implements Serializable {
                 }
                 break;
             case EQUAL:
-            case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
             case LESS:
@@ -377,39 +370,23 @@ final class IntEncoding implements Serializable {
     }
 
     /**
-     * Encodes functions and costs from initial state into its integer representation.
+     * Extract the initial value of the numeric fluent declared in the initial state. After the calling this method, the
+     * initial state contained only atomic formula.
      *
      * @param init the initial state encoded.
      * @return the encoded functions and costs from initial state.
      */
-    static Map<IntExpression, Double> encodeFunctionCostInit(final Set<IntExpression> init) {
+    static Map<IntExpression, Double> extractNumericFluentValues(Set<IntExpression> init) {
         Map<IntExpression, Double> intFunctionCost = new HashMap<>();
-        for (IntExpression intExp : init) {
-            if (intExp.getConnective().equals(PDDLConnective.EQUAL)) {
-                intFunctionCost.put(intExp.getChildren().get(0),
-                    Double.parseDouble(StringDecoder.toString(intExp.getChildren().get(1),
-                        Encoder.tableOfConstants,
-                        Encoder.tableOfTypes,
-                        Encoder.tableOfPredicates,
-                        Encoder.tableOfFunctions,
-                        Encoder.tableOfTasks, "")));
+        Iterator<IntExpression> i = init.iterator();
+        while (i.hasNext()) {
+            IntExpression initEl = i.next();
+            if (initEl.getConnective().equals(PDDLConnective.EQUAL)) {
+                intFunctionCost.put(initEl.getChildren().get(0), initEl.getChildren().get(1).getValue());
+                i.remove();
             }
         }
         return intFunctionCost;
-    }
-    //TODO make more clean method:
-    //init.stream().filter(x -> x.getConnective().getImage().equals("="))
-    // .collect(Collectors.toMap(x.getChildren().get(0)));
-
-    /**
-     * Removes functions and costs from initial state integer representation.
-     *
-     * @param init the initial state to encode.
-     * @return the initial state encoded without functions and costs.
-     */
-    static Set<IntExpression> removeFunctionCost(final Set<IntExpression> init) {
-        return init.stream().filter(x -> !x.getConnective().getImage().equals("="))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -750,7 +727,6 @@ final class IntEncoding implements Serializable {
                     intExp.getChildren().add(IntEncoding.encodeExp(exp.getChildren().get(0), variables));
                 }
                 break;
-            case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
             case LESS:

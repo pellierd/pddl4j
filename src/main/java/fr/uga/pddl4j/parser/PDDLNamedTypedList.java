@@ -121,7 +121,7 @@ public class PDDLNamedTypedList implements Serializable {
     /**
      * Adds a type to this name type list.
      *
-     * @param type the type to add.
+     * @param type the type to addValue.
      */
     public void addType(final PDDLSymbol type) {
         if (type == null) {
@@ -169,7 +169,7 @@ public class PDDLNamedTypedList implements Serializable {
     /**
      * Add a new argument at the end of the list.
      *
-     * @param arg the argument to add.
+     * @param arg the argument to addValue.
      * @return <code>true</code> if the argument was added <code>false</code> otherwise.
      */
     public boolean add(final PDDLTypedSymbol arg) {

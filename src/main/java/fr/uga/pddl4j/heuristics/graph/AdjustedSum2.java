@@ -33,7 +33,7 @@ import fr.uga.pddl4j.problem.Problem;
  * </pre>
  * where
  * <ul>
- * <li> <code>cost(S) := 1 +  cost(S + prec(a) - add(a))</code>
+ * <li> <code>cost(S) := 1 +  cost(S + prec(a) - addValue(a))</code>
  * <li> <code>delta(S) := lev(S) - max(lev(p))</code> for all <code>p</code> in <code>S</code>
  * </ul>
  * <b>Warning:</b> The adjusted sum heuristic is not admissible.

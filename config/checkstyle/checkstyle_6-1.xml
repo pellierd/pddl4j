@@ -10,7 +10,7 @@
 
     <property name="fileExtensions" value="java, properties, xml"/>
 
-    <!-- TODO add whitespaces checking -->
+    <!-- TODO addValue whitespaces checking -->
 
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>

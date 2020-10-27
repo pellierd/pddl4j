@@ -137,7 +137,7 @@ public class BitMatrix implements Serializable {
     /**
      * Adds a row at the end of the matrix.
      *
-     * @param row the row to add.
+     * @param row the row to addValue.
      */
     public final void addRow(BitVector row) {
         this.matrix.add(row);
@@ -147,7 +147,7 @@ public class BitMatrix implements Serializable {
      * Adds a row at a specified index in the matrix.
      *
      * @param index the index where the row must be added.
-     * @param row   the row to add.
+     * @param row   the row to addValue.
      */
     public void addRow(final int index, final BitVector row) {
         this.matrix.add(index, row);

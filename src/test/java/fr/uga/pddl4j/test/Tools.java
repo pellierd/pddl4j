@@ -147,7 +147,7 @@ public abstract class Tools {
     }
 
     /**
-     * Change the permissions for PDDL_VAL file (add read, write and execute).
+     * Change the permissions for PDDL_VAL file (addValue read, write and execute).
      */
     public static void changeVALPerm() {
         final File val = new File(Tools.PDDL_VAL);

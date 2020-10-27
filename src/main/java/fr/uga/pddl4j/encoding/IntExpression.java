@@ -172,7 +172,7 @@ public class IntExpression implements Serializable {
     /**
      * Adds a child to this expression.
      *
-     * @param child the child expression to add.
+     * @param child the child expression to addValue.
      * @return <code>true</code> if the child was added <code>false</code> otherwise.
      */
     public final boolean addChild(final IntExpression child) {

@@ -129,7 +129,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);
                 this.setCreatedNodes(this.getCreatedNodes() + 1);
-                successor.setCost(parent.getCost() + op.getCost());
+                successor.setCost(parent.getCost() + op.getCost().getValue());
                 successor.setHeuristic(heuristic.estimate(nextState, problem.getGoal()));
                 successor.setParent(parent);
                 successor.setAction(index);

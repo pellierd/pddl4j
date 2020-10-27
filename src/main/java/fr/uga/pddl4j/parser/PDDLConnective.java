@@ -64,13 +64,13 @@ public enum PDDLConnective {
      */
     F_EXP_T(""),
     /**
-     * The connective for the temporal variable.
+     * The connective for the duration variable.
      */
     TIME_VAR("?duration"),
     /**
-     * The connective for ground function expression used in initial fact expressions.
+     * The connective for the total-cost variable.
      */
-    FN_ATOM("="),
+    TOTAL_COST_VAR("?total-cost"),
     /**
      * The connective for ground function expression used in goal metric expressions.
      */
@@ -245,11 +245,6 @@ public enum PDDLConnective {
     LESS_ORDERING_CONSTRAINT("<");
 
     /**
-     * PDDLConnective for sortof constraints used in HDDL fragment.
-     */
-    //SORT_OF_CONSTRAINT("sortof");
-
-    /**
      * The image associate to the connective in the PDDL language.
      */
     private String image;
@@ -270,15 +265,6 @@ public enum PDDLConnective {
      */
     public String getImage() {
         return this.image;
-    }
-
-    /**
-     * Returns a string representation of this PDDL connective.
-     *
-     * @return a string representation of this PDDL connective.
-     */
-    public String toString() {
-        return this.getImage();
     }
 
 }

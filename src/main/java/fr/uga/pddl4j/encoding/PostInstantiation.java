@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -77,20 +78,24 @@ final class PostInstantiation implements Serializable {
      * @param methods the list of instantiated methods
      * @param init    the initial state.
      */
-    static void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods,
-                                     final Set<IntExpression> init) {
-        final Set<IntExpression> facts = new LinkedHashSet<>(10000);
+    static void extractRelevantFluents(final List<IntAction> actions, List<IntMethod> methods,
+                                       final Set<IntExpression> init) {
+        final Set<IntExpression> fluents = new LinkedHashSet<>(10000);
         for (IntAction a : actions) {
-            extractRelevantFacts(a.getPreconditions(), facts, init);
-            extractRelevantFacts(a.getEffects(), facts, init);
+            extractRelevantFluents(a.getPreconditions(), fluents, init);
+            extractRelevantFluents(a.getEffects(), fluents, init);
         }
         for (IntMethod m : methods) {
-            extractRelevantFacts(m.getPreconditions(), facts, init);
+            extractRelevantFluents(m.getPreconditions(), fluents, init);
         }
-        Encoder.tableOfRelevantFluents = new ArrayList<>(facts.size());
-        for (IntExpression exp : facts) {
-            final IntExpression relevant = new IntExpression(exp);
-            Encoder.tableOfRelevantFluents.add(relevant);
+        Encoder.tableOfRelevantFluents = new ArrayList<>(fluents.size());
+        Encoder.tableOfFluentIndex = new LinkedHashMap<>(fluents.size());
+        int index = 0;
+        for (IntExpression fluent : fluents) {
+            final IntExpression copy = new IntExpression(fluent);
+            Encoder.tableOfRelevantFluents.add(copy);
+            Encoder.tableOfFluentIndex.put(copy, index);
+            index++;
         }
     }
 
@@ -106,8 +111,8 @@ final class PostInstantiation implements Serializable {
      * @param facts the set of relevant facts.
      * @param init  the initial state.
      */
-    private static void extractRelevantFacts(final IntExpression exp, final Set<IntExpression> facts,
-                                             final Set<IntExpression> init) {
+    private static void extractRelevantFluents(final IntExpression exp, final Set<IntExpression> facts,
+                                               final Set<IntExpression> init) {
         switch (exp.getConnective()) {
             case ATOM:
                 facts.add(exp);
@@ -119,7 +124,7 @@ final class PostInstantiation implements Serializable {
             case AND:
             case OR:
                 for (IntExpression e : exp.getChildren()) {
-                    PostInstantiation.extractRelevantFacts(e, facts, init);
+                    PostInstantiation.extractRelevantFluents(e, facts, init);
                 }
                 break;
             case FORALL:
@@ -132,7 +137,7 @@ final class PostInstantiation implements Serializable {
             case SOMETIME:
             case AT_MOST_ONCE:
             case NOT:
-                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFluents(exp.getChildren().get(0), facts, init);
                 break;
             case WHEN:
             case LESS:
@@ -149,27 +154,22 @@ final class PostInstantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                extractRelevantFacts(exp.getChildren().get(0), facts, init);
-                extractRelevantFacts(exp.getChildren().get(1), facts, init);
-                break;
-            case F_EXP_T:
-                if (!exp.getChildren().isEmpty()) {
-                    extractRelevantFacts(exp.getChildren().get(0), facts, init);
-                }
+                extractRelevantFluents(exp.getChildren().get(0), facts, init);
+                extractRelevantFluents(exp.getChildren().get(1), facts, init);
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                extractRelevantFacts(exp.getChildren().get(0), facts, init);
-                extractRelevantFacts(exp.getChildren().get(1), facts, init);
-                extractRelevantFacts(exp.getChildren().get(3), facts, init);
+                extractRelevantFluents(exp.getChildren().get(0), facts, init);
+                extractRelevantFluents(exp.getChildren().get(1), facts, init);
+                extractRelevantFluents(exp.getChildren().get(3), facts, init);
                 break;
-            case FN_ATOM:
             case NUMBER:
+            case F_EXP:
+            case F_EXP_T:
             case DURATION_ATOM:
             case TIME_VAR:
             case IS_VIOLATED:
@@ -178,6 +178,108 @@ final class PostInstantiation implements Serializable {
                 break;
             default:
                 // do nothing
+        }
+    }
+
+    /**
+     * Extracts the relevant numeric fluents from the instantiated actions and methods.
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     */
+    static void extractRelevantNumericFluents(final List<IntAction> actions, List<IntMethod> methods) {
+        final Set<IntExpression> fluents = new LinkedHashSet<>(10000);
+        for (IntAction a : actions) {
+            PostInstantiation.extractRelevantNumericFluents(a.getDuration(), fluents);
+            PostInstantiation.extractRelevantNumericFluents(a.getPreconditions(), fluents);
+            PostInstantiation.extractRelevantNumericFluents(a.getEffects(), fluents);
+        }
+        for (IntMethod m : methods) {
+            PostInstantiation.extractRelevantNumericFluents(m.getPreconditions(),fluents);
+        }
+        Encoder.tableOfRelevantNumericFluents = new ArrayList<>(fluents.size());
+        Encoder.tableOfNumericFluentIndex = new LinkedHashMap<>(fluents.size());
+        int index = 0;
+        for (IntExpression fluent : fluents) {
+            final IntExpression copy = new IntExpression(fluent);
+            Encoder.tableOfRelevantNumericFluents.add(copy);
+            Encoder.tableOfNumericFluentIndex.put(copy, index);
+            index++;
+        }
+    }
+
+    /**
+     * Extracts the relevant numeric fluent from a specified expression.
+     *
+     * @param exp   the expression.
+     * @param fluents the set of relevant fluents extracted.
+     */
+     static void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
+        switch (exp.getConnective()) {
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    PostInstantiation.extractRelevantNumericFluents(e, fluents);
+                }
+                break;
+
+            case FN_HEAD:
+            case TIME_VAR:
+            case TOTAL_COST_VAR:
+                fluents.add(exp);
+                break;
+            case AT_START:
+            case AT_END:
+            case FORALL:
+            case EXISTS:
+            case UMINUS:
+            case ALWAYS:
+            case OVER_ALL:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case F_EXP:
+            case F_EXP_T:
+            case NOT:
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
+                break;
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(3), fluents);
+                break;
+            case ATOM:
+            case EQUAL_ATOM:
+            case NUMBER:
+            case IS_VIOLATED:
+            case MINIMIZE:
+            case MAXIMIZE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
     }
 
@@ -268,7 +370,7 @@ final class PostInstantiation implements Serializable {
                         // If a child expression is TRUE, we can remove the child expression.
                         exp.getChildren().remove(i);
                     } else if (ei.getConnective().equals(PDDLConnective.AND)) {
-                        // If the child expression to add is a conjunction, we can simplify the expression
+                        // If the child expression to addValue is a conjunction, we can simplify the expression
                         // by
                         // removing the inner conjunction.
                         exp.getChildren().remove(i);
@@ -349,7 +451,7 @@ final class PostInstantiation implements Serializable {
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
                     } else if (ei.getConnective().equals(PDDLConnective.OR)) {
-                        // If the child expression to add is a disjunction, we can simplify the expression
+                        // If the child expression to addValue is a disjunction, we can simplify the expression
                         // by
                         // removing the inner disjunction.
                         exp.getChildren().remove(i);
@@ -481,7 +583,6 @@ final class PostInstantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -489,10 +590,9 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplify(exp.getChildren().get(0));
                 PostInstantiation.simplify(exp.getChildren().get(1));
                 break;
+            case F_EXP:
             case F_EXP_T:
-                if (!exp.getChildren().isEmpty()) {
-                    PostInstantiation.simplify(exp.getChildren().get(0));
-                }
+                PostInstantiation.simplify(exp.getChildren().get(0));
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
@@ -500,7 +600,6 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplify(exp.getChildren().get(1));
                 PostInstantiation.simplify(exp.getChildren().get(3));
                 break;
-            case FN_ATOM:
             case NUMBER:
             case DURATION_ATOM:
             case TIME_VAR:
@@ -819,7 +918,6 @@ final class PostInstantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -827,6 +925,7 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(0), effect, init);
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(1), effect, init);
                 break;
+            case F_EXP:
             case F_EXP_T:
                 if (!exp.getChildren().isEmpty()) {
                     PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(0), effect, init);
@@ -838,7 +937,6 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(1), effect, init);
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(3), effect, init);
                 break;
-            case FN_ATOM:
             case NUMBER:
             case DURATION_ATOM:
             case TIME_VAR:
@@ -924,7 +1022,6 @@ final class PostInstantiation implements Serializable {
             case F_EXP_T:
             case EQUAL_ATOM:
             case FN_HEAD:
-            case FN_ATOM:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -1018,8 +1115,6 @@ final class PostInstantiation implements Serializable {
             case EQUAL_ATOM:
                 break;
             case FN_HEAD:
-                break;
-            case FN_ATOM:
                 break;
             case DURATION_ATOM:
                 break;

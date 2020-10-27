@@ -90,7 +90,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
-                        successor.setCost(current.getCost() + op.getCost());
+                        successor.setCost(current.getCost() + op.getCost().getValue());
                         successor.setHeuristic(0);
                         successor.setParent(current);
                         successor.setAction(index);

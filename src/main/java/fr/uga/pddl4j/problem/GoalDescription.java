@@ -19,9 +19,11 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.io.Serializable;
+import java.util.*;
 
 /**
  * This class implements a goal description. The class goal description is used to represents the preconditions and the
@@ -32,6 +34,7 @@ import java.io.Serializable;
  * @since 4.0
  * @see BitVector
  * @see TimedGoalDescription
+ * @see NumericConstraint
  */
 public class GoalDescription implements Serializable {
 
@@ -44,6 +47,11 @@ public class GoalDescription implements Serializable {
      * The time goal description used to store the negative fluents of the goal description.
      */
     private TimedGoalDescription negative;
+
+    /**
+     * The list of numeric constraint of this goal description.
+     */
+    private Set<NumericConstraint> constraints;
 
     /**
      * Creates a new goal description. By default the goal description has no positive and no negative fluents.
@@ -63,7 +71,8 @@ public class GoalDescription implements Serializable {
     }
 
     /**
-     * Creates a new goal description from a specified positive and negative timed goal description.
+     * Creates a new goal description from a specified positive and negative timed goal description and an empty set of
+     * numeric constraints.
      *
      * @param positive the positive timed goal description of goal description.
      * @param negative the positive timed goal description of goal description.
@@ -72,6 +81,7 @@ public class GoalDescription implements Serializable {
     public GoalDescription(final TimedGoalDescription positive, final TimedGoalDescription negative) {
         this.positive = positive;
         this.negative = negative;
+        this.constraints = new LinkedHashSet<>();
     }
 
     /**
@@ -131,6 +141,33 @@ public class GoalDescription implements Serializable {
     }
 
     /**
+     * Returns the numeric constraints of this goal description.
+     *
+     * @return the numeric constraints of this goal description.
+     */
+    public final Set<NumericConstraint> getNumericConstraints() {
+        return this.constraints;
+    }
+
+    /**
+     * Sets the numeric constraints of this goal description.
+     *
+     * @param constraints the numeric constraints of this goal description.
+     */
+    public final void setNumericConstraints(final Set<NumericConstraint> constraints) {
+        this.constraints = constraints;
+    }
+
+    /**
+     * Adds a numeric constraints of this goal description.
+     *
+     * @param constraint the numeric constraint to add.
+     */
+    public final void addNumericConstraint(final NumericConstraint constraint) {
+        this.constraints.add(constraint);
+    }
+
+    /**
      * Returns if goal description is empty, i.e., if the goal description has no positive and no negative
      * fluent. Such a goal description is always true.
      *
@@ -151,6 +188,35 @@ public class GoalDescription implements Serializable {
     }
 
     /**
+     * Returns if this goal description is durative. A goal description is durative it has fluent wit time specifier
+     * (at start, at end, over-all) or have durative numeric constraits.
+     *
+     * @return <code>true</code> if the goal description is durative.
+     */
+    public final boolean isDurative() {
+        return !this.getPositiveTimedGoalDescription().getOverAllFluents().isEmpty()
+            || !this.getPositiveTimedGoalDescription().getAtEndFluents().isEmpty()
+            || !this.getNegativeTimedGoalDescription().getOverAllFluents().isEmpty()
+            || !this.getNegativeTimedGoalDescription().getAtEndFluents().isEmpty()
+            || this.hasDurativeNumericConstraints();
+    }
+
+    /**
+     * Returns if the goal descriptions has a durative numeric constraints.
+     *
+     * @return <code>true</code> if the goak description has a durative numeric constraints.
+     */
+    public final boolean hasDurativeNumericConstraints() {
+        boolean durative = false;
+        final Iterator<NumericConstraint> i = this.getNumericConstraints().iterator();
+        while (i.hasNext() && !durative) {
+            final NumericConstraint constraint = i.next();
+            durative = constraint.isDurative();
+        }
+        return durative;
+    }
+
+    /**
      * Returns the hash code value of the goal description.
      *
      * @return the hash code value of the goal description.
@@ -158,11 +224,8 @@ public class GoalDescription implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + this.negative.hashCode();
-        result = prime * result + this.positive.hashCode();
-        return result;
+        return Objects.hash(this.getPositiveTimedGoalDescription(), this.getNegativeTimedGoalDescription(),
+            this.getNumericConstraints());
     }
 
     /**
@@ -179,7 +242,9 @@ public class GoalDescription implements Serializable {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof GoalDescription) {
             GoalDescription other = (GoalDescription) obj;
-            return this.positive.equals(other.positive) && this.negative.equals(other.negative);
+            return this.positive.equals(other.positive)
+                && this.negative.equals(other.negative)
+                && this.constraints.equals(other.constraints);
         }
         return false;
     }
@@ -196,6 +261,11 @@ public class GoalDescription implements Serializable {
         str.append(this.getPositiveTimedGoalDescription());
         str.append("** Negative fluents **\n");
         str.append(this.getNegativeTimedGoalDescription());
+        str.append("** Numeric constraints **\n");
+        for (NumericConstraint constraint : this.getNumericConstraints()) {
+            str.append(constraint);
+            str.append("\n");
+        }
         return str.toString();
     }
 }

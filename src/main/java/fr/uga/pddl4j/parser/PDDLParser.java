@@ -651,7 +651,7 @@ public final class PDDLParser {
             PDDLExpression gd = stackGD.poll();
             switch (gd.getConnective()) {
                 case ATOM:
-                case FN_ATOM:
+                case EQUAL:
                     boolean error = false;
                     List<PDDLSymbol> atom = gd.getAtom();
                     if (atom == null) {
@@ -690,7 +690,7 @@ public final class PDDLParser {
                             .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                             .getName().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
+                    } else if (checked && gd.getConnective().equals(PDDLConnective.EQUAL)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1435,7 +1435,7 @@ public final class PDDLParser {
                 .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
                 .getName().getBeginColumn());
             checked = false;
-        } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
+        } else if (checked && gd.getConnective().equals(PDDLConnective.EQUAL)
             && !this.isDeclaredFunction(atomSkeleton)) {
             this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer

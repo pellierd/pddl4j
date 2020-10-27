@@ -348,9 +348,9 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
                     lAchievers.getRow(p).or(ak1.getRow(p));
                 }
             }
-            // Clear the bit vector that will contain the operator to add at the next level
+            // Clear the bit vector that will contain the operator to addValue at the next level
             this.newOperators.clear();
-            // Initialize the bit vector that will contain the propositions to add at the next level
+            // Initialize the bit vector that will contain the propositions to addValue at the next level
             final BitVector newPropositions = new BitVector();
             // Add the NOOP operators
             this.opsLayer.or(this.propsLayer);
@@ -568,7 +568,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
 
     /**
      * Returns <code>true</code> if two opsLayer are dependent, i.e, if an operator delete an
-     * precondition or an add effect of the other.
+     * precondition or an addValue effect of the other.
      *
      * @param oi The first operator.
      * @param oj The second operator

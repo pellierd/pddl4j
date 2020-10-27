@@ -102,7 +102,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
-                        successor.setCost(current.getCost() + op.getCost());
+                        successor.setCost(current.getCost() + op.getCost().getValue());
                         successor.setHeuristic(heuristic.estimate(nextState, codedProblem.getGoal()));
                         successor.setParent(current);
                         successor.setAction(index);

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * This class implements a parser node used in PDDL expressions.
@@ -147,7 +148,7 @@ public class PDDLExpression implements Serializable {
     /**
      * Attach a new son to this node.
      *
-     * @param exp the son to add
+     * @param exp the son to addValue
      * @return <code>true</code> if the node was added; <code>false</code> otherwise
      * @throws RuntimeException if the specified node is null
      */
@@ -415,7 +416,6 @@ public class PDDLExpression implements Serializable {
                 }
                 break;
             case EQUAL:
-            case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
             case LESS:
@@ -515,7 +515,6 @@ public class PDDLExpression implements Serializable {
             case NUMBER:
             case F_EXP_T:
             case TIME_VAR:
-            case FN_ATOM:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -788,7 +787,6 @@ public class PDDLExpression implements Serializable {
             case TIME_VAR:
                 str.append(this.getVariable());
                 break;
-            case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
             case LESS:
@@ -912,8 +910,16 @@ public class PDDLExpression implements Serializable {
                     && this.children.get(1).isMalformedExpression()
                     && this.children.get(2).isMalformedExpression();
                 break;
-            case FN_ATOM:
             case DURATION_ATOM:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case HOLD_AFTER:
+            case LESS_ORDERING_CONSTRAINT:
+            case WITHIN:
+                malformed = this.atom.size() != 2;
+                break;
+            case WHEN:
+            case EQUAL:
             case LESS:
             case LESS_OR_EQUAL:
             case GREATER:
@@ -927,15 +933,6 @@ public class PDDLExpression implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case HOLD_AFTER:
-            case WITHIN:
-            case LESS_ORDERING_CONSTRAINT:
-                malformed = this.atom.size() != 2;
-                break;
-            case WHEN:
-            case EQUAL:
                 malformed = this.children.size() != 2
                     && this.children.get(0).isMalformedExpression()
                     && this.children.get(1).isMalformedExpression();
@@ -951,6 +948,7 @@ public class PDDLExpression implements Serializable {
             case MINIMIZE:
             case MAXIMIZE:
             case F_EXP_T:
+            case F_EXP:
                 malformed = this.children.size() != 1
                     && this.children.get(0).isMalformedExpression();
                 break;

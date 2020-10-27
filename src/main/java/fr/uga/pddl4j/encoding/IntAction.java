@@ -65,7 +65,7 @@ final class IntAction extends AbstractIntOperator {
         super(other);
         this.effects = new IntExpression(other.getEffects());
         this.cost = other.getCost();
-        if (this.duration != null) {
+        if (other.getDuration() != null) {
             this.duration = new IntExpression(other.getDuration());
         }
     }

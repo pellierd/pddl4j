@@ -20,14 +20,11 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class contains the methods needed to instantiate the actions and the method.
@@ -44,6 +41,11 @@ import java.util.Set;
 final class Instantiation implements Serializable {
 
     /**
+     * The default value of the numeric function when no value is specified in the initial state of the problem.
+     */
+    private static final double DEFAULT_NUMERIC_FLUENT_VALUE =  0.0;
+
+    /**
      * The default constructor with a private access to prevent instance creation.
      */
     private Instantiation() {
@@ -57,16 +59,16 @@ final class Instantiation implements Serializable {
      */
     static List<IntAction> instantiateActions(final List<IntAction> actions) {
         final List<IntAction> instActions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);
-        for (IntAction a : actions) {
+        for (IntAction action : actions) {
             // If an action has a parameter with a empty domain the action must be removed
             boolean toInstantiate = true;
             int i = 0;
-            while (i < a.arity() && toInstantiate) {
-                toInstantiate = !Encoder.tableOfDomains.get(a.getTypeOfParameters(i)).isEmpty();
+            while (i < action.arity() && toInstantiate) {
+                toInstantiate = !Encoder.tableOfDomains.get(action.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
             if (toInstantiate) {
-                instActions.addAll(Instantiation.instantiate(a));
+                instActions.addAll(Instantiation.instantiate(action));
             }
         }
         return instActions;
@@ -122,6 +124,7 @@ final class Instantiation implements Serializable {
      */
     private static void instantiate(final IntAction action, final int index, final int bound,
                                     final List<IntAction> actions) {
+
         if (bound == actions.size()) {
             return;
         }
@@ -132,9 +135,17 @@ final class Instantiation implements Serializable {
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 final IntExpression effect = action.getEffects();
                 Instantiation.simplify(effect);
-                if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
-                    actions.add(action);
-                }
+                /*if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
+                    System.out.println(action.getName());*/
+                        actions.add(action);
+                /*        System.out.println(Encoder.toString(action));
+                        try {
+                            System.in.read();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }*/
             }
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(action.getTypeOfParameters(index));
@@ -165,6 +176,138 @@ final class Instantiation implements Serializable {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Simply the duration constraints of express in a durative action. The expression in parameter that represents the
+     * duration constraints is modified. The durations constraints in parameter must be a conjuntion of simple duration
+     * constraints. If the simplification fails due to unconsistent constraints the expression is simply to FALSE.
+     * The case of constraints of type <code>(at <time-specifier> <simple-duration-constraint>)</code> is not is not
+     * addressed by the method.
+     *
+     * @param exp the expression that represents the duration constraints.
+     * @throws ArithmeticException if a division by 0 happens during simplification.
+     */
+    static void simplyDurationConstraints(IntExpression exp, Map<IntExpression, Double> numericFluentValues)
+            throws ArithmeticException {
+        IntExpression op1 = null;
+        IntExpression op2 = null;
+        switch (exp.getConnective()) {
+            case AND:
+                double inf = -Double.MAX_VALUE;
+                IntExpression infConstraint = null;
+                double sup = Double.MAX_VALUE;
+                IntExpression supConstraint = null;
+                double equal = Double.NaN;
+                IntExpression equalConstraint = null;
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                boolean consistent = true;
+                while (i.hasNext() && consistent) {
+                    final IntExpression constraint = i.next();
+                    Instantiation.simplyDurationConstraints(constraint, numericFluentValues);
+                    final double value = constraint.getChildren().get(1).getValue();
+                    switch (constraint.getConnective()) {
+                        case LESS_OR_EQUAL:
+                            if (value < sup) {
+                                sup = value;
+                                supConstraint = constraint;
+                            }
+                            consistent = sup < inf;
+                            break;
+                        case GREATER_OR_EQUAL:
+                            if (value > inf) {
+                                inf = value;
+                                infConstraint = constraint;
+                            }
+                            consistent = sup < inf;
+                            break;
+                        case EQUAL:
+                            if (Double.isNaN(equal)) {
+                                equal = value;
+                                equalConstraint = constraint;
+                            }
+                            consistent = (equal == value && inf <= equal && equal <= sup);
+                            break;
+                        default:
+                            throw new UnexpectedExpressionException(Encoder.toString(constraint));
+                    }
+                }
+                exp.getChildren().clear();
+                if (consistent) {
+                    if (equal == Double.NaN) {
+                        exp.addChild(infConstraint);
+                        exp.addChild(supConstraint);
+                    } else {
+                        exp.addChild(equalConstraint);
+                    }
+                } else {
+                    exp.setConnective(PDDLConnective.FALSE);
+                }
+                break;
+            case EQUAL:
+            case LESS_OR_EQUAL:
+            case GREATER_OR_EQUAL:
+                Instantiation.simplyDurationConstraints(exp.getChildren().get(1), numericFluentValues);
+                break;
+            case F_EXP:
+                exp.setConnective(PDDLConnective.NUMBER);
+                Instantiation.simplyDurationConstraints(exp.getChildren().get(0), numericFluentValues);
+                exp.setValue(exp.getChildren().get(0).getValue());
+                break;
+            case FN_HEAD:
+                Double value = numericFluentValues.get(exp);
+                if (value == null) {
+                    value = Instantiation.DEFAULT_NUMERIC_FLUENT_VALUE;
+                    numericFluentValues.put(exp, value);
+                }
+                exp.setValue(value);
+                exp.setConnective(PDDLConnective.NUMBER);
+                break;
+            case MINUS:
+                op1 = exp.getChildren().get(0);
+                Instantiation.simplyDurationConstraints(op1, numericFluentValues);
+                exp.setValue(op1.getValue() * -1.0);
+                exp.setConnective(PDDLConnective.NUMBER);
+                exp.getChildren().clear();
+                break;
+            case MUL:
+                op1 = exp.getChildren().get(0);
+                op2 = exp.getChildren().get(1);
+                Instantiation.simplyDurationConstraints(op1, numericFluentValues);
+                Instantiation.simplyDurationConstraints(op2, numericFluentValues);
+                exp.setValue(op1.getValue() * op2.getValue());
+                exp.setConnective(PDDLConnective.NUMBER);
+                exp.getChildren().clear();
+                break;
+            case DIV:
+                op1 = exp.getChildren().get(0);
+                op2 = exp.getChildren().get(1);
+                Instantiation.simplyDurationConstraints(op1, numericFluentValues);
+                Instantiation.simplyDurationConstraints(op2, numericFluentValues);
+                if (op2.getValue() != 0.0) {
+                    exp.setValue(op1.getValue() / op2.getValue());
+                } else {
+                    throw new ArithmeticException(Encoder.toString(exp));
+                }
+                exp.setConnective(PDDLConnective.NUMBER);
+                exp.getChildren().clear();
+                break;
+            case PLUS:
+                op1 = exp.getChildren().get(0);
+                op2 = exp.getChildren().get(1);
+                Instantiation.simplyDurationConstraints(op1, numericFluentValues);
+                Instantiation.simplyDurationConstraints(op2, numericFluentValues);
+                exp.setValue(op1.getValue() + op2.getValue());
+                exp.setConnective(PDDLConnective.NUMBER);
+                exp.getChildren().clear();
+                break;
+            case NUMBER:
+                // Do nothing
+                break;
+            default:
+                System.out.println(exp.getConnective());
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
     }
 
@@ -619,7 +762,6 @@ final class Instantiation implements Serializable {
                 break;
             case EQUAL_ATOM:
             case FN_HEAD:
-            case FN_ATOM:
             case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -701,7 +843,7 @@ final class Instantiation implements Serializable {
                         // If a child expression is TRUE, we can remove the child expression.
                         exp.getChildren().remove(i);
                     } else if (ei.getConnective().equals(PDDLConnective.AND)) {
-                        // If the child expression to add is a conjunction, we can simplify the expression by
+                        // If the child expression to addValue is a conjunction, we can simplify the expression by
                         exp.getChildren().remove(i); // removing the inner conjunction.
                         int j = 0;
                         int added = 0;
@@ -776,7 +918,7 @@ final class Instantiation implements Serializable {
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
                     } else if (ei.getConnective().equals(PDDLConnective.OR)) {
-                        // If the child expression to add is a disjunction, we can simplify the expression by
+                        // If the child expression to addValue is a disjunction, we can simplify the expression by
                         // removing the inner disjunction.
                         exp.getChildren().remove(i);
                         int j = 0;
@@ -853,13 +995,20 @@ final class Instantiation implements Serializable {
                     }
                 }
                 break;
-            case FORALL:
-            case EXISTS:
             case AT_START:
             case AT_END:
+            case OVER_ALL:
+                final IntExpression fluent = exp.getChildren().get(0);
+                Instantiation.simplify(fluent);
+                if (fluent.getConnective().equals(PDDLConnective.TRUE)
+                    || fluent.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(fluent.getConnective());
+                }
+                break;
+            case FORALL:
+            case EXISTS:
             case UMINUS:
             case ALWAYS:
-            case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
                 Instantiation.simplify(exp.getChildren().get(0));
@@ -888,7 +1037,6 @@ final class Instantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -897,6 +1045,7 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(exp.getChildren().get(1));
                 break;
             case F_EXP_T:
+            case F_EXP:
                 if (!exp.getChildren().isEmpty()) {
                     Instantiation.simplify(exp.getChildren().get(0));
                 }
@@ -907,7 +1056,6 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(exp.getChildren().get(1));
                 Instantiation.simplify(exp.getChildren().get(3));
                 break;
-            case FN_ATOM:
             case NUMBER:
             case DURATION_ATOM:
             case TIME_VAR:
@@ -1025,13 +1173,15 @@ final class Instantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
                 Instantiation.substitute(exp.getChildren().get(0), var, cons);
                 Instantiation.substitute(exp.getChildren().get(1), var, cons);
+                break;
+            case F_EXP:
+                Instantiation.substitute(exp.getChildren().get(0), var, cons);
                 break;
             case FORALL:
             case EXISTS:
@@ -1055,7 +1205,6 @@ final class Instantiation implements Serializable {
                 Instantiation.substitute(exp.getChildren().get(1), var, cons);
                 Instantiation.substitute(exp.getChildren().get(3), var, cons);
                 break;
-            case FN_ATOM:
             case NUMBER:
             case DURATION_ATOM:
             case TIME_VAR:
