@@ -85,7 +85,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
                     if (op.isApplicable(current)) {
                         final ClosedWorldState nextState = new ClosedWorldState(current);
                         op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition()))
-                            .forEach(ce -> nextState.apply(ce.getEffects()));
+                            .forEach(ce -> nextState.apply(ce.getEffect()));
 
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);

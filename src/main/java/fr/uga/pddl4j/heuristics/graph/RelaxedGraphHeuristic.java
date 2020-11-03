@@ -20,11 +20,8 @@
 package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.GoalDescription;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.problem.Precondition;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.util.Arrays;
@@ -81,27 +78,27 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
     /**
      * The array used to store the preconditions' edges for each operator.
      */
-    private GoalDescription[] precondEdges;
+    private Precondition[] precondEdges;
 
     /**
      * The array used to store the effects' edges for each operator.
      */
-    private GoalDescription[] effectsEdges;
+    private Precondition[] effectsEdges;
 
     /**
      * The array used to store the preconditions of the operators.
      */
-    private GoalDescription[] preconditions;
+    private Precondition[] preconditions;
 
     /**
      * The array used to store the effects of the operators.
      */
-    private GoalDescription[] effects;
+    private Effect[] effects;
 
     /**
      * The array used to store the unconditional effect of the operators.
      */
-    private GoalDescription[] unconditionalEffects;
+    private Precondition[] unconditionalEffects;
 
     /**
      * The counter used to count the number of goal propositions reached.
@@ -152,25 +149,25 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         // reached
         this.precondCounters = new int[nbUncondOperators];
         // Initialize the array that must contain for each operator its preconditions
-        this.preconditions = new GoalDescription[nbUncondOperators];
+        this.preconditions = new Precondition[nbUncondOperators];
         // Initialize the array that must contain for each operator its effects
-        this.effects = new GoalDescription[nbUncondOperators];
+        this.effects = new Effect[nbUncondOperators];
         // Initialize the array that must contain for each operator its unconditional effects
-        this.unconditionalEffects = new GoalDescription[nbOperators];
+        this.unconditionalEffects = new Precondition[nbOperators];
         for (int i = 0; i < this.unconditionalEffects.length; i++) {
-            this.unconditionalEffects[i] = new GoalDescription();
+            this.unconditionalEffects[i] = new Precondition();
         }
         // The array that contains for each proposition the list of its unconditional operators
         this.unconditionalOperators = new int[nbUncondOperators][];
         // Initialize the array that must contain for each operator its preconditions' edges
-        this.precondEdges = new GoalDescription[nbRelevantFacts];
+        this.precondEdges = new Precondition[nbRelevantFacts];
         for (int i = 0; i < this.precondEdges.length; i++) {
-            this.precondEdges[i] = new GoalDescription();
+            this.precondEdges[i] = new Precondition();
         }
         // Initialize the array that must contain for each operator its effects' edges
-        this.effectsEdges = new GoalDescription[nbRelevantFacts];
+        this.effectsEdges = new Precondition[nbRelevantFacts];
         for (int i = 0; i < this.effectsEdges.length; i++) {
-            this.effectsEdges[i] = new GoalDescription();
+            this.effectsEdges[i] = new Precondition();
         }
         // Initialize the number of proposition of the goal
         this.goalCardinality = super.getGoal().cardinality();
@@ -192,7 +189,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                 this.unconditionalOperators[uncondOpIndex] = eff;
 
                 // We pre-compute the preconditions' edges
-                final GoalDescription pre = new GoalDescription(op.getPreconditions());
+                final Precondition pre = new Precondition(op.getPreconditions());
                 final BitVector pPre = pre.getPositiveFluents();
                 final BitVector nPre = pre.getNegativeFluents();
                 pPre.or(cEffect.getCondition().getPositiveFluents());
@@ -208,7 +205,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                 this.preconditions[uncondOpIndex] = pre;
 
                 // We pre-compute the effects' edges
-                final GoalDescription effect = cEffect.getEffects();
+                final Effect effect = cEffect.getEffect();
                 final BitVector pEff = effect.getPositiveFluents();
                 final BitVector nEff = effect.getNegativeFluents();
                 for (int p = pEff.nextSetBit(0); p >= 0; p = pEff.nextSetBit(p + 1)) {
@@ -226,8 +223,8 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
 
                 // We initialize the unconditional effects of the operator
                 if (cEffect.getCondition().isEmpty()) {
-                    final GoalDescription uncondEff = this.unconditionalEffects[opIndex];
-                    final GoalDescription condEff = cEffect.getEffects();
+                    final Precondition uncondEff = this.unconditionalEffects[opIndex];
+                    final Effect condEff = cEffect.getEffect();
                     uncondEff.getPositiveFluents().or(condEff.getPositiveFluents());
                     uncondEff.getNegativeFluents().or(condEff.getNegativeFluents());
                 }
@@ -240,7 +237,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         // A hack for the operator without precondition
         for (int i = 0; i < nbUncondOperators; i++) {
             if (this.preconditions[i].isEmpty()) {
-                for (GoalDescription pEdge : precondEdges) {
+                for (Precondition pEdge : precondEdges) {
                     pEdge.getPositiveFluents().set(i);
                     pEdge.getNegativeFluents().set(i);
                 }
@@ -256,7 +253,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
      * @throws NullPointerException if <code>goal == null</code>.
      */
     @Override
-    protected final void setGoal(final GoalDescription goal) {
+    protected final void setGoal(final Precondition goal) {
         super.setGoal(goal);
         this.goalCardinality = goal.cardinality();
     }
@@ -478,9 +475,9 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         int value = 0;
 
         // We initialize the for each level of the graph the goal to reach
-        final GoalDescription[] goals = new GoalDescription[this.level + 1];
+        final Precondition[] goals = new Precondition[this.level + 1];
         for (int k = 0; k <= this.level; k++) {
-            goals[k] = new GoalDescription();
+            goals[k] = new Precondition();
         }
         final BitVector pGoal = super.getGoal().getPositiveFluents();
         final BitVector nGoal = super.getGoal().getNegativeFluents();
@@ -494,11 +491,11 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         // We start the extraction of the relaxed plan
         for (int k = level; k > 0; k--) {
             // goals at level k
-            final GoalDescription gk = goals[k];
+            final Precondition gk = goals[k];
             final BitVector pGk = gk.getPositiveFluents();
             final BitVector nGk = gk.getNegativeFluents();
             // goals at level k - 1
-            final GoalDescription gk1 = goals[k - 1];
+            final Precondition gk1 = goals[k - 1];
             final BitVector pGk1 = gk1.getPositiveFluents();
             final BitVector nGk1 = gk1.getNegativeFluents();
             // Each positive goal at level k we need to find a resolver to support it
@@ -506,7 +503,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                 // Select the best resolver according to the difficulty heuristic
                 final int resolverIndex = this.select(this.effectsEdges[pg].getPositiveFluents(), k);
                 if (resolverIndex != -1) {
-                    final GoalDescription pre = this.preconditions[resolverIndex];
+                    final Precondition pre = this.preconditions[resolverIndex];
                     final BitVector pPre = pre.getPositiveFluents();
                     for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
                         final int pLevel = this.pPropLevel[p];
@@ -522,7 +519,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                         }
                     }
                     // Get the effects of the operator marked them as true
-                    final GoalDescription effect = this.effects[resolverIndex];
+                    final Effect effect = this.effects[resolverIndex];
                     final BitVector pEffect = effect.getPositiveFluents();
                     final BitVector nEffect = effect.getNegativeFluents();
                     pGk1.andNot(pEffect);
@@ -540,7 +537,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
             for (int ng = nGk.nextSetBit(0); ng >= 0; ng = nGk.nextSetBit(ng + 1)) {
                 final int resolverIndex = this.select(this.effectsEdges[ng].getNegativeFluents(), k);
                 if (resolverIndex != -1) {
-                    final GoalDescription pre = this.preconditions[resolverIndex];
+                    final Precondition pre = this.preconditions[resolverIndex];
                     final BitVector pPre = pre.getPositiveFluents();
                     for (int p = pPre.nextSetBit(0); p >= 0; p = pPre.nextSetBit(p + 1)) {
                         final int pLevel = this.pPropLevel[p];
@@ -556,7 +553,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                         }
                     }
                     // Get the effects of the operator marked them as true
-                    final GoalDescription effect = this.effects[resolverIndex];
+                    final Effect effect = this.effects[resolverIndex];
                     final BitVector pEffect = effect.getPositiveFluents();
                     final BitVector nEffect = effect.getNegativeFluents();
                     pGk1.andNot(pEffect);

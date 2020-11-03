@@ -135,17 +135,7 @@ final class Instantiation implements Serializable {
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 final IntExpression effect = action.getEffects();
                 Instantiation.simplify(effect);
-                /*if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
-                    System.out.println(action.getName());*/
                         actions.add(action);
-                /*        System.out.println(Encoder.toString(action));
-                        try {
-                            System.in.read();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }*/
             }
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(action.getTypeOfParameters(index));

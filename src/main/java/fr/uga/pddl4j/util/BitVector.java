@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.Precondition;
 
 import java.lang.reflect.Field;
 import java.util.BitSet;
@@ -86,7 +86,7 @@ public class BitVector extends BitSet {
      *
      * @param exp the <code>BitExp</code> that represents <code>BitVector</code>.
      */
-    public BitVector(final GoalDescription exp) {
+    public BitVector(final Precondition exp) {
         this();
         this.or(exp.getPositiveFluents());
         this.andNot(exp.getNegativeFluents());

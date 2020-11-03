@@ -43,7 +43,7 @@ public class ClosedWorldState extends BitVector {
      *
      * @param state the state.
      */
-    public ClosedWorldState(final GoalDescription state) {
+    public ClosedWorldState(final Precondition state) {
         this();
         this.or(state.getPositiveFluents());
         this.andNot(state.getNegativeFluents());
@@ -63,11 +63,11 @@ public class ClosedWorldState extends BitVector {
      * Applies a specified state to this state. In other word, the positive facts of
      * the specified state are added to this state and the negative ones are delete.
      *
-     * @param state the state to apply.
+     * @param effect the state to apply.
      */
-    public final void apply(final GoalDescription state) {
-        this.andNot(state.getNegativeFluents());
-        this.or(state.getPositiveFluents());
+    public final void apply(final Effect effect) {
+        this.andNot(effect.getNegativeFluents());
+        this.or(effect.getPositiveFluents());
     }
 
     /**
@@ -76,7 +76,7 @@ public class ClosedWorldState extends BitVector {
      * @param effects the list of conditional effects to apply.
      */
     public final void apply(final List<ConditionalEffect> effects) {
-        effects.stream().forEach(ce -> this.apply(ce.getEffects()));
+        effects.stream().forEach(ce -> this.apply(ce.getEffect()));
     }
 
     /**
@@ -88,7 +88,7 @@ public class ClosedWorldState extends BitVector {
      */
     public final void apply(final ConditionalEffect effects) {
         if (this.satisfy(effects.getCondition())) {
-            this.apply(effects.getEffects());
+            this.apply(effects.getEffect());
         }
     }
 
@@ -98,7 +98,7 @@ public class ClosedWorldState extends BitVector {
      * @param state the state to be tested.
      * @return <code>true</code> if this state satisfy a specified state; <code>false</code> otherwise.
      */
-    public final boolean satisfy(final GoalDescription state) {
+    public final boolean satisfy(final Precondition state) {
         return this.include(state.getPositiveFluents()) && this.exclude(state.getNegativeFluents());
 
     }

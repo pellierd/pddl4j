@@ -22,22 +22,24 @@ package fr.uga.pddl4j.problem;
 import java.io.Serializable;
 
 /**
- * This class allows to implements the conditional effects of an action.
+ * This class implements the conditional effect of an action.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
+ * @see Precondition
+ * @see Effect
  */
 public class ConditionalEffect implements Serializable {
 
     /**
-     * The conditions of the expression.
+     * The condition of the expression.
      */
-    private GoalDescription conditions;
+    private Precondition condition;
 
     /**
-     * The effects associated to the conditions.
+     * The effect associated to the condition.
      */
-    private GoalDescription effects;
+    private Effect effect;
 
     /**
      * Creates a conditional effect from an other. This constructor is the copy constructor.
@@ -48,71 +50,71 @@ public class ConditionalEffect implements Serializable {
         if (other == null) {
             throw new NullPointerException("other == null");
         }
-        this.conditions = new GoalDescription(other.getCondition());
-        this.effects = new GoalDescription(other.getEffects());
+        this.condition = new Precondition(other.getCondition());
+        this.effect = new Effect(other.getEffect());
     }
 
     /**
      * Creates a new empty conditional effect.
      */
     public ConditionalEffect() {
-        this(new GoalDescription(), new GoalDescription());
+        this(new Precondition(), new Effect());
     }
 
     /**
-     * Creates a new conditional effect with some specified effects.
+     * Creates a new conditional effect with some specified effect.
      *
-     * @param effects the effects.
+     * @param effect the effect.
      */
-    public ConditionalEffect(final GoalDescription effects) {
-        this(new GoalDescription(), effects);
+    public ConditionalEffect(final Effect effect) {
+        this(new Precondition(), effect);
     }
 
     /**
-     * Creates a new conditional effect with some specified conditions and effects.
+     * Creates a new conditional effect with some specified condition and effect.
      *
-     * @param conditions the conditions.
-     * @param effects the effects.
+     * @param condition the condition.
+     * @param effect the effect.
      */
-    public ConditionalEffect(final GoalDescription conditions, final GoalDescription effects) {
-        this.setEffects(effects);
-        this.setCondition(conditions);
+    public ConditionalEffect(final Precondition condition, final Effect effect) {
+        this.setEffect(effect);
+        this.setCondition(condition);
     }
 
     /**
-     * Returns the conditions of the conditional effect.
+     * Returns the condition of the conditional effect.
      *
-     * @return the conditions of the conditional effect.
+     * @return the condition of the conditional effect.
      */
-    public final GoalDescription getCondition() {
-        return this.conditions;
+    public final Precondition getCondition() {
+        return this.condition;
     }
 
     /**
-     * Sets the conditions of the conditional effect.
+     * Sets the condition of the conditional effect.
      *
-     * @param conditions the conditions to set.
+     * @param condition the condition to set.
      */
-    public final void setCondition(GoalDescription conditions) {
-        this.conditions = conditions;
+    public final void setCondition(Precondition condition) {
+        this.condition = condition;
     }
 
     /**
-     * Returns the effects of the conditional effect.
+     * Returns the effect of the conditional effect.
      *
-     * @return the effects of the conditional effect.
+     * @return the effect of the conditional effect.
      */
-    public final GoalDescription getEffects() {
-        return this.effects;
+    public final Effect getEffect() {
+        return this.effect;
     }
 
     /**
-     * Sets the effects of the conditional effect.
+     * Sets the effect of the conditional effect.
      *
-     * @param effects the effects to set
+     * @param effect the effect to set
      */
-    public final void setEffects(GoalDescription effects) {
-        this.effects = effects;
+    public final void setEffect(Effect effect) {
+        this.effect = effect;
     }
 
     /**
@@ -125,15 +127,15 @@ public class ConditionalEffect implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + conditions.hashCode();
-        result = prime * result + effects.hashCode();
+        result = prime * result + condition.hashCode();
+        result = prime * result + effect.hashCode();
         return result;
     }
 
     /**
      * Returns <code>true</code> if a specified object is equal to this conditional expression. In
      * other words, returns <code>true</code> if the specified object is an instance of the same
-     * type as this instance, all of whose members (conditions and effects) are equal to the
+     * type as this instance, all of whose members (condition and effect) are equal to the
      * corresponding member of this conditional expression.
      *
      * @param obj the reference object with which to compare.
@@ -145,7 +147,7 @@ public class ConditionalEffect implements Serializable {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof ConditionalEffect) {
             ConditionalEffect other = (ConditionalEffect) obj;
-            return this.conditions.equals(other.conditions) && this.effects.equals(other.effects);
+            return this.condition.equals(other.condition) && this.effect.equals(other.effect);
         }
         return false;
     }

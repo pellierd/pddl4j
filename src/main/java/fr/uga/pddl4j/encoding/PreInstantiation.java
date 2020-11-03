@@ -307,7 +307,7 @@ final class PreInstantiation implements Serializable {
      *
      * @param tables predicates tables.
      */
-    void printPredicatesTables(final List<List<IntMatrix>> tables) {
+    private void printPredicatesTables(final List<List<IntMatrix>> tables) {
         LOGGER.trace("tables of predicates:");
         for (int predicate = 0; predicate < tables.size(); predicate++) {
             final List<IntMatrix> pTables = tables.get(predicate);
@@ -746,4 +746,5 @@ final class PreInstantiation implements Serializable {
         }
         return unaryInertia;
     }
+
 }

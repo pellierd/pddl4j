@@ -268,7 +268,7 @@ public final class Encoder implements Serializable {
     /**
      * The goal.
      */
-    static GoalDescription goal;
+    static Goal goal;
 
     /**
      * The initial task network.
@@ -278,12 +278,12 @@ public final class Encoder implements Serializable {
     /**
      * The encoded goal.
      */
-    static List<GoalDescription> codedGoal;
+    static List<Goal> codedGoal;
 
     /**
      * The initial state.
      */
-    static GoalDescription init;
+    static Precondition init;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
@@ -517,8 +517,6 @@ public final class Encoder implements Serializable {
             str.setLength(0);
         }
 
-
-
         // *****************************************************************************************
         // Step 3: PreInstantiation
         // *****************************************************************************************
@@ -741,9 +739,10 @@ public final class Encoder implements Serializable {
 
         if (intGoal != null && (!intGoal.getChildren().isEmpty()
                 || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, Encoder.tableOfFluentIndex);
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, Encoder.tableOfFluentIndex,
+                Encoder.tableOfNumericFluentIndex);
         } else {
-            Encoder.goal = new GoalDescription();
+            Encoder.goal = new Goal();
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
@@ -991,7 +990,7 @@ public final class Encoder implements Serializable {
      */
     static void printGoal(StringBuilder str) {
         str.append("Goal state is:\n");
-        for (GoalDescription exp : Encoder.codedGoal) {
+        for (Precondition exp : Encoder.codedGoal) {
             str.append(Encoder.toString(exp));
             str.append("\n");
         }
@@ -1135,7 +1134,7 @@ public final class Encoder implements Serializable {
      * @param gd the expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(GoalDescription gd) {
+    static String toString(Precondition gd) {
         return StringDecoder.toString(gd, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents,

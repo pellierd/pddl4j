@@ -21,7 +21,7 @@ package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.Precondition;
 import fr.uga.pddl4j.problem.Problem;
 
 /**
@@ -61,7 +61,7 @@ public final class SumMutex extends GraphHeuristic {
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final GoalDescription goal) {
+    public int estimate(final ClosedWorldState state, final Precondition goal) {
         super.setGoal(goal);
         super.expandPlanningGraph(state);
         return super.isGoalReachable() ? this.getSumValue() : Integer.MAX_VALUE;
@@ -77,7 +77,7 @@ public final class SumMutex extends GraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final GoalDescription goal) {
+    public double estimate(final Node node, final Precondition goal) {
         return estimate((ClosedWorldState) node, goal);
     }
 }

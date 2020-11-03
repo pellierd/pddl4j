@@ -135,12 +135,12 @@ public class Problem implements Serializable {
     /**
      * The goal.
      */
-    private GoalDescription goal;
+    private Precondition goal;
 
     /**
      * The initial state.
      */
-    private GoalDescription initialState;
+    private Precondition initialState;
 
     /**
      * The initial task network.
@@ -202,9 +202,9 @@ public class Problem implements Serializable {
         this.methods = new ArrayList<>();
         this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
         if (other.goal != null) {
-            this.goal = new GoalDescription(other.goal);
+            this.goal = new Precondition(other.goal);
         }
-        this.initialState = new GoalDescription(other.initialState);
+        this.initialState = new Precondition(other.initialState);
         if (other.initialTaskNetwork != null) {
             this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
         }
@@ -529,7 +529,7 @@ public class Problem implements Serializable {
      *
      * @return the goal of the problem.
      */
-    public final GoalDescription getGoal() {
+    public final Precondition getGoal() {
         return this.goal;
     }
 
@@ -564,7 +564,7 @@ public class Problem implements Serializable {
      *
      * @param goal the goal to set
      */
-    public final void setGoal(final GoalDescription goal) {
+    public final void setGoal(final Precondition goal) {
         this.goal = goal;
     }
 
@@ -573,7 +573,7 @@ public class Problem implements Serializable {
      *
      * @return the initial state of the problem.
      */
-    public final GoalDescription getInitialState() {
+    public final Precondition getInitialState() {
         return this.initialState;
     }
 
@@ -582,7 +582,7 @@ public class Problem implements Serializable {
      *
      * @param initialState the initial state to set.
      */
-    public final void setInitialState(final GoalDescription initialState) {
+    public final void setInitialState(final Precondition initialState) {
         this.initialState = initialState;
     }
 
@@ -698,20 +698,44 @@ public class Problem implements Serializable {
     }
 
     /**
-     * Returns a string representation of a state.
+     * Returns a string representation of the precondition in parameter.
      *
-     * @param state the state.
-     * @return a string representation of the state.
+     * @param precondition the precondition.
+     * @return a string representation of the precondition.
      */
-    public final String toString(final GoalDescription state) {
+    public final String toString(final Precondition precondition) {
         final StringBuilder str = new StringBuilder("(and");
-        final BitSet positive = state.getPositiveFluents();
+        final BitSet positive = precondition.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ");
             str.append(this.toString(this.getRelevantFluents().get(j)));
             str.append("\n");
         }
-        final BitSet negative = state.getNegativeFluents();
+        final BitSet negative = precondition.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" (not ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the effect in parameter.
+     *
+     * @param effect the effect.
+     * @return a string representation of the precondition.
+     */
+    public final String toString(final Effect effect) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = effect.getPositiveFluents();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append("\n");
+        }
+        final BitSet negative = effect.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ");
             str.append(this.toString(this.getRelevantFluents().get(i)));
@@ -853,12 +877,12 @@ public class Problem implements Serializable {
     public final String toString(final ConditionalEffect ceffect) {
         StringBuilder str = new StringBuilder();
         if (ceffect.getCondition().isEmpty()) {
-            str.append(this.toString(ceffect.getEffects()));
+            str.append(this.toString(ceffect.getEffect()));
         } else {
             str.append("(when ");
             str.append(this.toString(ceffect.getCondition()));
             str.append("\n");
-            str.append(this.toString(ceffect.getEffects()));
+            str.append(this.toString(ceffect.getEffect()));
             str.append(")");
         }
         return str.toString();

@@ -250,7 +250,7 @@ TOKEN : {
 |	< EXISTENTIAL_PRECONDITIONS : ":existential-preconditions" >
 |	< UNIVERSAL_PRECONDITIONS : ":universal-preconditions" >
 |	< QUANTIFIED_PRECONDITIONS : ":quantified-preconditions" >
-|	< CONDITIONAL_EFFECTS : ":conditional-effects" >
+|	< CONDITIONAL_EFFECTS : ":conditional-effect" >
 |	< ACTION_COSTS : ":action-costs" >
 |   < FLUENTS : ":fluents" >
 |   < NUMERIC_FLUENTS : ":numeric-fluents" >
@@ -262,7 +262,7 @@ TOKEN : {
 |	< TIMED_INITIAL_LITERALS : ":timed-initial-literals" >
 |	< PREFERENCES : ":preferences" >
 |	< CONSTRAINTS : ":constraints" >
-|	< CONTINUS_EFFECTS : ":continus-effects" >
+|	< CONTINUS_EFFECTS : ":continus-effect" >
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HIERARCHY : ":hierarchy" > // ADD HDDL
 |	< HTN : ":htn" > // ADD HDDL
@@ -2117,20 +2117,20 @@ PDDLAction action_def() :
 	PDDLSymbol name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+	PDDLExpression effect = new PDDLExpression(PDDLConnective.AND);;
 }
 {
 	try {
 		left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 		    <PRECONDITION> preconds=pre_gd()
-		    <EFFECT> effects=effect()
+		    <EFFECT> effect=effect()
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLAction(name, parameters, preconds, effects);
+		return new PDDLAction(name, parameters, preconds, effect);
 	}
 }
 
@@ -2139,20 +2139,20 @@ PDDLAction htn_action_def() :
 	PDDLSymbol name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+	PDDLExpression effect = new PDDLExpression(PDDLConnective.AND);;
 }
 {
 	try {
 		left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 		    [LOOKAHEAD(2) <PRECONDITION> preconds=pre_gd()]
-			[LOOKAHEAD(2) <EFFECT> effects=effect()]
+			[LOOKAHEAD(2) <EFFECT> effect=effect()]
 			right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLAction(name, parameters, preconds, effects);
+		return new PDDLAction(name, parameters, preconds, effect);
 	}
 }
 
@@ -2327,15 +2327,15 @@ PDDLExpression when_con_effect() :
 {
 	PDDLExpression node = new PDDLExpression(PDDLConnective.WHEN);
 	PDDLExpression condition = null;
-	PDDLExpression effects = null;
+	PDDLExpression effect = null;
 }
 {
 	left_bracket() <WHEN>
 		condition=gd()
-		effects=cond_effect()
+		effect=cond_effect()
 	right_bracket() {
 		node.addChild(condition);
-		node.addChild(effects);
+		node.addChild(effect);
 		return node;
 	}
 }

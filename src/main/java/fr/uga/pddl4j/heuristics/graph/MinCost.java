@@ -23,7 +23,7 @@ import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.Precondition;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.util.LinkedList;
@@ -61,7 +61,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
      * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final GoalDescription goal) {
+    public int estimate(final ClosedWorldState state, final Precondition goal) {
         return (int) estimateCost(new Node(state), goal);
     }
 
@@ -75,7 +75,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final GoalDescription goal) {
+    public double estimate(final Node node, final Precondition goal) {
         return estimateCost(node, goal);
     }
 
@@ -88,7 +88,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
      * @param goal the goal to reach.
      * @return the distance to the goal state from the specified node.
      */
-    public double estimateCost(final Node node, final GoalDescription goal) {
+    public double estimateCost(final Node node, final Precondition goal) {
         final LinkedList<Node> openList = new LinkedList<>();
 
         openList.add(node);
@@ -109,7 +109,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
                         final ClosedWorldState nextState = new ClosedWorldState(current);
 
                         op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition()))
-                            .forEach(ce -> nextState.apply(ce.getEffects())
+                            .forEach(ce -> nextState.apply(ce.getEffect())
                         );
 
 

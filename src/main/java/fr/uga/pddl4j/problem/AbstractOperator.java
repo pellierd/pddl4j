@@ -23,6 +23,7 @@ import fr.uga.pddl4j.encoding.AbstractGroundOperator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This abstract class implements the common part of an operator (action of method) with bitset representation.
@@ -35,7 +36,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     /**
      * The preconditions of the operator.
      */
-    private GoalDescription preconditions;
+    private Precondition preconditions;
 
     /**
      * The list of numeric variables of the operator.
@@ -49,8 +50,10 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     */
     protected AbstractOperator(final AbstractOperator other) {
         super(other);
-        this.preconditions = other.getPreconditions();
-        this.numericVariables = other.getNumericVariables();
+        this.preconditions = new Precondition(other.getPreconditions());
+        this.numericVariables = new ArrayList<>();
+        this.numericVariables.addAll(other.getNumericVariables().stream().map(NumericVariable::new)
+            .collect(Collectors.toList()));
 
     }
 
@@ -62,7 +65,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      */
     protected AbstractOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new GoalDescription();
+        this.preconditions = new Precondition();
         this.numericVariables = new ArrayList<>();
     }
 
@@ -75,7 +78,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      * @param preconditions  the preconditions of the operator.
      */
     protected AbstractOperator(final String name, final int[] parameters, final int[] instantiations,
-                               final GoalDescription preconditions) {
+                               final Precondition preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
         this.numericVariables = new ArrayList<>();
@@ -86,7 +89,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final GoalDescription getPreconditions() {
+    public final Precondition getPreconditions() {
         return this.preconditions;
     }
 
@@ -95,7 +98,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final GoalDescription preconditions) {
+    public final void setPreconditions(final Precondition preconditions) {
         this.preconditions = preconditions;
     }
 

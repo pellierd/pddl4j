@@ -124,7 +124,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
             if (op.isApplicable(parent)) {
                 final ClosedWorldState nextState = new ClosedWorldState(parent);
                 op.getConditionalEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
-                        nextState.apply(ce.getEffects())
+                        nextState.apply(ce.getEffect())
                 );
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);

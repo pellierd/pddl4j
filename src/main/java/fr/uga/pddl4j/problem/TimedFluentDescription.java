@@ -32,7 +32,7 @@ import java.util.Objects;
  * @version 1.0 - 21.10.2020
  * @since 4.0
  */
-public class TimedGoalDescription implements Serializable {
+public class TimedFluentDescription implements Serializable {
 
     /**
      * The bit vector used to store the fluent that must hold at start.
@@ -52,7 +52,7 @@ public class TimedGoalDescription implements Serializable {
     /**
      * Create a new timed goal description.
      */
-    public TimedGoalDescription() {
+    public TimedFluentDescription() {
         this.atStart = new BitVector();
         this.atEnd = new BitVector();
         this.overAll = new BitVector();
@@ -64,7 +64,7 @@ public class TimedGoalDescription implements Serializable {
      *
      * @param other the fluent goal description to copy.
      */
-    public TimedGoalDescription(TimedGoalDescription other) {
+    public TimedFluentDescription(TimedFluentDescription other) {
         this();
         this.atStart.or(other.getAtStartFluents());
         this.atEnd.or(other.getAtEndFluents());
@@ -127,7 +127,7 @@ public class TimedGoalDescription implements Serializable {
 
     /**
      * Returns if an object is equals to this timed goal description. An object is equal iff the object is an instance
-     * of the class <code>TimedGoalDescription</code> and has the same at start, at end and over all bit vector.
+     * of the class <code>TimedFluentDescription</code> and has the same at start, at end and over all bit vector.
      *
      * @param object the object to compared.
      * @return <code>true</code> if the object in parameter is equal to this timed goal description; <code>false</code>
@@ -138,10 +138,10 @@ public class TimedGoalDescription implements Serializable {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof TimedGoalDescription)) {
+        if (!(object instanceof TimedFluentDescription)) {
             return false;
         }
-        TimedGoalDescription other = (TimedGoalDescription) object;
+        TimedFluentDescription other = (TimedFluentDescription) object;
         return Objects.equals(this.getAtStartFluents(), other.getAtStartFluents())
             && Objects.equals(this.getAtEndFluents(), other.getAtEndFluents())
             && Objects.equals(this.getOverAllFluents(), other.getOverAllFluents());

@@ -147,11 +147,9 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
      * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#moveNegationInward()
      */
     protected Map<String, String> normalize(int index) {
         final Map<String, String> context = super.normalize(index);
-        //System.out.println(this);
         // Rename the effects
         // A hack to remove single atom in precondition
         if (this.effects.isLiteral()) {
@@ -160,17 +158,10 @@ public class PDDLAction extends PDDLAbstractOperator {
             this.effects.addChild(atom);
         }
         this.getEffects().renameVariables(context);
-        this.getEffects().moveNegationInward();
         // Rename the duration if the operator is a durative action.
         if (this.getDuration() != null) {
             this.getDuration().renameVariables(context);
         }
-        /*System.out.println(this);
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
         return context;
     }
 

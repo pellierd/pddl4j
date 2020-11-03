@@ -464,7 +464,7 @@ public class PDDLDomain implements Serializable {
         for (int i = 0; i < this.getDerivesPredicates().size(); i++) {
             this.getDerivesPredicates().get(i).normalize();
         }
-        // Rename all the variable from the ops
+        // Rename all the variable from the action
         for (int i = 0; i < this.getActions().size(); i++) {
             this.getActions().get(i).normalize();
         }

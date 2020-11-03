@@ -17,7 +17,7 @@ package fr.uga.pddl4j.heuristics;
 
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.Precondition;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
     /**
      * The goal to reached.
      */
-    private GoalDescription goal;
+    private Precondition goal;
 
     /**
      * The list of facts of the relaxed problem.
@@ -87,7 +87,7 @@ public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
      *
      * @return the goal.
      */
-    protected final GoalDescription getGoal() {
+    protected final Precondition getGoal() {
         return this.goal;
     }
 
@@ -96,7 +96,7 @@ public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
      *
      * @param goal the goal.
      */
-    protected void setGoal(final GoalDescription goal) {
+    protected void setGoal(final Precondition goal) {
         if (!goal.equals(this.goal)) {
             this.goal = goal;
         }

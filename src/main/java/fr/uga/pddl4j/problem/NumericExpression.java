@@ -28,7 +28,7 @@ import java.io.Serializable;
  * @version 1.0 - 27.10.2020
  * @since 4.0
  */
-interface NumericExpression extends Serializable {
+public interface NumericExpression extends Serializable {
 
     /**
      * Returns the right arithmetic expression of the numeric expression.

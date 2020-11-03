@@ -339,12 +339,12 @@ final class IntEncoding implements Serializable {
     /**
      * Encodes a specified list of actions into its integer representation.
      *
-     * @param ops the list of actions to encode.
+     * @param actions the list of actions to encode.
      * @return encoded the list of actions encoded.
      */
-    static List<IntAction> encodeActions(final List<PDDLAction> ops) {
+    static List<IntAction> encodeActions(final List<PDDLAction> actions) {
         Encoder.primitiveTaskSymbols = new LinkedHashSet<>();
-        return ops.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
+        return actions.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
     }
 
     /**

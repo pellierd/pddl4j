@@ -93,7 +93,7 @@ public final class NumericConstraint extends AbstractNumericExpression {
      *
      * @return <code>true</code> if the numeric constraint is evaluated to true; <code>false</code> otherwise.
      */
-    private boolean evaluate() {
+    public boolean evaluate() {
         final double left = super.getLeftExpression().evaluate();
         final double right = super.getRightExpression().evaluate();
         boolean eval = false;

@@ -21,10 +21,7 @@ package fr.uga.pddl4j.heuristics.criticalpath;
 
 import fr.uga.pddl4j.heuristics.graph.RelaxedGraphHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.GoalDescription;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.*;
 
 import fr.uga.pddl4j.util.BitVector;
 
@@ -42,9 +39,9 @@ import java.util.List;
  */
 public final class CriticalPath extends RelaxedGraphHeuristic {
 
-    private GoalDescription[] precond;
-    private GoalDescription[] effect;
-    private GoalDescription[] neffect;
+    private Precondition[] precond;
+    private Precondition[] effect;
+    private Precondition[] neffect;
     private int[] pGoal;
     private int[] nGoal;
     private static final int COEF = 2;
@@ -57,7 +54,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     }
 
     @Override
-    public int estimate(ClosedWorldState state, GoalDescription goal) {
+    public int estimate(ClosedWorldState state, Precondition goal) {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
@@ -69,9 +66,9 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         int nbRelevantFacts = super.getRevelantFacts().size();
         this.pGoal = new int[nbRelevantFacts];
         this.nGoal = new int[nbRelevantFacts];
-        this.precond = new GoalDescription[startPoint];
-        this.effect = new GoalDescription[startPoint];
-        this.neffect = new GoalDescription[startPoint];
+        this.precond = new Precondition[startPoint];
+        this.effect = new Precondition[startPoint];
+        this.neffect = new Precondition[startPoint];
         BitVector pGoalBitVector = super.getGoal().getPositiveFluents();
         BitVector nGoalBitVector = super.getGoal().getNegativeFluents();
 
@@ -91,8 +88,8 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
             }
             //Compute the positive preconditions
             for (Action op : this.getActions()) {
-                final GoalDescription pre = new GoalDescription(op.getPreconditions());
-                final GoalDescription npre = new GoalDescription(op.getPreconditions());
+                final Precondition pre = new Precondition(op.getPreconditions());
+                final Precondition npre = new Precondition(op.getPreconditions());
                 BitVector nprecon = npre.getNegativeFluents();
                 BitVector precon = pre.getPositiveFluents();
                 for (int p = precon.nextSetBit(0); p >= 0; p = precon.nextSetBit(p + 1)) {
@@ -106,7 +103,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
                 }
 
                 //Get the positive and negative effects
-                GoalDescription effects = op.getConditionalEffects().get(0).getEffects();
+                Effect effects = op.getConditionalEffects().get(0).getEffect();
                 BitVector positiveEffect = effects.getPositiveFluents();
                 BitVector negativeEffect = effects.getNegativeFluents();
                 BitVector newProp = new BitVector();
@@ -163,7 +160,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final GoalDescription goal) {
+    public double estimate(final Node node, final Precondition goal) {
         return estimate((ClosedWorldState) node, goal);
     }
 }

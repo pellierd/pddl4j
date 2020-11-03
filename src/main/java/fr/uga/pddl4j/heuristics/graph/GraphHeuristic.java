@@ -24,7 +24,7 @@ import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.Precondition;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
@@ -241,8 +241,8 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
                 }
                 this.preconditions[uncondOpIndex] = precond;
                 final BitVector effect = new BitVector();
-                effect.or(cEffect.getEffects().getPositiveFluents());
-                neg = cEffect.getEffects().getNegativeFluents();
+                effect.or(cEffect.getEffect().getPositiveFluents());
+                neg = cEffect.getEffect().getNegativeFluents();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     effect.set(p + this.negOffset);
                 }
@@ -288,7 +288,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
      * @param goal the goal.
      */
     @Override
-    protected final void setGoal(final GoalDescription goal) {
+    protected final void setGoal(final Precondition goal) {
         super.setGoal(goal);
         // Set the goal to the state representation
         this.bvgoal = new BitVector();

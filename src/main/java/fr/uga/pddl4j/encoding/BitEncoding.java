@@ -23,7 +23,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.*;
 
-import fr.uga.pddl4j.problem.GoalDescription;
+import fr.uga.pddl4j.problem.Precondition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,7 +37,7 @@ import java.util.Set;
 
 /**
  * <p>
- * This class contains methods to encodeGoalDescription actions, goal and initial state into <code>BitSet</code>
+ * This class contains methods to encodePrecondition actions, goal and initial state into <code>BitSet</code>
  * representation.
  * </p>
  * <p>
@@ -76,7 +76,7 @@ final class BitEncoding implements Serializable {
      * Encode a list of specified actions into <code>BitSet</code> representation. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param actions the list of actions to encodeGoalDescription.
+     * @param actions the list of actions to encodePrecondition.
      * @param fluentIndex the map that associates to a specified fluent its index.
      * @param numericFluentIndex the map that associates to a specified numeric fluent its index.
      * @return the list of actions encoded into bit set.
@@ -107,12 +107,12 @@ final class BitEncoding implements Serializable {
      *
      * @param action the action to be encoded. The precondition of the action must be a simple conjunction of atomic
      *               formulas
-     * @param fluentIndex the map that associates to a specified fluent its index.
-     * @param numericFluentIndex the map that associates to a specified numeric fluent its index.
+     * @param fluents the map that associates to a specified fluent its index.
+     * @param numericFluents the map that associates to a specified numeric fluent its index.
      * @return the action encoded.
      */
-    private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> fluentIndex,
-            final Map<IntExpression, Integer> numericFluentIndex) {
+    private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> fluents,
+            final Map<IntExpression, Integer> numericFluents) {
 
         System.out.println(Encoder.toString(action));
 
@@ -126,11 +126,11 @@ final class BitEncoding implements Serializable {
         }
 
         // Initialize the numeric variables of the action
-        final List<IntExpression> fluents = BitEncoding.extractNumericFluents(action);
+        final List<IntExpression> actionNumericfluents = BitEncoding.extractNumericFluents(action);
         final Map<IntExpression, NumericVariable> numericVariableIndex = new HashMap<>();
         final List<NumericVariable> variables = new ArrayList<>();
-        for (IntExpression fluent : fluents) {
-            final NumericVariable variable = new NumericVariable(numericFluentIndex.get(fluent));
+        for (IntExpression fluent : actionNumericfluents) {
+            final NumericVariable variable = new NumericVariable(numericFluents.get(fluent));
             variables.add(variable);
             numericVariableIndex.put(fluent, variable);
             switch (fluent.getConnective()) {
@@ -151,12 +151,12 @@ final class BitEncoding implements Serializable {
         }
 
         // Initialize the preconditions of the action
-        encoded.setPreconditions(BitEncoding.encodeGoalDescription(action.getPreconditions(), fluentIndex, numericVariableIndex));
+        encoded.setPreconditions(BitEncoding.encodePrecondition(action.getPreconditions(), fluents, numericVariableIndex));
 
         // Initialize the effects of the action
-        encoded.setConditionalEffects(BitEncoding.encodeEffects(action.getEffects(), fluentIndex, numericVariableIndex));
+        encoded.setConditionalEffects(BitEncoding.encodeEffects(action.getEffects(), fluents, numericVariableIndex));
 
-        System.exit(0);
+        System.out.println(Encoder.toString(encoded));
 
         return encoded;
     }
@@ -167,10 +167,21 @@ final class BitEncoding implements Serializable {
      * @param action the action.
      */
     private static List<IntExpression> extractNumericFluents(final IntAction action) {
-        Set<IntExpression> fluents = new HashSet<>();
+        final Set<IntExpression> fluents = new HashSet<>();
         PostInstantiation.extractRelevantNumericFluents(action.getDuration(), fluents);
         PostInstantiation.extractRelevantNumericFluents(action.getPreconditions(), fluents);
         PostInstantiation.extractRelevantNumericFluents(action.getEffects(), fluents);
+        return new ArrayList<>(fluents);
+    }
+
+    /**
+     * Extract numeric fluents from a expression.
+     *
+     * @param exp the expression.
+     */
+    private static List<IntExpression> extractNumericFluents(final IntExpression exp) {
+        final Set<IntExpression> fluents = new HashSet<>();
+        PostInstantiation.extractRelevantNumericFluents(exp, fluents);
         return new ArrayList<>(fluents);
     }
 
@@ -190,15 +201,15 @@ final class BitEncoding implements Serializable {
      * numeric constraints.
      *
      * @param exp the expression that represents the duration constraints.
-     * @param numericVariableIndex the map that associates to a specified numeric fluent its numeric variable.
+     * @param numericVariables the map that associates to a specified numeric fluent its numeric variable.
      *
      */
     static List<NumericConstraint> encodeDurationConstraints(final IntExpression exp,
-            final Map<IntExpression, NumericVariable> numericVariableIndex) {
+            final Map<IntExpression, NumericVariable> numericVariables) {
 
         List<NumericConstraint> constraints = new ArrayList<>();
         for (IntExpression constraint: exp.getChildren()) {
-            constraints.add(BitEncoding.encodeNumericConstraint(constraint, numericVariableIndex));
+            constraints.add(BitEncoding.encodeNumericConstraint(constraint, numericVariables));
         }
         return constraints;
     }
@@ -206,13 +217,13 @@ final class BitEncoding implements Serializable {
     /**
      * Encodes a numeric constraint.
      *
-     * @param numericVariableIndex the map that associates to a specified numeric fluent its numeric variable.
+     * @param numericVariables the map that associates to a specified numeric fluent its numeric variable.
      */
     static NumericConstraint encodeNumericConstraint(final IntExpression exp,
-            final Map<IntExpression, NumericVariable> numericVariableIndex) {
+            final Map<IntExpression, NumericVariable> numericVariables) {
 
-        ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
-        ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariableIndex);
+        ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariables);
+        ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariables);
         NumericConstraint constraint = null;
         switch (exp.getConnective()) {
             case EQUAL:
@@ -296,29 +307,29 @@ final class BitEncoding implements Serializable {
      * Encode a list of specified methods into the final compact representation. The specified
      * maps are used to speed-up the search by mapping the an expression to this index.
      *
-     * @param methods the list of methods to encodeGoalDescription.
-     * @param fluentIndex the map that associates at a specified fluent its index in the table of relevant fluents.
-     * @param numericFluentIndex the map that associates at a specified numeric fluent its index in the table of
+     * @param methods the list of methods to encodePrecondition.
+     * @param fluents the map that associates at a specified fluent its index in the table of relevant fluents.
+     * @param numericFluents the map that associates at a specified numeric fluent its index in the table of
      *                           relevant numeric fluents table.
-     * @param taskIndex the map that associates at a specified task its index in the table of relevant tasks.
+     * @param tasks the map that associates at a specified task its index in the table of relevant tasks.
      * @return the list of methods encoded into final compact representation.
      */
     static List<Method> encodeMethods(final List<IntMethod> methods,
-                                      final Map<IntExpression, Integer> fluentIndex,
-                                      final Map<IntExpression, Integer> numericFluentIndex,
-                                      final Map<IntExpression, Integer> taskIndex) throws UnexpectedExpressionException {
+                                      final Map<IntExpression, Integer> fluents,
+                                      final Map<IntExpression, Integer> numericFluents,
+                                      final Map<IntExpression, Integer> tasks) throws UnexpectedExpressionException {
 
         final List<Method> encodedMethods = new ArrayList<>(methods.size());
         final List<Method> addedMethods = new ArrayList<>();
         int methodIndex = Encoder.relevantActions.size();
         for (IntMethod intMethod : methods) {
             List<IntMethod> normalized = BitEncoding.normalizeMethod(intMethod);
-            encodedMethods.add(BitEncoding.encodeMethod(normalized.get(0), fluentIndex, numericFluentIndex, taskIndex));
+            encodedMethods.add(BitEncoding.encodeMethod(normalized.get(0), fluents, numericFluents, tasks));
             for (int i  = 1; i < normalized.size(); i++) {
                 if (Encoder.tableOfRelevantActions != null) {
                     Encoder.tableOfRelevantActions.get(methodIndex).add(methods.size() + addedMethods.size());
                 }
-                encodedMethods.add(BitEncoding.encodeMethod(normalized.get(i), fluentIndex, numericFluentIndex, taskIndex));
+                encodedMethods.add(BitEncoding.encodeMethod(normalized.get(i), fluents, numericFluents, tasks));
             }
             methodIndex++;
         }
@@ -330,19 +341,19 @@ final class BitEncoding implements Serializable {
      * Encode a list of specified methods into the final compact representation. The specified
      * maps are used to speed-up the search by mapping the an expression to this index.
      *
-     * @param method the list of methods to encodeGoalDescription.
-     * @param fluentIndex the map that associates at a specified fluent its index in the table of relevant fluents.
-     * @param numericFluentIndex the map that associates at a specified numeric fluent its index in the table of
+     * @param method the list of methods to encodePrecondition.
+     * @param fluents the map that associates at a specified fluent its index in the table of relevant fluents.
+     * @param numericFluents the map that associates at a specified numeric fluent its index in the table of
      *                           relevant numeric fluents table.
-     * @param taskIndex the map that associates at a specified task its index in the table of relevant tasks.
+     * @param tasks the map that associates at a specified task its index in the table of relevant tasks.
      *
      *
      * numericFluentIndex
      * @return the list of methods encoded into final compact representation.
      */
-    static Method encodeMethod(final IntMethod method, final Map<IntExpression, Integer> fluentIndex,
-            final Map<IntExpression, Integer> numericFluentIndex,
-            final Map<IntExpression, Integer> taskIndex) throws UnexpectedExpressionException {
+    static Method encodeMethod(final IntMethod method, final Map<IntExpression, Integer> fluents,
+            final Map<IntExpression, Integer> numericFluents,
+            final Map<IntExpression, Integer> tasks) throws UnexpectedExpressionException {
 
         final int arity = method.arity();
         final Method encoded = new Method(method.getName(), arity);
@@ -353,95 +364,115 @@ final class BitEncoding implements Serializable {
         }
 
         // Initialize the numeric variables of the action
-        final List<IntExpression> fluents = BitEncoding.extractNumericFluents(method);
-        final Map<IntExpression, NumericVariable> numericVariableIndex = new HashMap<>();
+        final List<IntExpression> methodNumericFluents = BitEncoding.extractNumericFluents(method);
+        final Map<IntExpression, NumericVariable> numericVariables = new HashMap<>();
         final List<NumericVariable> variables = new ArrayList<>();
-        for (IntExpression fluent : fluents) {
-            final NumericVariable variable = new NumericVariable(numericFluentIndex.get(fluent));
+        for (IntExpression fluent : methodNumericFluents) {
+            final NumericVariable variable = new NumericVariable(numericFluents.get(fluent));
             variables.add(variable);
-            numericVariableIndex.put(fluent, variable);
+            numericVariables.put(fluent, variable);
         }
         encoded.setNumericVariables(variables);
 
         // Encode the task carried out by the method
-        encoded.setTask(taskIndex.get(method.getTask()));
+        encoded.setTask(tasks.get(method.getTask()));
         // Encode the preconditions of the method
-        encoded.setPreconditions(BitEncoding.encodeGoalDescription(method.getPreconditions(), fluentIndex, numericVariableIndex));
+        encoded.setPreconditions(BitEncoding.encodePrecondition(method.getPreconditions(), fluents, numericVariables));
         // Encode the task network of the method
-        encoded.setTaskNetwork(BitEncoding.encodeTaskNetwork(method.getTaskNetwork(), taskIndex));
+        encoded.setTaskNetwork(BitEncoding.encodeTaskNetwork(method.getTaskNetwork(), tasks));
         return encoded;
     }
 
     /**
-     * Encode a specified goal in a disjunction of <code>GoalDescription</code>. The specified
+     * Encode a specified goal in a disjunction of <code>Precondition</code>. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param goal the goal to encodeGoalDescription.
+     * @param goalExp the goal to encodePrecondition.
      * @param fluentIndex  the map that associates to a specified fluent its index.
+     *
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static GoalDescription encodeGoal(IntExpression goal, final Map<IntExpression, Integer> fluentIndex)
+    static Goal encodeGoal(IntExpression goalExp, final Map<IntExpression, Integer> fluentIndex,
+                                   final Map<IntExpression, Integer> numericFluentIndex)
         throws UnexpectedExpressionException {
 
-        if (goal.getConnective().equals(PDDLConnective.FALSE)) {
+        // If the goal is simplified to fals
+        if (goalExp.getConnective().equals(PDDLConnective.FALSE)) {
             return null;
         }
 
-        GoalDescription newGoal;
-        BitEncoding.toDNF(goal);
-        Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
-        for (IntExpression exp : goal.getChildren()) {
-            if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-                IntExpression and = new IntExpression(PDDLConnective.AND);
-                and.getChildren().add(exp);
-                Encoder.codedGoal.add(BitEncoding.encodeGoalDescription(and, fluentIndex, new HashMap<IntExpression, NumericVariable>()));
-            } else {
-                Encoder.codedGoal.add(BitEncoding.encodeGoalDescription(exp, fluentIndex, new HashMap<IntExpression, NumericVariable>()));
+        // Convert the goal in disjunctive normal form.
+        BitEncoding.toDNF(goalExp);
+        // Create the list of goals. Each goal is in a conjunctive form.
+        List<Goal> goals = new ArrayList<>(goalExp.getChildren().size());
+
+        for (IntExpression conjunctiveGoalExp : goalExp.getChildren()) {
+            // Create a empty goal.
+            final Goal goal = new Goal();
+            // Initialize the numeric variables of the goal
+            final List<IntExpression> goalNumericFluents = BitEncoding.extractNumericFluents(conjunctiveGoalExp);
+            final Map<IntExpression, NumericVariable> numericVariables = new HashMap<>();
+            final List<NumericVariable> variables = new ArrayList<>();
+            for (IntExpression fluent : goalNumericFluents) {
+                final NumericVariable variable = new NumericVariable(numericFluentIndex.get(fluent));
+                variables.add(variable);
+                numericVariables.put(fluent, variable);
             }
+            goal.setNumericVariables(variables);
+
+            // Encode the fluents of the goal
+            BitEncoding.encodePrecondition(conjunctiveGoalExp, goal, fluentIndex, numericVariables);
+            // Add the goal to the list of goal to reach
+            goals.add(goal);
         }
-        if (Encoder.codedGoal.size() > 1) {
-            // Create a new dummy fact to encodeGoalDescription the goal
+
+        // We have a disjunctive goal
+        Goal encodedGoal = null;
+        if (goals.size() == 1) {
+            encodedGoal = goals.get(0);
+        } else {
+            // Create a new dummy fact to encodePrecondition the goal
             final int dummyPredicateIndex = Encoder.tableOfPredicates.size();
             Encoder.tableOfPredicates.add(Constants.DUMMY_GOAL);
             Encoder.tableOfTypedPredicates.add(new ArrayList<>());
-            IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
+            final IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
             dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);
             final int dummyGoalIndex = Encoder.tableOfRelevantFluents.size();
             Encoder.tableOfRelevantFluents.add(dummyGoal);
             fluentIndex.put(dummyGoal, dummyGoalIndex);
-            newGoal = new GoalDescription();
-            newGoal.getPositiveFluents().set(dummyGoalIndex);
-            final ConditionalEffect condEffect = new ConditionalEffect(newGoal);
+            final Effect effect = new Effect();
+            effect.getPositiveFluents().set(dummyGoalIndex);
+            final ConditionalEffect condEffect = new ConditionalEffect(effect);
+            encodedGoal = new Goal();
+            encodedGoal.getPositiveFluents().set(dummyGoalIndex);
             // for each disjunction create a dummy action
-            for (GoalDescription dis : Encoder.codedGoal) {
-                final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
-                op.setDummy(true);
-                op.setPreconditions(dis);
-                op.getConditionalEffects().add(condEffect);
-                Encoder.actions.add(op);
+            for (Precondition p : goals) {
+                final Action action = new Action(Constants.DUMMY_OPERATOR, 0);
+                action.setDummy(true);
+                action.setPreconditions(p);
+                action.getConditionalEffects().add(condEffect);
+                Encoder.actions.add(action);
             }
-        } else {
-            newGoal = Encoder.codedGoal.get(0);
         }
-        return newGoal;
+        return encodedGoal;
     }
 
     /**
      * Encode a specified task network.
      * map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param taskNetwork the tasknetwork to encodeGoalDescription.
+     * @param taskNetwork the tasknetwork to encodePrecondition.
      * @param map         the map that associates to a specified expression its index.
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
     static TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork, final Map<IntExpression, Integer> map) {
-        // We encodeGoalDescription first the tasks
+        // We encodePrecondition first the tasks
         final List<Integer> tasks = new ArrayList<Integer>();
         BitEncoding.encodeTasks(taskNetwork.getTasks(), map, tasks);
-        // We encodeGoalDescription then the ordering constraints
+        // We encodePrecondition then the ordering constraints
         final OrderingConstraintSet constraints = new OrderingConstraintSet(tasks.size());
         for (IntExpression c : taskNetwork.getOrderingConstraints().getChildren()) {
             constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
@@ -478,12 +509,12 @@ final class BitEncoding implements Serializable {
      * Encode a specified initial state in it <code>BitExp</code> representation. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param init the initial state to encodeGoalDescription.
+     * @param init the initial state to encodePrecondition.
      * @param map  the map that associates to a specified expression its index.
      * @return the <code>BitExp</code> that represents the initial encoded.
      */
-    static GoalDescription encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
-        final GoalDescription bitInit = new GoalDescription();
+    static Precondition encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
+        final Precondition bitInit = new Precondition();
         for (final IntExpression fact : init) {
             if (fact.getConnective().equals(PDDLConnective.ATOM)) {
                 final Integer i = map.get(fact);
@@ -501,125 +532,140 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Encode an specified <code>IntExpression</code> in its <code>GoalDescription</code> representation.The
+     * Encode an specified <code>IntExpression</code> in its <code>Precondition</code> representation.The
      * specified map is used to speed-up the search by mapping the an expression to this index.
      *
      * @param exp the <code>IntExpression</code>.
-     * @param map the map that associate to a specified expression its index.
+     * @param fluents the map that associate to a specified expression its index.
+     * @param variables the map that associate to a specified expression its numeric variable.
      * @return the expression in bit set representation.
      */
-    private static GoalDescription encodeGoalDescription(final IntExpression exp, final Map<IntExpression, Integer> map,
-                                                         final Map<IntExpression, NumericVariable> variables)
-        throws UnexpectedExpressionException {
+    private static Precondition encodePrecondition(final IntExpression exp, final Map<IntExpression, Integer> fluents,
+            final Map<IntExpression, NumericVariable> variables) throws UnexpectedExpressionException {
+        final Precondition precondition = new Precondition();
+        return BitEncoding.encodePrecondition(exp, precondition, fluents, variables);
 
-        final GoalDescription gd = new GoalDescription();
+    }
+    /**
+     * Encode an specified <code>IntExpression</code> in its <code>Precondition</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param exp the <code>IntExpression</code>.
+     * @param precondition the precondition to encode.
+     * @param fluents the map that associate to a specified expression its index.
+     * @param variables the map that associate to a specified expression its numeric variable.
+     * @return the expression in bit set representation.
+     */
+    private static Precondition encodePrecondition(final IntExpression exp, final Precondition precondition,
+            final Map<IntExpression, Integer> fluents, final Map<IntExpression, NumericVariable> variables)
+                throws UnexpectedExpressionException {
+
         switch (exp.getConnective()) {
             case AND:
                 final List<IntExpression> children = exp.getChildren();
                 for (IntExpression child : children) {
-                    switch (child.getConnective()) {
-                        case ATOM:
-                            Integer index = map.get(child);
-                            gd.getPositiveFluents().set(index);
-                            break;
-                        case NOT:
-                            IntExpression neg = child.getChildren().get(0);
-                            switch (neg.getConnective()) {
-                                case ATOM:
-                                    index = map.get(neg);
-                                    gd.getNegativeFluents().set(index);
-                                    break;
-                                case FALSE:
-                                    // do nothing
-                                    break;
-                                default:
-                                    throw new UnexpectedExpressionException(Encoder.toString(exp));
-                            }
-                            break;
-                        case AT_START:
-                            IntExpression c = child.getChildren().get(0);
-                            switch (c.getConnective()) {
-                                case ATOM:
-                                    index = map.get(c);
-                                    gd.getPositiveTimedGoalDescription().getAtStartFluents().set(index);
-                                    break;
-                                case NOT:
-                                    index = map.get(c.getChildren().get(0));
-                                    gd.getNegativeTimedGoalDescription().getAtStartFluents().set(index);
-                                    break;
-                                case EQUAL:
-                                case LESS:
-                                case LESS_OR_EQUAL:
-                                case GREATER:
-                                case GREATER_OR_EQUAL:
-                                    final NumericConstraint constraint = BitEncoding.encodeNumericConstraint(c, variables);
-                                    constraint.setTimeSpecifier(TimeSpecifier.AT_START);
-                                    gd.addNumericConstraint(constraint);
-                                    break;
-                                default:
-
-                                    throw new UnexpectedExpressionException(Encoder.toString(c));
-                            }
-                            break;
-                        case OVER_ALL:
-                            c = child.getChildren().get(0);
-                            switch (c.getConnective()) {
-                                case ATOM:
-                                    index = map.get(c);
-                                    gd.getPositiveTimedGoalDescription().getOverAllFluents().set(index);
-                                    break;
-                                case NOT:
-                                    index = map.get(c.getChildren().get(0));
-                                    gd.getNegativeTimedGoalDescription().getOverAllFluents().set(index);
-                                    break;
-                                default:
-                                    throw new UnexpectedExpressionException(Encoder.toString(c));
-                            }
-                            break;
-                        case AT_END:
-                            c = child.getChildren().get(0);
-                            switch (c.getConnective()) {
-                                case ATOM:
-                                    index = map.get(c);
-                                    gd.getPositiveTimedGoalDescription().getAtEndFluents().set(index);
-                                    break;
-                                case NOT:
-                                    index = map.get(c.getChildren().get(0));
-                                    gd.getNegativeTimedGoalDescription().getAtEndFluents().set(index);
-                                    break;
-                                case EQUAL:
-                                case LESS:
-                                case LESS_OR_EQUAL:
-                                case GREATER:
-                                case GREATER_OR_EQUAL:
-                                    final NumericConstraint constraint = BitEncoding.encodeNumericConstraint(c, variables);
-                                    constraint.setTimeSpecifier(TimeSpecifier.AT_END);
-                                    gd.addNumericConstraint(constraint);
-                                    break;
-                                default:
-                                    throw new UnexpectedExpressionException(Encoder.toString(c));
-                            }
-                            break;
-                        case TRUE:
-                            // do nothing
-                            break;
-                        case EQUAL:
-                        case LESS:
-                        case LESS_OR_EQUAL:
-                        case GREATER:
-                        case GREATER_OR_EQUAL:
-                            gd.addNumericConstraint(BitEncoding.encodeNumericConstraint(child, variables));
-                            break;
-                        default:
-                            throw new UnexpectedExpressionException(Encoder.toString(exp));
-                    }
+                    BitEncoding.encodePrecondition(child, precondition, fluents, variables);
                 }
+                break;
+            case ATOM:
+                Integer index = fluents.get(exp);
+                precondition.getPositiveFluents().set(index);
+                break;
+            case NOT:
+                IntExpression neg = exp.getChildren().get(0);
+                switch (neg.getConnective()) {
+                    case ATOM:
+                        index = fluents.get(neg);
+                        precondition.getNegativeFluents().set(index);
+                        break;
+                    case FALSE:
+                        // do nothing
+                        break;
+                    default:
+                        throw new UnexpectedExpressionException(Encoder.toString(exp));
+                }
+                break;
+            case AT_START:
+                IntExpression c = exp.getChildren().get(0);
+                switch (c.getConnective()) {
+                    case ATOM:
+                        index = fluents.get(c);
+                        precondition.getPositiveTimedGoalDescription().getAtStartFluents().set(index);
+                        break;
+                    case NOT:
+                        index = fluents.get(c.getChildren().get(0));
+                        precondition.getNegativeTimedGoalDescription().getAtStartFluents().set(index);
+                        break;
+                    case EQUAL:
+                    case LESS:
+                    case LESS_OR_EQUAL:
+                    case GREATER:
+                    case GREATER_OR_EQUAL:
+                        final NumericConstraint constraint = BitEncoding.encodeNumericConstraint(c, variables);
+                        constraint.setTimeSpecifier(TimeSpecifier.AT_START);
+                        precondition.addNumericConstraint(constraint);
+                        break;
+                    default:
+                        LOGGER.error(Encoder.toString(exp));
+                        throw new UnexpectedExpressionException(Encoder.toString(c));
+                }
+                break;
+            case OVER_ALL:
+                c = exp.getChildren().get(0);
+                switch (c.getConnective()) {
+                    case ATOM:
+                        index = fluents.get(c);
+                        precondition.getPositiveTimedGoalDescription().getOverAllFluents().set(index);
+                        break;
+                    case NOT:
+                        index = fluents.get(c.getChildren().get(0));
+                        precondition.getNegativeTimedGoalDescription().getOverAllFluents().set(index);
+                        break;
+                    default:
+                        LOGGER.error(Encoder.toString(exp));
+                        throw new UnexpectedExpressionException(Encoder.toString(c));
+                }
+                break;
+            case AT_END:
+                c = exp.getChildren().get(0);
+                switch (c.getConnective()) {
+                    case ATOM:
+                        index = fluents.get(c);
+                        precondition.getPositiveTimedGoalDescription().getAtEndFluents().set(index);
+                        break;
+                    case NOT:
+                        index = fluents.get(c.getChildren().get(0));
+                        precondition.getNegativeTimedGoalDescription().getAtEndFluents().set(index);
+                        break;
+                    case EQUAL:
+                    case LESS:
+                    case LESS_OR_EQUAL:
+                    case GREATER:
+                    case GREATER_OR_EQUAL:
+                        final NumericConstraint constraint = BitEncoding.encodeNumericConstraint(c, variables);
+                        constraint.setTimeSpecifier(TimeSpecifier.AT_END);
+                        precondition.addNumericConstraint(constraint);
+                        break;
+                    default:
+                        LOGGER.error(Encoder.toString(exp));
+                        throw new UnexpectedExpressionException(Encoder.toString(c));
+                }
+                break;
+            case TRUE:
+                // do nothing
+                break;
+            case EQUAL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+                precondition.addNumericConstraint(BitEncoding.encodeNumericConstraint(exp, variables));
                 break;
             default:
                 LOGGER.error(Encoder.toString(exp));
                 throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
-        return gd;
+        return precondition;
     }
 
 
@@ -631,8 +677,8 @@ final class BitEncoding implements Serializable {
      * @return the list of conditional effects that represents the effects of the action
      */
     private static List<ConditionalEffect> encodeEffects(final IntExpression exp,
-                                                         final Map<IntExpression, Integer> map,
-                                                         final Map<IntExpression, NumericVariable> numericFluents) {
+                                                         final Map<IntExpression, Integer> fluents,
+                                                         final Map<IntExpression, NumericVariable> numericVariables) {
 
         final List<ConditionalEffect> effects = new ArrayList<>();
         final ConditionalEffect unCondEffects = new ConditionalEffect();
@@ -643,33 +689,34 @@ final class BitEncoding implements Serializable {
             switch (connective) {
                 case WHEN:
                     final ConditionalEffect condBitExp = new ConditionalEffect();
-                    condBitExp.setCondition(BitEncoding.encodeGoalDescription(children.get(0), map, new HashMap<IntExpression, NumericVariable>()));
-                    condBitExp.setEffects(BitEncoding.encodeGoalDescription(children.get(1), map, new HashMap<IntExpression, NumericVariable>()));
+                    condBitExp.setCondition(BitEncoding.encodePrecondition(children.get(0), fluents, numericVariables));
+                    condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), fluents, numericVariables));
                     effects.add(condBitExp);
                     break;
                 case ATOM:
-                    Integer index = map.get(effect);
-                    unCondEffects.getEffects().getPositiveFluents().set(index);
+                    Integer index = fluents.get(effect);
+                    unCondEffects.getEffect().getPositiveFluents().set(index);
                     hasUnConditionalEffects = true;
                     break;
                 case AT_START:
                     switch (effect.getChildren().get(0).getConnective()) {
                         case ATOM:
-                            index = map.get(effect.getChildren().get(0));
-                            unCondEffects.getEffects().getPositiveTimedGoalDescription().getAtStartFluents().set(index);
+                            index = fluents.get(effect.getChildren().get(0));
+                            unCondEffects.getEffect().getPositiveTimedGoalDescription().getAtStartFluents().set(index);
                             break;
                         case NOT:
-                            index = map.get(effect.getChildren().get(0).getChildren().get(0));
-                            unCondEffects.getEffects().getNegativeTimedGoalDescription().getAtStartFluents().set(index);
+                            index = fluents.get(effect.getChildren().get(0).getChildren().get(0));
+                            unCondEffects.getEffect().getNegativeTimedGoalDescription().getAtStartFluents().set(index);
                             break;
                         case ASSIGN:
                         case INCREASE:
                         case DECREASE:
                         case SCALE_UP:
                         case SCALE_DOWN:
-                            BitEncoding.encodeNumericAssignment(effect.getChildren().get(0).getChildren().get(0), numericFluents);
-
-
+                            final NumericAssignment assignment = BitEncoding.encodeNumericAssignment(
+                                effect.getChildren().get(0), numericVariables);
+                            assignment.setTimeSpecifier(TimeSpecifier.AT_START);
+                            unCondEffects.getEffect().addNumericAssignment(assignment);
                             break;
                         default:
                             throw new UnexpectedExpressionException(Encoder.toString(effect));
@@ -679,12 +726,12 @@ final class BitEncoding implements Serializable {
                 case OVER_ALL:
                     switch (effect.getChildren().get(0).getConnective()) {
                         case ATOM:
-                            index = map.get(effect.getChildren().get(0));
-                            unCondEffects.getEffects().getPositiveTimedGoalDescription().getOverAllFluents().set(index);
+                            index = fluents.get(effect.getChildren().get(0));
+                            unCondEffects.getEffect().getPositiveTimedGoalDescription().getOverAllFluents().set(index);
                             break;
                         case NOT:
-                            index = map.get(effect.getChildren().get(0).getChildren().get(0));
-                            unCondEffects.getEffects().getNegativeTimedGoalDescription().getOverAllFluents().set(index);
+                            index = fluents.get(effect.getChildren().get(0).getChildren().get(0));
+                            unCondEffects.getEffect().getNegativeTimedGoalDescription().getOverAllFluents().set(index);
                             break;
                         default:
                             throw new UnexpectedExpressionException(Encoder.toString(effect));
@@ -694,12 +741,22 @@ final class BitEncoding implements Serializable {
                 case AT_END:
                     switch (effect.getChildren().get(0).getConnective()) {
                         case ATOM:
-                            index = map.get(effect.getChildren().get(0));
-                            unCondEffects.getEffects().getPositiveTimedGoalDescription().getAtEndFluents().set(index);
+                            index = fluents.get(effect.getChildren().get(0));
+                            unCondEffects.getEffect().getPositiveTimedGoalDescription().getAtEndFluents().set(index);
                             break;
                         case NOT:
-                            index = map.get(effect.getChildren().get(0).getChildren().get(0));
-                            unCondEffects.getEffects().getNegativeTimedGoalDescription().getAtEndFluents().set(index);
+                            index = fluents.get(effect.getChildren().get(0).getChildren().get(0));
+                            unCondEffects.getEffect().getNegativeTimedGoalDescription().getAtEndFluents().set(index);
+                            break;
+                        case ASSIGN:
+                        case INCREASE:
+                        case DECREASE:
+                        case SCALE_UP:
+                        case SCALE_DOWN:
+                            final NumericAssignment assignment = BitEncoding.encodeNumericAssignment(
+                                effect.getChildren().get(0), numericVariables);
+                            assignment.setTimeSpecifier(TimeSpecifier.AT_END);
+                            unCondEffects.getEffect().addNumericAssignment(assignment);
                             break;
                         default:
                             throw new UnexpectedExpressionException(Encoder.toString(effect));
@@ -710,8 +767,8 @@ final class BitEncoding implements Serializable {
                     // do nothing
                     break;
                 case NOT:
-                    index = map.get(children.get(0));
-                    unCondEffects.getEffects().getNegativeFluents().set(index);
+                    index = fluents.get(children.get(0));
+                    unCondEffects.getEffect().getNegativeFluents().set(index);
                     hasUnConditionalEffects = true;
                     break;
                 default:
@@ -726,15 +783,108 @@ final class BitEncoding implements Serializable {
     }
 
     /**
+     * Encodes the effect of an action.
+     *
+     * @param exp the expression that represents the effects of the action.
+     * @return the list of conditional effects that represents the effects of the action
+     */
+    private static Effect encodeEffect(final IntExpression exp,
+                                                         final Map<IntExpression, Integer> fluents,
+                                                         final Map<IntExpression, NumericVariable> numericVariables) {
+
+        final Effect effect = new Effect();
+        switch (exp.getConnective()) {
+            case ATOM:
+                Integer index = fluents.get(exp);
+                effect.getPositiveFluents().set(index);
+                break;
+            case AT_START:
+                switch (exp.getChildren().get(0).getConnective()) {
+                    case ATOM:
+                        index = fluents.get(exp.getChildren().get(0));
+                        effect.getPositiveTimedGoalDescription().getAtStartFluents().set(index);
+                        break;
+                    case NOT:
+                        index = fluents.get(exp.getChildren().get(0).getChildren().get(0));
+                        effect.getNegativeTimedGoalDescription().getAtStartFluents().set(index);
+                        break;
+                    case ASSIGN:
+                    case INCREASE:
+                    case DECREASE:
+                    case SCALE_UP:
+                    case SCALE_DOWN:
+                        final NumericAssignment assignment = BitEncoding.encodeNumericAssignment(
+                            exp.getChildren().get(0), numericVariables);
+                        assignment.setTimeSpecifier(TimeSpecifier.AT_START);
+                        effect.addNumericAssignment(assignment);
+                        break;
+                    default:
+                        throw new UnexpectedExpressionException(Encoder.toString(exp));
+                }
+                break;
+            case OVER_ALL:
+                switch (exp.getChildren().get(0).getConnective()) {
+                    case ATOM:
+                        index = fluents.get(exp.getChildren().get(0));
+                        effect.getPositiveTimedGoalDescription().getOverAllFluents().set(index);
+                        break;
+                    case NOT:
+                        index = fluents.get(exp.getChildren().get(0).getChildren().get(0));
+                        effect.getNegativeTimedGoalDescription().getOverAllFluents().set(index);
+                        break;
+                    default:
+                        throw new UnexpectedExpressionException(Encoder.toString(exp));
+                }
+                break;
+            case AT_END:
+                switch (exp.getChildren().get(0).getConnective()) {
+                    case ATOM:
+                        index = fluents.get(exp.getChildren().get(0));
+                        effect.getPositiveTimedGoalDescription().getAtEndFluents().set(index);
+                        break;
+                    case NOT:
+                        index = fluents.get(exp.getChildren().get(0).getChildren().get(0));
+                        effect.getNegativeTimedGoalDescription().getAtEndFluents().set(index);
+                        break;
+                    case ASSIGN:
+                    case INCREASE:
+                    case DECREASE:
+                    case SCALE_UP:
+                    case SCALE_DOWN:
+                        final NumericAssignment assignment = BitEncoding.encodeNumericAssignment(
+                            exp.getChildren().get(0), numericVariables);
+                        assignment.setTimeSpecifier(TimeSpecifier.AT_END);
+                        effect.addNumericAssignment(assignment);
+                        break;
+                    default:
+                        throw new UnexpectedExpressionException(Encoder.toString(exp));
+                }
+                break;
+            case TRUE:
+                // do nothing
+                break;
+            case NOT:
+                index = fluents.get(exp.getChildren().get(0));
+                effect.getNegativeFluents().set(index);
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return effect;
+    }
+
+    /**
      * Encodes a numeric assignment.
      *
      * @param numericVariableIndex the map that associates to a specified numeric fluent its numeric variable.
      */
     static NumericAssignment encodeNumericAssignment(final IntExpression exp,
-                                                     final Map<IntExpression, NumericVariable> numericVariableIndex) {
+            final Map<IntExpression, NumericVariable> numericVariableIndex) {
 
-        ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
-        ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariableIndex);
+        final ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(
+            exp.getChildren().get(0), numericVariableIndex);
+        final ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(
+            exp.getChildren().get(1), numericVariableIndex);
         NumericAssignment assignment = null;
         switch (exp.getConnective()) {
             case ASSIGN:
