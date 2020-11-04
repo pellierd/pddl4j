@@ -93,7 +93,7 @@ public class HSPTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Assembly_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -107,7 +107,7 @@ public class HSPTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Grid_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

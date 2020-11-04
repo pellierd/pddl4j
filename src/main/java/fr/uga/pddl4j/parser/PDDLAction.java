@@ -151,7 +151,7 @@ public class PDDLAction extends PDDLAbstractOperator {
             this.effects.addChild(atom);
         }
         this.getEffects().renameVariables(context);
-        this.getEffects().moveNegationInward();
+        //this.getEffects().moveNegationInward();
         // Rename the duration if the operator is a durative action.
         if (this.getDuration() != null) {
             this.getDuration().renameVariables(context);

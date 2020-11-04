@@ -458,7 +458,7 @@ public class PDDLDomain implements Serializable {
         // Rename all the variables from the constraints declaration of the domain
         if (this.getConstraints() != null) {
             this.getConstraints().renameVariables();
-            this.getConstraints().moveNegationInward();
+            //this.getConstraints().moveNegationInward();
         }
         // Rename all the variables from the derived predicates
         for (int i = 0; i < this.getDerivesPredicates().size(); i++) {

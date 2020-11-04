@@ -91,7 +91,7 @@ final class PreInstantiation implements Serializable {
      * @param actions the list of actions to simplified.
      */
     static void extractInertia(final List<IntAction> actions) {
-        final int nbPredicates = Encoder.tableOfPredicates.size();
+        final int nbPredicates = Encoder.intProblem.getPredicates().size();
         Encoder.tableOfInertia = new ArrayList<>(nbPredicates);
         for (int i = 0; i < nbPredicates; i++) {
             Encoder.tableOfInertia.add(Inertia.INERTIA);
@@ -200,9 +200,9 @@ final class PreInstantiation implements Serializable {
      * @param init the initial state.
      */
     static void inferTypesFromInertia(final Set<IntExpression> init) {
-        Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.tableOfPredicates.size());
-        for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
-            if (Encoder.tableOfTypedPredicates.get(i).size() == 1
+        Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.intProblem.getPredicates().size());
+        for (int i = 0; i < Encoder.intProblem.getPredicates().size(); i++) {
+            if (Encoder.intProblem.getTypeOfPredicateArguments().get(i).size() == 1
                 && Encoder.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
                 for (IntExpression fact : init) {
@@ -226,10 +226,10 @@ final class PreInstantiation implements Serializable {
      * @param init the initial state.
      */
     static void createPredicatesTables(final Set<IntExpression> init) {
-        final int tableSize = Encoder.tableOfConstants.size();
-        final int nbPredicate = Encoder.tableOfPredicates.size();
+        final int tableSize = Encoder.intProblem.getConstants().size();
+        final int nbPredicate = Encoder.intProblem.getPredicates().size();
         Encoder.predicatesTables = new ArrayList<>(nbPredicate);
-        for (final List<Integer> arguments : Encoder.tableOfTypedPredicates) {
+        for (final List<Integer> arguments : Encoder.intProblem.getTypeOfPredicateArguments()) {
             final int arity = arguments.size();
             final int nbTables = (int) Math.pow(2, arity);
             final List<IntMatrix> pTables = new ArrayList<>(nbTables);
@@ -244,7 +244,7 @@ final class PreInstantiation implements Serializable {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
-            final int arity = Encoder.tableOfTypedPredicates.get(fact.getPredicate()).size();
+            final int arity = Encoder.intProblem.getTypeOfPredicateArguments().get(fact.getPredicate()).size();
             final List<IntMatrix> pTables = Encoder.predicatesTables.get(fact.getPredicate());
             final int[] set = new int[arity];
             final int[] args = fact.getArguments();
@@ -312,7 +312,7 @@ final class PreInstantiation implements Serializable {
         LOGGER.trace("tables of predicates:");
         for (int predicate = 0; predicate < tables.size(); predicate++) {
             final List<IntMatrix> pTables = tables.get(predicate);
-            final int arity = Encoder.tableOfTypedPredicates.get(predicate).size();
+            final int arity = Encoder.intProblem.getTypeOfPredicateArguments().get(predicate).size();
             final int[] mask = new int[arity];
             for (int i = 0; i < pTables.size(); i++) {
                 this.print(predicate, arity, mask, new int[0], tables);
@@ -335,7 +335,7 @@ final class PreInstantiation implements Serializable {
         if (index.length == arity) {
             final StringBuilder str = new StringBuilder();
             str.append("(");
-            str.append(Encoder.tableOfPredicates.get(predicate));
+            str.append(Encoder.intProblem.getPredicates().get(predicate));
             int var = 0;
             int realIndexSize = 0;
             for (int anIndex : index) {
@@ -344,7 +344,7 @@ final class PreInstantiation implements Serializable {
                     var++;
                 } else {
                     realIndexSize++;
-                    str.append(" ").append(Encoder.tableOfConstants.get(anIndex));
+                    str.append(" ").append(Encoder.intProblem.getConstants().get(anIndex));
                 }
             }
             str.append(")");
@@ -367,7 +367,7 @@ final class PreInstantiation implements Serializable {
             newIndex[index.length] = -1;
             this.print(predicate, arity, mask, newIndex, tables);
         } else {
-            for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
+            for (int i = 0; i < Encoder.intProblem.getConstants().size(); i++) {
                 final int[] newIndex = new int[index.length + 1];
                 System.arraycopy(index, 0, newIndex, 0, index.length);
                 newIndex[index.length] = i;
@@ -414,28 +414,28 @@ final class PreInstantiation implements Serializable {
 
                     final int dtIndex = action.getTypeOfParameters(index);
 
-                    final String declaredType = Encoder.tableOfTypes.get(dtIndex);
+                    final String declaredType = Encoder.intProblem.getTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
-                    final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
+                    final String inertiaType = Encoder.intProblem.getPredicates().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
-                    int ti = Encoder.tableOfTypes.indexOf(sti);
+                    int ti = Encoder.intProblem.getTypes().indexOf(sti);
                     if (ti == -1) {
-                        ti = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ti = Encoder.intProblem.getTypes().size();
+                        Encoder.intProblem.getTypes().add(sti);
+                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.intProblem.getDomains().get(dtIndex));
                         dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt1);
+                        Encoder.intProblem.getDomains().add(dt1);
                     }
 
                     final String sts = declaredType + "\\" + inertiaType;
-                    int ts = Encoder.tableOfTypes.indexOf(sts);
+                    int ts = Encoder.intProblem.getTypes().indexOf(sts);
                     if (ts == -1) {
-                        ts = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ts = Encoder.intProblem.getTypes().size();
+                        Encoder.intProblem.getTypes().add(sts);
+                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.intProblem.getDomains().get(dtIndex));
                         dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt2);
+                        Encoder.intProblem.getDomains().add(dt2);
                     }
                     final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
@@ -500,28 +500,28 @@ final class PreInstantiation implements Serializable {
 
                     final int dtIndex = meth.getTypeOfParameters(index);
 
-                    final String declaredType = Encoder.tableOfTypes.get(dtIndex);
+                    final String declaredType = Encoder.intProblem.getTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
-                    final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
+                    final String inertiaType = Encoder.intProblem.getPredicates().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
-                    int ti = Encoder.tableOfTypes.indexOf(sti);
+                    int ti = Encoder.intProblem.getTypes().indexOf(sti);
                     if (ti == -1) {
-                        ti = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ti = Encoder.intProblem.getTypes().size();
+                        Encoder.intProblem.getTypes().add(sti);
+                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.intProblem.getDomains().get(dtIndex));
                         dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt1);
+                        Encoder.intProblem.getDomains().add(dt1);
                     }
 
                     final String sts = declaredType + "\\" + inertiaType;
-                    int ts = Encoder.tableOfTypes.indexOf(sts);
+                    int ts = Encoder.intProblem.getTypes().indexOf(sts);
                     if (ts == -1) {
-                        ts = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ts = Encoder.intProblem.getTypes().size();
+                        Encoder.intProblem.getTypes().add(sts);
+                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.intProblem.getDomains().get(dtIndex));
                         dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt2);
+                        Encoder.intProblem.getDomains().add(dt2);
                     }
 
                     final IntMethod meth1 = new IntMethod(m);

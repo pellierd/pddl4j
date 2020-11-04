@@ -153,7 +153,7 @@ final class BitEncoding implements Serializable {
                     hasUnConditionalEffects = true;
                 }
             } else {
-                throw new UnexpectedExpressionException(Encoder.toString(ei));
+                throw new UnexpectedExpressionException(Encoder.intProblem.toString(ei));
             }
         }
         if (hasUnConditionalEffects) {
@@ -251,9 +251,9 @@ final class BitEncoding implements Serializable {
         }
         if (Encoder.codedGoal.size() > 1) {
             // Create a new dummy fact to encode the goal
-            final int dummyPredicateIndex = Encoder.tableOfPredicates.size();
-            Encoder.tableOfPredicates.add(Constants.DUMMY_GOAL);
-            Encoder.tableOfTypedPredicates.add(new ArrayList<>());
+            final int dummyPredicateIndex = Encoder.intProblem.getPredicates().size();
+            Encoder.intProblem.getPredicates().add(Constants.DUMMY_GOAL);
+            Encoder.intProblem.getTypeOfPredicateArguments().add(new ArrayList<>());
             IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
             dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);
@@ -386,12 +386,12 @@ final class BitEncoding implements Serializable {
                 } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                     // do nothing
                 } else {
-                    throw new UnexpectedExpressionException(Encoder.toString(exp));
+                    throw new UnexpectedExpressionException(Encoder.intProblem.toString(exp));
                 }
             }
         } else {
-            LOGGER.error(Encoder.toString(exp));
-            throw new UnexpectedExpressionException(Encoder.toString(exp));
+            LOGGER.error(Encoder.intProblem.toString(exp));
+            throw new UnexpectedExpressionException(Encoder.intProblem.toString(exp));
         }
         return bitExp;
     }
@@ -614,7 +614,7 @@ final class BitEncoding implements Serializable {
                 exp.getChildren().add(copy);
                 break;
             default:
-                throw new UnexpectedExpressionException(Encoder.toString(exp));
+                throw new UnexpectedExpressionException(Encoder.intProblem.toString(exp));
         }
     }
 
@@ -690,7 +690,7 @@ final class BitEncoding implements Serializable {
                 exp.getChildren().add(and);
                 break;
             default:
-                throw new UnexpectedExpressionException(Encoder.toString(exp));
+                throw new UnexpectedExpressionException(Encoder.intProblem.toString(exp));
         }
     }
 }
