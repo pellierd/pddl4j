@@ -133,7 +133,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         int nbUncondOperators = 0;
         final List<Action> operators = problem.getActions();
         for (Action op : operators) {
-            nbUncondOperators += op.getCondEffects().size();
+            nbUncondOperators += op.getConditionalEffects().size();
         }
         // Initialize the array that must contain the level of the positive propositions
         this.pPropLevel = new int[nbRelevantFacts];
@@ -178,7 +178,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         // Start enumerating the unconditional operators
         for (int opIndex = 0; opIndex < operators.size(); opIndex++) {
             final Action op = operators.get(opIndex);
-            final List<ConditionalEffect> condEffects = op.getCondEffects();
+            final List<ConditionalEffect> condEffects = op.getConditionalEffects();
 
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
@@ -440,7 +440,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
     /**
      * Compute the max heuristic.
      *
-     * @return max heuristic value.
+     * @return max heuristic value += this.getActions().get(resolverIndex).getCost().getValue();.
      * @see Max
      */
     protected final int getMaxValue() {
@@ -525,7 +525,8 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                     pGk.andNot(pEffect);
                     nGk.andNot(nEffect);
                     // We increment the number of action of the relaxed plan
-                    value += this.getActions().get(resolverIndex).getCost();
+                    value += this.getActions().get(resolverIndex).getCost().getValue();
+                    //value += 1;
                 } else { // NOOP case
                     pGk1.clear(pg);
                     pGk.clear(pg);
@@ -559,7 +560,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                     pGk.andNot(pEffect);
                     nGk.andNot(nEffect);
                     // We increment the number of action of the relaxed plan
-                    value += this.getActions().get(resolverIndex).getCost();
+                    value += this.getActions().get(resolverIndex).getCost().getValue();
                 } else { // NOOP case
                     nGk1.set(ng);
                     nGk.clear(ng);

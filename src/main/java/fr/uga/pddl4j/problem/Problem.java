@@ -649,11 +649,18 @@ public class Problem implements Serializable {
                 str.append(" \n");
             }
         }
-        str.append("Preconditions:\n");
+        if (action.isDurative()) {
+            str.append("duration:\n");
+
+            str.append("Conditions:\n");
+        } else {
+            str.append("Preconditions:\n");
+        }
+
         str.append(this.toString(action.getPreconditions()));
         str.append("\n");
         str.append("Effects:\n");
-        for (ConditionalEffect condExp : action.getCondEffects()) {
+        for (ConditionalEffect condExp : action.getConditionalEffects()) {
             str.append(this.toString(condExp));
             str.append("\n");
         }
@@ -840,7 +847,7 @@ public class Problem implements Serializable {
         plan.timeSpecifiers().forEach(time ->
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%d]%n",
-                    time, this.toShortString(a), ((int) a.getDuration())))));
+                    time, this.toShortString(a), ((int) a.getDuration().getValue())))));
         return str.toString();
     }
 
@@ -947,7 +954,7 @@ public class Problem implements Serializable {
         plan.timeSpecifiers().forEach(time ->
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%4.2f]%n",
-                    time, this.toShortString(a), ((float) a.getCost())))));
+                    time, this.toShortString(a), ((float) a.getCost().getValue())))));
         return str.toString();
     }
 }

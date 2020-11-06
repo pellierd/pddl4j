@@ -912,11 +912,18 @@ public class PDDLExpression implements Serializable {
                     && this.children.get(1).isMalformedExpression()
                     && this.children.get(2).isMalformedExpression();
                 break;
-            case FN_ATOM:
             case DURATION_ATOM:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case HOLD_AFTER:
+            case LESS_ORDERING_CONSTRAINT:
+            case WITHIN:
+                malformed = this.atom.size() != 2;
+                break;
+            case WHEN:
+            case EQUAL:
             case LESS:
             case LESS_OR_EQUAL:
-            case EQUAL:
             case GREATER:
             case GREATER_OR_EQUAL:
             case ASSIGN:
@@ -928,14 +935,6 @@ public class PDDLExpression implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case HOLD_AFTER:
-            case WITHIN:
-            case LESS_ORDERING_CONSTRAINT:
-                malformed = this.atom.size() != 2;
-                break;
-            case WHEN:
                 malformed = this.children.size() != 2
                     && this.children.get(0).isMalformedExpression()
                     && this.children.get(1).isMalformedExpression();
@@ -951,6 +950,7 @@ public class PDDLExpression implements Serializable {
             case MINIMIZE:
             case MAXIMIZE:
             case F_EXP_T:
+            case F_EXP:
                 malformed = this.children.size() != 1
                     && this.children.get(0).isMalformedExpression();
                 break;

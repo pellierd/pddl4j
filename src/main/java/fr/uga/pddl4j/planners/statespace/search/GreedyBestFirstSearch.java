@@ -96,7 +96,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
                     if (op.isApplicable(current)) {
                         final ClosedWorldState nextState = new ClosedWorldState(current);
 
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                                 // Apply the effect to the successor node
                                 nextState.apply(ce.getEffects())
                         );
@@ -104,7 +104,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
-                        successor.setCost(current.getCost() + op.getCost());
+                        successor.setCost(current.getCost() + op.getCost().getValue());
                         successor.setHeuristic(heuristic.estimate(nextState, codedProblem.getGoal()));
                         successor.setParent(current);
                         successor.setAction(index);

@@ -21,6 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -135,7 +136,14 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(effect);
                 if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
                     actions.add(action);
+                } else if (effect.getConnective().equals(PDDLConnective.TRUE)) {
+                    effect.setConnective(PDDLConnective.AND);
+                    effect.getChildren().clear();
                 }
+                if (action.isDurative()) {
+                    action.getDuration().toCNF();
+                }
+
             }
         } else {
             final Set<Integer> values = Encoder.tableOfDomains.get(action.getTypeOfParameters(index));
@@ -155,6 +163,11 @@ final class Instantiation implements Serializable {
                         }
                         for (int i = 0; i < index; i++) {
                             copy.setValueOfParameter(i, action.getValueOfParameter(i));
+                        }
+                        if (action.isDurative()) {
+                            final IntExpression duration = new IntExpression(action.getDuration());
+                            duration.substitute(varIndex, value);
+                            copy.setDuration(duration);
                         }
                         copy.setValueOfParameter(index, value);
                         Instantiation.instantiate(copy, index + 1, bound, actions);
@@ -207,7 +220,6 @@ final class Instantiation implements Serializable {
                 for (int i = 0; i < arity; i++) {
                     copy.setValueOfParameter(i, network.getValueOfParameter(i));
                 }
-
                 copy.setValueOfParameter(index, value);
                 Instantiation.instantiate(copy, index + 1, networks);
             }
@@ -697,7 +709,7 @@ final class Instantiation implements Serializable {
                         // If a child expression is TRUE, we can remove the child expression.
                         exp.getChildren().remove(i);
                     } else if (ei.getConnective().equals(PDDLConnective.AND)) {
-                        // If the child expression to add is a conjunction, we can simplify the expression by
+                        // If the child expression to addValue is a conjunction, we can simplify the expression by
                         exp.getChildren().remove(i); // removing the inner conjunction.
                         int j = 0;
                         int added = 0;
@@ -772,7 +784,7 @@ final class Instantiation implements Serializable {
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
                     } else if (ei.getConnective().equals(PDDLConnective.OR)) {
-                        // If the child expression to add is a disjunction, we can simplify the expression by
+                        // If the child expression to addValue is a disjunction, we can simplify the expression by
                         // removing the inner disjunction.
                         exp.getChildren().remove(i);
                         int j = 0;
@@ -849,13 +861,20 @@ final class Instantiation implements Serializable {
                     }
                 }
                 break;
-            case FORALL:
-            case EXISTS:
             case AT_START:
             case AT_END:
+            case OVER_ALL:
+                final IntExpression fluent = exp.getChildren().get(0);
+                Instantiation.simplify(fluent);
+                if (fluent.getConnective().equals(PDDLConnective.TRUE)
+                    || fluent.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(fluent.getConnective());
+                }
+                break;
+            case FORALL:
+            case EXISTS:
             case UMINUS:
             case ALWAYS:
-            case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
                 Instantiation.simplify(exp.getChildren().get(0));
@@ -884,7 +903,6 @@ final class Instantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -893,6 +911,7 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(exp.getChildren().get(1));
                 break;
             case F_EXP_T:
+            case F_EXP:
                 if (!exp.getChildren().isEmpty()) {
                     Instantiation.simplify(exp.getChildren().get(0));
                 }
@@ -903,7 +922,6 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(exp.getChildren().get(1));
                 Instantiation.simplify(exp.getChildren().get(3));
                 break;
-            case FN_ATOM:
             case NUMBER:
             case DURATION_ATOM:
             case TIME_VAR:

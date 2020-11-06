@@ -87,7 +87,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
                         //nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         //nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                                 // Apply the effect to the successor node
                                 nextState.apply(ce.getEffects())
                         );
@@ -95,8 +95,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
-                        successor.setCost(current.getCost() + op.getCost());
-                        successor.setHeuristic(0);
+                        successor.setCost(current.getCost() + op.getCost().getValue());
                         successor.setParent(current);
                         successor.setAction(index);
                         successor.setDepth(current.getDepth() + 1);

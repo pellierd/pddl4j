@@ -144,7 +144,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(operator);
-                                childNode.getState().apply(action.getCondEffects());
+                                childNode.getState().apply(action.getConditionalEffects());
                                 childNode.getTaskNetwork().removeTask(task);
                                 childNode.setTask(taskIndex);
                                 open.add(childNode);

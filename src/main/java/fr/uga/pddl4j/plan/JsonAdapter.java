@@ -126,7 +126,7 @@ public class JsonAdapter implements Serializable {
                 precondJson.put("Negatives", negativeJsonPrecondition);
 
                 //CondExp
-                List<ConditionalEffect> condExp = action.getCondEffects();
+                List<ConditionalEffect> condExp = action.getConditionalEffects();
 
                 // Condition object
                 JSONArray condExpJsonArray = new JSONArray();

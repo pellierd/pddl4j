@@ -17,6 +17,7 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
@@ -420,7 +421,8 @@ public class StateSpacePlannerFactory implements Serializable {
             if (saveStats) {
                 planner.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
             }
-            if (!errorManager.isEmpty()) {
+            if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
+                    || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
                 errorManager.printAll();
                 System.exit(0);
             } else if (traceLevel > 0 && traceLevel != 8) {

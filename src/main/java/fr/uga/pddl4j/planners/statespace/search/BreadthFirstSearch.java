@@ -91,7 +91,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                                 // Apply the effect to the successor node
                                 nextState.apply(ce.getEffects())
                         );
@@ -99,7 +99,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);
-                        successor.setCost(current.getCost() + op.getCost());
+                        successor.setCost(current.getCost() + op.getCost().getValue());
                         successor.setHeuristic(0);
                         successor.setParent(current);
                         successor.setAction(index);

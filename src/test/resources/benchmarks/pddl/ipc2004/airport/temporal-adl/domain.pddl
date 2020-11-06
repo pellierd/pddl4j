@@ -9,7 +9,7 @@
 
 
 (define (domain airport_durative)
-(:requirements :durative-actions :adl)
+(:requirements :durative-actions :numeric-fluents :adl)
 
 (:types airplane segment direction airplanetype)
 
@@ -42,7 +42,7 @@
 (:durative-action move
  :parameters
      (?a - airplane ?t - airplanetype ?d1 - direction ?s1 ?s2  - segment ?d2 - direction)
- :duration 
+ :duration
      (= ?duration (/ (length ?s1) 30))
  :condition
      (and
@@ -97,7 +97,7 @@
 (:durative-action pushback
  :parameters
      (?a - airplane ?t - airplanetype ?d1 - direction ?s1 ?s2  - segment ?d2 - direction)
- :duration 
+ :duration
      (= ?duration (/ (length ?s1) 5))
  :condition
      (and
@@ -159,7 +159,7 @@
                 (at start (facing ?a ?d))
                 (over all (is-start-runway ?s ?d))
      )
- :effect 
+ :effect
      (and
                 (at end (not (blocked ?s ?a)))
 	          (at end (not (occupied ?s)))

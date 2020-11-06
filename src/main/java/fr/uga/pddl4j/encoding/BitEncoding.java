@@ -21,21 +21,14 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.OrderingConstraintSet;
-import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -82,7 +75,7 @@ final class BitEncoding implements Serializable {
      * @param map     the map that associates to a specified expression its index.
      * @return the list of actions encoded into bit set.
      */
-    static List<Action> encodeActions(final List<IntAction> actions, final Map<IntExpression, Integer> map)
+    static List<Action> encodeActions(final List<IntAction> actions, final Map<IntExpression, Integer> map, final Map<IntExpression, Integer> numericFluents)
         throws UnexpectedExpressionException {
 
         final List<Action> encodedActions = new ArrayList<>(actions.size());
@@ -90,12 +83,12 @@ final class BitEncoding implements Serializable {
         int actionIndex = 0;
         for (IntAction intAction : actions) {
             List<IntAction> normalized = BitEncoding.normalizeAction(intAction);
-            encodedActions.add(BitEncoding.encodeAction(normalized.get(0), map));
+            encodedActions.add(BitEncoding.encodeAction(normalized.get(0), map, numericFluents));
             for (int i  = 1; i < normalized.size(); i++) {
                 if (Encoder.tableOfRelevantOperators != null) {
                     Encoder.tableOfRelevantOperators.get(actionIndex).add(actions.size() + addedActions.size());
                 }
-                addedActions.add(BitEncoding.encodeAction(normalized.get(i), map));
+                addedActions.add(BitEncoding.encodeAction(normalized.get(i), map, numericFluents));
             }
             actionIndex++;
         }
@@ -111,10 +104,11 @@ final class BitEncoding implements Serializable {
      * @param map the map that associates to a specified expression its index.
      * @return the action encoded.
      */
-    private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> map) {
+    private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> map, final Map<IntExpression, Integer> numericFluents) {
+
         final int arity = action.arity();
         final Action encoded = new Action(action.getName(), arity);
-        encoded.setCost(action.getCost());
+        //encoded.setCost(action.getCost());
 
         // Initialize the parameters of the action
         for (int i = 0; i < arity; i++) {
@@ -122,44 +116,266 @@ final class BitEncoding implements Serializable {
             encoded.setTypeOfParameter(i, action.getTypeOfParameters(i));
         }
 
+        // Initialize the numeric variables of the action
+        final List<IntExpression> actionNumericfluents = BitEncoding.extractNumericFluents(action);
+        final Map<IntExpression, NumericVariable> numericVariableIndex = new HashMap<>();
+        final List<NumericVariable> variables = new ArrayList<>();
+        for (IntExpression fluent : actionNumericfluents) {
+            final NumericVariable variable = new NumericVariable(numericFluents.get(fluent));
+            variables.add(variable);
+            numericVariableIndex.put(fluent, variable);
+            switch (fluent.getConnective()) {
+                case TIME_VAR:
+                    encoded.setDuration(variable);
+                    break;
+                //case TOTAL_COST_VAR:
+                //    encoded.setCost(variable);
+                //    break;
+            }
+        }
+        encoded.setNumericVariables(variables);
+
+        // Initialize the duration of the action
+        if (action.isDurative()) {
+            encoded.setDurationConstraints(BitEncoding.encodeDurationConstraints(action.getDuration(), numericVariableIndex));
+        }
+
         // Initialize the preconditions of the action
         encoded.setPreconditions(BitEncoding.encode(action.getPreconditions(), map));
+        encoded.setNumericConstraints(BitEncoding.encodeNumericConstraints(action.getPreconditions(), numericVariableIndex));
+        /*System.out.println(Encoder.toString(action));*/
 
         // Initialize the effects of the action
+        // Les functions numeric ne fonctionne pas avec les effects conditionel.
         final List<IntExpression> effects = action.getEffects().getChildren();
 
         final ConditionalEffect unCondEffects = new ConditionalEffect();
         boolean hasUnConditionalEffects = false;
         for (IntExpression ei : effects) {
-            final PDDLConnective connective = ei.getConnective();
             final List<IntExpression> children = ei.getChildren();
-            if (connective.equals(PDDLConnective.WHEN)) {
-                final ConditionalEffect condBitExp = new ConditionalEffect();
-                condBitExp.setCondition(BitEncoding.encode(children.get(0), map));
-                condBitExp.setEffects(BitEncoding.encode(children.get(1), map));
-                encoded.getCondEffects().add(condBitExp);
-            } else if (connective.equals(PDDLConnective.ATOM)) {
-                final Integer index = map.get(ei);
-                if (index != null) {
-                    unCondEffects.getEffects().getPositive().set(index);
+            switch (ei.getConnective()) {
+                case WHEN:
+                    final ConditionalEffect condBitExp = new ConditionalEffect();
+                    condBitExp.setCondition(BitEncoding.encode(children.get(0), map));
+                    condBitExp.setEffects(BitEncoding.encode(children.get(1), map));
+                    encoded.getConditionalEffects().add(condBitExp);
+                    break;
+                case ATOM:
+                    unCondEffects.getEffects().getPositive().set(map.get(ei));
                     hasUnConditionalEffects = true;
-                }
-            } else if (connective.equals(PDDLConnective.TRUE)) {
-                // do nothing
-            } else if (connective.equals(PDDLConnective.NOT)) {
-                final Integer index = map.get(children.get(0));
-                if (index != null) {
-                    unCondEffects.getEffects().getNegative().set(index);
+                    break;
+                case TRUE:
+                    // do nothing
+                    break;
+                case NOT:
+                    unCondEffects.getEffects().getNegative().set(map.get(children.get(0)));
                     hasUnConditionalEffects = true;
-                }
-            } else {
-                throw new UnexpectedExpressionException(Encoder.toString(ei));
+                    break;
+                case ASSIGN:
+                case INCREASE:
+                case DECREASE:
+                case SCALE_DOWN:
+                case SCALE_UP:
+                    if (encoded.getNumericAssignments() == null) {
+                        encoded.setNumericAssignments(new ArrayList<>());
+                    }
+                    NumericAssignment assignment = BitEncoding.encodeNumericAssignment(ei, numericVariableIndex);
+                    //System.out.println(Encoder.toString(assignment));
+                    encoded.getNumericAssignments().add(assignment);
+                    break;
+                default:
+                    throw new UnexpectedExpressionException(Encoder.toString(ei));
             }
         }
         if (hasUnConditionalEffects) {
-            encoded.getCondEffects().add(unCondEffects);
+            encoded.getConditionalEffects().add(unCondEffects);
         }
+     /*   System.out.println(Encoder.toString(encoded));
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
         return encoded;
+    }
+
+
+    /**
+     * Extract numeric fluents from an action.
+     *
+     * @param action the action.
+     */
+    private static List<IntExpression> extractNumericFluents(final IntAction action) {
+        final Set<IntExpression> fluents = new HashSet<>();
+        if (action.isDurative()) {
+            PostInstantiation.extractRelevantNumericFluents(action.getDuration(), fluents);
+        }
+        PostInstantiation.extractRelevantNumericFluents(action.getPreconditions(), fluents);
+        PostInstantiation.extractRelevantNumericFluents(action.getEffects(), fluents);
+        return new ArrayList<>(fluents);
+    }
+
+    /**
+     * Extract numeric fluents from a expression.
+     *
+     * @param exp the expression.
+     */
+    private static List<IntExpression> extractNumericFluents(final IntExpression exp) {
+        final Set<IntExpression> fluents = new HashSet<>();
+        PostInstantiation.extractRelevantNumericFluents(exp, fluents);
+        return new ArrayList<>(fluents);
+    }
+
+    /**
+     * Extract numeric fluents from a method.
+     *
+     * @param method the method.
+     */
+    private static List<IntExpression> extractNumericFluents(final IntMethod method) {
+        Set<IntExpression> fluents = new HashSet<>();
+        PostInstantiation.extractRelevantNumericFluents(method.getPreconditions(), fluents);
+        return new ArrayList<>(fluents);
+    }
+
+    /**
+     * Encode the duration constraints of the action. The expression in parameter must be a conjunction of simple
+     * numeric constraints.
+     *
+     * @param exp the expression that represents the duration constraints.
+     * @param numericVariables the map that associates to a specified numeric fluent its numeric variable.
+     *
+     */
+    static List<NumericConstraint> encodeDurationConstraints(final IntExpression exp,
+                                                             final Map<IntExpression, NumericVariable> numericVariables) {
+
+        List<NumericConstraint> constraints = new ArrayList<>();
+        for (IntExpression constraint: exp.getChildren()) {
+            constraints.add(BitEncoding.encodeNumericConstraint(constraint, numericVariables));
+        }
+        return constraints;
+    }
+
+    /**
+     * Encodes a numeric constraint.
+     *
+     * @param numericVariables the map that associates to a specified numeric fluent its numeric variable.
+     */
+    static NumericConstraint encodeNumericConstraint(final IntExpression exp,
+                                                     final Map<IntExpression, NumericVariable> numericVariables) {
+
+        ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariables);
+        ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariables);
+        NumericConstraint constraint = null;
+        switch (exp.getConnective()) {
+            case EQUAL:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.EQUAL, left, right);
+                break;
+            case LESS:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.LESS, left, right);
+                break;
+            case LESS_OR_EQUAL:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.LESS_OR_EQUAL, left, right);
+                break;
+            case GREATER:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER, left, right);
+                break;
+            case GREATER_OR_EQUAL:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER_OR_EQUAL, left, right);
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return constraint;
+    }
+
+    /**
+     * Encodes an arithmetic expression.
+     *
+     * @param numericVariableIndex the map that associates to a specified numeric fluent its numeric variable.
+     */
+    static ArithmeticExpression encodeArithmeticExpression(final IntExpression exp,
+                                                           final Map<IntExpression, NumericVariable> numericVariableIndex) {
+
+        ArithmeticExpression arithmeticExpression;
+        ArithmeticExpression left;
+        ArithmeticExpression right;
+        switch (exp.getConnective()) {
+            case PLUS:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariableIndex);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.PLUS, left, right);
+                break;
+            case MINUS:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariableIndex);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.MINUS, left, right);
+                break;
+            case UMINUS:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.UMINUS, left, null);
+                break;
+            case DIV:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariableIndex);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.DIV, left, right);
+                break;
+            case MUL:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericVariableIndex);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.MUL, left, right);
+                break;
+            case NUMBER:
+                arithmeticExpression = new ArithmeticExpression(exp.getValue());
+                break;
+            case F_EXP:
+                arithmeticExpression = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), numericVariableIndex);
+                break;
+            case FN_HEAD:
+            case TIME_VAR:
+            //case TOTAL_COST_VAR:
+            case AT_START:
+            case AT_END:
+                arithmeticExpression = new ArithmeticExpression(numericVariableIndex.get(exp));
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return arithmeticExpression;
+    }
+
+    /**
+     * Encodes a numeric assignment.
+     *
+     * @param numericVariableIndex the map that associates to a specified numeric fluent its numeric variable.
+     */
+    static NumericAssignment encodeNumericAssignment(final IntExpression exp,
+                                                     final Map<IntExpression, NumericVariable> numericVariableIndex) {
+
+        final ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(
+            exp.getChildren().get(0), numericVariableIndex);
+        final ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(
+            exp.getChildren().get(1), numericVariableIndex);
+        NumericAssignment assignment = null;
+        switch (exp.getConnective()) {
+            case ASSIGN:
+                assignment = new NumericAssignment(NumericAssignment.Operator.ASSIGN, left, right);
+                break;
+            case INCREASE:
+                assignment = new NumericAssignment(NumericAssignment.Operator.INCREASE, left, right);
+                break;
+            case DECREASE:
+                assignment = new NumericAssignment(NumericAssignment.Operator.DECREASE, left, right);
+                break;
+            case SCALE_UP:
+                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_UP, left, right);
+                break;
+            case SCALE_DOWN:
+                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_DOWN, left, right);
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return assignment;
     }
 
     /**
@@ -268,7 +484,7 @@ final class BitEncoding implements Serializable {
                 final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
                 op.setDummy(true);
                 op.setPreconditions(dis);
-                op.getCondEffects().add(condEffect);
+                op.getConditionalEffects().add(condEffect);
                 Encoder.actions.add(op);
             }
         } else {
@@ -359,41 +575,122 @@ final class BitEncoding implements Serializable {
      */
     private static State encode(final IntExpression exp, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
-        final State bitExp = new State();
-        if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-            final Integer index = map.get(exp);
-            if (index != null) {
-                bitExp.getPositive().set(index);
-            }
-        } else if (exp.getConnective().equals(PDDLConnective.NOT)) {
-            final Integer index = map.get(exp.getChildren().get(0));
-            if (index != null) {
-                bitExp.getNegative().set(index);
-            }
-        } else if (exp.getConnective().equals(PDDLConnective.AND)) {
-            final List<IntExpression> children = exp.getChildren();
-            for (IntExpression ei : children) {
-                if (ei.getConnective().equals(PDDLConnective.ATOM)) {
-                    final Integer index = map.get(ei);
-                    if (index != null) {
-                        bitExp.getPositive().set(index);
-                    }
-                } else if (ei.getConnective().equals(PDDLConnective.NOT)) {
-                    final Integer index = map.get(ei.getChildren().get(0));
-                    if (index != null) {
-                        bitExp.getNegative().set(index);
-                    }
-                } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                    // do nothing
-                } else {
-                    throw new UnexpectedExpressionException(Encoder.toString(exp));
+
+        final State state = new State();
+        switch (exp.getConnective()) {
+            case ATOM:
+                state.getPositive().set(map.get(exp));
+                break;
+            case NOT:
+                state.getNegative().set(map.get(exp.getChildren().get(0)));
+                break;
+            case AND:
+                final List<IntExpression> children = exp.getChildren();
+                for (IntExpression ei : children) {
+                    State s = BitEncoding.encode(ei, map);
+                    state.getPositive().or(s.getPositive());
+                    state.getNegative().or(s.getNegative());
                 }
-            }
-        } else {
-            LOGGER.error(Encoder.toString(exp));
-            throw new UnexpectedExpressionException(Encoder.toString(exp));
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case TRUE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
-        return bitExp;
+        return state;
+    }
+
+    /**
+     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param exp the <code>IntExpression</code>.
+     * @return the expression in bit set representation.
+     */
+    private static List<NumericConstraint> encodeNumericConstraints(final IntExpression exp, Map<IntExpression, NumericVariable> variables)
+        throws UnexpectedExpressionException {
+
+        final List<NumericConstraint> constraints = new ArrayList<>();
+        final State state = new State();
+        switch (exp.getConnective()) {
+            case AND:
+                for (IntExpression e : exp.getChildren()) {
+                    constraints.addAll(BitEncoding.encodeNumericConstraints(e, variables));
+                }
+                break;
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+                constraints.add(BitEncoding.encodeNumericConstraint(exp, variables));
+                break;
+            case ATOM:
+            case NOT:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case TRUE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return constraints;
+    }
+
+    /**
+     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param exp the <code>IntExpression</code>.
+     * @return the expression in bit set representation.
+     */
+    private static List<NumericAssignment> encodeNumericAssignments(final IntExpression exp, Map<IntExpression, NumericVariable> variables)
+        throws UnexpectedExpressionException {
+
+        final List<NumericAssignment> constraints = new ArrayList<>();
+        final State state = new State();
+        switch (exp.getConnective()) {
+            case AND:
+                for (IntExpression e : exp.getChildren()) {
+                    constraints.addAll(BitEncoding.encodeNumericAssignments(e, variables));
+                }
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                constraints.add(BitEncoding.encodeNumericAssignment(exp, variables));
+                break;
+            case ATOM:
+            case NOT:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case TRUE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return constraints;
     }
 
     /**
@@ -407,31 +704,7 @@ final class BitEncoding implements Serializable {
     private static void normalizeActions(final List<IntAction> actions) {
         final List<IntAction> normalisedActions = new ArrayList<>(actions.size() + 100);
         for (IntAction a : actions) {
-            a.getEffects().toCNF();
-            BitEncoding.simplify(a.getEffects());
-            final IntExpression precond = a.getPreconditions();
-            precond.toDNF();
-            if (precond.getChildren().size() > 0) {
-                for (final IntExpression ei : precond.getChildren()) {
-                    final String name = a.getName();
-                    final int arity = a.arity();
-                    final IntAction newAction = new IntAction(name, arity);
-                    newAction.setCost(a.getCost());
-                    for (int i = 0; i < arity; i++) {
-                        newAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
-                    }
-                    for (int i = 0; i < arity; i++) {
-                        newAction.setValueOfParameter(i, a.getValueOfParameter(i));
-                    }
-                    newAction.setPreconditions(ei);
-
-                    newAction.setEffects(new IntExpression(a.getEffects()));
-                    normalisedActions.add(newAction);
-                }
-            } else {
-                normalisedActions.add(a);
-            }
-
+            normalisedActions.addAll(BitEncoding.normalizeAction(a));
         }
         actions.clear();
         actions.addAll(normalisedActions);
@@ -451,25 +724,24 @@ final class BitEncoding implements Serializable {
         BitEncoding.simplify(action.getEffects());
         final IntExpression precond = action.getPreconditions();
         precond.toDNF();
-        if (precond.getChildren().size() > 0) {
-            for (final IntExpression ei : precond.getChildren()) {
-                final String name = action.getName();
-                final int arity = action.arity();
-                final IntAction newAction = new IntAction(name, arity);
-                newAction.setCost(action.getCost());
-                for (int i = 0; i < arity; i++) {
-                    newAction.setTypeOfParameter(i, action.getTypeOfParameters(i));
-                }
-                for (int i = 0; i < arity; i++) {
-                    newAction.setValueOfParameter(i, action.getValueOfParameter(i));
-                }
-                newAction.setPreconditions(ei);
-
-                newAction.setEffects(new IntExpression(action.getEffects()));
-                normalisedActions.add(newAction);
+        for (final IntExpression ei : precond.getChildren()) {
+            final String name = action.getName();
+            final int arity = action.arity();
+            final IntAction newAction = new IntAction(name, arity);
+            newAction.setCost(action.getCost());
+            for (int i = 0; i < arity; i++) {
+                newAction.setTypeOfParameter(i, action.getTypeOfParameters(i));
             }
-        } else {
-            normalisedActions.add(action);
+            for (int i = 0; i < arity; i++) {
+                newAction.setValueOfParameter(i, action.getValueOfParameter(i));
+            }
+            if (action.isDurative()) {
+                newAction.setDuration(new IntExpression(action.getDuration()));
+            }
+            newAction.setPreconditions(ei);
+
+            newAction.setEffects(new IntExpression(action.getEffects()));
+            normalisedActions.add(newAction);
         }
         return normalisedActions;
     }

@@ -34,13 +34,7 @@ import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.OrderingConstraintSet;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -513,6 +507,11 @@ final class IntEncoding implements Serializable {
             intAction.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
+        // Encode the duration of the action
+        if (action.isDurative()) {
+            final IntExpression duration = IntEncoding.encodeExp(action.getDuration(), variables);
+            intAction.setDuration(duration);
+        }
         // Encode the preconditions of the operator
         final IntExpression preconditions = IntEncoding.encodeExp(action.getPreconditions(), variables);
         intAction.setPreconditions(preconditions);
@@ -630,6 +629,25 @@ final class IntEncoding implements Serializable {
         return intExp;
     }
 
+    /**
+     * Encodes the initial state of a specified problem and extract the initial numeric cost of the function.
+     *
+     * @param init the initial state of the problem.
+     */
+    static void encodeInitialState(final List<PDDLExpression> init) {
+        Encoder.intInitialState = init.stream().map(IntEncoding::encodeExp)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        Encoder.initialNumericFluentValues = new LinkedHashMap<>();
+        Iterator<IntExpression> i = Encoder.intInitialState.iterator();
+        while (i.hasNext()) {
+            IntExpression initEl = i.next();
+            if (initEl.getConnective().equals(PDDLConnective.EQUAL)) {
+                Encoder.initialNumericFluentValues.put(initEl.getChildren().get(0),
+                    initEl.getChildren().get(1).getValue());
+                i.remove();
+            }
+        }
+    }
 
 
     /**

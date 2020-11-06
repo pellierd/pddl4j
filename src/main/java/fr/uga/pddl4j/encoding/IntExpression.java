@@ -751,6 +751,24 @@ public class IntExpression implements Serializable {
             case ATOM:
             case NOT:
             case TRUE:
+            case ASSIGN:
+            case DECREASE:
+            case INCREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case PLUS:
+            case MINUS:
+            case UMINUS:
+            case MUL:
+            case DIV:
+            case AT_START:
+            case AT_END:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case OVER_ALL:
                 IntExpression copy = new IntExpression(this);
                 this.setConnective(PDDLConnective.AND);
                 this.getChildren().clear();
@@ -825,6 +843,24 @@ public class IntExpression implements Serializable {
             case ATOM:
             case NOT:
             case TRUE:
+            case ASSIGN:
+            case DECREASE:
+            case INCREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case PLUS:
+            case MINUS:
+            case UMINUS:
+            case MUL:
+            case DIV:
+            case AT_START:
+            case AT_END:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case OVER_ALL:
                 IntExpression and = new IntExpression(PDDLConnective.AND);
                 and.getChildren().add(new IntExpression(this));
                 this.setConnective(PDDLConnective.OR);

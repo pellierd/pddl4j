@@ -133,6 +133,15 @@ public class PDDLAction extends PDDLAbstractOperator {
     }
 
     /**
+     * Returns if this action is durative action.
+     *
+     * @return <code>true</code> if this action is a durative action, <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.getDuration() != null;
+    }
+
+    /**
      * Normalizes the operators.
      *
      * @param index the index of the first variable, index, i.e., ?Xi.

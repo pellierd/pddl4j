@@ -26,8 +26,13 @@ import java.util.stream.Collectors;
 /**
  * This class implements a compact representation for action of the planning problem.
  *
+ * <p>Revisions:
+ * <ul>
+ * <li>21.10.2020: change the duration attribute to encode temporal problem.</li>
+ * </ul>
+ *
  * @author D. Pellier
- * @version 1.1 - 08.04.2010
+ * @version 1.2 - 08.04.2010
  */
 public class Action extends AbstractOperator {
 
@@ -39,12 +44,22 @@ public class Action extends AbstractOperator {
     /**
      * The cost of the action.
      */
-    private double cost;
+    private NumericVariable cost;
 
     /**
      * The duration of the action.
      */
-    private double duration;
+    private NumericVariable duration;
+
+    /**
+     * The duration of the action.
+     */
+    private List<NumericConstraint> durationConstraints;
+
+    /**
+     * The list of numeric assignments of the operator.
+     */
+    private List<NumericAssignment> numericAssignments;
 
     /**
      * Creates a new action from an other. This constructor is the copy constructor.
@@ -54,7 +69,18 @@ public class Action extends AbstractOperator {
     public Action(final Action other) {
         super(other);
         this.effects = new ArrayList<>();
-        this.effects.addAll(other.getCondEffects().stream().map(ConditionalEffect::new).collect(Collectors.toList()));
+        this.effects.addAll(other.getConditionalEffects().stream().map(ConditionalEffect::new)
+            .collect(Collectors.toList()));
+        this.numericAssignments.addAll(other.getNumericAssignments().stream().map(NumericAssignment::new)
+            .collect(Collectors.toList()));
+        if (this.getDurationConstraints() != null) {
+            this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
+                .collect(Collectors.toList()));
+        }
+        this.cost = new NumericVariable(other.cost);
+        if (this.duration != null) {
+            this.duration = new NumericVariable(other.duration);
+        }
     }
 
     /**
@@ -66,6 +92,12 @@ public class Action extends AbstractOperator {
     public Action(final String name, final int arity) {
         super(name, arity);
         this.effects = new ArrayList<>();
+        this.cost = new NumericVariable(-1);
+        this.cost.setValue(1.0);
+        this.duration = new NumericVariable(-2);
+        this.duration.setValue(0.0);
+        this.durationConstraints = null;
+        this.numericAssignments = null;
     }
 
     /**
@@ -82,7 +114,13 @@ public class Action extends AbstractOperator {
         ConditionalEffect cexp = new ConditionalEffect();
         cexp.setCondition(new State());
         cexp.setEffects(effects);
-        this.addCondBitEffect(cexp);
+        this.addConditionalEffect(cexp);
+        this.cost = new NumericVariable(-1);
+        this.cost.setValue(1.0);
+        this.duration = new NumericVariable(-2);
+        this.duration.setValue(0.0);
+        this.durationConstraints = null;
+        this.numericAssignments = null;
     }
 
     /**
@@ -90,16 +128,25 @@ public class Action extends AbstractOperator {
      *
      * @return the effects of the action.
      */
-    public final List<ConditionalEffect> getCondEffects() {
+    public final List<ConditionalEffect> getConditionalEffects() {
         return this.effects;
+    }
+
+    /**
+     * Returns the conditional effects to the action.
+     *
+     * @param effects the conditional effects of the action.
+     */
+    public final void setConditionalEffects(List<ConditionalEffect> effects) {
+        this.effects = effects;
     }
 
     /**
      * Adds a conditional effect to the action.
      *
-     * @param effect the conditional effect to add.
+     * @param effect the conditional effect to addValue.
      */
-    public final void addCondBitEffect(ConditionalEffect effect) {
+    public final void addConditionalEffect(ConditionalEffect effect) {
         this.effects.add(effect);
     }
 
@@ -119,7 +166,7 @@ public class Action extends AbstractOperator {
      *
      * @return the unconditional effects of the action.
      */
-    public State getUnconditionalEffects() {
+    public final State getUnconditionalEffects() {
         final State ucEffect = new State();
         this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
             final State condEff = cEffect.getEffects();
@@ -130,21 +177,30 @@ public class Action extends AbstractOperator {
     }
 
     /**
+     * Returns if this action is durative.
+     *
+     * @return <code>true</code> if this action is durative or <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.durationConstraints != null;
+    }
+
+    /**
      * Returns the duration of the action.
      *
      * @return the duration of the action.
      */
-    public final double getDuration() {
-        return this.duration;
+    public final List<NumericConstraint> getDurationConstraints() {
+        return this.durationConstraints;
     }
 
     /**
      * Sets the duration of the action.
      *
-     * @param duration the duration to set.
+     * @param constraints the duration to set.
      */
-    public final void setDuration(final double duration) {
-        this.duration = duration;
+    public final void setDurationConstraints(final List<NumericConstraint> constraints) {
+        this.durationConstraints = constraints;
     }
 
     /**
@@ -152,7 +208,7 @@ public class Action extends AbstractOperator {
      *
      * @return the cost of the action.
      */
-    public final double getCost() {
+    public final NumericVariable getCost() {
         return this.cost;
     }
 
@@ -161,8 +217,44 @@ public class Action extends AbstractOperator {
      *
      * @param cost the cost to set.
      */
-    public final void setCost(double cost) {
+    public final void setCost(final NumericVariable cost) {
         this.cost = cost;
+    }
+
+    /**
+     * Returns the duration of the action.
+     *
+     * @return the duration of the action.
+     */
+    public final NumericVariable getDuration() {
+        return this.duration;
+    }
+
+    /**
+     * Sets the duration of the action.
+     *
+     * @param duration the duration to set.
+     */
+    public final void setDuration(final NumericVariable duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * Returns the list of numeric assignments of this action.
+     *
+     * @return the list of numeric assignments of this action.
+     */
+    public final List<NumericAssignment> getNumericAssignments() {
+        return this.numericAssignments;
+    }
+
+    /**
+     * Sets the list of numeric assignments of this action.
+     *
+     * @param assignments the list of numeric assignments of this action.
+     */
+    public final void setNumericAssignments(List<NumericAssignment> assignments) {
+        this.numericAssignments = assignments;
     }
 
 }

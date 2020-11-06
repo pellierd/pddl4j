@@ -21,12 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLSymbol;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
@@ -75,7 +70,13 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n");
+        if (action.isDurative()) {
+            str.append("Duration:\n");
+            str.append(toString(action.getDuration(), constants, types, predicates, functions, tasks));
+            str.append("\nCondition:\n");
+        } else {
+            str.append("Preconditions:\n");
+        }
         str.append(toString(action.getPreconditions(), constants, types, predicates, functions, tasks));
         str.append("\n");
         str.append("Effects:\n");
@@ -83,6 +84,9 @@ final class StringDecoder implements Serializable {
         str.append("\n");
         return str.toString();
     }
+
+
+
 
     /**
      * Returns a string representation of the specified method.
@@ -374,6 +378,7 @@ final class StringDecoder implements Serializable {
                 str.append(exp.getConnective());
                 break;
             case TIME_VAR:
+                str.append(exp.getConnective().getImage());
                 break;
             case FN_ATOM:
             case WHEN:
@@ -455,12 +460,16 @@ final class StringDecoder implements Serializable {
      */
     static String toString(final Action action, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
-                           final List<IntExpression> relevants) {
+                           final List<IntExpression> relevants, List<IntExpression> numericFluents) {
         StringBuilder str = new StringBuilder();
-        str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
+        str.append("== Action ");
+        str.append(action.getName());
+        str.append(" ==\n");
+        str.append("Instantiations:\n");
         for (int i = 0; i < action.arity(); i++) {
             final int index = action.getValueOfParameter(i);
             final String type = types.get(action.getTypeOfParameters(i));
+            str.append(" ");
             if (index == -1) {
                 str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i).append(" - ").append(type).append(" : ? \n");
             } else {
@@ -468,11 +477,240 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n").append(StringDecoder.toString(action.getPreconditions(), constants, types,
-            predicates, functions, relevants)).append("\n").append("Effects:\n");
-        for (ConditionalEffect condExp : action.getCondEffects()) {
-            str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants))
-                .append("\n");
+        if (!action.getNumericVariables().isEmpty()) {
+            str.append("Numeric variables:\n");
+            for (NumericVariable var : action.getNumericVariables()) {
+                str.append(" ");
+                IntExpression numericFluernt = numericFluents.get(var.getNumericFluents());
+                str.append(StringDecoder.toString(numericFluernt, constants, null, null, functions, null));
+                str.append(" : ");
+                str.append(var.getValue());
+                str.append("\n");
+            }
+        }
+        if (action.isDurative()) {
+            str.append("Duration:\n");
+            if (!action.getDurationConstraints().isEmpty()) {
+                str.append(StringDecoder.toString(action.getDurationConstraints().get(0), constants, functions, numericFluents));
+                for (int i = 1; i < action.getDurationConstraints().size(); i++) {
+                    str.append("\n  ");
+                    str.append(StringDecoder.toString(action.getDurationConstraints().get(i), constants, functions, numericFluents));
+                }
+            }
+            str.append("\nCondition:\n");
+        } else {
+            str.append("Precondition:\n");
+        }
+        str.append(StringDecoder.toString(action.getPreconditions(), constants, types, predicates, functions,
+                relevants));
+        str.append("\n");
+        str.append("Numeric constraints:\n");
+        str.append("(and ");
+        if (action.getNumericAssignments() != null && !action.getNumericConstraints().isEmpty()) {
+            str.append(StringDecoder.toString(action.getNumericConstraints().get(0), constants, functions, numericFluents));
+            for (int i = 1; i < action.getNumericConstraints().size(); i++) {
+                str.append("\n  ");
+                str.append(StringDecoder.toString(action.getNumericConstraints().get(i), constants, functions, numericFluents));
+            }
+        }
+        str.append(")\n");
+        str.append("Effect:\n");
+        for (ConditionalEffect condExp : action.getConditionalEffects()) {
+            str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants));
+            str.append("\n");
+        }
+        str.append("Numeric assignments:\n");
+        str.append("(and ");
+        if (action.getNumericAssignments() != null && !action.getNumericAssignments().isEmpty()) {
+            str.append(StringDecoder.toString(action.getNumericAssignments().get(0), constants, functions, numericFluents));
+            for (int i = 1; i < action.getNumericAssignments().size(); i++) {
+                str.append("\n  ");
+                str.append(StringDecoder.toString(action.getNumericAssignments().get(i), constants, functions, numericFluents));
+            }
+        }
+        str.append(")\n");
+
+
+        return str.toString();
+    }
+
+
+    /**
+     *
+     * @param constraint
+     * @param constants
+     * @param functions
+     * @param numericFluents
+     * @return
+     */
+    static String toString(final NumericConstraint constraint, final List<String> constants,
+                           final List<String> functions, final List<IntExpression> numericFluents) {
+
+        final StringBuilder str = new StringBuilder();
+
+        switch (constraint.getComparator()) {
+            case EQUAL:
+                str.append("(= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case LESS:
+                str.append("(< ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case LESS_OR_EQUAL:
+                str.append("(<= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case GREATER:
+                str.append("(> ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case GREATER_OR_EQUAL:
+                str.append("(>= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+        }
+
+        if (constraint.isDurative()) {
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+
+
+    /**
+     *
+     * @param assignment
+     * @param constants
+     * @param functions
+     * @param numericFluents
+     * @return
+     */
+    static String toString(final NumericAssignment assignment, final List<String> constants,
+                           final List<String> functions, final List<IntExpression> numericFluents) {
+
+        final StringBuilder str = new StringBuilder();
+
+        switch (assignment.getOperator()) {
+            case ASSIGN:
+                str.append("(assign ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case INCREASE:
+                str.append("(increase ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case DECREASE:
+                str.append("(decrease ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case SCALE_UP:
+                str.append("(scale-up ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+            case SCALE_DOWN:
+                str.append("(scale-down ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression(), constants, functions, numericFluents));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression(), constants, functions, numericFluents));
+                str.append(")");
+                break;
+        }
+
+        if (assignment.isDurative()) {
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    /**
+     *
+     * @param exp
+     * @param constants
+     * @param functions
+     * @param numericFluents
+     * @return
+     */
+    static String toString(final ArithmeticExpression exp, final List<String> constants, final List<String> functions,
+                           final List<IntExpression> numericFluents) {
+
+        StringBuilder str = new StringBuilder();
+        switch (exp.getType()) {
+            case NUMBER:
+                str.append(exp.getValue());
+                break;
+            case VARIABLE:
+                str.append("(");
+                str.append(StringDecoder.toString(numericFluents.get(exp.getNumericFluents()), constants, null, null,
+                    functions, null));
+                str.append("/");
+                str.append(exp.getValue());
+                str.append(")");
+                break;
+            case OPERATOR:
+                switch (exp.getArithmeticOperator()) {
+                    case PLUS:
+                        str.append("(+ ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case MINUS:
+                        str.append("(- ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case DIV:
+                        str.append("(/ ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case MUL:
+                        str.append("(* ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                    case UMINUS:
+                        str.append("(- ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression(), constants, functions, numericFluents));
+                        str.append(")");
+                        break;
+                }
         }
         return str.toString();
     }

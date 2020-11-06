@@ -138,7 +138,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(operator);
-                            childNode.getState().apply(action.getCondEffects());
+                            childNode.getState().apply(action.getConditionalEffects());
                             childNode.setTask(task);
                             open.add(childNode);
                             if (debug) {
