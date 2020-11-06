@@ -39,11 +39,6 @@ public abstract class AbstractNumericExpression implements NumericExpression {
     private ArithmeticExpression leftExpression;
 
     /**
-     * The time specifier of this numeric cosntraints.
-     */
-    private TimeSpecifier timeSpecifier;
-
-    /**
      * Creates a deep copy of numeric expression.
      *
      * @param other the numeric expression to be copied.
@@ -55,7 +50,6 @@ public abstract class AbstractNumericExpression implements NumericExpression {
         if (other.getRightExpression() != null) {
             this.setRightExpression(new ArithmeticExpression(other.getRightExpression()));
         }
-        this.setTimeSpecifier(other.getTimeSpecifier());
     }
 
     /**
@@ -68,7 +62,6 @@ public abstract class AbstractNumericExpression implements NumericExpression {
         super();
         this.setLeftExpression(left);
         this.setRightExpression(right);
-        this.setTimeSpecifier(TimeSpecifier.NO_TIME_SPECIFIER);
     }
 
     /**
@@ -107,31 +100,4 @@ public abstract class AbstractNumericExpression implements NumericExpression {
         this.leftExpression = left;
     }
 
-    /**
-     * Returns the time specifier of this numeric constraint.
-     *
-     * @return the time specifier of this numeric constraint.
-     */
-    public final TimeSpecifier getTimeSpecifier() {
-        return this.timeSpecifier;
-    }
-
-    /**
-     * Sets the time specifier of this numeric constraint.
-     *
-     * @param timeSpecifier the time specifier of this constraint.
-     */
-    public final void setTimeSpecifier(final TimeSpecifier timeSpecifier) {
-        this.timeSpecifier = timeSpecifier;
-    }
-
-    /**
-     * Returns if this numeric expression is durative. A numeric expression is durative if its time specifier is
-     * <code>AT_START</code> or <code>AT_END</code>.
-     *
-     * @return <code>true</code> if the numeric expression is durative.
-     */
-    public final boolean isDurative() {
-        return this.getTimeSpecifier() != TimeSpecifier.NO_TIME_SPECIFIER;
-    }
 }

@@ -585,10 +585,6 @@ final class StringDecoder implements Serializable {
                 str.append(")");
                 break;
         }
-
-        if (constraint.isDurative()) {
-            str.append(")");
-        }
         return str.toString();
     }
 
@@ -643,10 +639,6 @@ final class StringDecoder implements Serializable {
                 str.append(StringDecoder.toString(assignment.getRightExpression(), constants, functions, numericFluents));
                 str.append(")");
                 break;
-        }
-
-        if (assignment.isDurative()) {
-            str.append(")");
         }
         return str.toString();
     }

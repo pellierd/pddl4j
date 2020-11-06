@@ -154,11 +154,6 @@ public final class NumericAssignment extends AbstractNumericExpression {
      */
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        if (this.isDurative()) {
-            str.append("(");
-            str.append(super.getTimeSpecifier().getImage());
-            str.append(" ");
-        }
         final ArithmeticExpression left = super.getLeftExpression();
         final ArithmeticExpression right = super.getRightExpression();
         switch (this.getOperator()) {

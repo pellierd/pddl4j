@@ -136,7 +136,6 @@ public final class NumericConstraint extends AbstractNumericExpression {
         }
         final NumericConstraint other = (NumericConstraint) object;
         return this.getComparator() == other.getComparator()
-            && this.getTimeSpecifier() == other.getTimeSpecifier()
             && Objects.equals(super.getRightExpression(), other.getRightExpression())
             && Objects.equals(super.getLeftExpression(), other.getLeftExpression());
     }
@@ -148,7 +147,7 @@ public final class NumericConstraint extends AbstractNumericExpression {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getComparator(), super.getTimeSpecifier(), super.getRightExpression(),
+        return Objects.hash(this.getComparator(), super.getRightExpression(),
             super.getLeftExpression());
     }
 
@@ -160,11 +159,6 @@ public final class NumericConstraint extends AbstractNumericExpression {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        if (this.isDurative()) {
-            str.append("(");
-            str.append(super.getTimeSpecifier().getImage());
-            str.append(" ");
-        }
         final ArithmeticExpression left = super.getLeftExpression();
         final ArithmeticExpression right = super.getRightExpression();
         switch (this.getComparator()) {
@@ -203,9 +197,6 @@ public final class NumericConstraint extends AbstractNumericExpression {
                 str.append(right);
                 str.append(")");
                 break;
-        }
-        if (this.isDurative()) {
-            str.append(")");
         }
         return str.toString();
     }

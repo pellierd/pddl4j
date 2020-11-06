@@ -51,32 +51,4 @@ public interface NumericExpression extends Serializable {
      */
     ArithmeticExpression getLeftExpression();
 
-    /**
-     * Sets the left arithmetic expression of the numeric expression.
-     *
-     * @param leftExpression the left arithmetic expression of the numeric expression.
-     */
-    void setLeftExpression(final ArithmeticExpression leftExpression);
-
-    /**
-     * Returns the time specifier of this numeric expression.
-     *
-     * @return the time specifier of this numeric expression.
-     */
-    TimeSpecifier getTimeSpecifier();
-
-    /**
-     * Sets the time specifier of this numeric expression.
-     *
-     * @param timeSpecifier the time specifier of this expression.
-     */
-    void setTimeSpecifier(final TimeSpecifier timeSpecifier);
-
-    /**
-     * Returns if this numeric expression is durative. A numeric expression is durative if its time specifier is
-     * <code>AT_START</code> or <code>AT_END</code>.
-     *
-     * @return <code>true</code> if the numeric expression is durative.
-     */
-    boolean isDurative();
 }
