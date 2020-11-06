@@ -21,6 +21,11 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * This class implements an operator. This class is used to store compact representation of operator
  * during the instantiation process.
@@ -134,6 +139,73 @@ final class IntAction extends AbstractIntOperator {
     public final void setEffects(final IntExpression effects) {
         this.effects = effects;
     }
+
+
+    /**
+     * Expands the conditional effect of this action. The quantified expression of the effect must be removed before
+     * calling this method.
+     *
+     *  @return the list of action corresponding without conditional effects.
+     */
+    public List<IntAction> expandConditionalEffect() {
+        List<IntAction> expanded = new ArrayList<>();
+        LinkedList<IntAction> toExpand = new LinkedList<>();
+        toExpand.add(new IntAction(this));
+        while (!toExpand.isEmpty()) {
+            IntAction action = toExpand.pop();
+            IntExpression when = this.popWhenExpression(action.getEffects());
+            if (when == null) {
+                expanded.add(action);
+            } else {
+                IntAction a1 = new IntAction(action);
+                IntExpression precondition = new IntExpression(PDDLConnective.AND);
+                precondition.addChild(when.getChildren().get(0));
+                precondition.addChild(a1.getPreconditions());
+                a1.setPreconditions(precondition);
+                IntExpression effect = new IntExpression(PDDLConnective.AND);
+                effect.addChild(when.getChildren().get(1));
+                effect.addChild(a1.getEffects());
+                a1.setEffects(effect);
+                toExpand.add(a1);
+
+
+                IntAction a2 = new IntAction(action);
+                precondition = new IntExpression(PDDLConnective.AND);
+                IntExpression not = new IntExpression(PDDLConnective.NOT);
+                not.addChild(when.getChildren().get(0));
+
+                precondition.addChild(not);
+                precondition.addChild(a2.getPreconditions());
+
+                a2.setPreconditions(precondition);
+                toExpand.add(a2);
+            }
+        }
+        return expanded;
+    }
+
+    /**
+     * Pops and removes the first occurrence of the when expression contained in a specified expression.
+     *
+     * @param exp the expression.
+     * @return
+     */
+    private static IntExpression popWhenExpression(IntExpression exp) {
+        Iterator<IntExpression> i = exp.getChildren().iterator();
+        IntExpression when = null;
+        while (i.hasNext() && when == null) {
+            IntExpression e = i.next();
+            if (e.getConnective().equals(PDDLConnective.WHEN)) {
+                when = e;
+                i.remove();
+            } else {
+                when = popWhenExpression(e);
+            }
+        }
+        return when;
+    }
+
+
 
 
 }

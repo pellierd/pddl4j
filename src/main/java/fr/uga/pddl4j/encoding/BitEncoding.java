@@ -238,7 +238,7 @@ final class BitEncoding implements Serializable {
         }
 
         State newGoal;
-        BitEncoding.toDNF(goal);
+        goal.toDNF();
         Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
         for (IntExpression exp : goal.getChildren()) {
             if (exp.getConnective().equals(PDDLConnective.ATOM)) {
@@ -407,10 +407,10 @@ final class BitEncoding implements Serializable {
     private static void normalizeActions(final List<IntAction> actions) {
         final List<IntAction> normalisedActions = new ArrayList<>(actions.size() + 100);
         for (IntAction a : actions) {
-            BitEncoding.toCNF(a.getEffects());
+            a.getEffects().toCNF();
             BitEncoding.simplify(a.getEffects());
             final IntExpression precond = a.getPreconditions();
-            BitEncoding.toDNF(precond);
+            precond.toDNF();
             if (precond.getChildren().size() > 0) {
                 for (final IntExpression ei : precond.getChildren()) {
                     final String name = a.getName();
@@ -447,10 +447,10 @@ final class BitEncoding implements Serializable {
      */
     private static List<IntAction> normalizeAction(final IntAction action) {
         final List<IntAction> normalisedActions = new ArrayList<>();
-        BitEncoding.toCNF(action.getEffects());
+        action.getEffects().toCNF();
         BitEncoding.simplify(action.getEffects());
         final IntExpression precond = action.getPreconditions();
-        BitEncoding.toDNF(precond);
+        precond.toDNF();
         if (precond.getChildren().size() > 0) {
             for (final IntExpression ei : precond.getChildren()) {
                 final String name = action.getName();
@@ -485,7 +485,7 @@ final class BitEncoding implements Serializable {
         final List<IntMethod> normalisedMethods = new ArrayList<>(methods.size() + 100);
         for (IntMethod m : methods) {
             final IntExpression precond = m.getPreconditions();
-            BitEncoding.toDNF(precond);
+            precond.toDNF();
             if (precond.getChildren().size() > 0) {
                 for (final IntExpression ei : precond.getChildren()) {
                     final String name = m.getName();
@@ -521,7 +521,7 @@ final class BitEncoding implements Serializable {
     private static List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
         final List<IntMethod> normalisedMethods = new ArrayList<>();
         final IntExpression precond = method.getPreconditions();
-        BitEncoding.toDNF(precond);
+        precond.toDNF();
         if (precond.getChildren().size() > 0) {
             for (final IntExpression ei : precond.getChildren()) {
                 final String name = method.getName();
@@ -572,125 +572,5 @@ final class BitEncoding implements Serializable {
         } while (simplified);
     }
 
-    /**
-     * Convert an expression in conjunctive normal form (CNF).
-     *
-     * @param exp the expression to transform in CNF.
-     */
-    private static void toCNF(final IntExpression exp) throws UnexpectedExpressionException {
-        switch (exp.getConnective()) {
-            case WHEN:
-                final IntExpression antecedent = exp.getChildren().get(0);
-                final IntExpression consequence = exp.getChildren().get(1);
-                BitEncoding.toDNF(antecedent);
-                exp.setConnective(PDDLConnective.AND);
-                exp.getChildren().clear();
-                for (IntExpression ei : antecedent.getChildren()) {
-                    final IntExpression newWhen = new IntExpression(PDDLConnective.WHEN);
-                    newWhen.getChildren().add(ei);
-                    newWhen.getChildren().add(consequence);
-                    exp.getChildren().add(newWhen);
-                }
-                break;
-            case AND:
-                final List<IntExpression> children = exp.getChildren();
-                int i = 0;
-                while (i < children.size()) {
-                    final IntExpression ei = children.get(i);
-                    BitEncoding.toCNF(ei);
-                    exp.getChildren().remove(i);
-                    for (IntExpression ej : ei.getChildren()) {
-                        exp.getChildren().add(i, ej);
-                        i++;
-                    }
-                }
-                break;
-            case ATOM:
-            case NOT:
-            case TRUE:
-                IntExpression copy = new IntExpression(exp);
-                exp.setConnective(PDDLConnective.AND);
-                exp.getChildren().clear();
-                exp.getChildren().add(copy);
-                break;
-            default:
-                throw new UnexpectedExpressionException(Encoder.toString(exp));
-        }
-    }
 
-    /**
-     * Convert an expression in disjunctive normal form (DNF).
-     *
-     * @param exp the expression to transform in DNF.
-     */
-    private static void toDNF(final IntExpression exp) throws UnexpectedExpressionException {
-        switch (exp.getConnective()) {
-            case OR:
-                List<IntExpression> children = exp.getChildren();
-                int index = 0;
-                while (index < children.size()) {
-                    final IntExpression ei = children.get(index);
-                    BitEncoding.toDNF(ei);
-                    if (ei.getConnective().equals(PDDLConnective.OR)) {
-                        children.remove(index);
-                        for (IntExpression ej : ei.getChildren()) {
-                            children.add(index, ej);
-                            index++;
-                        }
-                    }
-                }
-                break;
-            case AND:
-                children = exp.getChildren();
-                for (IntExpression child : children) {
-                    BitEncoding.toDNF(child);
-                }
-                IntExpression dnf = exp.getChildren().get(0);
-                for (int i = 1; i < exp.getChildren().size(); i++) {
-                    final IntExpression orExp = exp.getChildren().get(i);
-                    final IntExpression newOr = new IntExpression(PDDLConnective.OR);
-                    for (IntExpression newAnd : dnf.getChildren()) {
-                        for (IntExpression ek : orExp.getChildren()) {
-                            ek.getChildren().stream().filter(el -> !newAnd.getChildren().contains(el)).forEach(el -> {
-                                if (el.getConnective().equals(PDDLConnective.OR)
-                                    || el.getConnective().equals(PDDLConnective.AND)
-                                    && el.getChildren().size() == 1) {
-                                    newAnd.getChildren().add(el.getChildren().get(0));
-                                } else {
-                                    newAnd.getChildren().add(el);
-                                }
-                            });
-                            boolean add = true;
-                            for (IntExpression el : newAnd.getChildren()) {
-                                if (el.getConnective().equals(PDDLConnective.FALSE)) {
-                                    add = false;
-                                    break;
-                                }
-                            }
-                            if (add) {
-                                if (newAnd.getChildren().size() == 1) {
-                                    newOr.getChildren().add(newAnd.getChildren().get(0));
-                                } else {
-                                    newOr.getChildren().add(newAnd);
-                                }
-                            }
-                        }
-                    }
-                    dnf = newOr;
-                }
-                exp.affect(dnf);
-                break;
-            case ATOM:
-            case NOT:
-            case TRUE:
-                IntExpression and = new IntExpression(PDDLConnective.AND);
-                and.getChildren().add(new IntExpression(exp));
-                exp.setConnective(PDDLConnective.OR);
-                exp.getChildren().clear();
-                exp.getChildren().add(and);
-                break;
-            default:
-                throw new UnexpectedExpressionException(Encoder.toString(exp));
-        }
-    }
 }

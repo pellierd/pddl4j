@@ -52,7 +52,7 @@ public class PFDPlannerTest {
     /**
      * Computation timeout.
      */
-    private static final int TIMEOUT = 60;
+    private static final int TIMEOUT = 10;
 
     /**
      * Default Trace level.

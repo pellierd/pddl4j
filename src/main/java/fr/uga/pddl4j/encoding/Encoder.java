@@ -34,15 +34,10 @@ import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -125,6 +120,7 @@ import java.util.stream.Collectors;
  */
 public final class Encoder implements Serializable {
 
+    static IProblem pb;
     /**
      * The logger of the class.
      */
@@ -347,6 +343,9 @@ public final class Encoder implements Serializable {
         accepted.add(PDDLRequireKey.ACTION_COSTS);
         accepted.add(PDDLRequireKey.HIERARCHY);
         accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
+        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
+        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
 
         Encoder.requirements = new LinkedHashSet<>();
         Encoder.requirements.addAll(domain.getRequirements());
@@ -369,6 +368,7 @@ public final class Encoder implements Serializable {
         // Step 2: Integer encoding
         // *****************************************************************************************
 
+
         // Encode the types declared in the domain
         IntEncoding.encodeTypes(domain);
         // Encode the constants declared in the domain and the objects of the problem
@@ -385,6 +385,22 @@ public final class Encoder implements Serializable {
         List<IntAction> intActions = IntEncoding.encodeActions(domain.getActions());
         // Encode method in integer representation
         List<IntMethod> intMethods = IntEncoding.encodeMethods(domain.getMethods());
+
+
+        if (Encoder.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            List<IntAction> simplifiedActions = new ArrayList<>();
+            for (IntAction a : intActions) {
+                a.getPreconditions().expandQuantifiedExpression(Encoder.tableOfDomains);
+                a.getEffects().expandQuantifiedExpression(Encoder.tableOfDomains);
+                a.getPreconditions().moveNegationInward();
+                a.getPreconditions().moveTimeSpecifierInward();
+                a.getEffects().moveNegationInward();
+                a.getEffects().moveTimeSpecifierInward();
+                simplifiedActions.addAll(a.expandConditionalEffect());
+            }
+            intActions.clear();
+            intActions.addAll(simplifiedActions);
+        }
 
         // Encode the initial state in integer representation
         final Set<IntExpression> intInit = IntEncoding.encodeInit(problem.getInit());
@@ -462,8 +478,9 @@ public final class Encoder implements Serializable {
         // Computed inertia from the encode actions
         PreInstantiation.extractInertia(intActions);
         // Infer the type from the unary inertia
-        PreInstantiation.inferTypesFromInertia(intInitPredicates);
+
         if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+            PreInstantiation.inferTypesFromInertia(intInitPredicates);
             // Simply the encoded action with the inferred types.
             intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
             // Simply the encoded methods with the inferred types
@@ -533,7 +550,7 @@ public final class Encoder implements Serializable {
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
         if (intGoal != null) {
             // Expand the quantified expression in the goal
-            Instantiation.expandQuantifiedExpression(intGoal);
+            intGoal.expandQuantifiedExpression(Encoder.tableOfDomains);
             // Simplify the goal with ground inertia information
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
 
@@ -611,7 +628,7 @@ public final class Encoder implements Serializable {
 
             intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
             // Simplify the methods with the ground inertia information previously extracted
-            //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
+            PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
                 str.append(System.lineSeparator());
                 str.append("\nInstantiation methods (");
@@ -794,6 +811,64 @@ public final class Encoder implements Serializable {
     // *********************************************************************************************
     // Methods for printing the different structures used during encoding
     // *********************************************************************************************
+
+
+    private static void expandConditionalEffect(List<IntAction> actions) {
+        List<IntAction> expanded = new ArrayList<>(actions.size());
+        LinkedList<IntAction> toExpand = new LinkedList<>(actions);
+        while (!toExpand.isEmpty()) {
+            IntAction action = toExpand.pop();
+            IntExpression when = expandeWhen(action.getEffects());
+            if (when == null) {
+                expanded.add(action);
+            } else {
+                IntAction a1 = new IntAction(action);
+                IntExpression precondition = new IntExpression(PDDLConnective.AND);
+                precondition.addChild(when.getChildren().get(0));
+                precondition.addChild(a1.getPreconditions());
+                a1.setPreconditions(precondition);
+                IntExpression effect = new IntExpression(PDDLConnective.AND);
+                effect.addChild(when.getChildren().get(1));
+                effect.addChild(a1.getEffects());
+                a1.setEffects(effect);
+                toExpand.add(a1);
+
+
+                IntAction a2 = new IntAction(action);
+                precondition = new IntExpression(PDDLConnective.AND);
+                IntExpression not = new IntExpression(PDDLConnective.NOT);
+                not.addChild(when.getChildren().get(0));
+
+                precondition.addChild(not);
+                precondition.addChild(a2.getPreconditions());
+
+                a2.setPreconditions(precondition);
+                toExpand.add(a2);
+            }
+        }
+        actions.clear();
+        actions.addAll(expanded);
+
+    }
+
+
+
+
+    private static IntExpression expandeWhen(IntExpression exp) {
+        Iterator<IntExpression> i = exp.getChildren().iterator();
+        IntExpression when = null;
+        while (i.hasNext() && when == null) {
+            IntExpression e = i.next();
+            if (e.getConnective().equals(PDDLConnective.WHEN)) {
+                when = e;
+                i.remove();
+            } else {
+                when = expandeWhen(e);
+            }
+        }
+       return when;
+    }
+
 
     /**
      * Print the table of types.
