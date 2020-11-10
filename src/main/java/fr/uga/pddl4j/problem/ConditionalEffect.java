@@ -20,9 +20,12 @@
 package fr.uga.pddl4j.problem;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * This class allows to implements the conditional effects of an action.
+ * This class allows to implements the conditional effect of an action.
  *
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
@@ -32,12 +35,12 @@ public class ConditionalEffect implements Serializable {
     /**
      * The conditions of the expression.
      */
-    private State conditions;
+    private List<Condition> conditions;
 
     /**
-     * The effects associated to the conditions.
+     * The effect associated to the conditions.
      */
-    private State effects;
+    private Effect effect;
 
     /**
      * Creates a conditional effect from an other. This constructor is the copy constructor.
@@ -45,38 +48,37 @@ public class ConditionalEffect implements Serializable {
      * @param other the other conditional bit expression.
      */
     public ConditionalEffect(final ConditionalEffect other) {
-        if (other == null) {
-            throw new NullPointerException("other == null");
-        }
-        this.conditions = new State(other.getCondition());
-        this.effects = new State(other.getEffects());
+        this.conditions = new ArrayList<>();
+        this.conditions.addAll(other.getConditions().stream().map(Condition::new)
+            .collect(Collectors.toList()));
+        this.effect = new Effect(other.getEffect());
     }
 
     /**
      * Creates a new empty conditional effect.
      */
     public ConditionalEffect() {
-        this(new State(), new State());
+        this(new Effect());
     }
 
     /**
-     * Creates a new conditional effect with some specified effects.
+     * Creates a new conditional effect with some specified effect.
      *
-     * @param effects the effects.
+     * @param effect the effect.
      */
-    public ConditionalEffect(final State effects) {
-        this(new State(), effects);
+    public ConditionalEffect(final Effect effect) {
+        this(new ArrayList<>(), effect);
     }
 
     /**
-     * Creates a new conditional effect with some specified conditions and effects.
+     * Creates a new conditional effect with some specified conditions and effect.
      *
      * @param conditions the conditions.
-     * @param effects    the effects.
+     * @param effects    the effect.
      */
-    public ConditionalEffect(State conditions, State effects) {
-        this.setEffects(effects);
-        this.setCondition(conditions);
+    public ConditionalEffect(List<Condition> conditions, Effect effects) {
+        this.setConditions(conditions);
+        this.setEffect(effects);
     }
 
     /**
@@ -84,8 +86,17 @@ public class ConditionalEffect implements Serializable {
      *
      * @return the conditions of the conditional effect.
      */
-    public final State getCondition() {
+    public final List<Condition> getConditions() {
         return this.conditions;
+    }
+
+    /**
+     * Adds a condition to this effect.
+     *
+     * @param condition the condition to add.
+     */
+    public final void addCondition(Condition condition) {
+        this.conditions.add(condition);
     }
 
     /**
@@ -93,26 +104,26 @@ public class ConditionalEffect implements Serializable {
      *
      * @param conditions the conditions to set.
      */
-    public final void setCondition(State conditions) {
+    public final void setConditions(List<Condition> conditions) {
         this.conditions = conditions;
     }
 
     /**
-     * Returns the effects of the conditional effect.
+     * Returns the effect of the conditional effect.
      *
-     * @return the effects of the conditional effect.
+     * @return the effect of the conditional effect.
      */
-    public final State getEffects() {
-        return this.effects;
+    public final Effect getEffect() {
+        return this.effect;
     }
 
     /**
-     * Sets the effects of the conditional effect.
+     * Sets the effect of the conditional effect.
      *
-     * @param effects the effects to set
+     * @param effect the effect to set
      */
-    public final void setEffects(State effects) {
-        this.effects = effects;
+    public final void setEffect(Effect effect) {
+        this.effect = effect;
     }
 
     /**
@@ -126,14 +137,14 @@ public class ConditionalEffect implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + conditions.hashCode();
-        result = prime * result + effects.hashCode();
+        result = prime * result + effect.hashCode();
         return result;
     }
 
     /**
      * Returns <code>true</code> if a specified object is equal to this conditional expression. In
      * other words, returns <code>true</code> if the specified object is an instance of the same
-     * type as this instance, all of whose members (conditions and effects) are equal to the
+     * type as this instance, all of whose members (conditions and effect) are equal to the
      * corresponding member of this conditional expression.
      *
      * @param obj the reference object with which to compare.
@@ -145,7 +156,7 @@ public class ConditionalEffect implements Serializable {
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof ConditionalEffect) {
             ConditionalEffect other = (ConditionalEffect) obj;
-            return this.conditions.equals(other.conditions) && this.effects.equals(other.effects);
+            return this.conditions.equals(other.conditions) && this.effect.equals(other.effect);
         }
         return false;
     }

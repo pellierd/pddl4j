@@ -28,7 +28,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
  * @author D. Pellier
  * @version 1.0 - 14.02.2020
  */
-final class IntMethod extends AbstractIntOperator {
+public final class IntMethod extends AbstractIntOperator {
 
     /**
      * The task carries out by this method.

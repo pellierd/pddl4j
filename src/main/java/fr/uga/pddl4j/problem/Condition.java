@@ -22,7 +22,6 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
  * @see FluentDescription
  * @see NumericConstraint
  */
-public class Precondition extends AbstractFluentDescription {
+public class Condition extends AbstractFluentDescription {
 
     /**
      * The list of numeric constraints of this precondition.
@@ -46,7 +45,7 @@ public class Precondition extends AbstractFluentDescription {
     /**
      * Creates new effect. By default the effect has no positive and no negative fluents.
      */
-    public Precondition() {
+    public Condition() {
         this(new BitVector(), new BitVector());
     }
 
@@ -55,7 +54,7 @@ public class Precondition extends AbstractFluentDescription {
      *
      * @param other the other one.
      */
-    public Precondition(final Precondition other) {
+    public Condition(final Condition other) {
         super(other);
         this.constraints = new ArrayList<>();
         this.constraints.addAll(other.getNumericConstraints().stream().map(NumericConstraint::new)
@@ -69,7 +68,7 @@ public class Precondition extends AbstractFluentDescription {
      * @param positive the positive bit vector of fluent description.
      * @param negative the negative bit vector of fluent description.
      */
-    public Precondition(final BitVector positive, final BitVector negative) {
+    public Condition(final BitVector positive, final BitVector negative) {
         super(positive, negative);
         this.constraints = new ArrayList<>();
     }
@@ -115,7 +114,7 @@ public class Precondition extends AbstractFluentDescription {
 
     /**
      * Return if a specified object is equals to this precondition. The specified object is equal to
-     * the precondition if and only if the object is an instance of the class <code>Precondition</code>
+     * the precondition if and only if the object is an instance of the class <code>Condition</code>
      * and it has the same positive and negative timed fluent description.
      *
      * @param obj the specified object to compared.
@@ -124,8 +123,8 @@ public class Precondition extends AbstractFluentDescription {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (obj != null && obj instanceof Precondition) {
-            Precondition other = (Precondition) obj;
+        if (obj != null && obj instanceof Condition) {
+            Condition other = (Condition) obj;
             return this.getPositiveFluents().equals(other.getPositiveFluents())
                 && this.getNegativeFluents().equals(other.getNegativeFluents())
                 && this.getNumericConstraints().equals(other.getNumericConstraints());

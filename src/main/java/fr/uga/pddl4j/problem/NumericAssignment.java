@@ -19,6 +19,7 @@
 package fr.uga.pddl4j.problem;
 
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -61,12 +62,12 @@ public final class NumericAssignment extends AbstractNumericExpression {
      * Creates a new numeric assignement with a specified operator, left and right expression.
      *
      * @param operator the operator the numeric assignment.
-     * @param left the left expression of the numeric assignment.
-     * @param right the right expression of the numeric assignment.
+     * @param fluent the variable of the numeric assignment.
+     * @param expression the arithmetic expression of the numeric assignment.
      */
-    public NumericAssignment(final Operator operator, final ArithmeticExpression left,
-                             final ArithmeticExpression right) {
-        super(left, right);
+    public NumericAssignment(final Operator operator, final NumericVariable fluent,
+                             final ArithmeticExpression expression) {
+        super(fluent, expression);
         this.setOperator(operator);
     }
 
@@ -112,29 +113,31 @@ public final class NumericAssignment extends AbstractNumericExpression {
     /**
      * Returns the value assigned.
      *
+     * @param context the context, i.e., the value of the different variables.
      * @return the value assigned.
      */
-    public double getAssignedValue() {
+    public NumericVariable assign(List<NumericVariable> context) {
         final ArithmeticExpression left = super.getLeftExpression();
         final ArithmeticExpression right = super.getRightExpression();
+        NumericVariable variable = context.get(left.getNumericFluents());
         switch (this.getOperator()) {
             case ASSIGN:
-                left.setValue(right.evaluate());
+                variable.setValue(right.evaluate(context));
                 break;
             case INCREASE:
-                left.setValue(left.getValue() + right.evaluate());
+                variable.setValue(left.evaluate(context) + right.evaluate(context));
                 break;
             case DECREASE:
-                left.setValue(left.getValue() - right.evaluate());
+                variable.setValue(left.evaluate(context) - right.evaluate(context));
                 break;
             case SCALE_UP:
-                left.setValue(left.getValue() * right.evaluate());
+                variable.setValue(left.evaluate(context) * right.evaluate(context));
                 break;
             case SCALE_DOWN:
-                left.setValue(left.getValue() / right.evaluate());
+                variable.setValue(left.evaluate(context) / right.evaluate(context));
                 break;
         }
-        return left.getValue();
+        return variable;
     }
 
     /**

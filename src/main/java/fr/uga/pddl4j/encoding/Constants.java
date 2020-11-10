@@ -39,16 +39,6 @@ public interface Constants {
     static final int DEFAULT_RELEVANT_FACTS_TABLE_SIZE = 1000;
 
     /**
-     * The name of the dummy predicate used to replace the goal when the goal is a disjunction.
-     */
-    static final String DUMMY_GOAL = "dummy_goal";
-
-    /**
-     * The name of the dummy operator that produce the dummy goal.
-     */
-    static final String DUMMY_OPERATOR = "dummy_operator";
-
-    /**
      * The default size of the actions table.
      */
     static final int DEFAULT_ACTION_TABLE_SIZE = 1000;

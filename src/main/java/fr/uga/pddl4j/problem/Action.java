@@ -57,11 +57,6 @@ public class Action extends AbstractOperator {
     private List<NumericConstraint> durationConstraints;
 
     /**
-     * The list of numeric assignments of the operator.
-     */
-    private List<NumericAssignment> numericAssignments;
-
-    /**
      * Creates a new action from an other. This constructor is the copy constructor.
      *
      * @param other the other action.
@@ -70,8 +65,6 @@ public class Action extends AbstractOperator {
         super(other);
         this.effects = new ArrayList<>();
         this.effects.addAll(other.getConditionalEffects().stream().map(ConditionalEffect::new)
-            .collect(Collectors.toList()));
-        this.numericAssignments.addAll(other.getNumericAssignments().stream().map(NumericAssignment::new)
             .collect(Collectors.toList()));
         if (this.getDurationConstraints() != null) {
             this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
@@ -97,7 +90,6 @@ public class Action extends AbstractOperator {
         this.duration = new NumericVariable(-2);
         this.duration.setValue(0.0);
         this.durationConstraints = null;
-        this.numericAssignments = null;
     }
 
     /**
@@ -105,22 +97,18 @@ public class Action extends AbstractOperator {
      *
      * @param name          the name of the action.
      * @param arity         the arity of the action.
-     * @param preconditions the precondition of the action.
-     * @param effects       the effects of the action.
+     * @param precondition the precondition of the action.
+     * @param effect       the effects of the action.
      */
-    public Action(final String name, final int arity, final State preconditions, final State effects) {
+    public Action(final String name, final int arity, final Condition precondition, final Effect effect) {
         this(name, arity);
-        this.setPreconditions(preconditions);
-        ConditionalEffect cexp = new ConditionalEffect();
-        cexp.setCondition(new State());
-        cexp.setEffects(effects);
-        this.addConditionalEffect(cexp);
+        this.getPreconditions().add(precondition);
+        this.addConditionalEffect(new ConditionalEffect(effect));
         this.cost = new NumericVariable(-1);
         this.cost.setValue(1.0);
         this.duration = new NumericVariable(-2);
         this.duration.setValue(0.0);
         this.durationConstraints = null;
-        this.numericAssignments = null;
     }
 
     /**
@@ -157,21 +145,22 @@ public class Action extends AbstractOperator {
      * @return <code>true</code> if this action is applicable in a specified state;
      * <code>false</code> otherwise.
      */
-    public boolean isApplicable(final ClosedWorldState state) {
+    public boolean isApplicable(final State state) {
         return state.satisfy(this.getPreconditions());
     }
 
     /**
-     * Returns the unconditional effects of the action.
+     * Returns the unconditional effect of the action.
      *
-     * @return the unconditional effects of the action.
+     * @return the unconditional effect of the action.
      */
-    public final State getUnconditionalEffects() {
-        final State ucEffect = new State();
-        this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
-            final State condEff = cEffect.getEffects();
-            ucEffect.getPositive().or(condEff.getPositive());
-            ucEffect.getNegative().or(condEff.getNegative());
+    public final Effect getUnconditionalEffect() {
+        final Effect ucEffect = new Effect();
+        this.effects.stream().filter(cEffect -> cEffect.getConditions().isEmpty()).forEach(cEffect -> {
+            final Effect condEff = cEffect.getEffect();
+            ucEffect.getPositiveFluents().or(condEff.getPositiveFluents());
+            ucEffect.getNegativeFluents().or(condEff.getNegativeFluents());
+            ucEffect.getNumericAssignments().addAll(condEff.getNumericAssignments());
         });
         return ucEffect;
     }
@@ -237,24 +226,6 @@ public class Action extends AbstractOperator {
      */
     public final void setDuration(final NumericVariable duration) {
         this.duration = duration;
-    }
-
-    /**
-     * Returns the list of numeric assignments of this action.
-     *
-     * @return the list of numeric assignments of this action.
-     */
-    public final List<NumericAssignment> getNumericAssignments() {
-        return this.numericAssignments;
-    }
-
-    /**
-     * Sets the list of numeric assignments of this action.
-     *
-     * @param assignments the list of numeric assignments of this action.
-     */
-    public final void setNumericAssignments(List<NumericAssignment> assignments) {
-        this.numericAssignments = assignments;
     }
 
 }

@@ -18,6 +18,7 @@
  */
 package fr.uga.pddl4j.problem;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -91,11 +92,13 @@ public final class NumericConstraint extends AbstractNumericExpression {
     /**
      * Returns the result of the evaluation of the numeric constraint.
      *
+     * @param context the context of the evaluation, i.e., the numeric variables and their values needed to complete the
+     *                evalution.
      * @return <code>true</code> if the numeric constraint is evaluated to true; <code>false</code> otherwise.
      */
-    public boolean evaluate() {
-        final double left = super.getLeftExpression().evaluate();
-        final double right = super.getRightExpression().evaluate();
+    public boolean evaluate(final List<NumericVariable> context) {
+        final double left = super.getLeftExpression().evaluate(context);
+        final double right = super.getRightExpression().evaluate(context);
         boolean eval = false;
         switch (this.getComparator()) {
             case EQUAL:

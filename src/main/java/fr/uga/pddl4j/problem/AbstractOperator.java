@@ -36,17 +36,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     /**
      * The preconditions of the operator.
      */
-    private State preconditions;
-
-    /**
-     * The list of numeric variables of the operator.
-     */
-    private List<NumericVariable> numericVariables;
-
-    /**
-     * The list of numeric constraints of the operator.
-     */
-    private List<NumericConstraint> numericConstraints;
+    private List<Condition> preconditions;
 
     /*
     * Creates a new operator from an other.
@@ -55,14 +45,9 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     */
     protected AbstractOperator(final AbstractOperator other) {
         super(other);
-        this.preconditions = new State(other.getPreconditions());
-        this.numericVariables = new ArrayList<>();
-        this.numericVariables.addAll(other.getNumericVariables().stream().map(NumericVariable::new)
+        this.preconditions = new ArrayList<>();
+        this.preconditions.addAll(other.getPreconditions().stream().map(Condition::new)
             .collect(Collectors.toList()));
-        this.numericConstraints = new ArrayList<>();
-        this.numericConstraints.addAll(other.getNumericConstraints().stream().map(NumericConstraint::new)
-            .collect(Collectors.toList()));
-
     }
 
     /**
@@ -73,9 +58,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      */
     protected AbstractOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new State();
-        this.numericVariables = new ArrayList<>();
-        this.numericConstraints = new ArrayList<>();
+        this.preconditions = new ArrayList<>();
     }
 
     /**
@@ -87,11 +70,9 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      * @param preconditions  the preconditions of the operator.
      */
     protected AbstractOperator(final String name, final int[] parameters, final int[] instantiations,
-                               final State preconditions) {
+                               final List<Condition> preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
-        this.numericVariables = new ArrayList<>();
-        this.numericConstraints = new ArrayList<>();
     }
 
     /**
@@ -99,7 +80,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final State getPreconditions() {
+    public final List<Condition> getPreconditions() {
         return this.preconditions;
     }
 
@@ -108,44 +89,8 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final State preconditions) {
+    public final void setPreconditions(final List<Condition> preconditions) {
         this.preconditions = preconditions;
-    }
-
-    /**
-     * Returns the numeric variables of this operator.
-     *
-     * @return the numeric variables of this operator.
-     */
-    public final List<NumericVariable> getNumericVariables() {
-        return this.numericVariables;
-    }
-
-    /**
-     * Sets the numeric variables of this operator.
-     *
-     * @param variables the numeric variables of this operator.
-     */
-    public void setNumericVariables(final List<NumericVariable> variables) {
-        this.numericVariables = variables;
-    }
-
-    /**
-     * Returns the list of numeric constraints of this operator.
-     *
-     * @returns the list of numeric constraints of this operator.
-     */
-    public final List<NumericConstraint> getNumericConstraints() {
-        return this.numericConstraints;
-    }
-
-    /**
-     * Sets the list of numeric constraints of this operator.
-     *
-     * @param constraints the list of numeric constraints of this operator.
-     */
-    public final void setNumericConstraints(List<NumericConstraint> constraints) {
-        this.numericConstraints = constraints;
     }
 
 }

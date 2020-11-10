@@ -39,7 +39,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.1 - 07.04.2010
  */
-final class IntAction extends AbstractIntOperator {
+public final class IntAction extends AbstractIntOperator {
 
     /**
      * The default cost of an action.

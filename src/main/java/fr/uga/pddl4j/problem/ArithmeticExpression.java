@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.problem;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -115,6 +116,21 @@ public class ArithmeticExpression extends AbstractNumericExpression {
     }
 
     /**
+     * Creates an arithmetic expression of type variable with for a specified numeric fluent and value.
+     *
+     * @param index the index of this numeric fluent that represents this variable.
+     * @param value of this arithmetic expression.
+     */
+    public ArithmeticExpression(final int index, final double value) {
+        super(null, null);
+        this.setType(Type.VARIABLE);
+        this.setArithmeticOpertor(null);
+        this.setValue(value);
+        this.setNumericFluents(index);
+    }
+
+
+    /**
      * Creates an arithmetic expression of type operator.
      *
      * @param operator the operator of the arithmetic expression.
@@ -209,31 +225,33 @@ public class ArithmeticExpression extends AbstractNumericExpression {
     /**
      * Evaluates an arithmetic expression and returns the result of its evaluation.
      *
+     * @param context the context of the evaluation, i.e., the numeric variables and their respectives values.
      * @return the result of the evaluation of this arithmetic expression.
      */
-    public final double evaluate() {
+    public final double evaluate(List<NumericVariable> context) {
         Double value = Double.NaN;
         switch (this.getType()) {
             case NUMBER:
-            case VARIABLE:
                 value = this.getValue();
+            case VARIABLE:
+                value = context.get(this.getNumericFluents()).getValue();
                 break;
             case OPERATOR:
                 switch (this.getArithmeticOperator()) {
                     case PLUS:
-                        value = this.getLeftExpression().evaluate() + this.getRightExpression().evaluate();
+                        value = this.getLeftExpression().evaluate(context) + this.getRightExpression().evaluate(context);
                         break;
                     case MINUS:
-                        value = this.getLeftExpression().evaluate() - this.getRightExpression().evaluate();
+                        value = this.getLeftExpression().evaluate(context) - this.getRightExpression().evaluate(context);
                         break;
                     case DIV:
-                        value = this.getLeftExpression().evaluate() / this.getRightExpression().evaluate();
+                        value = this.getLeftExpression().evaluate(context) / this.getRightExpression().evaluate(context);
                         break;
                     case MUL:
-                        value = this.getLeftExpression().evaluate() * this.getRightExpression().evaluate();
+                        value = this.getLeftExpression().evaluate(context) * this.getRightExpression().evaluate(context);
                         break;
                     case UMINUS:
-                        value = -this.getLeftExpression().evaluate();
+                        value = -this.getLeftExpression().evaluate(context);
                         break;
                 }
         }
@@ -264,7 +282,8 @@ public class ArithmeticExpression extends AbstractNumericExpression {
                 case NUMBER:
                     return Double.compare(other.getValue(), getValue()) == 0;
                 case VARIABLE:
-                    return this.getNumericFluents() == other.getNumericFluents();
+                    return this.getNumericFluents() == other.getNumericFluents()
+                        && Double.compare(other.getValue(), getValue()) == 0;
                 case OPERATOR:
                     return this.getArithmeticOperator() == other.getArithmeticOperator()
                         && Objects.equals(this.getLeftExpression(), other.getLeftExpression())

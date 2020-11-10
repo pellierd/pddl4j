@@ -350,7 +350,7 @@ public class PDDLProblem implements Serializable {
             str.append(this.initialTaskNetwork.toString());
             str.append("\n)\n");
         }
-        str.append("(:init");
+        str.append("(:intInitialState");
         for (PDDLExpression fact : this.initialFacts) {
             str.append("\n  ").append(fact);
         }
