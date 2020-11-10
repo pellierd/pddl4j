@@ -17,31 +17,32 @@ package fr.uga.pddl4j.problem;
 
 
 /**
- * This class implements a fluent, i.e., a proposition whose truth value changes during planning process.
+ * This class implements a numeric fluent.
  *
  * @author D. Pellier
  * @version 1.0 - 28.04.2020
  * @since 4.0
  */
-public class Fluent extends AbstractAtomicFormula {
+public class NumericFluent extends AbstractAtomicFormula {
 
     /**
-     * Create a new fluent from an other one. This constructor make a deep copy of the fluent in parameter.
+     * Create a new numeric fluent from an other one. This constructor make a deep copy of the numeric fluent in
+     * parameter.
      *
      * @param other the fluent.
      */
-    public Fluent(final Fluent other) {
+    public NumericFluent(final Fluent other) {
         super(other);
     }
 
 
     /**
-     * Creates a new fluent with a specified symbol and list of arguments.
+     * Creates a new new fluent with a specified symbol and list of arguments.
      *
      * @param symbol the symbol of the fluent.
      * @param arguments the list of arguments of the fluent.
      */
-    public Fluent(final int symbol, final int[] arguments) {
+    public NumericFluent(final int symbol, final int[] arguments) {
         super(symbol, arguments);
     }
 

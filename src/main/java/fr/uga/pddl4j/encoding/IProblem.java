@@ -64,7 +64,7 @@ public class IProblem {
     /**
      * The task symbols.
      */
-    private List<String> tasks;
+    private List<String> taskSymbols;
 
     /**
      * The types of the arguments of the tasks.
@@ -144,17 +144,17 @@ public class IProblem {
     /**
      * The table of the relevant task.
      */
-    private List<IntExpression> relevantTasks;
+    private List<Task> relevantTasks;
 
     /**
      * The table of the relevant fluents.
      */
-    private List<IntExpression> relevantFluents;
+    private List<Fluent> relevantFluents;
 
     /*
     * The table of the relevant numeric fluents.
     */
-    private List<IntExpression> relevantNumericFluents;
+    private List<NumericFluent> relevantNumericFluents;
 
     /**
      * The table of fluent index used to speedup the final and compact encoding of the problem.
@@ -410,32 +410,12 @@ public class IProblem {
     }
 
     /**
-     * Returns the list of relevant primitive tasks. The method returns null if the problem has not the requirement
-     * HIERARCHY.
-     *
-     * @return the list of relevant primitive tasks.
-     */
-    public final List<IntExpression> getRelevantPrimitiveTasks() {
-        return this.relevantPrimitiveTasks;
-    }
-
-    /**
-     * Returns the list of relevant compund tasks. The method returns null if the problem has not the requirement
-     * HIERARCHY.
-     *
-     * @return the list of relevant compund tasks.
-     */
-    public final List<IntExpression> getRelevantCompundTasks() {
-        return this.relevantCompundTasks;
-    }
-
-    /**
      * Returns the list of relevant tasks of the problem. The method returns null if the problem has not the requirement
      * HIERARCHY.
      *
      * @returns he list of relevant tasks of the problem.
      */
-    public final List<IntExpression> getRelevantTasks() {
+    public final List<Task> getRelevantTasks() {
         return this.relevantTasks;
     }
 
@@ -444,7 +424,7 @@ public class IProblem {
      *
      * @returns he list of relevant fluents of the problem.
      */
-    public final List<IntExpression> getRelevantFluents() {
+    public final List<Fluent> getRelevantFluents() {
         return this.relevantFluents;
     }
 
@@ -454,7 +434,7 @@ public class IProblem {
      *
      * @returns he list of relevant numeric fluents of the problem.
      */
-    public final List<IntExpression> getRelevantNumericFluents() {
+    public final List<NumericFluent> getRelevantNumericFluents() {
         return this.relevantNumericFluents;
     }
 
@@ -829,10 +809,10 @@ public class IProblem {
     private void collectTaskInformation(final PDDLDomain domain) {
         final List<PDDLNamedTypedList> tasks = domain.getTasks();
         final int nbTasks = tasks.size();
-        this.tasks = new ArrayList<>(nbTasks);
+        this.taskSymbols = new ArrayList<>(nbTasks);
         this.typeOfTaskArguments = new ArrayList<>(nbTasks);
         for (PDDLNamedTypedList task : tasks) {
-            this.tasks.add(task.getName().getImage());
+            this.taskSymbols.add(task.getName().getImage());
             final List<PDDLTypedSymbol> arguments = task.getArguments();
             final List<Integer> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol arg : arguments) {
@@ -1080,7 +1060,7 @@ public class IProblem {
                 break;
             case TASK:
                 final String task = exp.getAtom().get(0).getImage();
-                intExp.setPredicate(this.tasks.indexOf(task));
+                intExp.setPredicate(this.taskSymbols.indexOf(task));
                 intExp.setPrimtive(this.primitiveTaskSymbols.contains(task));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
@@ -1669,7 +1649,7 @@ public class IProblem {
         for (int i = 0; i < this.predicateSymbols.size(); i++) {
             final Set<Integer> newTypeDomain = new LinkedHashSet<>();
             if (this.typeOfPredicateArguments.get(i).size() == 1
-                    && this.inertia.get(i).equals(Inertia.INERTIA)) {
+                && this.inertia.get(i).equals(Inertia.INERTIA)) {
                 for (IntExpression fluent : this.intInitialState) {
                     if (fluent.getConnective().equals(PDDLConnective.NOT)) {
                         fluent = fluent.getChildren().get(0);
@@ -1784,7 +1764,7 @@ public class IProblem {
      * @param ts         the type substract.
      */
     private void replace(final IntExpression exp, final IntExpression inertia, final PDDLConnective connective,
-                                final int ti, final int ts) {
+                         final int ti, final int ts) {
         switch (exp.getConnective()) {
             case ATOM:
                 if (exp.equals(inertia)) {
@@ -2056,7 +2036,7 @@ public class IProblem {
      * @see IntAction
      */
     private void instantiate(final IntAction action, final int index, final int bound,
-                                    final List<IntAction> actions) {
+                             final List<IntAction> actions) {
         if (bound == actions.size()) {
             return;
         }
@@ -2116,8 +2096,8 @@ public class IProblem {
 
         if (instNetwork.size() > 1) {
             IntExpression root = new IntExpression(PDDLConnective.TASK);
-            root.setPredicate(this.tasks.size());
-            this.tasks.add("__top");
+            root.setPredicate(this.taskSymbols.size());
+            this.taskSymbols.add("__top");
             this.compoundTaskSymbols.add("__top");
             root.setPrimtive(false);
             int index = 0;
@@ -2339,7 +2319,7 @@ public class IProblem {
         for (IntAction action : this.intActions) {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
-            task.setPredicate(this.tasks.indexOf(action.getName()));
+            task.setPredicate(this.taskSymbols.indexOf(action.getName()));
             task.setArguments(action.getInstantiations());
             tasks.add(task);
         }
@@ -2356,7 +2336,7 @@ public class IProblem {
      * @param task   the tasks that accomplish the method.
      */
     private void instantiate(final IntMethod method, final int index, final int bound,
-                                    final List<IntMethod> methods, final IntExpression task) {
+                             final List<IntMethod> methods, final IntExpression task) {
         final IntExpression t = method.getTask();
         final IntMethod copy = new IntMethod(method);
         boolean instantiable = true;
@@ -2579,7 +2559,7 @@ public class IProblem {
         int index = 0;
         for (IntExpression fluent : fluents) {
             final IntExpression copy = new IntExpression(fluent);
-            this.relevantFluents.add(copy);
+            this.relevantFluents.add(new Fluent(copy.getPredicate(), copy.getArguments()));
             this.fluenIndex.put(copy, index);
             index++;
         }
@@ -2688,7 +2668,7 @@ public class IProblem {
         int index = 0;
         for (IntExpression fluent : fluents) {
             final IntExpression copy = new IntExpression(fluent);
-            this.relevantNumericFluents.add(copy);
+            this.relevantNumericFluents.add(new NumericFluent(copy.getPredicate(), copy.getArguments()));
             this.numericFluentIndex.put(copy, index);
             index++;
         }
@@ -2775,11 +2755,14 @@ public class IProblem {
      */
     private void extractRelevantTasks() {
         this.relevantTasks = new ArrayList<>();
-        this.relevantTasks.addAll(this.relevantPrimitiveTasks);
-        this.relevantTasks.addAll(this.relevantCompundTasks);
-        this.taskIndex = new LinkedHashMap<>(this.relevantTasks.size());
         int index = 0;
-        for (IntExpression task : this.relevantTasks) {
+        for (IntExpression task : this.relevantPrimitiveTasks) {
+            this.relevantTasks.add(new Task(task.getPredicate(), task.getArguments(), true));
+            this.taskIndex.put(task, index);
+            index++;
+        }
+        for (IntExpression task : this.relevantCompundTasks) {
+            this.relevantTasks.add(new Task(task.getPredicate(), task.getArguments(), false));
             this.taskIndex.put(task, index);
             index++;
         }
@@ -3492,7 +3475,7 @@ public class IProblem {
                     str.append(expression.getTaskID());
                     str.append(" (");
                 }
-                str.append(tasks.get(expression.getPredicate()));
+                str.append(taskSymbols.get(expression.getPredicate()));
                 args = expression.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -3992,7 +3975,7 @@ public class IProblem {
                 str.append(" \n");
             }
         }
-        IntExpression task = this.relevantTasks.get(method.getTask());
+        Task task = this.relevantTasks.get(method.getTask());
         str.append("task: ");
         str.append(this.toString(task));
         str.append("\n");
@@ -4176,14 +4159,45 @@ public class IProblem {
     /**
      * Returns a string representation of a fluent.
      *
-     * @param fluent the formula.
-     * @return a string representation of the specified expression.
+     * @param fluent the fluent.
+     * @return a string representation of the specified fluent.
      */
     public String toString(final Fluent fluent) {
+        return this.toString(fluent, this.predicateSymbols);
+    }
+
+    /**
+     * Returns a string representation of a task.
+     *
+     * @param task the task.
+     * @return a string representation of the specified task.
+     */
+    public String toString(final Task task) {
+        return this.toString(task, this.taskSymbols);
+    }
+
+    /**
+     * Returns a string representation of a numeric fluent.
+     *
+     * @param fluent the numeric fluent..
+     * @return a string representation of the specified numeric fluent..
+     */
+    public String toString(final NumericFluent fluent) {
+        return this.toString(fluent, this.functionSymbols);
+    }
+
+    /**
+     * Returns a string representation of an atomic formula.
+     *
+     * @param formula the formula.
+     * @param symbols the symbols to use.
+     * @return a string representation of the specified expression.
+     */
+    private String toString(final AbstractAtomicFormula formula, final List<String> symbols) {
         final StringBuffer str = new StringBuffer();
         str.append("(");
-        str.append(this.predicateSymbols.get(fluent.getSymbol()));
-        for (Integer arg : fluent.getArguments()) {
+        str.append(symbols.get(formula.getSymbol()));
+        for (Integer arg : formula.getArguments()) {
             str.append(" ");
             str.append(this.constantSymbols.get(arg));
         }
@@ -4191,23 +4205,7 @@ public class IProblem {
         return str.toString();
     }
 
-    /**
-     * Returns a string representation of a task.
-     *
-     * @param task the formula.
-     * @return a string representation of the specified expression.
-     */
-    public String toString(final Task task) {
-        final StringBuffer str = new StringBuffer();
-        str.append("(");
-        str.append(this.getTaskSymbols().get(task.getSymbol()));
-        for (Integer arg : task.getArguments()) {
-            str.append(" ");
-            str.append(this.constantSymbols.get(arg));
-        }
-        str.append(")");
-        return str.toString();
-    }
+
 
     /**
      * Returns a string representation of a closed world state.
@@ -4447,8 +4445,8 @@ public class IProblem {
         str.append("************************************************************\n");
         str.append("** TASKS SYMBOLS                                          **\n");
         str.append("************************************************************\n\n");
-        for (int i = 0; i < this.tasks.size(); i++) {
-            final String predicate = this.tasks.get(i);
+        for (int i = 0; i < this.taskSymbols.size(); i++) {
+            final String predicate = this.taskSymbols.get(i);
             str.append(i);
             str.append(": ");
             str.append(predicate);
