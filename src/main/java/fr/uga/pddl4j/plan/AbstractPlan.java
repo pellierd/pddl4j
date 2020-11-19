@@ -67,7 +67,7 @@ public abstract class AbstractPlan implements Plan {
     @Override
     public double cost() {
         return this.timeSpecifiers().stream().mapToDouble(t ->
-            this.getActionSet(t).stream().mapToDouble(a -> a.getCost()).sum()).sum();
+            this.getActionSet(t).stream().mapToDouble(a -> a.getCost().getValue()).sum()).sum();
     }
 
     /**

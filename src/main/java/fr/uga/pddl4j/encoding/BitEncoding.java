@@ -109,7 +109,7 @@ final class BitEncoding implements Serializable {
     private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> map) {
         final int arity = action.arity();
         final Action encoded = new Action(action.getName(), arity);
-        encoded.setCost(action.getCost());
+        encoded.setCost(new NumericVariable(-1, action.getCost()));
 
         // Initialize the parameters of the action
         for (int i = 0; i < arity; i++) {

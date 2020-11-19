@@ -864,7 +864,7 @@ public class Problem implements Serializable {
         plan.timeSpecifiers().forEach(time ->
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%d]%n",
-                    time, this.toShortString(a), ((int) a.getDuration())))));
+                    time, this.toShortString(a), ((int) a.getDuration().getValue())))));
         return str.toString();
     }
 
@@ -971,7 +971,7 @@ public class Problem implements Serializable {
         plan.timeSpecifiers().forEach(time ->
             plan.getActionSet(time).forEach(a ->
                 str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%4.2f]%n",
-                    time, this.toShortString(a), ((float) a.getCost())))));
+                    time, this.toShortString(a), ((float) a.getCost().getValue())))));
         return str.toString();
     }
 }

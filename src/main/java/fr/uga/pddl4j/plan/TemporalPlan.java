@@ -72,8 +72,8 @@ public class TemporalPlan extends AbstractPlan {
             final int start = this.actions.firstKey();
             final int last = this.actions.lastKey();
             final Action action = this.actions.lastEntry().getValue().stream().max(
-                Comparator.comparing(a -> a.getDuration())).get();
-            makespan = last + action.getDuration() - start;
+                Comparator.comparing(a -> a.getDuration().getValue())).get();
+            makespan = last + action.getDuration().getValue() - start;
         }
         return makespan;
     }
