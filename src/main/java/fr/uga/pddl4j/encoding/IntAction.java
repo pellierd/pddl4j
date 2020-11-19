@@ -22,6 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -84,7 +85,7 @@ public final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);
-        this.effects = new IntExpression(PDDLConnective.OR);
+        this.effects = new IntExpression(PDDLConnective.AND);
         this.cost = IntAction.DEFAULT_COST;
         this.duration = null;
     }
@@ -158,29 +159,46 @@ public final class IntAction extends AbstractIntOperator {
      *
      *  @return the list of action corresponding without conditional effects.
      */
-    public List<IntAction> expandConditionalEffect() {
-        List<IntAction> expanded = new ArrayList<>();
-        LinkedList<IntAction> toExpand = new LinkedList<>();
+    public List<IntAction> expandConditionalEffect(IProblem p) {
+
+
+        final List<IntAction> expanded = new ArrayList<>();
+        final LinkedList<IntAction> toExpand = new LinkedList<>();
         toExpand.add(new IntAction(this));
         while (!toExpand.isEmpty()) {
-            IntAction action = toExpand.pop();
-            IntExpression when = this.popWhenExpression(action.getEffects());
+            final IntAction action = toExpand.pop();
+            final IntExpression when = this.popWhenExpression(action.getEffects());
             if (when == null) {
+
+                //System.out.println("+++++++" + p.toString(action));
+
+
+                action.getPreconditions().moveNegationInward();
+                action.getPreconditions().toDNF();
+
+                action.getEffects().moveNegationInward();
+                action.getEffects().toCNF();
+                //System.out.println("---------"  + p.toString(action));
+                /*try {
+                    System.in.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
                 expanded.add(action);
             } else {
-                IntAction a1 = new IntAction(action);
+                final IntAction a1 = new IntAction(action);
                 IntExpression precondition = new IntExpression(PDDLConnective.AND);
                 precondition.addChild(when.getChildren().get(0));
                 precondition.addChild(a1.getPreconditions());
                 a1.setPreconditions(precondition);
-                IntExpression effect = new IntExpression(PDDLConnective.AND);
+                final IntExpression effect = new IntExpression(PDDLConnective.AND);
                 effect.addChild(when.getChildren().get(1));
                 effect.addChild(a1.getEffects());
                 a1.setEffects(effect);
                 toExpand.add(a1);
 
 
-                IntAction a2 = new IntAction(action);
+                final IntAction a2 = new IntAction(action);
                 precondition = new IntExpression(PDDLConnective.AND);
                 IntExpression not = new IntExpression(PDDLConnective.NOT);
                 not.addChild(when.getChildren().get(0));
@@ -221,10 +239,12 @@ public final class IntAction extends AbstractIntOperator {
      *
      * @return the list of actions corresponding with this action with only conjunctive precondition.
      */
-    public List<IntAction> expandDisjunctivePrecondition() {
+    public List<IntAction> expandDisjunctivePrecondition(IProblem pb) {
+
+        this.normalize(pb);
+
         final List<IntAction> expanded = new ArrayList<>();
         final IntExpression precondition = new IntExpression(this.getPreconditions());
-        precondition.toDNF();
         for (IntExpression and : precondition.getChildren()) {
             final IntAction action = new IntAction(this.getName(), this.arity());
             action.setCost(this.getCost());
@@ -245,11 +265,30 @@ public final class IntAction extends AbstractIntOperator {
     }
 
     /**
+     * Normalize the action, i.e put the precondition into disjunctive normal form and effect in disjunctive normal
+     * form. If a conditional effect occurs with a disjunctive condition, the conditional effect is rewrite with several
+     * when expression.
+     */
+    private void normalize(IProblem pb) {
+        this.getPreconditions().moveTimeSpecifierInward();
+        this.getPreconditions().toDisjunctiveNormalForm(pb);
+        this.effects.moveTimeSpecifierInward();
+        this.effects.toConjunctiveNormalForm(pb);
+    }
+
+    /**
      * Transforms this action in to simple non temporal actions. The action is not affected by this method.
      *
      * @return the list of actions corresponding with this action with non temporal time specifier.
      */
-    public List<IntAction> toSimpleNonTemporalActions() {
+    public List<IntAction> toSimpleNonTemporalActions(IProblem pb) {
+        System.out.println(pb.toString(this));
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         if (this.isDurative()) {
             final List<IntAction> expanded = new ArrayList<>();
             this.getPreconditions().moveNegationInward();

@@ -237,38 +237,6 @@ public class IProblem {
             this.collectInitialTaskNetworkInformation(problem);
         }
 
-        // HACK for durative action very inefficient
-        if (this.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-            List<IntAction> simplifiedActions = new ArrayList<>();
-            for (IntAction a : this.intActions) {
-                a.getPreconditions().expandQuantifiedExpression(this.typeDomains);
-                a.getEffects().expandQuantifiedExpression(this.typeDomains);
-                a.getPreconditions().moveNegationInward();
-                a.getPreconditions().moveTimeSpecifierInward();
-                a.getEffects().moveTimeSpecifierInward();
-                a.getEffects().moveNegationInward();
-                // TO DO: UPDATE TO DEAL WHITH CONDITIONAL EFFECT VERY INEFFICIENT
-                simplifiedActions.addAll(a.expandConditionalEffect());
-
-            }
-            this.intActions.clear();
-            this.intActions.addAll(simplifiedActions);
-
-            simplifiedActions.clear();
-            for (IntAction a : this.intActions) {
-                simplifiedActions.addAll(a.expandDisjunctivePrecondition());
-            }
-            this.intActions.clear();
-            this.intActions.addAll(simplifiedActions);
-
-            simplifiedActions.clear();
-            for (IntAction a : this.intActions) {
-                simplifiedActions.addAll(a.toSimpleNonTemporalActions());
-            }
-            this.intActions.clear();
-            this.intActions.addAll(simplifiedActions);
-        }
-
     }
 
     /**
@@ -517,6 +485,24 @@ public class IProblem {
         return true;
     }
 
+    private int dummyPredicateCounter = 0;
+    private IntExpression createDummyPredicate() {
+        this.predicateSymbols.add("^M"+this.dummyPredicateCounter);
+        this.dummyPredicateCounter++;
+        final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
+        atom.setPredicate(this.predicateSymbols.size() - 1);
+        return atom;
+
+    }
+
+    private int monitoringActionCounter = 0;
+
+    private IntAction createMonitoringAction() {
+        IntAction monitoring = new IntAction("monitoring_action" + this.monitoringActionCounter, 0);
+        this.monitoringActionCounter++;
+        return monitoring;
+    }
+
     /**
      * Instantiate the problem.
      */
@@ -525,11 +511,13 @@ public class IProblem {
         this.traceLevel = tracelevel;
         this.log(1);
 
+        this.collectInertiaInformation();
+        this.createPredicatesTables();
 
         // Infer the type from the unary inertia
         if (!this.requirements.contains(PDDLRequireKey.TYPING)) {
             // Collect the inertia information from the actions of the problem.
-            this.collectInertiaInformation();
+
             // Infer the type from the unary inertia
             List<Set<Integer>> inferredDomains = this.inferTypesFromInertia();
             // Update action with the inferred types
@@ -537,14 +525,47 @@ public class IProblem {
             this.log(2);
         }
 
+        // HACK for durative action very inefficient
+        if (this.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            this.expandTemporalActions();
+        }
+        for (IntAction a : this.intActions) {
+            System.out.println(this.toString(a));
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Instantiate the actions
+        System.out.println("Actions instantiation..." + this.intActions.size());
         this.instantiateActions();
         // Extract the ground inertia from the set of instantiated actions
         this.collectGroundInertia();
         // Simplify the actions based in the ground inertia
+        System.out.println("Simply actions...");
         this.simplyActionsWithGroundInertia();
+
+        System.out.println("Expand conditional effects..."+this.intActions.size());
+        List<IntAction> simplifiedActions = new ArrayList<>();
+       /* for (IntAction a : this.intActions) {
+            simplifiedActions.addAll(a.expandConditionalEffect(this));
+        }
+        this.intActions.clear();
+        this.intActions.addAll(simplifiedActions);*/
+
+        System.out.println("Expand disjunctive preconditions ...");
+        simplifiedActions.clear();
+        for (IntAction a : this.intActions) {
+            simplifiedActions.addAll(a.expandDisjunctivePrecondition(this));
+
+        }
+        this.intActions.clear();
+        this.intActions.addAll(simplifiedActions);
+
         // Expand the quantified expression in the goal
-        this.intGoal.expandQuantifiedExpression(this.typeDomains);
+        this.intGoal.expandQuantifiedExpression(this.typeDomains, this);
         // Simplify the goal with ground inertia information
         this.simplifyGoalWithGroundInertia();
 
@@ -569,6 +590,11 @@ public class IProblem {
             // Extract the releant tasks of the problem
             this.extractRelevantTasks();
         }
+
+
+
+
+
 
         // Encode the goal using bit vector representation in DNF form
         this.finalizeGoal();
@@ -1459,6 +1485,7 @@ public class IProblem {
             if (!a.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 this.simplifyWithGroundInertia(a.getEffects(), true);
                 a.getEffects().simplify();
+                //a.getEffects().toCNF();
                 if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                     toAdd.add(a);
                 } else {
@@ -1693,14 +1720,10 @@ public class IProblem {
 
         for (final IntExpression inertia : unaryInertia) {
             final List<IntAction> newActions = new ArrayList<>();
-            for (final IntAction o : actions) {
-                if (o.arity() > 0) {
+            for (final IntAction a : actions) {
+                if (a.arity() > 0) {
 
                     int index = -inertia.getArguments()[0] - 1;
-                    // Hack add for constant in predicate
-                    //if (index < 0) {
-                    //    break;
-                    //}
 
                     final int dtIndex = action.getTypeOfParameters(index);
 
@@ -1727,23 +1750,23 @@ public class IProblem {
                         dt2.removeAll(domains.get(itIndex));
                         this.typeDomains.add(dt2);
                     }
-                    final IntAction op1 = new IntAction(o);
-                    op1.setTypeOfParameter(index, ti);
-                    this.replace(op1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
-                    this.replace(op1.getEffects(), inertia, PDDLConnective.TRUE, ti, ts);
-                    if (!op1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
-                        && !op1.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                        newActions.add(op1);
+                    final IntAction a1 = new IntAction(a);
+                    a1.setTypeOfParameter(index, ti);
+                    this.replace(a1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
+                    this.replace(a1.getEffects(), inertia, PDDLConnective.TRUE, ti, ts);
+                    if (!a1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
+                        && !a1.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                        newActions.add(a1);
                     }
 
-                    final IntAction op2 = new IntAction(o);
-                    op2.setTypeOfParameter(index, ts);
-                    this.replace(op2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
-                    this.replace(op2.getEffects(), inertia, PDDLConnective.FALSE, ti, ts);
+                    final IntAction a2 = new IntAction(a);
+                    a2.setTypeOfParameter(index, ts);
+                    this.replace(a2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
+                    this.replace(a2.getEffects(), inertia, PDDLConnective.FALSE, ti, ts);
 
-                    if (!op2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
-                        && !op2.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                        newActions.add(op2);
+                    if (!a2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
+                        && !a2.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                        newActions.add(a2);
                     }
                 }
             }
@@ -1893,7 +1916,7 @@ public class IProblem {
         final List<IntExpression> unaryInertia = new ArrayList<>();
         switch (exp.getConnective()) {
             case ATOM:
-                if (domains.get(exp.getPredicate()) != null) {
+                if (!domains.get(exp.getPredicate()).isEmpty()) {
                     unaryInertia.add(exp);
                 }
                 break;
@@ -1996,10 +2019,10 @@ public class IProblem {
      */
     private List<IntAction> instantiate(final IntAction action, final int bound) {
         final List<IntAction> instAction = new ArrayList<>(100);
-        action.getPreconditions().expandQuantifiedExpression(this.typeDomains);
+        action.getPreconditions().expandQuantifiedExpression(this.typeDomains, this);
         action.getPreconditions().simplify();
         if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
-            action.getEffects().expandQuantifiedExpression(this.typeDomains);
+            action.getEffects().expandQuantifiedExpression(this.typeDomains, this);
             action.getEffects().simplify();
             if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                 this.instantiate(action, 0, bound, instAction);
@@ -2060,10 +2083,10 @@ public class IProblem {
             for (Integer value : values) {
                 final int varIndex = -index - 1;
                 final IntExpression precond = new IntExpression(action.getPreconditions());
-                precond.substitute(varIndex, value);
+                precond.substitute(varIndex, value, this);
                 if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntExpression effects = new IntExpression(action.getEffects());
-                    effects.substitute(varIndex, value);
+                    effects.substitute(varIndex, value, this);
                     if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
@@ -2076,7 +2099,7 @@ public class IProblem {
                         }
                         if (action.isDurative()) {
                             final IntExpression duration = new IntExpression(action.getDuration());
-                            duration.substitute(varIndex, value);
+                            duration.substitute(varIndex, value, this);
                             copy.setDuration(duration);
                         }
                         copy.setValueOfParameter(index, value);
@@ -2150,7 +2173,7 @@ public class IProblem {
                 copy.setOrderingConstraints(new IntExpression(network.getOrderingConstraints()));
 
                 final IntExpression tasksCopy = new IntExpression(network.getTasks());
-                tasksCopy.substitute(varIndex, value);
+                tasksCopy.substitute(varIndex, value, this);
                 copy.setTasks(tasksCopy);
 
                 for (int i = 0; i < arity; i++) {
@@ -2301,7 +2324,7 @@ public class IProblem {
         final Iterator<IntMethod> i = methods.iterator();
         while (i.hasNext()) {
             final IntMethod method = i.next();
-            method.getPreconditions().expandQuantifiedExpression(this.typeDomains);
+            method.getPreconditions().expandQuantifiedExpression(this.typeDomains, this);
             method.getPreconditions().simplify();
             if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 i.remove();
@@ -2347,9 +2370,9 @@ public class IProblem {
             final int type = copy.getTypeOfParameters((-var - 1));
             final Set<Integer> domain = this.typeDomains.get(type);
             if (domain.contains(cons)) {
-                copy.getPreconditions().substitute(var, cons);
-                copy.getTask().substitute(var, cons);
-                copy.getSubTasks().substitute(var, cons);
+                copy.getPreconditions().substitute(var, cons, this);
+                copy.getTask().substitute(var, cons, this);
+                copy.getSubTasks().substitute(var, cons, this);
                 copy.setValueOfParameter((-var - 1), cons);
             } else {
                 instantiable = false;
@@ -2397,18 +2420,18 @@ public class IProblem {
                 final int varIndex = -index - 1;
                 final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
 
-                preconditionCopy.substitute(varIndex, value);
+                preconditionCopy.substitute(varIndex, value, this);
                 if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
                     copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
 
                     final IntExpression taskCopy = new IntExpression(method.getTask());
-                    taskCopy.substitute(varIndex, value);
+                    taskCopy.substitute(varIndex, value, this);
                     copy.setTask(taskCopy);
 
                     final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
-                    subTasksCopy.substitute(varIndex, value);
+                    subTasksCopy.substitute(varIndex, value, this);
                     copy.setSubTasks(subTasksCopy);
 
                     for (int i = 0; i < arity; i++) {
@@ -3085,7 +3108,7 @@ public class IProblem {
                         this.initialState.getPositiveFluents().set(index);
                     }
                     break;
-                case EQUAL:
+                case FN_ATOM:
                     IntExpression numeric = fluent.getChildren().get(0);
                     IntExpression number = fluent.getChildren().get(1);
                     this.initialState.addNumericFluent(new NumericVariable(this.numericFluentIndex.get(numeric),
@@ -3411,18 +3434,18 @@ public class IProblem {
      * @return a string representation of the specified expression.
      */
     public String toString(final IntExpression expression) {
-        return this.toString(expression, " ");
+        return this.toString(expression, "");
     }
 
     /**
      * Returns a string representation of a expression.
      *
      * @param expression the expression.
-     * @param separator  the string separator between predicate symbol and arguments.
+     * @param offset  the string offset for the expression alignment.
      * @return a string representation of the specified expression.
      */
-    private String toString(final IntExpression expression, final String separator) {
-        return this.toString(expression, "", separator);
+    private String toString(final IntExpression expression, final String offset) {
+        return this.toString(expression, offset, " ");
     }
 
     /**
@@ -3508,18 +3531,18 @@ public class IProblem {
                 break;
             case AND:
             case OR:
-                String offsetOr = baseOffset + "  ";
+                String offset = baseOffset + "  ";
                 str.append("(");
                 str.append(expression.getConnective().getImage());
                 str.append(" ");
                 if (!expression.getChildren().isEmpty()) {
                     for (int i = 0; i < expression.getChildren().size() - 1; i++) {
-                        str.append(this.toString(expression.getChildren().get(i), offsetOr));
+                        str.append(this.toString(expression.getChildren().get(i), offset));
                         str.append("\n");
-                        str.append(offsetOr);
+                        str.append(offset);
                     }
                     str.append(this.toString(expression.getChildren()
-                        .get(expression.getChildren().size() - 1), offsetOr));
+                        .get(expression.getChildren().size() - 1), offset));
                 }
                 str.append(")");
                 break;
@@ -4614,5 +4637,1006 @@ public class IProblem {
         }
     }
 
+    private List<List<IntMatrix>> predicatesTables;
+    /**
+     * This method creates the predicates predicatesTables used to simplify atomic expression.
+     *
+     */
+    private void createPredicatesTables() {
+        final int tableSize = this.constantSymbols.size();
+        final int nbPredicate = this.predicateSymbols.size();
+        this.predicatesTables = new ArrayList<>(nbPredicate);
+        for (final List<Integer> arguments : this.typeOfPredicateArguments) {
+            final int arity = arguments.size();
+            final int nbTables = (int) Math.pow(2, arity);
+            final List<IntMatrix> pTables = new ArrayList<>(nbTables);
+            for (int j = 0; j < nbTables; j++) {
+                final int dimension = Integer.bitCount(j);
+                pTables.add(new IntMatrix(tableSize, dimension));
+            }
+            this.predicatesTables.add(pTables);
+        }
+
+        for (IntExpression fact : this.intInitialState) {
+            if (fact.getConnective().equals(PDDLConnective.NOT)) {
+                fact = fact.getChildren().get(0);
+            }
+            if (fact.getConnective().equals(PDDLConnective.ATOM)) {
+                final int arity = this.typeOfPredicateArguments.get(fact.getPredicate()).size();
+                final List<IntMatrix> pTables = this.predicatesTables.get(fact.getPredicate());
+                final int[] set = new int[arity];
+                final int[] args = fact.getArguments();
+                for (final IntMatrix intMatrix : pTables) {
+                    int indexSize = 0;
+                    for (int aSet : set) {
+                        if (aSet == 1) {
+                            indexSize++;
+                        }
+                    }
+                    final int[] index = new int[indexSize];
+                    int j = 0;
+                    for (int i = 0; i < set.length; i++) {
+                        if (set[i] == 1) {
+                            index[j] = args[i];
+                            j++;
+                        }
+                    }
+                    intMatrix.increment(index);
+                    this.incrementMask(set);
+                }
+            }
+        }
+    }
+
+    /**
+     * Return an integer representation of the specified array of integer. For example, if
+     * <code>mask = [0, 1, 1]</code> then the method will return 3.
+     *
+     * @param mask an array of integer that can only contain 0 or 1.
+     * @return the integer representation of the specified array.
+     */
+    private int toInt(final int[] mask) {
+        final int len = mask.length;
+        if (len > 0) {
+            int res = mask[0];
+            for (int i = 1; i < len; i++) {
+                res = res << 1 | mask[i];
+            }
+            return res;
+        }
+        return 0;
+    }
+
+    private int[] incrementMask(final int[] set) {
+        boolean overflow = false;
+        for (int i = set.length - 1; i >= 0; i--) {
+            if (set[i] == 0) {
+                set[i] = 1;
+                break;
+            } else {
+                set[i] = 0;
+                overflow = i == 0;
+            }
+        }
+        return overflow ? null : set;
+    }
+
+    /**
+     * This method simplifies an atomic specified expression. Two cased must be considered:
+     * <ul>
+     * <li>1. If the expression is a positive inertia and the number of unifying ground instances of
+     * the specified expression that are contained in the initial state is equal to 0 then the
+     * expression is simplified to FALSE.</li>
+     * <li>2. If the expression is a negative inertia and then the number of all possible
+     * type-consistent ground instances of the specified expression then the expression is
+     * simplified to TRUE.
+     * </ul>
+     *
+     * @param exp the atomic expression to simplify.
+     */
+    public void simplyAtom(final IntExpression exp) {
+        if (this.predicatesTables == null) return;
+        final int predicate = exp.getPredicate();
+        // Compute the mask i.e., the vector used to indicate where the constant are located in the
+        // atomic expression.
+        int indexSize = 0;
+        final int[] args = exp.getArguments();
+        final int[] mask = new int[args.length];
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] >= 0) {
+                mask[i] = 1;
+                indexSize++;
+            }
+        }
+        // Compute the index to access to the predicates table and compute the product (max) of the
+        // tableOfDomains of the non instantiated arguments of the atomic expression.
+        int j = 0;
+        int max = 1;
+        final int[] index = new int[indexSize];
+        final List<Integer> predArg = this.typeOfPredicateArguments.get(predicate);
+        for (int i = 0; i < mask.length; i++) {
+            if (mask[i] == 0) {
+                max *= this.typeDomains.get(predArg.get(i)).size();
+            } else {
+                index[j] = args[i];
+                j++;
+            }
+
+        }
+        // Get the number of unifying ground instances of the specified expression that are
+        // contained in the initial state.
+        final int n = this.predicatesTables.get(predicate).get(this.toInt(mask)).get(index);
+        // CASE 1: If the expression is a positive inertia and the number of unifying ground
+        // instances of the specified expression that are contained in the initial state is equal to
+        // 0 then the expression is simplified to FALSE.
+        final Inertia inertia = this.inertia.get(predicate);
+        if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
+            exp.setConnective(PDDLConnective.FALSE);
+            //System.out.println("ATOM SIMPLY");
+        } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
+            // CASE 2: If the expression is a negative inertia and then the number of all possible
+            // type-consistent ground instances of the specified expression then the expression is
+            // simplified to TRUE.
+            exp.setConnective(PDDLConnective.TRUE);
+            //System.out.println("ATOM SIMPLY");
+        }
+    }
+
+
+    /**
+     * Expands the quantified expressions contained in a specified expression.
+     */
+    private void expandQuantifiedExpression(IntExpression exp, boolean simplifyAtom) {
+        simplifyAtom = false;
+        switch (exp.getConnective()) {
+            case AND:
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
+                    // Remove quantified expression where the domain of the quantified variable is empty
+                    if ((ei.getConnective().equals(PDDLConnective.FORALL)
+                        || ei.getConnective().equals(PDDLConnective.EXISTS))
+                        && this.typeDomains.get(ei.getType()).isEmpty()) {
+                        i.remove();
+                        continue;
+                    }
+                    this.expandQuantifiedExpression(ei, simplifyAtom);
+                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
+                    //if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    //    exp.setConnective(PDDLConnective.FALSE);
+                    //}
+                }
+                break;
+            case OR:
+                i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
+                    // Remove quantified expression where the domain of the quantified variable is empty
+                    if ((ei.getConnective().equals(PDDLConnective.FORALL)
+                        || ei.getConnective().equals(PDDLConnective.EXISTS))
+                        && this.typeDomains.get(ei.getType()).isEmpty()) {
+                        i.remove();
+                        continue;
+                    }
+                    this.expandQuantifiedExpression(ei, simplifyAtom);
+                    // If a child expression is TRUE, the whole disjunction becomes TRUE.
+                    //if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    //    exp.setConnective(PDDLConnective.TRUE);
+                    //}
+                }
+                break;
+            case FORALL:
+                Set<Integer> constants = this.typeDomains.get(exp.getType());
+                IntExpression qExp = exp.getChildren().get(0);
+                int var = exp.getVariable();
+                exp.setConnective(PDDLConnective.AND);
+                exp.getChildren().clear();
+                Iterator<Integer> it = constants.iterator();
+                while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    int cons = it.next();
+                    IntExpression copy = new IntExpression(qExp);
+                    this.substitute(copy, var, cons, simplifyAtom);
+                    exp.getChildren().add(copy);
+                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
+                    //if (copy.getConnective().equals(PDDLConnective.FALSE)) {
+                    //    exp.setConnective(PDDLConnective.FALSE);
+                    //}
+                }
+                this.expandQuantifiedExpression(exp, simplifyAtom);
+                break;
+            case EXISTS:
+                constants = this.typeDomains.get(exp.getType());
+                qExp = exp.getChildren().get(0);
+                var = exp.getVariable();
+                exp.setConnective(PDDLConnective.OR);
+                exp.getChildren().clear();
+                it = constants.iterator();
+                while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    int cons = it.next();
+                    IntExpression copy = new IntExpression(qExp);
+                    this.substitute(copy, var, cons, simplifyAtom);
+                    exp.getChildren().add(copy);
+                    // If a child expression is TRUE, the whole disjunction becomes TRUE.
+                    //if (copy.getConnective().equals(PDDLConnective.TRUE)) {
+                    //    exp.setConnective(PDDLConnective.TRUE);
+                    //}
+                }
+                this.expandQuantifiedExpression(exp, simplifyAtom);
+                break;
+
+            case AT_START:
+            case AT_END:
+            case NOT:
+            case ALWAYS:
+            case OVER_ALL:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+                this.expandQuantifiedExpression(exp.getChildren().get(0), simplifyAtom);
+                break;
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+            case WHEN:
+                this.expandQuantifiedExpression(exp.getChildren().get(0), simplifyAtom);
+                this.expandQuantifiedExpression(exp.getChildren().get(1), simplifyAtom);
+                break;
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+                this.expandQuantifiedExpression(exp.getChildren().get(0), simplifyAtom);
+                this.expandQuantifiedExpression(exp.getChildren().get(1), simplifyAtom);
+                this.expandQuantifiedExpression(exp.getChildren().get(3), simplifyAtom);
+                break;
+            case ATOM:
+                if (simplifyAtom) {
+                    this.simplyAtom(exp);
+                }
+                break;
+            case EQUAL_ATOM:
+            case FN_HEAD:
+            case FN_ATOM:
+            case DURATION_ATOM:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case F_EXP_T:
+            case NUMBER:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case F_EXP:
+            case TIME_VAR:
+            case IS_VIOLATED:
+                // do nothing
+                break;
+            default:
+                // do nothing
+        }
+    }
+
+    /**
+     * Substitutes all occurrence of a specified variable into an expression by a constant.
+     *
+     * @param var  the variable.
+     * @param cons the constant.
+     */
+    private void substitute(IntExpression exp, final int var, final int cons, boolean simplifyAtom) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                boolean updated = false;
+                int[] args = exp.getArguments();
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] == var) {
+                        args[i] = cons;
+                        updated = true;
+                    }
+                }
+                if (updated && simplifyAtom) {
+                    this.simplyAtom(exp);
+                }
+                break;
+            case TASK:
+            case FN_HEAD:
+                args = exp.getArguments();
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] == var) {
+                        args[i] = cons;
+                    }
+                }
+                break;
+
+            case EQUAL_ATOM:
+                args = exp.getArguments();
+                // Get and substitute the first argument
+                final int arg1 = args[0];
+                if (arg1 == var) {
+                    args[0] = cons;
+                }
+                // Get and substitute the second argument
+                final int arg2 = args[1];
+                if (arg2 == var) {
+                    args[1] = cons;
+                }
+                // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
+                if (arg1 == arg2) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (arg1 >= 0 && arg2 >= 0) {
+                    // The equality is ground and the equality is FALSE because arg1 != arg2
+                    exp.setConnective(PDDLConnective.FALSE);
+                }
+                break;
+            case AND:
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
+                    this.substitute(ei, var, cons, simplifyAtom);
+                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    }
+                }
+                break;
+            case OR:
+                i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
+                    this.substitute(ei, var, cons, simplifyAtom);
+                    // If a child expression is TRUE, the whole disjunction is TRUE.
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    }
+                }
+                break;
+            case NOT:
+                final IntExpression neg = exp.getChildren().get(0);
+                this.substitute(neg, var, cons, simplifyAtom);
+                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case WHEN:
+                for (IntExpression ei : exp.getChildren()) {
+                    this.substitute(ei, var, cons, simplifyAtom);
+                }
+                break;
+            default:
+        }
+    }
+
+    /**
+     * Extract the subexpression having the timespecifier.
+     *
+     * Warning the time specidier must be move inward
+     */
+    private void extract(IntExpression exp, PDDLConnective timeSpecifier) {
+        switch (exp.getConnective()) {
+            case OR:
+            case AND:
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext()) {
+                    IntExpression e = i.next();
+                    this.extract(e, timeSpecifier);
+                    if (e.getConnective().equals(PDDLConnective.AND)
+                        && e.getChildren().isEmpty()) {
+                        i.remove();
+                    }
+                }
+                break;
+            case AT_END:
+            case AT_START:
+            case OVER_ALL:
+                if (!exp.getConnective().equals(timeSpecifier)) {
+                    exp.setConnective(PDDLConnective.AND);
+                    exp.getChildren().clear();
+                } else {
+                    exp.affect(exp.getChildren().get(0));
+                }
+                break;
+            default:
+
+        }
+
+    }
+
+    /**
+     * This method simplify a specified expression. The rules of simplification are as below:
+     * <ul>
+     * <li> not true eqv false </li>
+     * <li> true ^ phi eqv phi </li>
+     * <li> false ^ phi eqv false </li>
+     * <li> true v phi eqv true </li>
+     * <li> false v phi eqv false </li>
+     * <li> not false eqv true </li>
+     * <li> phi ^ phi eqv phi </li>
+     * <li> phi v phi eqv phi </li>
+     * <li> phi ^ not phi eqv false </li>
+     * <li> phi v not phi eqv true </li>
+     * <li> x = x eqv true </li>
+     * <li> x = y eqv false </li>
+     * </ul>
+     *
+     */
+    private void simplify(IntExpression exp) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                break;
+            case FN_HEAD:
+                break;
+            case EQUAL_ATOM:
+                int[] args = exp.getArguments();
+                // Get and substitute the first argument
+                final int arg1 = args[0];
+                // Get and substitute the second argument
+                final int arg2 = args[1];
+                if (arg1 == arg2) {
+                    // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
+                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (arg1 >= 0 && arg2 >= 0) {
+                    // The equality is ground and the equality is FALSE because arg1 != arg2
+                    exp.setConnective(PDDLConnective.FALSE);
+                }
+                break;
+            case AND:
+                int i = 0;
+                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = exp.getChildren().get(i);
+                    this.simplify(ei);
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        // If a child expression is FALSE, the whole conjunction becomes FALSE.
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        // If a child expression is TRUE, we can remove the child expression.
+                        exp.getChildren().remove(i);
+                    } else if (ei.getConnective().equals(PDDLConnective.AND)) {
+                        // If the child expression to add is a conjunction, we can simplify the expression by
+                        exp.getChildren().remove(i); // removing the inner conjunction.
+                        int j = 0;
+                        int added = 0;
+                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
+                            final IntExpression ej = ei.getChildren().get(j);
+                            if (ej.getConnective().equals(PDDLConnective.FALSE)) {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
+                                exp.getChildren().add(i + added, ej);
+                                added++;
+                            }
+                            j++;
+                        }
+                        i += added;
+                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
+                        // Simplification of the conditional expression.
+                        final IntExpression antecedent = ei.getChildren().get(0);
+                        final IntExpression consequent = ei.getChildren().get(1);
+                        // If the antecedent of a conditional effect becomes FALSE , the conditional
+                        // effect is removed from the action. In this case, the effect is never applicable
+                        // because it requires FALSE to hold, i.e., the state must be inconsistent.
+                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
+                            exp.getChildren().remove(i);
+                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
+                            // If the antecedent of a conditional effect becomes TRUE, the conditional
+                            // effect becomes unconditional.
+                            if (consequent.getConnective().equals(PDDLConnective.AND)) {
+                                exp.getChildren().remove(i);
+                                int j = 0;
+                                int added = 0;
+                                while (j < consequent.getChildren().size()
+                                    && exp.getConnective().equals(PDDLConnective.AND)) {
+
+                                    final IntExpression ej = consequent.getChildren().get(j);
+                                    if (ej.getConnective().equals(PDDLConnective.FALSE)) {
+                                        exp.setConnective(PDDLConnective.FALSE);
+                                    } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
+                                        exp.getChildren().add(i + added, ej);
+                                        added++;
+                                    }
+                                    j++;
+                                }
+                                i += added;
+                            } else {
+                                exp.getChildren().set(i, consequent);
+                                i++;
+                            }
+                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
+                            // If the consequent of a conditional effect becomes TRUE, the conditional
+                            // effect is removed because it does not lead to any state transition.
+                            exp.getChildren().remove(i);
+                        }   else if (consequent.getConnective().equals(PDDLConnective.FALSE)) {
+                            // If the consequent of a conditional effect becomes TRUE, the conditional
+                            // effect is removed because it does not lead to any state transition.
+                            exp.getChildren().remove(i);
+                        } else {
+                            i++;
+                        }
+                    } else {
+                        i++;
+                    }
+                }
+                // Finally, if the conjunction is empty, the expression becomes TRUE.
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
+                }
+                break;
+            case OR:
+                i = 0;
+                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = exp.getChildren().get(i);
+                    this.simplify(ei);
+                    // If a child expression is TRUE, the whole disjunction is TRUE.
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    } else if (ei.getConnective().equals(PDDLConnective.OR)) {
+                        // If the child expression to addValue is a disjunction, we can simplify the expression by
+                        // removing the inner disjunction.
+                        exp.getChildren().remove(i);
+                        int j = 0;
+                        int added = 0;
+                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
+                            final IntExpression ej = ei.getChildren().get(j);
+                            if (ej.getConnective().equals(PDDLConnective.TRUE)) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
+                                exp.getChildren().add(i + added, ej);
+                                added++;
+                            }
+                            j++;
+                        }
+                        i += added;
+                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
+                        // Simplification of the conditional expression.
+                        final IntExpression antecedent = ei.getChildren().get(0);
+                        final IntExpression consequent = ei.getChildren().get(1);
+                        // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
+                        // removed from the action. In this case, the effect is never applicable because it
+                        // requires FALSE to hold, i.e., the state must be inconsistent.
+                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
+                            exp.getChildren().remove(i);
+                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
+                            // If the antecedent of a conditional effect becomes TRUE, the conditional effect
+                            // becomes unconditional.
+                            if (consequent.getConnective().equals(PDDLConnective.OR)) {
+                                exp.getChildren().remove(i);
+                                int j = 0;
+                                int added = 0;
+                                while (j < consequent.getChildren().size()
+                                    && exp.getConnective().equals(PDDLConnective.OR)) {
+
+                                    final IntExpression ej = consequent.getChildren().get(j);
+                                    if (ej.getConnective().equals(PDDLConnective.TRUE)) {
+                                        exp.setConnective(PDDLConnective.TRUE);
+                                    } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
+                                        exp.getChildren().add(i + added, ej);
+                                        added++;
+                                    }
+                                    j++;
+                                }
+                                i += added;
+                            } else {
+                                exp.getChildren().set(i, consequent);
+                                i++;
+                            }
+                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
+                            // If the consequent of a conditional effect becomes TRUE, the conditional
+                            // effect is removed because it does not lead to any state transition.
+                            exp.getChildren().remove(i);
+                        } else {
+                            i++;
+                        }
+                    } else {
+                        i++;
+                    }
+                }
+                // Finally, if the disjunction is empty, the expression becomes TRUE.
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
+                } else {
+                    final Iterator<IntExpression> it = exp.getChildren().iterator();
+                    while (it.hasNext()) {
+                        if (it.next().getConnective().equals(PDDLConnective.FALSE)) {
+                            it.remove();
+                        }
+                    }
+                    if (exp.getChildren().isEmpty()) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    }
+                }
+                break;
+            case FORALL:
+            case EXISTS:
+            case UMINUS:
+            case ALWAYS:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+                this.simplify(exp.getChildren().get(0));
+                break;
+            case NOT:
+                final IntExpression neg = exp.getChildren().get(0);
+                simplify(neg);
+                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case WHEN:
+                this.simplify(exp.getChildren().get(0));
+                this.simplify(exp.getChildren().get(1));
+                break;
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+                this.simplify(exp.getChildren().get(0));
+                this.simplify(exp.getChildren().get(1));
+                break;
+            case F_EXP_T:
+            case F_EXP:
+                if (!exp.getChildren().isEmpty()) {
+                    this.simplify(exp.getChildren().get(0));
+                }
+                break;
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+                this.simplify(exp.getChildren().get(0));
+                this.simplify(exp.getChildren().get(1));
+                this.simplify(exp.getChildren().get(2));
+                break;
+            case NUMBER:
+            case DURATION_ATOM:
+            case TIME_VAR:
+            case IS_VIOLATED:
+            case MINIMIZE:
+            case MAXIMIZE:
+                break;
+            default:
+                // do nothing
+        }
+    }
+
+    /**
+     * Expands the temporal actions.
+     */
+    private void expandTemporalActions() {
+        List<IntAction> expandedActions = new ArrayList<>();
+
+        for (IntAction a : this.intActions) {
+            System.out.println("******************************************************");
+            System.out.println(this.toString(a));
+
+            this.expandQuantifiedExpression(a.getPreconditions(), true);
+            a.getPreconditions().moveTimeSpecifierInward();
+            a.getPreconditions().moveNegationInward();
+
+            System.out.println("*** Precondition ***");
+            System.out.println(this.toString(a.getPreconditions()));
+
+            final IntExpression startPrecondition = new IntExpression(a.getPreconditions());
+            this.extract(startPrecondition, PDDLConnective.AT_START);
+            this.simplify(startPrecondition);
+            startPrecondition.toDisjunctiveNormalForm(this);
+
+            System.out.println("*** At start precondition ***");
+            System.out.println(this.toString(startPrecondition));
+
+            final IntExpression endPrecondition = new IntExpression(a.getPreconditions());
+            this.extract(endPrecondition, PDDLConnective.AT_END);
+            this.simplify(endPrecondition);
+            endPrecondition.toDisjunctiveNormalForm(this);
+
+            System.out.println("*** At end precondition ***");
+            System.out.println(this.toString(endPrecondition));
+
+            final IntExpression overAllPrecondition = new IntExpression(a.getPreconditions());
+            this.extract(overAllPrecondition, PDDLConnective.OVER_ALL);
+            System.out.println("*** Over all precondition AV Simplify ***");
+            System.out.println(this.toString(overAllPrecondition));
+            this.simplify(overAllPrecondition);
+            overAllPrecondition.toDisjunctiveNormalForm(this);
+
+            System.out.println("*** Over all precondition ***");
+            System.out.println(this.toString(overAllPrecondition));
+
+
+            // Expands the quantified expression on the effect of the action
+            this.expandQuantifiedExpression(a.getEffects(), true);
+            a.getEffects().moveTimeSpecifierInward();
+            a.getEffects().moveNegationInward();
+            a.getEffects().toConjunctiveNormalForm(this);
+            //this.simplify(a.getEffects());
+
+            System.out.println("*** EFFECT ***");
+            System.out.println(this.toString(a.getEffects()));
+
+            try {
+                System.out.println("Press enter...");
+                System.in.read();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // The list of monitoring action need to deal with over all condition in conditional effect
+            final List<IntAction> monitoringActions = new ArrayList<>();
+            // The effect of the start action
+            final IntExpression startEffect = new IntExpression(PDDLConnective.AND);
+            // The effect of the end action
+            final IntExpression endEffect = new IntExpression(PDDLConnective.AND);
+
+            // Iterate over the effect of the action the action to initialize the start and end effect and the list of
+            // monitoring actions needed to deal with over all condition in conditional effects.
+            // We suppose that the effect is a conjunction of at_start or at_end or when.
+            for (IntExpression effect : a.getEffects().getChildren()) {
+                //System.out.println("EFFECT : "+ this.toString(effect));
+                switch (effect.getConnective()) {
+                    case AT_START:
+                        startEffect.addChild(effect.getChildren().get(0));
+                        break;
+                    case AT_END:
+                        endEffect.addChild(effect.getChildren().get(0));
+                        break;
+                    case WHEN:
+                        // Extract the start effect condition of the conditional effect
+                        final IntExpression ps = new IntExpression(effect.getChildren().get(0));
+                        this.extract(ps, PDDLConnective.AT_START);
+                        // Extract the end effect condition of the conditional effect
+                        final IntExpression pe = new IntExpression(effect.getChildren().get(0));
+                        this.extract(pe, PDDLConnective.AT_END);
+                        // Extract the overall effect condition of the conditional effect
+                        final IntExpression pi = new IntExpression(effect.getChildren().get(0));
+                        this.extract(pi, PDDLConnective.OVER_ALL);
+                        // Extract the start effect of the conditional effect
+                        final IntExpression qs = new IntExpression(effect.getChildren().get(1));
+                        this.extract(qs, PDDLConnective.AT_START);
+                        // Extract the end effect of the conditional effect
+                        final IntExpression qe = new IntExpression(effect.getChildren().get(1));
+                        this.extract(qe, PDDLConnective.AT_END);
+
+
+                        // CASE at start only in condition and at start only in effects
+                        // We add the condition of the effect to the start action and the effect to the start action.
+                        if (!ps.getChildren().isEmpty()
+                                && pe.getChildren().isEmpty()
+                                && pi.getChildren().isEmpty()
+                                && !qs.getChildren().isEmpty()
+                                && qe.getChildren().isEmpty()) {
+
+                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
+                            when.addChild(ps);
+                            when.addChild(ps);
+                            startEffect.addChild(when);
+                        }
+
+                        // CASE at end only in condition and at end only in effects
+                        // We add the condition of the effect to the end action and the effect to the end action.
+                        else if (ps.getChildren().isEmpty()
+                                && !pe.getChildren().isEmpty()
+                                && pi.getChildren().isEmpty()
+                                && qs.getChildren().isEmpty()
+                                && !qe.getChildren().isEmpty()) {
+
+                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
+                            when.addChild(pe);
+                            when.addChild(qe);
+                            endEffect.addChild(when);
+                        }
+
+                        // CASE at star and possibly at end but no overall in condition and at end in effects
+                        else if (!ps.getChildren().isEmpty()
+                                && pi.getChildren().isEmpty()
+                                && !qe.getChildren().isEmpty()) {
+
+                            // Create the conditional effect for the start action
+                            final IntExpression startWhen = new IntExpression(PDDLConnective.WHEN);
+                            startWhen.addChild(ps);
+                            // Create the dummy predicate to memorize the effect at end
+                            final IntExpression mps = this.createDummyPredicate();
+                            startWhen.addChild(mps);
+                            startEffect.addChild(startWhen);
+
+                            // Create the conditional effect for the end action
+                            final IntExpression endWhen = new IntExpression(PDDLConnective.WHEN);
+                            if (pe.getChildren().isEmpty()) {
+                                endWhen.addChild(mps);
+                            } else {
+                                final IntExpression and = new IntExpression(PDDLConnective.AND);
+                                and.addChild(pe);
+                                and.addChild(mps);
+                                endWhen.addChild(and);
+                            }
+                            endWhen.addChild(endEffect);
+                            endEffect.addChild(endWhen);
+                        }
+
+                        // CASE overall in condition with possibly no at start and no at end and at end in effect
+                        // (when (and (at start ps) (over all pi) (at end pe)) (at end q))
+                        else if (!pi.getChildren().isEmpty()
+                                && qe.getChildren().isEmpty()) {
+
+                            // Create the monitoring action with no precondition but effects of the form
+                            // (when (and (Mpi) (not pi)) (not (Mpi)))
+                            final IntAction monitoring = this.createMonitoringAction();
+                            final IntExpression when = new IntExpression(PDDLConnective.WHEN);
+                            IntExpression and = new IntExpression(PDDLConnective.AND);
+                            final IntExpression mpi = this.createDummyPredicate();
+                            and.addChild(mpi);
+                            final IntExpression notPi = new IntExpression(PDDLConnective.NOT);
+                            notPi.addChild(pi);
+                            notPi.moveNegationInward();
+                            and.addChild(notPi);
+                            when.addChild(and);
+                            final IntExpression notMpi = new IntExpression(PDDLConnective.NOT);
+                            notMpi.addChild(mpi);
+                            when.addChild(notMpi);
+                            monitoring.getEffects().addChild(when);
+                            monitoringActions.add(monitoring);
+
+                            // Create the start effect: (when ps (Mps))
+                            IntExpression mps = this.createDummyPredicate();
+                            if (!ps.getChildren().isEmpty()) {
+                                IntExpression startWhen = new IntExpression(PDDLConnective.WHEN);
+                                startWhen.addChild(ps);
+                                startWhen.addChild(mps);
+                                startEffect.addChild(startWhen);
+                            } else {
+                                startEffect.addChild(mps);
+                            }
+
+                            // Create the start effect: (when (and (Mps) (Mpi) pe) q).
+                            IntExpression endWhen = new IntExpression(PDDLConnective.WHEN);
+                            and = new IntExpression(PDDLConnective.AND);
+                            and.addChild(mps);
+                            and.addChild(mpi);
+                            if (!pe.getChildren().isEmpty()) {
+                                and.addChild(pe);
+                            }
+                            endWhen.addChild(and);
+                            endWhen.addChild(qe);
+                            endEffect.addChild(endWhen);
+                        }
+                    default:
+                        // Do nothing
+                }
+            }
+            //System.out.println("START PRECOND AVANT  SIM: ");
+            //System.out.println(this.toString(startPrecondition));
+            //this.simplify(startPrecondition);
+            //System.out.println("START PRECOND APRES  SIM: ");
+            //System.out.println(this.toString(startPrecondition));
+            //start.
+
+            //this.simplify(endPrecondition);
+            //this.simplify(overallPrecondition);
+
+            System.out.println("START EFFECT AVANT  SIM: ");
+            System.out.println(this.toString(startEffect));
+            this.simplify(startEffect);
+            //startEffect.toConjunctiveNormalForm(this);
+            System.out.println("START EFFECT APRES SIM: ");
+            System.out.println(this.toString(startEffect));
+
+            System.out.println("END EFFECT AVANT  SIM: ");
+            System.out.println(this.toString(endEffect));
+            this.simplify(endEffect);
+            //endEffect.toConjunctiveNormalForm(this);
+            System.out.println("END EFFECT APRES  SIM: ");
+            System.out.println(this.toString(endEffect));
+
+            // Create a start action for each conjunction of the start precondition
+            for (IntExpression precondition : startPrecondition.getChildren()) {
+                IntAction startAction = new IntAction(a.getName() + "_" + "start", a.arity());
+                startAction.setCost(a.getCost());
+                startAction.setDuration(new IntExpression(a.getDuration()));
+                for (int i = 0; i < a.arity(); i++) {
+                    startAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < a.arity(); i++) {
+                    startAction.setValueOfParameter(i, a.getValueOfParameter(i));
+                }
+                startAction.setPreconditions(new IntExpression(precondition));
+                startAction.setEffects(new IntExpression(startEffect));
+                expandedActions.add(startAction);
+
+                System.out.println("*"+this.toString(startAction));
+                try {
+                    System.out.println("Press enter...");
+                    System.in.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            for (IntExpression precondition : endPrecondition.getChildren()) {
+                IntAction endAction = new IntAction(a.getName() + "_" + "end", a.arity());
+                endAction.setCost(a.getCost());
+                endAction.setDuration(new IntExpression(a.getDuration()));
+                for (int i = 0; i < a.arity(); i++) {
+                    endAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < a.arity(); i++) {
+                    endAction.setValueOfParameter(i, a.getValueOfParameter(i));
+                }
+                endAction.setPreconditions(precondition);
+                endAction.setEffects(new IntExpression(endEffect));
+                expandedActions.add(endAction);
+
+                System.out.println("*"+this.toString(endAction));
+                try {
+                    System.out.println("Press enter...");
+                    System.in.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println(this.toString(overAllPrecondition));
+            for (IntExpression precondition : overAllPrecondition.getChildren()) {
+                if (!precondition.getConnective().equals(PDDLConnective.FALSE)) {
+                    IntAction invAction = new IntAction(a.getName() + "_" + "inv", a.arity());
+                    invAction.setCost(a.getCost());
+                    invAction.setDuration(new IntExpression(a.getDuration()));
+                    for (int i = 0; i < a.arity(); i++) {
+                        invAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
+                    }
+                    for (int i = 0; i < a.arity(); i++) {
+                        invAction.setValueOfParameter(i, a.getValueOfParameter(i));
+                    }
+                    invAction.setPreconditions(precondition);
+                    expandedActions.add(invAction);
+                    System.out.println("*" + this.toString(invAction));
+                    try {
+                        System.out.println("Press enter...");
+                        System.in.read();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            // Add the monitoring actions
+            for (IntAction m : monitoringActions) {
+                expandedActions.add(m);
+                /*
+                System.out.println(this.toString(m));
+                try {
+                    System.in.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
+            }
+
+        }
+        this.intActions.clear();
+        this.intActions.addAll(expandedActions);
+
+
+
+    }
 
 }

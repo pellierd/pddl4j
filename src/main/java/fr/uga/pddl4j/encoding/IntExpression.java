@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.IOException;
@@ -384,12 +385,24 @@ public class IntExpression implements Serializable {
      * @param var  the variable.
      * @param cons the constant.
      */
-    public void substitute(final int var, final int cons) {
+    public void substitute(final int var, final int cons, IProblem pb) {
         switch (this.getConnective()) {
             case ATOM:
+                boolean updated = false;
+                int[] args = this.getArguments();
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] == var) {
+                        args[i] = cons;
+                        updated = true;
+                    }
+                }
+                if (updated) {
+                    pb.simplyAtom(this);
+                }
+                break;
             case TASK:
             case FN_HEAD:
-                int[] args = this.getArguments();
+                args = this.getArguments();
                 for (int i = 0; i < args.length; i++) {
                     if (args[i] == var) {
                         args[i] = cons;
@@ -421,7 +434,7 @@ public class IntExpression implements Serializable {
                 Iterator<IntExpression> i = this.getChildren().iterator();
                 while (i.hasNext() && this.getConnective().equals(PDDLConnective.AND)) {
                     final IntExpression ei = i.next();
-                    ei.substitute(var, cons);
+                    ei.substitute(var, cons, pb);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         this.setConnective(PDDLConnective.FALSE);
@@ -432,7 +445,7 @@ public class IntExpression implements Serializable {
                 i = this.getChildren().iterator();
                 while (i.hasNext() && this.getConnective().equals(PDDLConnective.OR)) {
                     final IntExpression ei = i.next();
-                    ei.substitute(var, cons);
+                    ei.substitute(var, cons, pb);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         this.setConnective(PDDLConnective.TRUE);
@@ -441,17 +454,20 @@ public class IntExpression implements Serializable {
                 break;
             case NOT:
                 final IntExpression neg = this.getChildren().get(0);
-                neg.substitute(var, cons);
+                neg.substitute(var, cons, pb);
                 if (neg.getConnective().equals(PDDLConnective.TRUE)) {
                     this.setConnective(PDDLConnective.FALSE);
                 } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
                     this.setConnective(PDDLConnective.TRUE);
                 }
                 break;
-            default:
+            case WHEN:
+
                 for (IntExpression ei : this.getChildren()) {
-                    ei.substitute(var, cons);
+                    ei.substitute(var, cons, pb);
                 }
+                break;
+            default:
         }
     }
 
@@ -460,7 +476,7 @@ public class IntExpression implements Serializable {
      *
      * @param domains the domains of the quantified variables.
      */
-    public void expandQuantifiedExpression(final List<Set<Integer>> domains) {
+    public void expandQuantifiedExpression(final List<Set<Integer>> domains, IProblem pb) {
         switch (this.getConnective()) {
             case AND:
                 Iterator<IntExpression> i = this.getChildren().iterator();
@@ -473,10 +489,15 @@ public class IntExpression implements Serializable {
                         i.remove();
                         continue;
                     }
-                    ei.expandQuantifiedExpression(domains);
+                    ei.expandQuantifiedExpression(domains, pb);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         this.setConnective(PDDLConnective.FALSE);
+                    }
+                    // Remove conditional effect whose effect are alway false
+                    if (ei.getConnective().equals(PDDLConnective.WHEN)
+                        && ei.getChildren().get(1).getConnective().equals(PDDLConnective.FALSE)) {
+                        i.remove();
                     }
                 }
                 break;
@@ -491,10 +512,15 @@ public class IntExpression implements Serializable {
                         i.remove();
                         continue;
                     }
-                    ei.expandQuantifiedExpression(domains);
+                    ei.expandQuantifiedExpression(domains, pb);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         this.setConnective(PDDLConnective.TRUE);
+                    }
+                    // Remove conditional effect whose effect are always false
+                    if (ei.getConnective().equals(PDDLConnective.WHEN)
+                        && ei.getChildren().get(1).getConnective().equals(PDDLConnective.FALSE)) {
+                        i.remove();
                     }
                 }
                 break;
@@ -508,14 +534,14 @@ public class IntExpression implements Serializable {
                 while (it.hasNext() && this.getConnective().equals(PDDLConnective.AND)) {
                     int cons = it.next();
                     IntExpression copy = new IntExpression(qExp);
-                    copy.substitute(var, cons);
+                    copy.substitute(var, cons, pb);
                     this.getChildren().add(copy);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (copy.getConnective().equals(PDDLConnective.FALSE)) {
                         this.setConnective(PDDLConnective.FALSE);
                     }
                 }
-                this.expandQuantifiedExpression(domains);
+                this.expandQuantifiedExpression(domains, pb);
                 break;
             case EXISTS:
                 constants = domains.get(this.getType());
@@ -527,21 +553,25 @@ public class IntExpression implements Serializable {
                 while (it.hasNext() && this.getConnective().equals(PDDLConnective.OR)) {
                     int cons = it.next();
                     IntExpression copy = new IntExpression(qExp);
-                    copy.substitute(var, cons);
+                    copy.substitute(var, cons, pb);
                     this.getChildren().add(copy);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
                     if (copy.getConnective().equals(PDDLConnective.TRUE)) {
                         this.setConnective(PDDLConnective.TRUE);
                     }
                 }
-                this.expandQuantifiedExpression(domains);
+                this.expandQuantifiedExpression(domains, pb);
+                break;
+            case ATOM:
+                pb.simplyAtom(this);
                 break;
             default:
                 for (IntExpression ei : this.getChildren()) {
-                    ei.expandQuantifiedExpression(domains);
+                    ei.expandQuantifiedExpression(domains, pb);
                 }
 
         }
+        this.simplify();
     }
 
     /**
@@ -567,23 +597,33 @@ public class IntExpression implements Serializable {
                         notP.moveNegationInward();
                         break;
                     case AND:
-                        this.setConnective(PDDLConnective.OR);
-                        this.getChildren().clear();
-                        for (int i = 0; i < p.getChildren().size(); i++) {
-                            IntExpression q = new IntExpression(PDDLConnective.NOT);
-                            q.addChild(p.getChildren().get(i));
-                            q.moveNegationInward();
-                            this.addChild(q);
+                        if (this.getChildren().size() > 1) {
+                            this.setConnective(PDDLConnective.OR);
+                            this.getChildren().clear();
+                            for (int i = 0; i < p.getChildren().size(); i++) {
+                                IntExpression q = new IntExpression(PDDLConnective.NOT);
+                                q.addChild(p.getChildren().get(i));
+                                q.moveNegationInward();
+                                this.addChild(q);
+                            }
+                        } else {
+                            this.affect(this.getChildren().get(0));
+                            this.moveNegationInward();
                         }
                         break;
                     case OR:
-                        this.setConnective(PDDLConnective.AND);
-                        this.getChildren().clear();
-                        for (int i = 0; i < p.getChildren().size(); i++) {
-                            IntExpression q = new IntExpression(PDDLConnective.NOT);
-                            q.addChild(this.getChildren().get(i));
-                            q.moveNegationInward();
-                            this.addChild(q);
+                        if (this.getChildren().size() > 1) {
+                            this.setConnective(PDDLConnective.AND);
+                            this.getChildren().clear();
+                            for (int i = 0; i < p.getChildren().size(); i++) {
+                                IntExpression q = new IntExpression(PDDLConnective.NOT);
+                                q.addChild(p.getChildren().get(i));
+                                q.moveNegationInward();
+                                this.addChild(q);
+                            }
+                        } else {
+                            this.affect(this.getChildren().get(0));
+                            this.moveNegationInward();
                         }
                         break;
                     /*case IMPLY: // ¬(p =>) q = p and ¬q
@@ -672,12 +712,14 @@ public class IntExpression implements Serializable {
                         p.setConnective(this.getConnective());
                         this.setConnective(PDDLConnective.FORALL);
                         this.setVariable(p.getVariable());
+                        this.setType(p.getType());
                         p.moveTimeSpecifierInward();
                         break;
                     case EXISTS:
                         p.setConnective(this.getConnective());
                         this.setConnective(PDDLConnective.EXISTS);
                         this.setVariable(p.getVariable());
+                        this.setType(p.getType());
                         p.moveTimeSpecifierInward();
                         break;
                     case AND:
@@ -693,7 +735,7 @@ public class IntExpression implements Serializable {
                     case OR:
                         this.getChildren().clear();
                         for (int i = 0; i < p.getChildren().size(); i++) {
-                            IntExpression q = new IntExpression(this.getConnective());
+                            final IntExpression q = new IntExpression(this.getConnective());
                             q.addChild(p.getChildren().get(i));
                             q.moveTimeSpecifierInward();
                             this.addChild(q);
@@ -707,6 +749,18 @@ public class IntExpression implements Serializable {
                     case NOT:
                         p.setConnective(this.getConnective());
                         this.setConnective(PDDLConnective.NOT);
+                        break;
+                    case WHEN:
+                        final IntExpression timeCondition = new IntExpression(this.getConnective());
+                        timeCondition.addChild(p.getChildren().get(0));
+                        timeCondition.moveTimeSpecifierInward();
+                        final IntExpression timeEffect = new IntExpression(this.getConnective());
+                        timeEffect.addChild(p.getChildren().get(1));
+                        timeEffect.moveTimeSpecifierInward();
+                        this.setConnective(PDDLConnective.WHEN);
+                        this.children.clear();
+                        this.children.add(timeCondition);
+                        this.children.add(timeEffect);
                         break;
                     default:
                         // do nothing
@@ -785,6 +839,9 @@ public class IntExpression implements Serializable {
      *
      */
     public void toDNF() throws UnexpectedExpressionException {
+        // Suppress imply
+        // Move negation inward
+        // Distribute the
         switch (this.getConnective()) {
             case OR:
                 List<IntExpression> children = this.getChildren();
@@ -872,6 +929,232 @@ public class IntExpression implements Serializable {
                 throw new UnexpectedExpressionException(this.getConnective().getImage());
         }
     }
+
+    /**
+     * Convert an expression in conjunctive normal form (CNF).
+     *
+     */
+    public void toConjunctiveNormalForm(IProblem pb) {
+
+        this.moveNegationInward();
+        switch (this.getConnective()) {
+            case AND:
+                List<IntExpression> children = new ArrayList<>();
+                for (IntExpression e : this.getChildren()) {
+                    e.toConjunctiveNormalForm(pb);
+                    if (e.getConnective().equals(PDDLConnective.WHEN)) {
+                        IntExpression condition = e.getChildren().get(0);
+                        IntExpression effect = e.getChildren().get(1);
+                        for (IntExpression c : condition.getChildren()) {
+                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
+                            when.addChild(c);
+                            when.addChild(new IntExpression(effect));
+                            children.add(when);
+                        }
+                    } else {
+                        // Suppress not useful inner and
+                        if (e.getConnective().equals(PDDLConnective.AND)) {
+                            children.addAll(e.getChildren());
+                        } else {
+                            children.add(e);
+                        }
+                    }
+                }
+                this.children.clear();
+                this.children.addAll(children);
+                break;
+            case OR:
+                for (IntExpression e : this.children) {
+                    e.toConjunctiveNormalForm(pb);
+                }
+                this.distribute(pb);
+                break;
+            case WHEN:
+                this.getChildren().get(0).toDisjunctiveNormalForm(pb);
+                this.getChildren().get(1).toConjunctiveNormalForm(pb);
+                break;
+            case ATOM:
+            case NOT:
+            case TRUE:
+            case FALSE:
+            case ASSIGN:
+            case DECREASE:
+            case INCREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case PLUS:
+            case MINUS:
+            case UMINUS:
+            case MUL:
+            case DIV:
+            case AT_START:
+            case AT_END:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case OVER_ALL:
+                IntExpression copy = new IntExpression(this);
+                this.setConnective(PDDLConnective.AND);
+                this.getChildren().clear();
+                this.getChildren().add(copy);
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().getImage());
+        }
+    }
+
+    /**
+     * Convert an expression in disjunctive normal form (DNF).
+     *
+     */
+    public void toDisjunctiveNormalForm(IProblem pb) throws UnexpectedExpressionException {
+        // Suppress imply
+        // Move negation inward
+        this.moveNegationInward();
+        // Distribute the
+        switch (this.getConnective()) {
+            case OR:
+                for (IntExpression e : this.getChildren()) {
+                    e.toDisjunctiveNormalForm(pb);
+                }
+                break;
+            case AND:
+                for (IntExpression e : this.children) {
+                    e.toDisjunctiveNormalForm(pb);
+                }
+                this.distribute(pb);
+                break;
+            case WHEN:
+                this.getChildren().get(0).toDisjunctiveNormalForm(pb);
+                this.getChildren().get(1).toConjunctiveNormalForm(pb);
+                break;
+            case ATOM:
+            case NOT:
+            case TRUE:
+            case ASSIGN:
+            case DECREASE:
+            case INCREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case PLUS:
+            case MINUS:
+            case UMINUS:
+            case MUL:
+            case DIV:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case EQUAL_ATOM:
+            case FALSE:
+                IntExpression exp = new IntExpression(this);
+                this.setConnective(PDDLConnective.OR);
+                this.getChildren().clear();
+                this.getChildren().add(exp);
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().toString());
+        }
+    }
+
+    /**
+     * This method distribute the logical AND or OR to the
+     *
+     * @param index
+     * @param acc
+     * @param result
+     */
+    private void distribute(int index, IntExpression acc, IntExpression result, IProblem pb) {
+        if (this.getChildren().size() == index) {
+            if ((acc.getConnective().equals(PDDLConnective.AND)
+                || acc.getConnective().equals(PDDLConnective.OR))
+                && acc.getChildren().size() == 1) {
+                result.addChild(acc.getChildren().get(0));
+            } else {
+                result.addChild(acc);
+            }
+        } else {
+            final IntExpression e = this.getChildren().get(index);
+            index++;
+            for (IntExpression ei: e.getChildren()) {
+                IntExpression copy = new IntExpression(acc);
+                copy.addChild(ei);
+                this.distribute(index, copy, result, pb);
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private void distribute(IProblem pb) {
+        if (this.getConnective().equals(PDDLConnective.AND)) {
+            IntExpression or = new IntExpression(PDDLConnective.OR);
+            this.distribute(0, new IntExpression(PDDLConnective.AND), or, pb);
+            this.setConnective(PDDLConnective.OR);
+            this.getChildren().clear();
+            this.getChildren().addAll(or.getChildren());
+        }
+        else if (this.getConnective().equals(PDDLConnective.OR)) {
+            IntExpression and = new IntExpression(PDDLConnective.AND);
+            this.distribute(0, new IntExpression(PDDLConnective.OR), and, pb);
+            this.setConnective(PDDLConnective.AND);
+            this.getChildren().clear();
+            this.getChildren().addAll(and.getChildren());
+        }
+
+    }
+
+    public static void main(String[] args) {
+
+        IntExpression and = new IntExpression(PDDLConnective.AND);
+
+        IntExpression or1 = new IntExpression(PDDLConnective.OR);
+        IntExpression A = new IntExpression(PDDLConnective.ATOM);
+        A.setPredicate(1);
+        or1.addChild(A);
+        System.out.println("OR1 :  "+ or1.toString(" ", " "));
+
+
+        IntExpression or2 = new IntExpression(PDDLConnective.OR);
+        IntExpression B = new IntExpression(PDDLConnective.ATOM);
+        B.setPredicate(2);
+        or2.addChild(B);
+        IntExpression C = new IntExpression(PDDLConnective.ATOM);
+        C.setPredicate(3);
+        or2.addChild(C);
+
+        System.out.println("OR2 :  "+ or2.toString(" ", " "));
+
+        IntExpression or3 = new IntExpression(PDDLConnective.OR);
+        IntExpression D = new IntExpression(PDDLConnective.ATOM);
+        D.setPredicate(4);
+        or3.addChild(D);
+        IntExpression E = new IntExpression(PDDLConnective.ATOM);
+        E.setPredicate(5);
+        or3.addChild(E);
+
+        System.out.println("OR3 :  "+ or3.toString(" ", " "));
+
+        and.addChild(or1);
+        and.addChild(or2);
+        and.addChild(or3);
+
+        System.out.println(and.toString(" ", " "));
+        IntExpression or = new IntExpression(PDDLConnective.OR);
+        //distribute(and, 0, new IntExpression(PDDLConnective.AND), or);
+        //and.distribute();
+        System.out.println(and.toString(" ", " "));
+
+
+    }
+
 
     /**
      * This method simplify a specified expression. The rules of simplification are as below:
@@ -1080,10 +1363,6 @@ public class IntExpression implements Serializable {
             case OVER_ALL:
                 final IntExpression fluent = this.getChildren().get(0);
                 fluent.simplify();
-                if (fluent.getConnective().equals(PDDLConnective.TRUE)
-                    || fluent.getConnective().equals(PDDLConnective.FALSE)) {
-                    this.setConnective(fluent.getConnective());
-                }
                 break;
             case FORALL:
             case EXISTS:
@@ -1151,4 +1430,193 @@ public class IntExpression implements Serializable {
         }
     }
 
+    /**
+     * Returns a string representation of an expression.
+     *
+     * @param baseOffset the offset white space from the left used for indentation.
+     * @param separator  the string separator between predicate symbol and arguments.
+     * @return a string representation of the specified expression node.
+     */
+    private String toString(String baseOffset, final String separator) {
+        final StringBuilder str = new StringBuilder();
+        switch (this.getConnective()) {
+            case ATOM:
+                str.append("(P");
+                str.append(this.getPredicate());
+                int[] args = this.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ");
+                        str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                        str.append(-index - 1);
+                    } else {
+                        str.append(" C");
+                        str.append(index);
+                    }
+                }
+                str.append(")");
+                break;
+            case FN_HEAD:
+                str.append("(F");
+                str.append(this.getPredicate());
+                args = this.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ");
+                        str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                        str.append(-index - 1);
+                    } else {
+                        str.append(" C");
+                        str.append(index);
+                    }
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                if (this.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                    str.append(this.getTaskID());
+                    str.append(" (");
+                }
+                str.append("T" + this.getPredicate());
+                args = this.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ");
+                        str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                        str.append(-index - 1);
+                    } else {
+                        str.append(" ").append("C" + index);
+                    }
+                }
+                if (this.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                    str.append(")");
+                }
+                str.append(")");
+                break;
+            case EQUAL_ATOM:
+                str.append("(").append("=");
+                args = this.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ");
+                        str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                        str.append(-index - 1);
+                    } else {
+                        str.append(" ");
+                        str.append("C"+ index);
+                    }
+                }
+                str.append(")");
+                break;
+            case AND:
+            case OR:
+                String offsetOr = baseOffset + "  ";
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                if (!this.getChildren().isEmpty()) {
+                    for (int i = 0; i < this.getChildren().size() - 1; i++) {
+                        str.append(this.getChildren().get(i).toString(offsetOr, " "));
+                        str.append("\n");
+                        str.append(offsetOr);
+                    }
+                    str.append(this.getChildren()
+                        .get(this.getChildren().size() - 1).toString(offsetOr, " "));
+                }
+                str.append(")");
+                break;
+            case FORALL:
+            case EXISTS:
+                str.append(" (").append(this.getConnective().getImage());
+                str.append(" (").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(-this.getVariable() - 1);
+                str.append(" - ");
+                String offsetEx = baseOffset + baseOffset + "  ";
+                str.append("T" + this.getType());
+                str.append(")\n");
+                str.append(offsetEx);
+                if (this.getChildren().size() == 1) {
+                    str.append(this.getChildren().get(0).toString(offsetEx, " "));
+                }
+                str.append(")");
+                break;
+            case NUMBER:
+                str.append(this.getValue());
+                break;
+            case F_EXP:
+                str.append(this.getChildren().get(0).toString(baseOffset, " "));
+                break;
+            case F_EXP_T:
+            case TRUE:
+            case FALSE:
+                str.append(this.getConnective());
+                break;
+            case TIME_VAR:
+                str.append(this.getConnective().getImage());
+                break;
+            case FN_ATOM:
+            case WHEN:
+            case DURATION_ATOM:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset, " "));
+                str.append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset, " "));
+                str.append(")");
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case NOT:
+            case ALWAYS:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset, " "));
+                str.append(")");
+                break;
+            case IS_VIOLATED:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(")");
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+                str.append("(");
+                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(this.getChildren().get(0).getTaskID());
+                str.append(" ");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(this.getChildren().get(1).getTaskID());
+                str.append(")");
+                break;
+            default:
+                str.append("DEFAULT");
+                break;
+        }
+        return str.toString();
+    }
 }
