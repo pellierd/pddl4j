@@ -4,8 +4,8 @@
           :strips
           :typing
           :hierarchy
-          :method-preconditions
-          :negative-preconditions
+          :method-precondition
+          :negative-precondition
           :equality
     )
 

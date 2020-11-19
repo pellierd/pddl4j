@@ -61,7 +61,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         final List<Action> actions = this.getActions();
         int startPoint = 0;
         for (Action op : actions) {
-            startPoint += op.getCondEffects().size();
+            startPoint += op.getConditionalEffects().size();
         }
         int nbRelevantFacts = super.getRevelantFacts().size();
         this.pGoal = new int[nbRelevantFacts];
@@ -88,8 +88,8 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
             }
             //Compute the positive preconditions
             for (Action op : this.getActions()) {
-                final Condition pre = new Condition(op.getPreconditions());
-                final Condition npre = new Condition(op.getPreconditions());
+                final Condition pre = new Condition(op.getPrecondition());
+                final Condition npre = new Condition(op.getPrecondition());
                 BitVector nprecon = npre.getNegativeFluents();
                 BitVector precon = pre.getPositiveFluents();
                 for (int p = precon.nextSetBit(0); p >= 0; p = precon.nextSetBit(p + 1)) {
@@ -103,7 +103,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
                 }
 
                 //Get the positive and negative effects
-                Effect effects = op.getCondEffects().get(0).getEffect();
+                Effect effects = op.getConditionalEffects().get(0).getEffect();
                 BitVector positiveEffect = effects.getPositiveFluents();
                 BitVector negativeEffect = effects.getNegativeFluents();
                 BitVector newProp = new BitVector();

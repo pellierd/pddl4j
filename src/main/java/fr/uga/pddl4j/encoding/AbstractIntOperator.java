@@ -41,7 +41,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
     */
     protected AbstractIntOperator(final AbstractIntOperator other) {
         super(other);
-        //this.preconditions = other.getPreconditions();
+        //this.preconditions = other.getPrecondition();
         this.setPreconditions(new IntExpression(other.getPreconditions()));
     }
 

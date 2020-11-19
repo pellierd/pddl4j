@@ -108,7 +108,7 @@ public final class AStar extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                             // Apply the effect to the successor node
                             state.apply(ce.getEffect())
                         );

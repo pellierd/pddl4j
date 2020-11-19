@@ -129,7 +129,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         int nbUncondOperators = 0;
         final List<Action> operators = problem.getActions();
         for (Action op : operators) {
-            nbUncondOperators += op.getCondEffects().size();
+            nbUncondOperators += op.getConditionalEffects().size();
         }
         // Initialize the array that must contain the level of the positive propositions
         this.pPropLevel = new int[nbRelevantFacts];
@@ -174,7 +174,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         // Start enumerating the unconditional operators
         for (int opIndex = 0; opIndex < operators.size(); opIndex++) {
             final Action op = operators.get(opIndex);
-            final List<ConditionalEffect> condEffects = op.getCondEffects();
+            final List<ConditionalEffect> condEffects = op.getConditionalEffects();
 
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
@@ -183,7 +183,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
                 this.unconditionalOperators[uncondOpIndex] = eff;
 
                 // We pre-compute the preconditions' edges
-                final Condition pre = new Condition(op.getPreconditions());
+                final Condition pre = new Condition(op.getPrecondition());
                 final BitVector pPre = pre.getPositiveFluents();
                 final BitVector nPre = pre.getNegativeFluents();
                 pPre.or(cEffect.getCondition().getPositiveFluents());

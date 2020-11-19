@@ -2,9 +2,9 @@
 	(:requirements
 	:hierarchy
 	:typing
-	:universal-preconditions
-	:method-preconditions
-	:negative-preconditions
+	:universal-precondition
+	:method-precondition
+	:negative-precondition
     )
 	(:types
 		Floor - Object

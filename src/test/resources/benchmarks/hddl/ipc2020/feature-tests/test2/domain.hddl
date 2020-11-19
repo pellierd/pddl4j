@@ -1,5 +1,5 @@
 (define (domain test-domain)
-	(:requirements :typing :hierarchy :universal-preconditions)
+	(:requirements :typing :hierarchy :universal-precondition)
 
 	(:types A)
 

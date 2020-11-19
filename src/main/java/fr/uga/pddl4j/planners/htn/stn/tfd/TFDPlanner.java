@@ -133,11 +133,11 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                                 + problem.toString(problem.getTasks().get(task)) + " with \n\n"
                                 + problem.toString(action));
                         }
-                        if (state.satisfy(action.getPreconditions())) {
+                        if (state.satisfy(action.getPrecondition())) {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(operator);
-                            childNode.getState().apply(action.getCondEffects());
+                            childNode.getState().apply(action.getConditionalEffects());
                             childNode.setTask(task);
                             open.add(childNode);
                             if (debug) {
@@ -168,7 +168,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                                 + problem.toString(problem.getTasks().get(task)) + " with\n\n"
                                 + problem.toString(method));
                         }
-                        if (state.satisfy(method.getPreconditions())) {
+                        if (state.satisfy(method.getPrecondition())) {
                             final TFDNode childNode = new TFDNode(currentNode);
                             childNode.setParent(currentNode);
                             childNode.setOperator(problem.getActions().size() + operator);

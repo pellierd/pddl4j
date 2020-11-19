@@ -123,7 +123,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
         for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
                 final State nextState = new State(parent);
-                op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
+                op.getConditionalEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
                         // Apply the effect to the successor node
                         nextState.apply(ce.getEffect())
                 );

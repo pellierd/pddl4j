@@ -140,11 +140,11 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 System.out.println("=> Current state:");
                                 System.out.println(problem.toString(currentNode.getState()));
                             }
-                            if (state.satisfy(action.getPreconditions())) {
+                            if (state.satisfy(action.getPrecondition())) {
                                 final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(operator);
-                                childNode.getState().apply(action.getCondEffects());
+                                childNode.getState().apply(action.getConditionalEffects());
                                 childNode.getTaskNetwork().removeTask(task);
                                 childNode.setTask(taskIndex);
                                 open.add(childNode);
@@ -179,7 +179,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                     + problem.toString(problem.getTasks().get(taskIndex)) + " with\n\n"
                                     + problem.toString(method));
                             }
-                            if (state.satisfy(method.getPreconditions())) {
+                            if (state.satisfy(method.getPrecondition())) {
                                 final PFDNode childNode = new PFDNode(currentNode);
                                 childNode.setParent(currentNode);
                                 childNode.setOperator(problem.getActions().size() + operator);

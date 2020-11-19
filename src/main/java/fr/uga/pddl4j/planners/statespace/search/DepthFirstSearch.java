@@ -84,10 +84,10 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         final State nextState = new State(current);
-                        //nextState.or(op.getCondEffects().get(0).getEffect().getPositive());
-                        //nextState.andNot(op.getCondEffects().get(0).getEffect().getNegative());
+                        //nextState.or(op.getConditionalEffects().get(0).getEffect().getPositive());
+                        //nextState.andNot(op.getConditionalEffects().get(0).getEffect().getNegative());
 
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                                 // Apply the effect to the successor node
                                 nextState.apply(ce.getEffect())
                         );

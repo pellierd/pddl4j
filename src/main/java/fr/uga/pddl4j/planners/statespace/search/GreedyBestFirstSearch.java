@@ -96,7 +96,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
                     if (op.isApplicable(current)) {
                         final State nextState = new State(current);
 
-                        op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                                 // Apply the effect to the successor node
                                 nextState.apply(ce.getEffect())
                         );

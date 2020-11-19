@@ -463,9 +463,9 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n").append(StringDecoder.toString(action.getPreconditions(), constants, types,
+        str.append("Preconditions:\n").append(StringDecoder.toString(action.getPrecondition(), constants, types,
             predicates, functions, relevants)).append("\n").append("Effects:\n");
-        for (ConditionalEffect condExp : action.getCondEffects()) {
+        for (ConditionalEffect condExp : action.getConditionalEffects()) {
             str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants))
                 .append("\n");
         }
@@ -504,7 +504,7 @@ final class StringDecoder implements Serializable {
         str.append(StringDecoder.toString(task, constants, types, predicates, functions, tasks));
         str.append("\n");
         str.append("Preconditions:\n");
-        str.append(StringDecoder.toString(method.getPreconditions(), constants, types, predicates, functions,
+        str.append(StringDecoder.toString(method.getPrecondition(), constants, types, predicates, functions,
             relevantFacts));
         str.append("\n");
         str.append(StringDecoder.toString(method.getTaskNetwork(), constants, types, predicates, functions, tasks,

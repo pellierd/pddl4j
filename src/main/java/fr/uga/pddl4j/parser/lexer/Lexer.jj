@@ -244,12 +244,12 @@ TOKEN : {
 TOKEN : {
 	< STRIPS : ":strips" >
 |	< TYPING : ":typing" >
-|	< NEGATIVE_PRECONDITIONS : ":negative-preconditions" >
-|	< DISJUNCTIVE_PRECONDITIONS : ":disjunctive-preconditions" >
+|	< NEGATIVE_PRECONDITIONS : ":negative-precondition" >
+|	< DISJUNCTIVE_PRECONDITIONS : ":disjunctive-precondition" >
 |	< EQUALITY : ":equality" >
-|	< EXISTENTIAL_PRECONDITIONS : ":existential-preconditions" >
-|	< UNIVERSAL_PRECONDITIONS : ":universal-preconditions" >
-|	< QUANTIFIED_PRECONDITIONS : ":quantified-preconditions" >
+|	< EXISTENTIAL_PRECONDITIONS : ":existential-precondition" >
+|	< UNIVERSAL_PRECONDITIONS : ":universal-precondition" >
+|	< QUANTIFIED_PRECONDITIONS : ":quantified-precondition" >
 |	< CONDITIONAL_EFFECTS : ":conditional-effects" >
 |	< ACTION_COSTS : ":action-costs" >
 |   < FLUENTS : ":fluents" >
@@ -266,7 +266,7 @@ TOKEN : {
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HIERARCHY : ":hierarchy" > // ADD HDDL
 |	< HTN : ":htn" > // ADD HDDL
-|   < METHOD_PRECONDITIONS : ":method-preconditions" > // ADD HDDL
+|   < METHOD_PRECONDITIONS : ":method-precondition" > // ADD HDDL
 |   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
 |   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
 |   < TASKS : ":tasks" >
@@ -1820,7 +1820,7 @@ PDDLMethod method_def() : // ADD HDDL
 	PDDLSymbol name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression taskID = null;
-	PDDLExpression preconditions = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression precondition = new PDDLExpression(PDDLConnective.AND);
 	PDDLTaskNetwork tn = null;
 }
 {
@@ -1829,7 +1829,7 @@ PDDLMethod method_def() : // ADD HDDL
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
-			    <PRECONDITION> preconditions=pre_gd()
+			    <PRECONDITION> precondition=pre_gd()
 			]
             tn = task_network()
 			right_bracket()
@@ -1837,7 +1837,7 @@ PDDLMethod method_def() : // ADD HDDL
 	    this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLMethod(name, parameters, taskID, preconditions, tn);
+		return new PDDLMethod(name, parameters, taskID, precondition, tn);
 	}
 }
 

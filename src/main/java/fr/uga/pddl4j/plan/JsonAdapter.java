@@ -110,7 +110,7 @@ public class JsonAdapter implements Serializable {
                 }
 
                 // Preconditions
-                List<List<String>> preconds = this.toJsonString(action.getPreconditions());
+                List<List<String>> preconds = this.toJsonString(action.getPrecondition());
                 JSONObject precondJson = new JSONObject();
 
                 List<String> positives = preconds.get(0);
@@ -123,7 +123,7 @@ public class JsonAdapter implements Serializable {
                 precondJson.put("Negatives", negativeJsonPrecondition);
 
                 //CondExp
-                List<ConditionalEffect> condExp = action.getCondEffects();
+                List<ConditionalEffect> condExp = action.getConditionalEffects();
 
                 // Condition object
                 JSONArray condExpJsonArray = new JSONArray();

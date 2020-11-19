@@ -54,7 +54,7 @@ public class Action extends AbstractOperator {
     public Action(final Action other) {
         super(other);
         this.effects = new ArrayList<>();
-        this.effects.addAll(other.getCondEffects().stream().map(ConditionalEffect::new).collect(Collectors.toList()));
+        this.effects.addAll(other.getConditionalEffects().stream().map(ConditionalEffect::new).collect(Collectors.toList()));
     }
 
     /**
@@ -78,11 +78,11 @@ public class Action extends AbstractOperator {
      */
     public Action(final String name, final int arity, final Condition preconditions, final Effect effects) {
         this(name, arity);
-        this.setPreconditions(preconditions);
+        this.setPrecondition(preconditions);
         ConditionalEffect cexp = new ConditionalEffect();
         cexp.setCondition(new Condition());
         cexp.setEffect(effects);
-        this.addCondBitEffect(cexp);
+        this.addConditionalEffect(cexp);
     }
 
     /**
@@ -90,7 +90,7 @@ public class Action extends AbstractOperator {
      *
      * @return the effects of the action.
      */
-    public final List<ConditionalEffect> getCondEffects() {
+    public final List<ConditionalEffect> getConditionalEffects() {
         return this.effects;
     }
 
@@ -99,7 +99,7 @@ public class Action extends AbstractOperator {
      *
      * @param effect the conditional effect to add.
      */
-    public final void addCondBitEffect(ConditionalEffect effect) {
+    public final void addConditionalEffect(ConditionalEffect effect) {
         this.effects.add(effect);
     }
 
@@ -111,7 +111,7 @@ public class Action extends AbstractOperator {
      * <code>false</code> otherwise.
      */
     public boolean isApplicable(final State state) {
-        return state.satisfy(this.getPreconditions());
+        return state.satisfy(this.getPrecondition());
     }
 
     /**

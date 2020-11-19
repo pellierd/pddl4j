@@ -2,7 +2,7 @@
 	(:requirements
 	:hierarchy
 	:typing
-	:negative-preconditions
+	:negative-precondition
 	)
 	(:types
 		Agenda - TransferableByEmailRegular

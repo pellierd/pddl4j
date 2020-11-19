@@ -118,7 +118,7 @@ final class BitEncoding implements Serializable {
         }
 
         // Initialize the preconditions of the action
-        encoded.setPreconditions(BitEncoding.encodeCondition(action.getPreconditions(), map));
+        encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), map));
 
         // Initialize the effects of the action
         final List<IntExpression> effects = action.getEffects().getChildren();
@@ -132,7 +132,7 @@ final class BitEncoding implements Serializable {
                 final ConditionalEffect condBitExp = new ConditionalEffect();
                 condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map));
                 condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), map));
-                encoded.getCondEffects().add(condBitExp);
+                encoded.getConditionalEffects().add(condBitExp);
             } else if (connective.equals(PDDLConnective.ATOM)) {
                 final Integer index = map.get(ei);
                 if (index != null) {
@@ -152,7 +152,7 @@ final class BitEncoding implements Serializable {
             }
         }
         if (hasUnConditionalEffects) {
-            encoded.getCondEffects().add(unCondEffects);
+            encoded.getConditionalEffects().add(unCondEffects);
         }
         return encoded;
     }
@@ -210,7 +210,7 @@ final class BitEncoding implements Serializable {
         // Encode the task carried out by the method
         encoded.setTask(taskMap.get(method.getTask()));
         // Encode the preconditions of the method
-        encoded.setPreconditions(BitEncoding.encodeCondition(method.getPreconditions(), factMap));
+        encoded.setPrecondition(BitEncoding.encodeCondition(method.getPreconditions(), factMap));
         // Encode the task network of the method
         encoded.setTaskNetwork(BitEncoding.encodeTaskNetwork(method.getTaskNetwork(), taskMap));
         return encoded;
@@ -264,8 +264,8 @@ final class BitEncoding implements Serializable {
             for (Condition dis : Encoder.codedGoal) {
                 final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
                 op.setDummy(true);
-                op.setPreconditions(dis);
-                op.getCondEffects().add(condEffect);
+                op.setPrecondition(dis);
+                op.getConditionalEffects().add(condEffect);
                 Encoder.actions.add(op);
             }
         } else {

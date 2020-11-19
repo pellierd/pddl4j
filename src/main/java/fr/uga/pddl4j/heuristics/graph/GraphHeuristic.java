@@ -176,7 +176,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
         this.nbOperators = this.nbPropositions;
         final List<Action> pbOperators = problem.getActions();
         for (Action op : pbOperators) {
-            this.nbOperators += op.getCondEffects().size();
+            this.nbOperators += op.getConditionalEffects().size();
         }
 
         // If debug flag is true we create the array that contains the string representation of the
@@ -221,7 +221,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
         // Start enumerating the unconditional opsLayer
         int uncondOpIndex = this.nbPropositions;
         for (final Action op : pbOperators) {
-            final List<ConditionalEffect> condEffects = op.getCondEffects();
+            final List<ConditionalEffect> condEffects = op.getConditionalEffects();
             // For each conditional effect we create a new operator
             for (int ceIndex = 0; ceIndex < condEffects.size(); ceIndex++) {
                 final ConditionalEffect cEffect = condEffects.get(ceIndex);
@@ -229,9 +229,9 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
                     this.operators[uncondOpIndex] = "(" + problem.toShortString(op) + ")_" + ceIndex;
                 }
                 final BitVector precond = new BitVector();
-                precond.or(op.getPreconditions().getPositiveFluents());
+                precond.or(op.getPrecondition().getPositiveFluents());
                 precond.or(cEffect.getCondition().getPositiveFluents());
-                BitVector neg = op.getPreconditions().getNegativeFluents();
+                BitVector neg = op.getPrecondition().getNegativeFluents();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     precond.set(p + this.negOffset);
                 }

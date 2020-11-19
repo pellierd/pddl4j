@@ -30,9 +30,9 @@ import fr.uga.pddl4j.encoding.AbstractGroundOperator;
 public abstract class AbstractOperator extends AbstractGroundOperator {
 
     /**
-     * The preconditions of the operator.
+     * The precondition of the operator.
      */
-    private Condition preconditions;
+    private Condition precondition;
 
     /*
     * Creates a new operator from an other.
@@ -41,7 +41,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     */
     protected AbstractOperator(final AbstractOperator other) {
         super(other);
-        this.preconditions = other.getPreconditions();
+        this.precondition = other.getPrecondition();
     }
 
     /**
@@ -52,7 +52,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      */
     protected AbstractOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new Condition();
+        this.precondition = new Condition();
     }
 
     /**
@@ -61,30 +61,30 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      * @param name           the name of the operator.
      * @param parameters     the types of the parameters.
      * @param instantiations the values of the parameters.
-     * @param preconditions  the preconditions of the operator.
+     * @param preconditions  the precondition of the operator.
      */
     protected AbstractOperator(final String name, final int[] parameters, final int[] instantiations,
                                final Condition preconditions) {
         super(name, parameters, instantiations);
-        this.preconditions = preconditions;
+        this.precondition = preconditions;
     }
 
     /**
-     * Return the preconditions of the operator.
+     * Return the precondition of the operator.
      *
-     * @return the preconditions of the operator.
+     * @return the precondition of the operator.
      */
-    public final Condition getPreconditions() {
-        return this.preconditions;
+    public final Condition getPrecondition() {
+        return this.precondition;
     }
 
     /**
      * Set the precondition of the operator.
      *
-     * @param preconditions the preconditions to set.
+     * @param precondition the precondition to set.
      */
-    public final void setPreconditions(final Condition preconditions) {
-        this.preconditions = preconditions;
+    public final void setPrecondition(final Condition precondition) {
+        this.precondition = precondition;
     }
 }
 

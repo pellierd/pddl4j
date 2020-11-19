@@ -650,10 +650,10 @@ public class Problem implements Serializable {
             }
         }
         str.append("Preconditions:\n");
-        str.append(this.toString(action.getPreconditions()));
+        str.append(this.toString(action.getPrecondition()));
         str.append("\n");
         str.append("Effects:\n");
-        for (ConditionalEffect condExp : action.getCondEffects()) {
+        for (ConditionalEffect condExp : action.getConditionalEffects()) {
             str.append(this.toString(condExp));
             str.append("\n");
         }
@@ -691,7 +691,7 @@ public class Problem implements Serializable {
         }
         str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
         str.append("Preconditions:\n");
-        str.append(this.toString(method.getPreconditions()));
+        str.append(this.toString(method.getPrecondition()));
         str.append("\n");
         str.append(this.toString(method.getTaskNetwork()));
         return str.toString();
