@@ -25,7 +25,7 @@ import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.OrderingConstraintSet;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 import fr.uga.pddl4j.problem.TaskNetwork;
 
 import org.apache.logging.log4j.LogManager;
@@ -141,7 +141,7 @@ final class BitEncoding implements Serializable {
             } else if (connective.equals(PDDLConnective.ATOM)) {
                 final Integer index = map.get(ei);
                 if (index != null) {
-                    unCondEffects.getEffects().getPositive().set(index);
+                    unCondEffects.getEffects().getPositiveFluents().set(index);
                     hasUnConditionalEffects = true;
                 }
             } else if (connective.equals(PDDLConnective.TRUE)) {
@@ -149,7 +149,7 @@ final class BitEncoding implements Serializable {
             } else if (connective.equals(PDDLConnective.NOT)) {
                 final Integer index = map.get(children.get(0));
                 if (index != null) {
-                    unCondEffects.getEffects().getNegative().set(index);
+                    unCondEffects.getEffects().getNegativeFluents().set(index);
                     hasUnConditionalEffects = true;
                 }
             } else {
@@ -230,14 +230,14 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static State encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map)
+    static Condition encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
 
         if (goal.getConnective().equals(PDDLConnective.FALSE)) {
             return null;
         }
 
-        State newGoal;
+        Condition newGoal;
         BitEncoding.toDNF(goal);
         Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
         for (IntExpression exp : goal.getChildren()) {
@@ -260,11 +260,11 @@ final class BitEncoding implements Serializable {
             final int dummyGoalIndex = Encoder.tableOfRelevantFluents.size();
             Encoder.tableOfRelevantFluents.add(dummyGoal);
             map.put(dummyGoal, dummyGoalIndex);
-            newGoal = new State();
-            newGoal.getPositive().set(dummyGoalIndex);
+            newGoal = new Condition();
+            newGoal.getPositiveFluents().set(dummyGoalIndex);
             final ConditionalEffect condEffect = new ConditionalEffect(newGoal);
             // for each disjunction create a dummy action
-            for (State dis : Encoder.codedGoal) {
+            for (Condition dis : Encoder.codedGoal) {
                 final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
                 op.setDummy(true);
                 op.setPreconditions(dis);
@@ -331,18 +331,18 @@ final class BitEncoding implements Serializable {
      * @param map  the map that associates to a specified expression its index.
      * @return the <code>BitExp</code> that represents the initial encoded.
      */
-    static State encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
-        final State bitInit = new State();
+    static Condition encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
+        final Condition bitInit = new Condition();
         for (final IntExpression fact : init) {
             if (fact.getConnective().equals(PDDLConnective.ATOM)) {
                 final Integer i = map.get(fact);
                 if (i != null) {
-                    bitInit.getPositive().set(i);
+                    bitInit.getPositiveFluents().set(i);
                 }
             } else {
                 final Integer i = map.get(fact.getChildren().get(0));
                 if (i != null) {
-                    bitInit.getNegative().set(i);
+                    bitInit.getNegativeFluents().set(i);
                 }
             }
         }
@@ -357,18 +357,18 @@ final class BitEncoding implements Serializable {
      * @param map the map that associate to a specified expression its index.
      * @return the expression in bit set representation.
      */
-    private static State encode(final IntExpression exp, final Map<IntExpression, Integer> map)
+    private static Condition encode(final IntExpression exp, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
-        final State bitExp = new State();
+        final Condition bitExp = new Condition();
         if (exp.getConnective().equals(PDDLConnective.ATOM)) {
             final Integer index = map.get(exp);
             if (index != null) {
-                bitExp.getPositive().set(index);
+                bitExp.getPositiveFluents().set(index);
             }
         } else if (exp.getConnective().equals(PDDLConnective.NOT)) {
             final Integer index = map.get(exp.getChildren().get(0));
             if (index != null) {
-                bitExp.getNegative().set(index);
+                bitExp.getNegativeFluents().set(index);
             }
         } else if (exp.getConnective().equals(PDDLConnective.AND)) {
             final List<IntExpression> children = exp.getChildren();
@@ -376,12 +376,12 @@ final class BitEncoding implements Serializable {
                 if (ei.getConnective().equals(PDDLConnective.ATOM)) {
                     final Integer index = map.get(ei);
                     if (index != null) {
-                        bitExp.getPositive().set(index);
+                        bitExp.getPositiveFluents().set(index);
                     }
                 } else if (ei.getConnective().equals(PDDLConnective.NOT)) {
                     final Integer index = map.get(ei.getChildren().get(0));
                     if (index != null) {
-                        bitExp.getNegative().set(index);
+                        bitExp.getNegativeFluents().set(index);
                     }
                 } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                     // do nothing

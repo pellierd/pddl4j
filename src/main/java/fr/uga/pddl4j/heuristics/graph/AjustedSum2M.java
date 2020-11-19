@@ -22,7 +22,7 @@ package fr.uga.pddl4j.heuristics.graph;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 
 /**
  * This class implement the adjusted sum 2M heuristic. This heuristic improves the adjusted sum 2
@@ -79,7 +79,7 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final State goal) {
+    public int estimate(final ClosedWorldState state, final Condition goal) {
         super.setGoal(goal);
         // First, we expand the relaxed planing graph to compute the relaxed plan value heuristic
         super.expandRelaxedPlanningGraph(state);
@@ -100,7 +100,7 @@ public final class AjustedSum2M extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final State goal) {
+    public double estimate(final Node node, final Condition goal) {
         return estimate((ClosedWorldState) node, goal);
     }
 

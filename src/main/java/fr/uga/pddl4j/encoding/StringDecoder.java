@@ -25,7 +25,7 @@ import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 import fr.uga.pddl4j.problem.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
 
@@ -528,16 +528,16 @@ final class StringDecoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(State state, final List<String> constants, final List<String> types,
+    static String toString(Condition state, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<IntExpression> relevants) {
         final StringBuilder str = new StringBuilder("(and");
-        final BitSet positive = state.getPositive();
+        final BitSet positive = state.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
                 new ArrayList<String>())).append("\n");
         }
-        final BitSet negative = state.getNegative();
+        final BitSet negative = state.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
                 functions, new ArrayList<String>())).append(")\n");

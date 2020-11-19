@@ -43,10 +43,10 @@ public class ClosedWorldState extends BitVector {
      *
      * @param state the state.
      */
-    public ClosedWorldState(final State state) {
+    public ClosedWorldState(final Condition state) {
         this();
-        this.or(state.getPositive());
-        this.andNot(state.getNegative());
+        this.or(state.getPositiveFluents());
+        this.andNot(state.getNegativeFluents());
     }
 
     /**
@@ -65,9 +65,9 @@ public class ClosedWorldState extends BitVector {
      *
      * @param state the state to apply.
      */
-    public final void apply(final State state) {
-        this.andNot(state.getNegative());
-        this.or(state.getPositive());
+    public final void apply(final Condition state) {
+        this.andNot(state.getNegativeFluents());
+        this.or(state.getPositiveFluents());
     }
 
     /**
@@ -98,8 +98,8 @@ public class ClosedWorldState extends BitVector {
      * @param state the state to be tested.
      * @return <code>true</code> if this state satisfy a specified state; <code>false</code> otherwise.
      */
-    public final boolean satisfy(final State state) {
-        return this.include(state.getPositive()) && this.exclude(state.getNegative());
+    public final boolean satisfy(final Condition state) {
+        return this.include(state.getPositiveFluents()) && this.exclude(state.getNegativeFluents());
 
     }
 

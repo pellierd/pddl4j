@@ -76,11 +76,11 @@ public class Action extends AbstractOperator {
      * @param preconditions the precondition of the action.
      * @param effects       the effects of the action.
      */
-    public Action(final String name, final int arity, final State preconditions, final State effects) {
+    public Action(final String name, final int arity, final Condition preconditions, final Condition effects) {
         this(name, arity);
         this.setPreconditions(preconditions);
         ConditionalEffect cexp = new ConditionalEffect();
-        cexp.setCondition(new State());
+        cexp.setCondition(new Condition());
         cexp.setEffects(effects);
         this.addCondBitEffect(cexp);
     }
@@ -119,12 +119,12 @@ public class Action extends AbstractOperator {
      *
      * @return the unconditional effects of the action.
      */
-    public State getUnconditionalEffects() {
-        final State ucEffect = new State();
+    public Condition getUnconditionalEffects() {
+        final Condition ucEffect = new Condition();
         this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
-            final State condEff = cEffect.getEffects();
-            ucEffect.getPositive().or(condEff.getPositive());
-            ucEffect.getNegative().or(condEff.getNegative());
+            final Condition condEff = cEffect.getEffects();
+            ucEffect.getPositiveFluents().or(condEff.getPositiveFluents());
+            ucEffect.getNegativeFluents().or(condEff.getNegativeFluents());
         });
         return ucEffect;
     }

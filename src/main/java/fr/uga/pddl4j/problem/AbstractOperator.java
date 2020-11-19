@@ -32,7 +32,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     /**
      * The preconditions of the operator.
      */
-    private State preconditions;
+    private Condition preconditions;
 
     /*
     * Creates a new operator from an other.
@@ -52,7 +52,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      */
     protected AbstractOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new State();
+        this.preconditions = new Condition();
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      * @param preconditions  the preconditions of the operator.
      */
     protected AbstractOperator(final String name, final int[] parameters, final int[] instantiations,
-                               final State preconditions) {
+                               final Condition preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
     }
@@ -74,7 +74,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final State getPreconditions() {
+    public final Condition getPreconditions() {
         return this.preconditions;
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final State preconditions) {
+    public final void setPreconditions(final Condition preconditions) {
         this.preconditions = preconditions;
     }
 }

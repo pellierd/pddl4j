@@ -28,7 +28,7 @@ import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 import fr.uga.pddl4j.problem.Task;
 import fr.uga.pddl4j.problem.TaskNetwork;
 import org.apache.logging.log4j.LogManager;
@@ -234,7 +234,7 @@ public final class Encoder implements Serializable {
     /**
      * The goal.
      */
-    static State goal;
+    static Condition goal;
 
     /**
      * The initial task network.
@@ -244,12 +244,12 @@ public final class Encoder implements Serializable {
     /**
      * The encoded goal.
      */
-    static List<State> codedGoal;
+    static List<Condition> codedGoal;
 
     /**
      * The initial state.
      */
-    static State init;
+    static Condition init;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
@@ -687,7 +687,7 @@ public final class Encoder implements Serializable {
                 || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
             Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
         } else {
-            Encoder.goal = new State();
+            Encoder.goal = new Condition();
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
@@ -930,7 +930,7 @@ public final class Encoder implements Serializable {
      */
     static void printGoal(StringBuilder str) {
         str.append("Goal state is:\n");
-        for (State exp : Encoder.codedGoal) {
+        for (Condition exp : Encoder.codedGoal) {
             str.append(Encoder.toString(exp));
             str.append("\n");
         }
@@ -1039,7 +1039,7 @@ public final class Encoder implements Serializable {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    static String toString(State exp) {
+    static String toString(Condition exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);

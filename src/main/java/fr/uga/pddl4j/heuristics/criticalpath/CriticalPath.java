@@ -24,7 +24,7 @@ import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.ClosedWorldState;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 
 import fr.uga.pddl4j.util.BitVector;
 
@@ -42,9 +42,9 @@ import java.util.List;
  */
 public final class CriticalPath extends RelaxedGraphHeuristic {
 
-    private State[] precond;
-    private State[] effect;
-    private State[] neffect;
+    private Condition[] precond;
+    private Condition[] effect;
+    private Condition[] neffect;
     private int[] pGoal;
     private int[] nGoal;
     private static final int COEF = 2;
@@ -57,7 +57,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     }
 
     @Override
-    public int estimate(ClosedWorldState state, State goal) {
+    public int estimate(ClosedWorldState state, Condition goal) {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
@@ -69,11 +69,11 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
         int nbRelevantFacts = super.getRevelantFacts().size();
         this.pGoal = new int[nbRelevantFacts];
         this.nGoal = new int[nbRelevantFacts];
-        this.precond = new State[startPoint];
-        this.effect = new State[startPoint];
-        this.neffect = new State[startPoint];
-        BitVector pGoalBitVector = super.getGoal().getPositive();
-        BitVector nGoalBitVector = super.getGoal().getNegative();
+        this.precond = new Condition[startPoint];
+        this.effect = new Condition[startPoint];
+        this.neffect = new Condition[startPoint];
+        BitVector pGoalBitVector = super.getGoal().getPositiveFluents();
+        BitVector nGoalBitVector = super.getGoal().getNegativeFluents();
 
 
         if (this.goalCard <= COEF) {
@@ -91,33 +91,33 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
             }
             //Compute the positive preconditions
             for (Action op : this.getActions()) {
-                final State pre = new State(op.getPreconditions());
-                final State npre = new State(op.getPreconditions());
-                BitVector nprecon = npre.getNegative();
-                BitVector precon = pre.getPositive();
+                final Condition pre = new Condition(op.getPreconditions());
+                final Condition npre = new Condition(op.getPreconditions());
+                BitVector nprecon = npre.getNegativeFluents();
+                BitVector precon = pre.getPositiveFluents();
                 for (int p = precon.nextSetBit(0); p >= 0; p = precon.nextSetBit(p + 1)) {
-                    precon = this.precond[p].getPositive();
+                    precon = this.precond[p].getPositiveFluents();
                     precon.set(p);
                 }
 
                 for (int p = nprecon.nextSetBit(0); p >= 0; p = nprecon.nextSetBit(p + 1)) {
-                    nprecon = this.precond[p].getNegative();
+                    nprecon = this.precond[p].getNegativeFluents();
                     nprecon.set(p);
                 }
 
                 //Get the positive and negative effects
-                State effects = op.getCondEffects().get(0).getEffects();
-                BitVector positiveEffect = effects.getPositive();
-                BitVector negativeEffect = effects.getNegative();
+                Condition effects = op.getCondEffects().get(0).getEffects();
+                BitVector positiveEffect = effects.getPositiveFluents();
+                BitVector negativeEffect = effects.getNegativeFluents();
                 BitVector newProp = new BitVector();
                 for (int p = newProp.nextSetBit(0); p >= 0; p = newProp.nextSetBit(p + 1)) {
-                    positiveEffect.or(this.effect[p].getPositive());
-                    negativeEffect.or(this.effect[p].getNegative());
+                    positiveEffect.or(this.effect[p].getPositiveFluents());
+                    negativeEffect.or(this.effect[p].getNegativeFluents());
                 }
                 final BitVector nPos = negativeEffect;
                 for (int p = nPos.nextSetBit(0); p >= 0; p = nPos.nextSetBit(p + 1)) {
-                    this.neffect[p].getNegative().set(p);
-                    nPos.or(this.neffect[p].getNegative());
+                    this.neffect[p].getNegativeFluents().set(p);
+                    nPos.or(this.neffect[p].getNegativeFluents());
                 }
                 //A is relevant for G only if positive effect does not equal zero and negative effect equals zero
                 if (this.effect.length != 0 && this.neffect.length == 0) {
@@ -163,7 +163,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      * @return the distance to the goal state from the specified state.
      */
     @Override
-    public double estimate(final Node node, final State goal) {
+    public double estimate(final Node node, final Condition goal) {
         return estimate((ClosedWorldState) node, goal);
     }
 }

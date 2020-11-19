@@ -135,12 +135,12 @@ public class Problem implements Serializable {
     /**
      * The goal.
      */
-    private State goal;
+    private Condition goal;
 
     /**
      * The initial state.
      */
-    private State initialState;
+    private Condition initialState;
 
     /**
      * The initial task network.
@@ -202,9 +202,9 @@ public class Problem implements Serializable {
         this.methods = new ArrayList<>();
         this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
         if (other.goal != null) {
-            this.goal = new State(other.goal);
+            this.goal = new Condition(other.goal);
         }
-        this.initialState = new State(other.initialState);
+        this.initialState = new Condition(other.initialState);
         if (other.initialTaskNetwork != null) {
             this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
         }
@@ -529,7 +529,7 @@ public class Problem implements Serializable {
      *
      * @return the goal of the problem.
      */
-    public final State getGoal() {
+    public final Condition getGoal() {
         return this.goal;
     }
 
@@ -564,7 +564,7 @@ public class Problem implements Serializable {
      *
      * @param goal the goal to set
      */
-    public final void setGoal(final State goal) {
+    public final void setGoal(final Condition goal) {
         this.goal = goal;
     }
 
@@ -573,7 +573,7 @@ public class Problem implements Serializable {
      *
      * @return the initial state of the problem.
      */
-    public final State getInitialState() {
+    public final Condition getInitialState() {
         return this.initialState;
     }
 
@@ -582,7 +582,7 @@ public class Problem implements Serializable {
      *
      * @param initialState the initial state to set.
      */
-    public final void setInitialState(final State initialState) {
+    public final void setInitialState(final Condition initialState) {
         this.initialState = initialState;
     }
 
@@ -703,15 +703,15 @@ public class Problem implements Serializable {
      * @param state the state.
      * @return a string representation of the state.
      */
-    public final String toString(final State state) {
+    public final String toString(final Condition state) {
         final StringBuilder str = new StringBuilder("(and");
-        final BitSet positive = state.getPositive();
+        final BitSet positive = state.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ");
             str.append(this.toString(this.getRelevantFluents().get(j)));
             str.append("\n");
         }
-        final BitSet negative = state.getNegative();
+        final BitSet negative = state.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ");
             str.append(this.toString(this.getRelevantFluents().get(i)));

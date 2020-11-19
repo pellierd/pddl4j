@@ -2,7 +2,7 @@ package fr.uga.pddl4j.heuristics;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ClosedWorldState;
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 
 import java.io.Serializable;
 
@@ -29,7 +29,7 @@ public interface GoalCostHeuristic extends Serializable {
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
      */
-    int estimate(final ClosedWorldState state, final State goal);
+    int estimate(final ClosedWorldState state, final Condition goal);
 
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is
@@ -40,7 +40,7 @@ public interface GoalCostHeuristic extends Serializable {
      * @param goal the goal expression.
      * @return the distance to the goal state from the specified state.
      */
-    double estimate(final Node node, final State goal);
+    double estimate(final Node node, final Condition goal);
 
     /**
      * Returns <code>true</code> if this heuristic is admissible.

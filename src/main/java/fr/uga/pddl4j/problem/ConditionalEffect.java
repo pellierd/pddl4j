@@ -32,12 +32,12 @@ public class ConditionalEffect implements Serializable {
     /**
      * The conditions of the expression.
      */
-    private State conditions;
+    private Condition conditions;
 
     /**
      * The effects associated to the conditions.
      */
-    private State effects;
+    private Condition effects;
 
     /**
      * Creates a conditional effect from an other. This constructor is the copy constructor.
@@ -48,15 +48,15 @@ public class ConditionalEffect implements Serializable {
         if (other == null) {
             throw new NullPointerException("other == null");
         }
-        this.conditions = new State(other.getCondition());
-        this.effects = new State(other.getEffects());
+        this.conditions = new Condition(other.getCondition());
+        this.effects = new Condition(other.getEffects());
     }
 
     /**
      * Creates a new empty conditional effect.
      */
     public ConditionalEffect() {
-        this(new State(), new State());
+        this(new Condition(), new Condition());
     }
 
     /**
@@ -64,8 +64,8 @@ public class ConditionalEffect implements Serializable {
      *
      * @param effects the effects.
      */
-    public ConditionalEffect(final State effects) {
-        this(new State(), effects);
+    public ConditionalEffect(final Condition effects) {
+        this(new Condition(), effects);
     }
 
     /**
@@ -74,7 +74,7 @@ public class ConditionalEffect implements Serializable {
      * @param conditions the conditions.
      * @param effects    the effects.
      */
-    public ConditionalEffect(State conditions, State effects) {
+    public ConditionalEffect(Condition conditions, Condition effects) {
         this.setEffects(effects);
         this.setCondition(conditions);
     }
@@ -84,7 +84,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @return the conditions of the conditional effect.
      */
-    public final State getCondition() {
+    public final Condition getCondition() {
         return this.conditions;
     }
 
@@ -93,7 +93,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @param conditions the conditions to set.
      */
-    public final void setCondition(State conditions) {
+    public final void setCondition(Condition conditions) {
         this.conditions = conditions;
     }
 
@@ -102,7 +102,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @return the effects of the conditional effect.
      */
-    public final State getEffects() {
+    public final Condition getEffects() {
         return this.effects;
     }
 
@@ -111,7 +111,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @param effects the effects to set
      */
-    public final void setEffects(State effects) {
+    public final void setEffects(Condition effects) {
         this.effects = effects;
     }
 

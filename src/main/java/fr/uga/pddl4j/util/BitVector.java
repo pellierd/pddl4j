@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.Condition;
 
 import java.lang.reflect.Field;
 import java.util.BitSet;
@@ -88,10 +88,10 @@ public class BitVector extends BitSet {
      *
      * @param exp the <code>BitExp</code> that represents <code>BitVector</code>.
      */
-    public BitVector(final State exp) {
+    public BitVector(final Condition exp) {
         this();
-        this.or(exp.getPositive());
-        this.andNot(exp.getNegative());
+        this.or(exp.getPositiveFluents());
+        this.andNot(exp.getNegativeFluents());
     }
 
     /**
