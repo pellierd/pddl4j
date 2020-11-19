@@ -65,7 +65,7 @@ public class State extends BitVector {
      *
      * @param state the state to apply.
      */
-    public final void apply(final Condition state) {
+    public final void apply(final Effect state) {
         this.andNot(state.getNegativeFluents());
         this.or(state.getPositiveFluents());
     }
@@ -76,7 +76,7 @@ public class State extends BitVector {
      * @param effects the list of conditional effects to apply.
      */
     public final void apply(final List<ConditionalEffect> effects) {
-        effects.stream().forEach(ce -> this.apply(ce.getEffects()));
+        effects.stream().forEach(ce -> this.apply(ce.getEffect()));
     }
 
     /**
@@ -88,7 +88,7 @@ public class State extends BitVector {
      */
     public final void apply(final ConditionalEffect effects) {
         if (this.satisfy(effects.getCondition())) {
-            this.apply(effects.getEffects());
+            this.apply(effects.getEffect());
         }
     }
 

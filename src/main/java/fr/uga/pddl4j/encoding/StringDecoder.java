@@ -21,12 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLSymbol;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Condition;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.io.Serializable;
@@ -547,6 +542,35 @@ final class StringDecoder implements Serializable {
     }
 
     /**
+     * Returns a string representation of a state.
+     *
+     * @param state      the state.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param relevants  the table of relevant facts.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(Effect state, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions,
+                           final List<IntExpression> relevants) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = state.getPositiveFluents();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                new ArrayList<String>())).append("\n");
+        }
+        final BitSet negative = state.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                functions, new ArrayList<String>())).append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
      * Returns a string representation of a bit state.
      *
      * @param bitState   the state.
@@ -587,11 +611,11 @@ final class StringDecoder implements Serializable {
                            final List<IntExpression> relevants) {
         StringBuilder str = new StringBuilder();
         if (exp.getCondition().isEmpty()) {
-            str.append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions, relevants));
+            str.append(StringDecoder.toString(exp.getEffect(), constants, types, predicates, functions, relevants));
         } else {
             str.append("(when ");
             str.append(StringDecoder.toString(exp.getCondition(), constants, types, predicates, functions, relevants));
-            str.append("\n").append(StringDecoder.toString(exp.getEffects(), constants, types, predicates, functions,
+            str.append("\n").append(StringDecoder.toString(exp.getEffect(), constants, types, predicates, functions,
                 relevants));
             str.append(")");
         }

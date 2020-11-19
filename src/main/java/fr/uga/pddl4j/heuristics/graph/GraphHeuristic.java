@@ -241,8 +241,8 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
                 }
                 this.preconditions[uncondOpIndex] = precond;
                 final BitVector effect = new BitVector();
-                effect.or(cEffect.getEffects().getPositiveFluents());
-                neg = cEffect.getEffects().getNegativeFluents();
+                effect.or(cEffect.getEffect().getPositiveFluents());
+                neg = cEffect.getEffect().getNegativeFluents();
                 for (int p = neg.nextSetBit(0); p >= 0; p = neg.nextSetBit(p + 1)) {
                     effect.set(p + this.negOffset);
                 }

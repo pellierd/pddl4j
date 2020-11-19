@@ -110,7 +110,7 @@ public final class AStar extends AbstractStateSpaceSearch {
                         // Apply the effect to the successor node
                         op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                             // Apply the effect to the successor node
-                            state.apply(ce.getEffects())
+                            state.apply(ce.getEffect())
                         );
                         final double g = current.getCost() + op.getCost();
                         Node result = openSet.get(state);

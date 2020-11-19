@@ -133,7 +133,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
                 final State nextState = new State(parent);
                 op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
                         // Apply the effect to the successor node
-                        nextState.apply(ce.getEffects())
+                        nextState.apply(ce.getEffect())
                 );
                 // Apply the effect of the applicable operator
                 final Node successor = new Node(nextState);

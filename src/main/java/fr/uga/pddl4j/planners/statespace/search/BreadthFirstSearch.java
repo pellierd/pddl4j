@@ -85,15 +85,15 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         final State nextState = new State(current);
-                        //nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
-                        //nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
+                        //nextState.or(op.getCondEffects().get(0).getEffect().getPositive());
+                        //nextState.andNot(op.getCondEffects().get(0).getEffect().getNegative());
 
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
                         op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                                 // Apply the effect to the successor node
-                                nextState.apply(ce.getEffects())
+                                nextState.apply(ce.getEffect())
                         );
 
                         // Apply the effect of the applicable operator

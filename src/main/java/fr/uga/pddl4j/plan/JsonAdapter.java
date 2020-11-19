@@ -19,10 +19,7 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Condition;
+import fr.uga.pddl4j.problem.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -147,7 +144,7 @@ public class JsonAdapter implements Serializable {
                     expJsonCondition.put("Positives", positivesConditionJson);
                     expJsonCondition.put("Negatives", negativesConditionJson);
 
-                    List<List<String>> condExpElementsEffect = this.toJsonString(condExp.get(k).getEffects());
+                    List<List<String>> condExpElementsEffect = this.toJsonString(condExp.get(k).getEffect());
 
                     JSONArray positivesEffectJson = listToJson(condExpElementsEffect.get(0));
                     JSONArray negativesEffectJson = listToJson(condExpElementsEffect.get(1));
@@ -189,6 +186,32 @@ public class JsonAdapter implements Serializable {
      * @return an 2D collection of Strings.
      */
     private List<List<String>> toJsonString(final Condition exp) {
+        List<String> fluentsPos = new ArrayList<>();
+        List<String> fluentsNeg = new ArrayList<>();
+        List<List<String>> fluents = new ArrayList<>();
+
+        final BitSet positive = exp.getPositiveFluents();
+        for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
+            fluentsPos.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
+        }
+
+        final BitSet negative = exp.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            fluentsNeg.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
+        }
+
+        fluents.add(fluentsPos);
+        fluents.add(fluentsNeg);
+        return fluents;
+    }
+
+    /**
+     * Convert a BitExp into a String collection.
+     *
+     * @param exp the BitExp instance to convert.
+     * @return an 2D collection of Strings.
+     */
+    private List<List<String>> toJsonString(final Effect exp) {
         List<String> fluentsPos = new ArrayList<>();
         List<String> fluentsNeg = new ArrayList<>();
         List<List<String>> fluents = new ArrayList<>();

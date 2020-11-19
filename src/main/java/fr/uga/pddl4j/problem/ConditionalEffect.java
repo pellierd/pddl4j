@@ -37,7 +37,7 @@ public class ConditionalEffect implements Serializable {
     /**
      * The effects associated to the conditions.
      */
-    private Condition effects;
+    private Effect effects;
 
     /**
      * Creates a conditional effect from an other. This constructor is the copy constructor.
@@ -49,14 +49,14 @@ public class ConditionalEffect implements Serializable {
             throw new NullPointerException("other == null");
         }
         this.conditions = new Condition(other.getCondition());
-        this.effects = new Condition(other.getEffects());
+        this.effects = new Effect(other.getEffect());
     }
 
     /**
      * Creates a new empty conditional effect.
      */
     public ConditionalEffect() {
-        this(new Condition(), new Condition());
+        this(new Condition(), new Effect());
     }
 
     /**
@@ -64,7 +64,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @param effects the effects.
      */
-    public ConditionalEffect(final Condition effects) {
+    public ConditionalEffect(final Effect effects) {
         this(new Condition(), effects);
     }
 
@@ -74,8 +74,8 @@ public class ConditionalEffect implements Serializable {
      * @param conditions the conditions.
      * @param effects    the effects.
      */
-    public ConditionalEffect(Condition conditions, Condition effects) {
-        this.setEffects(effects);
+    public ConditionalEffect(Condition conditions, Effect effects) {
+        this.setEffect(effects);
         this.setCondition(conditions);
     }
 
@@ -102,7 +102,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @return the effects of the conditional effect.
      */
-    public final Condition getEffects() {
+    public final Effect getEffect() {
         return this.effects;
     }
 
@@ -111,7 +111,7 @@ public class ConditionalEffect implements Serializable {
      *
      * @param effects the effects to set
      */
-    public final void setEffects(Condition effects) {
+    public final void setEffect(Effect effects) {
         this.effects = effects;
     }
 

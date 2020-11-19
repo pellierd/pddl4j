@@ -110,7 +110,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
 
                         op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                             // Apply the effect to the successor node
-                            nextState.apply(ce.getEffects())
+                            nextState.apply(ce.getEffect())
                         );
 
 

@@ -21,10 +21,7 @@ package fr.uga.pddl4j.heuristics.criticalpath;
 
 import fr.uga.pddl4j.heuristics.graph.RelaxedGraphHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Condition;
+import fr.uga.pddl4j.problem.*;
 
 import fr.uga.pddl4j.util.BitVector;
 
@@ -106,7 +103,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
                 }
 
                 //Get the positive and negative effects
-                Condition effects = op.getCondEffects().get(0).getEffects();
+                Effect effects = op.getCondEffects().get(0).getEffect();
                 BitVector positiveEffect = effects.getPositiveFluents();
                 BitVector negativeEffect = effects.getNegativeFluents();
                 BitVector newProp = new BitVector();

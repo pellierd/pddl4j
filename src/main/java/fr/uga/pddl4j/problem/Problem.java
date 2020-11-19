@@ -722,6 +722,30 @@ public class Problem implements Serializable {
     }
 
     /**
+     * Returns a string representation of a state.
+     *
+     * @param state the state.
+     * @return a string representation of the state.
+     */
+    public final String toString(final Effect state) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = state.getPositiveFluents();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append("\n");
+        }
+        final BitSet negative = state.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" (not ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
      * Returns a string representation of a closed world state.
      *
      * @param state the state.
@@ -853,12 +877,12 @@ public class Problem implements Serializable {
     public final String toString(final ConditionalEffect ceffect) {
         StringBuilder str = new StringBuilder();
         if (ceffect.getCondition().isEmpty()) {
-            str.append(this.toString(ceffect.getEffects()));
+            str.append(this.toString(ceffect.getEffect()));
         } else {
             str.append("(when ");
             str.append(this.toString(ceffect.getCondition()));
             str.append("\n");
-            str.append(this.toString(ceffect.getEffects()));
+            str.append(this.toString(ceffect.getEffect()));
             str.append(")");
         }
         return str.toString();
