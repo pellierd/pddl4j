@@ -22,7 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Condition;
@@ -558,7 +558,7 @@ final class StringDecoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(ClosedWorldState bitState, final List<String> constants, final List<String> types,
+    static String toString(State bitState, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions, final List<String> tasks,
                            final List<IntExpression> relevants) {
         final StringBuilder str = new StringBuilder("(and");

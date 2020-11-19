@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
 import fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param other the node to be copied.
      */
     public TFDNode(final TFDNode other) {
-        super(new ClosedWorldState(other.getState()), other.getParent(), other.getOperator(), other.getTask());
+        super(new State(other.getState()), other.getParent(), other.getOperator(), other.getTask());
         this.setTasks(new LinkedList<>(other.getTasks()));
     }
 
@@ -55,7 +55,7 @@ public class TFDNode extends AbstractSTNNode {
      * to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      */
     public TFDNode() {
-        super(new ClosedWorldState(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
+        super(new State(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
         this.setTasks(new LinkedList<>());
     }
 
@@ -66,7 +66,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param state the state of the node.
      * @param tasks the task network of the node.
      */
-    public TFDNode(final ClosedWorldState state, final List<Integer> tasks) {
+    public TFDNode(final State state, final List<Integer> tasks) {
         super(state, null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
         this.setTasks(tasks);
     }
@@ -80,7 +80,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param operator the index of the operator applied to reach this node.
      * @param task     the task processed in this node.
      */
-    public TFDNode(final ClosedWorldState state, final List<Integer> tasks, final TFDNode parent, final int operator,
+    public TFDNode(final State state, final List<Integer> tasks, final TFDNode parent, final int operator,
                    final int task) {
         super(state, parent, operator, task);
         this.setTasks(tasks);

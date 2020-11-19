@@ -727,7 +727,7 @@ public class Problem implements Serializable {
      * @param state the state.
      * @return a string representation of the specified expression.
      */
-    public final String toString(final ClosedWorldState state) {
+    public final String toString(final State state) {
         final StringBuilder str = new StringBuilder("(and");
         for (int i = state.nextSetBit(0); i >= 0; i = state.nextSetBit(i + 1)) {
             str.append(" ");

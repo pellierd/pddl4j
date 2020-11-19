@@ -21,7 +21,7 @@ package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.Problem;
@@ -305,7 +305,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
      * @param state the initial state of the relaxed planning graph.
      * @return the level of the graph built.
      */
-    protected final int expandPlanningGraph(final ClosedWorldState state) {
+    protected final int expandPlanningGraph(final State state) {
 
         // The array that contains the level of the positive proposition apparition
         Arrays.fill(this.propositionsLevel, Integer.MAX_VALUE);

@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.Condition;
 
@@ -62,7 +62,7 @@ public final class SetLevel extends GraphHeuristic {
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final Condition goal) {
+    public int estimate(final State state, final Condition goal) {
         super.setGoal(goal);
         return this.expandPlanningGraph(state);
     }
@@ -78,7 +78,7 @@ public final class SetLevel extends GraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final Condition goal) {
-        return estimate((ClosedWorldState) node, goal);
+        return estimate((State) node, goal);
     }
 
 }

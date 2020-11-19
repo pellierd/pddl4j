@@ -17,13 +17,12 @@ package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
 
@@ -70,7 +69,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             }
         });
         // Create the root node of the search space
-        final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
+        final State init = new State(problem.getInitialState());
         final TFDNode root = new TFDNode(init, problem.getInitialTaskNetwork().getTasks());
         //root.getState().getNegative().set(0, problem.getRelevantFluents().size());
         //root.getState().getNegative().andNot(root.getState().getPositive());
@@ -122,7 +121,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 //System.out.println(currentNode);
                 int task = currentNode.popTask();
                 // Get the current state of the search
-                final ClosedWorldState state = currentNode.getState();
+                final State state = currentNode.getState();
                 // Get the relevant operators, i.e., action or method that are relevant for this task.
                 final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
                 // Case of primitive task

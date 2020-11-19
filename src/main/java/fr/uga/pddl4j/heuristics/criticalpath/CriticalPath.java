@@ -22,7 +22,7 @@ package fr.uga.pddl4j.heuristics.criticalpath;
 import fr.uga.pddl4j.heuristics.graph.RelaxedGraphHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.Condition;
 
@@ -57,7 +57,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     }
 
     @Override
-    public int estimate(ClosedWorldState state, Condition goal) {
+    public int estimate(State state, Condition goal) {
         super.setGoal(goal);
         //this.goalCard = super.getGoal().cardinality(); // Useless cause by next line affectation
         goalCard = goal.cardinality();
@@ -164,6 +164,6 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final Condition goal) {
-        return estimate((ClosedWorldState) node, goal);
+        return estimate((State) node, goal);
     }
 }

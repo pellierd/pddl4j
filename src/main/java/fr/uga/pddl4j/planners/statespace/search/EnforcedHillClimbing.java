@@ -22,7 +22,7 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
 
@@ -73,7 +73,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
         final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = getTimeout();
 
-        ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
+        State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 
@@ -130,7 +130,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
         for (Action op : problem.getActions()) {
             // Test if a specified operator is applicable in the current state
             if (op.isApplicable(parent)) {
-                final ClosedWorldState nextState = new ClosedWorldState(parent);
+                final State nextState = new State(parent);
                 op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
                         // Apply the effect to the successor node
                         nextState.apply(ce.getEffects())

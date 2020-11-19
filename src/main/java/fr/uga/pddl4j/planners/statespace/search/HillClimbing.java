@@ -18,7 +18,7 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
 
@@ -67,7 +67,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
         final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
             getHeuristicType(), codedProblem);
 
-        ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
+        State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
         openList.add(root);
 
@@ -122,7 +122,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
         int index = 0;
         for (Action op : problem.getActions()) {
             if (op.isApplicable(parent)) {
-                final ClosedWorldState nextState = new ClosedWorldState(parent);
+                final State nextState = new State(parent);
                 op.getCondEffects().stream().filter(ce -> parent.satisfy(ce.getCondition())).forEach(ce ->
                         // Apply the effect to the successor node
                         nextState.apply(ce.getEffects())

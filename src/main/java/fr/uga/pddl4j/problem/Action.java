@@ -110,7 +110,7 @@ public class Action extends AbstractOperator {
      * @return <code>true</code> if this action is applicable in a specified state;
      * <code>false</code> otherwise.
      */
-    public boolean isApplicable(final ClosedWorldState state) {
+    public boolean isApplicable(final State state) {
         return state.satisfy(this.getPreconditions());
     }
 

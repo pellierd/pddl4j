@@ -22,7 +22,7 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Method;
 import fr.uga.pddl4j.problem.Problem;
 
@@ -69,7 +69,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
             }
         });
         // Create the root node of the search space
-        final ClosedWorldState init = new ClosedWorldState(problem.getInitialState());
+        final State init = new State(problem.getInitialState());
         final PFDNode root = new PFDNode(init, problem.getInitialTaskNetwork());
 
         // Create the root node of the search space
@@ -123,7 +123,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                 final List<Integer> tasks = currentNode.getTaskNetwork().getTasksWithNoPredecessors();
 
                 // Get the current state of the search
-                final ClosedWorldState state = currentNode.getState();
+                final State state = currentNode.getState();
                 // For each task with no predecessors
                 for (Integer task : tasks) {
                     int taskIndex = currentNode.getTaskNetwork().getTasks().get(task);

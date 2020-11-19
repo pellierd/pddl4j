@@ -22,7 +22,7 @@ package fr.uga.pddl4j.heuristics.graph;
 import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.Condition;
 
@@ -61,7 +61,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
      * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final Condition goal) {
+    public int estimate(final State state, final Condition goal) {
         return (int) estimateCost(new Node(state), goal);
     }
 
@@ -106,7 +106,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
             for (Action op : getActions()) {
                 if (op.isApplicable(current)) {
                     if (op.getCost() <= cost) { //TODO take into account = or not
-                        final ClosedWorldState nextState = new ClosedWorldState(current);
+                        final State nextState = new State(current);
 
                         op.getCondEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
                             // Apply the effect to the successor node

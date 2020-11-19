@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
 
@@ -62,7 +62,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
         final LinkedList<Node> openSet = new LinkedList<>();
         final int timeout = getTimeout();
 
-        ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
+        State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, 0);
         root.setDepth(0);
         openSet.add(root);
@@ -83,7 +83,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
 
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
-                        final ClosedWorldState nextState = new ClosedWorldState(current);
+                        final State nextState = new State(current);
                         //nextState.or(op.getCondEffects().get(0).getEffects().getPositive());
                         //nextState.andNot(op.getCondEffects().get(0).getEffects().getNegative());
 

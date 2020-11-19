@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 
 import java.io.Serializable;
 
@@ -41,7 +41,7 @@ public abstract class AbstractSTNNode implements Serializable {
     /**
      * The state that describes the state of the world reached by the search.
      */
-    private ClosedWorldState state;
+    private State state;
 
     /**
      * The operator used to reach this node.
@@ -64,7 +64,7 @@ public abstract class AbstractSTNNode implements Serializable {
      * @param other the node to be copied.
      */
     public AbstractSTNNode(final AbstractSTNNode other) {
-        this(new ClosedWorldState(other.getState()),
+        this(new State(other.getState()),
             other.getParent(),
             other.getOperator(),
             other.getTask());
@@ -75,7 +75,7 @@ public abstract class AbstractSTNNode implements Serializable {
      * operator to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      */
     public AbstractSTNNode() {
-        this(new ClosedWorldState(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
+        this(new State(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class AbstractSTNNode implements Serializable {
      * @param operator the index of the operator applied to reach the node.
      * @param task     the task processed in this node.
      */
-    public AbstractSTNNode(final ClosedWorldState state, final AbstractSTNNode parent, final int operator,
+    public AbstractSTNNode(final State state, final AbstractSTNNode parent, final int operator,
                            final int task) {
         super();
         this.setState(state);
@@ -100,7 +100,7 @@ public abstract class AbstractSTNNode implements Serializable {
      *
      * @return the state of this node.
      */
-    public final ClosedWorldState getState() {
+    public final State getState() {
         return this.state;
     }
 
@@ -109,7 +109,7 @@ public abstract class AbstractSTNNode implements Serializable {
      *
      * @param state the state to set.
      */
-    public final void setState(final ClosedWorldState state) {
+    public final void setState(final State state) {
         this.state = state;
     }
 

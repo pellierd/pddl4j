@@ -29,12 +29,12 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.1 - 13.04.2010
  */
-public class ClosedWorldState extends BitVector {
+public class State extends BitVector {
 
     /**
      * Creates a new state.
      */
-    public ClosedWorldState() {
+    public State() {
         super();
     }
 
@@ -43,7 +43,7 @@ public class ClosedWorldState extends BitVector {
      *
      * @param state the state.
      */
-    public ClosedWorldState(final Condition state) {
+    public State(final Condition state) {
         this();
         this.or(state.getPositiveFluents());
         this.andNot(state.getNegativeFluents());
@@ -54,7 +54,7 @@ public class ClosedWorldState extends BitVector {
      *
      * @param state the other state to copy.
      */
-    public ClosedWorldState(final ClosedWorldState state) {
+    public State(final State state) {
         this();
         this.or(state);
     }

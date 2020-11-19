@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.Condition;
 
@@ -80,7 +80,7 @@ public final class Max extends RelaxedGraphHeuristic {
      * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
-    public int estimate(final ClosedWorldState state, final Condition goal) {
+    public int estimate(final State state, final Condition goal) {
         super.setGoal(goal);
         super.expandRelaxedPlanningGraph(state);
         return super.isGoalReachable() ? super.getMaxValue() : Integer.MAX_VALUE;
@@ -97,7 +97,7 @@ public final class Max extends RelaxedGraphHeuristic {
      */
     @Override
     public double estimate(final Node node, final Condition goal) {
-        return estimate((ClosedWorldState) node, goal);
+        return estimate((State) node, goal);
     }
 
 }

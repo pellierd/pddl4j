@@ -18,7 +18,7 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ClosedWorldState;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.util.MemoryAgent;
 
@@ -67,10 +67,10 @@ public final class AStar extends AbstractStateSpaceSearch {
         final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
             getHeuristicType(), codedProblem);
         // Get the initial state from the planning problem
-        final ClosedWorldState init = new ClosedWorldState(codedProblem.getInitialState());
+        final State init = new State(codedProblem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)
-        final Map<ClosedWorldState, Node> closeSet = new HashMap<>();
-        final Map<ClosedWorldState, Node> openSet = new HashMap<>();
+        final Map<State, Node> closeSet = new HashMap<>();
+        final Map<State, Node> openSet = new HashMap<>();
         // Initialize the opened list (store the pending node)
         final double currWeight = getWeight();
         // The list stores the node ordered according to the A* (getFValue = g + h) function
