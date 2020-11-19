@@ -145,7 +145,7 @@ test {
     // The set of Junit tests
     scanForTestClasses = false
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
-    includes = ['**/HDDLEncoderTest.class', '**/PDDLEncoderTest.class']
+    includes = ['**/HSPTest.class']
 }
 
 defaultTasks 'clean', 'build', 'test'
