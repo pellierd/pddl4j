@@ -41,7 +41,7 @@ public class HDDLEncoderTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Encoder_IPC2020_HDDL_Childsnack() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

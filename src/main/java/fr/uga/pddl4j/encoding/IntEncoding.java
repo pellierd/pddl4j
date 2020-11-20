@@ -513,6 +513,11 @@ final class IntEncoding implements Serializable {
             intAction.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
+        // Encode the duration of the action
+        if (action.isDurative()) {
+            final IntExpression duration = IntEncoding.encodeExp(action.getDuration(), variables);
+            intAction.setDuration(duration);
+        }
         // Encode the preconditions of the operator
         final IntExpression preconditions = IntEncoding.encodeExp(action.getPreconditions(), variables);
         intAction.setPreconditions(preconditions);

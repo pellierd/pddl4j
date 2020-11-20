@@ -108,9 +108,7 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @throws NullPointerException if the specified effects is null.
      */
     public final void setEffects(final PDDLExpression effects) {
-        if (effects == null) {
-            throw new NullPointerException();
-        }
+
         this.effects = effects;
     }
 
@@ -133,6 +131,15 @@ public class PDDLAction extends PDDLAbstractOperator {
     }
 
     /**
+     * Returns if this action is durative action.
+     *
+     * @return <code>true</code> if this action is a durative action, <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.getDuration() != null;
+    }
+
+    /**
      * Normalizes the operators.
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
@@ -142,7 +149,6 @@ public class PDDLAction extends PDDLAbstractOperator {
      */
     protected Map<String, String> normalize(int index) {
         final Map<String, String> context = super.normalize(index);
-        //System.out.println(this);
         // Rename the effects
         // A hack to remove single atom in precondition
         if (this.effects.isLiteral()) {
@@ -156,12 +162,6 @@ public class PDDLAction extends PDDLAbstractOperator {
         if (this.getDuration() != null) {
             this.getDuration().renameVariables(context);
         }
-        /*System.out.println(this);
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
         return context;
     }
 

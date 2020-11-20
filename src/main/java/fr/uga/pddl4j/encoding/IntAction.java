@@ -20,96 +20,114 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * This class implements an operator. This class is used to store compact representation of operator
+ * This class implements an action. This class is used to store compact representation of an action
  * during the instantiation process.
  *
+ * <p>Revisions:
+ * <ul>
+ * <li>20.10.2020: change the duration attribute to encode temporal problem.</li>
+ * </ul>
+ *
  * @author D. Pellier
- * @version 1.0 - 07.04.2010
+ * @version 1.1 - 07.04.2010
  */
-final class IntAction extends AbstractIntOperator {
+public final class IntAction extends AbstractIntOperator {
 
     /**
-     * The default duration of an operator.
-     */
-    public static final double DEFAULT_DURATION = 1.0;
-
-    /**
-     * The default cost of an operator.
+     * The default cost of an action.
      */
     public static double DEFAULT_COST = 1.0;
 
     /**
-     * The expression that represents the effect of the operator.
+     * The expression that represents the effect of the action.
      */
     private IntExpression effects;
 
     /**
-     * The cost of the operator.
+     * The cost of the action.
      */
     private double cost;
 
     /**
-     * The duration of the operator.
+     * The duration of the action.
      */
-    private double duration;
+    private IntExpression duration;
 
     /**
-     * Create a new operator from a specified operator. This constructor create a deep copy of the
-     * specified operator.
+     * Create a new action from a specified action. This constructor create a deep copy of the
+     * specified action.
      *
-     * @param other the other operator.
+     * @param other the other action.
      */
     public IntAction(final IntAction other) {
         super(other);
         this.effects = new IntExpression(other.getEffects());
         this.cost = other.getCost();
-        this.duration = other.getDuration();
+        if (other.getDuration() != null) {
+            this.duration = new IntExpression(other.getDuration());
+        }
     }
 
     /**
-     * Create a new operator with a specified name.
+     * Create a new action with a specified name.
      *
-     * @param name  the name of the operator.
-     * @param arity the arity of the operator. Arity must be > 0.
+     * @param name  the name of the action.
+     * @param arity the arity of the action. Arity must be > 0.
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);
-        this.effects = new IntExpression(PDDLConnective.OR);
+        this.effects = new IntExpression(PDDLConnective.AND);
         this.cost = IntAction.DEFAULT_COST;
-        this.duration = IntAction.DEFAULT_DURATION;
+        this.duration = null;
     }
 
     /**
-     * Returns the duration of the operator.
+     * Returns if this action is a durative action.
      *
-     * @return the duration of the operator.
+     * @return <code>true</code> if this action is durative; <code>false</code> otherwise.
      */
-    public final double getDuration() {
+    public final boolean isDurative() {
+        return this.duration != null;
+    }
+
+    /**
+     * Returns the duration of the action.
+     *
+     * @return the duration of the action.
+     */
+    public final IntExpression getDuration() {
         return this.duration;
     }
 
     /**
-     * Sets the duration of the operator.
+     * Sets the duration of the action.
      *
      * @param duration the duration to set.
      */
-    public final void setDuration(final double duration) {
+    public final void setDuration(final IntExpression duration) {
         this.duration = duration;
     }
 
     /**
-     * Returns the cost of the operator.
+     * Returns the cost of the action.
      *
-     * @return the cost of the operator.
+     * @return the cost of the action.
      */
     public final double getCost() {
         return this.cost;
     }
 
     /**
-     * Sets the cost of the operator.
+     * Sets the cost of the action.
      *
      * @param cost the cost to set.
      */
@@ -118,22 +136,21 @@ final class IntAction extends AbstractIntOperator {
     }
 
     /**
-     * Return the effects of the operator.
+     * Return the effects of the action.
      *
-     * @return the effects of the operator.
+     * @return the effects of the action.
      */
     public final IntExpression getEffects() {
         return this.effects;
     }
 
     /**
-     * Set the new effects of the operator.
+     * Set the new effects of the action.
      *
      * @param effects the effects to set
      */
     public final void setEffects(final IntExpression effects) {
         this.effects = effects;
     }
-
 
 }
