@@ -650,6 +650,9 @@ final class BitEncoding implements Serializable {
                 }
                 break;
             case ATOM:
+            case AT_END:
+            case AT_START:
+            case OVER_ALL:
             case NOT:
             case TRUE:
                 IntExpression copy = new IntExpression(exp);
