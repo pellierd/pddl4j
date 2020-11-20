@@ -149,7 +149,7 @@ final class PostInstantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
+
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -158,6 +158,7 @@ final class PostInstantiation implements Serializable {
                 extractRelevantFacts(exp.getChildren().get(1), facts, init);
                 break;
             case F_EXP_T:
+            case F_EXP:
                 if (!exp.getChildren().isEmpty()) {
                     extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 }
@@ -469,7 +470,6 @@ final class PostInstantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -478,9 +478,8 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplify(exp.getChildren().get(1));
                 break;
             case F_EXP_T:
-                if (!exp.getChildren().isEmpty()) {
-                    PostInstantiation.simplify(exp.getChildren().get(0));
-                }
+            case F_EXP:
+                PostInstantiation.simplify(exp.getChildren().get(0));
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
@@ -807,7 +806,6 @@ final class PostInstantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -816,9 +814,8 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(1), effect, init);
                 break;
             case F_EXP_T:
-                if (!exp.getChildren().isEmpty()) {
-                    PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(0), effect, init);
-                }
+            case F_EXP:
+                PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(0), effect, init);
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:

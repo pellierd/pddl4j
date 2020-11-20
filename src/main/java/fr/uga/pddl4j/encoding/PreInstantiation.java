@@ -759,7 +759,7 @@ final class PreInstantiation implements Serializable {
         List<IntAction> expandedActions = new ArrayList<>();
 
         for (IntAction a : actions) {
-            //System.out.println("******************************************************");
+           // System.out.println("******************************************************");
             //System.out.println(Encoder.toString(a));
 
             Instantiation.expandQuantifiedExpression(a.getPreconditions(), false);
@@ -771,7 +771,11 @@ final class PreInstantiation implements Serializable {
 
             final IntExpression startPrecondition = new IntExpression(a.getPreconditions());
             PreInstantiation.extract(startPrecondition, PDDLConnective.AT_START);
+            //System.out.println("*** At start precondition ***");
+            //System.out.println(Encoder.toString(startPrecondition));
             Instantiation.simplify(startPrecondition);
+            //System.out.println("*** At start precondition ***");
+            //System.out.println(Encoder.toString(startPrecondition));
             BitEncoding.toDNF(startPrecondition);
 
             //System.out.println("*** At start precondition ***");

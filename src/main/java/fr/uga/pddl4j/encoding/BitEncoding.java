@@ -653,6 +653,10 @@ final class BitEncoding implements Serializable {
             case AT_END:
             case AT_START:
             case OVER_ALL:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
             case NOT:
             case TRUE:
                 IntExpression copy = new IntExpression(exp);
@@ -729,6 +733,16 @@ final class BitEncoding implements Serializable {
                 break;
             case ATOM:
             case NOT:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case FALSE:
             case TRUE:
                 IntExpression and = new IntExpression(PDDLConnective.AND);
                 and.getChildren().add(new IntExpression(exp));
