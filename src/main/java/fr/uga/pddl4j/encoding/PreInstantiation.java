@@ -762,7 +762,7 @@ final class PreInstantiation implements Serializable {
             System.out.println("******************************************************");
             System.out.println(Encoder.toString(a));
 
-            Instantiation.expandQuantifiedExpression(a.getPreconditions());
+            Instantiation.expandQuantifiedExpression(a.getPreconditions(), false);
             a.getPreconditions().moveTimeSpecifierInward();
             a.getPreconditions().moveNegationInward();
 
@@ -797,7 +797,7 @@ final class PreInstantiation implements Serializable {
 
 
             // Expands the quantified expression on the effect of the action
-            Instantiation.expandQuantifiedExpression(a.getEffects());
+            Instantiation.expandQuantifiedExpression(a.getEffects(), false);
             a.getEffects().moveTimeSpecifierInward();
             a.getEffects().moveNegationInward();
             BitEncoding.toCNF(a.getEffects());

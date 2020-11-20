@@ -82,10 +82,10 @@ final class Instantiation implements Serializable {
      */
     static List<IntAction> instantiate(final IntAction action, final int bound) {
         final List<IntAction> instOps = new ArrayList<>(100);
-        Instantiation.expandQuantifiedExpression(action.getPreconditions());
+        Instantiation.expandQuantifiedExpression(action.getPreconditions(), true);
         Instantiation.simplify(action.getPreconditions());
         if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
-            Instantiation.expandQuantifiedExpression(action.getEffects());
+            Instantiation.expandQuantifiedExpression(action.getEffects(), true);
             Instantiation.simplify(action.getEffects());
             if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                 Instantiation.instantiate(action, 0, bound, instOps);
@@ -142,10 +142,10 @@ final class Instantiation implements Serializable {
             for (Integer value : values) {
                 final int varIndex = -index - 1;
                 final IntExpression precond = new IntExpression(action.getPreconditions());
-                Instantiation.substitute(precond, varIndex, value);
+                Instantiation.substitute(precond, varIndex, value, true);
                 if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntExpression effects = new IntExpression(action.getEffects());
-                    Instantiation.substitute(effects, varIndex, value);
+                    Instantiation.substitute(effects, varIndex, value, true);
                     if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
@@ -198,7 +198,7 @@ final class Instantiation implements Serializable {
                 copy.setOrderingConstraints(new IntExpression(network.getOrderingConstraints()));
 
                 final IntExpression tasksCopy = new IntExpression(network.getTasks());
-                Instantiation.substitute(tasksCopy, varIndex, value);
+                Instantiation.substitute(tasksCopy, varIndex, value, true);
                 copy.setTasks(tasksCopy);
 
                 for (int i = 0; i < arity; i++) {
@@ -251,18 +251,18 @@ final class Instantiation implements Serializable {
                 final int varIndex = -index - 1;
                 final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
 
-                Instantiation.substitute(preconditionCopy, varIndex, value);
+                Instantiation.substitute(preconditionCopy, varIndex, value, true);
                 if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
                     copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
 
                     final IntExpression taskCopy = new IntExpression(method.getTask());
-                    Instantiation.substitute(taskCopy, varIndex, value);
+                    Instantiation.substitute(taskCopy, varIndex, value, true);
                     copy.setTask(taskCopy);
 
                     final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
-                    Instantiation.substitute(subTasksCopy, varIndex, value);
+                    Instantiation.substitute(subTasksCopy, varIndex, value, true);
                     copy.setSubTasks(subTasksCopy);
 
                     for (int i = 0; i < arity; i++) {
@@ -299,9 +299,9 @@ final class Instantiation implements Serializable {
             final int type = copy.getTypeOfParameters((-var - 1));
             final Set<Integer> domain = Encoder.tableOfDomains.get(type);
             if (domain.contains(cons)) {
-                Instantiation.substitute(copy.getPreconditions(), var, cons);
-                Instantiation.substitute(copy.getTask(), var, cons);
-                Instantiation.substitute(copy.getSubTasks(), var, cons);
+                Instantiation.substitute(copy.getPreconditions(), var, cons, true);
+                Instantiation.substitute(copy.getTask(), var, cons, true);
+                Instantiation.substitute(copy.getSubTasks(), var, cons, true);
                 copy.setValueOfParameter((-var - 1), cons);
             } else {
                 instantiable = false;
@@ -475,7 +475,7 @@ final class Instantiation implements Serializable {
         final Iterator<IntMethod> i = methods.iterator();
         while (i.hasNext()) {
             final IntMethod method = i.next();
-            Instantiation.expandQuantifiedExpression(method.getPreconditions());
+            Instantiation.expandQuantifiedExpression(method.getPreconditions(), true);
             Instantiation.simplify(method.getPreconditions());
             if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 i.remove();
@@ -509,8 +509,9 @@ final class Instantiation implements Serializable {
      * Expands the quantified expressions contained in a specified expression.
      *
      * @param exp the expression.
+     * @param simplify the flag to indicate if logical simplifications must be done during the expansion.
      */
-    static void expandQuantifiedExpression(final IntExpression exp) {
+    static void expandQuantifiedExpression(final IntExpression exp, boolean simplify) {
         switch (exp.getConnective()) {
             case AND:
                 Iterator<IntExpression> i = exp.getChildren().iterator();
@@ -523,9 +524,9 @@ final class Instantiation implements Serializable {
                         i.remove();
                         continue;
                     }
-                    Instantiation.expandQuantifiedExpression(ei);
+                    Instantiation.expandQuantifiedExpression(ei, simplify);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (simplify && ei.getConnective().equals(PDDLConnective.FALSE)) {
                         exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
@@ -541,9 +542,9 @@ final class Instantiation implements Serializable {
                         i.remove();
                         continue;
                     }
-                    Instantiation.expandQuantifiedExpression(ei);
+                    Instantiation.expandQuantifiedExpression(ei, simplify);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (simplify && ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
                     }
                 }
@@ -558,14 +559,14 @@ final class Instantiation implements Serializable {
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     int cons = it.next();
                     IntExpression copy = new IntExpression(qExp);
-                    Instantiation.substitute(copy, var, cons);
+                    Instantiation.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (copy.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (simplify && copy.getConnective().equals(PDDLConnective.FALSE)) {
                         exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
-                Instantiation.expandQuantifiedExpression(exp);
+                Instantiation.expandQuantifiedExpression(exp, simplify);
                 break;
             case EXISTS:
                 constants = Encoder.tableOfDomains.get(exp.getType());
@@ -577,14 +578,14 @@ final class Instantiation implements Serializable {
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     int cons = it.next();
                     IntExpression copy = new IntExpression(qExp);
-                    Instantiation.substitute(copy, var, cons);
+                    Instantiation.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (copy.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (simplify && copy.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
                     }
                 }
-                Instantiation.expandQuantifiedExpression(exp);
+                Instantiation.expandQuantifiedExpression(exp, simplify);
                 break;
 
             case AT_START:
@@ -594,21 +595,21 @@ final class Instantiation implements Serializable {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0));
+                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
                 break;
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
             case WHEN:
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0));
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(1));
+                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
+                Instantiation.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0));
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(1));
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(3));
+                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
+                Instantiation.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
+                Instantiation.expandQuantifiedExpression(exp.getChildren().get(3), simplify);
                 break;
             case ATOM:
                 Instantiation.simplyAtom(exp);
@@ -923,7 +924,7 @@ final class Instantiation implements Serializable {
      * @param var  the variable.
      * @param cons the constant.
      */
-    private static void substitute(final IntExpression exp, final int var, final int cons) {
+    private static void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
         switch (exp.getConnective()) {
             case ATOM:
                 boolean updated = false;
@@ -979,9 +980,9 @@ final class Instantiation implements Serializable {
                 Iterator<IntExpression> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     final IntExpression ei = i.next();
-                    Instantiation.substitute(ei, var, cons);
+                    Instantiation.substitute(ei, var, cons, simplify);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (simplify && ei.getConnective().equals(PDDLConnective.FALSE)) {
                         exp.setConnective(PDDLConnective.FALSE);
                     }
                 }
@@ -990,19 +991,19 @@ final class Instantiation implements Serializable {
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     final IntExpression ei = i.next();
-                    Instantiation.substitute(ei, var, cons);
+                    Instantiation.substitute(ei, var, cons, simplify);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (simplify && ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
                     }
                 }
                 break;
             case NOT:
                 final IntExpression neg = exp.getChildren().get(0);
-                Instantiation.substitute(neg, var, cons);
-                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                Instantiation.substitute(neg, var, cons, simplify);
+                if (simplify && neg.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.setConnective(PDDLConnective.FALSE);
-                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                } else if (simplify && neg.getConnective().equals(PDDLConnective.FALSE)) {
                     exp.setConnective(PDDLConnective.TRUE);
                 }
                 break;
@@ -1026,8 +1027,8 @@ final class Instantiation implements Serializable {
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                Instantiation.substitute(exp.getChildren().get(0), var, cons);
-                Instantiation.substitute(exp.getChildren().get(1), var, cons);
+                Instantiation.substitute(exp.getChildren().get(0), var, cons, simplify);
+                Instantiation.substitute(exp.getChildren().get(1), var, cons, simplify);
                 break;
             case FORALL:
             case EXISTS:
@@ -1038,18 +1039,18 @@ final class Instantiation implements Serializable {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
-                Instantiation.substitute(exp.getChildren().get(0), var, cons);
+                Instantiation.substitute(exp.getChildren().get(0), var, cons, simplify);
                 break;
             case F_EXP_T:
                 if (!exp.getChildren().isEmpty()) {
-                    Instantiation.substitute(exp.getChildren().get(0), var, cons);
+                    Instantiation.substitute(exp.getChildren().get(0), var, cons, simplify);
                 }
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                Instantiation.substitute(exp.getChildren().get(0), var, cons);
-                Instantiation.substitute(exp.getChildren().get(1), var, cons);
-                Instantiation.substitute(exp.getChildren().get(3), var, cons);
+                Instantiation.substitute(exp.getChildren().get(0), var, cons, simplify);
+                Instantiation.substitute(exp.getChildren().get(1), var, cons, simplify);
+                Instantiation.substitute(exp.getChildren().get(3), var, cons, simplify);
                 break;
             case FN_ATOM:
             case NUMBER:
