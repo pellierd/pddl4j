@@ -225,23 +225,23 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static Condition encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map)
+    static Goal encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map)
         throws UnexpectedExpressionException {
 
         if (goal.getConnective().equals(PDDLConnective.FALSE)) {
             return null;
         }
 
-        Condition newGoal;
+        Goal newGoal;
         BitEncoding.toDNF(goal);
         Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
         for (IntExpression exp : goal.getChildren()) {
             if (exp.getConnective().equals(PDDLConnective.ATOM)) {
                 IntExpression and = new IntExpression(PDDLConnective.AND);
                 and.getChildren().add(exp);
-                Encoder.codedGoal.add(BitEncoding.encodeCondition(and, map));
+                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(and, map)));
             } else {
-                Encoder.codedGoal.add(BitEncoding.encodeCondition(exp, map));
+                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(exp, map)));
             }
         }
         if (Encoder.codedGoal.size() > 1) {
@@ -257,7 +257,7 @@ final class BitEncoding implements Serializable {
             map.put(dummyGoal, dummyGoalIndex);
             Effect effect = new Effect();
             effect.getPositiveFluents().set(dummyGoalIndex);
-            newGoal = new Condition();
+            newGoal = new Goal();
             effect.getPositiveFluents().set(dummyGoalIndex);
             final ConditionalEffect condEffect = new ConditionalEffect(effect);
             // for each disjunction create a dummy action

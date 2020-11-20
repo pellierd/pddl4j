@@ -13,4 +13,20 @@ public class Goal extends Condition {
     public Goal(Goal goal) {
         super(goal);
     }
+
+    /**
+     *  Create a new goal from a other goal.
+     *
+     * @param condition the other goal.
+     */
+    public Goal(Condition condition) {
+        super(condition);
+    }
+
+    /**
+     *  Create a new empty goal from a other goal.
+     */
+    public Goal() {
+        super();
+    }
 }

@@ -23,14 +23,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.ConditionalEffect;
-import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.Condition;
-import fr.uga.pddl4j.problem.Task;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -234,7 +227,7 @@ public final class Encoder implements Serializable {
     /**
      * The goal.
      */
-    static Condition goal;
+    static Goal goal;
 
     /**
      * The initial task network.
@@ -244,7 +237,7 @@ public final class Encoder implements Serializable {
     /**
      * The encoded goal.
      */
-    static List<Condition> codedGoal;
+    static List<Goal> codedGoal;
 
     /**
      * The initial state.
@@ -687,7 +680,7 @@ public final class Encoder implements Serializable {
                 || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
             Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
         } else {
-            Encoder.goal = new Condition();
+            Encoder.goal = new Goal();
         }
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
@@ -930,7 +923,7 @@ public final class Encoder implements Serializable {
      */
     static void printGoal(StringBuilder str) {
         str.append("Goal state is:\n");
-        for (Condition exp : Encoder.codedGoal) {
+        for (Goal exp : Encoder.codedGoal) {
             str.append(Encoder.toString(exp));
             str.append("\n");
         }
@@ -1040,6 +1033,18 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(Condition exp) {
+        return StringDecoder.toString(exp, Encoder.tableOfConstants,
+            Encoder.tableOfTypes, Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
+    }
+
+    /**
+     * Returns a string representation of a bit expression.
+     *
+     * @param exp the expression.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(Goal exp) {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);

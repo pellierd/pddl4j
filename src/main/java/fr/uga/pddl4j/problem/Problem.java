@@ -135,7 +135,7 @@ public class Problem implements Serializable {
     /**
      * The goal.
      */
-    private Condition goal;
+    private Goal goal;
 
     /**
      * The initial state.
@@ -202,7 +202,7 @@ public class Problem implements Serializable {
         this.methods = new ArrayList<>();
         this.methods.addAll(other.methods.stream().map(Method::new).collect(Collectors.toList()));
         if (other.goal != null) {
-            this.goal = new Condition(other.goal);
+            this.goal = new Goal(other.goal);
         }
         this.initialState = new Condition(other.initialState);
         if (other.initialTaskNetwork != null) {
@@ -564,7 +564,7 @@ public class Problem implements Serializable {
      *
      * @param goal the goal to set
      */
-    public final void setGoal(final Condition goal) {
+    public final void setGoal(final Goal goal) {
         this.goal = goal;
     }
 
