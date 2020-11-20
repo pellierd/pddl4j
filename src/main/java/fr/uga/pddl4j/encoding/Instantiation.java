@@ -890,7 +890,6 @@ final class Instantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -899,9 +898,8 @@ final class Instantiation implements Serializable {
                 Instantiation.simplify(exp.getChildren().get(1));
                 break;
             case F_EXP_T:
-                if (!exp.getChildren().isEmpty()) {
-                    Instantiation.simplify(exp.getChildren().get(0));
-                }
+            case F_EXP:
+                Instantiation.simplify(exp.getChildren().get(0));
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
