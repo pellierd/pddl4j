@@ -45,7 +45,7 @@ public class TimeEncoderTest {
      * TO long from pb22
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Depots_Time_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -71,7 +71,7 @@ public class TimeEncoderTest {
      *  TO long from pb01
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Depots_Time_Simple_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -84,7 +84,7 @@ public class TimeEncoderTest {
      * TO DO Check why it is to hard even for the pb01
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Depots_Time_Simple_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -97,7 +97,7 @@ public class TimeEncoderTest {
      * TO DO Check why it is to hard even for the pb01
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Driverlog_Time_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -110,7 +110,7 @@ public class TimeEncoderTest {
      *
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Driverlog_Time_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -123,7 +123,7 @@ public class TimeEncoderTest {
      *
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Driverlog_Time_Simple_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -136,7 +136,7 @@ public class TimeEncoderTest {
      * TO DO Check why it is to hard even for the pb01
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Driverlog_Time_Simple_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -149,7 +149,7 @@ public class TimeEncoderTest {
      * TO check why pb22 fails to long
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Rover_Time_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -162,7 +162,7 @@ public class TimeEncoderTest {
      * TO Check until pb08
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Rover_Time_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -175,7 +175,7 @@ public class TimeEncoderTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Rover_Time_Simple_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -188,7 +188,7 @@ public class TimeEncoderTest {
      * Failure pb08
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_Parser_IPC2002_Rover_Time_Simple_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

@@ -542,7 +542,7 @@ public final class Encoder implements Serializable {
 
         }
         // Extract increase and add value to action cost
-        PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
+        //PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
 
         // Just for logging
         if (Encoder.logLevel == 5) {

@@ -386,7 +386,7 @@ final class IntEncoding implements Serializable {
     static Map<IntExpression, Double> encodeFunctionCostInit(final Set<IntExpression> init) {
         Map<IntExpression, Double> intFunctionCost = new HashMap<>();
         for (IntExpression intExp : init) {
-            if (intExp.getConnective().equals(PDDLConnective.EQUAL)) {
+            if (intExp.getConnective().equals(PDDLConnective.FN_ATOM)) {
                 intFunctionCost.put(intExp.getChildren().get(0),
                     Double.parseDouble(StringDecoder.toString(intExp.getChildren().get(1),
                         Encoder.tableOfConstants,
