@@ -340,6 +340,9 @@ public final class Encoder implements Serializable {
         accepted.add(PDDLRequireKey.ACTION_COSTS);
         accepted.add(PDDLRequireKey.HIERARCHY);
         accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
+        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
+        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
 
         Encoder.requirements = new LinkedHashSet<>();
         Encoder.requirements.addAll(domain.getRequirements());
