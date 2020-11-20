@@ -621,7 +621,7 @@ final class BitEncoding implements Serializable {
      *
      * @param exp the expression to transform in CNF.
      */
-    private static void toCNF(final IntExpression exp) throws UnexpectedExpressionException {
+     static void toCNF(final IntExpression exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case WHEN:
                 final IntExpression antecedent = exp.getChildren().get(0);
@@ -667,7 +667,7 @@ final class BitEncoding implements Serializable {
      *
      * @param exp the expression to transform in DNF.
      */
-    private static void toDNF(final IntExpression exp) throws UnexpectedExpressionException {
+     static void toDNF(final IntExpression exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case OR:
                 List<IntExpression> children = exp.getChildren();

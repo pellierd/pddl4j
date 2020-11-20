@@ -665,7 +665,7 @@ final class Instantiation implements Serializable {
      *
      * @param exp the expression to simplify.
      */
-    private static void simplify(final IntExpression exp) {
+     static void simplify(final IntExpression exp) {
         switch (exp.getConnective()) {
             case ATOM:
                 break;

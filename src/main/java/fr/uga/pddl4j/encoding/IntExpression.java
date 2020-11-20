@@ -377,4 +377,200 @@ public class IntExpression implements Serializable {
         return result;
     }
 
+    /**
+     * Move negation inward the expression.
+     */
+    public void moveNegationInward() {
+        switch (this.getConnective()) {
+            case NOT:
+                IntExpression p = this.getChildren().get(0);
+                switch (p.getConnective()) {
+                    case FORALL:
+                        this.setConnective(PDDLConnective.EXISTS);
+                        IntExpression notP = new IntExpression(PDDLConnective.NOT);
+                        notP.addChild(p);
+                        this.children.set(0, notP);
+                        notP.moveNegationInward();
+                        break;
+                    case EXISTS:
+                        this.setConnective(PDDLConnective.FORALL);
+                        notP = new IntExpression(PDDLConnective.NOT);
+                        notP.addChild(p);
+                        this.children.set(0, notP);
+                        notP.moveNegationInward();
+                        break;
+                    case AND:
+                        if (this.getChildren().size() > 1) {
+                            this.setConnective(PDDLConnective.OR);
+                            this.getChildren().clear();
+                            for (int i = 0; i < p.getChildren().size(); i++) {
+                                IntExpression q = new IntExpression(PDDLConnective.NOT);
+                                q.addChild(p.getChildren().get(i));
+                                q.moveNegationInward();
+                                this.addChild(q);
+                            }
+                        } else {
+                            this.affect(this.getChildren().get(0));
+                            this.moveNegationInward();
+                        }
+                        break;
+                    case OR:
+                        if (this.getChildren().size() > 1) {
+                            this.setConnective(PDDLConnective.AND);
+                            this.getChildren().clear();
+                            for (int i = 0; i < p.getChildren().size(); i++) {
+                                IntExpression q = new IntExpression(PDDLConnective.NOT);
+                                q.addChild(p.getChildren().get(i));
+                                q.moveNegationInward();
+                                this.addChild(q);
+                            }
+                        } else {
+                            this.affect(this.getChildren().get(0));
+                            this.moveNegationInward();
+                        }
+                        break;
+                    /*case IMPLY: // ¬(p =>) q = p and ¬q
+                        p.expandImply();
+                        this.moveNegationInward();
+                        break;*/
+                    case NOT:
+                        IntExpression neg = p.getChildren().get(0);
+                        this.affect(neg);
+                        this.moveNegationInward();
+                        break;
+                    case AT_START:
+                    case AT_END:
+                    case OVER_ALL:
+                        this.setConnective(p.getConnective());
+                        p.setConnective(PDDLConnective.NOT);
+                        p.moveNegationInward();
+                        break;
+                    default:
+                        // do nothing
+                }
+                break;
+            /*case IMPLY: // p => q = (¬p) ∨ q
+                this.setConnective(PDDLConnective.OR);
+                final IntExpression notP = new IntExpression(PDDLConnective.NOT);
+                notP.addChild(this.getChildren().get(0));
+                notP.moveNegationInward();
+                this.getChildren().get(1).moveNegationInward();
+                this.getChildren().set(0, notP);
+                break;*/
+            default:
+                this.children.forEach(IntExpression::moveNegationInward);
+                break;
+            // do nothing
+        }
+    }
+
+    /**
+     * Move time specifier inward the expression.
+     */
+    public void moveTimeSpecifierInward() {
+        switch (this.getConnective()) {
+            case AND:
+            case OR:
+                this.children.forEach(IntExpression::moveTimeSpecifierInward);
+                break;
+            case NOT:
+            case FORALL:
+            case EXISTS:
+            case ALWAYS:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+                this.getChildren().get(0).moveTimeSpecifierInward();
+                break;
+            case WHEN:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+                this.getChildren().get(0).moveTimeSpecifierInward();
+                this.getChildren().get(1).moveTimeSpecifierInward();
+                break;
+            case WITHIN:
+            case HOLD_AFTER:
+                this.getChildren().get(1).moveTimeSpecifierInward();
+                break;
+            case ALWAYS_WITHIN:
+                this.getChildren().get(1).moveTimeSpecifierInward();
+                this.getChildren().get(2).moveTimeSpecifierInward();
+                break;
+            case HOLD_DURING:
+                this.getChildren().get(3).moveTimeSpecifierInward();
+                break;
+            /*case IMPLY: // p => q = (¬p) ∨ q
+                this.setConnective(PDDLConnective.OR);
+                final IntExpression notP = new IntExpression(PDDLConnective.NOT);
+                notP.addChild(this.getChildren().get(0));
+                notP.moveTimeSpecifierInward();
+                this.getChildren().get(1).moveTimeSpecifierInward();
+                this.getChildren().set(0, notP);
+                break;*/
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                IntExpression p = this.getChildren().get(0);
+                switch (p.getConnective()) {
+                    case FORALL:
+                        p.setConnective(this.getConnective());
+                        this.setConnective(PDDLConnective.FORALL);
+                        this.setVariable(p.getVariable());
+                        this.setType(p.getType());
+                        p.moveTimeSpecifierInward();
+                        break;
+                    case EXISTS:
+                        p.setConnective(this.getConnective());
+                        this.setConnective(PDDLConnective.EXISTS);
+                        this.setVariable(p.getVariable());
+                        this.setType(p.getType());
+                        p.moveTimeSpecifierInward();
+                        break;
+                    case AND:
+                        this.getChildren().clear();
+                        for (int i = 0; i < p.getChildren().size(); i++) {
+                            IntExpression q = new IntExpression(this.getConnective());
+                            q.addChild(p.getChildren().get(i));
+                            q.moveTimeSpecifierInward();
+                            this.addChild(q);
+                        }
+                        this.setConnective(PDDLConnective.AND);
+                        break;
+                    case OR:
+                        this.getChildren().clear();
+                        for (int i = 0; i < p.getChildren().size(); i++) {
+                            final IntExpression q = new IntExpression(this.getConnective());
+                            q.addChild(p.getChildren().get(i));
+                            q.moveTimeSpecifierInward();
+                            this.addChild(q);
+                        }
+                        this.setConnective(PDDLConnective.OR);
+                        break;
+                    /*case IMPLY:
+                        p.expandImply();
+                        this.moveTimeSpecifierInward();
+                        break;*/
+                    case NOT:
+                        p.setConnective(this.getConnective());
+                        this.setConnective(PDDLConnective.NOT);
+                        break;
+                    case WHEN:
+                        final IntExpression timeCondition = new IntExpression(this.getConnective());
+                        timeCondition.addChild(p.getChildren().get(0));
+                        timeCondition.moveTimeSpecifierInward();
+                        final IntExpression timeEffect = new IntExpression(this.getConnective());
+                        timeEffect.addChild(p.getChildren().get(1));
+                        timeEffect.moveTimeSpecifierInward();
+                        this.setConnective(PDDLConnective.WHEN);
+                        this.children.clear();
+                        this.children.add(timeCondition);
+                        this.children.add(timeEffect);
+                        break;
+                    default:
+                        // do nothing
+                }
+                break;
+            default:
+                // do nothing
+        }
+    }
 }

@@ -471,6 +471,13 @@ public final class Encoder implements Serializable {
         // initial state
         PreInstantiation.createPredicatesTables(intInitPredicates);
 
+
+        // HACK for durative action very inefficient
+        if (Encoder.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            intActions = PreInstantiation.expandTemporalActions(intActions);
+        }
+
+
         // Just for logging
         if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
             Encoder.printTableOfInertia(str);
