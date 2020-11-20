@@ -50,6 +50,17 @@ public class State extends BitVector {
     }
 
     /**
+     * Creates a new state from a specified initial state.
+     *
+     * @param state the state.
+     */
+    public State(final InitialState state) {
+        this();
+        this.or(state.getPositiveFluents());
+        this.andNot(state.getNegativeFluents());
+    }
+
+    /**
      * Creates a new state from an other state. This constructor is the copy constructor.
      *
      * @param state the other state to copy.

@@ -52,7 +52,7 @@ public class TFDPlannerTest {
     /**
      * Computation timeout.
      */
-    private static final int TIMEOUT = 60;
+    private static final int TIMEOUT = 5;
 
     /**
      * Default Trace level.
@@ -165,7 +165,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_TFDPlanner_IPC2020_HDDL_Childsnack() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

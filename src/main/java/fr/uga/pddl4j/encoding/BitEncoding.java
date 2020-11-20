@@ -328,8 +328,8 @@ final class BitEncoding implements Serializable {
      * @param map  the map that associates to a specified expression its index.
      * @return the <code>BitExp</code> that represents the initial encoded.
      */
-    static Condition encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
-        final Condition bitInit = new Condition();
+    static InitialState encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
+        final InitialState bitInit = new InitialState();
         for (final IntExpression fact : init) {
             if (fact.getConnective().equals(PDDLConnective.ATOM)) {
                 final Integer i = map.get(fact);

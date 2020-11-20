@@ -242,7 +242,7 @@ public final class Encoder implements Serializable {
     /**
      * The initial state.
      */
-    static Condition init;
+    static InitialState init;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.

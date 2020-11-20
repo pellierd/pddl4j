@@ -140,7 +140,7 @@ public class Problem implements Serializable {
     /**
      * The initial state.
      */
-    private Condition initialState;
+    private InitialState initialState;
 
     /**
      * The initial task network.
@@ -204,7 +204,7 @@ public class Problem implements Serializable {
         if (other.goal != null) {
             this.goal = new Goal(other.goal);
         }
-        this.initialState = new Condition(other.initialState);
+        this.initialState = new InitialState(other.initialState);
         if (other.initialTaskNetwork != null) {
             this.initialTaskNetwork = new TaskNetwork(other.initialTaskNetwork);
         }
@@ -573,7 +573,7 @@ public class Problem implements Serializable {
      *
      * @return the initial state of the problem.
      */
-    public final Condition getInitialState() {
+    public final InitialState getInitialState() {
         return this.initialState;
     }
 
@@ -582,7 +582,7 @@ public class Problem implements Serializable {
      *
      * @param initialState the initial state to set.
      */
-    public final void setInitialState(final Condition initialState) {
+    public final void setInitialState(final InitialState initialState) {
         this.initialState = initialState;
     }
 
