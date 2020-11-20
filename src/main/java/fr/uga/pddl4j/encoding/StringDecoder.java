@@ -70,7 +70,13 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n");
+        if (action.isDurative()) {
+            str.append("Duration:\n");
+            str.append(toString(action.getDuration(), constants, types, predicates, functions, tasks));
+            str.append("\nCondition:\n");
+        } else {
+            str.append("Preconditions:\n");
+        }
         str.append(toString(action.getPreconditions(), constants, types, predicates, functions, tasks));
         str.append("\n");
         str.append("Effects:\n");

@@ -19,14 +19,13 @@
 
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.problem.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -1079,6 +1078,68 @@ public final class Encoder implements Serializable {
         stringBuilder.append("Ground inertia table:");
         for (Entry<IntExpression, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
             stringBuilder.append(Encoder.toString(e.getKey())).append(": ").append(e.getValue());
+        }
+    }
+
+    /**
+     * This method is used to make quick test to encoder class. Command line example:
+     * <ul>
+     *     <li>java -cp build/libs/pddl4j-3.8.3.jar fr.uga.pddl4j.encoding.Encoder \\
+     *     src/test/resources/benchmarks/pddl/ipc2002/depots//time-simple-automatic/domain.pddl\\
+     *     src/test/resources/benchmarks/pddl/ipc2002/depots/time-simple-automatic/p01.pddl
+     *     </li>
+     * </ul>
+     *
+     * @param args the arguments of the command line (args[0] the path to the domain file and args[1] the path to the
+     *             problem file).
+     */
+    public static void main(String[] args) {
+
+        if (args.length != 2) {
+            System.out.println("invalide arguments");
+            System.exit(0);
+        }
+
+        final String domain = args[0];
+        final String problem = args[1];
+        final int traceLevel = 3;
+
+
+        try {
+            // Parses the PDDL domain and problem description
+            PDDLParser parser = new PDDLParser();
+            parser.parse(new File(domain), new File(problem));
+            ErrorManager errorManager = parser.getErrorManager();
+            if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+                && !errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
+                System.out.println(errorManager.getMessages());
+                System.exit(0);
+            }
+            if (!errorManager.getMessages(Message.Type.PARSER_WARNING).isEmpty()) {
+                //System.out.println(errorManager.getMessages());
+            }
+
+            // Encodes and instantiates the problem in a compact representation
+
+            try {
+                System.out.println(" * Encoding [" + problem + "]" + "...");
+                Problem pb = Encoder.encode(parser.getDomain(), parser.getProblem());
+
+
+
+            } catch (OutOfMemoryError err) {
+                System.err.println("ERR: " + err.getMessage() + " - test aborted");
+                return;
+            } catch (IllegalArgumentException iaex) {
+                if (iaex.getMessage().equalsIgnoreCase("type of the problem to encode not ADL")) {
+                    System.err.println("[" + problem + "]: Not ADL problem!");
+                } else {
+                    throw iaex;
+                }
+            }
+
+        } catch (IOException ioEx) {
+            ioEx.printStackTrace();
         }
     }
 
