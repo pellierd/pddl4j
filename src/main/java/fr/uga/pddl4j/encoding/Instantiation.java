@@ -156,6 +156,11 @@ final class Instantiation implements Serializable {
                         for (int i = 0; i < index; i++) {
                             copy.setValueOfParameter(i, action.getValueOfParameter(i));
                         }
+                        if (action.isDurative()) {
+                            final IntExpression duration = new IntExpression(action.getDuration());
+                            Instantiation.substitute(duration, varIndex, value, true);
+                            copy.setDuration(duration);
+                        }
                         copy.setValueOfParameter(index, value);
                         Instantiation.instantiate(copy, index + 1, bound, actions);
                     }
@@ -1022,7 +1027,6 @@ final class Instantiation implements Serializable {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
@@ -1039,6 +1043,7 @@ final class Instantiation implements Serializable {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
+            case F_EXP:
                 Instantiation.substitute(exp.getChildren().get(0), var, cons, simplify);
                 break;
             case F_EXP_T:

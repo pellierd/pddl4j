@@ -66,7 +66,7 @@ public enum PDDLConnective {
     /**
      * The connective for the temporal variable.
      */
-    TIME_VAR(""),
+    TIME_VAR("?duration"),
     /**
      * The connective for ground function expression used in initial fact expressions.
      */

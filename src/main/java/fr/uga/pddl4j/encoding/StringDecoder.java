@@ -375,6 +375,7 @@ final class StringDecoder implements Serializable {
                 str.append(exp.getConnective());
                 break;
             case TIME_VAR:
+                str.append(exp.getConnective().getImage());
                 break;
             case FN_ATOM:
             case WHEN:

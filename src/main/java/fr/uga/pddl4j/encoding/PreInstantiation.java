@@ -759,41 +759,41 @@ final class PreInstantiation implements Serializable {
         List<IntAction> expandedActions = new ArrayList<>();
 
         for (IntAction a : actions) {
-            System.out.println("******************************************************");
-            System.out.println(Encoder.toString(a));
+            //System.out.println("******************************************************");
+            //System.out.println(Encoder.toString(a));
 
             Instantiation.expandQuantifiedExpression(a.getPreconditions(), false);
             a.getPreconditions().moveTimeSpecifierInward();
             a.getPreconditions().moveNegationInward();
 
-            System.out.println("*** Precondition ***");
-            System.out.println(Encoder.toString(a.getPreconditions()));
+            //System.out.println("*** Precondition ***");
+            //System.out.println(Encoder.toString(a.getPreconditions()));
 
             final IntExpression startPrecondition = new IntExpression(a.getPreconditions());
             PreInstantiation.extract(startPrecondition, PDDLConnective.AT_START);
             Instantiation.simplify(startPrecondition);
             BitEncoding.toDNF(startPrecondition);
 
-            System.out.println("*** At start precondition ***");
-            System.out.println(Encoder.toString(startPrecondition));
+            //System.out.println("*** At start precondition ***");
+            //System.out.println(Encoder.toString(startPrecondition));
 
             final IntExpression endPrecondition = new IntExpression(a.getPreconditions());
             PreInstantiation.extract(endPrecondition, PDDLConnective.AT_END);
             Instantiation.simplify(endPrecondition);
             BitEncoding.toDNF(endPrecondition);
 
-            System.out.println("*** At end precondition ***");
-            System.out.println(Encoder.toString(endPrecondition));
+            //System.out.println("*** At end precondition ***");
+            //System.out.println(Encoder.toString(endPrecondition));
 
             final IntExpression overAllPrecondition = new IntExpression(a.getPreconditions());
             PreInstantiation.extract(overAllPrecondition, PDDLConnective.OVER_ALL);
-            System.out.println("*** Over all precondition AV Simplify ***");
-            System.out.println(Encoder.toString(overAllPrecondition));
+            //System.out.println("*** Over all precondition AV Simplify ***");
+            //System.out.println(Encoder.toString(overAllPrecondition));
             Instantiation.simplify(overAllPrecondition);
             BitEncoding.toDNF(overAllPrecondition);
 
-            System.out.println("*** Over all precondition ***");
-            System.out.println(Encoder.toString(overAllPrecondition));
+            //System.out.println("*** Over all precondition ***");
+            //System.out.println(Encoder.toString(overAllPrecondition));
 
 
             // Expands the quantified expression on the effect of the action
@@ -803,15 +803,15 @@ final class PreInstantiation implements Serializable {
             BitEncoding.toCNF(a.getEffects());
             //this.simplify(a.getEffects());
 
-            System.out.println("*** EFFECT ***");
-            System.out.println(Encoder.toString(a.getEffects()));
+            //System.out.println("*** EFFECT ***");
+            //System.out.println(Encoder.toString(a.getEffects()));
 
-            try {
-                System.out.println("Press enter...");
-                System.in.read();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            //try {
+            //    System.out.println("Press enter...");
+            //    System.in.read();
+            //} catch (IOException e) {
+            //    e.printStackTrace();
+            //}
             // The list of monitoring action need to deal with over all condition in conditional effect
             final List<IntAction> monitoringActions = new ArrayList<>();
             // The effect of the start action
@@ -964,19 +964,19 @@ final class PreInstantiation implements Serializable {
             //this.simplify(endPrecondition);
             //this.simplify(overallPrecondition);
 
-            System.out.println("START EFFECT AVANT  SIM: ");
-            System.out.println(Encoder.toString(startEffect));
+            //System.out.println("START EFFECT AVANT  SIM: ");
+            //System.out.println(Encoder.toString(startEffect));
             Instantiation.simplify(startEffect);
             //startEffect.toConjunctiveNormalForm(this);
-            System.out.println("START EFFECT APRES SIM: ");
-            System.out.println(Encoder.toString(startEffect));
+            //System.out.println("START EFFECT APRES SIM: ");
+            //System.out.println(Encoder.toString(startEffect));
 
-            System.out.println("END EFFECT AVANT  SIM: ");
-            System.out.println(Encoder.toString(endEffect));
+            //System.out.println("END EFFECT AVANT  SIM: ");
+            //System.out.println(Encoder.toString(endEffect));
             Instantiation.simplify(endEffect);
             //endEffect.toConjunctiveNormalForm(this);
-            System.out.println("END EFFECT APRES  SIM: ");
-            System.out.println(Encoder.toString(endEffect));
+            //System.out.println("END EFFECT APRES  SIM: ");
+            //System.out.println(Encoder.toString(endEffect));
 
             // Create a start action for each conjunction of the start precondition
             for (IntExpression precondition : startPrecondition.getChildren()) {
@@ -989,17 +989,17 @@ final class PreInstantiation implements Serializable {
                 for (int i = 0; i < a.arity(); i++) {
                     startAction.setValueOfParameter(i, a.getValueOfParameter(i));
                 }
-                startAction.setPreconditions(new IntExpression(precondition));
+                startAction.setPreconditions(precondition);
                 startAction.setEffects(new IntExpression(startEffect));
                 expandedActions.add(startAction);
 
-                System.out.println("*"+Encoder.toString(startAction));
-                try {
-                    System.out.println("Press enter...");
-                    System.in.read();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                //System.out.println("*"+Encoder.toString(startAction));
+                //try {
+                //    System.out.println("Press enter...");
+                //    System.in.read();
+                //} catch (IOException e) {
+                //    e.printStackTrace();
+                //}
             }
 
             for (IntExpression precondition : endPrecondition.getChildren()) {
@@ -1016,15 +1016,15 @@ final class PreInstantiation implements Serializable {
                 endAction.setEffects(new IntExpression(endEffect));
                 expandedActions.add(endAction);
 
-                System.out.println("*"+Encoder.toString(endAction));
+                /*System.out.println("*"+Encoder.toString(endAction));
                 try {
                     System.out.println("Press enter...");
                     System.in.read();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
-            System.out.println(Encoder.toString(overAllPrecondition));
+            //System.out.println(Encoder.toString(overAllPrecondition));
             for (IntExpression precondition : overAllPrecondition.getChildren()) {
                 if (!precondition.getConnective().equals(PDDLConnective.FALSE)) {
                     IntAction invAction = new IntAction(a.getName() + "_" + "inv", a.arity());
@@ -1038,13 +1038,13 @@ final class PreInstantiation implements Serializable {
                     }
                     invAction.setPreconditions(precondition);
                     expandedActions.add(invAction);
-                    System.out.println("*" + Encoder.toString(invAction));
+                    /*System.out.println("*" + Encoder.toString(invAction));
                     try {
                         System.out.println("Press enter...");
                         System.in.read();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                 }
             }
 
