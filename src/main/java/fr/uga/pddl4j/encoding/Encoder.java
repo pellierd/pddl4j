@@ -191,6 +191,10 @@ public final class Encoder implements Serializable {
      * The table that contains the ground inertia.
      */
     static Map<IntExpression, Inertia> tableOfGroundInertia;
+    /**
+     * The table that contains the ground inertia.
+     */
+    static Map<IntExpression, Inertia> tableOfNumericGroundInertia;
 
     /**
      * The list of predicates tables used to count the occurrence of a specified predicate in the
@@ -529,9 +533,11 @@ public final class Encoder implements Serializable {
 
         // Instantiate the actions
         intActions = Instantiation.instantiateActions(intActions);
-
         // Extract the ground inertia from the set of instantiated actions
         PostInstantiation.extractGroundInertia(intActions);
+        // Extract the gound numetic inertia from the set of instantiated actions
+        PostInstantiation.extractGroundNumericInertia(intActions);
+
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
         if (intGoal != null) {

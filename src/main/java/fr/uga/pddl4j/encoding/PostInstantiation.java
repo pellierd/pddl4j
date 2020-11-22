@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -945,6 +946,68 @@ final class PostInstantiation implements Serializable {
                 break;
             default:
                 // do nothing
+        }
+    }
+
+    /**
+     * Do a pass over the effects of a specified list of instantiated actions and update the ground
+     * inertia table.
+     *
+     * @param actions the list of instantiated actions.
+     */
+    static void extractGroundNumericInertia(final List<IntAction> actions) {
+        Encoder.tableOfNumericGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
+        for (IntAction a : actions) {
+            PostInstantiation.extractGroundNumericInertia(a.getEffects());
+        }
+    }
+
+    /**
+     * Do a pass over the effects of an instantiated action and update the ground inertia table.
+     * A numeric inertia is a function that is never change by any action of the problem.
+     *
+     * @param exp the effect.
+     */
+    private static void extractGroundNumericInertia(final IntExpression exp) {
+        switch (exp.getConnective()) {
+            case AND:
+                exp.getChildren().forEach(PostInstantiation::extractGroundNumericInertia);
+                break;
+            case WHEN:
+                extractGroundNumericInertia(exp.getChildren().get(1));
+                break;
+            case NOT:
+                extractGroundNumericInertia(exp.getChildren().get(0));
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case PLUS:
+            case MINUS:
+            case MUL:
+            case DIV:
+                extractGroundNumericInertia(exp.getChildren().get(0));
+                extractGroundNumericInertia(exp.getChildren().get(1));
+                break;
+            case F_EXP:
+                extractGroundNumericInertia(exp.getChildren().get(0));
+                break;
+            case UMINUS:
+                extractGroundNumericInertia(exp.getChildren().get(0));
+                break;
+            case FN_HEAD:
+                Encoder.tableOfNumericGroundInertia.put(exp, Inertia.FLUENT);
+                break;
+            case NUMBER:
+            case ATOM:
+            case TRUE:
+            case TIME_VAR:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().getImage());
         }
     }
 
