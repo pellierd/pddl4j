@@ -185,6 +185,90 @@ final class PostInstantiation implements Serializable {
     }
 
     /**
+     * Extracts the relevant numeric fluents.
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     */
+    static void extractRelevantNumericFluents(final List<IntAction> actions, List<IntMethod> methods) {
+        final Set<IntExpression> fluents = new LinkedHashSet<>(100);
+        for (IntAction a : actions) {
+            if (a.isDurative()) {
+                extractRelevantNumericFluents(a.getDuration(), fluents);
+            }
+            extractRelevantNumericFluents(a.getPreconditions(), fluents);
+            extractRelevantNumericFluents(a.getEffects(), fluents);
+        }
+        Encoder.tableOfRelevantNumericFluents = new ArrayList<>(fluents.size());
+        for (IntExpression exp : fluents) {
+            final IntExpression relevant = new IntExpression(exp);
+            Encoder.tableOfRelevantNumericFluents.add(relevant);
+        }
+    }
+
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param fluents the set of relevant facts.
+     */
+    private static void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
+        switch (exp.getConnective()) {
+            case FN_HEAD:
+            case TIME_VAR:
+                fluents.add(exp);
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    PostInstantiation.extractRelevantNumericFluents(e, fluents);
+                }
+                break;
+            case UMINUS:
+            case NOT:
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
+                break;
+            case F_EXP:
+                PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case NUMBER:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+
+        }
+    }
+
+
+
+    /**
      * Extracts the relevant tasks from the instantiated methods. A ground tasks is relevant if and
      * only if it occurs as a task or a subtask of a instantiated method.
      *

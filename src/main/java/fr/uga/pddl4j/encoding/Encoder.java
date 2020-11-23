@@ -208,6 +208,11 @@ public final class Encoder implements Serializable {
     static List<IntExpression> tableOfRelevantFluents;
 
     /**
+     * The table of the relevant fluents.
+     */
+    static List<IntExpression> tableOfRelevantNumericFluents;
+
+    /**
      * The table of the relevant task.
      */
     static List<IntExpression> tableOfRelevantTasks;
@@ -647,6 +652,8 @@ public final class Encoder implements Serializable {
 
         // Extract the relevant fluents from the simplified and instantiated actions and methods
         PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
+        PostInstantiation.extractRelevantNumericFluents(intActions, intMethods);
+
         // Create the list of relevant tasks
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantTasks = new ArrayList<>();
