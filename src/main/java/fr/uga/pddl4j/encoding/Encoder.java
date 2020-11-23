@@ -277,6 +277,8 @@ public final class Encoder implements Serializable {
      */
     static List<Integer> relevantActions;
 
+    static Map<IntExpression, Double> intInitFunctionCost;
+
     /**
      * Creates a new planner.
      */
@@ -388,7 +390,7 @@ public final class Encoder implements Serializable {
         // Encode the initial state in integer representation
         final Set<IntExpression> intInit = IntEncoding.encodeInit(problem.getInit());
         // Create Map containing functions and associed cost from encoded initial state
-        final Map<IntExpression, Double> intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
+        Encoder.intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
         // Create Set containing integer representation of initial state without functions and associed cost
         final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
@@ -540,6 +542,7 @@ public final class Encoder implements Serializable {
 
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
+        
         if (intGoal != null) {
             // Expand the quantified expression in the goal
             Instantiation.expandQuantifiedExpression(intGoal, true);

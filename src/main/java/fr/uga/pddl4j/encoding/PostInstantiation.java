@@ -22,6 +22,7 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -520,13 +521,19 @@ final class PostInstantiation implements Serializable {
         final Set<Integer> toRemove = new HashSet<>(actions.size());
         int index = 0;
         for (IntAction a : actions) {
+            if (a.isDurative()) {
+                PostInstantiation.simplifyWithGroundNumericInertia(a.getDuration(), false);
+            }
             PostInstantiation.simplifyWithGroundInertia(a.getPreconditions(), false, init);
+            // ADD to symplified Numeric function
+            PostInstantiation.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
             PostInstantiation.simplify(a.getPreconditions());
             if (!a.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 PostInstantiation.simplifyWithGroundInertia(a.getEffects(), true, init);
+                // ADD for numeric fluents
+                PostInstantiation.simplifyWithGroundNumericInertia(a.getEffects(), true);
                 PostInstantiation.simplify(a.getEffects());
                 if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                    //&& !a.getEffect().getConnective().equals(PDDLConnective.TRUE)) {
                     toAdd.add(a);
                 } else {
                     toRemove.add(index);
@@ -963,8 +970,9 @@ final class PostInstantiation implements Serializable {
     }
 
     /**
-     * Do a pass over the effects of an instantiated action and update the ground inertia table.
+     * Do a pass over the effects of an instantiated action and update the ground numeric inertia table.
      * A numeric inertia is a function that is never change by any action of the problem.
+     * PDDLConnetive checks.
      *
      * @param exp the effect.
      */
@@ -1008,6 +1016,178 @@ final class PostInstantiation implements Serializable {
                 break;
             default:
                 throw new UnexpectedExpressionException(exp.getConnective().getImage());
+        }
+    }
+
+
+    /**
+     * Simplify a specified expression based on the ground inertia information.
+     *
+     *
+     * @param exp    the expression to simply.
+     * @param effect a boolean to indicate if the expression is an effect or a precondition.
+     */
+    private static void simplifyWithGroundNumericInertia(final IntExpression exp, final boolean effect) {
+        //System.out.println(exp.getConnective() + " " + Encoder.toString(exp));
+        switch (exp.getConnective()) {
+            case AND:
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
+                    PostInstantiation.simplifyWithGroundNumericInertia(ei, effect);
+                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        i.remove();
+                    }
+                }
+                if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
+                }
+                break;
+            case OR:
+                i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
+                    PostInstantiation.simplifyWithGroundNumericInertia(ei, effect);
+                    // If a child expression is TRUE, the whole disjunction is TRUE.
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        i.remove();
+                    }
+                }
+                if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
+                }
+                break;
+            case NOT:
+                final IntExpression neg = exp.getChildren().get(0);
+                PostInstantiation.simplifyWithGroundNumericInertia(neg, effect);
+                if (!effect) {
+                    if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    }
+                }
+                break;
+            case WHEN:
+                PostInstantiation.simplifyWithGroundNumericInertia(exp.getChildren().get(0), false);
+                PostInstantiation.simplifyWithGroundNumericInertia(exp.getChildren().get(1), true);
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                PostInstantiation.simplifyWithGroundNumericInertia(exp.getChildren().get(1), effect);
+                break;
+            case PLUS:
+            case MINUS:
+            case MUL:
+            case DIV:
+                IntExpression op1 = exp.getChildren().get(0);
+                IntExpression op2 = exp.getChildren().get(1);
+                PostInstantiation.simplifyWithGroundNumericInertia(op1, effect);
+                PostInstantiation.simplifyWithGroundNumericInertia(op2, effect);
+                if (op1.getConnective().equals(PDDLConnective.NUMBER)
+                        && op2.getConnective().equals(PDDLConnective.NUMBER)) {
+                    switch (exp.getConnective()) {
+                        case PLUS:
+                            exp.setValue(op1.getValue() + op2.getValue());
+                            break;
+                        case MINUS:
+                            exp.setValue(op1.getValue() - op2.getValue());
+                            break;
+                        case MUL:
+                            exp.setValue(op1.getValue() * op2.getValue());
+                            break;
+                        case DIV:
+                            exp.setValue(op1.getValue() / op2.getValue());
+                            break;
+                    }
+                    exp.setConnective(PDDLConnective.NUMBER);
+
+                }
+                break;
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+                op1 = exp.getChildren().get(0);
+                op2 = exp.getChildren().get(1);
+                PostInstantiation.simplifyWithGroundNumericInertia(op1, effect);
+                PostInstantiation.simplifyWithGroundNumericInertia(op2, effect);
+                if (op1.getConnective().equals(PDDLConnective.NUMBER)
+                        && op2.getConnective().equals(PDDLConnective.NUMBER)) {
+                    switch (exp.getConnective()) {
+                        case LESS:
+                            if (op1.getValue() < op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case LESS_OR_EQUAL:
+                            if (op1.getValue() <= op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case GREATER:
+                            if (op1.getValue() > op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case GREATER_OR_EQUAL:
+                            if (op1.getValue() >= op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case EQUAL:
+                            if (op1.getValue() == op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                    }
+                }
+                break;
+            case F_EXP:
+                IntExpression fexp = exp.getChildren().get(0);
+                PostInstantiation.simplifyWithGroundNumericInertia(fexp, effect);
+                if (fexp.getConnective().equals(PDDLConnective.NUMBER)) {
+                    exp.setValue(fexp.getValue());
+                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.getChildren().clear();
+                }
+                break;
+            case FN_HEAD:
+                Inertia inertia = Encoder.tableOfNumericGroundInertia.get(exp);
+                if (inertia == null) {
+                    Double value = Encoder.intInitFunctionCost.get(exp);
+                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.setValue(value);
+                }
+                break;
+            case NUMBER:
+            case TIME_VAR:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
 
