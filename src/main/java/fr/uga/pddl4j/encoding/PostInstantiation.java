@@ -1197,6 +1197,14 @@ final class PostInstantiation implements Serializable {
 
                 }
                 break;
+            case UMINUS:
+                op1 = exp.getChildren().get(0);
+                if (op1.getConnective().equals(PDDLConnective.NUMBER)) {
+                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.setValue(-op1.getValue());
+                    exp.getChildren().clear();
+                }
+            }
             case LESS:
             case LESS_OR_EQUAL:
             case EQUAL:
