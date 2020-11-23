@@ -542,7 +542,7 @@ public final class Encoder implements Serializable {
 
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
-        
+
         if (intGoal != null) {
             // Expand the quantified expression in the goal
             Instantiation.expandQuantifiedExpression(intGoal, true);

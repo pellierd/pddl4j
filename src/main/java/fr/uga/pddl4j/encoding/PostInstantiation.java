@@ -689,6 +689,7 @@ final class PostInstantiation implements Serializable {
      */
     static void simplifyGoalWithGroundInertia(final IntExpression goal, final Set<IntExpression> init) {
         PostInstantiation.simplifyWithGroundInertia(goal, false, init);
+        PostInstantiation.simplifyWithGroundNumericInertia(goal, false);
         PostInstantiation.simplify(goal);
     }
 
