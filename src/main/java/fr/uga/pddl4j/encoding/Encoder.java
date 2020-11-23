@@ -652,7 +652,9 @@ public final class Encoder implements Serializable {
 
         // Extract the relevant fluents from the simplified and instantiated actions and methods
         PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
-        PostInstantiation.extractRelevantNumericFluents(intActions, intMethods);
+        if (Encoder.requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            PostInstantiation.extractRelevantNumericFluents(intActions, intMethods);
+        }
 
         // Create the list of relevant tasks
         if (Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
@@ -689,6 +691,17 @@ public final class Encoder implements Serializable {
         for (IntExpression fluent : Encoder.tableOfRelevantFluents) {
             fluentIndexMap.put(fluent, index);
             index++;
+        }
+
+        Map<IntExpression, Integer> numericFluentIndexMap = null;
+        if (Encoder.requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            // Create a map of the relevant numeric fluents with their index to speedup the bit set encoding of the actions
+            numericFluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
+            index = 0;
+            for (IntExpression fluent : Encoder.tableOfRelevantNumericFluents) {
+                numericFluentIndexMap.put(fluent, index);
+                index++;
+            }
         }
 
         // Creates the list of relevant operators
