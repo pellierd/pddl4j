@@ -1204,7 +1204,7 @@ final class PostInstantiation implements Serializable {
                     exp.setValue(-op1.getValue());
                     exp.getChildren().clear();
                 }
-            }
+                break;
             case LESS:
             case LESS_OR_EQUAL:
             case EQUAL:
