@@ -26,6 +26,7 @@ import fr.uga.pddl4j.problem.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -325,25 +326,42 @@ final class BitEncoding implements Serializable {
      * map is used to speed-up the search by mapping the an expression to this index.
      *
      * @param init the initial state to encode.
-     * @param map  the map that associates to a specified expression its index.
+     * @param fluentMap  the map that associates to a specified expression its index.
      * @return the <code>BitExp</code> that represents the initial encoded.
      */
-    static InitialState encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> map) {
+    static InitialState encodeInit(final Set<IntExpression> init, final Map<IntExpression, Integer> fluentMap) {
         final InitialState bitInit = new InitialState();
         for (final IntExpression fact : init) {
-            if (fact.getConnective().equals(PDDLConnective.ATOM)) {
-                final Integer i = map.get(fact);
-                if (i != null) {
-                    bitInit.getPositiveFluents().set(i);
-                }
-            } else {
-                final Integer i = map.get(fact.getChildren().get(0));
-                if (i != null) {
-                    bitInit.getNegativeFluents().set(i);
-                }
+            switch (fact.getConnective()) {
+                case ATOM:
+                    Integer i = fluentMap.get(fact);
+                    if (i != null) {
+                        bitInit.getPositiveFluents().set(i);
+                    }
+                    break;
+                case NOT:
+                    i = fluentMap.get(fact.getChildren().get(0));
+                    if (i != null) {
+                        bitInit.getNegativeFluents().set(i);
+                    }
+                    break;
             }
         }
+
         return bitInit;
+    }
+
+    /**
+     *
+     */
+    static void encodeInitNumericFluent(InitialState init, final Map<IntExpression, Integer> numericFluentMap,
+                                        final Map<IntExpression, Double> initValue) {
+        for (Map.Entry<IntExpression, Integer> e : numericFluentMap.entrySet()) {
+            int index = e.getValue();
+            double value = initValue.get(e.getKey());
+            NumericVariable fluent = new NumericVariable(index, value);
+            init.addNumericFluent(fluent);
+        }
     }
 
     /**

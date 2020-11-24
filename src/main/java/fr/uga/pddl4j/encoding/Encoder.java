@@ -396,6 +396,7 @@ public final class Encoder implements Serializable {
         final Set<IntExpression> intInit = IntEncoding.encodeInit(problem.getInit());
         // Create Map containing functions and associed cost from encoded initial state
         Encoder.intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
+
         // Create Set containing integer representation of initial state without functions and associed cost
         final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
@@ -693,10 +694,9 @@ public final class Encoder implements Serializable {
             index++;
         }
 
-        Map<IntExpression, Integer> numericFluentIndexMap = null;
+        final Map<IntExpression, Integer> numericFluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
         if (Encoder.requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             // Create a map of the relevant numeric fluents with their index to speedup the bit set encoding of the actions
-            numericFluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
             index = 0;
             for (IntExpression fluent : Encoder.tableOfRelevantNumericFluents) {
                 numericFluentIndexMap.put(fluent, index);
@@ -738,6 +738,14 @@ public final class Encoder implements Serializable {
 
         // Encode the initial state in bit set representation
         Encoder.init = BitEncoding.encodeInit(intInitPredicates, fluentIndexMap);
+        if (Encoder.requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            BitEncoding.encodeInitNumericFluent(Encoder.init, numericFluentIndexMap, Encoder.intInitFunctionCost);
+        }
+        if (Encoder.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            NumericVariable duration = new NumericVariable(Encoder.tableOfRelevantNumericFluents.size(), 0.0);
+            Encoder.tableOfRelevantNumericFluents.add(new IntExpression(PDDLConnective.TIME_VAR));
+            Encoder.init.addNumericFluent(duration);
+        }
 
         // Encode the actions in bit set representation
         Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
@@ -1087,6 +1095,23 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(exp, Encoder.tableOfConstants,
             Encoder.tableOfTypes, Encoder.tableOfPredicates,
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
+    }
+
+    /**
+     * Returns a string representation of a bit expression.
+     *
+     * @param state the expression.
+     * @return a string representation of the specified expression.
+     */
+    static String toString(InitialState state) {
+        return StringDecoder.toString(state,
+            Encoder.tableOfConstants,
+            Encoder.tableOfTypes,
+            Encoder.tableOfPredicates,
+            Encoder.tableOfFunctions,
+            Encoder.tableOfRelevantFluents,
+            Encoder.tableOfRelevantNumericFluents,
+            Encoder.tableOfTasks);
     }
 
     /**

@@ -559,6 +559,45 @@ final class StringDecoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
+    static String toString(InitialState state, final List<String> constants, final List<String> types,
+                           final List<String> predicates, final List<String> functions,
+                           final List<IntExpression> relevants, final List<IntExpression> numericFluents,
+                           final List<String> tasks) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = state.getPositiveFluents();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
+                new ArrayList<String>())).append("\n");
+        }
+        final BitSet negative = state.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
+                functions, new ArrayList<String>())).append(")\n");
+        }
+        for (NumericVariable numeric : state.getNumericFluents()) {
+            str.append(" (= ");
+            IntExpression exp = numericFluents.get(numeric.getNumericFluents());
+            str.append(StringDecoder.toString(exp, constants, types, predicates, functions, tasks));
+            str.append(" ");
+            str.append(numeric.getValue());
+            str.append(")\n");
+        }
+
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a state.
+     *
+     * @param state      the state.
+     * @param constants  the table of constants.
+     * @param types      the table of types.
+     * @param predicates the table of predicates.
+     * @param functions  the table of functions.
+     * @param relevants  the table of relevant facts.
+     * @return a string representation of the specified expression.
+     */
     static String toString(Effect state, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<IntExpression> relevants) {

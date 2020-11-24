@@ -220,8 +220,7 @@ final class PostInstantiation implements Serializable {
     private static void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
         switch (exp.getConnective()) {
             case FN_HEAD:
-            case TIME_VAR:
-                fluents.add(exp);
+            fluents.add(exp);
                 break;
             case AND:
             case OR:
@@ -254,6 +253,7 @@ final class PostInstantiation implements Serializable {
             case F_EXP:
                 PostInstantiation.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
                 break;
+            case TIME_VAR:
             case NUMBER:
             case ATOM:
             case TRUE:
