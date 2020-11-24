@@ -748,7 +748,7 @@ public final class Encoder implements Serializable {
         }
 
         // Encode the actions in bit set representation
-        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap));
+        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap, numericFluentIndexMap));
 
         // Just for logging
         if (Encoder.logLevel == 7) {
@@ -1112,6 +1112,10 @@ public final class Encoder implements Serializable {
             Encoder.tableOfRelevantFluents,
             Encoder.tableOfRelevantNumericFluents,
             Encoder.tableOfTasks);
+    }
+
+    static String toString(NumericConstraint constraint) {
+        return StringDecoder.toString(constraint);
     }
 
     /**

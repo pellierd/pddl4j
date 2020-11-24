@@ -5,6 +5,7 @@ package fr.uga.pddl4j.problem;
  */
 public class NumericVariable extends ArithmeticExpression {
 
+    public static final int DURATION = -1;
     /**
      * Create a new numeric variable.
      */

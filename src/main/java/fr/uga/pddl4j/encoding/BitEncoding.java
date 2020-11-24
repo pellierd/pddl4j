@@ -78,20 +78,22 @@ final class BitEncoding implements Serializable {
      * @param map     the map that associates to a specified expression its index.
      * @return the list of actions encoded into bit set.
      */
-    static List<Action> encodeActions(final List<IntAction> actions, final Map<IntExpression, Integer> map)
-        throws UnexpectedExpressionException {
+    static List<Action> encodeActions(final List<IntAction> actions,
+                                      final Map<IntExpression, Integer> map,
+                                      final Map<IntExpression, Integer> numericFluentIndexMap)
+                                            throws UnexpectedExpressionException {
 
         final List<Action> encodedActions = new ArrayList<>(actions.size());
         final List<Action> addedActions = new ArrayList<>();
         int actionIndex = 0;
         for (IntAction intAction : actions) {
             List<IntAction> normalized = BitEncoding.normalizeAction(intAction);
-            encodedActions.add(BitEncoding.encodeAction(normalized.get(0), map));
+            encodedActions.add(BitEncoding.encodeAction(normalized.get(0), map, numericFluentIndexMap));
             for (int i  = 1; i < normalized.size(); i++) {
                 if (Encoder.tableOfRelevantOperators != null) {
                     Encoder.tableOfRelevantOperators.get(actionIndex).add(actions.size() + addedActions.size());
                 }
-                addedActions.add(BitEncoding.encodeAction(normalized.get(i), map));
+                addedActions.add(BitEncoding.encodeAction(normalized.get(i), map, numericFluentIndexMap));
             }
             actionIndex++;
         }
@@ -107,7 +109,9 @@ final class BitEncoding implements Serializable {
      * @param map the map that associates to a specified expression its index.
      * @return the action encoded.
      */
-    private static Action encodeAction(final IntAction action, final Map<IntExpression, Integer> map) {
+    private static Action encodeAction(final IntAction action,
+                                       final Map<IntExpression, Integer> map,
+                                       final Map<IntExpression, Integer> numericFluentIndexMap) {
         final int arity = action.arity();
         final Action encoded = new Action(action.getName(), arity);
         encoded.setCost(new NumericVariable(-1, action.getCost()));
@@ -117,6 +121,12 @@ final class BitEncoding implements Serializable {
             encoded.setValueOfParameter(i, action.getValueOfParameter(i));
             encoded.setTypeOfParameter(i, action.getTypeOfParameters(i));
         }
+
+        if (action.isDurative()) {
+            List<NumericConstraint> duration = BitEncoding.encodeNumericConstraints(action.getDuration(), numericFluentIndexMap);
+            encoded.setDurationConstraints(duration);
+        }
+        
 
         // Initialize the preconditions of the action
         encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), map));
@@ -129,27 +139,32 @@ final class BitEncoding implements Serializable {
         for (IntExpression ei : effects) {
             final PDDLConnective connective = ei.getConnective();
             final List<IntExpression> children = ei.getChildren();
-            if (connective.equals(PDDLConnective.WHEN)) {
-                final ConditionalEffect condBitExp = new ConditionalEffect();
-                condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map));
-                condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), map));
-                encoded.getConditionalEffects().add(condBitExp);
-            } else if (connective.equals(PDDLConnective.ATOM)) {
-                final Integer index = map.get(ei);
-                if (index != null) {
-                    unCondEffects.getEffect().getPositiveFluents().set(index);
-                    hasUnConditionalEffects = true;
-                }
-            } else if (connective.equals(PDDLConnective.TRUE)) {
-                // do nothing
-            } else if (connective.equals(PDDLConnective.NOT)) {
-                final Integer index = map.get(children.get(0));
-                if (index != null) {
-                    unCondEffects.getEffect().getNegativeFluents().set(index);
-                    hasUnConditionalEffects = true;
-                }
-            } else {
-                throw new UnexpectedExpressionException(Encoder.toString(ei));
+            switch (connective) {
+                case WHEN:
+                    final ConditionalEffect condBitExp = new ConditionalEffect();
+                    condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map));
+                    condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), map));
+                    encoded.getConditionalEffects().add(condBitExp);
+                    break;
+                case ATOM:
+                    Integer index = map.get(ei);
+                    if (index != null) {
+                        unCondEffects.getEffect().getPositiveFluents().set(index);
+                        hasUnConditionalEffects = true;
+                    }
+                break;
+                case NOT:
+                    index = map.get(children.get(0));
+                    if (index != null) {
+                        unCondEffects.getEffect().getNegativeFluents().set(index);
+                        hasUnConditionalEffects = true;
+                    }
+                    break;
+                case TRUE:
+                    // do nothing
+                    break;
+                default:
+                    throw new UnexpectedExpressionException(Encoder.toString(ei));
             }
         }
         if (hasUnConditionalEffects) {
@@ -459,47 +474,6 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Normalize the actions, i.e, put in disjunctive normal form (DNF) for preconditions and put
-     * in conjunctive normal form (CNF) for effects. If an action has disjunctive preconditions, a
-     * new operator is created such all actions after normalization have only conjunctive
-     * precondition.
-     *
-     * @param actions the list of actions to normalizeActions.
-     */
-    private static void normalizeActions(final List<IntAction> actions) {
-        final List<IntAction> normalisedActions = new ArrayList<>(actions.size() + 100);
-        for (IntAction a : actions) {
-            BitEncoding.toCNF(a.getEffects());
-            BitEncoding.simplify(a.getEffects());
-            final IntExpression precond = a.getPreconditions();
-            BitEncoding.toDNF(precond);
-            if (precond.getChildren().size() > 0) {
-                for (final IntExpression ei : precond.getChildren()) {
-                    final String name = a.getName();
-                    final int arity = a.arity();
-                    final IntAction newAction = new IntAction(name, arity);
-                    newAction.setCost(a.getCost());
-                    for (int i = 0; i < arity; i++) {
-                        newAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
-                    }
-                    for (int i = 0; i < arity; i++) {
-                        newAction.setValueOfParameter(i, a.getValueOfParameter(i));
-                    }
-                    newAction.setPreconditions(ei);
-
-                    newAction.setEffects(new IntExpression(a.getEffects()));
-                    normalisedActions.add(newAction);
-                }
-            } else {
-                normalisedActions.add(a);
-            }
-
-        }
-        actions.clear();
-        actions.addAll(normalisedActions);
-    }
-
-    /**
      * Normalize an action, i.e, put in disjunctive normal form (DNF) for preconditions and put
      * in conjunctive normal form (CNF) for effects. If an action has disjunctive preconditions, a
      * new operator is created such all actions after normalization have only conjunctive
@@ -524,6 +498,9 @@ final class BitEncoding implements Serializable {
                 }
                 for (int i = 0; i < arity; i++) {
                     newAction.setValueOfParameter(i, action.getValueOfParameter(i));
+                }
+                if (action.isDurative()) {
+                    newAction.setDuration(new IntExpression(action.getDuration()));
                 }
                 newAction.setPreconditions(ei);
 
@@ -771,5 +748,122 @@ final class BitEncoding implements Serializable {
             default:
                 throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
+    }
+
+    /**
+     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param exp the <code>IntExpression</code>.
+     * @return the expression in bit set representation.
+     */
+    static List<NumericConstraint> encodeNumericConstraints(final IntExpression exp, final Map<IntExpression, Integer> indexMap)
+        throws UnexpectedExpressionException {
+
+        final List<NumericConstraint> constraints = new ArrayList<>();
+        switch (exp.getConnective()) {
+            case AND:
+                for (IntExpression e : exp.getChildren()) {
+                    constraints.addAll(BitEncoding.encodeNumericConstraints(e, indexMap));
+                }
+                break;
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+                constraints.add(BitEncoding.encodeNumericConstraint(exp, indexMap));
+                break;
+            case TRUE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return constraints;
+    }
+
+    /**
+     * Encodes a numeric constraint.
+     */
+    static NumericConstraint encodeNumericConstraint(final IntExpression exp,
+                                                     final Map<IntExpression, Integer> indexMap) {
+
+        ArithmeticExpression left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+        ArithmeticExpression right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), indexMap);
+        NumericConstraint constraint = null;
+        switch (exp.getConnective()) {
+            case EQUAL:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.EQUAL, left, right);
+                break;
+            case LESS:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.LESS, left, right);
+                break;
+            case LESS_OR_EQUAL:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.LESS_OR_EQUAL, left, right);
+                break;
+            case GREATER:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER, left, right);
+                break;
+            case GREATER_OR_EQUAL:
+                constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER_OR_EQUAL, left, right);
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return constraint;
+    }
+    /**
+     * Encodes an arithmetic expression.
+     *
+     * @param exp the expression to encode.
+     */
+    static ArithmeticExpression encodeArithmeticExpression(final IntExpression exp,
+                                                           final Map<IntExpression, Integer> indexMap) {
+
+        ArithmeticExpression arithmeticExpression;
+        ArithmeticExpression left;
+        ArithmeticExpression right;
+        switch (exp.getConnective()) {
+            case PLUS:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), indexMap);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.PLUS, left, right);
+                break;
+            case MINUS:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), indexMap);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.MINUS, left, right);
+                break;
+            case UMINUS:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.UMINUS, left, null);
+                break;
+            case DIV:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), indexMap);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.DIV, left, right);
+                break;
+            case MUL:
+                left = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+                right = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), indexMap);
+                arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.MUL, left, right);
+                break;
+            case NUMBER:
+                arithmeticExpression = new ArithmeticExpression(exp.getValue());
+                break;
+            case F_EXP:
+                arithmeticExpression = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(0), indexMap);
+                break;
+            case FN_HEAD:
+                arithmeticExpression = new NumericVariable(indexMap.get(exp));
+                break;
+            case TIME_VAR:
+                arithmeticExpression = new NumericVariable(NumericVariable.DURATION);
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return arithmeticExpression;
     }
 }

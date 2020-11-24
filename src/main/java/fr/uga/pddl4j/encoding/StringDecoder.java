@@ -690,4 +690,117 @@ final class StringDecoder implements Serializable {
         return str.toString();
     }
 
+    /**
+     * Returns a string representation of numeric constraints.
+     *
+     * @param constraint the numeric constraints.
+     * @return a string representation of numeric constraints.
+     */
+    static String toString(final NumericConstraint constraint) {
+        final StringBuilder str = new StringBuilder();
+        switch (constraint.getComparator()) {
+            case EQUAL:
+                str.append("(= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression()));
+                str.append(")");
+                break;
+            case LESS:
+                str.append("(< ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression()));
+                str.append(")");
+                break;
+            case LESS_OR_EQUAL:
+                str.append("(<= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression()));
+                str.append(")");
+                break;
+            case GREATER:
+                str.append("(> ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression()));
+                str.append(")");
+                break;
+            case GREATER_OR_EQUAL:
+                str.append("(>= ");
+                str.append(StringDecoder.toString(constraint.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(constraint.getRightExpression()));
+                str.append(")");
+                break;
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of an arithmetic expression.
+     *
+     * @param exp the arithmetic expression.
+     * @return a string representation of an arithmetic expression.
+     */
+    static String toString(final ArithmeticExpression exp) {
+        StringBuilder str = new StringBuilder();
+        switch (exp.getType()) {
+            case NUMBER:
+                str.append(exp.getValue());
+                break;
+            case VARIABLE:
+                str.append("(");
+                if (exp.getNumericFluents() == NumericVariable.DURATION) {
+                    str.append("?duration");
+                } else {
+                    str.append(StringDecoder.toString(Encoder.tableOfRelevantNumericFluents.get(exp.getNumericFluents()),
+                        Encoder.tableOfConstants, Encoder.tableOfTypes, Encoder.tableOfPredicates,
+                        Encoder.tableOfFunctions, Encoder.tableOfTasks));
+                }
+                str.append("/");
+                str.append(exp.getValue());
+                str.append(")");
+                break;
+            case OPERATOR:
+                switch (exp.getArithmeticOperator()) {
+                    case PLUS:
+                        str.append("(+ ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression()));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression()));
+                        str.append(")");
+                        break;
+                    case MINUS:
+                        str.append("(- ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression()));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression()));
+                        str.append(")");
+                        break;
+                    case DIV:
+                        str.append("(/ ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression()));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression()));
+                        str.append(")");
+                        break;
+                    case MUL:
+                        str.append("(* ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression()));
+                        str.append(" ");
+                        str.append(StringDecoder.toString(exp.getRightExpression()));
+                        str.append(")");
+                        break;
+                    case UMINUS:
+                        str.append("(- ");
+                        str.append(StringDecoder.toString(exp.getLeftExpression()));
+                        str.append(")");
+                        break;
+                }
+        }
+        return str.toString();
+    }
+
 }
