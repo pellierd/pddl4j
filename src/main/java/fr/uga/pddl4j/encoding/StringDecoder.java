@@ -544,6 +544,11 @@ final class StringDecoder implements Serializable {
             str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
                 functions, new ArrayList<String>())).append(")\n");
         }
+        for (NumericConstraint constraint : state.getNumericConstraints()) {
+            str.append(StringDecoder.toString(constraint));
+            str.append("\n");
+        }
+
         str.append(")");
         return str.toString();
     }

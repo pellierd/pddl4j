@@ -28,10 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -126,10 +123,10 @@ final class BitEncoding implements Serializable {
             List<NumericConstraint> duration = BitEncoding.encodeNumericConstraints(action.getDuration(), numericFluentIndexMap);
             encoded.setDurationConstraints(duration);
         }
-        
+
 
         // Initialize the preconditions of the action
-        encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), map));
+        encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), map, numericFluentIndexMap));
 
         // Initialize the effects of the action
         final List<IntExpression> effects = action.getEffects().getChildren();
@@ -142,7 +139,7 @@ final class BitEncoding implements Serializable {
             switch (connective) {
                 case WHEN:
                     final ConditionalEffect condBitExp = new ConditionalEffect();
-                    condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map));
+                    condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map, numericFluentIndexMap));
                     condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), map));
                     encoded.getConditionalEffects().add(condBitExp);
                     break;
@@ -226,7 +223,7 @@ final class BitEncoding implements Serializable {
         // Encode the task carried out by the method
         encoded.setTask(taskMap.get(method.getTask()));
         // Encode the preconditions of the method
-        encoded.setPrecondition(BitEncoding.encodeCondition(method.getPreconditions(), factMap));
+        encoded.setPrecondition(BitEncoding.encodeCondition(method.getPreconditions(), factMap, new HashMap<>()));
         // Encode the task network of the method
         encoded.setTaskNetwork(BitEncoding.encodeTaskNetwork(method.getTaskNetwork(), taskMap));
         return encoded;
@@ -255,9 +252,9 @@ final class BitEncoding implements Serializable {
             if (exp.getConnective().equals(PDDLConnective.ATOM)) {
                 IntExpression and = new IntExpression(PDDLConnective.AND);
                 and.getChildren().add(exp);
-                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(and, map)));
+                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(and, map, new HashMap<>())));
             } else {
-                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(exp, map)));
+                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(exp, map, new HashMap<>())));
             }
         }
         if (Encoder.codedGoal.size() > 1) {
@@ -387,43 +384,40 @@ final class BitEncoding implements Serializable {
      * @param map the map that associate to a specified expression its index.
      * @return the expression in bit set representation.
      */
-    private static Condition encodeCondition(final IntExpression exp, final Map<IntExpression, Integer> map)
+    private static Condition encodeCondition(final IntExpression exp,
+                                             final Map<IntExpression, Integer> map,
+                                             final Map<IntExpression, Integer> numeric)
         throws UnexpectedExpressionException {
-        final Condition bitExp = new Condition();
-        if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-            final Integer index = map.get(exp);
-            if (index != null) {
-                bitExp.getPositiveFluents().set(index);
-            }
-        } else if (exp.getConnective().equals(PDDLConnective.NOT)) {
-            final Integer index = map.get(exp.getChildren().get(0));
-            if (index != null) {
-                bitExp.getNegativeFluents().set(index);
-            }
-        } else if (exp.getConnective().equals(PDDLConnective.AND)) {
-            final List<IntExpression> children = exp.getChildren();
-            for (IntExpression ei : children) {
-                if (ei.getConnective().equals(PDDLConnective.ATOM)) {
-                    final Integer index = map.get(ei);
-                    if (index != null) {
-                        bitExp.getPositiveFluents().set(index);
-                    }
-                } else if (ei.getConnective().equals(PDDLConnective.NOT)) {
-                    final Integer index = map.get(ei.getChildren().get(0));
-                    if (index != null) {
-                        bitExp.getNegativeFluents().set(index);
-                    }
-                } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                    // do nothing
-                } else {
-                    throw new UnexpectedExpressionException(Encoder.toString(exp));
+        final Condition condition = new Condition();
+        switch (exp.getConnective()) {
+            case ATOM:
+                condition.getPositiveFluents().set(map.get(exp));
+                break;
+            case NOT:
+                condition.getNegativeFluents().set(map.get(exp.getChildren().get(0)));
+                break;
+            case AND:
+                for (IntExpression e : exp.getChildren()) {
+                    Condition ce = BitEncoding.encodeCondition(e, map, numeric);
+                    condition.getPositiveFluents().or(ce.getPositiveFluents());
+                    condition.getNegativeFluents().or(ce.getNegativeFluents());
+                    condition.getNumericConstraints().addAll(ce.getNumericConstraints());
                 }
-            }
-        } else {
-            LOGGER.error(Encoder.toString(exp));
-            throw new UnexpectedExpressionException(Encoder.toString(exp));
+                break;
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
+                condition.getNumericConstraints().add(BitEncoding.encodeNumericConstraint(exp, numeric));
+                break;
+            case TRUE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
-        return bitExp;
+        return condition;
     }
 
     /**
