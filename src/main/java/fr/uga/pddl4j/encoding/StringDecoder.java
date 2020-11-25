@@ -470,7 +470,16 @@ final class StringDecoder implements Serializable {
                     .append(constants.get(index)).append(" \n");
             }
         }
-        str.append("Preconditions:\n").append(StringDecoder.toString(action.getPrecondition(), constants, types,
+        if (action.isDurative()) {
+            str.append("Duration:");
+            for (NumericConstraint constraint : action.getDurationConstraints()) {
+                str.append("\n " + StringDecoder.toString(constraint));
+            }
+            str.append("\nCondition:\n");
+        } else {
+            str.append("Preconditions:\n");
+        }
+        str.append(StringDecoder.toString(action.getPrecondition(), constants, types,
             predicates, functions, relevants)).append("\n").append("Effects:\n");
         for (ConditionalEffect condExp : action.getConditionalEffects()) {
             str.append(StringDecoder.toString(condExp, constants, types, predicates, functions, relevants))
@@ -545,7 +554,7 @@ final class StringDecoder implements Serializable {
                 functions, new ArrayList<String>())).append(")\n");
         }
         for (NumericConstraint constraint : state.getNumericConstraints()) {
-            str.append(StringDecoder.toString(constraint));
+            str.append(" " + StringDecoder.toString(constraint));
             str.append("\n");
         }
 
@@ -595,7 +604,7 @@ final class StringDecoder implements Serializable {
     /**
      * Returns a string representation of a state.
      *
-     * @param state      the state.
+     * @param effect      the state.
      * @param constants  the table of constants.
      * @param types      the table of types.
      * @param predicates the table of predicates.
@@ -603,19 +612,23 @@ final class StringDecoder implements Serializable {
      * @param relevants  the table of relevant facts.
      * @return a string representation of the specified expression.
      */
-    static String toString(Effect state, final List<String> constants, final List<String> types,
+    static String toString(Effect effect, final List<String> constants, final List<String> types,
                            final List<String> predicates, final List<String> functions,
                            final List<IntExpression> relevants) {
         final StringBuilder str = new StringBuilder("(and");
-        final BitSet positive = state.getPositiveFluents();
+        final BitSet positive = effect.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ").append(StringDecoder.toString(relevants.get(j), constants, types, predicates, functions,
                 new ArrayList<String>())).append("\n");
         }
-        final BitSet negative = state.getNegativeFluents();
+        final BitSet negative = effect.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ").append(StringDecoder.toString(relevants.get(i), constants, types, predicates,
                 functions, new ArrayList<String>())).append(")\n");
+        }
+        for (NumericAssignment assignment : effect.getNumericAssignments()) {
+            str.append(" " + StringDecoder.toString(assignment));
+            str.append("\n");
         }
         str.append(")");
         return str.toString();
@@ -804,6 +817,54 @@ final class StringDecoder implements Serializable {
                         str.append(")");
                         break;
                 }
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a numeric assignment.
+     *
+     * @param assignment the numeric assignment.
+     * @return a string representation of a numeric assignment.
+     */
+    public static String toString(final NumericAssignment assignment) {
+        final StringBuilder str = new StringBuilder();
+        switch (assignment.getOperator()) {
+            case ASSIGN:
+                str.append("(assign ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression()));
+                str.append(")");
+                break;
+            case INCREASE:
+                str.append("(increase ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression()));
+                str.append(")");
+                break;
+            case DECREASE:
+                str.append("(decrease ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression()));
+                str.append(")");
+                break;
+            case SCALE_UP:
+                str.append("(scale-up ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression()));
+                str.append(")");
+                break;
+            case SCALE_DOWN:
+                str.append("(scale-down ");
+                str.append(StringDecoder.toString(assignment.getLeftExpression()));
+                str.append(" ");
+                str.append(StringDecoder.toString(assignment.getRightExpression()));
+                str.append(")");
+                break;
         }
         return str.toString();
     }

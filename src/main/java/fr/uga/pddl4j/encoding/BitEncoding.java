@@ -124,7 +124,6 @@ final class BitEncoding implements Serializable {
             encoded.setDurationConstraints(duration);
         }
 
-
         // Initialize the preconditions of the action
         encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), map, numericFluentIndexMap));
 
@@ -138,6 +137,7 @@ final class BitEncoding implements Serializable {
             final List<IntExpression> children = ei.getChildren();
             switch (connective) {
                 case WHEN:
+                    // NumericAssignement not encoded in conditional effect.
                     final ConditionalEffect condBitExp = new ConditionalEffect();
                     condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map, numericFluentIndexMap));
                     condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), map));
@@ -159,6 +159,14 @@ final class BitEncoding implements Serializable {
                     break;
                 case TRUE:
                     // do nothing
+                    break;
+                case ASSIGN:
+                case SCALE_DOWN:
+                case SCALE_UP:
+                case INCREASE:
+                case DECREASE:
+                    NumericAssignment assignment = BitEncoding.encodeNumericAssignment(ei, numericFluentIndexMap);
+                    unCondEffects.getEffect().addNumericAssignment(assignment);
                     break;
                 default:
                     throw new UnexpectedExpressionException(Encoder.toString(ei));
@@ -859,5 +867,35 @@ final class BitEncoding implements Serializable {
                 throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
         return arithmeticExpression;
+    }
+
+    /**
+     * Encodes a numeric assignment.
+     */
+    static NumericAssignment encodeNumericAssignment(final IntExpression exp, Map<IntExpression, Integer> numericIndex) {
+
+        final NumericVariable fluent = new NumericVariable(numericIndex.get(exp.getChildren().get(0)));
+        final ArithmeticExpression arithmeticExpression = BitEncoding.encodeArithmeticExpression(exp.getChildren().get(1), numericIndex);
+        NumericAssignment assignment = null;
+        switch (exp.getConnective()) {
+            case ASSIGN:
+                assignment = new NumericAssignment(NumericAssignment.Operator.ASSIGN, fluent, arithmeticExpression);
+                break;
+            case INCREASE:
+                assignment = new NumericAssignment(NumericAssignment.Operator.INCREASE, fluent, arithmeticExpression);
+                break;
+            case DECREASE:
+                assignment = new NumericAssignment(NumericAssignment.Operator.DECREASE, fluent, arithmeticExpression);
+                break;
+            case SCALE_UP:
+                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_UP, fluent, arithmeticExpression);
+                break;
+            case SCALE_DOWN:
+                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_DOWN, fluent, arithmeticExpression);
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
+        }
+        return assignment;
     }
 }
