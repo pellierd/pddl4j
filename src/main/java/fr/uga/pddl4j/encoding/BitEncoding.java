@@ -103,12 +103,12 @@ final class BitEncoding implements Serializable {
      *
      * @param action the action to be encoded. The precondition of the action must be a simple conjunction of atomic
      *               formulas
-     * @param map the map that associates to a specified expression its index.
+     * @param fluents the map that associates to a specified expression its index.
      * @return the action encoded.
      */
     private static Action encodeAction(final IntAction action,
-                                       final Map<IntExpression, Integer> map,
-                                       final Map<IntExpression, Integer> numericFluentIndexMap) {
+                                       final Map<IntExpression, Integer> fluents,
+                                       final Map<IntExpression, Integer> numeric) {
         final int arity = action.arity();
         final Action encoded = new Action(action.getName(), arity);
         encoded.setCost(new NumericVariable(-1, action.getCost()));
@@ -120,12 +120,12 @@ final class BitEncoding implements Serializable {
         }
 
         if (action.isDurative()) {
-            List<NumericConstraint> duration = BitEncoding.encodeNumericConstraints(action.getDuration(), numericFluentIndexMap);
+            List<NumericConstraint> duration = BitEncoding.encodeNumericConstraints(action.getDuration(), numeric);
             encoded.setDurationConstraints(duration);
         }
 
         // Initialize the preconditions of the action
-        encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), map, numericFluentIndexMap));
+        encoded.setPrecondition(BitEncoding.encodeCondition(action.getPreconditions(), fluents, numeric));
 
         // Initialize the effects of the action
         final List<IntExpression> effects = action.getEffects().getChildren();
@@ -139,19 +139,19 @@ final class BitEncoding implements Serializable {
                 case WHEN:
                     // NumericAssignement not encoded in conditional effect.
                     final ConditionalEffect condBitExp = new ConditionalEffect();
-                    condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), map, numericFluentIndexMap));
-                    condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), map));
+                    condBitExp.setCondition(BitEncoding.encodeCondition(children.get(0), fluents, numeric));
+                    condBitExp.setEffect(BitEncoding.encodeEffect(children.get(1), fluents, numeric));
                     encoded.getConditionalEffects().add(condBitExp);
                     break;
                 case ATOM:
-                    Integer index = map.get(ei);
+                    Integer index = fluents.get(ei);
                     if (index != null) {
                         unCondEffects.getEffect().getPositiveFluents().set(index);
                         hasUnConditionalEffects = true;
                     }
                 break;
                 case NOT:
-                    index = map.get(children.get(0));
+                    index = fluents.get(children.get(0));
                     if (index != null) {
                         unCondEffects.getEffect().getNegativeFluents().set(index);
                         hasUnConditionalEffects = true;
@@ -165,7 +165,7 @@ final class BitEncoding implements Serializable {
                 case SCALE_UP:
                 case INCREASE:
                 case DECREASE:
-                    NumericAssignment assignment = BitEncoding.encodeNumericAssignment(ei, numericFluentIndexMap);
+                    NumericAssignment assignment = BitEncoding.encodeNumericAssignment(ei, numeric);
                     unCondEffects.getEffect().addNumericAssignment(assignment);
                     break;
                 default:
@@ -436,43 +436,69 @@ final class BitEncoding implements Serializable {
      * @param map the map that associate to a specified expression its index.
      * @return the expression in bit set representation.
      */
-    private static Effect encodeEffect(final IntExpression exp, final Map<IntExpression, Integer> map)
+    private static Effect encodeEffect(final IntExpression exp, final Map<IntExpression, Integer> map, final Map<IntExpression, Integer> numericIndex)
         throws UnexpectedExpressionException {
-        final Effect bitExp = new Effect();
-        if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-            final Integer index = map.get(exp);
-            if (index != null) {
-                bitExp.getPositiveFluents().set(index);
-            }
-        } else if (exp.getConnective().equals(PDDLConnective.NOT)) {
-            final Integer index = map.get(exp.getChildren().get(0));
-            if (index != null) {
-                bitExp.getNegativeFluents().set(index);
-            }
-        } else if (exp.getConnective().equals(PDDLConnective.AND)) {
-            final List<IntExpression> children = exp.getChildren();
-            for (IntExpression ei : children) {
-                if (ei.getConnective().equals(PDDLConnective.ATOM)) {
-                    final Integer index = map.get(ei);
-                    if (index != null) {
-                        bitExp.getPositiveFluents().set(index);
-                    }
-                } else if (ei.getConnective().equals(PDDLConnective.NOT)) {
-                    final Integer index = map.get(ei.getChildren().get(0));
-                    if (index != null) {
-                        bitExp.getNegativeFluents().set(index);
-                    }
-                } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                    // do nothing
-                } else {
-                    throw new UnexpectedExpressionException(Encoder.toString(exp));
+        final Effect effect = new Effect();
+        switch (exp.getConnective()) {
+            case ATOM:
+                Integer index = map.get(exp);
+                if (index != null) {
+                    effect.getPositiveFluents().set(index);
                 }
-            }
-        } else {
-            LOGGER.error(Encoder.toString(exp));
-            throw new UnexpectedExpressionException(Encoder.toString(exp));
+                break;
+            case NOT:
+                index = map.get(exp.getChildren().get(0));
+                if (index != null) {
+                    effect.getNegativeFluents().set(index);
+                }
+                break;
+            case AND:
+                final List<IntExpression> children = exp.getChildren();
+                for (IntExpression ei : children) {
+                    switch (ei.getConnective()) {
+                        case ATOM:
+                        index = map.get(ei);
+                            if (index != null) {
+                                effect.getPositiveFluents().set(index);
+                            }
+                            break;
+                        case NOT:
+                            index = map.get(ei.getChildren().get(0));
+                            if (index != null) {
+                                effect.getNegativeFluents().set(index);
+                            }
+                            break;
+                        case TRUE:
+                            // do nothing
+                            break;
+                        case ASSIGN:
+                        case INCREASE:
+                        case DECREASE:
+                        case SCALE_UP:
+                        case SCALE_DOWN:
+                            NumericAssignment assignment = BitEncoding.encodeNumericAssignment(ei, numericIndex);
+                            effect.addNumericAssignment(assignment);
+                            break;
+                        default:
+                            throw new UnexpectedExpressionException(Encoder.toString(exp));
+                    }
+                }
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                NumericAssignment assignment = BitEncoding.encodeNumericAssignment(exp, numericIndex);
+                effect.addNumericAssignment(assignment);
+                break;
+            case TRUE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(Encoder.toString(exp));
         }
-        return bitExp;
+        return effect;
     }
 
     /**
