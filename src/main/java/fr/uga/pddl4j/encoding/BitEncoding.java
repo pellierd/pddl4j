@@ -629,7 +629,7 @@ final class BitEncoding implements Serializable {
                 for (IntExpression ei : antecedent.getChildren()) {
                     final IntExpression newWhen = new IntExpression(PDDLConnective.WHEN);
                     newWhen.getChildren().add(ei);
-                    newWhen.getChildren().add(consequence);
+                    newWhen.getChildren().add(new IntExpression(consequence));
                     exp.getChildren().add(newWhen);
                 }
                 break;
