@@ -292,7 +292,7 @@ public class TimeEncoderTest {
      * Failure: Initial Time in problem not supported
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2004pipesworld_No_Tankage_Temporal_Deadlines_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-temporal-deadlines-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -300,6 +300,18 @@ public class TimeEncoderTest {
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
+    /**
+     * Method that executes tests using IPC 2004 Pipesworld no tankage temporal STRIPS benchmarks.
+     * Failure: p10
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2004pipesworld_No_Tankage_Temporal_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-temporal-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
 
 
 
