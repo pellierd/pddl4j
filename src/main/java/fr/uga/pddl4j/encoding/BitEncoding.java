@@ -761,6 +761,7 @@ final class BitEncoding implements Serializable {
             case GREATER:
             case GREATER_OR_EQUAL:
             case EQUAL:
+            case EQUAL_ATOM:
             case INCREASE:
             case DECREASE:
             case SCALE_UP:

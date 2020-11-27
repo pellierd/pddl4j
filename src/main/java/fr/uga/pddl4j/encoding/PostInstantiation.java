@@ -1082,26 +1082,11 @@ final class PostInstantiation implements Serializable {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case PLUS:
-            case MINUS:
-            case MUL:
-            case DIV:
-                extractGroundNumericInertia(exp.getChildren().get(0));
-                extractGroundNumericInertia(exp.getChildren().get(1));
+                Encoder.tableOfNumericGroundInertia.put(exp.getChildren().get(0), Inertia.FLUENT);
                 break;
-            case F_EXP:
-                extractGroundNumericInertia(exp.getChildren().get(0));
-                break;
-            case UMINUS:
-                extractGroundNumericInertia(exp.getChildren().get(0));
-                break;
-            case FN_HEAD:
-                Encoder.tableOfNumericGroundInertia.put(exp, Inertia.FLUENT);
-                break;
-            case NUMBER:
             case ATOM:
             case TRUE:
-            case TIME_VAR:
+            case FALSE:
                 // Do nothing
                 break;
             default:

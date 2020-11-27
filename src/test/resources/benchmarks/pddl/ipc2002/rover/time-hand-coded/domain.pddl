@@ -1,8 +1,8 @@
 (define (domain Rover)
-(:requirements :typing :durative-actions :fluents :duration-inequalities)
+(:requirements :typing :durative-actions :numeric-fluents :duration-inequalities)
 (:types rover waypoint store camera mode lander objective)
 
-(:predicates (at ?x - rover ?y - waypoint) 
+(:predicates (at ?x - rover ?y - waypoint)
              (at_lander ?x - lander ?y - waypoint)
              (can_traverse ?r - rover ?x - waypoint ?y - waypoint)
 	     (equipped_for_soil_analysis ?r - rover)
@@ -12,7 +12,7 @@
              (have_rock_analysis ?r - rover ?w - waypoint)
              (have_soil_analysis ?r - rover ?w - waypoint)
              (full ?s - store)
-	     (calibrated ?c - camera ?r - rover) 
+	     (calibrated ?c - camera ?r - rover)
 	     (supports ?c - camera ?m - mode)
              (available ?r - rover)
              (visible ?w - waypoint ?p - waypoint)
@@ -31,9 +31,9 @@
 
 )
 (:functions (energy ?r - rover) (recharge-rate ?x - rover))
-	
+
 (:durative-action navigate
-:parameters (?x - rover ?y - waypoint ?z - waypoint) 
+:parameters (?x - rover ?y - waypoint ?z - waypoint)
 :duration (= ?duration 5)
 :condition (and (over all (can_traverse ?x ?y ?z)) (at start (available ?x)) (at start (at ?x ?y))  (at start (>= (energy ?x) 8))
                 (over all (visible ?y ?z))
@@ -43,7 +43,7 @@
 (:durative-action recharge
 :parameters (?x - rover ?w - waypoint)
 :duration (= ?duration (/ (- 80 (energy ?x)) (recharge-rate ?x)))
-:condition (and (at start (at ?x ?w)) (over all (at ?x ?w)) 
+:condition (and (at start (at ?x ?w)) (over all (at ?x ?w))
 					(at start (in_sun ?w)) (at start (<= (energy ?x) 80)))
 :effect (and (at end (increase (energy ?x) (* ?duration (recharge-rate ?x)))))
 )
@@ -117,7 +117,7 @@
 (:durative-action communicate_rock_data
  :parameters (?r - rover ?l - lander ?p - waypoint ?x - waypoint ?y - waypoint)
  :duration (= ?duration 10)
- :condition (and (over all (at ?r ?x)) (over all (at_lander ?l ?y)) (at start (have_rock_analysis ?r ?p)) 
+ :condition (and (over all (at ?r ?x)) (over all (at_lander ?l ?y)) (at start (have_rock_analysis ?r ?p))
                    (at start (visible ?x ?y)) (at start (available ?r))(at start (channel_free ?l)) (at start (>= (energy ?r) 4))
             )
  :effect (and (at start (not (available ?r))) (at start (not (channel_free ?l))) (at end (channel_free ?l))(at end (communicated_rock_data ?p))(at end (available ?r)) (at start (decrease (energy ?r) 4))
@@ -128,7 +128,7 @@
 (:durative-action communicate_image_data
  :parameters (?r - rover ?l - lander ?o - objective ?m - mode ?x - waypoint ?y - waypoint)
  :duration (= ?duration 15)
- :condition (and (over all (at ?r ?x)) (over all (at_lander ?l ?y)) (at start (have_image ?r ?o ?m)) 
+ :condition (and (over all (at ?r ?x)) (over all (at_lander ?l ?y)) (at start (have_image ?r ?o ?m))
                    (at start (visible ?x ?y)) (at start (available ?r)) (at start (channel_free ?l)) (at start (>= (energy ?r) 6))
             )
  :effect (and (at start (not (available ?r))) (at start (not (channel_free ?l))) (at end (channel_free ?l)) (at end (communicated_image_data ?o ?m)) (at end (available ?r)) (at start (decrease (energy ?r) 6))
