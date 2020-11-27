@@ -607,6 +607,11 @@ final class PostInstantiation implements Serializable {
         for (IntAction a : actions) {
             if (a.isDurative()) {
                 PostInstantiation.simplifyWithGroundNumericInertia(a.getDuration(), false);
+                if (a.getDuration().getConnective().equals(PDDLConnective.FALSE)) {
+                    toRemove.add(index);
+                    index++;
+                    continue;
+                }
             }
             PostInstantiation.simplifyWithGroundInertia(a.getPreconditions(), false, init);
             // ADD to symplified Numeric function
@@ -1177,7 +1182,11 @@ final class PostInstantiation implements Serializable {
                 IntExpression op2 = exp.getChildren().get(1);
                 PostInstantiation.simplifyWithGroundNumericInertia(op1, effect);
                 PostInstantiation.simplifyWithGroundNumericInertia(op2, effect);
-                if (op1.getConnective().equals(PDDLConnective.NUMBER)
+                if (op1.getConnective().equals(PDDLConnective.FALSE)
+                    || op2.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
                         && op2.getConnective().equals(PDDLConnective.NUMBER)) {
                     switch (exp.getConnective()) {
                         case PLUS:
@@ -1203,6 +1212,9 @@ final class PostInstantiation implements Serializable {
                     exp.setConnective(PDDLConnective.NUMBER);
                     exp.setValue(-op1.getValue());
                     exp.getChildren().clear();
+                } else if (op1.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
                 }
                 break;
             case LESS:
@@ -1214,7 +1226,11 @@ final class PostInstantiation implements Serializable {
                 op2 = exp.getChildren().get(1);
                 PostInstantiation.simplifyWithGroundNumericInertia(op1, effect);
                 PostInstantiation.simplifyWithGroundNumericInertia(op2, effect);
-                if (op1.getConnective().equals(PDDLConnective.NUMBER)
+                if (op1.getConnective().equals(PDDLConnective.FALSE)
+                        || op2.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
                         && op2.getConnective().equals(PDDLConnective.NUMBER)) {
                     switch (exp.getConnective()) {
                         case LESS:
@@ -1262,15 +1278,24 @@ final class PostInstantiation implements Serializable {
                     exp.setValue(fexp.getValue());
                     exp.setConnective(PDDLConnective.NUMBER);
                     exp.getChildren().clear();
+                } else if (fexp.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
                 }
                 break;
             case FN_HEAD:
                 Inertia inertia = Encoder.tableOfNumericGroundInertia.get(exp);
                 if (inertia == null) {
                     Double value = Encoder.intInitFunctionCost.get(exp);
-                    exp.setConnective(PDDLConnective.NUMBER);
-                    exp.setValue(value);
+                    // The numeric fluent is never modified and does not appear in the initial state
+                    if (value == null) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else {
+                        exp.setConnective(PDDLConnective.NUMBER);
+                        exp.setValue(value);
+                    }
                 }
+                System.out.println("+"+Encoder.toString(exp));
                 break;
             case NUMBER:
             case TIME_VAR:
