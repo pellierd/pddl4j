@@ -742,8 +742,7 @@ public final class Encoder implements Serializable {
             BitEncoding.encodeInitNumericFluent(Encoder.init, numericFluentIndexMap, Encoder.intInitFunctionCost);
         }
         if (Encoder.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-            NumericVariable duration = new NumericVariable(Encoder.tableOfRelevantNumericFluents.size(), 0.0);
-            Encoder.tableOfRelevantNumericFluents.add(new IntExpression(PDDLConnective.TIME_VAR));
+            NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
             Encoder.init.addNumericFluent(duration);
         }
 
