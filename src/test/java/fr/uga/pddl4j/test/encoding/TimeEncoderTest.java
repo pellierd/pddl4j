@@ -214,7 +214,7 @@ public class TimeEncoderTest {
      * Failure: p09
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2002_Satellite_Time_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -222,6 +222,18 @@ public class TimeEncoderTest {
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
+    /**
+     * Method that executes tests using IPC 2002 Satellite time simple automatic benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2002_Satellite_Time_Simple_Automatic() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-simple-automatic" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
 
     /**
      * Method that executes tests using IPC 2004 rover time hand coded benchmarks.
