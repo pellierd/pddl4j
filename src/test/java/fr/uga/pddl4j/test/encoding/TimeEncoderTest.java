@@ -236,11 +236,11 @@ public class TimeEncoderTest {
     }
 
     /**
-     * Method that executes tests using IPC 2004 Airport temporal time windows compiled adl benchmarks.
+     * Method that executes tests using IPC 2004 Airport temporal time windows compiled ADL benchmarks.
      * Failure p01
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2004_Aiport_Temporal_Time_Windows_Compiled_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-time-windows-compiled-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -248,9 +248,18 @@ public class TimeEncoderTest {
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
-
-
-
+    /**
+     * Method that executes tests using IPC 2004 Airport temporal time windows compiled STRIPS benchmarks.
+     * Failure p01
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2004_Aiport_Temporal_Time_Windows_Compiled_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-time-windows-compiled-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
 
 
 }
