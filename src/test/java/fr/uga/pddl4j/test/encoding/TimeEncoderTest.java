@@ -224,7 +224,7 @@ public class TimeEncoderTest {
 
      /**
      * Method that executes tests using IPC 2004 Airport Time windows adl benchmarks.
-     *
+     * NOT SUPPORTED Initial Time in problem
      * @throws Exception if something went wrong.
      */
     @Test
