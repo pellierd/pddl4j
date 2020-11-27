@@ -331,9 +331,23 @@ public class TimeEncoderTest {
      * Failure: p29
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2004_Satellite_Time_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/satellite/time-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2004 Satellite time time windows compiled STRIPS benchmarks.
+     * Failure: p29
+     * p10 has initial time literal. The timed literal was commented.
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2004_Satellite_Time_Time_Windows_Compiled_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/satellite/time-time-windows-compiled-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
