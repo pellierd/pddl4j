@@ -766,6 +766,9 @@ final class BitEncoding implements Serializable {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
+            case AT_END:
+            case AT_START:
+            case OVER_ALL:
             case FALSE:
             case TRUE:
                 IntExpression and = new IntExpression(PDDLConnective.AND);

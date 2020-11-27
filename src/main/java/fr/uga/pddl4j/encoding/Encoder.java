@@ -1196,14 +1196,13 @@ public final class Encoder implements Serializable {
             parser.parse(new File(domain), new File(problem));
             ErrorManager errorManager = parser.getErrorManager();
             if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
-                && !errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
+                || !errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
                 System.out.println(errorManager.getMessages());
                 System.exit(0);
             }
             if (!errorManager.getMessages(Message.Type.PARSER_WARNING).isEmpty()) {
                 //System.out.println(errorManager.getMessages());
             }
-
             // Encodes and instantiates the problem in a compact representation
 
             try {

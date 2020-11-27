@@ -374,6 +374,11 @@ public abstract class Tools {
             try {
                 factory.setTraceLevel(level);
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
+                    || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
+                    errorManager.printAll();
+
+                }
                 Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
                     && errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
 
@@ -462,7 +467,14 @@ public abstract class Tools {
             // Parses the PDDL domain and problem description
             try {
                 factory.setTraceLevel(level);
+
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
+                    || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
+                    errorManager.printAll();
+
+                }
+
                 Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
                     && errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
 

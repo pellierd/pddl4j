@@ -10,7 +10,7 @@
 
 (define (domain airport_fixed_structure)
 
-(:requirements :durative-actions :typing :equality)
+(:requirements :durative-actions :typing :numeric-fluents)
 
 (:types airplane segment direction airplanetype)
 
