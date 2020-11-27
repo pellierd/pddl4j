@@ -1295,7 +1295,6 @@ final class PostInstantiation implements Serializable {
                         exp.setValue(value);
                     }
                 }
-                System.out.println("+"+Encoder.toString(exp));
                 break;
             case NUMBER:
             case TIME_VAR:
