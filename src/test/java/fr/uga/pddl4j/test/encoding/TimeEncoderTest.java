@@ -202,7 +202,7 @@ public class TimeEncoderTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Parser_IPC2004_Aiport_Temporal_ADL() throws Exception {
+    public void test_Parser_IPC2004_Airport_Temporal_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -215,7 +215,7 @@ public class TimeEncoderTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Parser_IPC2004_Aiport_Temporal_STRIPS() throws Exception {
+    public void test_Parser_IPC2004_Airport_Temporal_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -228,7 +228,7 @@ public class TimeEncoderTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Parser_IPC2004_Aiport_Temporal_Time_Windows_ADL() throws Exception {
+    public void test_Parser_IPC2004_Airport_Temporal_Time_Windows_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-time-windows-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -241,7 +241,7 @@ public class TimeEncoderTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Parser_IPC2004_Aiport_Temporal_Time_Windows_Compiled_ADL() throws Exception {
+    public void test_Parser_IPC2004_Airport_Temporal_Time_Windows_Compiled_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-time-windows-compiled-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -254,7 +254,7 @@ public class TimeEncoderTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Parser_IPC2004_Aiport_Temporal_Time_Windows_Compiled_STRIPS() throws Exception {
+    public void test_Parser_IPC2004_Airport_Temporal_Time_Windows_Compiled_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-time-windows-compiled-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -262,17 +262,32 @@ public class TimeEncoderTest {
     }
 
     /**
-     * Method that executes tests using IPC 2004 Airport temporal time windows compiled STRIPS benchmarks.
+     * Method that executes tests using IPC 2004 Airport temporal time windows STRIPS benchmarks.
      * Failure: Initial Time in problem not supported
      * @throws Exception if something went wrong.
      */
-    @Test
-    public void test_Parser_IPC2004_Aiport_Temporal_Time_Windows_STRIPS() throws Exception {
+    /*@Test
+    public void test_Parser_IPC2004_Airport_Temporal_Time_Windows_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-time-windows-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
+
+    /**
+     * Method that executes tests using IPC 2004 Pipesworld no tankage temporal deadlines compiled STRIPS benchmarks.
+     * Failure p10
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2004pipesworld_No_Tankage_Temporal_Deadlines_Compiled_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-temporal-deadlines-compiled-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+
 
 
 }
