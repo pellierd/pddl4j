@@ -678,6 +678,7 @@ final class BitEncoding implements Serializable {
             case OVER_ALL:
             case INCREASE:
             case DECREASE:
+            case ASSIGN:
             case SCALE_UP:
             case SCALE_DOWN:
             case NOT:
