@@ -140,7 +140,7 @@ public class ProblemFactory {
         try {
             return Encoder.encode(domain, problem);
         } catch (IllegalArgumentException ilException) {
-            LOGGER.error("The problem to encode is not ADL, \":requirements\" not supported at this time\n");
+            LOGGER.error(ilException.getMessage());
             return null;
         }
     }

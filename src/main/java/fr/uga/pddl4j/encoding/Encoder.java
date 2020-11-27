@@ -371,7 +371,14 @@ public final class Encoder implements Serializable {
         Encoder.requirements.addAll(problem.getRequirements());
 
         if (!accepted.containsAll(Encoder.requirements)) {
-            throw new IllegalArgumentException("only ADL, ACTION_COSTS or HTN problem can be encoded");
+            Encoder.requirements.removeAll(accepted);
+            StringBuilder str = new StringBuilder();
+            str.append("Requirements not supported:");
+            for (PDDLRequireKey requirement : Encoder.requirements) {
+                str.append(" ");
+                str.append(requirement.getImage());
+            }
+            throw new IllegalArgumentException(str.toString());
         }
 
         // *****************************************************************************************
