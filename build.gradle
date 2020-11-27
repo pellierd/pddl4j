@@ -31,7 +31,7 @@ dependencies {
 
 
 compileJavacc {
-    arguments = [debug_parser: 'false'] // debug true to print the lexcial tree
+    arguments = [debug_parser: 'false'] // debug true to print the lexical tree
     inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
     outputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
 }
