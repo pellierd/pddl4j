@@ -928,9 +928,9 @@ final class Instantiation implements Serializable {
      * @param cons the constant.
      */
     private static void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
+        boolean updated = false;
         switch (exp.getConnective()) {
             case ATOM:
-                boolean updated = false;
                 int[] args = exp.getArguments();
                 for (int i = 0; i < args.length; i++) {
                     if (args[i] == var) {
@@ -947,7 +947,6 @@ final class Instantiation implements Serializable {
                 for (int i = 0; i < args.length; i++) {
                     if (args[i] == var) {
                         args[i] = cons;
-                        updated = true;
                     }
                 }
                 break;
@@ -956,7 +955,11 @@ final class Instantiation implements Serializable {
                 for (int i = 0; i < args.length; i++) {
                     if (args[i] == var) {
                         args[i] = cons;
+                        updated = true;
                     }
+                }
+                if (updated) {
+                    Instantiation.simplyFunction(exp);
                 }
                 break;
             case EQUAL_ATOM:
@@ -1124,6 +1127,64 @@ final class Instantiation implements Serializable {
             // simplified to TRUE.
             exp.setConnective(PDDLConnective.TRUE);
         }
+    }
+
+    /**
+     * This method simplifies an atomic specified expression. Two cased must be considered:
+     * <ul>
+     * <li>1. If the expression is a positive inertia and the number of unifying ground instances of
+     * the specified expression that are contained in the initial state is equal to 0 then the
+     * expression is simplified to FALSE.</li>
+     * <li>2. If the expression is a negative inertia and then the number of all possible
+     * type-consistent ground instances of the specified expression then the expression is
+     * simplified to TRUE.
+     * </ul>
+     *
+     * @param exp the atomic expression to simplify.
+     */
+    private static void simplyFunction(final IntExpression exp) {
+        final int predicate = exp.getPredicate();
+        // Compute the mask i.e., the vector used to indicate where the constant are located in the
+        // atomic expression.
+        int indexSize = 0;
+        final int[] args = exp.getArguments();
+        final int[] mask = new int[args.length];
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] >= 0) {
+                mask[i] = 1;
+                indexSize++;
+            }
+        }
+        // Compute the index to access to the predicates table and compute the product (max) of the
+        // tableOfDomains of the non instantiated arguments of the atomic expression.
+        int j = 0;
+        int max = 1;
+        final int[] index = new int[indexSize];
+        final List<Integer> predArg = Encoder.tableOfTypedFunctions.get(predicate);
+        for (int i = 0; i < mask.length; i++) {
+            if (mask[i] == 0) {
+                max *= Encoder.tableOfDomains.get(predArg.get(i)).size();
+            } else {
+                index[j] = args[i];
+                j++;
+            }
+
+        }
+        // Get the number of unifying ground instances of the specified expression that are
+        // contained in the initial state.
+        final int n = Encoder.functionsTables.get(predicate).get(PreInstantiation.toInt(mask)).get(index);
+        // CASE 1: If the expression is a positive inertia and the number of unifying ground
+        // instances of the specified expression that are contained in the initial state is equal to
+        // 0 then the expression is simplified to FALSE.
+        final Inertia inertia = Encoder.tableOfNumericInertia.get(predicate);
+        if ((inertia.equals(Inertia.FLUENT) || inertia.equals(Inertia.INERTIA)) && n == 0) {
+            exp.setConnective(PDDLConnective.FALSE);
+        } /*else if ((inertia.equals(Inertia.FLUENT) || inertia.equals(Inertia.INERTIA)) && max == n) {
+            // CASE 2: If the expression is a negative inertia and then the number of all possible
+            // type-consistent ground instances of the specified expression then the expression is
+            // simplified to TRUE.
+            exp.setConnective(PDDLConnective.TRUE);
+        }*/
     }
 
 }

@@ -21,6 +21,7 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -131,6 +132,7 @@ final class PreInstantiation implements Serializable {
             case EXISTS:
             case AT_START:
             case AT_END:
+            case OVER_ALL:
                 PreInstantiation.extract(exp.getChildren().get(0));
                 break;
             case WHEN:
@@ -184,7 +186,6 @@ final class PreInstantiation implements Serializable {
             case MAXIMIZE:
             case UMINUS:
             case ALWAYS:
-            case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
             case F_EXP:
@@ -195,6 +196,55 @@ final class PreInstantiation implements Serializable {
         }
     }
 
+    static void extractNumericInertia(final List<IntAction> actions) {
+        final int nbFunctions = Encoder.tableOfFunctions.size();
+        Encoder.tableOfNumericInertia = new ArrayList<>(nbFunctions);
+        for (int i = 0; i < nbFunctions; i++) {
+            Encoder.tableOfNumericInertia.add(Inertia.INERTIA);
+        }
+        for (final IntAction a : actions) {
+            PreInstantiation.extractNumericInertia(a.getEffects());
+        }
+
+    }
+
+    /**
+     * Do a pass over the effects of an instantiated action and update the ground numeric inertia table.
+     * A numeric inertia is a function that is never change by any action of the problem.
+     * PDDLConnetive checks.
+     *
+     * @param exp the effect.
+     */
+    private static void extractNumericInertia(final IntExpression exp) {
+        switch (exp.getConnective()) {
+            case AND:
+                exp.getChildren().forEach(PreInstantiation::extractNumericInertia);
+                break;
+            case WHEN:
+                extractNumericInertia(exp.getChildren().get(1));
+                break;
+            case NOT:
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                PreInstantiation.extractNumericInertia(exp.getChildren().get(0));
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                Encoder.tableOfNumericInertia.set(exp.getChildren().get(0).getPredicate(), Inertia.FLUENT);
+                break;
+            case ATOM:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+    }
     /**
      * Infer type from unary inertia.
      *
@@ -247,6 +297,55 @@ final class PreInstantiation implements Serializable {
             }
             final int arity = Encoder.tableOfTypedPredicates.get(fact.getPredicate()).size();
             final List<IntMatrix> pTables = Encoder.predicatesTables.get(fact.getPredicate());
+            final int[] set = new int[arity];
+            final int[] args = fact.getArguments();
+            for (final IntMatrix intMatrix : pTables) {
+                int indexSize = 0;
+                for (int aSet : set) {
+                    if (aSet == 1) {
+                        indexSize++;
+                    }
+                }
+                final int[] index = new int[indexSize];
+                int j = 0;
+                for (int i = 0; i < set.length; i++) {
+                    if (set[i] == 1) {
+                        index[j] = args[i];
+                        j++;
+                    }
+                }
+                intMatrix.increment(index);
+                PreInstantiation.incrementMask(set);
+            }
+        }
+    }
+
+    /**
+     * This method creates the predicates predicatesTables used to simplify atomic expression.
+     *
+     * @param init the initial state.
+     */
+    static void createFunctionsTables(final Set<IntExpression> init) {
+        final int tableSize = Encoder.tableOfConstants.size();
+        final int nbFunction = Encoder.tableOfFunctions.size();
+        Encoder.functionsTables = new ArrayList<>(nbFunction);
+        for (final List<Integer> arguments : Encoder.tableOfTypedFunctions) {
+            final int arity = arguments.size();
+            final int nbTables = (int) Math.pow(2, arity);
+            final List<IntMatrix> pTables = new ArrayList<>(nbTables);
+            for (int j = 0; j < nbTables; j++) {
+                final int dimension = Integer.bitCount(j);
+                pTables.add(new IntMatrix(tableSize, dimension));
+            }
+            Encoder.functionsTables.add(pTables);
+        }
+
+        for (IntExpression fact : init) {
+            if (fact.getConnective().equals(PDDLConnective.NOT)) {
+                fact = fact.getChildren().get(0);
+            }
+            final int arity = Encoder.tableOfTypedFunctions.get(fact.getPredicate()).size();
+            final List<IntMatrix> pTables = Encoder.functionsTables.get(fact.getPredicate());
             final int[] set = new int[arity];
             final int[] args = fact.getArguments();
             for (final IntMatrix intMatrix : pTables) {

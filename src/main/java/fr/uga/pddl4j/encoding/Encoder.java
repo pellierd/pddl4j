@@ -183,6 +183,12 @@ public final class Encoder implements Serializable {
     static List<Inertia> tableOfInertia;
 
     /**
+     * The table that defines for each predicates its type of inertia.
+     */
+    static List<Inertia> tableOfNumericInertia;
+
+
+    /**
      * The log level of the planner.
      */
     static int logLevel;
@@ -201,6 +207,12 @@ public final class Encoder implements Serializable {
      * initial state.
      */
     static List<List<IntMatrix>> predicatesTables;
+
+    /**
+     * The list of predicates tables used to count the occurrence of a specified predicate in the
+     * initial state.
+     */
+    static List<List<IntMatrix>> functionsTables;
 
     /**
      * The table of the relevant fluents.
@@ -468,6 +480,17 @@ public final class Encoder implements Serializable {
 
         // Computed inertia from the encode actions
         PreInstantiation.extractInertia(intActions);
+
+        if (Encoder.requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            PreInstantiation.extractNumericInertia(intActions);
+            /*for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
+                String predicate = Encoder.tableOfFunctions.get(i);
+                System.out.println(i + ": " + predicate + " : " + Encoder.tableOfNumericInertia.get(i));
+            }*/
+        }
+
+
+
         // Infer the type from the unary inertia
         PreInstantiation.inferTypesFromInertia(intInitPredicates);
         if (!Encoder.requirements.contains(PDDLRequireKey.HIERARCHY)) {
@@ -482,6 +505,9 @@ public final class Encoder implements Serializable {
         // initial state
         PreInstantiation.createPredicatesTables(intInitPredicates);
 
+        if (Encoder.requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            PreInstantiation.createFunctionsTables(intInitFunctionCost.keySet());
+        }
 
         // HACK for durative action very inefficient
         if (Encoder.requirements.contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
