@@ -250,12 +250,25 @@ public class TimeEncoderTest {
 
     /**
      * Method that executes tests using IPC 2002 Zenotravel time automatic benchmarks.
-     *
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    /*@Test
+    public void test_Parser_IPC2002_Zenotravel_Time_Automatic() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-automatic" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2002 Zenotravel time hand coded benchmarks.
+     * Failure: p20
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Parser_IPC2002_Zenotraval_Time_Automatic() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-automatic" + File.separator;
+    public void test_Parser_IPC2002_Zenotravel_Time_Hand_Coded() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
