@@ -397,9 +397,22 @@ public class TimeEncoderTest {
      * Failure: Initial Time in problem not supported
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2004_UMTS_Flaw_Temporal_Time_Windows_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/umts/flaw-temporal-time-windows-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2004 UMTS flaw temporal STRIPS benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2004_UMTS_Flaw_Temporal_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/umts/flaw-temporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
