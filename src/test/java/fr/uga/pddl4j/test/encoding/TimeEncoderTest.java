@@ -197,7 +197,21 @@ public class TimeEncoderTest {
     }
 
     /**
-     * Method that executes tests using IPC 2002 rover time hand coded benchmarks.
+     * Method that executes tests using IPC 2002 Satellite time automatic benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2002_Satellite_Time_Automatic() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-automatic" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+
+    /**
+     * Method that executes tests using IPC 2004 rover time hand coded benchmarks.
      * Failure p01
      * @throws Exception if something went wrong.
      */
@@ -210,7 +224,7 @@ public class TimeEncoderTest {
     }
 
     /**
-     * Method that executes tests using IPC 2002 rover time hand coded benchmarks.
+     * Method that executes tests using IPC 2004 rover time hand coded benchmarks.
      * OK
      * @throws Exception if something went wrong.
      */
@@ -423,12 +437,25 @@ public class TimeEncoderTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
-    public void test_Parser_IPC2004_UMTS_Temporal_Time_Windows_CompiledSTRIPS() throws Exception {
+    /*@Test
+    public void test_Parser_IPC2004_UMTS_Temporal_Time_Windows_Compiled_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/umts/temporal-time-windows-compiled-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
+
+    /**
+     * Method that executes tests using IPC 2004 UMTS temporal time windows STRIPS benchmarks.
+     * Failure: Initial Time in problem not supported
+     * @throws Exception if something went wrong.
+     */
+    /*@Test
+    public void test_Parser_IPC2004_UMTS_Temporal_Time_Windows_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/umts/temporal-time-windows-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }*/
 
 }
