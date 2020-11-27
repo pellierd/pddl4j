@@ -1158,6 +1158,10 @@ final class PostInstantiation implements Serializable {
             case SCALE_UP:
             case SCALE_DOWN:
                 PostInstantiation.simplifyWithGroundNumericInertia(exp.getChildren().get(1), effect);
+                if (exp.getChildren().get(1).getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                }
                 break;
             case PLUS:
             case MINUS:
