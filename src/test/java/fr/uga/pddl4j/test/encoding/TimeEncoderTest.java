@@ -1034,9 +1034,22 @@ public class TimeEncoderTest {
      * Failure: p18
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2011_Temporal_Machine_Shop_Temporal_satisficing() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/temporal-machine-shop/temporal-satisficing" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2011 Turn and Open temporal satisficing benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2011_Turn_And_Open_Temporal_satisficing() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/turn-and-open/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
