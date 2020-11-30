@@ -1,0 +1,137 @@
+; woodworking task with 10 parts
+; Machines:
+;   2 grinder
+;   3 glazer
+;   1 immersion-varnisher
+;   2 planer
+;   2 highspeed-saw
+;   1 spray-varnisher
+;   1 saw
+; random seed: 297877
+
+(define (problem wood-prob)
+  (:domain woodworking)
+  (:objects
+    grinder0 grinder1 - grinder
+    glazer0 glazer1 glazer2 - glazer
+    immersion-varnisher0 - immersion-varnisher
+    planer0 planer1 - planer
+    highspeed-saw0 highspeed-saw1 - highspeed-saw
+    spray-varnisher0 - spray-varnisher
+    saw0 - saw
+    black white red green blue mauve - acolour
+    oak teak cherry - awood
+    p0 p1 p2 p3 p4 p5 p6 p7 p8 p9 - part
+    b0 b1 b2 b3 - board
+  )
+  (:init
+    (grind-treatment-change varnished colourfragments)
+    (grind-treatment-change glazed untreated)
+    (grind-treatment-change untreated untreated)
+    (grind-treatment-change colourfragments untreated)
+    (is-smooth smooth)
+    (is-smooth verysmooth)
+    (idle grinder0)
+    (idle grinder1)
+    (idle glazer0)
+    (has-colour glazer0 blue)
+    (has-colour glazer0 white)
+    (idle glazer1)
+    (has-colour glazer1 white)
+    (idle glazer2)
+    (has-colour glazer2 black)
+    (idle immersion-varnisher0)
+    (has-colour immersion-varnisher0 blue)
+    (has-colour immersion-varnisher0 mauve)
+    (has-colour immersion-varnisher0 white)
+    (has-colour immersion-varnisher0 black)
+    (idle planer0)
+    (idle planer1)
+    (idle highspeed-saw0)
+    (empty highspeed-saw0)
+    (idle highspeed-saw1)
+    (empty highspeed-saw1)
+    (idle spray-varnisher0)
+    (has-colour spray-varnisher0 blue)
+    (has-colour spray-varnisher0 mauve)
+    (has-colour spray-varnisher0 white)
+    (has-colour spray-varnisher0 black)
+    (idle saw0)
+    (unused p0)
+    (= (goal-size p0) 15)
+    (unused p1)
+    (= (goal-size p1) 15)
+    (unused p2)
+    (= (goal-size p2) 11)
+    (unused p3)
+    (= (goal-size p3) 9)
+    (unused p4)
+    (= (goal-size p4) 14)
+    (unused p5)
+    (= (goal-size p5) 15)
+    (unused p6)
+    (= (goal-size p6) 10)
+    (unused p7)
+    (= (goal-size p7) 12)
+    (unused p8)
+    (= (goal-size p8) 10)
+    (unused p9)
+    (= (goal-size p9) 12)
+    (= (board-size b0) 63)
+    (wood b0 cherry)
+    (surface-condition b0 rough)
+    (available b0)
+    (= (board-size b1) 14)
+    (wood b1 cherry)
+    (surface-condition b1 rough)
+    (available b1)
+    (= (board-size b2) 56)
+    (wood b2 oak)
+    (surface-condition b2 rough)
+    (available b2)
+    (= (board-size b3) 17)
+    (wood b3 teak)
+    (surface-condition b3 rough)
+    (available b3)
+  )
+  (:goal
+    (and
+      (available p0)
+      (wood p0 cherry)
+      (surface-condition p0 verysmooth)
+      (available p1)
+      (colour p1 black)
+      (surface-condition p1 verysmooth)
+      (available p2)
+      (colour p2 white)
+      (wood p2 cherry)
+      (surface-condition p2 verysmooth)
+      (treatment p2 varnished)
+      (available p3)
+      (colour p3 black)
+      (wood p3 oak)
+      (treatment p3 varnished)
+      (available p4)
+      (surface-condition p4 verysmooth)
+      (treatment p4 glazed)
+      (available p5)
+      (colour p5 white)
+      (wood p5 cherry)
+      (available p6)
+      (colour p6 blue)
+      (surface-condition p6 verysmooth)
+      (available p7)
+      (colour p7 mauve)
+      (wood p7 cherry)
+      (surface-condition p7 verysmooth)
+      (treatment p7 varnished)
+      (available p8)
+      (surface-condition p8 smooth)
+      (treatment p8 glazed)
+      (available p9)
+      (colour p9 black)
+      (surface-condition p9 verysmooth)
+    )
+  )
+  (:metric minimize (total-time))
+)

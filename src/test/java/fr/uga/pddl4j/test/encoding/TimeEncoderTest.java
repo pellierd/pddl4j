@@ -887,13 +887,26 @@ public class TimeEncoderTest {
     }
 
     /**
-     * Method that executes tests using IPC 2008 Transpor temporal satisficing numeric fluents benchmarks.
-     *
+     * Method that executes tests using IPC 2008 Transport temporal satisficing numeric fluents benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    /*@Test
+    public void test_Parser_IPC2008_Transport_Temporal_Satisficing_Numeric_Fluents() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2008/transport/temporal-satisficing-numeric-fluents" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2008 Woodworking temporal satisficing numeric fluents benchmarks.
+     * OK
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Parser_IPC2008_Transport_Temporal_Satisficing_Numeric_Fluents() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2008/transport/temporal-satisficing-numeric-fluents" + File.separator;
+    public void test_Parser_IPC2008_Woodworking_Temporal_Satisficing_Numeric_Fluents() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2008/woodworking/temporal-satisficing-numeric-fluents" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
