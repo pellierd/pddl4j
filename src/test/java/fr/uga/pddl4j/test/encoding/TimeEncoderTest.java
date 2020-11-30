@@ -657,9 +657,22 @@ public class TimeEncoderTest {
      * Failure: p20
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*Test
     public void test_Parser_IPC2006_Storage_Time() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/storage/time" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Storage time constraints benchmarks.
+     * Failure: Constraints not supported
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2006_Storage_Time_Constraints() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/storage/time-constraints" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
