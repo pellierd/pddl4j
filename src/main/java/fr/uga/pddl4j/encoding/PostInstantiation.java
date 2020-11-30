@@ -89,6 +89,15 @@ final class PostInstantiation implements Serializable {
         for (IntMethod m : methods) {
             extractRelevantFacts(m.getPreconditions(), facts, init);
         }
+        for (IntExpression p : init) {
+            Inertia inertia = Encoder.tableOfGroundInertia.get(p);
+            if (inertia == null) {
+                inertia = Inertia.INERTIA;
+            }
+            if (init.contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
+                facts.add(p);
+            }
+        }
         Encoder.tableOfRelevantFluents = new ArrayList<>(facts.size());
         for (IntExpression exp : facts) {
             final IntExpression relevant = new IntExpression(exp);
@@ -112,7 +121,14 @@ final class PostInstantiation implements Serializable {
                                              final Set<IntExpression> init) {
         switch (exp.getConnective()) {
             case ATOM:
-                facts.add(exp);
+                Inertia inertia = Encoder.tableOfGroundInertia.get(exp);
+                if (inertia == null) {
+                    inertia = Inertia.INERTIA;
+                }
+                if ((init.contains(exp) && !inertia.equals(Inertia.NEGATIVE))
+                    || (!init.contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
+                    facts.add(exp);
+                }
                 break;
             case FN_HEAD:
                 break;

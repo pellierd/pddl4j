@@ -578,8 +578,6 @@ public final class Encoder implements Serializable {
         PostInstantiation.extractGroundInertia(intActions);
         // Extract the ground numetic inertia from the set of instantiated actions
         PostInstantiation.extractGroundNumericInertia(intActions);
-
-
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
 
@@ -588,7 +586,6 @@ public final class Encoder implements Serializable {
             Instantiation.expandQuantifiedExpression(intGoal, true);
             // Simplify the goal with ground inertia information
             PostInstantiation.simplifyGoalWithGroundInertia(intGoal, intInitPredicates);
-
         }
         // Extract increase and add value to action cost
         //PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
