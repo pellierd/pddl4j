@@ -576,7 +576,7 @@ public class TimeEncoderTest {
 
     /**
      * Method that executes tests using IPC 2006 Openstacks time benchmarks.
-     * Failure: P03
+     * Failure: p03
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -592,9 +592,22 @@ public class TimeEncoderTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2006_Openstacks_Time_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/time-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Pathways metric time benchmarks.
+     * Failure: p04
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2006_Pathways_Metric_Time() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/metric-time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);

@@ -751,7 +751,7 @@ public final class Encoder implements Serializable {
 
         if (intGoal != null && (!intGoal.getChildren().isEmpty()
                 || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap);
+            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap, numericFluentIndexMap);
         } else {
             Encoder.goal = new Goal();
         }

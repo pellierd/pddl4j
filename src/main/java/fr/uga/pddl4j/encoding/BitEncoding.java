@@ -246,7 +246,8 @@ final class BitEncoding implements Serializable {
      * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
      * <code>BitExp</code>.
      */
-    static Goal encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map)
+    static Goal encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map,
+                           final Map<IntExpression, Integer> numericIndex)
         throws UnexpectedExpressionException {
 
         if (goal.getConnective().equals(PDDLConnective.FALSE)) {
@@ -260,9 +261,9 @@ final class BitEncoding implements Serializable {
             if (exp.getConnective().equals(PDDLConnective.ATOM)) {
                 IntExpression and = new IntExpression(PDDLConnective.AND);
                 and.getChildren().add(exp);
-                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(and, map, new HashMap<>())));
+                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(and, map, numericIndex)));
             } else {
-                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(exp, map, new HashMap<>())));
+                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(exp, map, numericIndex)));
             }
         }
         if (Encoder.codedGoal.size() > 1) {
