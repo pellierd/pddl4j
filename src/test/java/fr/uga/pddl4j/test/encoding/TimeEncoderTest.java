@@ -951,4 +951,17 @@ public class TimeEncoderTest {
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
+    /**
+     * Method that executes tests using IPC 2011 Match Cellar temporal satisficing benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2008_Match_Cellar_Temporal_Satisficing() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/match-cellar/temporal-satisficing" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
 }
