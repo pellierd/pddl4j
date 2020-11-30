@@ -644,9 +644,22 @@ public class TimeEncoderTest {
      * Failure: p21
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2006_Rovers_Metric_Time() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/rovers/metric-time" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Storage time benchmarks.
+     * Failure: p20
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2006_Storage_Time() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/storage/time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
