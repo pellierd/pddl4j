@@ -292,7 +292,7 @@ public class TimeEncoderTest {
      * Failure: p10
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2002_Zenotravel_Time_Simple_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -546,6 +546,19 @@ public class TimeEncoderTest {
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
-    }*/
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Openstacks metric time  benchmarks.
+     * Failure: p03
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2006_Openstacks_Metric_Time() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/metric-time" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
 
 }
