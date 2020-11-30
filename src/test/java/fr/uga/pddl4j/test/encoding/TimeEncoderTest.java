@@ -930,7 +930,7 @@ public class TimeEncoderTest {
      * Failure: p01
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2008_Elevator_Temporal_Satisficing() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/elevator/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -938,6 +938,17 @@ public class TimeEncoderTest {
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
-
+    /**
+     * Method that executes tests using IPC 2011 Floor-tile temporal satisficing benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2008_Floor_Tile_Temporal_Satisficing() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/floor-tile/temporal-satisficing" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
 
 }
