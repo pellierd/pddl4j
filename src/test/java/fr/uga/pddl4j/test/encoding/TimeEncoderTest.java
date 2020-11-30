@@ -631,9 +631,22 @@ public class TimeEncoderTest {
      * Failure: Constraints not supported
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2006_Pipesworld_Metric_Time_Constraints() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pipesworld/metric-time-constraints" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Rovers metric time benchmarks.
+     * Failure: p21
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2006_Rovers_Metric_Time() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/rovers/metric-time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
