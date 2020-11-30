@@ -722,9 +722,22 @@ public class TimeEncoderTest {
      * Failure: Constraints not supported
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2006_Trucks_Time_Constraints() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/trucks/time-constraints" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Trucks time constraints timed initial literals benchmarks.
+     * Failure: Timed initial literal not supported
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2006_Trucks_Time_Constraints_Timed_Initial_Literals() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/trucks/time-constraints-timed-initial-literals" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
