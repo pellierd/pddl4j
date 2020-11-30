@@ -1008,9 +1008,22 @@ public class TimeEncoderTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2011_Peg_Solitaire_Temporal_satisficing() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/peg-solitaire/temporal-satisficing" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2011 Sokoban temporal satisficing benchmarks.
+     * Failure: p01
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2011_Sokoban_Temporal_satisficing() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/sokoban/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
