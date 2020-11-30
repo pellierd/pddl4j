@@ -771,10 +771,10 @@ public class TimeEncoderTest {
 
     /**
      * Method that executes tests using IPC 2008 Elevator temporal satisficing numeric fluents benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2008_Elevator_Temporal_Satisficing_Numeric_Fluents() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2008/elevator/temporal-satisficing-numeric-fluents" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -782,7 +782,18 @@ public class TimeEncoderTest {
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
-
+    /**
+     * Method that executes tests using IPC 2008 Elevator temporal satisficing STRIPS benchmarks.
+     * Failure: p13
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2008_Elevator_Temporal_Satisficing_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2008/elevator/temporal-satisficing-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
 
 
 }
