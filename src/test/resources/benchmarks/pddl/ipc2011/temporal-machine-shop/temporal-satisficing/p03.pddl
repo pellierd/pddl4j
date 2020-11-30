@@ -1,0 +1,52 @@
+(define (problem pfile2)
+ (:domain domain-tms-2-3-light)
+ (:objects 
+ kiln0 - kiln8
+ kiln0 - kiln20
+ pone0 pone1 pone2 pone3 pone4 pone5 pone6 pone7 pone8 pone9 pone10 pone11 pone12 pone13 - piecetype1
+ ptwo0 ptwo1 ptwo2 ptwo3 ptwo4 ptwo5 ptwo6 ptwo7 ptwo8 ptwo9 ptwo10 ptwo11 ptwo12 ptwo13 ptwo14 ptwo15 ptwo16 ptwo17 ptwo18 ptwo19 ptwo20 - piecetype2
+ pthree0 pthree1 pthree2 pthree3 pthree4 pthree5 pthree6 pthree7 pthree8 pthree9 pthree10 pthree11 pthree12 pthree13 pthree14 pthree15 pthree16 pthree17 pthree18 pthree19 pthree20 pthree21 pthree22 pthree23 pthree24 pthree25 pthree26 pthree27 pthree28 pthree29 pthree30 pthree31 pthree32 pthree33 pthree34 - piecetype3
+)
+ (:init 
+  (energy)
+)
+ (:goal
+  (and
+     (baked-structure pthree9 pone10)
+     (baked-structure pthree23 pthree8)
+     (baked-structure pthree16 ptwo3)
+     (baked-structure pthree2 ptwo11)
+     (baked-structure pthree6 ptwo9)
+     (baked-structure pthree18 pthree34)
+     (baked-structure pthree3 pone7)
+     (baked-structure pthree32 pthree26)
+     (baked-structure ptwo13 ptwo18)
+     (baked-structure ptwo17 pthree0)
+     (baked-structure pthree22 ptwo14)
+     (baked-structure pthree7 pthree25)
+     (baked-structure pthree31 pthree10)
+     (baked-structure pone0 pone2)
+     (baked-structure pthree19 pthree20)
+     (baked-structure pthree12 pthree29)
+     (baked-structure ptwo15 pthree17)
+     (baked-structure ptwo4 ptwo20)
+     (baked-structure pthree11 ptwo1)
+     (baked-structure pthree4 ptwo8)
+     (baked-structure pthree30 pthree33)
+     (baked-structure pone6 pthree5)
+     (baked-structure ptwo12 pone12)
+     (baked-structure pthree28 pthree13)
+     (baked-structure pthree21 ptwo5)
+     (baked-structure pone13 ptwo6)
+     (baked-structure pone3 pone9)
+     (baked-structure pone5 pthree24)
+     (baked-structure pthree1 ptwo19)
+     (baked-structure pone4 ptwo0)
+     (baked-structure ptwo7 pthree27)
+     (baked-structure ptwo16 pone1)
+     (baked-structure pthree15 ptwo10)
+     (baked-structure pone11 pthree14)
+     (baked-structure pone8 ptwo2)
+))
+ (:metric minimize (total-time))
+)
