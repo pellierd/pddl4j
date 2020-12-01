@@ -14,78 +14,78 @@ public class ADLProblem {
     /**
      *
      */
-    public PDDLDomain domain;
+    private PDDLDomain domain;
 
-    public PDDLProblem problem;
+    private PDDLProblem problem;
 
     /**
      * The set of requirements.
      */
-    public Set<PDDLRequireKey> requirements;
+    private Set<PDDLRequireKey> requirements;
 
     /**
      * The table of types.
      */
-    public List<String> tableOfTypes;
+    private List<String> tableOfTypes;
 
     /**
      * The domain of associated to the type.
      */
-    public List<Set<Integer>> tableOfDomains;
+    private List<Set<Integer>> tableOfDomains;
 
     /**
      * The table of constants.
      */
-    public List<String> tableOfConstants;
+    private List<String> tableOfConstants;
 
     /**
      * The table of predicates.
      */
-    public List<String> tableOfPredicates;
+    private List<String> tableOfPredicates;
 
     /**
      * The table that contains the types of the arguments of the predicates.
      */
-    public List<List<Integer>> tableOfTypedPredicates;
+    private List<List<Integer>> tableOfTypedPredicates;
 
     /**
      * The table of the functions.
      */
-    public List<String> tableOfFunctions;
+    private List<String> tableOfFunctions;
 
     /**
      * The table that contains the types of the arguments of the functions.
      */
-    public List<List<Integer>> tableOfTypedFunctions;
+    private List<List<Integer>> tableOfTypedFunctions;
 
     /**
      * The table of tasks.
      */
-    public List<String> tableOfTasks;
+    private List<String> tableOfTasks;
 
     /**
      * The table that contains the types of the arguments of the tasks.
      */
-    public List<List<Integer>> tableOfTypedTasks;
+    private List<List<Integer>> tableOfTypedTasks;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
      */
-    public Set<String> primitiveTaskSymbols;
+    private Set<String> primitiveTaskSymbols;
 
-    public Map<IntExpression, Double> intInitFunctionCost;
+    private Map<IntExpression, Double> intInitFunctionCost;
 
-    public IntExpression intGoal;
+    private IntExpression intGoal;
 
-    public Set<IntExpression> intInitPredicates;
+    private Set<IntExpression> intInitPredicates;
     public IntTaskNetwork intTaskNetwork;
-    public List<IntAction> intActions;
-    public List<IntMethod> intMethods;
+    private List<IntAction> intActions;
+    private List<IntMethod> intMethods;
 
     /**
      * The set compund task symbols, i.e., the set of task symbols used in methods.
      */
-    public Set<String> compoundTaskSymbols;
+    private Set<String> compoundTaskSymbols;
 
     public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
         this.domain = domain;
@@ -131,9 +131,9 @@ public class ADLProblem {
         }
 
         // Encode the initial task network in integer representation
-        /*if (this.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+        if (this.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             this.intTaskNetwork = this.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
-        }*/
+        }
     }
 
     /**
@@ -1004,5 +1004,9 @@ public class ADLProblem {
 
     public IntExpression getIntGoal() {
         return intGoal;
+    }
+
+    public IntTaskNetwork getIntTaskNetwork() {
+        return intTaskNetwork;
     }
 }

@@ -326,10 +326,10 @@ public final class Encoder implements Serializable {
         }*/
 
         // Encode the initial task network in integer representation
-        IntTaskNetwork intTaskNetwork = null;
+        /*IntTaskNetwork intTaskNetwork = null;
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
-        }
+        }*/
 
         final StringBuilder str = new StringBuilder();
 
@@ -361,9 +361,9 @@ public final class Encoder implements Serializable {
             if (Encoder.pb.getIntGoal() != null) {
                 str.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(Encoder.pb.getIntGoal()));
             }
-            if (intTaskNetwork != null) {
+            if (Encoder.pb.getIntTaskNetwork() != null) {
                 str.append(")").append("\n\nCoded initial task network:\n")
-                    .append(Encoder.toString(intTaskNetwork));
+                    .append(Encoder.toString(Encoder.pb.getIntTaskNetwork()));
             }
             if (!Encoder.pb.getIntActions().isEmpty()) {
                 str.append(")").append("\n\nCoded actions:\n\n");
@@ -445,10 +445,10 @@ public final class Encoder implements Serializable {
                 str.append("\n\nPre-instantiation goal state:\n");
                 str.append(Encoder.toString(Encoder.pb.getIntGoal()));
             }
-            if (intTaskNetwork != null) {
+            if (Encoder.pb.getIntTaskNetwork() != null) {
                 str.append(")");
                 str.append("\n\nPre-instantiation initial task network:\n");
-                str.append(Encoder.toString(intTaskNetwork));
+                str.append(Encoder.toString(Encoder.pb.getIntTaskNetwork()));
             }
             str.append("\nPre-instantiation actions with inferred types (");
             str.append(Encoder.pb.getIntActions().size());
@@ -528,7 +528,7 @@ public final class Encoder implements Serializable {
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
 
-            List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(intTaskNetwork);
+            List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(Encoder.pb.getIntTaskNetwork());
             if (initialTaskNetworks.size() > 1) {
                 IntExpression root = new IntExpression(PDDLConnective.TASK);
                 root.setPredicate(Encoder.pb.getTableOfTasks().size());
@@ -552,13 +552,13 @@ public final class Encoder implements Serializable {
                 }
 
                 // Creates the abstract initial task network
-                intTaskNetwork = new IntTaskNetwork();
-                intTaskNetwork.getTasks().addChild(new IntExpression(root));
+                Encoder.pb.intTaskNetwork = new IntTaskNetwork();
+                Encoder.pb.intTaskNetwork.getTasks().addChild(new IntExpression(root));
             } else {
-                intTaskNetwork = initialTaskNetworks.get(0);
+                Encoder.pb.intTaskNetwork = initialTaskNetworks.get(0);
             }
 
-            Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), intTaskNetwork, Encoder.pb.getIntActions());
+            Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntTaskNetwork(), Encoder.pb.getIntActions());
             // Simplify the methods with the ground inertia information previously extracted
             //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
@@ -572,7 +572,7 @@ public final class Encoder implements Serializable {
                 }
                 str.append(")");
                 str.append("\n\nInstantiation initial task network:\n");
-                str.append(Encoder.toString(intTaskNetwork));
+                str.append(Encoder.toString(Encoder.pb.getIntTaskNetwork()));
             }
             LOGGER.trace(str);
             str.setLength(0);
@@ -662,7 +662,7 @@ public final class Encoder implements Serializable {
 
             }
             // Encode the initial task network
-            Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(intTaskNetwork, taskIndexMap);
+            Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntTaskNetwork(), taskIndexMap);
             // Encode the methods in bit set representation
             Encoder.methods.addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), fluentIndexMap, taskIndexMap));
         }
