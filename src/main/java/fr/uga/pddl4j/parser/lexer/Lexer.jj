@@ -244,12 +244,12 @@ TOKEN : {
 TOKEN : {
 	< STRIPS : ":strips" >
 |	< TYPING : ":typing" >
-|	< NEGATIVE_PRECONDITIONS : ":negative-precondition" >
-|	< DISJUNCTIVE_PRECONDITIONS : ":disjunctive-precondition" >
+|	< NEGATIVE_PRECONDITIONS : ":negative-preconditions" >
+|	< DISJUNCTIVE_PRECONDITIONS : ":disjunctive-preconditions" >
 |	< EQUALITY : ":equality" >
-|	< EXISTENTIAL_PRECONDITIONS : ":existential-precondition" >
-|	< UNIVERSAL_PRECONDITIONS : ":universal-precondition" >
-|	< QUANTIFIED_PRECONDITIONS : ":quantified-precondition" >
+|	< EXISTENTIAL_PRECONDITIONS : ":existential-preconditions" >
+|	< UNIVERSAL_PRECONDITIONS : ":universal-preconditions" >
+|	< QUANTIFIED_PRECONDITIONS : ":quantified-preconditions" >
 |	< CONDITIONAL_EFFECTS : ":conditional-effects" >
 |	< ACTION_COSTS : ":action-costs" >
 |   < FLUENTS : ":fluents" >

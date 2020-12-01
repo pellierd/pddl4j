@@ -90,7 +90,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Assembly ADL benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -104,7 +104,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Grid STRIPS untyped benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -118,10 +118,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 gripper ADL benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Gripper_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -132,7 +132,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Gripper STRIPS benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -146,7 +146,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Logistics ADL benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -160,10 +160,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Logistics STRIPS Round1 benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Logistics_STRIPS_Round1() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -174,7 +174,7 @@ public class HSPTest {
 
     /**
      *  Method that executes tests using IPC 1998 Logistics STRIPS Round2 benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -188,7 +188,7 @@ public class HSPTest {
 
     /**
      *  Method that executes tests using IPC 1998 Movie ADL benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -201,11 +201,11 @@ public class HSPTest {
     }
 
     /**
-     *  Method that executes tests using IPC 1998 Movie STRIPS benchmarks.
-     *
+     * Method that executes tests using IPC 1998 Movie STRIPS benchmarks.
+     * Ok
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Movie_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -216,10 +216,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Blocks STRIPS typed benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Blocks_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -230,10 +230,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Blocks STRIPS untyped benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Blocks_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -244,10 +244,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL full typed benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -258,10 +258,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL simple typed benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -272,10 +272,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator STRIPS simple typed benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_STRIPS_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -286,7 +286,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator STRIPS simple untyped benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -300,10 +300,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Freecell STRIPS  typed benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Freecell_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -314,10 +314,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Freecell STRIPS untyped benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Freecell_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -328,10 +328,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Logistics STRIPS typed benchmarks.
-     *
+     * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Logistics_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -342,7 +342,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Logistics STRIPS untyped benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -356,7 +356,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Schedule ADL typed benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -370,12 +370,26 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Schedule ADL untyped benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
     /*@Test
     public void test_HSP_IPC2000_Schedule_ADL_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2002 Depots STRIPS automatic benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_HSP_IPC2002_Depots_STRIPS_Automatic() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
