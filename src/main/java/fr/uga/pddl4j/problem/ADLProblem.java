@@ -108,9 +108,9 @@ public class ADLProblem {
         // Encode the predicates defined in the domain.
         this.encodePredicates(domain);
         // Encode the functions defined in the domain.
-        /*this.encodeFunctions(domain);
+        this.encodeFunctions(domain);
         // Encode the tasks defined in the domain.
-        this.encodeTasks(domain);
+        /*this.encodeTasks(domain);
         // Encode actions in integer representation
         this.intActions = this.encodeActions(domain.getActions());
         // Encode method in integer representation
@@ -960,5 +960,13 @@ public class ADLProblem {
 
     public List<List<Integer>> getTableOfTypedPredicates() {
         return tableOfTypedPredicates;
+    }
+
+    public List<List<Integer>> getTableOfTypedFunctions() {
+        return tableOfTypedFunctions;
+    }
+
+    public List<String> getTableOfFunctions() {
+        return tableOfFunctions;
     }
 }

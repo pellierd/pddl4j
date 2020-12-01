@@ -58,37 +58,6 @@ final class IntEncoding implements Serializable {
     private IntEncoding() {
     }
 
-
-    /**
-     * Encodes all the function of a specified domain.
-     *
-     * @param domain the domain.
-     */
-    static void encodeFunctions(final PDDLDomain domain) {
-        final List<PDDLNamedTypedList> functions = domain.getFunctions();
-        Encoder.tableOfFunctions = new ArrayList<>(functions.size());
-        Encoder.tableOfTypedFunctions = new ArrayList<>(functions.size());
-        for (PDDLNamedTypedList function : functions) {
-            Encoder.tableOfFunctions.add(function.getName().getImage());
-            List<PDDLTypedSymbol> arguments = function.getArguments();
-            List<Integer> argType = new ArrayList<>(arguments.size());
-            for (PDDLTypedSymbol argument : arguments) {
-                List<PDDLSymbol> types = argument.getTypes();
-                if (types.size() > 1) {
-                    StringBuilder type = new StringBuilder("either");
-                    for (PDDLSymbol type1 : types) {
-                        type.append("~").append(type1.getImage());
-                    }
-                    argType.add(Encoder.pb.getTableOfTypes().indexOf(type.toString()));
-                } else {
-                    argType.add(Encoder.pb.getTableOfTypes().indexOf(types.get(0).getImage()));
-                }
-            }
-            Encoder.tableOfTypedFunctions.add(argType);
-
-        }
-    }
-
     /**
      * Encodes all the tasks of a specified domain.
      *
@@ -451,7 +420,7 @@ final class IntEncoding implements Serializable {
                 break;
             case FN_HEAD:
                 final String functor = exp.getAtom().get(0).getImage();
-                intExp.setPredicate(Encoder.tableOfFunctions.indexOf(functor));
+                intExp.setPredicate(Encoder.pb.getTableOfFunctions().indexOf(functor));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
                     final PDDLSymbol argument = exp.getAtom().get(i);

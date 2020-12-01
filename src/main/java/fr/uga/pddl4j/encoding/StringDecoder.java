@@ -775,7 +775,7 @@ final class StringDecoder implements Serializable {
                 } else {
                     str.append(StringDecoder.toString(Encoder.tableOfRelevantNumericFluents.get(exp.getNumericFluents()),
                         Encoder.pb.getTableOfConstants(), Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-                        Encoder.tableOfFunctions, Encoder.tableOfTasks));
+                        Encoder.pb.getTableOfFunctions(), Encoder.tableOfTasks));
                 }
                 str.append("/");
                 str.append(exp.getValue());

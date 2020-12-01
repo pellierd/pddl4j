@@ -197,7 +197,7 @@ final class PreInstantiation implements Serializable {
     }
 
     static void extractNumericInertia(final List<IntAction> actions) {
-        final int nbFunctions = Encoder.tableOfFunctions.size();
+        final int nbFunctions = Encoder.pb.getTableOfFunctions().size();
         Encoder.tableOfNumericInertia = new ArrayList<>(nbFunctions);
         for (int i = 0; i < nbFunctions; i++) {
             Encoder.tableOfNumericInertia.add(Inertia.INERTIA);
@@ -327,9 +327,9 @@ final class PreInstantiation implements Serializable {
      */
     static void createFunctionsTables(final Set<IntExpression> init) {
         final int tableSize = Encoder.pb.getTableOfConstants().size();
-        final int nbFunction = Encoder.tableOfFunctions.size();
+        final int nbFunction = Encoder.pb.getTableOfFunctions().size();
         Encoder.functionsTables = new ArrayList<>(nbFunction);
-        for (final List<Integer> arguments : Encoder.tableOfTypedFunctions) {
+        for (final List<Integer> arguments : Encoder.pb.getTableOfTypedFunctions()) {
             final int arity = arguments.size();
             final int nbTables = (int) Math.pow(2, arity);
             final List<IntMatrix> pTables = new ArrayList<>(nbTables);
@@ -344,7 +344,7 @@ final class PreInstantiation implements Serializable {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
-            final int arity = Encoder.tableOfTypedFunctions.get(fact.getPredicate()).size();
+            final int arity = Encoder.pb.getTableOfTypedFunctions().get(fact.getPredicate()).size();
             final List<IntMatrix> pTables = Encoder.functionsTables.get(fact.getPredicate());
             final int[] set = new int[arity];
             final int[] args = fact.getArguments();
