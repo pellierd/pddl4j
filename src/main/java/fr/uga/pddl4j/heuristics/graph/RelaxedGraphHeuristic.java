@@ -119,7 +119,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
      *
      * @param problem the problem to be solved.
      */
-    protected RelaxedGraphHeuristic(final Problem problem) {
+    protected RelaxedGraphHeuristic(final ProblemOld problem) {
         super(problem);
         // Get the number of relevant facts of the problem
         final int nbRelevantFacts = super.getRevelantFacts().size();

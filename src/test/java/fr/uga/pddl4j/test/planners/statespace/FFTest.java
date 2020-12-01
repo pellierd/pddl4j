@@ -20,7 +20,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.FF;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -441,7 +441,7 @@ public class FFTest {
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
                 Assert.assertTrue(errorManager.isEmpty());
 
-                Problem pb = null;
+                ProblemOld pb = null;
                 Plan plan = null;
                 try {
                     // Encodes and instantiates the problem in a compact representation

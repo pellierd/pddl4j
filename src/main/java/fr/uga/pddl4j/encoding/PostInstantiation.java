@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.IOException;
@@ -86,8 +87,10 @@ final class PostInstantiation implements Serializable {
             extractRelevantFacts(a.getPreconditions(), facts, init);
             extractRelevantFacts(a.getEffects(), facts, init);
         }
-        for (IntMethod m : methods) {
-            extractRelevantFacts(m.getPreconditions(), facts, init);
+        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            for (IntMethod m : methods) {
+                extractRelevantFacts(m.getPreconditions(), facts, init);
+            }
         }
         for (IntExpression p : init) {
             Inertia inertia = Encoder.tableOfGroundInertia.get(p);

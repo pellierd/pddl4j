@@ -48,7 +48,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
     private int goalCard;
     private int critical;
 
-    public CriticalPath(Problem problem) {
+    public CriticalPath(ProblemOld problem) {
         super(problem);
         super.setAdmissible(true);
     }

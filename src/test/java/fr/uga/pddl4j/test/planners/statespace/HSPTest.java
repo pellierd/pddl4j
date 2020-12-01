@@ -21,7 +21,7 @@ import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.statespace.HSP;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -766,7 +766,7 @@ public class HSPTest {
                 Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty());
                 Assert.assertTrue(errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
 
-                Problem pb = null;
+                ProblemOld pb = null;
                 Plan plan = null;
                 // Encodes and instantiates the problem in a compact representation
                 System.out.println("* Encoding [" + currentProblem + "]" + "...");

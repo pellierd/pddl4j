@@ -63,7 +63,7 @@ final class Instantiation implements Serializable {
             boolean toInstantiate = true;
             int i = 0;
             while (i < a.arity() && toInstantiate) {
-                toInstantiate = !Encoder.pb.getTableOfDomains().get(a.getTypeOfParameters(i)).isEmpty();
+                toInstantiate = !Encoder.pb.getDomains().get(a.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
             if (toInstantiate) {
@@ -139,7 +139,7 @@ final class Instantiation implements Serializable {
                 }
             }
         } else {
-            final Set<Integer> values = Encoder.pb.getTableOfDomains().get(action.getTypeOfParameters(index));
+            final Set<Integer> values = Encoder.pb.getDomains().get(action.getTypeOfParameters(index));
             for (Integer value : values) {
                 final int varIndex = -index - 1;
                 final IntExpression precond = new IntExpression(action.getPreconditions());
@@ -197,7 +197,7 @@ final class Instantiation implements Serializable {
         if (index == arity) {
             networks.add(network);
         } else {
-            final Set<Integer> values = Encoder.pb.getTableOfDomains().get(network.getTypeOfParameters(index));
+            final Set<Integer> values = Encoder.pb.getDomains().get(network.getTypeOfParameters(index));
             for (Integer value : values) {
                 final int varIndex = -index - 1;
                 final IntTaskNetwork copy = new IntTaskNetwork(arity);
@@ -252,7 +252,7 @@ final class Instantiation implements Serializable {
         } else if (method.getValueOfParameter(index) >= 0) {
             Instantiation.instantiate(method, index + 1, bound, methods);
         } else {
-            final Set<Integer> values = Encoder.pb.getTableOfDomains().get(method.getTypeOfParameters(index));
+            final Set<Integer> values = Encoder.pb.getDomains().get(method.getTypeOfParameters(index));
             for (Integer value : values) {
                 final int varIndex = -index - 1;
                 final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
@@ -303,7 +303,7 @@ final class Instantiation implements Serializable {
             final int var = t.getArguments()[i];
             final int cons = task.getArguments()[i];
             final int type = copy.getTypeOfParameters((-var - 1));
-            final Set<Integer> domain = Encoder.pb.getTableOfDomains().get(type);
+            final Set<Integer> domain = Encoder.pb.getDomains().get(type);
             if (domain.contains(cons)) {
                 Instantiation.substitute(copy.getPreconditions(), var, cons, true);
                 Instantiation.substitute(copy.getTask(), var, cons, true);
@@ -349,7 +349,7 @@ final class Instantiation implements Serializable {
             boolean toInstantiate = true;
             int i = 0;
             while (i < m.arity() && toInstantiate) {
-                toInstantiate = !Encoder.pb.getTableOfDomains().get(m.getTypeOfParameters(i)).isEmpty();
+                toInstantiate = !Encoder.pb.getDomains().get(m.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
             if (toInstantiate) {
@@ -463,7 +463,7 @@ final class Instantiation implements Serializable {
         for (IntAction a : actions) {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
-            task.setPredicate(Encoder.pb.getTableOfTasks().indexOf(a.getName()));
+            task.setPredicate(Encoder.pb.getTaskSymbols().indexOf(a.getName()));
             task.setArguments(a.getInstantiations());
             tasks.add(task);
         }
@@ -502,7 +502,7 @@ final class Instantiation implements Serializable {
             boolean toInstantiate = true;
             int i = 0;
             while (i < method.arity() && toInstantiate) {
-                toInstantiate = !Encoder.pb.getTableOfDomains().get(method.getTypeOfParameters(i)).isEmpty();
+                toInstantiate = !Encoder.pb.getDomains().get(method.getTypeOfParameters(i)).isEmpty();
                 i++;
             }
             if (!toInstantiate) {
@@ -526,7 +526,7 @@ final class Instantiation implements Serializable {
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && Encoder.pb.getTableOfDomains().get(ei.getType()).isEmpty()) {
+                        && Encoder.pb.getDomains().get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -544,7 +544,7 @@ final class Instantiation implements Serializable {
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && Encoder.pb.getTableOfDomains().get(ei.getType()).isEmpty()) {
+                        && Encoder.pb.getDomains().get(ei.getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -556,7 +556,7 @@ final class Instantiation implements Serializable {
                 }
                 break;
             case FORALL:
-                Set<Integer> constants = Encoder.pb.getTableOfDomains().get(exp.getType());
+                Set<Integer> constants = Encoder.pb.getDomains().get(exp.getType());
                 IntExpression qExp = exp.getChildren().get(0);
                 int var = exp.getVariable();
                 exp.setConnective(PDDLConnective.AND);
@@ -575,7 +575,7 @@ final class Instantiation implements Serializable {
                 Instantiation.expandQuantifiedExpression(exp, simplify);
                 break;
             case EXISTS:
-                constants = Encoder.pb.getTableOfDomains().get(exp.getType());
+                constants = Encoder.pb.getDomains().get(exp.getType());
                 qExp = exp.getChildren().get(0);
                 var = exp.getVariable();
                 exp.setConnective(PDDLConnective.OR);
@@ -1103,10 +1103,10 @@ final class Instantiation implements Serializable {
         int j = 0;
         int max = 1;
         final int[] index = new int[indexSize];
-        final List<Integer> predArg = Encoder.pb.getTableOfTypedPredicates().get(predicate);
+        final List<Integer> predArg = Encoder.pb.getPredicateSignatures().get(predicate);
         for (int i = 0; i < mask.length; i++) {
             if (mask[i] == 0) {
-                max *= Encoder.pb.getTableOfDomains().get(predArg.get(i)).size();
+                max *= Encoder.pb.getDomains().get(predArg.get(i)).size();
             } else {
                 index[j] = args[i];
                 j++;
@@ -1161,10 +1161,10 @@ final class Instantiation implements Serializable {
         int j = 0;
         int max = 1;
         final int[] index = new int[indexSize];
-        final List<Integer> predArg = Encoder.pb.getTableOfTypedFunctions().get(predicate);
+        final List<Integer> predArg = Encoder.pb.getFunctionSignatures().get(predicate);
         for (int i = 0; i < mask.length; i++) {
             if (mask[i] == 0) {
-                max *= Encoder.pb.getTableOfDomains().get(predArg.get(i)).size();
+                max *= Encoder.pb.getDomains().get(predArg.get(i)).size();
             } else {
                 index[j] = args[i];
                 j++;

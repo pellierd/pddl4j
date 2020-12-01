@@ -4,7 +4,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.planners.ProblemFactory;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -131,7 +131,7 @@ public abstract class Tools {
      * @param problemFile the file file to be tested.
      * @return a coded problem from the parsing file
      */
-    public static Problem generateCodedProblem(String domainFile, String problemFile) {
+    public static ProblemOld generateCodedProblem(String domainFile, String problemFile) {
         try {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
@@ -382,7 +382,7 @@ public abstract class Tools {
                 Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
                     && errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
 
-                final Problem pb;
+                final ProblemOld pb;
                 try {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println(" * Encoding [" + currentProblem + "]" + "...");
@@ -478,7 +478,7 @@ public abstract class Tools {
                 Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
                     && errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
 
-                final Problem pb;
+                final ProblemOld pb;
                 try {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println(" * Encoding [" + currentProblem + "]" + "...");

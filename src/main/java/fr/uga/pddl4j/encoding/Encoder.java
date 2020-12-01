@@ -28,9 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -286,100 +284,12 @@ public final class Encoder implements Serializable {
      * @return the problem encoded.
      * @throws IllegalArgumentException if the problem to encode is not ADL or ACTION_COSTS or HTN.
      */
-    public static Problem encode(final PDDLDomain domain, final PDDLProblem problem) {
+    public static ProblemOld encode(final PDDLDomain domain, final PDDLProblem problem) {
 
         Encoder.pb = new ADLProblem(domain, problem);
 
-        // *****************************************************************************************
-        // Step 2: Integer encoding
-        // *****************************************************************************************
-
-        // Encode the types declared in the domain
-        //IntEncoding.encodeTypes(domain);
-        // Encode the constants declared in the domain and the objects of the problem
-        //IntEncoding.encodeConstants(domain, problem);
-        // Encode the type of the form (either t1 t2...) declared in the domain and the problem
-        //IntEncoding.encodeEitherTypes(domain, problem);
-        // Encode the predicates defined in the domain.
-        //IntEncoding.encodePredicates(domain);
-        // Encode the functions defined in the domain.
-        //IntEncoding.encodeFunctions(domain);
-        // Encode the tasks defined in the domain.
-        //IntEncoding.encodeTasks(domain);
-        // Encode actions in integer representation
-        //List<IntAction> intActions = IntEncoding.encodeActions(domain.getActions());
-        // Encode method in integer representation
-        //List<IntMethod> intMethods = IntEncoding.encodeMethods(domain.getMethods());
-
-        // Encode the initial state in integer representation
-        //final Set<IntExpression> intInit = IntEncoding.encodeInit(problem.getInit());
-        // Create Map containing functions and associed cost from encoded initial state
-        //Encoder.intInitFunctionCost = IntEncoding.encodeFunctionCostInit(intInit);
-
-        // Create Set containing integer representation of initial state without functions and associed cost
-        //final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
-
-        // Encode the goal in integer representation
-        /*IntExpression intGoal =  null;
-        if (problem.getGoal() != null) {
-            intGoal = IntEncoding.encodeGoal(problem.getGoal());
-        }*/
-
-        // Encode the initial task network in integer representation
-        /*IntTaskNetwork intTaskNetwork = null;
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            intTaskNetwork = IntEncoding.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
-        }*/
 
         final StringBuilder str = new StringBuilder();
-
-        // Just for logging
-        if (Encoder.logLevel == 1 || Encoder.logLevel == 2) {
-            Encoder.printTableOfConstants(str);
-            str.append(System.lineSeparator());
-            Encoder.printTableOfPredicates(str);
-            str.append(System.lineSeparator());
-            if (!Encoder.pb.getTableOfFunctions().isEmpty()) {
-                Encoder.printTableOfFunctions(str);
-                str.append(System.lineSeparator());
-            }
-            if (!Encoder.pb.getTableOfTasks().isEmpty() && Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-                Encoder.printTableOfTasks(str);
-                str.append(System.lineSeparator());
-            }
-            Encoder.printTableOfTypes(str);
-            LOGGER.trace(str);
-            str.setLength(0);
-        }
-
-        // Just for logging
-        if (Encoder.logLevel == 2) {
-            str.append("\nCoded initial state:\n").append("(and");
-            for (IntExpression f : Encoder.pb.getIntInitPredicates()) {
-                str.append(" ").append(Encoder.toString(f)).append("\n");
-            }
-            if (Encoder.pb.getIntGoal() != null) {
-                str.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(Encoder.pb.getIntGoal()));
-            }
-            if (Encoder.pb.getIntTaskNetwork() != null) {
-                str.append(")").append("\n\nCoded initial task network:\n")
-                    .append(Encoder.toString(Encoder.pb.getIntTaskNetwork()));
-            }
-            if (!Encoder.pb.getIntActions().isEmpty()) {
-                str.append(")").append("\n\nCoded actions:\n\n");
-                for (IntAction op : Encoder.pb.getIntActions()) {
-                    str.append(Encoder.toString(op)).append(System.lineSeparator());
-                }
-            }
-            if (!Encoder.pb.getIntMethods().isEmpty()) {
-                str.append(")").append("\n\nCoded methods:\n\n");
-                for (IntMethod meth : Encoder.pb.getIntMethods()) {
-                    str.append(Encoder.toString(meth)).append(System.lineSeparator());
-                }
-            }
-            LOGGER.trace(str);
-            str.setLength(0);
-        }
 
         // *****************************************************************************************
         // Step 3: PreInstantiation
@@ -445,10 +355,10 @@ public final class Encoder implements Serializable {
                 str.append("\n\nPre-instantiation goal state:\n");
                 str.append(Encoder.toString(Encoder.pb.getIntGoal()));
             }
-            if (Encoder.pb.getIntTaskNetwork() != null) {
+            if (Encoder.pb.getIntInitialTaskNetwork() != null) {
                 str.append(")");
                 str.append("\n\nPre-instantiation initial task network:\n");
-                str.append(Encoder.toString(Encoder.pb.getIntTaskNetwork()));
+                str.append(Encoder.toString(Encoder.pb.getIntInitialTaskNetwork()));
             }
             str.append("\nPre-instantiation actions with inferred types (");
             str.append(Encoder.pb.getIntActions().size());
@@ -528,11 +438,11 @@ public final class Encoder implements Serializable {
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
 
-            List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(Encoder.pb.getIntTaskNetwork());
+            List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(Encoder.pb.getIntInitialTaskNetwork());
             if (initialTaskNetworks.size() > 1) {
                 IntExpression root = new IntExpression(PDDLConnective.TASK);
-                root.setPredicate(Encoder.pb.getTableOfTasks().size());
-                Encoder.pb.getTableOfTasks().add("__top");
+                root.setPredicate(Encoder.pb.getTaskSymbols().size());
+                Encoder.pb.getTaskSymbols().add("__top");
                 Encoder.pb.getCompoundTaskSymbols().add("__top");
                 root.setPrimtive(false);
                 int index = 0;
@@ -552,13 +462,13 @@ public final class Encoder implements Serializable {
                 }
 
                 // Creates the abstract initial task network
-                Encoder.pb.intTaskNetwork = new IntTaskNetwork();
-                Encoder.pb.intTaskNetwork.getTasks().addChild(new IntExpression(root));
+                Encoder.pb.intInitialTaskNetwork = new IntTaskNetwork();
+                Encoder.pb.intInitialTaskNetwork.getTasks().addChild(new IntExpression(root));
             } else {
-                Encoder.pb.intTaskNetwork = initialTaskNetworks.get(0);
+                Encoder.pb.intInitialTaskNetwork = initialTaskNetworks.get(0);
             }
 
-            Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntTaskNetwork(), Encoder.pb.getIntActions());
+            Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getIntActions());
             // Simplify the methods with the ground inertia information previously extracted
             //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
@@ -572,7 +482,7 @@ public final class Encoder implements Serializable {
                 }
                 str.append(")");
                 str.append("\n\nInstantiation initial task network:\n");
-                str.append(Encoder.toString(Encoder.pb.getIntTaskNetwork()));
+                str.append(Encoder.toString(Encoder.pb.getIntInitialTaskNetwork()));
             }
             LOGGER.trace(str);
             str.setLength(0);
@@ -615,7 +525,9 @@ public final class Encoder implements Serializable {
 
         // Creates the final list of actions and methods that will be used in the problem
         Encoder.actions = new ArrayList<>(Encoder.pb.getIntActions().size());
-        Encoder.methods = new ArrayList<>(Encoder.pb.getIntMethods().size());
+        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            Encoder.methods = new ArrayList<>(Encoder.pb.getIntMethods().size());
+        }
 
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
         final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
@@ -662,7 +574,7 @@ public final class Encoder implements Serializable {
 
             }
             // Encode the initial task network
-            Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntTaskNetwork(), taskIndexMap);
+            Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntInitialTaskNetwork(), taskIndexMap);
             // Encode the methods in bit set representation
             Encoder.methods.addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), fluentIndexMap, taskIndexMap));
         }
@@ -732,20 +644,20 @@ public final class Encoder implements Serializable {
         }
 
 
-        final Problem codedProblem = new Problem();
+        final ProblemOld codedProblem = new ProblemOld();
         codedProblem.setRequirements(Encoder.pb.getRequirements());
         codedProblem.setGoal(Encoder.goal);
         codedProblem.setInitialState(Encoder.init);
         codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
         codedProblem.setActions(Encoder.actions);
         codedProblem.setMethods(Encoder.methods);
-        codedProblem.setConstantSymbols(Encoder.pb.getTableOfConstants());
-        codedProblem.setDomains(Encoder.pb.getTableOfDomains());
-        codedProblem.setFunctionSymbols(Encoder.pb.getTableOfFunctions());
-        codedProblem.setTaskSymbols(Encoder.pb.getTableOfTasks());
+        codedProblem.setConstantSymbols(Encoder.pb.getConstantSymbols());
+        codedProblem.setDomains(Encoder.pb.getDomains());
+        codedProblem.setFunctionSymbols(Encoder.pb.getFunctionSymbols());
+        codedProblem.setTaskSymbols(Encoder.pb.getTaskSymbols());
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
-        codedProblem.setPredicateSymbols(Encoder.pb.getTableOfPredicates());
+        codedProblem.setPredicateSymbols(Encoder.pb.getPredicateSymbols());
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
@@ -754,9 +666,9 @@ public final class Encoder implements Serializable {
                     task.isPrimtive())).collect(Collectors.toList()));
         }
         codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
-        codedProblem.setFunctionSignatures(Encoder.pb.getTableOfTypedFunctions());
-        codedProblem.setPredicateSignatures(Encoder.pb.getTableOfTypedPredicates());
-        codedProblem.setTypeSymbols(Encoder.pb.getTableOfTypes());
+        codedProblem.setFunctionSignatures(Encoder.pb.getFunctionSignatures());
+        codedProblem.setPredicateSignatures(Encoder.pb.getPredicateSignatures());
+        codedProblem.setTypeSymbols(Encoder.pb.getTypeSymbols());
         return codedProblem;
 
     }
@@ -772,9 +684,9 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfTypes(StringBuilder str) {
         str.append("Types table:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfTypes().size(); i++) {
-            str.append(i).append(": ").append(Encoder.pb.getTableOfTypes().get(i)).append(":");
-            Set<Integer> domain = Encoder.pb.getTableOfDomains().get(i);
+        for (int i = 0; i < Encoder.pb.getTypeSymbols().size(); i++) {
+            str.append(i).append(": ").append(Encoder.pb.getTypeSymbols().get(i)).append(":");
+            Set<Integer> domain = Encoder.pb.getDomains().get(i);
             for (Integer constant : domain) {
                 str.append(" ").append(constant);
             }
@@ -789,8 +701,8 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfConstants(StringBuilder str) {
         str.append("Constants table:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfConstants().size(); i++) {
-            str.append(i).append(": ").append(Encoder.pb.getTableOfConstants().get(i)).append("\n");
+        for (int i = 0; i < Encoder.pb.getConstantSymbols().size(); i++) {
+            str.append(i).append(": ").append(Encoder.pb.getConstantSymbols().get(i)).append("\n");
         }
     }
 
@@ -801,12 +713,12 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfPredicates(StringBuilder str) {
         str.append("Predicates table:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfPredicates().size(); i++) {
-            String predicate = Encoder.pb.getTableOfPredicates().get(i);
+        for (int i = 0; i < Encoder.pb.getPredicateSymbols().size(); i++) {
+            String predicate = Encoder.pb.getPredicateSymbols().get(i);
             str.append(i).append(": ").append(predicate).append(" :");
-            for (int j = 0; j < Encoder.pb.getTableOfTypedPredicates().get(i).size(); j++) {
+            for (int j = 0; j < Encoder.pb.getPredicateSignatures().get(i).size(); j++) {
                 str.append(" ")
-                    .append(Encoder.pb.getTableOfTypes().get(Encoder.pb.getTableOfTypedPredicates().get(i).get(j)));
+                    .append(Encoder.pb.getTypeSymbols().get(Encoder.pb.getPredicateSignatures().get(i).get(j)));
             }
             str.append("\n");
         }
@@ -819,11 +731,11 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfFunctions(StringBuilder str) {
         str.append("Functions table:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfFunctions().size(); i++) {
-            String predicate = Encoder.pb.getTableOfFunctions().get(i);
+        for (int i = 0; i < Encoder.pb.getFunctionSymbols().size(); i++) {
+            String predicate = Encoder.pb.getFunctionSymbols().get(i);
             str.append(i).append(": ").append(predicate).append(":");
-            for (int j = 0; j < Encoder.pb.getTableOfTypedFunctions().get(i).size(); j++) {
-                str.append(" ").append(Encoder.pb.getTableOfTypes().get(Encoder.pb.getTableOfTypedFunctions().get(i).get(j)));
+            for (int j = 0; j < Encoder.pb.getFunctionSignatures().get(i).size(); j++) {
+                str.append(" ").append(Encoder.pb.getTypeSymbols().get(Encoder.pb.getFunctionSignatures().get(i).get(j)));
             }
             str.append("\n");
         }
@@ -836,12 +748,12 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfTasks(StringBuilder str) {
         str.append("Tasks table:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfTasks().size(); i++) {
-            String predicate = Encoder.pb.getTableOfTasks().get(i);
+        for (int i = 0; i < Encoder.pb.getTaskSymbols().size(); i++) {
+            String predicate = Encoder.pb.getTaskSymbols().get(i);
             str.append(i).append(": ").append(predicate).append(" :");
-            for (int j = 0; j < Encoder.pb.getTableOfTypedTasks().get(i).size(); j++) {
+            for (int j = 0; j < Encoder.pb.getTaskSignatures().get(i).size(); j++) {
                 str.append(" ")
-                    .append(Encoder.pb.getTableOfTypes().get(Encoder.pb.getTableOfTypedTasks().get(i).get(j)));
+                    .append(Encoder.pb.getTypeSymbols().get(Encoder.pb.getTaskSignatures().get(i).get(j)));
             }
             str.append("\n");
         }
@@ -854,8 +766,8 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfInertia(StringBuilder str) {
         str.append("Inertias table:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfPredicates().size(); i++) {
-            String predicate = Encoder.pb.getTableOfPredicates().get(i);
+        for (int i = 0; i < Encoder.pb.getPredicateSymbols().size(); i++) {
+            String predicate = Encoder.pb.getPredicateSymbols().get(i);
             str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.tableOfInertia.get(i));
             str.append("\n");
         }
@@ -914,7 +826,7 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified operator.
      */
     static String toShortString(final AbstractGroundOperator op) {
-        return StringDecoder.toShortString(op, Encoder.pb.getTableOfConstants());
+        return StringDecoder.toShortString(op, Encoder.pb.getConstantSymbols());
     }
 
     /**
@@ -924,9 +836,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified operator.
      */
     static String toString(final IntAction op) {
-        return StringDecoder.toString(op, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks());
+        return StringDecoder.toString(op, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
     }
 
     /**
@@ -936,9 +848,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified method.
      */
     static String toString(final IntMethod meth) {
-        return StringDecoder.toString(meth, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks());
+        return StringDecoder.toString(meth, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
     }
 
     /**
@@ -948,9 +860,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified tn.
      */
     static String toString(final IntTaskNetwork tn) {
-        return StringDecoder.toString(tn, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks());
+        return StringDecoder.toString(tn, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
     }
 
     /**
@@ -960,9 +872,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified action.
      */
     static String toString(final Action a) {
-        return StringDecoder.toString(a, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.tableOfRelevantFluents);
+        return StringDecoder.toString(a, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
     }
 
     /**
@@ -972,9 +884,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified method.
      */
     static String toString(final Method m) {
-        return StringDecoder.toString(m, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks(),
+        return StringDecoder.toString(m, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
             Encoder.tableOfRelevantFluents, Encoder.tableOfRelevantTasks);
     }
 
@@ -985,9 +897,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified task network.
      */
     static String toString(final TaskNetwork taskNetwork) {
-        return StringDecoder.toString(taskNetwork, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks(),
+        return StringDecoder.toString(taskNetwork, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
             Encoder.tableOfRelevantTasks);
     }
 
@@ -998,9 +910,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(final IntExpression exp) {
-        return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks());
+        return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
     }
 
     /**
@@ -1010,9 +922,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(Condition exp) {
-        return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.tableOfRelevantFluents);
+        return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
     }
 
     /**
@@ -1022,9 +934,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(Goal exp) {
-        return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.tableOfRelevantFluents);
+        return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
     }
 
     /**
@@ -1035,13 +947,13 @@ public final class Encoder implements Serializable {
      */
     static String toString(InitialState state) {
         return StringDecoder.toString(state,
-            Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(),
-            Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(),
+            Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(),
+            Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(),
             Encoder.tableOfRelevantFluents,
             Encoder.tableOfRelevantNumericFluents,
-            Encoder.pb.getTableOfTasks());
+            Encoder.pb.getTaskSymbols());
     }
 
     static String toString(NumericConstraint constraint) {
@@ -1055,9 +967,9 @@ public final class Encoder implements Serializable {
      * @return a string representation of the specified expression.
      */
     static String toString(ConditionalEffect exp) {
-        return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-            Encoder.pb.getTableOfFunctions(), Encoder.tableOfRelevantFluents);
+        return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
+            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
     }
 
     /**
@@ -1111,7 +1023,7 @@ public final class Encoder implements Serializable {
 
             try {
                 System.out.println(" * Encoding [" + problem + "]" + "...");
-                Problem pb = Encoder.encode(parser.getDomain(), parser.getProblem());
+                ProblemOld pb = Encoder.encode(parser.getDomain(), parser.getProblem());
 
 
 

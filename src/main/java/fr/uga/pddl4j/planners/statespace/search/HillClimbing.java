@@ -19,7 +19,7 @@ import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
@@ -60,7 +60,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node.
      */
-    public Node search(final Problem codedProblem) {
+    public Node search(final ProblemOld codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
         final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
@@ -115,7 +115,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(final Node parent, final Problem problem,
+    private LinkedList<Node> getSuccessors(final Node parent, final ProblemOld problem,
                                            final PlanningGraphHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 

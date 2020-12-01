@@ -22,7 +22,7 @@ import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      *
      * @param problem the planning problem
      */
-    private void initTasksCosts(Problem problem) {
+    private void initTasksCosts(ProblemOld problem) {
         this.costs = new int[problem.getRelevantOperators().size()];
         Arrays.fill(this.costs, -1);
         for (int i = 0; i < problem.getTasks().size(); i++) {
@@ -97,7 +97,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the planning problem.
      * @param closed the set of task already encountered.
      */
-    private int cost(int task, Problem problem, Set<Integer> closed) {
+    private int cost(int task, ProblemOld problem, Set<Integer> closed) {
         closed.add(task);
         if (this.costs[task] != -1) {
             return this.costs[task];
@@ -132,7 +132,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    protected Plan extractPlan(final AbstractSTNNode node, final Problem problem) {
+    protected Plan extractPlan(final AbstractSTNNode node, final ProblemOld problem) {
         AbstractSTNNode n = node;
         final Plan plan = new SequentialPlan();
         while (n.getParent() != null) {
@@ -155,7 +155,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the hierarchy of the solution plan.
      */
-    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final Problem problem) {
+    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final ProblemOld problem) {
 
         // Extract hierarchy of the plan
         final LinkedList<Integer> operators = new LinkedList<>();

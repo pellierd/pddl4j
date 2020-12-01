@@ -20,7 +20,7 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 
 import java.util.Objects;
 
@@ -286,7 +286,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @return the solution node or null.
      */
     @Override
-    public Node searchSolutionNode(final Problem codedProblem) {
+    public Node searchSolutionNode(final ProblemOld codedProblem) {
         Objects.requireNonNull(codedProblem);
         return search(codedProblem);
     }
@@ -298,7 +298,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @return the solution plan or null.
      */
     @Override
-    public Plan searchPlan(final Problem codedProblem) {
+    public Plan searchPlan(final ProblemOld codedProblem) {
         Objects.requireNonNull(codedProblem);
         final Node solutionNode = search(codedProblem);
         if (solutionNode != null) {
@@ -316,7 +316,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @return the solution plan or null is no solution was found.
      */
     @Override
-    public SequentialPlan extractPlan(final Node node, final Problem problem) {
+    public SequentialPlan extractPlan(final Node node, final ProblemOld problem) {
         if (node != null) {
             Node n = node;
             final SequentialPlan plan = new SequentialPlan();

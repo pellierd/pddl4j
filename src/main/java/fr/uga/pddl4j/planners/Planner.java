@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -125,7 +125,7 @@ public interface Planner extends Serializable {
      * @param problem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null is no solution was found.
      */
-    Plan search(final Problem problem);
+    Plan search(final ProblemOld problem);
 
     /**
      * Returns the statistics of the planner.

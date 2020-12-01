@@ -24,7 +24,7 @@ import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +61,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public Plan search(final Problem problem) {
+    public Plan search(final ProblemOld problem) {
         // Create the list of pending nodes to explore
         final PriorityQueue<TFDNode> open = new PriorityQueue<>(1000, new Comparator<TFDNode>() {
             public int compare(TFDNode n1, TFDNode n2) {
@@ -266,7 +266,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
         factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
-        Problem pb =  null;
+        ProblemOld pb =  null;
         try {
             pb = factory.encode();
         } catch (OutOfMemoryError err) {

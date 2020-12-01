@@ -26,7 +26,6 @@ import fr.uga.pddl4j.problem.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -268,9 +267,9 @@ final class BitEncoding implements Serializable {
         }
         if (Encoder.codedGoal.size() > 1) {
             // Create a new dummy fact to encode the goal
-            final int dummyPredicateIndex = Encoder.pb.getTableOfPredicates().size();
-            Encoder.pb.getTableOfPredicates().add(Constants.DUMMY_GOAL);
-            Encoder.pb.getTableOfTypedPredicates().add(new ArrayList<>());
+            final int dummyPredicateIndex = Encoder.pb.getPredicateSymbols().size();
+            Encoder.pb.getPredicateSymbols().add(Constants.DUMMY_GOAL);
+            Encoder.pb.getPredicateSignatures().add(new ArrayList<>());
             IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
             dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);

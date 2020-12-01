@@ -21,7 +21,7 @@ import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +35,7 @@ import java.io.IOException;
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- * @see Problem
+ * @see ProblemOld
  * @since 3.0
  */
 public class ProblemFactory {
@@ -129,7 +129,7 @@ public class ProblemFactory {
      *
      * @return the encoded planning problem or null if the problem cannot be encoded.
      */
-    public Problem encode() {
+    public ProblemOld encode() {
         if (!this.parser.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()
                 || !this.parser.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
             return null;

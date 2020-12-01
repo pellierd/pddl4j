@@ -47,7 +47,7 @@ public class JsonAdapter implements Serializable {
     /**
      * The current coded problem the plan is based on.
      */
-    private Problem problem;
+    private ProblemOld problem;
 
     /**
      * Plan in its JSON form.
@@ -59,7 +59,7 @@ public class JsonAdapter implements Serializable {
      *
      * @param problem the pddl4j problem representation.
      */
-    public JsonAdapter(Problem problem) {
+    public JsonAdapter(ProblemOld problem) {
         this.problem = problem;
     }
 

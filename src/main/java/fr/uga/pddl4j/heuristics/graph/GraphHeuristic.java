@@ -24,7 +24,7 @@ import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.ConditionalEffect;
 import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.problem.Condition;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
@@ -151,7 +151,7 @@ public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implement
      *
      * @param problem the problem to be solved.
      */
-    protected GraphHeuristic(final Problem problem) {
+    protected GraphHeuristic(final ProblemOld problem) {
         super(problem);
         this.debug = false;
 

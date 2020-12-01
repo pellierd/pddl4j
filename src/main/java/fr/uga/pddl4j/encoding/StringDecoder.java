@@ -774,8 +774,8 @@ final class StringDecoder implements Serializable {
                     str.append("?duration");
                 } else {
                     str.append(StringDecoder.toString(Encoder.tableOfRelevantNumericFluents.get(exp.getNumericFluents()),
-                        Encoder.pb.getTableOfConstants(), Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
-                        Encoder.pb.getTableOfFunctions(), Encoder.pb.getTableOfTasks()));
+                        Encoder.pb.getConstantSymbols(), Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
+                        Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols()));
                 }
                 str.append("/");
                 str.append(exp.getValue());

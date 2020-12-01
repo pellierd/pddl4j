@@ -17,7 +17,7 @@ package fr.uga.pddl4j.heuristics;
 
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.problem.Condition;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
      *
      * @param problem the problem to solve.
      */
-    protected AbstractGoalCostHeuristic(final Problem problem) {
+    protected AbstractGoalCostHeuristic(final ProblemOld problem) {
         this.facts = problem.getRelevantFluents();
         this.goal = problem.getGoal();
         this.actions = problem.getActions();
