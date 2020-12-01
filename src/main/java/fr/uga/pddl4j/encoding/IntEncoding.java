@@ -210,32 +210,6 @@ final class IntEncoding implements Serializable {
     }
 
     /**
-     * Encodes all the constants of the specified domain and the problem.
-     *
-     * @param domain  the domain.
-     * @param problem the problem.
-     */
-    static void encodeConstants(final PDDLDomain domain, final PDDLProblem problem) {
-        final List<PDDLTypedSymbol> constants = domain.getConstants();
-        Encoder.tableOfConstants = new ArrayList<>(domain.getConstants().size());
-        constants.addAll(problem.getObjects());
-        for (PDDLTypedSymbol constant : constants) {
-            int ic = Encoder.tableOfConstants.indexOf(constant.getImage());
-            if (ic == -1) {
-                ic = Encoder.tableOfConstants.size();
-                Encoder.tableOfConstants.add(constant.getImage());
-            }
-            final LinkedList<PDDLSymbol> types = new LinkedList<>(constant.getTypes());
-            while (!types.isEmpty()) {
-                PDDLSymbol type = types.poll();
-                final int it = Encoder.pb.getTableOfTypes().indexOf(type.getImage());
-                types.addAll(domain.getType(type).getTypes());
-                Encoder.pb.getTableOfDomains().get(it).add(ic);
-            }
-        }
-    }
-
-    /**
      * Encodes all the predicates of a specified domain.
      *
      * @param domain the domain.
@@ -373,7 +347,7 @@ final class IntEncoding implements Serializable {
             if (intExp.getConnective().equals(PDDLConnective.FN_ATOM)) {
                 intFunctionCost.put(intExp.getChildren().get(0),
                     Double.parseDouble(StringDecoder.toString(intExp.getChildren().get(1),
-                        Encoder.tableOfConstants,
+                        Encoder.pb.getTableOfConstants(),
                         Encoder.pb.getTableOfTypes(),
                         Encoder.tableOfPredicates,
                         Encoder.tableOfFunctions,
@@ -657,7 +631,7 @@ final class IntEncoding implements Serializable {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i] = Encoder.tableOfConstants.indexOf(argument.getImage());
+                        args[i] = Encoder.pb.getTableOfConstants().indexOf(argument.getImage());
                     }
                 }
                 intExp.setArguments(args);
@@ -671,7 +645,7 @@ final class IntEncoding implements Serializable {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
+                        args[i - 1] = Encoder.pb.getTableOfConstants().indexOf(argument.getImage());
                     }
                 }
                 intExp.setArguments(args);
@@ -685,7 +659,7 @@ final class IntEncoding implements Serializable {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
+                        args[i - 1] = Encoder.pb.getTableOfConstants().indexOf(argument.getImage());
                     }
                 }
                 intExp.setArguments(args);
@@ -700,7 +674,7 @@ final class IntEncoding implements Serializable {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i - 1] = Encoder.tableOfConstants.indexOf(argument.getImage());
+                        args[i - 1] = Encoder.pb.getTableOfConstants().indexOf(argument.getImage());
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded

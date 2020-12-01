@@ -277,7 +277,7 @@ final class PreInstantiation implements Serializable {
      * @param init the initial state.
      */
     static void createPredicatesTables(final Set<IntExpression> init) {
-        final int tableSize = Encoder.tableOfConstants.size();
+        final int tableSize = Encoder.pb.getTableOfConstants().size();
         final int nbPredicate = Encoder.tableOfPredicates.size();
         Encoder.predicatesTables = new ArrayList<>(nbPredicate);
         for (final List<Integer> arguments : Encoder.tableOfTypedPredicates) {
@@ -326,7 +326,7 @@ final class PreInstantiation implements Serializable {
      * @param init the initial state.
      */
     static void createFunctionsTables(final Set<IntExpression> init) {
-        final int tableSize = Encoder.tableOfConstants.size();
+        final int tableSize = Encoder.pb.getTableOfConstants().size();
         final int nbFunction = Encoder.tableOfFunctions.size();
         Encoder.functionsTables = new ArrayList<>(nbFunction);
         for (final List<Integer> arguments : Encoder.tableOfTypedFunctions) {
@@ -444,7 +444,7 @@ final class PreInstantiation implements Serializable {
                     var++;
                 } else {
                     realIndexSize++;
-                    str.append(" ").append(Encoder.tableOfConstants.get(anIndex));
+                    str.append(" ").append(Encoder.pb.getTableOfConstants().get(anIndex));
                 }
             }
             str.append(")");
@@ -467,7 +467,7 @@ final class PreInstantiation implements Serializable {
             newIndex[index.length] = -1;
             this.print(predicate, arity, mask, newIndex, tables);
         } else {
-            for (int i = 0; i < Encoder.tableOfConstants.size(); i++) {
+            for (int i = 0; i < Encoder.pb.getTableOfConstants().size(); i++) {
                 final int[] newIndex = new int[index.length + 1];
                 System.arraycopy(index, 0, newIndex, 0, index.length);
                 newIndex[index.length] = i;

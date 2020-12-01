@@ -102,9 +102,9 @@ public class ADLProblem {
         // Encode the types declared in the domain
         this.encodeTypes(domain);
         // Encode the constants declared in the domain and the objects of the problem
-        /*this.encodeConstants(domain, problem);
+        this.encodeConstants(domain, problem);
         // Encode the type of the form (either t1 t2...) declared in the domain and the problem
-        this.encodeEitherTypes(domain, problem);
+        /*this.encodeEitherTypes(domain, problem);
         // Encode the predicates defined in the domain.
         this.encodePredicates(domain);
         // Encode the functions defined in the domain.
@@ -948,5 +948,9 @@ public class ADLProblem {
 
     public List<Set<Integer>> getTableOfDomains() {
         return tableOfDomains;
+    }
+
+    public List<String> getTableOfConstants() {
+        return tableOfConstants;
     }
 }
