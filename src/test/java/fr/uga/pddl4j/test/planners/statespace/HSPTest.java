@@ -678,12 +678,26 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2006 Pathways propositional benchmarks.
-     * Failure: Plan no validated
+     * Failure: Plans no validated
+     * @throws Exception if something went wrong.
+     */
+    /*@Test
+    public void test_HSP_IPC2006_Pathways_Propositional() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2006 Pathways propositional STRIPS benchmarks.
+     * Failure: Plans no validated
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_HSP_IPC2006_Pathways_Propositional() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional" + File.separator;
+    public void test_HSP_IPC2006_Pathways_Propositional_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
