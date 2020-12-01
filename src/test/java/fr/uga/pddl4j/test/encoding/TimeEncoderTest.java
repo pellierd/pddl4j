@@ -145,52 +145,52 @@ public class TimeEncoderTest {
     }
 
     /**
-     * Method that executes tests using IPC 2002 rover time automatic benchmarks.
+     * Method that executes tests using IPC 2002 Rovers time automatic benchmarks.
      * OK
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Encoder_IPC2002_Rover_Time_Automatic() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-automatic" + File.separator;
+    public void test_Encoder_IPC2002_Rovers_Time_Automatic() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
-     * Method that executes tests using IPC 2002 rover time hand coded benchmarks.
+     * Method that executes tests using IPC 2002 Rover time hand coded benchmarks.
      * Failure p08
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Encoder_IPC2002_Rover_Time_Hand_Coded() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-hand-coded" + File.separator;
+    public void test_Encoder_IPC2002_Rovers_Time_Hand_Coded() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
-     * Method that executes tests using IPC 2002 rover time simple automatic benchmarks.
+     * Method that executes tests using IPC 2002 Rovers time simple automatic benchmarks.
      * OK
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Encoder_IPC2002_Rover_Time_Simple_Automatic() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-simple-automatic" + File.separator;
+    public void test_Encoder_IPC2002_Rovers_Time_Simple_Automatic() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
-     * Method that executes tests using IPC 2002 rover time hand coded benchmarks.
+     * Method that executes tests using IPC 2002 Rovers time hand coded benchmarks.
      * Failure p08
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_Encoder_IPC2002_Rover_Time_Simple_Hand_Coded() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rover/time-simple-hand-coded" + File.separator;
+    public void test_Encoder_IPC2002_Rovers_Time_Simple_Hand_Coded() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
