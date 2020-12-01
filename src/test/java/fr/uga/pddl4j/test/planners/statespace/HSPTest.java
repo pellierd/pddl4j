@@ -485,7 +485,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Satellite_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -494,6 +494,19 @@ public class HSPTest {
         Tools.validatePDDLPlans(localTestPath);
     }
 
+    /**
+     * Method that executes tests using IPC 2002 Satellite STRIPS hand coded benchmarks.
+     * OK to hard in 10 second
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_HSP_IPC2002_Satellite_STRIPS_Hand_Coded() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/strips-hand-coded" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
 
     /**
      * Generate output plan KLC-planning validator formatted.
