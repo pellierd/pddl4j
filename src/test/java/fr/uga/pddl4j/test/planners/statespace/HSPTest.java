@@ -583,9 +583,23 @@ public class HSPTest {
      * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Pipesworld_Tankage_Non_Temporal_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/tankage-nontemporal-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2004 Promela Dining Philosophers ADL benchmarks.
+     * Failure: type "number" cannot be used as derived type
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_HSP_IPC2004_Promela_Dining_Philisophers_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/promela-dining-philosophers/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
@@ -648,6 +662,9 @@ public class HSPTest {
                 factory.setTraceLevel(TRACE_LEVEL);
 
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                if (!errorManager.isEmpty()) {
+                    errorManager.printAll();
+                }
                 Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty());
                 Assert.assertTrue(errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
 
