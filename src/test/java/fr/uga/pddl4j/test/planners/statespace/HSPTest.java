@@ -621,6 +621,20 @@ public class HSPTest {
     }
 
     /**
+     * Method that executes tests using IPC 2004 PSR small STRIPS benchmarks.
+     * Failure: Plan not validated
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_HSP_IPC2004_PSR_small_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/psr/small-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
      * Generate output plan KLC-planning validator formatted.
      *
      * @param currentTestPath the current sub dir to test
