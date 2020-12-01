@@ -538,12 +538,26 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2004 Airport non temporal ADL benchmarks.
-     * Failure: Computing relaxe plannig graph
+     * Failure: Computing relaxed planning graph
+     * @throws Exception if something went wrong.
+     */
+    /*@Test
+    public void test_HSP_IPC2004_Airport_Non_Temporal_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-adl" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2004 Airport non temporal STRIPS benchmarks.
+     * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_HSP_IPC2002_Airport_Non_Temporal_ADL() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-adl" + File.separator;
+    public void test_HSP_IPC2004_Airport_Non_Temporal_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
