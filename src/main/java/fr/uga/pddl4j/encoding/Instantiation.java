@@ -327,7 +327,7 @@ final class Instantiation implements Serializable {
      * @param initialTasksNetwork the initial tasks network.
      * @param actions             the list of action already instantiate.
      */
-    static List<IntMethod> instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork,
+    static void instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork,
                                               List<IntAction> actions) {
 
         // Init the list of instantiated methods or ground methods
@@ -448,8 +448,8 @@ final class Instantiation implements Serializable {
                 index++;
             }
         }
-
-        return instMethods;
+        methods.clear();
+        methods.addAll(instMethods);
     }
 
     /**

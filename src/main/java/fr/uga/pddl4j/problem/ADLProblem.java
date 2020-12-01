@@ -114,7 +114,7 @@ public class ADLProblem {
         // Encode actions in integer representation
         this.intActions = this.encodeActions(domain.getActions());
         // Encode method in integer representation
-        /*this.intMethods = this.encodeMethods(domain.getMethods());
+        this.intMethods = this.encodeMethods(domain.getMethods());
 
         // Encode the initial state in integer representation
         final Set<IntExpression> intInit = this.encodeInit(problem.getInit());
@@ -125,7 +125,7 @@ public class ADLProblem {
         this.intInitPredicates = this.removeFunctionCost(intInit);
 
         // Encode the goal in integer representation
-        this.intGoal =  null;
+        /*this.intGoal =  null;
         if (problem.getGoal() != null) {
             intGoal = this.encodeGoal(problem.getGoal());
         }
@@ -984,5 +984,21 @@ public class ADLProblem {
 
     public Set<String> getPrimitiveTaskSymbols() {
         return primitiveTaskSymbols;
+    }
+
+    public List<IntMethod> getIntMethods() {
+        return intMethods;
+    }
+
+    public Set<String> getCompoundTaskSymbols() {
+        return compoundTaskSymbols;
+    }
+
+    public Set<IntExpression> getIntInitPredicates() {
+        return intInitPredicates;
+    }
+
+    public Map<IntExpression, Double> getIntInitFunctionCost() {
+        return intInitFunctionCost;
     }
 }

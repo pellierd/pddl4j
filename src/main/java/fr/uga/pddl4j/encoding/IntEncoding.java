@@ -59,18 +59,6 @@ final class IntEncoding implements Serializable {
     }
 
     /**
-     * Encodes a specified list of methods into its integer representation.
-     *
-     * @param meths the list of methods to encode.
-     * @return encoded the list of methods encoded.
-     */
-    static List<IntMethod> encodeMethods(final List<PDDLMethod> meths) {
-        Encoder.compoundTaskSymbols = new LinkedHashSet<>();
-        return meths.stream().map(IntEncoding::encodeMethod).collect(Collectors.toList());
-    }
-
-
-    /**
      * Encodes a specified initial state into its integer representation.
      *
      * @param init the initial state to encode.
@@ -193,83 +181,6 @@ final class IntEncoding implements Serializable {
     }
 
 
-    /**
-     * Encode an method into its integer representation.
-     *
-     * @param method the metho to encode.
-     * @return encoded method.
-     */
-    private static IntMethod encodeMethod(final PDDLMethod method) {
-        final IntMethod intMeth = new IntMethod(method.getName().getImage(), method.getArity());
-        Encoder.compoundTaskSymbols.add(method.getTask().getAtom().get(0).getImage());
-        // Encode the parameters of the operator
-        final List<String> variables = new ArrayList<>(method.getArity());
-        for (int i = 0; i < method.getArity(); i++) {
-            final PDDLTypedSymbol parameter = method.getParameters().get(i);
-            final String typeImage = IntEncoding.toStringType(parameter.getTypes());
-            final int type = Encoder.pb.getTableOfTypes().indexOf(typeImage);
-            intMeth.setTypeOfParameter(i, type);
-            variables.add(parameter.getImage());
-        }
-        // Encode the task carried out by the method
-        final IntExpression task = IntEncoding.encodeExp(method.getTask(), variables);
-        intMeth.setTask(task);
-        // Encode the preconditions of the method
-        final IntExpression preconditions = IntEncoding.encodeExp(method.getPreconditions(), variables);
-        intMeth.setPreconditions(preconditions);
-        // Encode the subtasks of the method
-        final IntExpression subtasks = IntEncoding.encodeExp(method.getSubTasks(), variables);
-        intMeth.setSubTasks(subtasks);
-        // Encode the ordering constraints of the method
-        IntExpression orderingConstraints = null;
-        // Express the total ordering into explicites constraints
-        if (method.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-            orderingConstraints = new IntExpression(PDDLConnective.AND);
-            for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
-                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(i));
-                constraint.addChild(t1);
-                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(i + 1));
-                constraint.addChild(t2);
-                orderingConstraints.addChild(constraint);
-            }
-        } else {
-            final int size = subtasks.getChildren().size();
-            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = IntEncoding.encodeOrderingConstraints(method.getOrderingConstraints());
-            for (IntExpression c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
-            }
-            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
-                for (int i = 0; i < size; i++) {
-                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
-                    constraints.removeRow(subtaskIndex);
-                    constraints.removeColumn(subtaskIndex);
-                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
-                    subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(i);
-                    orderedSubtasks.addChild(st);
-                }
-                intMeth.setSubTasks(orderedSubtasks);
-                orderingConstraints = new IntExpression(PDDLConnective.AND);
-                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
-                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new Integer(i));
-                    constraint.addChild(t1);
-                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new Integer(i + 1));
-                    constraint.addChild(t2);
-                    orderingConstraints.addChild(constraint);
-                }
-            }
-        }
-        intMeth.setOrderingConstraints(orderingConstraints);
-        return intMeth;
-    }
 
     /**
      * Encode the ordering constraints of method. The index used to encode a task in the ordering constraints
