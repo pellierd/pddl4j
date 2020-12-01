@@ -104,9 +104,9 @@ public class ADLProblem {
         // Encode the constants declared in the domain and the objects of the problem
         this.encodeConstants(domain, problem);
         // Encode the type of the form (either t1 t2...) declared in the domain and the problem
-        /*this.encodeEitherTypes(domain, problem);
+        this.encodeEitherTypes(domain, problem);
         // Encode the predicates defined in the domain.
-        this.encodePredicates(domain);
+        /*this.encodePredicates(domain);
         // Encode the functions defined in the domain.
         this.encodeFunctions(domain);
         // Encode the tasks defined in the domain.

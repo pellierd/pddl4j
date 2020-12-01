@@ -338,7 +338,7 @@ public final class Encoder implements Serializable {
         // Encode the constants declared in the domain and the objects of the problem
         //IntEncoding.encodeConstants(domain, problem);
         // Encode the type of the form (either t1 t2...) declared in the domain and the problem
-        IntEncoding.encodeEitherTypes(domain, problem);
+        //IntEncoding.encodeEitherTypes(domain, problem);
         // Encode the predicates defined in the domain.
         IntEncoding.encodePredicates(domain);
         // Encode the functions defined in the domain.
