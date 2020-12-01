@@ -128,16 +128,6 @@ public final class Encoder implements Serializable {
     static List<Set<Integer>> tableOfInferredDomains;
 
     /**
-     * The table of predicates.
-     */
-    static List<String> tableOfPredicates;
-
-    /**
-     * The table that contains the types of the arguments of the predicates.
-     */
-    static List<List<Integer>> tableOfTypedPredicates;
-
-    /**
      * The table of the functions.
      */
     static List<String> tableOfFunctions;
@@ -340,7 +330,7 @@ public final class Encoder implements Serializable {
         // Encode the type of the form (either t1 t2...) declared in the domain and the problem
         //IntEncoding.encodeEitherTypes(domain, problem);
         // Encode the predicates defined in the domain.
-        IntEncoding.encodePredicates(domain);
+        //IntEncoding.encodePredicates(domain);
         // Encode the functions defined in the domain.
         IntEncoding.encodeFunctions(domain);
         // Encode the tasks defined in the domain.
@@ -784,7 +774,7 @@ public final class Encoder implements Serializable {
         codedProblem.setTaskSymbols(Encoder.tableOfTasks);
         codedProblem.setInertia(Encoder.tableOfInertia);
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
-        codedProblem.setPredicateSymbols(Encoder.tableOfPredicates);
+        codedProblem.setPredicateSymbols(Encoder.pb.getTableOfPredicates());
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
@@ -794,7 +784,7 @@ public final class Encoder implements Serializable {
         }
         codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
         codedProblem.setFunctionSignatures(Encoder.tableOfTypedFunctions);
-        codedProblem.setPredicateSignatures(Encoder.tableOfTypedPredicates);
+        codedProblem.setPredicateSignatures(Encoder.pb.getTableOfTypedPredicates());
         codedProblem.setTypeSymbols(Encoder.pb.getTableOfTypes());
         return codedProblem;
 
@@ -840,12 +830,12 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfPredicates(StringBuilder str) {
         str.append("Predicates table:\n");
-        for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
-            String predicate = Encoder.tableOfPredicates.get(i);
+        for (int i = 0; i < Encoder.pb.getTableOfPredicates().size(); i++) {
+            String predicate = Encoder.pb.getTableOfPredicates().get(i);
             str.append(i).append(": ").append(predicate).append(" :");
-            for (int j = 0; j < Encoder.tableOfTypedPredicates.get(i).size(); j++) {
+            for (int j = 0; j < Encoder.pb.getTableOfTypedPredicates().get(i).size(); j++) {
                 str.append(" ")
-                    .append(Encoder.pb.getTableOfTypes().get(Encoder.tableOfTypedPredicates.get(i).get(j)));
+                    .append(Encoder.pb.getTableOfTypes().get(Encoder.pb.getTableOfTypedPredicates().get(i).get(j)));
             }
             str.append("\n");
         }
@@ -893,8 +883,8 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfInertia(StringBuilder str) {
         str.append("Inertias table:\n");
-        for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
-            String predicate = Encoder.tableOfPredicates.get(i);
+        for (int i = 0; i < Encoder.pb.getTableOfPredicates().size(); i++) {
+            String predicate = Encoder.pb.getTableOfPredicates().get(i);
             str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.tableOfInertia.get(i));
             str.append("\n");
         }
@@ -964,7 +954,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final IntAction op) {
         return StringDecoder.toString(op, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
 
@@ -976,7 +966,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final IntMethod meth) {
         return StringDecoder.toString(meth, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
 
@@ -988,7 +978,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final IntTaskNetwork tn) {
         return StringDecoder.toString(tn, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
 
@@ -1000,7 +990,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 
@@ -1012,7 +1002,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final Method m) {
         return StringDecoder.toString(m, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfTasks,
             Encoder.tableOfRelevantFluents, Encoder.tableOfRelevantTasks);
     }
@@ -1025,7 +1015,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final TaskNetwork taskNetwork) {
         return StringDecoder.toString(taskNetwork, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfTasks,
             Encoder.tableOfRelevantTasks);
     }
@@ -1038,7 +1028,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(final IntExpression exp) {
         return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfTasks);
     }
 
@@ -1050,7 +1040,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(Condition exp) {
         return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 
@@ -1062,7 +1052,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(Goal exp) {
         return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 
@@ -1076,7 +1066,7 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(state,
             Encoder.pb.getTableOfConstants(),
             Encoder.pb.getTableOfTypes(),
-            Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions,
             Encoder.tableOfRelevantFluents,
             Encoder.tableOfRelevantNumericFluents,
@@ -1095,7 +1085,7 @@ public final class Encoder implements Serializable {
      */
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.pb.getTableOfConstants(),
-            Encoder.pb.getTableOfTypes(), Encoder.tableOfPredicates,
+            Encoder.pb.getTableOfTypes(), Encoder.pb.getTableOfPredicates(),
             Encoder.tableOfFunctions, Encoder.tableOfRelevantFluents);
     }
 

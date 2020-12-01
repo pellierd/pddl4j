@@ -58,36 +58,6 @@ final class IntEncoding implements Serializable {
     private IntEncoding() {
     }
 
-    /**
-     * Encodes all the predicates of a specified domain.
-     *
-     * @param domain the domain.
-     */
-    static void encodePredicates(final PDDLDomain domain) {
-        final List<PDDLNamedTypedList> predicates = domain.getPredicates();
-        final int nbPredicates = predicates.size();
-        Encoder.tableOfPredicates = new ArrayList<>(nbPredicates);
-        Encoder.tableOfTypedPredicates = new ArrayList<>(nbPredicates);
-        for (PDDLNamedTypedList predicate : predicates) {
-            Encoder.tableOfPredicates.add(predicate.getName().getImage());
-            final List<PDDLTypedSymbol> arguments = predicate.getArguments();
-            final List<Integer> argType = new ArrayList<>(arguments.size());
-            for (PDDLTypedSymbol arg : arguments) {
-                final List<PDDLSymbol> types = arg.getTypes();
-                if (types.size() > 1) {
-                    final StringBuilder image = new StringBuilder("either");
-                    for (PDDLSymbol type : types) {
-                        image.append("~");
-                        image.append(type.getImage());
-                    }
-                    argType.add(Encoder.pb.getTableOfTypes().indexOf(image.toString()));
-                } else {
-                    argType.add(Encoder.pb.getTableOfTypes().indexOf(types.get(0).getImage()));
-                }
-            }
-            Encoder.tableOfTypedPredicates.add(argType);
-        }
-    }
 
     /**
      * Encodes all the function of a specified domain.
@@ -194,13 +164,7 @@ final class IntEncoding implements Serializable {
         Map<IntExpression, Double> intFunctionCost = new HashMap<>();
         for (IntExpression intExp : init) {
             if (intExp.getConnective().equals(PDDLConnective.FN_ATOM)) {
-                intFunctionCost.put(intExp.getChildren().get(0),
-                    Double.parseDouble(StringDecoder.toString(intExp.getChildren().get(1),
-                        Encoder.pb.getTableOfConstants(),
-                        Encoder.pb.getTableOfTypes(),
-                        Encoder.tableOfPredicates,
-                        Encoder.tableOfFunctions,
-                        Encoder.tableOfTasks, "")));
+                intFunctionCost.put(intExp.getChildren().get(0), intExp.getChildren().get(1).getValue());
             }
         }
         return intFunctionCost;
@@ -501,7 +465,7 @@ final class IntEncoding implements Serializable {
                 break;
             case ATOM:
                 final String predicate = exp.getAtom().get(0).getImage();
-                intExp.setPredicate(Encoder.tableOfPredicates.indexOf(predicate));
+                intExp.setPredicate(Encoder.pb.getTableOfPredicates().indexOf(predicate));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
                     final PDDLSymbol argument = exp.getAtom().get(i);

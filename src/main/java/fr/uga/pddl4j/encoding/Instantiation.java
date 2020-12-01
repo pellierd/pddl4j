@@ -1102,7 +1102,7 @@ final class Instantiation implements Serializable {
         int j = 0;
         int max = 1;
         final int[] index = new int[indexSize];
-        final List<Integer> predArg = Encoder.tableOfTypedPredicates.get(predicate);
+        final List<Integer> predArg = Encoder.pb.getTableOfTypedPredicates().get(predicate);
         for (int i = 0; i < mask.length; i++) {
             if (mask[i] == 0) {
                 max *= Encoder.pb.getTableOfDomains().get(predArg.get(i)).size();

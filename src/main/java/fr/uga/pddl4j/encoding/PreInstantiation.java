@@ -93,7 +93,7 @@ final class PreInstantiation implements Serializable {
      * @param actions the list of actions to simplified.
      */
     static void extractInertia(final List<IntAction> actions) {
-        final int nbPredicates = Encoder.tableOfPredicates.size();
+        final int nbPredicates = Encoder.pb.getTableOfPredicates().size();
         Encoder.tableOfInertia = new ArrayList<>(nbPredicates);
         for (int i = 0; i < nbPredicates; i++) {
             Encoder.tableOfInertia.add(Inertia.INERTIA);
@@ -251,9 +251,9 @@ final class PreInstantiation implements Serializable {
      * @param init the initial state.
      */
     static void inferTypesFromInertia(final Set<IntExpression> init) {
-        Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.tableOfPredicates.size());
-        for (int i = 0; i < Encoder.tableOfPredicates.size(); i++) {
-            if (Encoder.tableOfTypedPredicates.get(i).size() == 1
+        Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.pb.getTableOfPredicates().size());
+        for (int i = 0; i < Encoder.pb.getTableOfPredicates().size(); i++) {
+            if (Encoder.pb.getTableOfTypedPredicates().get(i).size() == 1
                 && Encoder.tableOfInertia.get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
                 for (IntExpression fact : init) {
@@ -278,9 +278,9 @@ final class PreInstantiation implements Serializable {
      */
     static void createPredicatesTables(final Set<IntExpression> init) {
         final int tableSize = Encoder.pb.getTableOfConstants().size();
-        final int nbPredicate = Encoder.tableOfPredicates.size();
+        final int nbPredicate = Encoder.pb.getTableOfPredicates().size();
         Encoder.predicatesTables = new ArrayList<>(nbPredicate);
-        for (final List<Integer> arguments : Encoder.tableOfTypedPredicates) {
+        for (final List<Integer> arguments : Encoder.pb.getTableOfTypedPredicates()) {
             final int arity = arguments.size();
             final int nbTables = (int) Math.pow(2, arity);
             final List<IntMatrix> pTables = new ArrayList<>(nbTables);
@@ -295,7 +295,7 @@ final class PreInstantiation implements Serializable {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
-            final int arity = Encoder.tableOfTypedPredicates.get(fact.getPredicate()).size();
+            final int arity = Encoder.pb.getTableOfTypedPredicates().get(fact.getPredicate()).size();
             final List<IntMatrix> pTables = Encoder.predicatesTables.get(fact.getPredicate());
             final int[] set = new int[arity];
             final int[] args = fact.getArguments();
@@ -412,7 +412,7 @@ final class PreInstantiation implements Serializable {
         LOGGER.trace("tables of predicates:");
         for (int predicate = 0; predicate < tables.size(); predicate++) {
             final List<IntMatrix> pTables = tables.get(predicate);
-            final int arity = Encoder.tableOfTypedPredicates.get(predicate).size();
+            final int arity = Encoder.pb.getTableOfTypedPredicates().get(predicate).size();
             final int[] mask = new int[arity];
             for (int i = 0; i < pTables.size(); i++) {
                 this.print(predicate, arity, mask, new int[0], tables);
@@ -435,7 +435,7 @@ final class PreInstantiation implements Serializable {
         if (index.length == arity) {
             final StringBuilder str = new StringBuilder();
             str.append("(");
-            str.append(Encoder.tableOfPredicates.get(predicate));
+            str.append(Encoder.pb.getTableOfPredicates().get(predicate));
             int var = 0;
             int realIndexSize = 0;
             for (int anIndex : index) {
@@ -516,7 +516,7 @@ final class PreInstantiation implements Serializable {
 
                     final String declaredType = Encoder.pb.getTableOfTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
-                    final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
+                    final String inertiaType = Encoder.pb.getTableOfPredicates().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
                     int ti = Encoder.pb.getTableOfTypes().indexOf(sti);
@@ -602,7 +602,7 @@ final class PreInstantiation implements Serializable {
 
                     final String declaredType = Encoder.pb.getTableOfTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
-                    final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
+                    final String inertiaType = Encoder.pb.getTableOfPredicates().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
                     int ti = Encoder.pb.getTableOfTypes().indexOf(sti);
@@ -1206,10 +1206,10 @@ final class PreInstantiation implements Serializable {
 
     private static int dummyPredicateCounter = 0;
     private static IntExpression createDummyPredicate() {
-        Encoder.tableOfPredicates.add("^M" + PreInstantiation.dummyPredicateCounter);
+        Encoder.pb.getTableOfPredicates().add("^M" + PreInstantiation.dummyPredicateCounter);
         PreInstantiation.dummyPredicateCounter++;
         final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
-        atom.setPredicate(Encoder.tableOfPredicates.size() - 1);
+        atom.setPredicate(Encoder.pb.getTableOfPredicates().size() - 1);
         return atom;
 
     }
