@@ -1047,9 +1047,22 @@ public class TimeEncoderTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2011_Turn_And_Open_Temporal_satisficing() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/turn-and-open/temporal-satisficing" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2014 Driver Log temporal satisficing benchmarks.
+     * Failure: p05
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2014_Driver_Logn_Temporal_satisficing() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/driver-log/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
