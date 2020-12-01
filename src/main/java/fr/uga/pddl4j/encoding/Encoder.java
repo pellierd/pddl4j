@@ -320,10 +320,10 @@ public final class Encoder implements Serializable {
         //final Set<IntExpression> intInitPredicates = IntEncoding.removeFunctionCost(intInit);
 
         // Encode the goal in integer representation
-        IntExpression intGoal =  null;
+        /*IntExpression intGoal =  null;
         if (problem.getGoal() != null) {
             intGoal = IntEncoding.encodeGoal(problem.getGoal());
-        }
+        }*/
 
         // Encode the initial task network in integer representation
         IntTaskNetwork intTaskNetwork = null;
@@ -358,8 +358,8 @@ public final class Encoder implements Serializable {
             for (IntExpression f : Encoder.pb.getIntInitPredicates()) {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
-            if (intGoal != null) {
-                str.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(intGoal));
+            if (Encoder.pb.getIntGoal() != null) {
+                str.append(")").append("\n\nCoded goal state:\n").append(Encoder.toString(Encoder.pb.getIntGoal()));
             }
             if (intTaskNetwork != null) {
                 str.append(")").append("\n\nCoded initial task network:\n")
@@ -440,10 +440,10 @@ public final class Encoder implements Serializable {
             for (IntExpression f : Encoder.pb.getIntInitPredicates()) {
                 str.append(" ").append(Encoder.toString(f)).append("\n");
             }
-            if (intGoal != null) {
+            if (Encoder.pb.getIntGoal() != null) {
                 str.append(")");
                 str.append("\n\nPre-instantiation goal state:\n");
-                str.append(Encoder.toString(intGoal));
+                str.append(Encoder.toString(Encoder.pb.getIntGoal()));
             }
             if (intTaskNetwork != null) {
                 str.append(")");
@@ -481,11 +481,11 @@ public final class Encoder implements Serializable {
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(Encoder.pb.getIntActions(), Encoder.pb.getIntInitPredicates());
 
-        if (intGoal != null) {
+        if (Encoder.pb.getIntGoal() != null) {
             // Expand the quantified expression in the goal
-            Instantiation.expandQuantifiedExpression(intGoal, true);
+            Instantiation.expandQuantifiedExpression(Encoder.pb.getIntGoal(), true);
             // Simplify the goal with ground inertia information
-            PostInstantiation.simplifyGoalWithGroundInertia(intGoal, Encoder.pb.getIntInitPredicates());
+            PostInstantiation.simplifyGoalWithGroundInertia(Encoder.pb.getIntGoal(), Encoder.pb.getIntInitPredicates());
         }
         // Extract increase and add value to action cost
         //PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
@@ -509,11 +509,11 @@ public final class Encoder implements Serializable {
                 str.append(Encoder.toString(op));
                 str.append("\n");
             }
-            if (intGoal != null) {
+            if (Encoder.pb.getIntGoal() != null) {
                 str.append(")");
                 str.append("\n\nInstantiation goal state:\n");
                 str.append("(and");
-                for (final IntExpression g : intGoal.getChildren()) {
+                for (final IntExpression g : Encoder.pb.getIntGoal().getChildren()) {
                     str.append(" ");
                     str.append(Encoder.toString(g));
                 }
@@ -646,9 +646,9 @@ public final class Encoder implements Serializable {
             Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
         }
 
-        if (intGoal != null && (!intGoal.getChildren().isEmpty()
-            || intGoal.getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(intGoal, fluentIndexMap, numericFluentIndexMap);
+        if (Encoder.pb.getIntGoal() != null && (!Encoder.pb.getIntGoal().getChildren().isEmpty()
+            || Encoder.pb.getIntGoal().getConnective().equals(PDDLConnective.ATOM))) {
+            Encoder.goal = BitEncoding.encodeGoal(Encoder.pb.getIntGoal(), fluentIndexMap, numericFluentIndexMap);
         } else {
             Encoder.goal = new Goal();
         }

@@ -125,13 +125,13 @@ public class ADLProblem {
         this.intInitPredicates = this.removeFunctionCost(intInit);
 
         // Encode the goal in integer representation
-        /*this.intGoal =  null;
+        this.intGoal =  null;
         if (problem.getGoal() != null) {
             intGoal = this.encodeGoal(problem.getGoal());
         }
 
         // Encode the initial task network in integer representation
-        if (this.requirements.contains(PDDLRequireKey.HIERARCHY)) {
+        /*if (this.requirements.contains(PDDLRequireKey.HIERARCHY)) {
             this.intTaskNetwork = this.encodeInitialTaskNetwork(problem.getInitialTaskNetwork());
         }*/
     }
@@ -1000,5 +1000,9 @@ public class ADLProblem {
 
     public Map<IntExpression, Double> getIntInitFunctionCost() {
         return intInitFunctionCost;
+    }
+
+    public IntExpression getIntGoal() {
+        return intGoal;
     }
 }
