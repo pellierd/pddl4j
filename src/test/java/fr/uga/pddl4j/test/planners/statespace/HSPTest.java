@@ -527,9 +527,23 @@ public class HSPTest {
      * OK to hard in 10 seconds
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Zenotravel_STRIPS_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/strips-hand-coded" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2004 Airport non temporal ADL benchmarks.
+     * Failure: Computing relaxe plannig graph
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_HSP_IPC2002_Airport_Non_Temporal_ADL() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
