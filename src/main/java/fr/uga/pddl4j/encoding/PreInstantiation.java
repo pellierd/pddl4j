@@ -514,28 +514,28 @@ final class PreInstantiation implements Serializable {
 
                     final int dtIndex = action.getTypeOfParameters(index);
 
-                    final String declaredType = Encoder.tableOfTypes.get(dtIndex);
+                    final String declaredType = Encoder.pb.getTableOfTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
                     final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
-                    int ti = Encoder.tableOfTypes.indexOf(sti);
+                    int ti = Encoder.pb.getTableOfTypes().indexOf(sti);
                     if (ti == -1) {
-                        ti = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ti = Encoder.pb.getTableOfTypes().size();
+                        Encoder.pb.getTableOfTypes().add(sti);
+                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.pb.getTableOfDomains().get(dtIndex));
                         dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt1);
+                        Encoder.pb.getTableOfDomains().add(dt1);
                     }
 
                     final String sts = declaredType + "\\" + inertiaType;
-                    int ts = Encoder.tableOfTypes.indexOf(sts);
+                    int ts = Encoder.pb.getTableOfTypes().indexOf(sts);
                     if (ts == -1) {
-                        ts = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ts = Encoder.pb.getTableOfTypes().size();
+                        Encoder.pb.getTableOfTypes().add(sts);
+                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.pb.getTableOfDomains().get(dtIndex));
                         dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt2);
+                        Encoder.pb.getTableOfDomains().add(dt2);
                     }
                     final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
@@ -600,28 +600,28 @@ final class PreInstantiation implements Serializable {
 
                     final int dtIndex = meth.getTypeOfParameters(index);
 
-                    final String declaredType = Encoder.tableOfTypes.get(dtIndex);
+                    final String declaredType = Encoder.pb.getTableOfTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
                     final String inertiaType = Encoder.tableOfPredicates.get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
-                    int ti = Encoder.tableOfTypes.indexOf(sti);
+                    int ti = Encoder.pb.getTableOfTypes().indexOf(sti);
                     if (ti == -1) {
-                        ti = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ti = Encoder.pb.getTableOfTypes().size();
+                        Encoder.pb.getTableOfTypes().add(sti);
+                        final Set<Integer> dt1 = new LinkedHashSet<>(Encoder.pb.getTableOfDomains().get(dtIndex));
                         dt1.retainAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt1);
+                        Encoder.pb.getTableOfDomains().add(dt1);
                     }
 
                     final String sts = declaredType + "\\" + inertiaType;
-                    int ts = Encoder.tableOfTypes.indexOf(sts);
+                    int ts = Encoder.pb.getTableOfTypes().indexOf(sts);
                     if (ts == -1) {
-                        ts = Encoder.tableOfTypes.size();
-                        Encoder.tableOfTypes.add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.tableOfDomains.get(dtIndex));
+                        ts = Encoder.pb.getTableOfTypes().size();
+                        Encoder.pb.getTableOfTypes().add(sts);
+                        final Set<Integer> dt2 = new LinkedHashSet<>(Encoder.pb.getTableOfDomains().get(dtIndex));
                         dt2.removeAll(Encoder.tableOfInferredDomains.get(itIndex));
-                        Encoder.tableOfDomains.add(dt2);
+                        Encoder.pb.getTableOfDomains().add(dt2);
                     }
 
                     final IntMethod meth1 = new IntMethod(m);
