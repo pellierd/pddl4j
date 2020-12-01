@@ -555,9 +555,23 @@ public class HSPTest {
      * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Airport_Non_Temporal_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-strips" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        this.generateValOutputPlans(localTestPath);
+        Tools.validatePDDLPlans(localTestPath);
+    }
+
+    /**
+     * Method that executes tests using IPC 2004 Pipesworld no-tankage non temporal STRIPS benchmarks.
+     *  Failure: Plans not validated
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_HSP_IPC2004_Pipesworld_No_Tankage_Non_Temporal_STRIPS() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-nontemporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
