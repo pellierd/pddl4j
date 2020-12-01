@@ -906,6 +906,20 @@ final class PostInstantiation implements Serializable {
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(0), false, init);
                 PostInstantiation.simplifyWithGroundInertia(exp.getChildren().get(1), true, init);
                 break;
+            case EQUAL_ATOM:
+                int[] args = exp.getArguments();
+                // Get and substitute the first argument
+                final int arg1 = args[0];
+                // Get and substitute the second argument
+                final int arg2 = args[1];
+                if (arg1 == arg2) {
+                    // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
+                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (arg1 >= 0 && arg2 >= 0) {
+                    // The equality is ground and the equality is FALSE because arg1 != arg2
+                    exp.setConnective(PDDLConnective.FALSE);
+                }
+                break;
             case LESS:
             case LESS_OR_EQUAL:
             case EQUAL:
@@ -945,7 +959,6 @@ final class PostInstantiation implements Serializable {
             case MINIMIZE:
             case MAXIMIZE:
             case FN_HEAD:
-            case EQUAL_ATOM:
                 break;
             default:
                 // do nothing
@@ -1309,6 +1322,7 @@ final class PostInstantiation implements Serializable {
                 // do nothing
                 break;
             default:
+                System.out.println(Encoder.toString(exp));
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
