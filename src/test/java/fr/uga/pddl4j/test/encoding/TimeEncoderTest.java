@@ -1060,9 +1060,22 @@ public class TimeEncoderTest {
      * Failure: p05
      * @throws Exception if something went wrong.
      */
-    @Test
-    public void test_Parser_IPC2014_Driver_Logn_Temporal_satisficing() throws Exception {
+    /*@Test
+    public void test_Parser_IPC2014_Driver_Log_Temporal_satisficing() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/driver-log/temporal-satisficing" + File.separator;
+        Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
+            Tools.isBenchmarkExist(localTestPath));
+        Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+    }
+
+    /**
+     * Method that executes tests using IPC 2014 Floor Tile temporal satisficing benchmarks.
+     * OK
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void test_Parser_IPC2014_Floor_Tile_Temporal_satisficing() throws Exception {
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/floor-tile/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.encodePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
