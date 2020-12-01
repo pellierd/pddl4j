@@ -1,5 +1,5 @@
 (define (domain rover_domain)
-	(:requirements :typing :hierarchy :method-precondition :negative-precondition)
+	(:requirements :typing :hierarchy :method-preconditions :negative-preconditions)
     (:types
 		waypoint - object
 		mode - object

@@ -266,7 +266,7 @@ TOKEN : {
 |	< DURATION_INEQUALITIES : ":duration-inequalities" >
 |	< HIERARCHY : ":hierarchy" > // ADD HDDL
 |	< HTN : ":htn" > // ADD HDDL
-|   < METHOD_PRECONDITIONS : ":method-precondition" > // ADD HDDL
+|   < METHOD_PRECONDITIONS : ":method-preconditions" > // ADD HDDL
 |   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
 |   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
 |   < TASKS : ":tasks" >

@@ -462,7 +462,7 @@ final class Instantiation implements Serializable {
         for (IntAction a : actions) {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
-            task.setPredicate(Encoder.tableOfTasks.indexOf(a.getName()));
+            task.setPredicate(Encoder.pb.getTableOfTasks().indexOf(a.getName()));
             task.setArguments(a.getInstantiations());
             tasks.add(task);
         }

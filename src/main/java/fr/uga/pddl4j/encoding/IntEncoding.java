@@ -59,38 +59,6 @@ final class IntEncoding implements Serializable {
     }
 
     /**
-     * Encodes all the tasks of a specified domain.
-     *
-     * @param domain the domain.
-     */
-    static void encodeTasks(final PDDLDomain domain) {
-        final List<PDDLNamedTypedList> tasks = domain.getTasks();
-        final int nbTasks = tasks.size();
-        Encoder.tableOfTasks = new ArrayList<>(nbTasks);
-        Encoder.tableOfTypedTasks = new ArrayList<>(nbTasks);
-        for (PDDLNamedTypedList task : tasks) {
-            Encoder.tableOfTasks.add(task.getName().getImage());
-            final List<PDDLTypedSymbol> arguments = task.getArguments();
-            final List<Integer> argType = new ArrayList<>(arguments.size());
-            for (PDDLTypedSymbol arg : arguments) {
-                final List<PDDLSymbol> types = arg.getTypes();
-                if (types.size() > 1) {
-                    final StringBuilder image = new StringBuilder("either");
-                    for (PDDLSymbol type : types) {
-                        image.append("~");
-                        image.append(type.getImage());
-                    }
-                    argType.add(Encoder.pb.getTableOfTypes().indexOf(image.toString()));
-                } else {
-                    argType.add(Encoder.pb.getTableOfTypes().indexOf(types.get(0).getImage()));
-                }
-            }
-            Encoder.tableOfTypedTasks.add(argType);
-        }
-    }
-
-
-    /**
      * Encodes a specified list of actions into its integer representation.
      *
      * @param ops the list of actions to encode.
@@ -448,7 +416,7 @@ final class IntEncoding implements Serializable {
                 break;
             case TASK:
                 final String task = exp.getAtom().get(0).getImage();
-                intExp.setPredicate(Encoder.tableOfTasks.indexOf(task));
+                intExp.setPredicate(Encoder.pb.getTableOfTasks().indexOf(task));
                 intExp.setPrimtive(Encoder.primitiveTaskSymbols.contains(task));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
