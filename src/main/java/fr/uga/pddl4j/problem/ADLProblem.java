@@ -112,9 +112,9 @@ public class ADLProblem {
         // Encode the tasks defined in the domain.
         this.encodeTasks(domain);
         // Encode actions in integer representation
-        /*this.intActions = this.encodeActions(domain.getActions());
+        this.intActions = this.encodeActions(domain.getActions());
         // Encode method in integer representation
-        this.intMethods = this.encodeMethods(domain.getMethods());
+        /*this.intMethods = this.encodeMethods(domain.getMethods());
 
         // Encode the initial state in integer representation
         final Set<IntExpression> intInit = this.encodeInit(problem.getInit());
@@ -976,5 +976,13 @@ public class ADLProblem {
 
     public List<String> getTableOfTasks() {
         return tableOfTasks;
+    }
+
+    public List<IntAction> getIntActions() {
+        return intActions;
+    }
+
+    public Set<String> getPrimitiveTaskSymbols() {
+        return primitiveTaskSymbols;
     }
 }

@@ -481,12 +481,13 @@ final class PreInstantiation implements Serializable {
      *
      * @return the list of simplified actions.
      */
-    static List<IntAction> simplifyActionsWithInferredTypes(final List<IntAction> actions) {
+    static void simplifyActionsWithInferredTypes(final List<IntAction> actions) {
         final List<IntAction> ops = new LinkedList<>();
         for (final IntAction op : actions) {
             ops.addAll(PreInstantiation.simplifyActionsWithInferredTypes(op));
         }
-        return ops;
+        actions.clear();
+        actions.addAll(ops);
     }
 
     private static List<IntAction> simplifyActionsWithInferredTypes(final IntAction action) {
@@ -854,7 +855,7 @@ final class PreInstantiation implements Serializable {
     /**
      * Expands the temporal actions.
      */
-    static List<IntAction> expandTemporalActions(List<IntAction> actions) {
+    static void expandTemporalActions(List<IntAction> actions) {
         List<IntAction> expandedActions = new ArrayList<>();
 
         for (IntAction a : actions) {
@@ -1164,7 +1165,8 @@ final class PreInstantiation implements Serializable {
             }
 
         }
-        return expandedActions;
+        actions.clear();
+        actions.addAll(expandedActions);
 
     }
 

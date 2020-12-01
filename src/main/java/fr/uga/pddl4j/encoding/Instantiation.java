@@ -56,7 +56,7 @@ final class Instantiation implements Serializable {
      * @param actions the list of actions to instantiate.
      * @return the list of instantiated actions.
      */
-    static List<IntAction> instantiateActions(final List<IntAction> actions) {
+    static void instantiateActions(final List<IntAction> actions) {
         final List<IntAction> instActions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);
         for (IntAction a : actions) {
             // If an action has a parameter with a empty domain the action must be removed
@@ -70,7 +70,8 @@ final class Instantiation implements Serializable {
                 instActions.addAll(Instantiation.instantiate(a));
             }
         }
-        return instActions;
+        actions.clear();
+        actions.addAll(instActions);
     }
 
     /**

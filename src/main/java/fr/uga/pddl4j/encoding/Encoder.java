@@ -214,10 +214,6 @@ public final class Encoder implements Serializable {
      */
     static InitialState init;
 
-    /**
-     * The set primitive task symbols, i.e., the set of action symbol.
-     */
-    static Set<String> primitiveTaskSymbols;
 
     /**
      * The set compund task symbols, i.e., the set of task symbols used in methods.
@@ -316,7 +312,7 @@ public final class Encoder implements Serializable {
         // Encode the tasks defined in the domain.
         //IntEncoding.encodeTasks(domain);
         // Encode actions in integer representation
-        List<IntAction> intActions = IntEncoding.encodeActions(domain.getActions());
+        //List<IntAction> intActions = IntEncoding.encodeActions(domain.getActions());
         // Encode method in integer representation
         List<IntMethod> intMethods = IntEncoding.encodeMethods(domain.getMethods());
 
@@ -374,9 +370,9 @@ public final class Encoder implements Serializable {
                 str.append(")").append("\n\nCoded initial task network:\n")
                     .append(Encoder.toString(intTaskNetwork));
             }
-            if (!intActions.isEmpty()) {
+            if (!Encoder.pb.getIntActions().isEmpty()) {
                 str.append(")").append("\n\nCoded actions:\n\n");
-                for (IntAction op : intActions) {
+                for (IntAction op : Encoder.pb.getIntActions()) {
                     str.append(Encoder.toString(op)).append(System.lineSeparator());
                 }
             }
@@ -395,10 +391,10 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Computed inertia from the encode actions
-        PreInstantiation.extractInertia(intActions);
+        PreInstantiation.extractInertia(Encoder.pb.getIntActions());
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            PreInstantiation.extractNumericInertia(intActions);
+            PreInstantiation.extractNumericInertia(Encoder.pb.getIntActions());
             /*for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
                 String predicate = Encoder.tableOfFunctions.get(i);
                 System.out.println(i + ": " + predicate + " : " + Encoder.tableOfNumericInertia.get(i));
@@ -411,7 +407,7 @@ public final class Encoder implements Serializable {
         PreInstantiation.inferTypesFromInertia(intInitPredicates);
         if (!Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             // Simply the encoded action with the inferred types.
-            intActions = PreInstantiation.simplifyActionsWithInferredTypes(intActions);
+            PreInstantiation.simplifyActionsWithInferredTypes(Encoder.pb.getIntActions());
             // Simply the encoded methods with the inferred types
             // Does not work with methods
             // intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
@@ -427,7 +423,7 @@ public final class Encoder implements Serializable {
 
         // HACK for durative action very inefficient
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-            intActions = PreInstantiation.expandTemporalActions(intActions);
+            PreInstantiation.expandTemporalActions(Encoder.pb.getIntActions());
         }
 
 
@@ -460,9 +456,9 @@ public final class Encoder implements Serializable {
                 str.append(Encoder.toString(intTaskNetwork));
             }
             str.append("\nPre-instantiation actions with inferred types (");
-            str.append(intActions.size());
+            str.append(Encoder.pb.getIntActions().size());
             str.append(" actions):\n");
-            for (IntAction a : intActions) {
+            for (IntAction a : Encoder.pb.getIntActions()) {
                 str.append(Encoder.toString(a)).append("\n");
             }
             if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
@@ -482,13 +478,13 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Instantiate the actions
-        intActions = Instantiation.instantiateActions(intActions);
+        Instantiation.instantiateActions(Encoder.pb.getIntActions());
         // Extract the ground inertia from the set of instantiated actions
-        PostInstantiation.extractGroundInertia(intActions);
+        PostInstantiation.extractGroundInertia(Encoder.pb.getIntActions());
         // Extract the ground numetic inertia from the set of instantiated actions
-        PostInstantiation.extractGroundNumericInertia(intActions);
+        PostInstantiation.extractGroundNumericInertia(Encoder.pb.getIntActions());
         // Simplify the actions based in the ground inertia
-        PostInstantiation.simplyActionsWithGroundInertia(intActions, intInitPredicates);
+        PostInstantiation.simplyActionsWithGroundInertia(Encoder.pb.getIntActions(), intInitPredicates);
 
         if (intGoal != null) {
             // Expand the quantified expression in the goal
@@ -512,9 +508,9 @@ public final class Encoder implements Serializable {
                 str.append("\n");
             }
             str.append("\n\nInstantiation actions with inferred types (");
-            str.append(intActions.size());
+            str.append(Encoder.pb.getIntActions().size());
             str.append(" actions):\n\n");
-            for (final IntAction op : intActions) {
+            for (final IntAction op : Encoder.pb.getIntActions()) {
                 str.append(Encoder.toString(op));
                 str.append("\n");
             }
@@ -567,7 +563,7 @@ public final class Encoder implements Serializable {
                 intTaskNetwork = initialTaskNetworks.get(0);
             }
 
-            intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, intActions);
+            intMethods = Instantiation.instantiateMethods(intMethods, intTaskNetwork, Encoder.pb.getIntActions());
             // Simplify the methods with the ground inertia information previously extracted
             //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
             if (Encoder.logLevel == 5) {
@@ -592,9 +588,9 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Extract the relevant fluents from the simplified and instantiated actions and methods
-        PostInstantiation.extractRelevantFacts(intActions, intMethods, intInitPredicates);
+        PostInstantiation.extractRelevantFacts(Encoder.pb.getIntActions(), intMethods, intInitPredicates);
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            PostInstantiation.extractRelevantNumericFluents(intActions, intMethods);
+            PostInstantiation.extractRelevantNumericFluents(Encoder.pb.getIntActions(), intMethods);
         }
 
         // Create the list of relevant tasks
@@ -623,7 +619,7 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Creates the final list of actions and methods that will be used in the problem
-        Encoder.actions = new ArrayList<>(intActions.size());
+        Encoder.actions = new ArrayList<>(Encoder.pb.getIntActions().size());
         Encoder.methods = new ArrayList<>(intMethods.size());
 
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
@@ -687,7 +683,7 @@ public final class Encoder implements Serializable {
         }
 
         // Encode the actions in bit set representation
-        Encoder.actions.addAll(0, BitEncoding.encodeActions(intActions, fluentIndexMap, numericFluentIndexMap));
+        Encoder.actions.addAll(0, BitEncoding.encodeActions(Encoder.pb.getIntActions(), fluentIndexMap, numericFluentIndexMap));
 
         // Just for logging
         if (Encoder.logLevel == 7) {

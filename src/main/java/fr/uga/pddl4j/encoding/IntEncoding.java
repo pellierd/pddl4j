@@ -59,17 +59,6 @@ final class IntEncoding implements Serializable {
     }
 
     /**
-     * Encodes a specified list of actions into its integer representation.
-     *
-     * @param ops the list of actions to encode.
-     * @return encoded the list of actions encoded.
-     */
-    static List<IntAction> encodeActions(final List<PDDLAction> ops) {
-        Encoder.primitiveTaskSymbols = new LinkedHashSet<>();
-        return ops.stream().map(IntEncoding::encodeAction).collect(Collectors.toList());
-    }
-
-    /**
      * Encodes a specified list of methods into its integer representation.
      *
      * @param meths the list of methods to encode.
@@ -203,37 +192,6 @@ final class IntEncoding implements Serializable {
         return encoded;
     }
 
-    /**
-     * Encode an operator into its integer representation.
-     *
-     * @param action the operator to encode.
-     * @return encoded operator.
-     */
-    private static IntAction encodeAction(final PDDLAction action) {
-        final IntAction intAction = new IntAction(action.getName().getImage(), action.getArity());
-        Encoder.primitiveTaskSymbols.add(action.getName().getImage());
-        // Encode the parameters of the operator
-        final List<String> variables = new ArrayList<>(action.getArity());
-        for (int i = 0; i < action.getArity(); i++) {
-            final PDDLTypedSymbol parameter = action.getParameters().get(i);
-            final String typeImage = IntEncoding.toStringType(parameter.getTypes());
-            final int type = Encoder.pb.getTableOfTypes().indexOf(typeImage);
-            intAction.setTypeOfParameter(i, type);
-            variables.add(parameter.getImage());
-        }
-        // Encode the duration of the action
-        if (action.isDurative()) {
-            final IntExpression duration = IntEncoding.encodeExp(action.getDuration(), variables);
-            intAction.setDuration(duration);
-        }
-        // Encode the preconditions of the operator
-        final IntExpression preconditions = IntEncoding.encodeExp(action.getPreconditions(), variables);
-        intAction.setPreconditions(preconditions);
-        // Encode the effects of the operator
-        final IntExpression effects = IntEncoding.encodeExp(action.getEffects(), variables);
-        intAction.setEffects(effects);
-        return intAction;
-    }
 
     /**
      * Encode an method into its integer representation.
@@ -417,7 +375,7 @@ final class IntEncoding implements Serializable {
             case TASK:
                 final String task = exp.getAtom().get(0).getImage();
                 intExp.setPredicate(Encoder.pb.getTableOfTasks().indexOf(task));
-                intExp.setPrimtive(Encoder.primitiveTaskSymbols.contains(task));
+                intExp.setPrimtive(Encoder.pb.getPrimitiveTaskSymbols().contains(task));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
                     final PDDLSymbol argument = exp.getAtom().get(i);
