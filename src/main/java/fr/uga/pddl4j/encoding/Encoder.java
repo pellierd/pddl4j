@@ -269,94 +269,10 @@ public final class Encoder implements Serializable {
 
 
         // *****************************************************************************************
-        // Step 4: Actions instantiation
-        // *****************************************************************************************
-
-        // Instantiate the actions
-        //Instantiation.instantiateActions(Encoder.pb.getIntActions());
-        // Extract the ground inertia from the set of instantiated actions
-        //PostInstantiation.extractGroundInertia(Encoder.pb.getIntActions());
-        // Extract the ground numetic inertia from the set of instantiated actions
-        //PostInstantiation.extractGroundNumericInertia(Encoder.pb.getIntActions());
-        // Simplify the actions based in the ground inertia
-        //PostInstantiation.simplyActionsWithGroundInertia(Encoder.pb.getIntActions(), Encoder.pb.getIntInitPredicates());
-
-        if (Encoder.pb.getIntGoal() != null) {
-            // Expand the quantified expression in the goal
-            Instantiation.expandQuantifiedExpression(Encoder.pb.getIntGoal(), true);
-            // Simplify the goal with ground inertia information
-            PostInstantiation.simplifyGoalWithGroundInertia(Encoder.pb.getIntGoal(), Encoder.pb.getIntInitPredicates());
-        }
-        // Extract increase and add value to action cost
-        //PostInstantiation.simplifyIncrease(intActions, intInitFunctionCost);
-
-        // Just for logging
-        if (Encoder.logLevel == 5) {
-            str.append(System.lineSeparator());
-            Encoder.printTableOfConstants(str);
-            str.append(System.lineSeparator());
-            Encoder.printTableOfTypes(str);
-            str.append(System.lineSeparator());
-            str.append("\nInstantiation initial state:\n").append("(and");
-            for (IntExpression f : Encoder.pb.getIntInitPredicates()) {
-                str.append(" ").append(Encoder.toString(f));
-                str.append("\n");
-            }
-            str.append("\n\nInstantiation actions with inferred types (");
-            str.append(Encoder.pb.getIntActions().size());
-            str.append(" actions):\n\n");
-            for (final IntAction op : Encoder.pb.getIntActions()) {
-                str.append(Encoder.toString(op));
-                str.append("\n");
-            }
-            if (Encoder.pb.getIntGoal() != null) {
-                str.append(")");
-                str.append("\n\nInstantiation goal state:\n");
-                str.append("(and");
-                for (final IntExpression g : Encoder.pb.getIntGoal().getChildren()) {
-                    str.append(" ");
-                    str.append(Encoder.toString(g));
-                }
-            }
-            LOGGER.trace(str);
-            str.setLength(0);
-        }
-
-        // *****************************************************************************************
         // Step 5: Instantiation of the methods
         // *****************************************************************************************
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-
-            List<IntTaskNetwork> initialTaskNetworks = Instantiation.instantiate(Encoder.pb.getIntInitialTaskNetwork());
-            if (initialTaskNetworks.size() > 1) {
-                IntExpression root = new IntExpression(PDDLConnective.TASK);
-                root.setPredicate(Encoder.pb.getTaskSymbols().size());
-                Encoder.pb.getTaskSymbols().add("__top");
-                Encoder.pb.getCompoundTaskSymbols().add("__top");
-                root.setPrimtive(false);
-                int index = 0;
-                for (IntTaskNetwork tn : initialTaskNetworks) {
-                    IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
-                    for (int i = 0; i < tn.arity(); i++) {
-                        method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
-                    }
-                    for (int i = 0; i < tn.arity(); i++) {
-                        method.setValueOfParameter(i, tn.getValueOfParameter(i));
-                    }
-                    method.setTask(new IntExpression(root));
-                    method.setPreconditions(new IntExpression(PDDLConnective.AND));
-                    method.setTaskNetwork(tn);
-                    Encoder.pb.getIntMethods().add(method);
-                    index++;
-                }
-
-                // Creates the abstract initial task network
-                Encoder.pb.intInitialTaskNetwork = new IntTaskNetwork();
-                Encoder.pb.intInitialTaskNetwork.getTasks().addChild(new IntExpression(root));
-            } else {
-                Encoder.pb.intInitialTaskNetwork = initialTaskNetworks.get(0);
-            }
 
             Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getIntActions());
             // Simplify the methods with the ground inertia information previously extracted

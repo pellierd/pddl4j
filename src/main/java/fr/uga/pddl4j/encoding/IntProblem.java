@@ -218,7 +218,9 @@ public abstract class IntProblem implements Problem {
         return intInitialTaskNetwork;
     }
 
-
+    public void setIntInitialTaskNetwork(IntTaskNetwork intInitialTaskNetwork) {
+        this.intInitialTaskNetwork = intInitialTaskNetwork;
+    }
 
     /**
      * The set compund task symbols, i.e., the set of task symbols used in methods.

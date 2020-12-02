@@ -1,9 +1,6 @@
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.parser.*;
 
 import java.util.*;
 
@@ -31,6 +28,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         this.extractGroundInertia();
         this.extractGroundNumericInertia();
         this.simplyActionsWithGroundInertia();
+        this.instantiateGoal();
+        this.simplifyGoalWithGroundInertia();
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            this.instantiateInitialTaskNetwork();
+        }
     }
 
 
@@ -52,6 +54,24 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         for (IntAction a : this.getIntActions()) {
             extractGroundInertia(a.getEffects());
         }
+    }
+
+    /**
+     * Instantiate the goal.
+     */
+    protected void instantiateGoal() {
+        // Expand the quantified expression in the goal
+        this.expandQuantifiedExpression(this.getIntGoal(), true);
+    }
+
+    /**
+     * Simplify a specified goal expression based on the ground inertia information.
+     *
+     */
+    protected void simplifyGoalWithGroundInertia() {
+        this.simplifyWithGroundInertia(this.getIntGoal(), false);
+        this.simplifyWithGroundNumericInertia(this.getIntGoal(), false);
+        this.simplify(this.getIntGoal());
     }
 
     /**
@@ -596,6 +616,90 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             default:
                 System.out.println(Encoder.toString(exp));
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+    }
+
+    protected void instantiateInitialTaskNetwork() {
+        final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
+        if (taskNetworks.size() > 1) {
+            IntExpression root = new IntExpression(PDDLConnective.TASK);
+            root.setPredicate(Encoder.pb.getTaskSymbols().size());
+            Encoder.pb.getTaskSymbols().add("__top");
+            Encoder.pb.getCompoundTaskSymbols().add("__top");
+            root.setPrimtive(false);
+            int index = 0;
+            for (IntTaskNetwork tn : taskNetworks) {
+                IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
+                for (int i = 0; i < tn.arity(); i++) {
+                    method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < tn.arity(); i++) {
+                    method.setValueOfParameter(i, tn.getValueOfParameter(i));
+                }
+                method.setTask(new IntExpression(root));
+                method.setPreconditions(new IntExpression(PDDLConnective.AND));
+                method.setTaskNetwork(tn);
+                Encoder.pb.getIntMethods().add(method);
+                index++;
+            }
+
+            // Creates the abstract initial task network
+            IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
+            newTaskNetwork.getTasks().addChild(new IntExpression(root));
+            this.setIntInitialTaskNetwork(newTaskNetwork);
+        } else {
+            this.setIntInitialTaskNetwork(taskNetworks.get(0));
+        }
+    }
+
+
+
+    /**
+     * Instantiates a specified task network.
+     *
+     * @param network the task network to instantiate.
+     * @return the list of task netwok instantiated corresponding the specified network.
+     */
+    private List<IntTaskNetwork> instantiate(final IntTaskNetwork network) {
+        final List<IntTaskNetwork> instNetwork = new ArrayList<>(100);
+        this.instantiate(network, 0, instNetwork);
+        return instNetwork;
+    }
+
+    /**
+     * Instantiates a specified task network.
+     *
+     * @param network  the action.
+     * @param index   the index of the parameter to instantiate.
+     * @param networks the list of tasknetwork already instantiated.
+     * @see IntAction
+     */
+    private void instantiate(final IntTaskNetwork network, final int index, final List<IntTaskNetwork> networks) {
+
+        final int arity = network.arity();
+        if (index == arity) {
+            networks.add(network);
+        } else {
+            final Set<Integer> values = this.getDomains().get(network.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntTaskNetwork copy = new IntTaskNetwork(arity);
+                copy.setOrderingConstraints(new IntExpression(network.getOrderingConstraints()));
+
+                final IntExpression tasksCopy = new IntExpression(network.getTasks());
+                this.substitute(tasksCopy, varIndex, value, true);
+                copy.setTasks(tasksCopy);
+
+                for (int i = 0; i < arity; i++) {
+                    copy.setTypeOfParameter(i, network.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < arity; i++) {
+                    copy.setValueOfParameter(i, network.getValueOfParameter(i));
+                }
+
+                copy.setValueOfParameter(index, value);
+                this.instantiate(copy, index + 1, networks);
+            }
         }
     }
 }

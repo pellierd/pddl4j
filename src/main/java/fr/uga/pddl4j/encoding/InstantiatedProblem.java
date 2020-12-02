@@ -558,7 +558,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      * @param var  the variable.
      * @param cons the constant.
      */
-    private void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
+    protected void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
         boolean updated = false;
         switch (exp.getConnective()) {
             case ATOM:
