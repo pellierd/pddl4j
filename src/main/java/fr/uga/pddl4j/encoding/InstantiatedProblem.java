@@ -42,7 +42,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 i++;
             }
             if (toInstantiate) {
-                instActions.addAll(Instantiation.instantiate(a));
+                instActions.addAll(this.instantiate(a));
             }
         }
         this.getIntActions().clear();
@@ -77,7 +77,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      * @return the list of actions instantiated corresponding the specified action.
      */
     protected List<IntAction> instantiate(final IntAction action) {
-        return Instantiation.instantiate(action, Integer.MAX_VALUE);
+        return this.instantiate(action, Integer.MAX_VALUE);
     }
 
 
