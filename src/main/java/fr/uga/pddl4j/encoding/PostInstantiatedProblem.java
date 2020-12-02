@@ -39,6 +39,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private List<Integer> relevantActions;
 
+    /**
+     * The table of the relevant fluents.
+     */
+    private List<IntExpression> tableOfRelevantFluents;
+
     public PostInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
@@ -54,7 +59,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
             this.simplyMethodsWithGroundInertia();
         }
-
+        this.extractRelevantFacts(this.getIntActions(), this.getIntMethods(), this.getIntInitPredicates());
     }
 
 
@@ -80,6 +85,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
     public List<List<Integer>> getRelevantMethods() {
         return relevantMethods;
+    }
+
+    public List<IntExpression> getTableOfRelevantFluents() {
+        return tableOfRelevantFluents;
     }
 
     /**
@@ -1139,5 +1148,142 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         }
         this.simplyRecursivelyMethodsWithTasksNoMoreReachable(this.getIntMethods(), toRemove);
     }
+
+
+    /**
+     * Extracts the relevant facts from the instantiated actions. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     * @param init    the initial state.
+     */
+    protected void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods,
+                                     final Set<IntExpression> init) {
+        final Set<IntExpression> facts = new LinkedHashSet<>(10000);
+        for (IntAction a : actions) {
+            extractRelevantFacts(a.getPreconditions(), facts, init);
+            extractRelevantFacts(a.getEffects(), facts, init);
+        }
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            for (IntMethod m : methods) {
+                extractRelevantFacts(m.getPreconditions(), facts, init);
+            }
+        }
+        for (IntExpression p : init) {
+            Inertia inertia = this.getTableOfGroundInertia().get(p);
+            if (inertia == null) {
+                inertia = Inertia.INERTIA;
+            }
+            if (init.contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
+                facts.add(p);
+            }
+        }
+        this.tableOfRelevantFluents = new ArrayList<>(facts.size());
+        for (IntExpression exp : facts) {
+            final IntExpression relevant = new IntExpression(exp);
+            this.tableOfRelevantFluents.add(relevant);
+        }
+    }
+
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param facts the set of relevant facts.
+     * @param init  the initial state.
+     */
+    private void extractRelevantFacts(final IntExpression exp, final Set<IntExpression> facts,
+                                             final Set<IntExpression> init) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                Inertia inertia = this.getTableOfGroundInertia().get(exp);
+                if (inertia == null) {
+                    inertia = Inertia.INERTIA;
+                }
+                if ((init.contains(exp) && !inertia.equals(Inertia.NEGATIVE))
+                    || (!init.contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
+                    facts.add(exp);
+                }
+                break;
+            case FN_HEAD:
+                break;
+            case EQUAL_ATOM:
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.extractRelevantFacts(e, facts, init);
+                }
+                break;
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case UMINUS:
+            case ALWAYS:
+            case OVER_ALL:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case NOT:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                break;
+            case F_EXP_T:
+            case F_EXP:
+                if (!exp.getChildren().isEmpty()) {
+                    extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                }
+                break;
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                extractRelevantFacts(exp.getChildren().get(3), facts, init);
+                break;
+            case FN_ATOM:
+            case NUMBER:
+            case DURATION_ATOM:
+            case TIME_VAR:
+            case IS_VIOLATED:
+            case MINIMIZE:
+            case MAXIMIZE:
+                break;
+            default:
+                // do nothing
+        }
+    }
+
 
 }

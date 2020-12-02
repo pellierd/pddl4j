@@ -273,8 +273,8 @@ final class BitEncoding implements Serializable {
             IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
             dummyGoal.setPredicate(dummyPredicateIndex);
             dummyGoal.setArguments(new int[0]);
-            final int dummyGoalIndex = Encoder.tableOfRelevantFluents.size();
-            Encoder.tableOfRelevantFluents.add(dummyGoal);
+            final int dummyGoalIndex = Encoder.pb.getTableOfRelevantFluents().size();
+            Encoder.pb.getTableOfRelevantFluents().add(dummyGoal);
             map.put(dummyGoal, dummyGoalIndex);
             Effect effect = new Effect();
             effect.getPositiveFluents().set(dummyGoalIndex);

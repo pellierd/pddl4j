@@ -140,7 +140,7 @@ public final class Encoder implements Serializable {
     /**
      * The table of the relevant fluents.
      */
-    static List<IntExpression> tableOfRelevantFluents;
+    //static List<IntExpression> tableOfRelevantFluents;
 
     /**
      * The table of the relevant fluents.
@@ -269,37 +269,11 @@ public final class Encoder implements Serializable {
 
 
         // *****************************************************************************************
-        // Step 5: Instantiation of the methods
-        // *****************************************************************************************
-
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-
-            //Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getIntActions());
-            // Simplify the methods with the ground inertia information previously extracted
-            //PostInstantiation.simplyMethodsWithGroundInertia(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitPredicates());
-            if (Encoder.logLevel == 5) {
-                str.append(System.lineSeparator());
-                str.append("\nInstantiation methods (");
-                str.append(Encoder.pb.getIntMethods().size());
-                str.append(" methods):\n\n");
-                for (IntMethod meth : Encoder.pb.getIntMethods()) {
-                    str.append(Encoder.toString(meth));
-                    str.append("\n");
-                }
-                str.append(")");
-                str.append("\n\nInstantiation initial task network:\n");
-                str.append(Encoder.toString(Encoder.pb.getIntInitialTaskNetwork()));
-            }
-            LOGGER.trace(str);
-            str.setLength(0);
-        }
-
-        // *****************************************************************************************
         // Step 6: PostInstantiation
         // *****************************************************************************************
 
         // Extract the relevant fluents from the simplified and instantiated actions and methods
-        PostInstantiation.extractRelevantFacts(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods(), Encoder.pb.getIntInitPredicates());
+        //PostInstantiation.extractRelevantFacts(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods(), Encoder.pb.getIntInitPredicates());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             PostInstantiation.extractRelevantNumericFluents(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods());
         }
@@ -336,14 +310,14 @@ public final class Encoder implements Serializable {
         }
 
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
-        final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
+        final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.pb.getTableOfRelevantFluents().size());
         int index = 0;
-        for (IntExpression fluent : Encoder.tableOfRelevantFluents) {
+        for (IntExpression fluent : Encoder.pb.getTableOfRelevantFluents()) {
             fluentIndexMap.put(fluent, index);
             index++;
         }
 
-        final Map<IntExpression, Integer> numericFluentIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantFluents.size());
+        final Map<IntExpression, Integer> numericFluentIndexMap = new LinkedHashMap<>(Encoder.pb.getTableOfRelevantFluents().size());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             // Create a map of the relevant numeric fluents with their index to speedup the bit set encoding of the actions
             index = 0;
@@ -464,7 +438,7 @@ public final class Encoder implements Serializable {
         codedProblem.setInertia(Encoder.pb.getTableOfInertia());
         codedProblem.setInferredDomains(Encoder.pb.getTableOfInferredDomains());
         codedProblem.setPredicateSymbols(Encoder.pb.getPredicateSymbols());
-        codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
+        codedProblem.setRelevantFluents(Encoder.pb.getTableOfRelevantFluents().stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
@@ -586,8 +560,8 @@ public final class Encoder implements Serializable {
      */
     static void printRelevantFactsTable(StringBuilder str) {
         str.append("Relevant fluents:\n");
-        for (int i = 0; i < Encoder.tableOfRelevantFluents.size(); i++) {
-            str.append(i).append(": ").append(Encoder.toString(Encoder.tableOfRelevantFluents.get(i)));
+        for (int i = 0; i < Encoder.pb.getTableOfRelevantFluents().size(); i++) {
+            str.append(i).append(": ").append(Encoder.toString(Encoder.pb.getTableOfRelevantFluents().get(i)));
             str.append("\n");
         }
     }
@@ -680,7 +654,7 @@ public final class Encoder implements Serializable {
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
     }
 
     /**
@@ -693,7 +667,7 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(m, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
-            Encoder.tableOfRelevantFluents, Encoder.tableOfRelevantTasks);
+            Encoder.pb.getTableOfRelevantFluents(), Encoder.tableOfRelevantTasks);
     }
 
     /**
@@ -730,7 +704,7 @@ public final class Encoder implements Serializable {
     static String toString(Condition exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
     }
 
     /**
@@ -742,7 +716,7 @@ public final class Encoder implements Serializable {
     static String toString(Goal exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
     }
 
     /**
@@ -757,7 +731,7 @@ public final class Encoder implements Serializable {
             Encoder.pb.getTypeSymbols(),
             Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(),
-            Encoder.tableOfRelevantFluents,
+            Encoder.pb.getTableOfRelevantFluents(),
             Encoder.tableOfRelevantNumericFluents,
             Encoder.pb.getTaskSymbols());
     }
@@ -775,7 +749,7 @@ public final class Encoder implements Serializable {
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.tableOfRelevantFluents);
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
     }
 
     /**
