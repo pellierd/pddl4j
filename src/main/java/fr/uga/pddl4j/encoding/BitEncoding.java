@@ -237,65 +237,6 @@ final class BitEncoding implements Serializable {
     }
 
     /**
-     * Encode a specified goal in a disjunction of <code>BitExp</code>. The specified
-     * map is used to speed-up the search by mapping the an expression to this index.
-     *
-     * @param goal the goal to encode.
-     * @param map  the map that associates to a specified expression its index.
-     * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
-     * <code>BitExp</code>.
-     */
-    static Goal encodeGoal(IntExpression goal, final Map<IntExpression, Integer> map,
-                           final Map<IntExpression, Integer> numericIndex)
-        throws UnexpectedExpressionException {
-
-        if (goal.getConnective().equals(PDDLConnective.FALSE)) {
-            return null;
-        }
-
-        Goal newGoal;
-        BitEncoding.toDNF(goal);
-        Encoder.codedGoal = new ArrayList<>(goal.getChildren().size());
-        for (IntExpression exp : goal.getChildren()) {
-            if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-                IntExpression and = new IntExpression(PDDLConnective.AND);
-                and.getChildren().add(exp);
-                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(and, map, numericIndex)));
-            } else {
-                Encoder.codedGoal.add(new Goal(BitEncoding.encodeCondition(exp, map, numericIndex)));
-            }
-        }
-        if (Encoder.codedGoal.size() > 1) {
-            // Create a new dummy fact to encode the goal
-            final int dummyPredicateIndex = Encoder.pb.getPredicateSymbols().size();
-            Encoder.pb.getPredicateSymbols().add(Constants.DUMMY_GOAL);
-            Encoder.pb.getPredicateSignatures().add(new ArrayList<>());
-            IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
-            dummyGoal.setPredicate(dummyPredicateIndex);
-            dummyGoal.setArguments(new int[0]);
-            final int dummyGoalIndex = Encoder.pb.getTableOfRelevantFluents().size();
-            Encoder.pb.getTableOfRelevantFluents().add(dummyGoal);
-            map.put(dummyGoal, dummyGoalIndex);
-            Effect effect = new Effect();
-            effect.getPositiveFluents().set(dummyGoalIndex);
-            newGoal = new Goal();
-            effect.getPositiveFluents().set(dummyGoalIndex);
-            final ConditionalEffect condEffect = new ConditionalEffect(effect);
-            // for each disjunction create a dummy action
-            for (Condition dis : Encoder.codedGoal) {
-                final Action op = new Action(Constants.DUMMY_OPERATOR, 0);
-                op.setDummy(true);
-                op.setPrecondition(dis);
-                op.getConditionalEffects().add(condEffect);
-                Encoder.pb.getActions().add(op);
-            }
-        } else {
-            newGoal = Encoder.codedGoal.get(0);
-        }
-        return newGoal;
-    }
-
-    /**
      * Encode a specified task network.
      * map is used to speed-up the search by mapping the an expression to this index.
      *

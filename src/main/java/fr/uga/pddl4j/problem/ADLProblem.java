@@ -26,8 +26,14 @@ public class ADLProblem extends PostInstantiatedProblem {
     private Map<IntExpression, Integer> mapOfFluentIndex;
 
     private Map<IntExpression, Integer> mapOfNumericFluentIndex;
+    private Map<IntExpression, Integer> mapOfTasksIndex;
 
     private Goal goal;
+
+    /**
+     * The initial task network.
+     */
+    private TaskNetwork initialTaskNetwork;
 
     /**
      * The table containing for each relevant task its set of resolvers, i.e., action or methods
@@ -61,12 +67,20 @@ public class ADLProblem extends PostInstantiatedProblem {
         return mapOfNumericFluentIndex;
     }
 
+    public Map<IntExpression, Integer> getMapOfTasksIndex() {
+        return mapOfTasksIndex;
+    }
+
     public List<List<Integer>> getTableOfRelevantOperators() {
         return tableOfRelevantOperators;
     }
 
     public Goal getGoal() {
         return goal;
+    }
+
+    public TaskNetwork getInitialTaskNetwork() {
+        return initialTaskNetwork;
     }
 
     public void completeInstantiation() {
@@ -83,9 +97,14 @@ public class ADLProblem extends PostInstantiatedProblem {
 
         if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             this.initRelevantOperators();
+            this.initMapOfTaskIndex();
         }
 
-        encodeGoal();
+        this.encodeGoal();
+
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            this.encodeInitialTaskNetwork();
+        }
 
     }
 
@@ -96,6 +115,17 @@ public class ADLProblem extends PostInstantiatedProblem {
         for (IntExpression fluent : this.getTableOfRelevantFluents()) {
             this.mapOfFluentIndex.put(fluent, index);
             index++;
+        }
+    }
+
+    protected void initMapOfTaskIndex() {
+        // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
+        this.mapOfTasksIndex = new LinkedHashMap<>(this.getRelevantTasks().size());
+        int index = 0;
+        for (IntExpression task : this.getRelevantTasks()) {
+            this.mapOfTasksIndex.put(task, index);
+            index++;
+
         }
     }
 
@@ -119,6 +149,8 @@ public class ADLProblem extends PostInstantiatedProblem {
         }
         this.tableOfRelevantOperators.addAll(this.getRelevantMethods());
     }
+
+
 
     /**
      * Encode a specified goal in a disjunction of <code>BitExp</code>. The specified
@@ -469,4 +501,53 @@ public class ADLProblem extends PostInstantiatedProblem {
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
+
+    protected void encodeInitialTaskNetwork() {
+        this.initialTaskNetwork = this.encodeTaskNetwork(this.getIntInitialTaskNetwork());
+    }
+
+    /**
+     * Encode a specified task network.
+     * map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param taskNetwork the tasknetwork to encode.
+     * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
+     * <code>BitExp</code>.
+     */
+    protected TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork) {
+        // We encode first the tasks
+        final List<Integer> tasks = new ArrayList<Integer>();
+        this.encodeTasks(taskNetwork.getTasks(), tasks);
+        // We encode then the ordering constraints
+        final OrderingConstraintSet constraints = new OrderingConstraintSet(tasks.size());
+        for (IntExpression c : taskNetwork.getOrderingConstraints().getChildren()) {
+            constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
+        }
+        final TaskNetwork tn = new TaskNetwork(tasks, constraints);
+        tn.transitiveClosure();
+        return tn;
+    }
+
+    /**
+     * Encode the list of tasks expressed as an IntExpression into a list of integer.
+     *
+     * @param exp   the list of tasks expressed as an IntExpression.
+     * @param tasks the list of task encoded as integer.
+     */
+    private void encodeTasks(IntExpression exp, List<Integer> tasks) {
+        switch (exp.getConnective()) {
+            case TASK:
+                tasks.add(this.mapOfTasksIndex.get(exp));
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.encodeTasks(e, tasks);
+                }
+                break;
+            default:
+                // Do nothing
+        }
+    }
+
 }

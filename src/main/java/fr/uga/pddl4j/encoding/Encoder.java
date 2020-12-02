@@ -175,12 +175,12 @@ public final class Encoder implements Serializable {
     /**
      * The initial task network.
      */
-    static TaskNetwork initialTaskNetwork;
+    //static TaskNetwork initialTaskNetwork;
 
     /**
      * The encoded goal.
      */
-    static List<Goal> codedGoal;
+    //static List<Goal> codedGoal;
 
     /**
      * The initial state.
@@ -208,7 +208,7 @@ public final class Encoder implements Serializable {
      */
     //static List<Integer> relevantActions;
 
-    static Map<IntExpression, Double> intInitFunctionCost;
+    //static Map<IntExpression, Double> intInitFunctionCost;
 
     static ADLProblem pb;
     /**
@@ -274,24 +274,16 @@ public final class Encoder implements Serializable {
 
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
-            final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.pb.getRelevantTasks().size());
-            int index = 0;
-            for (IntExpression task : Encoder.pb.getRelevantTasks()) {
-                taskIndexMap.put(task, index);
-                index++;
-
-            }
             // Encode the initial task network
-            Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntInitialTaskNetwork(), taskIndexMap);
+            //Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getMapOfTasksIndex());
             // Encode the methods in bit set representation
-            Encoder.pb.getMethods().addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), Encoder.pb.getMapOfFluentIndex(), taskIndexMap));
+            Encoder.pb.getMethods().addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfTasksIndex()));
         }
 
         // Encode the initial state in bit set representation
         Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            BitEncoding.encodeInitNumericFluent(Encoder.init, Encoder.pb.getMapOfNumericFluentIndex(), Encoder.intInitFunctionCost);
+            BitEncoding.encodeInitNumericFluent(Encoder.init, Encoder.pb.getMapOfNumericFluentIndex(), Encoder.pb.getIntInitFunctionCost());
         }
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
@@ -306,7 +298,7 @@ public final class Encoder implements Serializable {
         codedProblem.setRequirements(Encoder.pb.getRequirements());
         codedProblem.setGoal(Encoder.pb.getGoal());
         codedProblem.setInitialState(Encoder.init);
-        codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
+        codedProblem.setInitialTaskNetwork(Encoder.pb.getInitialTaskNetwork());
         codedProblem.setActions(Encoder.pb.getActions());
         codedProblem.setMethods(Encoder.pb.getMethods());
         codedProblem.setConstantSymbols(Encoder.pb.getConstantSymbols());
@@ -463,18 +455,6 @@ public final class Encoder implements Serializable {
         }
     }
 
-    /**
-     * Print the goal.
-     *
-     * @param str the string builder used to print.
-     */
-    static void printGoal(StringBuilder str) {
-        str.append("Goal state is:\n");
-        for (Goal exp : Encoder.codedGoal) {
-            str.append(Encoder.toString(exp));
-            str.append("\n");
-        }
-    }
 
     /**
      * Returns a short string representation of the specified operator, i.e., only its name and the
