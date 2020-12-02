@@ -773,7 +773,7 @@ final class StringDecoder implements Serializable {
                 if (exp.getNumericFluents() == NumericVariable.DURATION) {
                     str.append("?duration");
                 } else {
-                    str.append(StringDecoder.toString(Encoder.tableOfRelevantNumericFluents.get(exp.getNumericFluents()),
+                    str.append(StringDecoder.toString(Encoder.pb.getTableOfRelevantNumericFluents().get(exp.getNumericFluents()),
                         Encoder.pb.getConstantSymbols(), Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
                         Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols()));
                 }

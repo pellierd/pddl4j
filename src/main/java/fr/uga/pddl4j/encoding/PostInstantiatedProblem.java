@@ -44,6 +44,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private List<IntExpression> tableOfRelevantFluents;
 
+    /**
+     * The table of the relevant fluents.
+     */
+    private List<IntExpression> tableOfRelevantNumericFluents;
+
     public PostInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
@@ -60,6 +65,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             this.simplyMethodsWithGroundInertia();
         }
         this.extractRelevantFacts(this.getIntActions(), this.getIntMethods(), this.getIntInitPredicates());
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.extractRelevantNumericFluents(this.getIntActions(),this.getIntMethods());
+        }
+
     }
 
 
@@ -89,6 +98,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
     public List<IntExpression> getTableOfRelevantFluents() {
         return tableOfRelevantFluents;
+    }
+
+    public List<IntExpression> getTableOfRelevantNumericFluents() {
+        return tableOfRelevantNumericFluents;
     }
 
     /**
@@ -1285,5 +1298,86 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         }
     }
 
+    /**
+     * Extracts the relevant numeric fluents.
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     */
+    protected void extractRelevantNumericFluents(final List<IntAction> actions, List<IntMethod> methods) {
+        final Set<IntExpression> fluents = new LinkedHashSet<>(100);
+        for (IntAction a : actions) {
+            if (a.isDurative()) {
+                this.extractRelevantNumericFluents(a.getDuration(), fluents);
+            }
+            this.extractRelevantNumericFluents(a.getPreconditions(), fluents);
+            this.extractRelevantNumericFluents(a.getEffects(), fluents);
+        }
+        this.tableOfRelevantNumericFluents = new ArrayList<>(fluents.size());
+        for (IntExpression exp : fluents) {
+            final IntExpression relevant = new IntExpression(exp);
+            this.tableOfRelevantNumericFluents.add(relevant);
+        }
+    }
+
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param fluents the set of relevant facts.
+     */
+    private void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
+        switch (exp.getConnective()) {
+            case FN_HEAD:
+                fluents.add(exp);
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.extractRelevantNumericFluents(e, fluents);
+                }
+                break;
+            case UMINUS:
+            case NOT:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                this.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
+                break;
+            case F_EXP:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case TIME_VAR:
+            case NUMBER:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+
+        }
+    }
 
 }

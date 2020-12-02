@@ -145,7 +145,7 @@ public final class Encoder implements Serializable {
     /**
      * The table of the relevant fluents.
      */
-    static List<IntExpression> tableOfRelevantNumericFluents;
+    //static List<IntExpression> tableOfRelevantNumericFluents;
 
     /**
      * The table of the relevant task.
@@ -274,9 +274,9 @@ public final class Encoder implements Serializable {
 
         // Extract the relevant fluents from the simplified and instantiated actions and methods
         //PostInstantiation.extractRelevantFacts(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods(), Encoder.pb.getIntInitPredicates());
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             PostInstantiation.extractRelevantNumericFluents(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods());
-        }
+        }*/
 
         // Create the list of relevant tasks
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
@@ -321,7 +321,7 @@ public final class Encoder implements Serializable {
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             // Create a map of the relevant numeric fluents with their index to speedup the bit set encoding of the actions
             index = 0;
-            for (IntExpression fluent : Encoder.tableOfRelevantNumericFluents) {
+            for (IntExpression fluent : Encoder.pb.getTableOfRelevantNumericFluents()) {
                 numericFluentIndexMap.put(fluent, index);
                 index++;
             }
@@ -732,7 +732,7 @@ public final class Encoder implements Serializable {
             Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(),
             Encoder.pb.getTableOfRelevantFluents(),
-            Encoder.tableOfRelevantNumericFluents,
+            Encoder.pb.getTableOfRelevantNumericFluents(),
             Encoder.pb.getTaskSymbols());
     }
 
