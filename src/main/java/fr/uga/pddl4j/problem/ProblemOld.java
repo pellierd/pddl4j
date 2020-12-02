@@ -474,7 +474,7 @@ public class ProblemOld implements Serializable {
      *
      * @return the list of tasks of the problem.
      */
-    public final List<Task> getTasks() {
+    public final List<Task> getRelevantTasks() {
         return this.tasks;
     }
 
@@ -689,7 +689,7 @@ public class ProblemOld implements Serializable {
                 str.append(" \n");
             }
         }
-        str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
+        str.append("Task: " + this.toString(this.getRelevantTasks().get(method.getTask())) + "\n");
         str.append("Preconditions:\n");
         str.append(this.toString(method.getPrecondition()));
         str.append("\n");
@@ -912,7 +912,7 @@ public class ProblemOld implements Serializable {
         for (Map.Entry<Integer, Method> m : hierarchy.getCounpoudTasks().entrySet()) {
             str.append(m.getKey());
             str.append(" ");
-            str.append(this.toString(this.getTasks().get(m.getValue().getTask())));
+            str.append(this.toString(this.getRelevantTasks().get(m.getValue().getTask())));
             str.append(" -> ");
             str.append(m.getValue().getName());
             for (Integer t : hierarchy.getDecomposition().get(m.getKey())) {

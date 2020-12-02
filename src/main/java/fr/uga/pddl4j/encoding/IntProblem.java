@@ -2,8 +2,8 @@ package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.encoding.*;
 import fr.uga.pddl4j.parser.*;
-import fr.uga.pddl4j.problem.OrderingConstraintSet;
-import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -366,7 +366,7 @@ public abstract class IntProblem implements Problem {
      * problem and creates their respective domain. Warning: constants must be collected before using this method. It
      * is necessary to correctly initialized the domain of the either types collected.
      */
-    private void collectEitherTypeInformation() {
+    protected void collectEitherTypeInformation() {
         // Collect the types from the predicates declaration
         for (PDDLNamedTypedList predicate : this.domain.getPredicates()) {
             this.collectEitherTypeInformation(predicate.getArguments());
@@ -1037,6 +1037,346 @@ public abstract class IntProblem implements Problem {
             }
         } else {
             str.append(types.get(0).getImage());
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified action.
+     *
+     * @param action         the operator to print.
+     * @return a string representation of the specified operator.
+     */
+    protected String toString(final IntAction action) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Action ").append(action.getName()).append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < action.arity(); i++) {
+            final int index = action.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(action.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index)).append(" \n");
+            }
+        }
+        if (action.isDurative()) {
+            str.append("Duration:\n");
+            str.append(toString(action.getDuration()));
+            str.append("\nCondition:\n");
+        } else {
+            str.append("Preconditions:\n");
+        }
+        str.append(toString(action.getPreconditions()));
+        str.append("\n");
+        str.append("Effects:\n");
+        str.append(toString(action.getEffects()));
+        str.append("\n");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param method       the method to print.
+     * @return a string representation of the specified method.
+     */
+    protected String toString(final IntMethod method) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Method ").append(method.getName()).append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < method.arity(); i++) {
+            final int index = method.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(method.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Task: ").append(toString(method.getTask()));
+        str.append("\n");
+        str.append("Preconditions:\n");
+        str.append(toString(method.getPreconditions()));
+        str.append("\n");
+        str.append("Subtasks:\n");
+        str.append(toString(method.getSubTasks()));
+        str.append("\n");
+        str.append("Ordering:\n");
+        str.append(toString(method.getOrderingConstraints()));
+        str.append("\n");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param taskNetwork the task network to print.
+     * @return a string representation of the specified method.
+     */
+    protected String toString(final IntTaskNetwork taskNetwork) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Parameters:\n");
+        for (int i = 0; i < taskNetwork.arity(); i++) {
+            final int index = taskNetwork.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(taskNetwork.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Tasks:\n");
+        str.append(toString(taskNetwork.getTasks()));
+        str.append("\n");
+        str.append("Ordering constraints:\n");
+        str.append(toString(taskNetwork.getOrderingConstraints()));
+        str.append("\n");
+        return str.toString();
+    }
+
+
+
+    /**
+     * Returns a string representation of an expression.
+     *
+     * @param exp the expression.
+     * @return a string representation of the specified expression.
+     */
+    protected String toString(final IntExpression exp) {
+        return this.toString(exp, " ");
+    }
+
+    /**
+     * Returns a string representation of an expression.
+     *
+     * @param exp        the expression.
+     * @return a string representation of the specified expression.
+     */
+    protected String toString(final IntExpression exp, final String separator) {
+        return this.toString(exp, "", separator);
+    }
+
+    /**
+     * Returns a string representation of an expression.
+     *
+     * @param exp        the expression.
+     * @param baseOffset the offset white space from the left used for indentation.
+     * @param separator  the string separator between predicate symbol and arguments.
+     * @return a string representation of the specified expression node.
+     */
+    protected String toString(final IntExpression exp, String baseOffset, final String separator) {
+        final StringBuilder str = new StringBuilder();
+        switch (exp.getConnective()) {
+            case ATOM:
+                str.append("(");
+                str.append(this.getPredicateSymbols().get(exp.getPredicate()));
+                int[] args = exp.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                    } else {
+                        str.append(" ").append(this.getConstantSymbols().get(index));
+                    }
+                }
+                str.append(")");
+                break;
+            case FN_HEAD:
+                str.append("(").append(this.getFunctionSymbols().get(exp.getPredicate()));
+                args = exp.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                    } else {
+                        str.append(" ").append(this.getConstantSymbols().get(index));
+                    }
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                    str.append(exp.getTaskID());
+                    str.append(" (");
+                }
+                str.append(this.getTaskSymbols().get(exp.getPredicate()));
+                args = exp.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                    } else {
+                        str.append(" ").append(this.getConstantSymbols().get(index));
+                    }
+                }
+                if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                    str.append(")");
+                }
+                str.append(")");
+                break;
+            case EQUAL_ATOM:
+                str.append("(").append("=");
+                args = exp.getArguments();
+                for (int index : args) {
+                    if (index < 0) {
+                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
+                    } else {
+                        str.append(" ").append(this.getConstantSymbols().get(index));
+                    }
+                }
+                str.append(")");
+                break;
+            case AND:
+            case OR:
+                String offsetOr = baseOffset + "  ";
+                str.append("(");
+                str.append(exp.getConnective().getImage());
+                str.append(" ");
+                if (!exp.getChildren().isEmpty()) {
+                    for (int i = 0; i < exp.getChildren().size() - 1; i++) {
+                        str.append(toString(exp.getChildren().get(i), offsetOr)).append("\n").append(offsetOr);
+                    }
+                    str.append(toString(exp.getChildren().get(
+                        exp.getChildren().size() - 1), offsetOr));
+                }
+                str.append(")");
+                break;
+            case FORALL:
+            case EXISTS:
+                str.append(" (").append(exp.getConnective().getImage());
+                str.append(" (").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(-exp.getVariable() - 1);
+                str.append(" - ");
+                String offsetEx = baseOffset + baseOffset + "  ";
+                str.append(this.getTypeSymbols().get(exp.getType())).append(")\n").append(offsetEx);
+                if (exp.getChildren().size() == 1) {
+                    str.append(toString(exp.getChildren().get(0), offsetEx));
+                }
+                str.append(")");
+                break;
+            case NUMBER:
+                str.append(exp.getValue());
+                break;
+            case F_EXP:
+                str.append(toString(exp.getChildren().get(0), baseOffset));
+                break;
+            case F_EXP_T:
+            case TRUE:
+            case FALSE:
+                str.append(exp.getConnective());
+                break;
+            case TIME_VAR:
+                str.append(exp.getConnective().getImage());
+                break;
+            case FN_ATOM:
+            case WHEN:
+            case DURATION_ATOM:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+                str.append("(");
+                str.append(exp.getConnective().getImage());
+                str.append(" ");
+                str.append(toString(exp.getChildren().get(0), baseOffset));
+                str.append(" ");
+                str.append(toString(exp.getChildren().get(1), baseOffset));
+                str.append(")");
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case NOT:
+            case ALWAYS:
+                str.append("(");
+                str.append(exp.getConnective().getImage());
+                str.append(" ");
+                str.append(toString(exp.getChildren().get(0), baseOffset));
+                str.append(")");
+                break;
+            case IS_VIOLATED:
+                str.append("(");
+                str.append(exp.getConnective().getImage());
+                str.append(")");
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+                str.append("(");
+                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(exp.getChildren().get(0).getTaskID());
+                str.append(" ");
+                str.append(exp.getConnective().getImage());
+                str.append(" ");
+                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(exp.getChildren().get(1).getTaskID());
+                str.append(")");
+                break;
+            default:
+                str.append("DEFAULT");
+                break;
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a short string representation of the specified operator, i.e., its name and its
+     * instantiated parameters.
+     *
+     * @param operator  the operator.
+     * @param constants the table of constants.
+     * @return a string representation of the specified operator.
+     */
+    public String toShortString(final AbstractGroundOperator operator, final List<String> constants) {
+        final StringBuilder str = new StringBuilder();
+        str.append(operator.getName());
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            if (index == -1) {
+                str.append(" ?");
+            } else {
+                str.append(" ").append(constants.get(index));
+            }
         }
         return str.toString();
     }

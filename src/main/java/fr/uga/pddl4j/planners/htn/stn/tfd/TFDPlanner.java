@@ -100,7 +100,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 System.out.println("\n=> Tasks to be excuted:");
                 System.out.println(currentNode.getTasks());
                 for (int i = 0; i < currentNode.getTasks().size(); i++) {
-                    System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
+                    System.out.println(problem.toString(problem.getRelevantTasks().get(currentNode.getTasks().get(i))));
                 }
             }
             // If the task network is empty we've got a solution
@@ -125,12 +125,12 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 // Get the relevant operators, i.e., action or method that are relevant for this task.
                 final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
                 // Case of primitive task
-                if (problem.getTasks().get(task).isPrimtive()) {
+                if (problem.getRelevantTasks().get(task).isPrimtive()) {
                     for (Integer operator : relevantOperators) {
                         final Action action = problem.getActions().get(operator);
                         if (debug) {
                             System.out.println("\n======> Try to decompose primitive tasks "
-                                + problem.toString(problem.getTasks().get(task)) + " with \n\n"
+                                + problem.toString(problem.getRelevantTasks().get(task)) + " with \n\n"
                                 + problem.toString(action));
                         }
                         if (state.satisfy(action.getPrecondition())) {
@@ -144,7 +144,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                                 System.out.println("=====> Decomposition succeeded push node:");
                                 System.out.println(problem.toString(childNode.getState()));
                                 for (int t : childNode.getTasks()) {
-                                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                                    System.out.println(problem.toString(problem.getRelevantTasks().get(t)));
                                 }
                             }
                         } else {
@@ -165,7 +165,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                         final Method method = problem.getMethods().get(operator);
                         if (debug) {
                             System.out.println("\n======> Try to decompose compound tasks "
-                                + problem.toString(problem.getTasks().get(task)) + " with\n\n"
+                                + problem.toString(problem.getRelevantTasks().get(task)) + " with\n\n"
                                 + problem.toString(method));
                         }
                         if (state.satisfy(method.getPrecondition())) {
@@ -180,7 +180,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                                 System.out.println("=====>\n" + problem.toString(childNode.getState()));
                                 System.out.println("=====>\n");
                                 for (int t : childNode.getTasks()) {
-                                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                                    System.out.println(problem.toString(problem.getRelevantTasks().get(t)));
                                 }
                             }
                         } else {
@@ -285,7 +285,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             + pb.getActions().size() + " actions, "
             + pb.getMethods().size() + " methods, "
             + pb.getRelevantFluents().size() + " fluents, "
-            + pb.getTasks().size() + " tasks)\n");
+            + pb.getRelevantTasks().size() + " tasks)\n");
 
         if (!pb.isTotallyOrederd()) {
             System.out.println("Unable to solve a problem that isn't totally ordered.\n");

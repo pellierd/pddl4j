@@ -66,7 +66,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
         this.createPredicatesTables();
 
         if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-            this.expandTemporalActions(Encoder.pb.getIntActions());
+            this.expandTemporalActions(this.getIntActions());
         }
     }
 
@@ -1077,10 +1077,10 @@ public abstract class PreInstantiatedProblem extends IntProblem {
 
     private int dummyPredicateCounter = 0;
     private IntExpression createDummyPredicate() {
-        Encoder.pb.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
+        this.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
         this.dummyPredicateCounter++;
         final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
-        atom.setPredicate(Encoder.pb.getPredicateSymbols().size() - 1);
+        atom.setPredicate(this.getPredicateSymbols().size() - 1);
         return atom;
 
     }

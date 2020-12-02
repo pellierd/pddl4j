@@ -126,7 +126,7 @@ public interface Problem extends Serializable {
      *
      * @return the list of tasks of the problem.
      */
-    //List<Task> getTasks();
+    //List<Task> getRelevantTasks();
 
     /**
      * Returns the list of instantiated actions of the problem.

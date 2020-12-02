@@ -77,23 +77,6 @@ public class ADLProblem extends PostInstantiatedProblem {
         return isSovable;
     }
 
-    /**
-     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchic.
-     * A hierarchical problem is totally ordered if and only the subtasks of each method of the problem are totally
-     * ordered and the initial task network is totally ordered.
-     *
-     * @return true if the problem is totally ordered, false otherwise.
-     */
-    public final boolean isTotallyOrederd() {
-        boolean totallyOrdered = true;
-        Iterator<Method> i = this.getMethods().iterator();
-        while (i.hasNext() && totallyOrdered) {
-            Method m = i.next();
-            totallyOrdered = m.getTaskNetwork().isTotallyOrdered();
-        }
-        return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
-    }
-
     public List<Action> getActions() {
         return actions;
     }
@@ -102,11 +85,11 @@ public class ADLProblem extends PostInstantiatedProblem {
         return methods;
     }
 
-    public Map<IntExpression, Integer> getMapOfFluentIndex() {
+    protected Map<IntExpression, Integer> getMapOfFluentIndex() {
         return mapOfFluentIndex;
     }
 
-    public Map<IntExpression, Integer> getMapOfNumericFluentIndex() {
+    protected Map<IntExpression, Integer> getMapOfNumericFluentIndex() {
         return mapOfNumericFluentIndex;
     }
 
@@ -130,7 +113,7 @@ public class ADLProblem extends PostInstantiatedProblem {
         return init;
     }
 
-    public void completeInstantiation() {
+    protected void completeInstantiation() {
         // Creates the final list of actions and methods that will be used in the problem
         this.actions = new ArrayList<>(this.getIntActions().size());
         if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {

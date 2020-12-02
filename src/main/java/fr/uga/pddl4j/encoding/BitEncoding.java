@@ -65,7 +65,7 @@ final class BitEncoding implements Serializable {
      */
     private BitEncoding() {
     }
-    
+
 
     /**
      * Convert an expression in conjunctive normal form (CNF).
