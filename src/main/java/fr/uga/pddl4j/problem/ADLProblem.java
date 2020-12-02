@@ -51,6 +51,49 @@ public class ADLProblem extends PostInstantiatedProblem {
         this.completeInstantiation();
     }
 
+    /**
+     * Returns <code>true</code> if this problem is solvable. In the case of STRIPS planning, the method returns
+     * <code>false</code> if the goal is simplified to <code>false</code> during the encoding process, otherwise the
+     * method returns <code>true</code>. In the case of HTN planning, the method returns <code>false</code> if at least
+     * one of the task of the initial task network is not reachable after the encoding process, i.e., as a task is set
+     * to null in the tasks list of the initial task network, otherwise the method returns <code>true</code>.
+     * <p>
+     * Warning, it is not because the method returns <code>true</code> that the problem is solvable. It just means that
+     * the encoding process can not exclude the fact that the problem is solvable.
+     * </p>
+     *
+     * @return <code>true</code> if this problem is solvable; <code>false</code>.
+     */
+    public final boolean isSolvable() {
+        boolean isSovable = true;
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            Iterator<Integer> i = this.initialTaskNetwork.getTasks().iterator();
+            while (i.hasNext() && isSovable) {
+                isSovable = i.next() != null;
+            }
+        } else {
+            isSovable = this.goal != null;
+        }
+        return isSovable;
+    }
+
+    /**
+     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchic.
+     * A hierarchical problem is totally ordered if and only the subtasks of each method of the problem are totally
+     * ordered and the initial task network is totally ordered.
+     *
+     * @return true if the problem is totally ordered, false otherwise.
+     */
+    public final boolean isTotallyOrederd() {
+        boolean totallyOrdered = true;
+        Iterator<Method> i = this.getMethods().iterator();
+        while (i.hasNext() && totallyOrdered) {
+            Method m = i.next();
+            totallyOrdered = m.getTaskNetwork().isTotallyOrdered();
+        }
+        return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
+    }
+
     public List<Action> getActions() {
         return actions;
     }
@@ -71,7 +114,7 @@ public class ADLProblem extends PostInstantiatedProblem {
         return mapOfTasksIndex;
     }
 
-    public List<List<Integer>> getTableOfRelevantOperators() {
+    public List<List<Integer>> getRelevantOperators() {
         return tableOfRelevantOperators;
     }
 
@@ -83,7 +126,7 @@ public class ADLProblem extends PostInstantiatedProblem {
         return initialTaskNetwork;
     }
 
-    public InitialState getInit() {
+    public InitialState getInitialState() {
         return init;
     }
 
@@ -119,14 +162,15 @@ public class ADLProblem extends PostInstantiatedProblem {
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
             this.init.addNumericFluent(duration);
         }
+        this.encodeActions(this.getIntActions());
 
     }
 
     protected void initOfMapFluentIndex() {
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
-        this.mapOfFluentIndex = new LinkedHashMap<>(this.getTableOfRelevantFluents().size());
+        this.mapOfFluentIndex = new LinkedHashMap<>(this.getRelevantFluents().size());
         int index = 0;
-        for (IntExpression fluent : this.getTableOfRelevantFluents()) {
+        for (IntExpression fluent : this.getRelevantFluents()) {
             this.mapOfFluentIndex.put(fluent, index);
             index++;
         }
@@ -164,7 +208,250 @@ public class ADLProblem extends PostInstantiatedProblem {
         this.tableOfRelevantOperators.addAll(this.getRelevantMethods());
     }
 
+    /**
+     * Encode a list of specified actions into <code>BitSet</code> representation. The specified
+     * map is used to speed-up the search by mapping the an expression to this index.
+     *
+     */
+    protected void encodeActions(final List<IntAction> actions)
+        throws UnexpectedExpressionException {
 
+        final List<Action> encodedActions = new ArrayList<>(actions.size());
+        final List<Action> addedActions = new ArrayList<>();
+        int actionIndex = 0;
+        for (IntAction intAction : actions) {
+            List<IntAction> normalized = this.normalizeAction(intAction);
+            encodedActions.add(this.encodeAction(normalized.get(0)));
+            for (int i  = 1; i < normalized.size(); i++) {
+                if (this.getRelevantOperators() != null) {
+                    this.getRelevantOperators().get(actionIndex).add(actions.size() + addedActions.size());
+                }
+                addedActions.add(this.encodeAction(normalized.get(i)));
+            }
+            actionIndex++;
+        }
+        encodedActions.addAll(addedActions);
+        this.actions.addAll(encodedActions);
+    }
+
+    /**
+     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @return the expression in bit set representation.
+     */
+    private Effect encodeEffect(final IntExpression exp)
+        throws UnexpectedExpressionException {
+        final Effect effect = new Effect();
+        switch (exp.getConnective()) {
+            case ATOM:
+                Integer index = this.mapOfFluentIndex.get(exp);
+                if (index != null) {
+                    effect.getPositiveFluents().set(index);
+                }
+                break;
+            case NOT:
+                index = this.mapOfFluentIndex.get(exp.getChildren().get(0));
+                if (index != null) {
+                    effect.getNegativeFluents().set(index);
+                }
+                break;
+            case AND:
+                final List<IntExpression> children = exp.getChildren();
+                for (IntExpression ei : children) {
+                    switch (ei.getConnective()) {
+                        case ATOM:
+                            index = this.mapOfFluentIndex.get(ei);
+                            if (index != null) {
+                                effect.getPositiveFluents().set(index);
+                            }
+                            break;
+                        case NOT:
+                            index = this.mapOfFluentIndex.get(ei.getChildren().get(0));
+                            if (index != null) {
+                                effect.getNegativeFluents().set(index);
+                            }
+                            break;
+                        case TRUE:
+                            // do nothing
+                            break;
+                        case ASSIGN:
+                        case INCREASE:
+                        case DECREASE:
+                        case SCALE_UP:
+                        case SCALE_DOWN:
+                            NumericAssignment assignment = this.encodeNumericAssignment(ei);
+                            effect.addNumericAssignment(assignment);
+                            break;
+                        default:
+                            throw new UnexpectedExpressionException(ei.getConnective().toString());
+                    }
+                }
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                NumericAssignment assignment = this.encodeNumericAssignment(exp);
+                effect.addNumericAssignment(assignment);
+                break;
+            case TRUE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+        return effect;
+    }
+
+    /**
+     * Normalize an action, i.e, put in disjunctive normal form (DNF) for preconditions and put
+     * in conjunctive normal form (CNF) for effects. If an action has disjunctive preconditions, a
+     * new operator is created such all actions after normalization have only conjunctive
+     * precondition.
+     *
+     * @param action the action to normalize.
+     */
+    private List<IntAction> normalizeAction(final IntAction action) {
+        final List<IntAction> normalisedActions = new ArrayList<>();
+        this.toCNF(action.getEffects());
+        this.simplify(action.getEffects());
+        final IntExpression precond = action.getPreconditions();
+        this.toDNF(precond);
+        if (precond.getChildren().size() > 0) {
+            for (final IntExpression ei : precond.getChildren()) {
+                final String name = action.getName();
+                final int arity = action.arity();
+                final IntAction newAction = new IntAction(name, arity);
+                newAction.setCost(action.getCost());
+                for (int i = 0; i < arity; i++) {
+                    newAction.setTypeOfParameter(i, action.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < arity; i++) {
+                    newAction.setValueOfParameter(i, action.getValueOfParameter(i));
+                }
+                if (action.isDurative()) {
+                    newAction.setDuration(new IntExpression(action.getDuration()));
+                }
+                newAction.setPreconditions(ei);
+
+                newAction.setEffects(new IntExpression(action.getEffects()));
+                normalisedActions.add(newAction);
+            }
+        } else {
+            normalisedActions.add(action);
+        }
+        return normalisedActions;
+    }
+
+    /**
+     * Encodes a numeric assignment.
+     */
+    protected NumericAssignment encodeNumericAssignment(final IntExpression exp) {
+
+        final NumericVariable fluent = new NumericVariable(this.mapOfNumericFluentIndex.get(exp.getChildren().get(0)));
+        final ArithmeticExpression arithmeticExpression = this.encodeArithmeticExpression(exp.getChildren().get(1));
+        NumericAssignment assignment = null;
+        switch (exp.getConnective()) {
+            case ASSIGN:
+                assignment = new NumericAssignment(NumericAssignment.Operator.ASSIGN, fluent, arithmeticExpression);
+                break;
+            case INCREASE:
+                assignment = new NumericAssignment(NumericAssignment.Operator.INCREASE, fluent, arithmeticExpression);
+                break;
+            case DECREASE:
+                assignment = new NumericAssignment(NumericAssignment.Operator.DECREASE, fluent, arithmeticExpression);
+                break;
+            case SCALE_UP:
+                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_UP, fluent, arithmeticExpression);
+                break;
+            case SCALE_DOWN:
+                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_DOWN, fluent, arithmeticExpression);
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+        return assignment;
+    }
+
+    /**
+     * Encodes a specified action.
+     *
+     * @param action the action to be encoded. The precondition of the action must be a simple conjunction of atomic
+     *               formulas
+     * @param fluents the map that associates to a specified expression its index.
+     * @return the action encoded.
+     */
+    private Action encodeAction(final IntAction action) {
+        final int arity = action.arity();
+        final Action encoded = new Action(action.getName(), arity);
+        encoded.setCost(new NumericVariable(-1, action.getCost()));
+
+        // Initialize the parameters of the action
+        for (int i = 0; i < arity; i++) {
+            encoded.setValueOfParameter(i, action.getValueOfParameter(i));
+            encoded.setTypeOfParameter(i, action.getTypeOfParameters(i));
+        }
+
+        if (action.isDurative()) {
+            List<NumericConstraint> duration = this.encodeNumericConstraints(action.getDuration());
+            encoded.setDurationConstraints(duration);
+        }
+
+        // Initialize the preconditions of the action
+        encoded.setPrecondition(this.encodeCondition(action.getPreconditions()));
+
+        // Initialize the effects of the action
+        final List<IntExpression> effects = action.getEffects().getChildren();
+
+        final ConditionalEffect unCondEffects = new ConditionalEffect();
+        boolean hasUnConditionalEffects = false;
+        for (IntExpression ei : effects) {
+            final PDDLConnective connective = ei.getConnective();
+            final List<IntExpression> children = ei.getChildren();
+            switch (connective) {
+                case WHEN:
+                    // NumericAssignement not encoded in conditional effect.
+                    final ConditionalEffect condBitExp = new ConditionalEffect();
+                    condBitExp.setCondition(this.encodeCondition(children.get(0)));
+                    condBitExp.setEffect(this.encodeEffect(children.get(1)));
+                    encoded.getConditionalEffects().add(condBitExp);
+                    break;
+                case ATOM:
+                    Integer index = this.mapOfFluentIndex.get(ei);
+                    if (index != null) {
+                        unCondEffects.getEffect().getPositiveFluents().set(index);
+                        hasUnConditionalEffects = true;
+                    }
+                    break;
+                case NOT:
+                    index = this.mapOfFluentIndex.get(children.get(0));
+                    if (index != null) {
+                        unCondEffects.getEffect().getNegativeFluents().set(index);
+                        hasUnConditionalEffects = true;
+                    }
+                    break;
+                case TRUE:
+                    // do nothing
+                    break;
+                case ASSIGN:
+                case SCALE_DOWN:
+                case SCALE_UP:
+                case INCREASE:
+                case DECREASE:
+                    NumericAssignment assignment = this.encodeNumericAssignment(ei);
+                    unCondEffects.getEffect().addNumericAssignment(assignment);
+                    break;
+                default:
+                    throw new UnexpectedExpressionException(ei.getConnective().toString());
+            }
+        }
+        if (hasUnConditionalEffects) {
+            encoded.getConditionalEffects().add(unCondEffects);
+        }
+        return encoded;
+    }
 
     /**
      * Encode a specified goal in a disjunction of <code>BitExp</code>. The specified
@@ -197,8 +484,8 @@ public class ADLProblem extends PostInstantiatedProblem {
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
                 dummyGoal.setPredicate(dummyPredicateIndex);
                 dummyGoal.setArguments(new int[0]);
-                final int dummyGoalIndex = this.getTableOfRelevantFluents().size();
-                this.getTableOfRelevantFluents().add(dummyGoal);
+                final int dummyGoalIndex = this.getRelevantFluents().size();
+                this.getRelevantFluents().add(dummyGoal);
                 this.mapOfNumericFluentIndex.put(dummyGoal, dummyGoalIndex);
                 Effect effect = new Effect();
                 effect.getPositiveFluents().set(dummyGoalIndex);
@@ -578,8 +865,8 @@ public class ADLProblem extends PostInstantiatedProblem {
             List<IntMethod> normalized = this.normalizeMethod(intMethod);
             this.methods.add(this.encodeMethod(normalized.get(0), this.mapOfFluentIndex, this.mapOfTasksIndex));
             for (int i  = 1; i < normalized.size(); i++) {
-                if (this.getTableOfRelevantOperators() != null) {
-                    this.getTableOfRelevantOperators().get(methodIndex).add(methods.size() + addedMethods.size());
+                if (this.getRelevantOperators() != null) {
+                    this.getRelevantOperators().get(methodIndex).add(methods.size() + addedMethods.size());
                 }
                 this.methods.add(this.encodeMethod(normalized.get(i), this.mapOfFluentIndex, this.mapOfTasksIndex));
             }

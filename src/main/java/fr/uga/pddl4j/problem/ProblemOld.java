@@ -465,7 +465,7 @@ public class ProblemOld implements Serializable {
      *
      * @param operators the list of operators for the relevant tasks of the problem.
      */
-    public final void setTaskResolvers(final List<List<Integer>> operators) {
+    public final void setRelevantOperators(final List<List<Integer>> operators) {
         this.relevantOperators = operators;
     }
 
@@ -483,7 +483,7 @@ public class ProblemOld implements Serializable {
      *
      * @param tasks the list of tasks to set.
      */
-    public final void setTasks(final List<Task> tasks) {
+    public final void setRelevantTasks(final List<Task> tasks) {
         this.tasks = tasks;
     }
 

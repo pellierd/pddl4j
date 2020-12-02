@@ -32,7 +32,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
         super(domain, problem);
     }
 
-    public List<Inertia> getTableOfInertia() {
+    public List<Inertia> getInertia() {
         return tableOfInertia;
     }
 
@@ -259,7 +259,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
         this.tableOfInferredDomains = new ArrayList<>(this.getPredicateSymbols().size());
         for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
             if (this.getPredicateSignatures().get(i).size() == 1
-                && this.getTableOfInertia().get(i).equals(Inertia.INERTIA)) {
+                && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
                 for (IntExpression fact : this.getIntInitPredicates()) {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {

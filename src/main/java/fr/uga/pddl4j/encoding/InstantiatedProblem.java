@@ -749,7 +749,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         // CASE 1: If the expression is a positive inertia and the number of unifying ground
         // instances of the specified expression that are contained in the initial state is equal to
         // 0 then the expression is simplified to FALSE.
-        final Inertia inertia = this.getTableOfInertia().get(predicate);
+        final Inertia inertia = this.getInertia().get(predicate);
         if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
             exp.setConnective(PDDLConnective.FALSE);
         } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {

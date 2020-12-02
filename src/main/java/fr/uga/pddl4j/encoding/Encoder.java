@@ -27,10 +27,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -265,31 +261,10 @@ public final class Encoder implements Serializable {
         Encoder.pb.instantiate(1000);
 
 
-        final StringBuilder str = new StringBuilder();
-
-        // *****************************************************************************************
-        // Step 7: Bit set encoding of the problem
-        // *****************************************************************************************
-
-
-        // Encode the initial state in bit set representation
-        //Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
-        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            BitEncoding.encodeInitNumericFluent(Encoder.pb.getInit(), Encoder.pb.getMapOfNumericFluentIndex(), Encoder.pb.getIntInitFunctionCost());
-        }*/
-        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-            NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
-            pb.getInit().addNumericFluent(duration);
-        }*/
-
-        // Encode the actions in bit set representation
-        Encoder.pb.getActions().addAll(0, BitEncoding.encodeActions(Encoder.pb.getIntActions(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfNumericFluentIndex()));
-
-
         final ProblemOld codedProblem = new ProblemOld();
         codedProblem.setRequirements(Encoder.pb.getRequirements());
         codedProblem.setGoal(Encoder.pb.getGoal());
-        codedProblem.setInitialState(Encoder.pb.getInit());
+        codedProblem.setInitialState(Encoder.pb.getInitialState());
         codedProblem.setInitialTaskNetwork(Encoder.pb.getInitialTaskNetwork());
         codedProblem.setActions(Encoder.pb.getActions());
         codedProblem.setMethods(Encoder.pb.getMethods());
@@ -297,17 +272,17 @@ public final class Encoder implements Serializable {
         codedProblem.setDomains(Encoder.pb.getDomains());
         codedProblem.setFunctionSymbols(Encoder.pb.getFunctionSymbols());
         codedProblem.setTaskSymbols(Encoder.pb.getTaskSymbols());
-        codedProblem.setInertia(Encoder.pb.getTableOfInertia());
+        codedProblem.setInertia(Encoder.pb.getInertia());
         codedProblem.setInferredDomains(Encoder.pb.getTableOfInferredDomains());
         codedProblem.setPredicateSymbols(Encoder.pb.getPredicateSymbols());
-        codedProblem.setRelevantFluents(Encoder.pb.getTableOfRelevantFluents().stream().map(
+        codedProblem.setRelevantFluents(Encoder.pb.getRelevantFluents().stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            codedProblem.setTasks(Encoder.pb.getRelevantTasks().stream().map(
+            codedProblem.setRelevantTasks(Encoder.pb.getRelevantTasks().stream().map(
                 task -> new Task(task.getPredicate(), task.getArguments(),
                     task.isPrimtive())).collect(Collectors.toList()));
         }
-        codedProblem.setTaskResolvers(Encoder.pb.getTableOfRelevantOperators());
+        codedProblem.setRelevantOperators(Encoder.pb.getRelevantOperators());
         codedProblem.setFunctionSignatures(Encoder.pb.getFunctionSignatures());
         codedProblem.setPredicateSignatures(Encoder.pb.getPredicateSignatures());
         codedProblem.setTypeSymbols(Encoder.pb.getTypeSymbols());
@@ -410,7 +385,7 @@ public final class Encoder implements Serializable {
         str.append("Inertias table:\n");
         for (int i = 0; i < Encoder.pb.getPredicateSymbols().size(); i++) {
             String predicate = Encoder.pb.getPredicateSymbols().get(i);
-            str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.pb.getTableOfInertia().get(i));
+            str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.pb.getInertia().get(i));
             str.append("\n");
         }
     }
@@ -422,8 +397,8 @@ public final class Encoder implements Serializable {
      */
     static void printRelevantFactsTable(StringBuilder str) {
         str.append("Relevant fluents:\n");
-        for (int i = 0; i < Encoder.pb.getTableOfRelevantFluents().size(); i++) {
-            str.append(i).append(": ").append(Encoder.toString(Encoder.pb.getTableOfRelevantFluents().get(i)));
+        for (int i = 0; i < Encoder.pb.getRelevantFluents().size(); i++) {
+            str.append(i).append(": ").append(Encoder.toString(Encoder.pb.getRelevantFluents().get(i)));
             str.append("\n");
         }
     }
@@ -504,7 +479,7 @@ public final class Encoder implements Serializable {
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
     }
 
     /**
@@ -517,7 +492,7 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(m, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
-            Encoder.pb.getTableOfRelevantFluents(), Encoder.pb.getRelevantTasks());
+            Encoder.pb.getRelevantFluents(), Encoder.pb.getRelevantTasks());
     }
 
     /**
@@ -554,7 +529,7 @@ public final class Encoder implements Serializable {
     static String toString(Condition exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
     }
 
     /**
@@ -566,7 +541,7 @@ public final class Encoder implements Serializable {
     static String toString(Goal exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
     }
 
     /**
@@ -581,7 +556,7 @@ public final class Encoder implements Serializable {
             Encoder.pb.getTypeSymbols(),
             Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(),
-            Encoder.pb.getTableOfRelevantFluents(),
+            Encoder.pb.getRelevantFluents(),
             Encoder.pb.getTableOfRelevantNumericFluents(),
             Encoder.pb.getTaskSymbols());
     }
@@ -599,7 +574,7 @@ public final class Encoder implements Serializable {
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTableOfRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
     }
 
     /**

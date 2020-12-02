@@ -96,7 +96,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         return relevantMethods;
     }
 
-    public List<IntExpression> getTableOfRelevantFluents() {
+    public List<IntExpression> getRelevantFluents() {
         return tableOfRelevantFluents;
     }
 
