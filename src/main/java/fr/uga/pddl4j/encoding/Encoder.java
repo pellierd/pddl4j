@@ -272,14 +272,6 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
 
-
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            // Encode the initial task network
-            //Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getMapOfTasksIndex());
-            // Encode the methods in bit set representation
-            Encoder.pb.getMethods().addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfTasksIndex()));
-        }
-
         // Encode the initial state in bit set representation
         Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {

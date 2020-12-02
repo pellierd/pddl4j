@@ -3,10 +3,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.encoding.*;
 import fr.uga.pddl4j.parser.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by pellier on 01/12/2020.
@@ -104,6 +101,7 @@ public class ADLProblem extends PostInstantiatedProblem {
 
         if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             this.encodeInitialTaskNetwork();
+            this.encodeMethods();
         }
 
     }
@@ -550,4 +548,88 @@ public class ADLProblem extends PostInstantiatedProblem {
         }
     }
 
+    /**
+     * Encode a list of specified methods into the final compact representation. The specified
+     * maps are used to speed-up the search by mapping the an expression to this index.
+     *
+     * @return the list of methods encoded into final compact representation.
+     */
+    protected void encodeMethods() throws UnexpectedExpressionException {
+        this.methods = new ArrayList<>(methods.size());
+        final List<Method> addedMethods = new ArrayList<>();
+        int methodIndex = this.getRelevantActions().size();
+        for (IntMethod intMethod : this.getIntMethods()) {
+            List<IntMethod> normalized = this.normalizeMethod(intMethod);
+            this.methods.add(this.encodeMethod(normalized.get(0), this.mapOfFluentIndex, this.mapOfTasksIndex));
+            for (int i  = 1; i < normalized.size(); i++) {
+                if (this.getTableOfRelevantOperators() != null) {
+                    this.getTableOfRelevantOperators().get(methodIndex).add(methods.size() + addedMethods.size());
+                }
+                this.methods.add(this.encodeMethod(normalized.get(i), this.mapOfFluentIndex, this.mapOfTasksIndex));
+            }
+            methodIndex++;
+        }
+        this.methods.addAll(addedMethods);
+    }
+
+    /**
+     * Encode a list of specified methods into the final compact representation. The specified
+     * maps are used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param method the list of methods to encode.
+     * @param factMap the map that associates at a specified fact its index in the table of relevant fluents.
+     * @param taskMap the map that associates at a specified task its index in the table of relevant tasks.
+     * @return the list of methods encoded into final compact representation.
+     */
+    protected Method encodeMethod(final IntMethod method, final Map<IntExpression, Integer> factMap,
+                               final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
+
+        final int arity = method.arity();
+        final Method encoded = new Method(method.getName(), arity);
+        // Initialize the parameters of the method
+        for (int i = 0; i < arity; i++) {
+            encoded.setValueOfParameter(i, method.getValueOfParameter(i));
+            encoded.setTypeOfParameter(i, method.getTypeOfParameters(i));
+        }
+        // Encode the task carried out by the method
+        encoded.setTask(taskMap.get(method.getTask()));
+        // Encode the preconditions of the method
+        encoded.setPrecondition(this.encodeCondition(method.getPreconditions()));
+        // Encode the task network of the method
+        encoded.setTaskNetwork(this.encodeTaskNetwork(method.getTaskNetwork()));
+        return encoded;
+    }
+
+    /**
+     * Normalize the methods, i.e, put in disjunctive normal form (DNF) the preconditions. If a method has
+     * disjunctive preconditions, a new method is created such all methods after normalization have only conjunctive
+     * precondition.
+     *
+     * @param method the list of methods to normalizeActions.
+     */
+    private List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
+        final List<IntMethod> normalisedMethods = new ArrayList<>();
+        final IntExpression precond = method.getPreconditions();
+        this.toDNF(precond);
+        if (precond.getChildren().size() > 0) {
+            for (final IntExpression ei : precond.getChildren()) {
+                final String name = method.getName();
+                final int arity = method.arity();
+                final IntMethod newMethod = new IntMethod(name, arity);
+                for (int i = 0; i < arity; i++) {
+                    newMethod.setTypeOfParameter(i, method.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < arity; i++) {
+                    newMethod.setValueOfParameter(i, method.getValueOfParameter(i));
+                }
+                newMethod.setPreconditions(ei);
+                newMethod.setTask(new IntExpression(method.getTask()));
+                newMethod.setTaskNetwork(new IntTaskNetwork(method.getTaskNetwork()));
+                normalisedMethods.add(newMethod);
+            }
+        } else {
+            normalisedMethods.add(method);
+        }
+        return normalisedMethods;
+    }
 }
