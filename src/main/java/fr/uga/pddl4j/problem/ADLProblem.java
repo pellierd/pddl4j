@@ -37,6 +37,9 @@ public class ADLProblem extends PostInstantiatedProblem {
      */
     private List<List<Integer>> tableOfRelevantOperators;
 
+
+    private InitialState init;
+
     public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
@@ -80,6 +83,10 @@ public class ADLProblem extends PostInstantiatedProblem {
         return initialTaskNetwork;
     }
 
+    public InitialState getInit() {
+        return init;
+    }
+
     public void completeInstantiation() {
         // Creates the final list of actions and methods that will be used in the problem
         this.actions = new ArrayList<>(this.getIntActions().size());
@@ -103,6 +110,8 @@ public class ADLProblem extends PostInstantiatedProblem {
             this.encodeInitialTaskNetwork();
             this.encodeMethods();
         }
+
+        this.encodeInit();
 
     }
 
@@ -631,5 +640,31 @@ public class ADLProblem extends PostInstantiatedProblem {
             normalisedMethods.add(method);
         }
         return normalisedMethods;
+    }
+
+    /**
+     * Encode a specified initial state in it <code>BitExp</code> representation. The specified
+     * map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @return the <code>BitExp</code> that represents the initial encoded.
+     */
+    private void encodeInit() {
+        this.init = new InitialState();
+        for (final IntExpression fact : this.getIntInitPredicates()) {
+            switch (fact.getConnective()) {
+                case ATOM:
+                    Integer i = this.mapOfFluentIndex.get(fact);
+                    if (i != null) {
+                        this.init.getPositiveFluents().set(i);
+                    }
+                    break;
+                case NOT:
+                    i = this.mapOfFluentIndex.get(fact.getChildren().get(0));
+                    if (i != null) {
+                        this.init.getNegativeFluents().set(i);
+                    }
+                    break;
+            }
+        }
     }
 }

@@ -185,7 +185,7 @@ public final class Encoder implements Serializable {
     /**
      * The initial state.
      */
-    static InitialState init;
+    //static InitialState init;
 
 
     /**
@@ -273,13 +273,13 @@ public final class Encoder implements Serializable {
 
 
         // Encode the initial state in bit set representation
-        Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
+        //Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            BitEncoding.encodeInitNumericFluent(Encoder.init, Encoder.pb.getMapOfNumericFluentIndex(), Encoder.pb.getIntInitFunctionCost());
+            BitEncoding.encodeInitNumericFluent(Encoder.pb.getInit(), Encoder.pb.getMapOfNumericFluentIndex(), Encoder.pb.getIntInitFunctionCost());
         }
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
-            Encoder.init.addNumericFluent(duration);
+            pb.getInit().addNumericFluent(duration);
         }
 
         // Encode the actions in bit set representation
@@ -289,7 +289,7 @@ public final class Encoder implements Serializable {
         final ProblemOld codedProblem = new ProblemOld();
         codedProblem.setRequirements(Encoder.pb.getRequirements());
         codedProblem.setGoal(Encoder.pb.getGoal());
-        codedProblem.setInitialState(Encoder.init);
+        codedProblem.setInitialState(Encoder.pb.getInit());
         codedProblem.setInitialTaskNetwork(Encoder.pb.getInitialTaskNetwork());
         codedProblem.setActions(Encoder.pb.getActions());
         codedProblem.setMethods(Encoder.pb.getMethods());
