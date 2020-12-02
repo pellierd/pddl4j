@@ -380,7 +380,7 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Instantiate the actions
-        Instantiation.instantiateActions(Encoder.pb.getIntActions());
+        //Instantiation.instantiateActions(Encoder.pb.getIntActions());
         // Extract the ground inertia from the set of instantiated actions
         PostInstantiation.extractGroundInertia(Encoder.pb.getIntActions());
         // Extract the ground numetic inertia from the set of instantiated actions

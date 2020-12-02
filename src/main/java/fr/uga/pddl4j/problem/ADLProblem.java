@@ -1,5 +1,6 @@
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.encoding.InstantiatedProblem;
 import fr.uga.pddl4j.encoding.IntProblem;
 import fr.uga.pddl4j.encoding.PreInstantiatedProblem;
 import fr.uga.pddl4j.parser.*;
@@ -7,7 +8,7 @@ import fr.uga.pddl4j.parser.*;
 /**
  * Created by pellier on 01/12/2020.
  */
-public class ADLProblem extends PreInstantiatedProblem {
+public class ADLProblem extends InstantiatedProblem {
 
 
     public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {

@@ -70,11 +70,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
         }
     }
 
-    public void instantiate() {
-        this.preInstantiate();
-    }
 
-    protected abstract void postInstantiate();
 
     /*
      * This method proceeds over the actions of the domain and checks for all atom which kind of
