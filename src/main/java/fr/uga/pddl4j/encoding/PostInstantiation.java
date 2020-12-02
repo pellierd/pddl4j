@@ -93,7 +93,7 @@ final class PostInstantiation implements Serializable {
             }
         }
         for (IntExpression p : init) {
-            Inertia inertia = Encoder.tableOfGroundInertia.get(p);
+            Inertia inertia = Encoder.pb.getTableOfGroundInertia().get(p);
             if (inertia == null) {
                 inertia = Inertia.INERTIA;
             }
@@ -124,7 +124,7 @@ final class PostInstantiation implements Serializable {
                                              final Set<IntExpression> init) {
         switch (exp.getConnective()) {
             case ATOM:
-                Inertia inertia = Encoder.tableOfGroundInertia.get(exp);
+                Inertia inertia = Encoder.pb.getTableOfGroundInertia().get(exp);
                 if (inertia == null) {
                     inertia = Inertia.INERTIA;
                 }
@@ -829,7 +829,7 @@ final class PostInstantiation implements Serializable {
                                                   final Set<IntExpression> init) {
         switch (exp.getConnective()) {
             case ATOM:
-                Inertia inertia = Encoder.tableOfGroundInertia.get(exp);
+                Inertia inertia = Encoder.pb.getTableOfGroundInertia().get(exp);
                 if (inertia == null) {
                     inertia = Inertia.INERTIA;
                 }
@@ -956,115 +956,6 @@ final class PostInstantiation implements Serializable {
         }
     }
 
-    /**
-     * Do a pass over the effects of a specified list of instantiated actions and update the ground
-     * inertia table.
-     *
-     * @param actions the list of instantiated actions.
-     */
-    static void extractGroundInertia(final List<IntAction> actions) {
-        Encoder.tableOfGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
-        for (IntAction a : actions) {
-            extractGroundInertia(a.getEffects());
-        }
-    }
-
-    /**
-     * Do a pass over the effects of an instantiated action and update the ground inertia table.
-     *
-     * @param exp the effect.
-     */
-    private static void extractGroundInertia(final IntExpression exp) {
-        switch (exp.getConnective()) {
-            case ATOM:
-                Inertia inertia = Encoder.tableOfGroundInertia.get(exp);
-                if (inertia == null) {
-                    inertia = Inertia.INERTIA;
-                }
-                switch (inertia) {
-                    case INERTIA:
-                        Encoder.tableOfGroundInertia.put(exp, Inertia.NEGATIVE);
-                        break;
-                    case POSITIVE:
-                        Encoder.tableOfGroundInertia.put(exp, Inertia.FLUENT);
-                        break;
-                    default:
-                        // do nothing
-                }
-                break;
-            case AND:
-            case OR:
-                exp.getChildren().forEach(PostInstantiation::extractGroundInertia);
-                break;
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-                extractGroundInertia(exp.getChildren().get(0));
-                break;
-            case WHEN:
-                extractGroundInertia(exp.getChildren().get(1));
-                break;
-            case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
-                    inertia = Encoder.tableOfGroundInertia.get(neg);
-                    if (inertia == null) {
-                        inertia = Inertia.INERTIA;
-                    }
-                    switch (inertia) {
-                        case INERTIA:
-                            Encoder.tableOfGroundInertia.put(neg, Inertia.POSITIVE);
-                            break;
-                        case NEGATIVE:
-                            Encoder.tableOfGroundInertia.put(neg, Inertia.FLUENT);
-                            break;
-                        default:
-                            // do nothing
-                    }
-                }
-                break;
-            case F_EXP_T:
-            case EQUAL_ATOM:
-            case FN_HEAD:
-            case FN_ATOM:
-            case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case MUL:
-            case DIV:
-            case MINUS:
-            case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
-            case TIME_VAR:
-            case IS_VIOLATED:
-            case NUMBER:
-            case MINIMIZE:
-            case MAXIMIZE:
-            case UMINUS:
-            case ALWAYS:
-            case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case F_EXP:
-                break;
-            default:
-                // do nothing
-        }
-    }
 
     /**
      * Do a pass over the effects of a specified list of instantiated actions and update the ground

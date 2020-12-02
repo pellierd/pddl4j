@@ -139,7 +139,7 @@ public final class Encoder implements Serializable {
     /**
      * The table that contains the ground inertia.
      */
-    static Map<IntExpression, Inertia> tableOfGroundInertia;
+    //static Map<IntExpression, Inertia> tableOfGroundInertia;
     /**
      * The table that contains the ground inertia.
      */
@@ -282,7 +282,7 @@ public final class Encoder implements Serializable {
     public static ProblemOld encode(final PDDLDomain domain, final PDDLProblem problem) {
 
         Encoder.pb = new ADLProblem(domain, problem);
-        Encoder.pb.instantiate();
+        Encoder.pb.instantiate(1000);
 
 
         final StringBuilder str = new StringBuilder();
@@ -382,7 +382,7 @@ public final class Encoder implements Serializable {
         // Instantiate the actions
         //Instantiation.instantiateActions(Encoder.pb.getIntActions());
         // Extract the ground inertia from the set of instantiated actions
-        PostInstantiation.extractGroundInertia(Encoder.pb.getIntActions());
+        //PostInstantiation.extractGroundInertia(Encoder.pb.getIntActions());
         // Extract the ground numetic inertia from the set of instantiated actions
         PostInstantiation.extractGroundNumericInertia(Encoder.pb.getIntActions());
         // Simplify the actions based in the ground inertia
@@ -503,7 +503,7 @@ public final class Encoder implements Serializable {
         }
 
         // The table of ground inertia are no more needed
-        Encoder.tableOfGroundInertia = null;
+        //Encoder.tableOfGroundInertia = null;
 
         // Just for logging
         if (Encoder.logLevel == 6) {
@@ -974,7 +974,7 @@ public final class Encoder implements Serializable {
      */
     static void printTableOfGroundInertia(StringBuilder stringBuilder) {
         stringBuilder.append("Ground inertia table:");
-        for (Entry<IntExpression, Inertia> e : Encoder.tableOfGroundInertia.entrySet()) {
+        for (Entry<IntExpression, Inertia> e : Encoder.pb.getTableOfGroundInertia().entrySet()) {
             stringBuilder.append(Encoder.toString(e.getKey())).append(": ").append(e.getValue());
         }
     }

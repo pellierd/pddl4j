@@ -19,12 +19,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
     public void instantiate() {
-        this.preInstantiate();
         this.instantiateActions();
     }
-
-    protected abstract void postInstantiate();
-
 
     /**
      * Instantiates a specified list of actions.

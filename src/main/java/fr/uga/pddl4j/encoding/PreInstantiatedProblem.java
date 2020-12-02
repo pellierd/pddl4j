@@ -71,7 +71,6 @@ public abstract class PreInstantiatedProblem extends IntProblem {
     }
 
 
-
     /*
      * This method proceeds over the actions of the domain and checks for all atom which kind of
      * inertia it is. For each atom it checks if it satisfies one of the following definitions:
