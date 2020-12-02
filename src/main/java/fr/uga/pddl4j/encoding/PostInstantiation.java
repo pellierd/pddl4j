@@ -657,7 +657,7 @@ final class PostInstantiation implements Serializable {
 
 
         // Simplification for HTN
-        if (Encoder.relevantActions != null) {
+        /*if (Encoder.relevantActions != null) {
             final Set<IntExpression> primitiveTasksNoMoreReachable = new HashSet<IntExpression>();
             // Update the relevant actions for the tasks
             for (int i = 0; i < Encoder.relevantActions.size(); i++) {
@@ -669,7 +669,7 @@ final class PostInstantiation implements Serializable {
                     Encoder.relevantActions.set(i, i);
                 }
             }
-        }
+        }*/
 
         actions.clear();
         actions.addAll(toAdd);

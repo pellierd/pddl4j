@@ -279,7 +279,7 @@ public final class Encoder implements Serializable {
         // Extract the ground numetic inertia from the set of instantiated actions
         //PostInstantiation.extractGroundNumericInertia(Encoder.pb.getIntActions());
         // Simplify the actions based in the ground inertia
-        PostInstantiation.simplyActionsWithGroundInertia(Encoder.pb.getIntActions(), Encoder.pb.getIntInitPredicates());
+        //PostInstantiation.simplyActionsWithGroundInertia(Encoder.pb.getIntActions(), Encoder.pb.getIntInitPredicates());
 
         if (Encoder.pb.getIntGoal() != null) {
             // Expand the quantified expression in the goal
