@@ -104,6 +104,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         return tableOfRelevantNumericFluents;
     }
 
+    public List<IntExpression> getRelevantTasks() {
+        List<IntExpression> tasks = new ArrayList<>(this.tableOfRelevantPrimitiveTasks.size()
+            + this.tableOfRelevantCompundTasks.size());
+        tasks.addAll(this.tableOfRelevantPrimitiveTasks);
+        tasks.addAll(this.tableOfRelevantCompundTasks);
+        return tasks;
+    }
     /**
      * Do a pass over the effects of a specified list of instantiated actions and update the ground
      * inertia table.
@@ -1379,5 +1386,4 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
         }
     }
-
 }

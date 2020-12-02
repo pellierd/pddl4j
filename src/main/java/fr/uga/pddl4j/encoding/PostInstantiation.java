@@ -69,55 +69,7 @@ final class PostInstantiation implements Serializable {
     }
 
 
-    /**
-     * Extracts the relevant tasks from the instantiated methods. A ground tasks is relevant if and
-     * only if it occurs as a task or a subtask of a instantiated method.
-     *
-     * @param methods the list of instantiated methods
-     */
-    static void extractRelevantTasks(List<IntMethod> methods) {
-        final Set<IntExpression> tasks = new LinkedHashSet<>(1000);
-        for (IntMethod m : methods) {
-            tasks.add(m.getTask());
-            PostInstantiation.extractRelevantTasks(m.getSubTasks(), tasks);
-        }
-        Encoder.tableOfRelevantTasks = new ArrayList<>(tasks.size());
-        int primitive = 0;
-        int compound = 0;
-        for (IntExpression task : tasks) {
-            final IntExpression copy = new IntExpression(task);
-            copy.setTaskID(IntExpression.DEFAULT_TASK_ID);
-            Encoder.tableOfRelevantTasks.add(copy);
-            if (copy.isPrimtive()) {
-                primitive++;
-            } else {
-                compound++;
-            }
-        }
-    }
 
-    /**
-     * Extracts the tasks from a specified expression. A ground task is relevant if and
-     * only if it occurs as a subtask of a instantiated method.
-     *
-     * @param exp   the expression.
-     * @param tasks the set of relevant tasks.
-     */
-    private static void extractRelevantTasks(final IntExpression exp, final Set<IntExpression> tasks) {
-        switch (exp.getConnective()) {
-            case TASK:
-                tasks.add(exp);
-                break;
-            case AND:
-            case OR:
-                for (IntExpression e : exp.getChildren()) {
-                    PostInstantiation.extractRelevantTasks(e, tasks);
-                }
-                break;
-            default:
-                // do nothing
-        }
-    }
 
     /**
      * This method simplify a specified expression.

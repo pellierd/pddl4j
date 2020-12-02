@@ -150,7 +150,7 @@ public final class Encoder implements Serializable {
     /**
      * The table of the relevant task.
      */
-    static List<IntExpression> tableOfRelevantTasks;
+    //static List<IntExpression> tableOfRelevantTasks;
 
     /**
      * The table containing for each relevant task its set of resolvers, i.e., action or methods
@@ -279,7 +279,7 @@ public final class Encoder implements Serializable {
         }*/
 
         // Create the list of relevant tasks
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantTasks = new ArrayList<>();
             Encoder.tableOfRelevantTasks.addAll(pb.getTableOfRelevantPrimitiveTasks());
             Encoder.tableOfRelevantTasks.addAll(pb.getTableOfRelevantCompundTasks());
@@ -291,13 +291,13 @@ public final class Encoder implements Serializable {
         // Just for logging
         if (Encoder.logLevel == 6) {
             Encoder.printRelevantFactsTable(str);
-            if (!Encoder.tableOfRelevantTasks.isEmpty()) {
+            if (!Encoder.pb.getRelevantTasks().isEmpty()) {
                 str.append("\n");
                 Encoder.printRelevantTasksTable(str);
             }
             LOGGER.trace(str);
             str.setLength(0);
-        }
+        }*/
 
         // *****************************************************************************************
         // Step 7: Bit set encoding of the problem
@@ -346,9 +346,9 @@ public final class Encoder implements Serializable {
         }
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
-            final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.tableOfRelevantTasks.size());
+            final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.pb.getRelevantTasks().size());
             index = 0;
-            for (IntExpression task : Encoder.tableOfRelevantTasks) {
+            for (IntExpression task : Encoder.pb.getRelevantTasks()) {
                 taskIndexMap.put(task, index);
                 index++;
 
@@ -409,7 +409,7 @@ public final class Encoder implements Serializable {
                 str.append("\nTable of task resolvers:\n");
                 for (int ti = 0; ti < Encoder.tableOfRelevantOperators.size(); ti++) {
                     str.append(ti).append(": ");
-                    str.append(Encoder.toString(Encoder.tableOfRelevantTasks.get(ti)));
+                    str.append(Encoder.toString(Encoder.pb.getRelevantTasks().get(ti)));
                     str.append(":");
                     List<Integer> resolvers = Encoder.tableOfRelevantOperators.get(ti);
                     for (int ri = 0; ri < resolvers.size(); ri++) {
@@ -441,7 +441,7 @@ public final class Encoder implements Serializable {
         codedProblem.setRelevantFluents(Encoder.pb.getTableOfRelevantFluents().stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            codedProblem.setTasks(Encoder.tableOfRelevantTasks.stream().map(
+            codedProblem.setTasks(Encoder.pb.getRelevantTasks().stream().map(
                 task -> new Task(task.getPredicate(), task.getArguments(),
                     task.isPrimtive())).collect(Collectors.toList()));
         }
@@ -573,8 +573,8 @@ public final class Encoder implements Serializable {
      */
     static void printRelevantTasksTable(StringBuilder str) {
         str.append("Relevant tasks:\n");
-        for (int i = 0; i < Encoder.tableOfRelevantTasks.size(); i++) {
-            IntExpression task = Encoder.tableOfRelevantTasks.get(i);
+        for (int i = 0; i < Encoder.pb.getRelevantTasks().size(); i++) {
+            IntExpression task = Encoder.pb.getRelevantTasks().get(i);
             str.append(i).append(": ").append(Encoder.toString(task));
             if (task.isPrimtive()) {
                 str.append(" - PRIMITIVE");
@@ -667,7 +667,7 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(m, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
-            Encoder.pb.getTableOfRelevantFluents(), Encoder.tableOfRelevantTasks);
+            Encoder.pb.getTableOfRelevantFluents(), Encoder.pb.getRelevantTasks());
     }
 
     /**
@@ -680,7 +680,7 @@ public final class Encoder implements Serializable {
         return StringDecoder.toString(taskNetwork, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
-            Encoder.tableOfRelevantTasks);
+            Encoder.pb.getRelevantTasks());
     }
 
     /**
