@@ -959,9 +959,9 @@ final class Instantiation implements Serializable {
                         updated = true;
                     }
                 }
-                if (updated) {
-                    Instantiation.simplyFunction(exp);
-                }
+                //if (updated) {
+                //    Instantiation.simplyFunction(exp);
+                //}
                 break;
             case EQUAL_ATOM:
                 args = exp.getArguments();
@@ -1115,7 +1115,7 @@ final class Instantiation implements Serializable {
         }
         // Get the number of unifying ground instances of the specified expression that are
         // contained in the initial state.
-        final int n = Encoder.predicatesTables.get(predicate).get(PreInstantiation.toInt(mask)).get(index);
+        final int n = Encoder.pb.getPredicatesTables().get(predicate).get(Encoder.pb.toInt(mask)).get(index);
         // CASE 1: If the expression is a positive inertia and the number of unifying ground
         // instances of the specified expression that are contained in the initial state is equal to
         // 0 then the expression is simplified to FALSE.
@@ -1143,7 +1143,7 @@ final class Instantiation implements Serializable {
      *
      * @param exp the atomic expression to simplify.
      */
-    private static void simplyFunction(final IntExpression exp) {
+    /*private static void simplyFunction(final IntExpression exp) {
         final int predicate = exp.getPredicate();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
@@ -1185,7 +1185,7 @@ final class Instantiation implements Serializable {
             // type-consistent ground instances of the specified expression then the expression is
             // simplified to TRUE.
             exp.setConnective(PDDLConnective.TRUE);
-        }*/
-    }
+        }
+    }*/
 
 }

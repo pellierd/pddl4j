@@ -123,7 +123,7 @@ public final class Encoder implements Serializable {
     /**
      * The table of inferred domains based on unary inertia encoding.
      */
-    static List<Set<Integer>> tableOfInferredDomains;
+    //static List<Set<Integer>> tableOfInferredDomains;
 
     /**
      * The table that defines for each predicates its type of inertia.
@@ -149,7 +149,7 @@ public final class Encoder implements Serializable {
      * The list of predicates tables used to count the occurrence of a specified predicate in the
      * initial state.
      */
-    static List<List<IntMatrix>> predicatesTables;
+    //static List<List<IntMatrix>> predicatesTables;
 
     /**
      * The list of predicates tables used to count the occurrence of a specified predicate in the
@@ -305,25 +305,26 @@ public final class Encoder implements Serializable {
 
 
         // Infer the type from the unary inertia
-        PreInstantiation.inferTypesFromInertia(Encoder.pb.getIntInitPredicates());
-        if (!Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+        //PreInstantiation.inferTypesFromInertia(Encoder.pb.getIntInitPredicates());
+        //if (!Encoder.pb.getRequirements().contains(PDDLRequireKey.TYPING)
+        //    && !Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             // Simply the encoded action with the inferred types.
-            PreInstantiation.simplifyActionsWithInferredTypes(Encoder.pb.getIntActions());
+            //PreInstantiation.simplifyActionsWithInferredTypes(Encoder.pb.getIntActions());
             // Simply the encoded methods with the inferred types
             // Does not work with methods
             // intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
-        }
+        //PreInstantiation.simplifyActionsWithInferredTypes(Encoder.pb.getIntActions());}
 
         // Create the predicates tables used to count the occurrences of the predicates in the
         // initial state
-        PreInstantiation.createPredicatesTables(Encoder.pb.getIntInitPredicates());
+        //PreInstantiation.createPredicatesTables(Encoder.pb.getIntInitPredicates());
 
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            PreInstantiation.createFunctionsTables(intInitFunctionCost.keySet());
-        }
+        //if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        //    PreInstantiation.createFunctionsTables(intInitFunctionCost.keySet());
+        //}
 
         // HACK for durative action very inefficient
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
             PreInstantiation.expandTemporalActions(Encoder.pb.getIntActions());
         }
 
@@ -372,7 +373,7 @@ public final class Encoder implements Serializable {
             }
             LOGGER.trace(str);
             str.setLength(0);
-        }
+        }*/
 
         // *****************************************************************************************
         // Step 4: Actions instantiation
@@ -652,7 +653,7 @@ public final class Encoder implements Serializable {
         codedProblem.setFunctionSymbols(Encoder.pb.getFunctionSymbols());
         codedProblem.setTaskSymbols(Encoder.pb.getTaskSymbols());
         codedProblem.setInertia(Encoder.pb.getTableOfInertia());
-        codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
+        codedProblem.setInferredDomains(Encoder.pb.getTableOfInferredDomains());
         codedProblem.setPredicateSymbols(Encoder.pb.getPredicateSymbols());
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
             fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
