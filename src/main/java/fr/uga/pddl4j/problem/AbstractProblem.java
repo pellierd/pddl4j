@@ -1,9 +1,6 @@
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.encoding.IntAction;
-import fr.uga.pddl4j.encoding.IntExpression;
-import fr.uga.pddl4j.encoding.IntMethod;
-import fr.uga.pddl4j.encoding.IntTaskNetwork;
+import fr.uga.pddl4j.encoding.*;
 import fr.uga.pddl4j.parser.*;
 
 import java.util.*;
@@ -78,6 +75,14 @@ public abstract class AbstractProblem implements Problem {
      * The set primitive task symbols, i.e., the set of action symbol.
      */
     private Set<String> primitiveTaskSymbols;
+
+
+    /**
+     * The table that defines for each predicates its type of inertia.
+     */
+    private List<Inertia> tableOfInertia;
+
+    private List<Inertia> tableOfNumericInertia;
 
 
     private List<IntAction> intActions;
@@ -218,6 +223,14 @@ public abstract class AbstractProblem implements Problem {
         return intInitialTaskNetwork;
     }
 
+    public List<Inertia> getTableOfInertia() {
+        return tableOfInertia;
+    }
+
+    public List<Inertia> getTableOfNumericInertia() {
+        return tableOfNumericInertia;
+    }
+
     /**
      * The set compund task symbols, i.e., the set of task symbols used in methods.
      */
@@ -276,7 +289,12 @@ public abstract class AbstractProblem implements Problem {
 
     protected abstract void preInstantiate();
 
-    protected abstract void instantiate();
+    public void instantiate() {
+        this.extractInertia();
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.extractNumericInertia();
+        }
+    }
 
     protected abstract void postInstantiate();
 
@@ -1039,7 +1057,210 @@ public abstract class AbstractProblem implements Problem {
         return str.toString();
     }
 
+    /*
+     * This method proceeds over the actions of the domain and checks for all atom which kind of
+     * inertia it is. For each atom it checks if it satisfies one of the following definitions:
+     * <p>
+     * <i>Definition:</i> A relation is a positive inertia iff it does not occur positively in an
+     * unconditional effect or the consequent of a conditional effect of an action.
+     * </p>
+     * <p>
+     * <i>Definition:</i> A relation is a negative inertia iff it does not occur negatively in an
+     * unconditional effect or the consequent of a conditional effect of an action.
+     * </p>
+     * <p>
+     * Relations, which are positive as well as negative inertia, are simply called inertia.
+     * Relations, which are neither positive nor negative inertia, are called fluents. The detection
+     * of inertia and fluents is easy because in ADL, effects are restricted to conjunctions of
+     * literals. Furthermore, this information can be obtained with a single pass over the domain
+     * description, which takes almost no time at all.
+     * </p>
+     * <p>
+     * Note: before calling this method the domain must be encode into integer and the negation must
+     * be move inward the expression.
+     * </p>
+     *
+     * @param actions the list of actions to simplified.
+     */
+    protected void extractInertia() {
+        final int nbPredicates = this.getPredicateSymbols().size();
+        this.tableOfInertia = new ArrayList<>(nbPredicates);
+        for (int i = 0; i < nbPredicates; i++) {
+            this.tableOfInertia.add(Inertia.INERTIA);
+        }
+        for (final IntAction action : this.intActions) {
+            this.extract(action.getEffects());
+        }
 
+    }
 
+    /**
+     * Do a pass over the effects of an action and update the inertia table.
+     *
+     * @param exp the effect.
+     */
+    private void extract(final IntExpression exp) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                int predicate = exp.getPredicate();
+                switch (this.tableOfInertia.get(predicate)) {
+                    case INERTIA:
+                        this.tableOfInertia.set(predicate, Inertia.NEGATIVE);
+                        break;
+                    case POSITIVE:
+                        this.tableOfInertia.set(predicate, Inertia.FLUENT);
+                        break;
+                    default:
+                        // do nothing
+                }
+                break;
+            case AND:
+            case OR:
+                exp.getChildren().forEach(this::extract);
+                break;
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.extract(exp.getChildren().get(0));
+                break;
+            case WHEN:
+                this.extract(exp.getChildren().get(1));
+                break;
+            case NOT:
+                final IntExpression neg = exp.getChildren().get(0);
+                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
+                    predicate = neg.getPredicate();
+                    switch (this.tableOfInertia.get(predicate)) {
+                        case INERTIA:
+                            this.tableOfInertia.set(predicate, Inertia.POSITIVE);
+                            break;
+                        case NEGATIVE:
+                            this.tableOfInertia.set(predicate, Inertia.FLUENT);
+                            break;
+                        default:
+                            // do nothing
+                    }
+                }
+                break;
+            case F_EXP_T:
+            case EQUAL_ATOM:
+            case FN_HEAD:
+            case FN_ATOM:
+            case DURATION_ATOM:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+            case TIME_VAR:
+            case IS_VIOLATED:
+            case NUMBER:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case ALWAYS:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case F_EXP:
+                // do nothing
+                break;
+            default:
+                // do nothing
+        }
+    }
 
+    /**
+     * Extract the numeric inertia from the list of actions. A numeric fluent is a inertia iff it never appears in the
+     * effect of an action.
+     */
+    private void extractNumericInertia() {
+        final int nbFunctions = this.getFunctionSymbols().size();
+        this.tableOfNumericInertia = new ArrayList<>(nbFunctions);
+        for (int i = 0; i < nbFunctions; i++) {
+            this.tableOfNumericInertia.add(Inertia.INERTIA);
+        }
+        for (final IntAction a : this.intActions) {
+            this.extractNumericInertia(a.getEffects());
+        }
+
+    }
+
+    /**
+     * Do a pass over the effects of an action and update the numeric inertia table.
+     * A numeric inertia is a function that is never change by any action of the problem.
+     *
+     * @param exp the effect.
+     */
+    private void extractNumericInertia(final IntExpression exp) {
+        switch (exp.getConnective()) {
+            case AND:
+                exp.getChildren().forEach(this::extractNumericInertia);
+                break;
+            case WHEN:
+                extractNumericInertia(exp.getChildren().get(1));
+                break;
+            case NOT:
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.extractNumericInertia(exp.getChildren().get(0));
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.tableOfNumericInertia.set(exp.getChildren().get(0).getPredicate(), Inertia.FLUENT);
+                break;
+            case ATOM:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+    }
+    /**
+     * Infer type from unary inertia.
+     *
+     * @param init the initial state.
+     */
+    /*private void inferTypesFromInertia(final Set<IntExpression> init) {
+        Encoder.tableOfInferredDomains = new ArrayList<>(Encoder.pb.getPredicateSymbols().size());
+        for (int i = 0; i < Encoder.pb.getPredicateSymbols().size(); i++) {
+            if (Encoder.pb.getPredicateSignatures().get(i).size() == 1
+                && Encoder.pb.getTableOfInertia().get(i).equals(Inertia.INERTIA)) {
+                final Set<Integer> newTypeDomain = new LinkedHashSet<>();
+                for (IntExpression fact : init) {
+                    if (fact.getConnective().equals(PDDLConnective.NOT)) {
+                        fact = fact.getChildren().get(0);
+                    }
+                    if (fact.getPredicate() == i) {
+                        newTypeDomain.add(fact.getArguments()[0]);
+                    }
+                }
+                Encoder.tableOfInferredDomains.add(newTypeDomain);
+            } else {
+                Encoder.tableOfInferredDomains.add(null);
+            }
+        }
+    }*/
 }

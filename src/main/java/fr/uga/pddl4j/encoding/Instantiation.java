@@ -1119,7 +1119,7 @@ final class Instantiation implements Serializable {
         // CASE 1: If the expression is a positive inertia and the number of unifying ground
         // instances of the specified expression that are contained in the initial state is equal to
         // 0 then the expression is simplified to FALSE.
-        final Inertia inertia = Encoder.tableOfInertia.get(predicate);
+        final Inertia inertia = Encoder.pb.getTableOfInertia().get(predicate);
         if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
             exp.setConnective(PDDLConnective.FALSE);
         } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
@@ -1177,7 +1177,7 @@ final class Instantiation implements Serializable {
         // CASE 1: If the expression is a positive inertia and the number of unifying ground
         // instances of the specified expression that are contained in the initial state is equal to
         // 0 then the expression is simplified to FALSE.
-        final Inertia inertia = Encoder.tableOfNumericInertia.get(predicate);
+        final Inertia inertia = Encoder.pb.getTableOfNumericInertia().get(predicate);
         if ((inertia.equals(Inertia.FLUENT) || inertia.equals(Inertia.INERTIA)) && n == 0) {
             exp.setConnective(PDDLConnective.FALSE);
         } /*else if ((inertia.equals(Inertia.FLUENT) || inertia.equals(Inertia.INERTIA)) && max == n) {

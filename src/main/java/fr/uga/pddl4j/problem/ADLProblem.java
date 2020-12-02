@@ -17,10 +17,6 @@ public class ADLProblem extends AbstractProblem {
 
     }
 
-    @Override
-    protected void instantiate() {
-
-    }
 
     @Override
     protected void postInstantiate() {

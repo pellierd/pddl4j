@@ -170,7 +170,7 @@ public interface Problem extends Serializable {
      * @param timeout the time in second allocated to the instantiation.
      */
     //void instantiate(final int timeout);
-
+    void instantiate();
     /**
      * Returns the initial state of the problem.
      *

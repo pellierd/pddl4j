@@ -128,12 +128,7 @@ public final class Encoder implements Serializable {
     /**
      * The table that defines for each predicates its type of inertia.
      */
-    static List<Inertia> tableOfInertia;
-
-    /**
-     * The table that defines for each predicates its type of inertia.
-     */
-    static List<Inertia> tableOfNumericInertia;
+    //static List<Inertia> tableOfNumericInertia;
 
 
     /**
@@ -287,6 +282,7 @@ public final class Encoder implements Serializable {
     public static ProblemOld encode(final PDDLDomain domain, final PDDLProblem problem) {
 
         Encoder.pb = new ADLProblem(domain, problem);
+        Encoder.pb.instantiate();
 
 
         final StringBuilder str = new StringBuilder();
@@ -296,15 +292,15 @@ public final class Encoder implements Serializable {
         // *****************************************************************************************
 
         // Computed inertia from the encode actions
-        PreInstantiation.extractInertia(Encoder.pb.getIntActions());
+        //PreInstantiation.extractInertia(Encoder.pb.getIntActions());
 
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             PreInstantiation.extractNumericInertia(Encoder.pb.getIntActions());
             /*for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
                 String predicate = Encoder.tableOfFunctions.get(i);
                 System.out.println(i + ": " + predicate + " : " + Encoder.tableOfNumericInertia.get(i));
             }*/
-        }
+        //}
 
 
 
@@ -655,7 +651,7 @@ public final class Encoder implements Serializable {
         codedProblem.setDomains(Encoder.pb.getDomains());
         codedProblem.setFunctionSymbols(Encoder.pb.getFunctionSymbols());
         codedProblem.setTaskSymbols(Encoder.pb.getTaskSymbols());
-        codedProblem.setInertia(Encoder.tableOfInertia);
+        codedProblem.setInertia(Encoder.pb.getTableOfInertia());
         codedProblem.setInferredDomains(Encoder.tableOfInferredDomains);
         codedProblem.setPredicateSymbols(Encoder.pb.getPredicateSymbols());
         codedProblem.setRelevantFluents(Encoder.tableOfRelevantFluents.stream().map(
@@ -768,7 +764,7 @@ public final class Encoder implements Serializable {
         str.append("Inertias table:\n");
         for (int i = 0; i < Encoder.pb.getPredicateSymbols().size(); i++) {
             String predicate = Encoder.pb.getPredicateSymbols().get(i);
-            str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.tableOfInertia.get(i));
+            str.append(i).append(": ").append(predicate).append(" : ").append(Encoder.pb.getTableOfInertia().get(i));
             str.append("\n");
         }
     }
