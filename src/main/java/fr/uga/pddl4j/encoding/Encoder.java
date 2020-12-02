@@ -155,17 +155,17 @@ public final class Encoder implements Serializable {
     /**
      * The table containing for each relevant task its set of resolvers, i.e., action or methods
      */
-    static List<List<Integer>> tableOfRelevantOperators;
+    //static List<List<Integer>> tableOfRelevantOperators;
 
     /**
      * The list of instantiated actions encoded into bit sets.
      */
-    static List<Action> actions;
+    //static List<Action> actions;
 
     /**
      * The list of instantiated methods encoded into bit sets.
      */
-    static List<Method> methods;
+    //static List<Method> methods;
 
     /**
      * The goal.
@@ -303,51 +303,18 @@ public final class Encoder implements Serializable {
         // Step 7: Bit set encoding of the problem
         // *****************************************************************************************
 
-        // Creates the final list of actions and methods that will be used in the problem
-        Encoder.actions = new ArrayList<>(Encoder.pb.getIntActions().size());
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            Encoder.methods = new ArrayList<>(Encoder.pb.getIntMethods().size());
-        }
-
-        // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
-        final Map<IntExpression, Integer> fluentIndexMap = new LinkedHashMap<>(Encoder.pb.getTableOfRelevantFluents().size());
-        int index = 0;
-        for (IntExpression fluent : Encoder.pb.getTableOfRelevantFluents()) {
-            fluentIndexMap.put(fluent, index);
-            index++;
-        }
-
-        final Map<IntExpression, Integer> numericFluentIndexMap = new LinkedHashMap<>(Encoder.pb.getTableOfRelevantFluents().size());
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            // Create a map of the relevant numeric fluents with their index to speedup the bit set encoding of the actions
-            index = 0;
-            for (IntExpression fluent : Encoder.pb.getTableOfRelevantNumericFluents()) {
-                numericFluentIndexMap.put(fluent, index);
-                index++;
-            }
-        }
-
-        // Creates the list of relevant operators
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            Encoder.tableOfRelevantOperators = new ArrayList<>();
-            for (Integer a : Encoder.pb.getRelevantActions()) {
-                List<Integer> l = new ArrayList<>(1);
-                l.add(a);
-                Encoder.tableOfRelevantOperators.add(l);
-            }
-            Encoder.tableOfRelevantOperators.addAll(Encoder.pb.getRelevantMethods());
-        }
 
         if (Encoder.pb.getIntGoal() != null && (!Encoder.pb.getIntGoal().getChildren().isEmpty()
             || Encoder.pb.getIntGoal().getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(Encoder.pb.getIntGoal(), fluentIndexMap, numericFluentIndexMap);
+            Encoder.goal = BitEncoding.encodeGoal(Encoder.pb.getIntGoal(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfNumericFluentIndex());
         } else {
             Encoder.goal = new Goal();
         }
+
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
             final Map<IntExpression, Integer> taskIndexMap = new LinkedHashMap<>(Encoder.pb.getRelevantTasks().size());
-            index = 0;
+            int index = 0;
             for (IntExpression task : Encoder.pb.getRelevantTasks()) {
                 taskIndexMap.put(task, index);
                 index++;
@@ -356,13 +323,13 @@ public final class Encoder implements Serializable {
             // Encode the initial task network
             Encoder.initialTaskNetwork = BitEncoding.encodeTaskNetwork(Encoder.pb.getIntInitialTaskNetwork(), taskIndexMap);
             // Encode the methods in bit set representation
-            Encoder.methods.addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), fluentIndexMap, taskIndexMap));
+            Encoder.pb.getMethods().addAll(0, BitEncoding.encodeMethods(Encoder.pb.getIntMethods(), Encoder.pb.getMapOfFluentIndex(), taskIndexMap));
         }
 
         // Encode the initial state in bit set representation
-        Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), fluentIndexMap);
+        Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            BitEncoding.encodeInitNumericFluent(Encoder.init, numericFluentIndexMap, Encoder.intInitFunctionCost);
+            BitEncoding.encodeInitNumericFluent(Encoder.init, Encoder.pb.getMapOfNumericFluentIndex(), Encoder.intInitFunctionCost);
         }
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
@@ -370,17 +337,17 @@ public final class Encoder implements Serializable {
         }
 
         // Encode the actions in bit set representation
-        Encoder.actions.addAll(0, BitEncoding.encodeActions(Encoder.pb.getIntActions(), fluentIndexMap, numericFluentIndexMap));
+        Encoder.pb.getActions().addAll(0, BitEncoding.encodeActions(Encoder.pb.getIntActions(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfNumericFluentIndex()));
 
         // Just for logging
         if (Encoder.logLevel == 7) {
             str.append("\nFinal actions:\n");
-            for (Action a : Encoder.actions) {
+            for (Action a : Encoder.pb.getActions()) {
                 str.append(Encoder.toString(a) + "\n");
             }
             if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nFinal methods:\n");
-                for (Method m : Encoder.methods) {
+                for (Method m : Encoder.pb.getMethods()) {
                     str.append(Encoder.toString(m) + "\n");
                 }
             }
@@ -407,11 +374,11 @@ public final class Encoder implements Serializable {
 
             if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
                 str.append("\nTable of task resolvers:\n");
-                for (int ti = 0; ti < Encoder.tableOfRelevantOperators.size(); ti++) {
+                for (int ti = 0; ti < Encoder.pb.getTableOfRelevantOperators().size(); ti++) {
                     str.append(ti).append(": ");
                     str.append(Encoder.toString(Encoder.pb.getRelevantTasks().get(ti)));
                     str.append(":");
-                    List<Integer> resolvers = Encoder.tableOfRelevantOperators.get(ti);
+                    List<Integer> resolvers = Encoder.pb.getTableOfRelevantOperators().get(ti);
                     for (int ri = 0; ri < resolvers.size(); ri++) {
                         str.append(" ").append(resolvers.get(ri));
                     }
@@ -429,8 +396,8 @@ public final class Encoder implements Serializable {
         codedProblem.setGoal(Encoder.goal);
         codedProblem.setInitialState(Encoder.init);
         codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
-        codedProblem.setActions(Encoder.actions);
-        codedProblem.setMethods(Encoder.methods);
+        codedProblem.setActions(Encoder.pb.getActions());
+        codedProblem.setMethods(Encoder.pb.getMethods());
         codedProblem.setConstantSymbols(Encoder.pb.getConstantSymbols());
         codedProblem.setDomains(Encoder.pb.getDomains());
         codedProblem.setFunctionSymbols(Encoder.pb.getFunctionSymbols());
@@ -445,7 +412,7 @@ public final class Encoder implements Serializable {
                 task -> new Task(task.getPredicate(), task.getArguments(),
                     task.isPrimtive())).collect(Collectors.toList()));
         }
-        codedProblem.setTaskResolvers(Encoder.tableOfRelevantOperators);
+        codedProblem.setTaskResolvers(Encoder.pb.getTableOfRelevantOperators());
         codedProblem.setFunctionSignatures(Encoder.pb.getFunctionSignatures());
         codedProblem.setPredicateSignatures(Encoder.pb.getPredicateSignatures());
         codedProblem.setTypeSymbols(Encoder.pb.getTypeSymbols());

@@ -86,8 +86,8 @@ final class BitEncoding implements Serializable {
             List<IntAction> normalized = BitEncoding.normalizeAction(intAction);
             encodedActions.add(BitEncoding.encodeAction(normalized.get(0), map, numericFluentIndexMap));
             for (int i  = 1; i < normalized.size(); i++) {
-                if (Encoder.tableOfRelevantOperators != null) {
-                    Encoder.tableOfRelevantOperators.get(actionIndex).add(actions.size() + addedActions.size());
+                if (Encoder.pb.getTableOfRelevantOperators() != null) {
+                    Encoder.pb.getTableOfRelevantOperators().get(actionIndex).add(actions.size() + addedActions.size());
                 }
                 addedActions.add(BitEncoding.encodeAction(normalized.get(i), map, numericFluentIndexMap));
             }
@@ -197,8 +197,8 @@ final class BitEncoding implements Serializable {
             List<IntMethod> normalized = BitEncoding.normalizeMethod(intMethod);
             encodedMethods.add(BitEncoding.encodeMethod(normalized.get(0), factMap, taskMap));
             for (int i  = 1; i < normalized.size(); i++) {
-                if (Encoder.tableOfRelevantOperators != null) {
-                    Encoder.tableOfRelevantOperators.get(methodIndex).add(methods.size() + addedMethods.size());
+                if (Encoder.pb.getTableOfRelevantOperators() != null) {
+                    Encoder.pb.getTableOfRelevantOperators().get(methodIndex).add(methods.size() + addedMethods.size());
                 }
                 encodedMethods.add(BitEncoding.encodeMethod(normalized.get(i), factMap, taskMap));
             }
@@ -287,7 +287,7 @@ final class BitEncoding implements Serializable {
                 op.setDummy(true);
                 op.setPrecondition(dis);
                 op.getConditionalEffects().add(condEffect);
-                Encoder.actions.add(op);
+                Encoder.pb.getActions().add(op);
             }
         } else {
             newGoal = Encoder.codedGoal.get(0);
