@@ -112,6 +112,13 @@ public class ADLProblem extends PostInstantiatedProblem {
         }
 
         this.encodeInit();
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.encodeInitNumericFluent();
+        }
+        if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
+            this.init.addNumericFluent(duration);
+        }
 
     }
 
@@ -665,6 +672,18 @@ public class ADLProblem extends PostInstantiatedProblem {
                     }
                     break;
             }
+        }
+    }
+
+    /**
+     * Encode the numeric fluent of the initial state.
+     */
+    private void encodeInitNumericFluent() {
+        for (Map.Entry<IntExpression, Integer> e : this.mapOfNumericFluentIndex.entrySet()) {
+            int index = e.getValue();
+            double value = this.getIntInitFunctionCost().get(e.getKey());
+            NumericVariable fluent = new NumericVariable(index, value);
+            this.init.addNumericFluent(fluent);
         }
     }
 }

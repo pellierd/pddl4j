@@ -274,13 +274,13 @@ public final class Encoder implements Serializable {
 
         // Encode the initial state in bit set representation
         //Encoder.init = BitEncoding.encodeInit(Encoder.pb.getIntInitPredicates(), Encoder.pb.getMapOfFluentIndex());
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             BitEncoding.encodeInitNumericFluent(Encoder.pb.getInit(), Encoder.pb.getMapOfNumericFluentIndex(), Encoder.pb.getIntInitFunctionCost());
-        }
-        if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+        }*/
+        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
             pb.getInit().addNumericFluent(duration);
-        }
+        }*/
 
         // Encode the actions in bit set representation
         Encoder.pb.getActions().addAll(0, BitEncoding.encodeActions(Encoder.pb.getIntActions(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfNumericFluentIndex()));
