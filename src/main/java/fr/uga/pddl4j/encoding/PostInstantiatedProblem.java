@@ -3,9 +3,9 @@ package fr.uga.pddl4j.encoding;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,17 +18,28 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private Map<IntExpression, Inertia> tableOfGroundInertia;
 
+    /**
+     * The table that contains the ground inertia.
+     */
+    private Map<IntExpression, Inertia> tableOfNumericGroundInertia;
+
+
     public PostInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
 
     public void postInstantiate() {
         this.extractGroundInertia();
+        this.extractGroundNumericInertia();
     }
 
 
     public Map<IntExpression, Inertia> getTableOfGroundInertia() {
         return tableOfGroundInertia;
+    }
+
+    public Map<IntExpression, Inertia> getTableOfNumericGroundInertia() {
+        return tableOfNumericGroundInertia;
     }
 
     /**
@@ -140,4 +151,49 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         }
     }
 
+    /**
+     * Do a pass over the effects of a specified list of instantiated actions and update the ground
+     * inertia table.
+     */
+    protected void extractGroundNumericInertia() {
+        this.tableOfNumericGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
+        for (IntAction a : this.getIntActions()) {
+            this.extractGroundNumericInertia(a.getEffects());
+        }
+    }
+
+    /**
+     * Do a pass over the effects of an instantiated action and update the ground numeric inertia table.
+     * A numeric inertia is a function that is never change by any action of the problem.
+     * PDDLConnetive checks.
+     *
+     * @param exp the effect.
+     */
+    private void extractGroundNumericInertia(final IntExpression exp) {
+        switch (exp.getConnective()) {
+            case AND:
+                exp.getChildren().forEach(this::extractGroundNumericInertia);
+                break;
+            case WHEN:
+                extractGroundNumericInertia(exp.getChildren().get(1));
+                break;
+            case NOT:
+                extractGroundNumericInertia(exp.getChildren().get(0));
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.getTableOfNumericGroundInertia().put(exp.getChildren().get(0), Inertia.FLUENT);
+                break;
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().getImage());
+        }
+    }
 }

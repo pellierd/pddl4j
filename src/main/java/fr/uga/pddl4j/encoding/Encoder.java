@@ -136,26 +136,6 @@ public final class Encoder implements Serializable {
      */
     static int logLevel;
 
-    /**
-     * The table that contains the ground inertia.
-     */
-    //static Map<IntExpression, Inertia> tableOfGroundInertia;
-    /**
-     * The table that contains the ground inertia.
-     */
-    static Map<IntExpression, Inertia> tableOfNumericGroundInertia;
-
-    /**
-     * The list of predicates tables used to count the occurrence of a specified predicate in the
-     * initial state.
-     */
-    //static List<List<IntMatrix>> predicatesTables;
-
-    /**
-     * The list of predicates tables used to count the occurrence of a specified predicate in the
-     * initial state.
-     */
-    static List<List<IntMatrix>> functionsTables;
 
     /**
      * The table of the relevant fluents.
@@ -287,93 +267,6 @@ public final class Encoder implements Serializable {
 
         final StringBuilder str = new StringBuilder();
 
-        // *****************************************************************************************
-        // Step 3: PreInstantiation
-        // *****************************************************************************************
-
-        // Computed inertia from the encode actions
-        //PreInstantiation.extractInertia(Encoder.pb.getIntActions());
-
-        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            PreInstantiation.extractNumericInertia(Encoder.pb.getIntActions());
-            /*for (int i = 0; i < Encoder.tableOfFunctions.size(); i++) {
-                String predicate = Encoder.tableOfFunctions.get(i);
-                System.out.println(i + ": " + predicate + " : " + Encoder.tableOfNumericInertia.get(i));
-            }*/
-        //}
-
-
-
-        // Infer the type from the unary inertia
-        //PreInstantiation.inferTypesFromInertia(Encoder.pb.getIntInitPredicates());
-        //if (!Encoder.pb.getRequirements().contains(PDDLRequireKey.TYPING)
-        //    && !Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            // Simply the encoded action with the inferred types.
-            //PreInstantiation.simplifyActionsWithInferredTypes(Encoder.pb.getIntActions());
-            // Simply the encoded methods with the inferred types
-            // Does not work with methods
-            // intMethods = PreInstantiation.simplifyMethodsWithInferredTypes(intMethods);
-        //PreInstantiation.simplifyActionsWithInferredTypes(Encoder.pb.getIntActions());}
-
-        // Create the predicates tables used to count the occurrences of the predicates in the
-        // initial state
-        //PreInstantiation.createPredicatesTables(Encoder.pb.getIntInitPredicates());
-
-        //if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    PreInstantiation.createFunctionsTables(intInitFunctionCost.keySet());
-        //}
-
-        // HACK for durative action very inefficient
-        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-            PreInstantiation.expandTemporalActions(Encoder.pb.getIntActions());
-        }
-
-
-        // Just for logging
-        if (Encoder.logLevel == 3 || Encoder.logLevel == 4) {
-            Encoder.printTableOfInertia(str);
-            LOGGER.trace(str);
-            str.setLength(0);
-        }
-        // Just for logging
-        if (Encoder.logLevel == 4) {
-            str.append(System.lineSeparator());
-            Encoder.printTableOfConstants(str);
-            str.append(System.lineSeparator());
-            Encoder.printTableOfTypes(str);
-            str.append(System.lineSeparator());
-            str.append("\nPre-instantiation initial state:\n");
-            str.append("(and");
-            for (IntExpression f : Encoder.pb.getIntInitPredicates()) {
-                str.append(" ").append(Encoder.toString(f)).append("\n");
-            }
-            if (Encoder.pb.getIntGoal() != null) {
-                str.append(")");
-                str.append("\n\nPre-instantiation goal state:\n");
-                str.append(Encoder.toString(Encoder.pb.getIntGoal()));
-            }
-            if (Encoder.pb.getIntInitialTaskNetwork() != null) {
-                str.append(")");
-                str.append("\n\nPre-instantiation initial task network:\n");
-                str.append(Encoder.toString(Encoder.pb.getIntInitialTaskNetwork()));
-            }
-            str.append("\nPre-instantiation actions with inferred types (");
-            str.append(Encoder.pb.getIntActions().size());
-            str.append(" actions):\n");
-            for (IntAction a : Encoder.pb.getIntActions()) {
-                str.append(Encoder.toString(a)).append("\n");
-            }
-            if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-                str.append("\nPre-instantiation methods with inferred types (");
-                str.append(Encoder.pb.getIntMethods().size());
-                str.append(" methods):\n\n");
-                for (IntMethod meth : Encoder.pb.getIntMethods()) {
-                    str.append(Encoder.toString(meth)).append("\n");
-                }
-            }
-            LOGGER.trace(str);
-            str.setLength(0);
-        }*/
 
         // *****************************************************************************************
         // Step 4: Actions instantiation
@@ -384,7 +277,7 @@ public final class Encoder implements Serializable {
         // Extract the ground inertia from the set of instantiated actions
         //PostInstantiation.extractGroundInertia(Encoder.pb.getIntActions());
         // Extract the ground numetic inertia from the set of instantiated actions
-        PostInstantiation.extractGroundNumericInertia(Encoder.pb.getIntActions());
+        //PostInstantiation.extractGroundNumericInertia(Encoder.pb.getIntActions());
         // Simplify the actions based in the ground inertia
         PostInstantiation.simplyActionsWithGroundInertia(Encoder.pb.getIntActions(), Encoder.pb.getIntInitPredicates());
 

@@ -957,54 +957,6 @@ final class PostInstantiation implements Serializable {
     }
 
 
-    /**
-     * Do a pass over the effects of a specified list of instantiated actions and update the ground
-     * inertia table.
-     *
-     * @param actions the list of instantiated actions.
-     */
-    static void extractGroundNumericInertia(final List<IntAction> actions) {
-        Encoder.tableOfNumericGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
-        for (IntAction a : actions) {
-            PostInstantiation.extractGroundNumericInertia(a.getEffects());
-        }
-    }
-
-    /**
-     * Do a pass over the effects of an instantiated action and update the ground numeric inertia table.
-     * A numeric inertia is a function that is never change by any action of the problem.
-     * PDDLConnetive checks.
-     *
-     * @param exp the effect.
-     */
-    private static void extractGroundNumericInertia(final IntExpression exp) {
-        switch (exp.getConnective()) {
-            case AND:
-                exp.getChildren().forEach(PostInstantiation::extractGroundNumericInertia);
-                break;
-            case WHEN:
-                extractGroundNumericInertia(exp.getChildren().get(1));
-                break;
-            case NOT:
-                extractGroundNumericInertia(exp.getChildren().get(0));
-                break;
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-                Encoder.tableOfNumericGroundInertia.put(exp.getChildren().get(0), Inertia.FLUENT);
-                break;
-            case ATOM:
-            case TRUE:
-            case FALSE:
-                // Do nothing
-                break;
-            default:
-                throw new UnexpectedExpressionException(exp.getConnective().getImage());
-        }
-    }
-
 
     /**
      * Simplify a specified expression based on the ground inertia information.
@@ -1184,7 +1136,7 @@ final class PostInstantiation implements Serializable {
                 }
                 break;
             case FN_HEAD:
-                Inertia inertia = Encoder.tableOfNumericGroundInertia.get(exp);
+                Inertia inertia = Encoder.pb.getTableOfNumericGroundInertia().get(exp);
                 if (inertia == null) {
                     Double value = Encoder.intInitFunctionCost.get(exp);
                     // The numeric fluent is never modified and does not appear in the initial state
