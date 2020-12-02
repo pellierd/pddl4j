@@ -222,6 +222,10 @@ public abstract class IntProblem implements Problem {
         this.intInitialTaskNetwork = intInitialTaskNetwork;
     }
 
+    public Set<IntExpression> getIntInitFunctions() {
+        return intInitFunctions;
+    }
+
     /**
      * The set compund task symbols, i.e., the set of task symbols used in methods.
      */

@@ -191,22 +191,22 @@ public final class Encoder implements Serializable {
     /**
      * The list of relevant primitive tasks.
      */
-    static List<IntExpression> tableOfRelevantPrimitiveTasks;
+    //static List<IntExpression> tableOfRelevantPrimitiveTasks;
 
     /**
      * The list of relevant compund tasks.
      */
-    static List<IntExpression> tableOfRelevantCompundTasks;
+    //static List<IntExpression> tableOfRelevantCompundTasks;
 
     /**
      * The list of relevant methods for a specific task.
      */
-    static List<List<Integer>> relevantMethods;
+    //static List<List<Integer>> relevantMethods;
 
     /**
      * The list of relevant action for a specific task.
      */
-    static List<Integer> relevantActions;
+    //static List<Integer> relevantActions;
 
     static Map<IntExpression, Double> intInitFunctionCost;
 
@@ -274,9 +274,9 @@ public final class Encoder implements Serializable {
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
 
-            Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getIntActions());
+            //Instantiation.instantiateMethods(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitialTaskNetwork(), Encoder.pb.getIntActions());
             // Simplify the methods with the ground inertia information previously extracted
-            //PostInstantiation.simplyMethodsWithGroundInertia(intMethods, intInitPredicates);
+            //PostInstantiation.simplyMethodsWithGroundInertia(Encoder.pb.getIntMethods(), Encoder.pb.getIntInitPredicates());
             if (Encoder.logLevel == 5) {
                 str.append(System.lineSeparator());
                 str.append("\nInstantiation methods (");
@@ -307,8 +307,8 @@ public final class Encoder implements Serializable {
         // Create the list of relevant tasks
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantTasks = new ArrayList<>();
-            Encoder.tableOfRelevantTasks.addAll(Encoder.tableOfRelevantPrimitiveTasks);
-            Encoder.tableOfRelevantTasks.addAll(Encoder.tableOfRelevantCompundTasks);
+            Encoder.tableOfRelevantTasks.addAll(pb.getTableOfRelevantPrimitiveTasks());
+            Encoder.tableOfRelevantTasks.addAll(pb.getTableOfRelevantCompundTasks());
         }
 
         // The table of ground inertia are no more needed
@@ -356,12 +356,12 @@ public final class Encoder implements Serializable {
         // Creates the list of relevant operators
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             Encoder.tableOfRelevantOperators = new ArrayList<>();
-            for (Integer a : Encoder.relevantActions) {
+            for (Integer a : Encoder.pb.getRelevantActions()) {
                 List<Integer> l = new ArrayList<>(1);
                 l.add(a);
                 Encoder.tableOfRelevantOperators.add(l);
             }
-            Encoder.tableOfRelevantOperators.addAll(Encoder.relevantMethods);
+            Encoder.tableOfRelevantOperators.addAll(Encoder.pb.getRelevantMethods());
         }
 
         if (Encoder.pb.getIntGoal() != null && (!Encoder.pb.getIntGoal().getChildren().isEmpty()

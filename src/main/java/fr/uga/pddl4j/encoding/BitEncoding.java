@@ -192,7 +192,7 @@ final class BitEncoding implements Serializable {
 
         final List<Method> encodedMethods = new ArrayList<>(methods.size());
         final List<Method> addedMethods = new ArrayList<>();
-        int methodIndex = Encoder.relevantActions.size();
+        int methodIndex = Encoder.pb.getRelevantActions().size();
         for (IntMethod intMethod : methods) {
             List<IntMethod> normalized = BitEncoding.normalizeMethod(intMethod);
             encodedMethods.add(BitEncoding.encodeMethod(normalized.get(0), factMap, taskMap));

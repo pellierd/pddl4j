@@ -19,6 +19,25 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private Map<IntExpression, Inertia> tableOfNumericGroundInertia;
 
+    /**
+     * The list of relevant methods for a specific task.
+     */
+    private List<List<Integer>> relevantMethods;
+
+    /**
+     * The list of relevant primitive tasks.
+     */
+    private List<IntExpression> tableOfRelevantPrimitiveTasks;
+
+    /**
+     * The list of relevant compund tasks.
+     */
+    private List<IntExpression> tableOfRelevantCompundTasks;
+
+    /**
+     * The list of relevant action for a specific task.
+     */
+    private List<Integer> relevantActions;
 
     public PostInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
@@ -32,7 +51,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         this.simplifyGoalWithGroundInertia();
         if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             this.instantiateInitialTaskNetwork();
+            this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
+            this.simplyMethodsWithGroundInertia();
         }
+
     }
 
 
@@ -42,6 +64,22 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
     public Map<IntExpression, Inertia> getTableOfNumericGroundInertia() {
         return tableOfNumericGroundInertia;
+    }
+
+    public List<IntExpression> getTableOfRelevantPrimitiveTasks() {
+        return tableOfRelevantPrimitiveTasks;
+    }
+
+    public List<IntExpression> getTableOfRelevantCompundTasks() {
+        return tableOfRelevantCompundTasks;
+    }
+
+    public List<Integer> getRelevantActions() {
+        return relevantActions;
+    }
+
+    public List<List<Integer>> getRelevantMethods() {
+        return relevantMethods;
     }
 
     /**
@@ -287,7 +325,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     private void simplifyWithGroundInertia(final IntExpression exp, final boolean effect) {
         switch (exp.getConnective()) {
             case ATOM:
-                Inertia inertia = Encoder.pb.getTableOfGroundInertia().get(exp);
+                Inertia inertia = this.getTableOfGroundInertia().get(exp);
                 if (inertia == null) {
                     inertia = Inertia.INERTIA;
                 }
@@ -594,9 +632,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 break;
             case FN_HEAD:
-                Inertia inertia = Encoder.pb.getTableOfNumericGroundInertia().get(exp);
+                Inertia inertia = this.getTableOfNumericGroundInertia().get(exp);
                 if (inertia == null) {
-                    Double value = Encoder.intInitFunctionCost.get(exp);
+                    Double value = this.getIntInitFunctionCost().get(exp);
                     // The numeric fluent is never modified and does not appear in the initial state
                     if (value == null) {
                         exp.setConnective(PDDLConnective.FALSE);
@@ -614,7 +652,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // do nothing
                 break;
             default:
-                System.out.println(Encoder.toString(exp));
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
@@ -623,9 +660,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
         if (taskNetworks.size() > 1) {
             IntExpression root = new IntExpression(PDDLConnective.TASK);
-            root.setPredicate(Encoder.pb.getTaskSymbols().size());
-            Encoder.pb.getTaskSymbols().add("__top");
-            Encoder.pb.getCompoundTaskSymbols().add("__top");
+            root.setPredicate(this.getTaskSymbols().size());
+            this.getTaskSymbols().add("__top");
+            this.getCompoundTaskSymbols().add("__top");
             root.setPrimtive(false);
             int index = 0;
             for (IntTaskNetwork tn : taskNetworks) {
@@ -639,7 +676,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 method.setTask(new IntExpression(root));
                 method.setPreconditions(new IntExpression(PDDLConnective.AND));
                 method.setTaskNetwork(tn);
-                Encoder.pb.getIntMethods().add(method);
+                this.getIntMethods().add(method);
                 index++;
             }
 
@@ -702,4 +739,405 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             }
         }
     }
+
+    /**
+     * Make the instantiation of a list of methods.
+     *
+     * @param methods             the method to instantiate.
+     * @param initialTasksNetwork the initial tasks network.
+     * @param actions             the list of action already instantiate.
+     */
+    protected void instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork,
+                                   List<IntAction> actions) {
+
+        // Init the list of instantiated methods or ground methods
+        final List<IntMethod> instMethods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
+
+        // Init the set used to store the compound tasks
+        final Set<IntExpression> compound = new LinkedHashSet<>();
+
+        // Init the set used to store the primtive tasks
+        final Set<IntExpression> primtive = new LinkedHashSet<>();
+
+        // Init the table used to store for each task the list of methods that are relevant
+        this.relevantMethods = new ArrayList<List<Integer>>();
+
+        // Init the list of methods to instantiate
+        List<IntMethod> meths = new ArrayList<>();
+        for (IntMethod m : methods) {
+            // If a method has a parameter with a empty domain the method must be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < m.arity() && toInstantiate) {
+                toInstantiate = !this.getDomains().get(m.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (toInstantiate) {
+                meths.add(m);
+            }
+        }
+
+        // Filter methods with a parameter with an empty domain
+        this.filterMethodWithEmptyDomainParameter(methods);
+
+        // Expand the quantified expression contains in the the method precondition
+        this.expandQuantifiedExpressionAndSimplyMethods(meths);
+
+        // Compute the set of primitive task from the action already instantiated
+        LinkedHashSet<IntExpression> primitiveTaskSet = this.computePrimitiveTaskSet(actions);
+
+        // TInit the list of pending tasks to decompose
+        final LinkedList<IntExpression> tasks = new LinkedList<>();
+
+        // Add the task of the initial task network with the compound tasks
+        for (IntExpression subtasks : initialTasksNetwork.getTasks().getChildren()) {
+            if (!tasks.contains(subtasks)) {
+                if (!subtasks.isPrimtive()) {
+                    tasks.add(subtasks);
+                    compound.add(subtasks);
+                } else {
+                    primtive.add(subtasks);
+                }
+            }
+        }
+
+        // Start exploring the task tree
+        int indexMethod = 0;
+        while (!tasks.isEmpty()) {
+            final IntExpression task = tasks.pop();
+            final List<IntMethod> relevant = new ArrayList<>();
+            final List<Integer> relevantIndex = new ArrayList<>();
+            for (IntMethod method : meths) {
+                if (method.getTask().getPredicate() == task.getPredicate()
+                    && method.getTask().getArguments().length == task.getArguments().length) {
+                    final List<IntMethod> instantiated = new ArrayList<>(100);
+                    this.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
+                    for (IntMethod instance : instantiated) {
+                        final Iterator<IntExpression> i = instance.getSubTasks().getChildren().iterator();
+                        final Set<IntExpression> primitiveSet = new LinkedHashSet<>();
+                        final Set<IntExpression> compoundSet = new LinkedHashSet<>();
+                        boolean stop = false;
+                        while (i.hasNext() && !stop) {
+                            final IntExpression subtask = i.next();
+                            if (subtask.isPrimtive()) {
+                                if (!primitiveTaskSet.contains(subtask)) {
+                                    stop = true;
+                                } else {
+                                    primitiveSet.add(subtask);
+                                }
+                            } else {
+                                if (!compound.contains(subtask)) {
+                                    compoundSet.add(subtask);
+                                }
+                            }
+                        }
+                        if (!stop) {
+                            primtive.addAll(primitiveSet);
+                            tasks.addAll(compoundSet);
+                            compound.addAll(compoundSet);
+                            relevant.add(instance);
+                            relevantIndex.add(indexMethod);
+                            indexMethod++;
+                        }
+                    }
+                }
+            }
+
+            this.relevantMethods.add(relevantIndex);
+            instMethods.addAll(relevant);
+        }
+
+        // Initialize the table of relevant methods for each compund task and the table of relevant compound tasks
+        this.tableOfRelevantCompundTasks = new ArrayList<>(compound.size());
+        this.tableOfRelevantCompundTasks.addAll(compound);
+
+        // Initialize the table of relevant actions for each primitive task and the table of relevant primitive tasks
+        this.relevantActions = new ArrayList<Integer>(primitiveTaskSet.size());
+        this.tableOfRelevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
+        int index = 0;
+        Iterator<IntExpression> i = primitiveTaskSet.iterator();
+        while (i.hasNext()) {
+            // The action at index i can be remove because it not reachable from the initial task network.
+            IntExpression primitiveTask = i.next();
+            if (!primtive.contains(primitiveTask)) {
+                actions.remove(index);
+                i.remove();
+            } else {
+                this.relevantActions.add(index);
+                this.tableOfRelevantPrimitiveTasks.add(primitiveTask);
+                index++;
+            }
+        }
+        methods.clear();
+        methods.addAll(instMethods);
+    }
+
+    /**
+     * Filter methods with a parameter with a empty domain.
+     *
+     * @param methods the list of methods to filter.
+     */
+    private void filterMethodWithEmptyDomainParameter(List<IntMethod> methods) {
+        Iterator<IntMethod> it = methods.iterator();
+        while (it.hasNext()) {
+            final IntMethod method = it.next();
+            // If an method has a parameter with a empty domain the method can be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < method.arity() && toInstantiate) {
+                toInstantiate = !this.getDomains().get(method.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (!toInstantiate) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
+     * Expands the quantified expression contained in the preconditions of the methods in parameter and simplify the
+     * their precondition. If the preconditions can be simplied to false, the method simplified is removed.
+     *
+     * @param methods the list of methods to process.
+     */
+    private void expandQuantifiedExpressionAndSimplyMethods(List<IntMethod> methods) {
+        final Iterator<IntMethod> i = methods.iterator();
+        while (i.hasNext()) {
+            final IntMethod method = i.next();
+            this.expandQuantifiedExpression(method.getPreconditions(), true);
+            this.simplify(method.getPreconditions());
+            if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+                i.remove();
+            }
+        }
+    }
+
+    /**
+     * Computes the list of possible primitive tasks from the action already instantiated.
+     *
+     * @param actions the list of actions altready instantiated.
+     * @return the list of possible primitive tasks from the action already instantiated.
+     */
+    private LinkedHashSet<IntExpression> computePrimitiveTaskSet(List<IntAction> actions) {
+        LinkedHashSet<IntExpression> tasks = new LinkedHashSet<>();
+        for (IntAction a : actions) {
+            IntExpression task = new IntExpression(PDDLConnective.TASK);
+            task.setPrimtive(true);
+            task.setPredicate(this.getTaskSymbols().indexOf(a.getName()));
+            task.setArguments(a.getInstantiations());
+            tasks.add(task);
+        }
+        return tasks;
+
+    }
+
+    /**
+     * Make the preinstantion of a method based on the argument used in the tasks accomplish by the method.
+     *
+     * @param method the method to instantiate.
+     * @param index  the index of the parameter to instantiate. Initially, the index is set to 0.
+     * @param bound  a bound on the number of methods to instantiate.
+     * @param task   the tasks that accomplish the method.
+     */
+    private void instantiate(final IntMethod method, final int index, final int bound,
+                                    final List<IntMethod> methods, final IntExpression task) {
+        final IntExpression t = method.getTask();
+        final IntMethod copy = new IntMethod(method);
+        boolean instantiable = true;
+        int i = 0;
+        while (i < t.getArguments().length && instantiable) {
+            final int var = t.getArguments()[i];
+            final int cons = task.getArguments()[i];
+            final int type = copy.getTypeOfParameters((-var - 1));
+            final Set<Integer> domain = this.getDomains().get(type);
+            if (domain.contains(cons)) {
+                this.substitute(copy.getPreconditions(), var, cons, true);
+                this.substitute(copy.getTask(), var, cons, true);
+                this.substitute(copy.getSubTasks(), var, cons, true);
+                copy.setValueOfParameter((-var - 1), cons);
+            } else {
+                instantiable = false;
+            }
+            i++;
+        }
+        // This case may occur when variables are identical in the tasks
+        if (copy.getTask().equals(task) && instantiable) {
+            this.instantiate(copy, index, bound, methods);
+        }
+    }
+
+    /**
+     * Instantiates a specified method. This method used brut force.
+     * <p>
+     * The assumption is made that different method parameters are instantiated with different
+     * constants, i.e., the planner never generates methods like move(a,a) because we consider this
+     * as a bad domain representation that should be revised. In fact, in methods with identical
+     * constant parameters, all but one of the constants are superfluous and can be skipped from the
+     * representation without loss of information. Warning this assumption make the process no-sound.
+     * </p>
+     *
+     * @param method  the method.
+     * @param index   the index of the parameter to instantiate.
+     * @param bound   the bound of methods to instantiate.
+     * @param methods the list of methods already instantiated.
+     * @see IntMethod
+     */
+    private void instantiate(final IntMethod method, final int index, final int bound,
+                                    final List<IntMethod> methods) {
+        if (bound == methods.size()) {
+            return;
+        }
+        final int arity = method.arity();
+        if (index == arity) {
+            final IntExpression precond = method.getPreconditions();
+            this.simplify(precond);
+            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                methods.add(method);
+            }
+        } else if (method.getValueOfParameter(index) >= 0) {
+            this.instantiate(method, index + 1, bound, methods);
+        } else {
+            final Set<Integer> values = this.getDomains().get(method.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
+
+                this.substitute(preconditionCopy, varIndex, value, true);
+                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
+                    final IntMethod copy = new IntMethod(method.getName(), arity);
+                    copy.setPreconditions(preconditionCopy);
+                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
+
+                    final IntExpression taskCopy = new IntExpression(method.getTask());
+                    this.substitute(taskCopy, varIndex, value, true);
+                    copy.setTask(taskCopy);
+
+                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
+                    this.substitute(subTasksCopy, varIndex, value, true);
+                    copy.setSubTasks(subTasksCopy);
+
+                    for (int i = 0; i < arity; i++) {
+                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
+                    }
+                    for (int i = 0; i < arity; i++) {
+                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
+                    }
+
+                    copy.setValueOfParameter(index, value);
+                    this.instantiate(copy, index + 1, bound, methods);
+                }
+            }
+        }
+    }
+
+    /**
+     * Simply recursively the methods by removing unreachable tasks.
+     *
+     * @param methods the list of method to simplify.
+     * @param tasks   the set of compound tasks which are no more reachable.
+     * @return the list of task no more reachable.
+     */
+    private void simplyRecursivelyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
+                                                                         final Set<IntExpression> tasks) {
+        while (!tasks.isEmpty()) {
+            this.simplyMethodsWithTasksNoMoreReachable(methods, tasks);
+        }
+    }
+
+    /**
+     * Simply the method by removing unreachable tasks.
+     *
+     * @param methods the list of method to simplify.
+     * @param tasks   the set of compound tasks which are no more reachable.
+     * @return the list of task no more reachable.
+     */
+    private void simplyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
+                                                              final Set<IntExpression> tasks) {
+        final Set<IntExpression> tasksNoMoreReachable = new LinkedHashSet<>();
+        for (int i = 0; i < methods.size(); i++) {
+            final IntMethod method = methods.get(i);
+            if (this.isSimplified(method, tasks)) {
+                methods.remove(i);
+                for (int j = 0; j < this.getRelevantMethods().size(); j++) {
+                    final List<Integer> relevant = this.getRelevantMethods().get(j);
+                    if (relevant.remove(new Integer(i))) {
+                        //System.out.println("remove " + i);
+                        this.updateRelevantMethods(i);
+                        // There is no more relevant method for the compound task
+                        if (relevant.isEmpty()) {
+                            tasksNoMoreReachable.add(this.getTableOfRelevantCompundTasks().get(j));
+                            this.getTableOfRelevantCompundTasks().remove(j);
+                            this.getRelevantMethods().remove(j);
+                            //System.out.println("A task is no more reachable");
+                            j--;
+                        }
+                        break;
+                    }
+                }
+                i--;
+            }
+        }
+        tasks.clear();
+        tasks.addAll(tasksNoMoreReachable);
+    }
+
+    /**
+     * Returns if a method can be simplified. A method can be simplified if it is relevant for a task that is no more
+     * reachable or has a child that is no more reachable. The set of no more reachable set of tasks is given as
+     * parameter of the methods.
+     *
+     * @param method the method to test.
+     * @param tasks  the set of tasks that are no more reachable.
+     * @return <code>true</code> if the method is simplified, <code>false</code>
+     */
+    private boolean isSimplified(IntMethod method, Set<IntExpression> tasks) {
+        boolean isSimplified = true;
+        if (!tasks.contains(method.getTask())) {
+            final List<IntExpression> subtasks = method.getSubTasks().getChildren();
+            final Iterator<IntExpression> i = subtasks.iterator();
+            isSimplified = false;
+            while (i.hasNext() && !isSimplified) {
+                isSimplified = tasks.contains(i.next());
+            }
+        }
+        return isSimplified;
+    }
+
+    /**
+     * Update the index of the relevant method when a method is removed.
+     *
+     * @param index the index of the method removed.
+     */
+    private void updateRelevantMethods(final int index) {
+        for (List<Integer> relevant : this.getRelevantMethods()) {
+            int i = 0;
+            for (Integer m : relevant) {
+                if (m > index) {
+                    relevant.set(i, --m);
+                }
+                i++;
+            }
+
+        }
+    }
+
+    /**
+     * Do a pass over the preconditions of all the instantiated methods and update the ground inertia
+     * table. Then, simplify the methods according to the extracted ground inertia.
+     */
+    protected void simplyMethodsWithGroundInertia() {
+        final List<IntMethod> toAdd = new ArrayList<>(this.getIntMethods().size());
+        final Set<IntExpression> toRemove = new HashSet<>();
+        for (IntMethod m : this.getIntMethods()) {
+            this.simplifyWithGroundInertia(m.getPreconditions(), false);
+            this.simplify(m.getPreconditions());
+            if (!m.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+                toAdd.add(m);
+            } else {
+                toRemove.add(m.getTask());
+            }
+        }
+        this.simplyRecursivelyMethodsWithTasksNoMoreReachable(this.getIntMethods(), toRemove);
+    }
+
 }
