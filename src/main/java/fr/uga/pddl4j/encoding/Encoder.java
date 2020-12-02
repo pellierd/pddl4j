@@ -170,7 +170,7 @@ public final class Encoder implements Serializable {
     /**
      * The goal.
      */
-    static Goal goal;
+    //static Goal goal;
 
     /**
      * The initial task network.
@@ -267,49 +267,11 @@ public final class Encoder implements Serializable {
 
         final StringBuilder str = new StringBuilder();
 
-
-        // *****************************************************************************************
-        // Step 6: PostInstantiation
-        // *****************************************************************************************
-
-        // Extract the relevant fluents from the simplified and instantiated actions and methods
-        //PostInstantiation.extractRelevantFacts(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods(), Encoder.pb.getIntInitPredicates());
-        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            PostInstantiation.extractRelevantNumericFluents(Encoder.pb.getIntActions(), Encoder.pb.getIntMethods());
-        }*/
-
-        // Create the list of relevant tasks
-        /*if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            Encoder.tableOfRelevantTasks = new ArrayList<>();
-            Encoder.tableOfRelevantTasks.addAll(pb.getTableOfRelevantPrimitiveTasks());
-            Encoder.tableOfRelevantTasks.addAll(pb.getTableOfRelevantCompundTasks());
-        }
-
-        // The table of ground inertia are no more needed
-        //Encoder.tableOfGroundInertia = null;
-
-        // Just for logging
-        if (Encoder.logLevel == 6) {
-            Encoder.printRelevantFactsTable(str);
-            if (!Encoder.pb.getRelevantTasks().isEmpty()) {
-                str.append("\n");
-                Encoder.printRelevantTasksTable(str);
-            }
-            LOGGER.trace(str);
-            str.setLength(0);
-        }*/
-
         // *****************************************************************************************
         // Step 7: Bit set encoding of the problem
         // *****************************************************************************************
 
 
-        if (Encoder.pb.getIntGoal() != null && (!Encoder.pb.getIntGoal().getChildren().isEmpty()
-            || Encoder.pb.getIntGoal().getConnective().equals(PDDLConnective.ATOM))) {
-            Encoder.goal = BitEncoding.encodeGoal(Encoder.pb.getIntGoal(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfNumericFluentIndex());
-        } else {
-            Encoder.goal = new Goal();
-        }
 
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
@@ -339,61 +301,10 @@ public final class Encoder implements Serializable {
         // Encode the actions in bit set representation
         Encoder.pb.getActions().addAll(0, BitEncoding.encodeActions(Encoder.pb.getIntActions(), Encoder.pb.getMapOfFluentIndex(), Encoder.pb.getMapOfNumericFluentIndex()));
 
-        // Just for logging
-        if (Encoder.logLevel == 7) {
-            str.append("\nFinal actions:\n");
-            for (Action a : Encoder.pb.getActions()) {
-                str.append(Encoder.toString(a) + "\n");
-            }
-            if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-                str.append("\nFinal methods:\n");
-                for (Method m : Encoder.pb.getMethods()) {
-                    str.append(Encoder.toString(m) + "\n");
-                }
-            }
-            str.append("Final initial state:\n").append("(and");
-            for (IntExpression f : Encoder.pb.getIntInitPredicates()) {
-                str.append(" ").append(Encoder.toString(f)).append("\n");
-            }
-
-            if (Encoder.goal !=  null) {
-                str.append("\nFinal goal state:\n");
-                if (Encoder.goal == null) { // Goal null
-                    str.append("goal can be simplified to FALSE");
-                } else if (!Encoder.goal.isEmpty()) { // Goal not Null and not empty
-                    str.append(Encoder.toString(Encoder.goal));
-                } else { // Goal not Null and empty
-                    str.append("goal can be simplified to TRUE");
-                }
-                str.append("\n\n");
-            }
-            if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-                str.append("Final initial task network state:\n");
-                str.append(Encoder.toString(Encoder.initialTaskNetwork));
-            }
-
-            if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-                str.append("\nTable of task resolvers:\n");
-                for (int ti = 0; ti < Encoder.pb.getTableOfRelevantOperators().size(); ti++) {
-                    str.append(ti).append(": ");
-                    str.append(Encoder.toString(Encoder.pb.getRelevantTasks().get(ti)));
-                    str.append(":");
-                    List<Integer> resolvers = Encoder.pb.getTableOfRelevantOperators().get(ti);
-                    for (int ri = 0; ri < resolvers.size(); ri++) {
-                        str.append(" ").append(resolvers.get(ri));
-                    }
-                    str.append("\n");
-                }
-            }
-            str.append("\n\n");
-            LOGGER.trace(str);
-            str.setLength(0);
-        }
-
 
         final ProblemOld codedProblem = new ProblemOld();
         codedProblem.setRequirements(Encoder.pb.getRequirements());
-        codedProblem.setGoal(Encoder.goal);
+        codedProblem.setGoal(Encoder.pb.getGoal());
         codedProblem.setInitialState(Encoder.init);
         codedProblem.setInitialTaskNetwork(Encoder.initialTaskNetwork);
         codedProblem.setActions(Encoder.pb.getActions());
