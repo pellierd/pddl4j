@@ -15,14 +15,13 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.encoding.Encoder;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.problem.ProblemOld;
 
+import fr.uga.pddl4j.problem.ADLProblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,15 +34,10 @@ import java.io.IOException;
  *
  * @author D. Pellier
  * @version 1.0 - 12.04.2016
- * @see ProblemOld
+ * @see ADLProblem
  * @since 3.0
  */
 public class ProblemFactory {
-
-    /**
-     * The logger of the class.
-     */
-    private static final Logger LOGGER = LogManager.getLogger(Encoder.class);
 
     /**
      * An instance of the ProblemFactory.
@@ -129,20 +123,23 @@ public class ProblemFactory {
      *
      * @return the encoded planning problem or null if the problem cannot be encoded.
      */
-    public ProblemOld encode() {
+    public ADLProblem encode() {
         if (!this.parser.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()
                 || !this.parser.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
             return null;
         }
         final PDDLDomain domain = this.parser.getDomain();
         final PDDLProblem problem = this.parser.getProblem();
-        Encoder.setLogLevel(this.getTraceLevel());
+        ADLProblem pb = new ADLProblem(domain, problem);
+        pb.instantiate(10);
+        return pb;
+        /*Encoder.setLogLevel(this.getTraceLevel());
         try {
             return Encoder.encode(domain, problem);
         } catch (IllegalArgumentException ilException) {
             LOGGER.error(ilException.getMessage());
             return null;
-        }
+        }*/
     }
 
     /**

@@ -164,4 +164,22 @@ public class ADLProblem extends PostInstantiatedProblem {
         }
         return isSovable;
     }
+
+    /**
+     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchic.
+     * A hierarchical problem is totally ordered if and only the subtasks of each method of the problem are totally
+     * ordered and the initial task network is totally ordered.
+     *
+     * @return true if the problem is totally ordered, false otherwise.
+     */
+    public final boolean isTotallyOrederd() {
+        boolean totallyOrdered = true;
+        Iterator<Method> i = this.getMethods().iterator();
+        while (i.hasNext() && totallyOrdered) {
+            Method m = i.next();
+            totallyOrdered = m.getTaskNetwork().isTotallyOrdered();
+        }
+        return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
+    }
+
 }

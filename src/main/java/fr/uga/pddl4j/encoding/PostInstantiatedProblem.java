@@ -1,7 +1,10 @@
 package fr.uga.pddl4j.encoding;
 
 import fr.uga.pddl4j.parser.*;
+import fr.uga.pddl4j.plan.Hierarchy;
+import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.util.BitMatrix;
 
 import java.util.*;
 
@@ -1047,6 +1050,359 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     }
 
 
+    /**
+     * Returns a string representation of a specified operator.
+     *
+     * @param action     the action.
+     * @return a string representation of the specified operator.
+     */
+    public final String toString(final Action action) {
+        StringBuilder str = new StringBuilder();
+        str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
+        for (int i = 0; i < action.arity(); i++) {
+            final int index = action.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(action.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Preconditions:\n");
+        str.append(this.toString(action.getPrecondition()));
+        str.append("\n");
+        str.append("Effects:\n");
+        for (ConditionalEffect condExp : action.getConditionalEffects()) {
+            str.append(this.toString(condExp));
+            str.append("\n");
+        }
+        return str.toString();
+    }
 
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param method the method.
+     * @return a string representation of the specified method.
+     */
+    public final String toString(final Method method) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Method ");
+        str.append(method.getName());
+        str.append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < method.arity(); i++) {
+            final int index = method.getValueOfParameter(i);
+            final String type = this.getTypeSymbols().get(method.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i).append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Task: " + this.toString(this.getRelevantTasks().get(method.getTask())) + "\n");
+        str.append("Preconditions:\n");
+        str.append(this.toString(method.getPrecondition()));
+        str.append("\n");
+        str.append(this.toString(method.getTaskNetwork()));
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a state.
+     *
+     * @param state the state.
+     * @return a string representation of the state.
+     */
+    public final String toString(final Condition state) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = state.getPositiveFluents();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append("\n");
+        }
+        final BitSet negative = state.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" (not ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a conditional effect.
+     *
+     * @param ceffect  the conditional effect.
+     * @return a string representation of the specified condition effect.
+     */
+    public final String toString(final ConditionalEffect ceffect) {
+        StringBuilder str = new StringBuilder();
+        if (ceffect.getCondition().isEmpty()) {
+            str.append(this.toString(ceffect.getEffect()));
+        } else {
+            str.append("(when ");
+            str.append(this.toString(ceffect.getCondition()));
+            str.append("\n");
+            str.append(this.toString(ceffect.getEffect()));
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a state.
+     *
+     * @param state the state.
+     * @return a string representation of the state.
+     */
+    public final String toString(final Effect state) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitSet positive = state.getPositiveFluents();
+        for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append("\n");
+        }
+        final BitSet negative = state.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" (not ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a closed world state.
+     *
+     * @param state the state.
+     * @return a string representation of the specified expression.
+     */
+    public final String toString(final State state) {
+        final StringBuilder str = new StringBuilder("(and");
+        for (int i = state.nextSetBit(0); i >= 0; i = state.nextSetBit(i + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append("\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param tasknetwork the task network.
+     * @return a string representation of the specified task network.
+     */
+    public final String toString(final TaskNetwork tasknetwork) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Tasks:\n");
+        if (tasknetwork.getTasks().isEmpty()) {
+            str.append(" ()\n");
+        } else {
+            for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
+                str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
+                str.append(this.toString(this.getRelevantTasks().get(tasknetwork.getTasks().get(i))));
+                str.append("\n");
+            }
+        }
+        str.append("Ordering constraints:\n");
+        if (tasknetwork.getOrderingConstraints().cardinality() == 0) {
+            str.append(" ()");
+        } else {
+            BitMatrix constraints = tasknetwork.getOrderingConstraints();
+            int index = 0;
+            for (int r = 0; r < constraints.rows(); r++) {
+                BitSet row = constraints.getRow(r);
+                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
+                    str.append(" C");
+                    str.append(index);
+                    str.append(": ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r);
+                    str.append(" ");
+                    str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage());
+                    str.append(" ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c);
+                    str.append("\n");
+                    index++;
+                }
+            }
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a fluent.
+     *
+     * @param fluent the formula.
+     * @return a string representation of the specified expression.
+     */
+    public String toString(final Fluent fluent) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(this.getPredicateSymbols().get(fluent.getSymbol()));
+        for (Integer arg : fluent.getArguments()) {
+            str.append(" ");
+            str.append(this.getConstantSymbols().get(arg));
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a task.
+     *
+     * @param task the formula.
+     * @return a string representation of the specified expression.
+     */
+    public String toString(final Task task) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(this.getTaskSymbols().get(task.getSymbol()));
+        for (Integer arg : task.getArguments()) {
+            str.append(" ");
+            str.append(this.getConstantSymbols().get(arg));
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+
+    /**
+     * Returns a string representation of a hierarchical decomposition of plan.
+     *
+     * @param hierarchy the hierarchical decomposition to convert into string represention.
+     * @return the string representation of the he hierarchical decomposition in parameter.
+     */
+    public String toString(final Hierarchy hierarchy) {
+        StringBuilder str = new StringBuilder();
+        str.append("==>\n");
+        for (Map.Entry<Integer, Action> a : hierarchy.getPrimtiveTasks().entrySet()) {
+            str.append(a.getKey());
+            str.append(" ");
+            str.append(this.toShortString(a.getValue()));
+            str.append("\n");
+        }
+        str.append("root");
+        for (Integer rootTask : hierarchy.getRootTasks()) {
+            str.append(" ");
+            str.append(rootTask);
+        }
+        str.append("\n");
+        for (Map.Entry<Integer, Method> m : hierarchy.getCounpoudTasks().entrySet()) {
+            str.append(m.getKey());
+            str.append(" ");
+            str.append(this.toString(this.getRelevantTasks().get(m.getValue().getTask())));
+            str.append(" -> ");
+            str.append(m.getValue().getName());
+            for (Integer t : hierarchy.getDecomposition().get(m.getKey())) {
+                str.append(" ");
+                str.append(t);
+            }
+            str.append("\n");
+        }
+        str.append("<==\n");
+        return str.toString();
+
+    }
+
+    /**
+     * Returns a short string representation of the specified operator, i.e., its name and its
+     * instantiated parameters. This method can be used for actions and methods.
+     *
+     * @param operator  the operator.
+     * @return a string representation of the specified operator.
+     */
+    public final String toShortString(final AbstractGroundOperator operator) {
+        final StringBuilder str = new StringBuilder();
+        str.append(operator.getName());
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            if (index == -1) {
+                str.append(" ?");
+            } else {
+                str.append(" ");
+                str.append(this.getConstantSymbols().get(index));
+            }
+        }
+        return str.toString();
+    }
+
+    /**
+     * Return a detailed string representation of a search. Not compatible with VAL.
+     *
+     * @param plan the search.
+     * @return a string representation of the specified search.
+     */
+    public final String toStringCost(final Plan plan) {
+        int max = Integer.MIN_VALUE;
+        for (Integer t : plan.timeSpecifiers()) {
+            for (Action a : plan.getActionSet(t)) {
+                int length = this.toShortString(a).length();
+                if (max < length) {
+                    max = length;
+                }
+            }
+        }
+        final int actionSize = max;
+        final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
+
+        final StringBuilder str = new StringBuilder();
+        plan.timeSpecifiers().forEach(time ->
+            plan.getActionSet(time).forEach(a ->
+                str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%4.2f]%n",
+                    time, this.toShortString(a), ((float) a.getCost().getValue())))));
+        return str.toString();
+    }
+
+    /**
+     * Return a string representation of a search.
+     *
+     * @param plan the search.
+     * @return a string representation of the specified search.
+     */
+    public final String toString(final Plan plan) {
+        int max = Integer.MIN_VALUE;
+        for (Integer t : plan.timeSpecifiers()) {
+            for (Action a : plan.getActionSet(t)) {
+                int length = this.toShortString(a).length();
+                if (max < length) {
+                    max = length;
+                }
+            }
+        }
+        final int actionSize = max;
+        final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
+
+        final StringBuilder str = new StringBuilder();
+        plan.timeSpecifiers().forEach(time ->
+            plan.getActionSet(time).forEach(a ->
+                str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%d]%n",
+                    time, this.toShortString(a), (int) a.getDuration().getValue()))));
+        return str.toString();
+    }
 
 }

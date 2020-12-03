@@ -21,10 +21,10 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.ProblemOld;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +61,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public Plan search(final ProblemOld problem) {
+    public Plan search(final ADLProblem problem) {
         // Create the list of pending nodes to explore
         final PriorityQueue<PFDNode> open = new PriorityQueue<>(1000, new Comparator<PFDNode>() {
             public int compare(PFDNode n1, PFDNode n2) {
@@ -274,7 +274,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
         factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
-        ProblemOld pb =  null;
+        ADLProblem pb =  null;
         try {
             pb = factory.encode();
         } catch (OutOfMemoryError err) {

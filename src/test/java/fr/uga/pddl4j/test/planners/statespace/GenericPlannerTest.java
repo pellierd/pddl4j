@@ -27,7 +27,7 @@ import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.HillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
-import fr.uga.pddl4j.problem.ProblemOld;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -271,7 +271,7 @@ public class GenericPlannerTest {
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
                 Assert.assertTrue(errorManager.isEmpty());
 
-                ProblemOld pb = null;
+                ADLProblem pb = null;
                 Plan plan = null;
                 try {
                     // Encodes and instantiates the problem in a compact representation

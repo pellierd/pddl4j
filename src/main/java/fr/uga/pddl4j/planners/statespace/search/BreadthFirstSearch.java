@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.HashSet;
@@ -55,7 +55,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return a solution plan or null if it does not exist.
      */
-    public Node search(final ProblemOld codedProblem) {
+    public Node search(final ADLProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 

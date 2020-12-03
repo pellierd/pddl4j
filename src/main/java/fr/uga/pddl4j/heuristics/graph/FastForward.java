@@ -20,8 +20,8 @@
 package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.problem.Condition;
 
 /**
@@ -61,7 +61,7 @@ public final class FastForward extends RelaxedGraphHeuristic {
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public FastForward(ProblemOld problem) {
+    public FastForward(ADLProblem problem) {
         super(problem);
         super.setAdmissible(false);
     }

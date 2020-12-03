@@ -20,9 +20,9 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.Method;
-import fr.uga.pddl4j.problem.ProblemOld;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      *
      * @param problem the planning problem
      */
-    private void initTasksCosts(ProblemOld problem) {
+    private void initTasksCosts(ADLProblem problem) {
         this.costs = new int[problem.getRelevantOperators().size()];
         Arrays.fill(this.costs, -1);
         for (int i = 0; i < problem.getRelevantTasks().size(); i++) {
@@ -97,7 +97,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the planning problem.
      * @param closed the set of task already encountered.
      */
-    private int cost(int task, ProblemOld problem, Set<Integer> closed) {
+    private int cost(int task, ADLProblem problem, Set<Integer> closed) {
         closed.add(task);
         if (this.costs[task] != -1) {
             return this.costs[task];
@@ -132,7 +132,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    protected Plan extractPlan(final AbstractSTNNode node, final ProblemOld problem) {
+    protected Plan extractPlan(final AbstractSTNNode node, final ADLProblem problem) {
         AbstractSTNNode n = node;
         final Plan plan = new SequentialPlan();
         while (n.getParent() != null) {
@@ -155,7 +155,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner {
      * @param problem the problem to be solved.
      * @return the hierarchy of the solution plan.
      */
-    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final ProblemOld problem) {
+    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final ADLProblem problem) {
 
         // Extract hierarchy of the plan
         final LinkedList<Integer> operators = new LinkedList<>();

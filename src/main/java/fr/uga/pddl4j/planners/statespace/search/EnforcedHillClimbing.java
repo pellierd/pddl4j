@@ -21,9 +21,9 @@ package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.LinkedList;
@@ -63,7 +63,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node or null.
      */
-    public Node search(final ProblemOld codedProblem) {
+    public Node search(final ADLProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
@@ -123,7 +123,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, ProblemOld problem, PlanningGraphHeuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, ADLProblem problem, PlanningGraphHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

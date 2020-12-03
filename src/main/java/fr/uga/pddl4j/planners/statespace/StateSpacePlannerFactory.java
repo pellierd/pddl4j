@@ -21,7 +21,7 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
-import fr.uga.pddl4j.problem.ProblemOld;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import org.apache.logging.log4j.LogManager;
@@ -433,7 +433,7 @@ public class StateSpacePlannerFactory implements Serializable {
 
             // Encodes and instantiates the problem in a compact representation
             begin = System.currentTimeMillis();
-            final ProblemOld pb = factory.encode();
+            final ADLProblem pb = factory.encode();
             if (saveStats) {
                 planner.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
                 planner.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));

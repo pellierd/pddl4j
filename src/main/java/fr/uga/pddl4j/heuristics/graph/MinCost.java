@@ -21,9 +21,9 @@ package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Action;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.ProblemOld;
 import fr.uga.pddl4j.problem.Condition;
 
 import java.util.LinkedList;
@@ -45,7 +45,7 @@ public class MinCost extends AbstractGoalCostHeuristic implements PlanningGraphH
      * @param problem the coded problem of the specified planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public MinCost(final ProblemOld problem) {
+    public MinCost(final ADLProblem problem) {
         super(problem);
         super.setAdmissible(false);
     }

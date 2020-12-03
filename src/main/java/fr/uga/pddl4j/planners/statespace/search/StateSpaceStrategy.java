@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.problem.ProblemOld;
+import fr.uga.pddl4j.problem.ADLProblem;
 
 import java.io.Serializable;
 
@@ -148,7 +148,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return a solution search or null if it does not exist.
      */
-    Node search(final ProblemOld codedProblem);
+    Node search(final ADLProblem codedProblem);
 
     /**
      * Search a solution node to a specified domain and problem.
@@ -156,7 +156,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node or null.
      */
-    Node searchSolutionNode(final ProblemOld codedProblem);
+    Node searchSolutionNode(final ADLProblem codedProblem);
 
     /**
      * Search a solution plan to a specified domain and problem.
@@ -164,7 +164,7 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null.
      */
-    Plan searchPlan(final ProblemOld codedProblem);
+    Plan searchPlan(final ADLProblem codedProblem);
 
     /**
      * Extract a plan from a solution node for the specified planning problem.
@@ -173,6 +173,6 @@ public interface StateSpaceStrategy extends Serializable {
      * @param codedProblem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    Plan extractPlan(final Node solutionNode, final ProblemOld codedProblem);
+    Plan extractPlan(final Node solutionNode, final ADLProblem codedProblem);
 
 }

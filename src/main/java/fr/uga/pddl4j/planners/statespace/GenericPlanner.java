@@ -23,8 +23,8 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
-import fr.uga.pddl4j.problem.ProblemOld;
 
+import fr.uga.pddl4j.problem.ADLProblem;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
@@ -77,7 +77,7 @@ public final class GenericPlanner extends AbstractStateSpacePlanner {
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public Plan search(final ProblemOld problem) {
+    public Plan search(final ADLProblem problem) {
         final Logger logger = this.getLogger();
         Objects.requireNonNull(problem);
 

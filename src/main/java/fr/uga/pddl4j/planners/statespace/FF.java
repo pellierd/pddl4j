@@ -27,8 +27,8 @@ import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
-import fr.uga.pddl4j.problem.ProblemOld;
 
+import fr.uga.pddl4j.problem.ADLProblem;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
@@ -111,7 +111,7 @@ public final class FF extends AbstractStateSpacePlanner {
      * @param pb the problem to solve.
      */
     @Override
-    public Plan search(final ProblemOld pb) {
+    public Plan search(final ADLProblem pb) {
         final Logger logger = this.getLogger();
         Objects.requireNonNull(pb);
 
