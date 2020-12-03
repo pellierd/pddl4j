@@ -275,12 +275,9 @@ public final class Encoder implements Serializable {
         codedProblem.setInertia(Encoder.pb.getInertia());
         codedProblem.setInferredDomains(Encoder.pb.getTableOfInferredDomains());
         codedProblem.setPredicateSymbols(Encoder.pb.getPredicateSymbols());
-        codedProblem.setRelevantFluents(Encoder.pb.getRelevantFluents().stream().map(
-            fluent -> new Fluent(fluent.getPredicate(), fluent.getArguments())).collect(Collectors.toList()));
+        codedProblem.setRelevantFluents(Encoder.pb.getRelevantFluents());
         if (Encoder.pb.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            codedProblem.setRelevantTasks(Encoder.pb.getRelevantTasks().stream().map(
-                task -> new Task(task.getPredicate(), task.getArguments(),
-                    task.isPrimtive())).collect(Collectors.toList()));
+            codedProblem.setRelevantTasks(Encoder.pb.getRelevantTasks());
         }
         codedProblem.setRelevantOperators(Encoder.pb.getRelevantOperators());
         codedProblem.setFunctionSignatures(Encoder.pb.getFunctionSignatures());
@@ -397,78 +394,12 @@ public final class Encoder implements Serializable {
      */
     static void printRelevantFactsTable(StringBuilder str) {
         str.append("Relevant fluents:\n");
-        for (int i = 0; i < Encoder.pb.getRelevantFluents().size(); i++) {
-            str.append(i).append(": ").append(Encoder.toString(Encoder.pb.getRelevantFluents().get(i)));
+        for (int i = 0; i < Encoder.pb.getRelevantIntExpFluents().size(); i++) {
+            str.append(i).append(": ").append(Encoder.toString(Encoder.pb.getRelevantIntExpFluents().get(i)));
             str.append("\n");
         }
     }
 
-    /**
-     * Print the relevant fluents table.
-     *
-     * @param str the string builder used to print.
-     */
-    static void printRelevantTasksTable(StringBuilder str) {
-        str.append("Relevant tasks:\n");
-        for (int i = 0; i < Encoder.pb.getRelevantTasks().size(); i++) {
-            IntExpression task = Encoder.pb.getRelevantTasks().get(i);
-            str.append(i).append(": ").append(Encoder.toString(task));
-            if (task.isPrimtive()) {
-                str.append(" - PRIMITIVE");
-            } else {
-                str.append(" - COMPOUND");
-            }
-            str.append("\n");
-        }
-    }
-
-
-    /**
-     * Returns a short string representation of the specified operator, i.e., only its name and the
-     * value of its parameters.
-     *
-     * @param op the operator.
-     * @return a string representation of the specified operator.
-     */
-    static String toShortString(final AbstractGroundOperator op) {
-        return StringDecoder.toShortString(op, Encoder.pb.getConstantSymbols());
-    }
-
-    /**
-     * Returns a string representation of the specified operator.
-     *
-     * @param op the operator to print.
-     * @return a string representation of the specified operator.
-     */
-    static String toString(final IntAction op) {
-        return StringDecoder.toString(op, Encoder.pb.getConstantSymbols(),
-            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
-    }
-
-    /**
-     * Returns a string representation of the specified method.
-     *
-     * @param meth the method to print.
-     * @return a string representation of the specified method.
-     */
-    static String toString(final IntMethod meth) {
-        return StringDecoder.toString(meth, Encoder.pb.getConstantSymbols(),
-            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
-    }
-
-    /**
-     * Returns a string representation of the specified tn.
-     *
-     * @param tn the method to print.
-     * @return a string representation of the specified tn.
-     */
-    static String toString(final IntTaskNetwork tn) {
-        return StringDecoder.toString(tn, Encoder.pb.getConstantSymbols(),
-            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols());
-    }
 
     /**
      * Returns a string representation of the specified action.
@@ -479,34 +410,10 @@ public final class Encoder implements Serializable {
     static String toString(final Action a) {
         return StringDecoder.toString(a, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantIntExpFluents());
     }
 
-    /**
-     * Returns a string representation of the specified method.
-     *
-     * @param m the method to print.
-     * @return a string representation of the specified method.
-     */
-    static String toString(final Method m) {
-        return StringDecoder.toString(m, Encoder.pb.getConstantSymbols(),
-            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
-            Encoder.pb.getRelevantFluents(), Encoder.pb.getRelevantTasks());
-    }
 
-    /**
-     * Returns a string representation of the specified task network.
-     *
-     * @param taskNetwork the task network to print.
-     * @return a string representation of the specified task network.
-     */
-    static String toString(final TaskNetwork taskNetwork) {
-        return StringDecoder.toString(taskNetwork, Encoder.pb.getConstantSymbols(),
-            Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getTaskSymbols(),
-            Encoder.pb.getRelevantTasks());
-    }
 
     /**
      * Returns a string representation of an expression.
@@ -529,7 +436,7 @@ public final class Encoder implements Serializable {
     static String toString(Condition exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantIntExpFluents());
     }
 
     /**
@@ -541,7 +448,7 @@ public final class Encoder implements Serializable {
     static String toString(Goal exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantIntExpFluents());
     }
 
     /**
@@ -556,7 +463,7 @@ public final class Encoder implements Serializable {
             Encoder.pb.getTypeSymbols(),
             Encoder.pb.getPredicateSymbols(),
             Encoder.pb.getFunctionSymbols(),
-            Encoder.pb.getRelevantFluents(),
+            Encoder.pb.getRelevantIntExpFluents(),
             Encoder.pb.getTableOfRelevantNumericFluents(),
             Encoder.pb.getTaskSymbols());
     }
@@ -574,7 +481,7 @@ public final class Encoder implements Serializable {
     static String toString(ConditionalEffect exp) {
         return StringDecoder.toString(exp, Encoder.pb.getConstantSymbols(),
             Encoder.pb.getTypeSymbols(), Encoder.pb.getPredicateSymbols(),
-            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantFluents());
+            Encoder.pb.getFunctionSymbols(), Encoder.pb.getRelevantIntExpFluents());
     }
 
     /**

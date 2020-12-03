@@ -95,14 +95,18 @@ public class ADLProblem extends PostInstantiatedProblem {
             this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
             this.simplyMethodsWithGroundInertia();
         }
-        this.extractRelevantFacts(this.getIntActions(), this.getIntMethods(), this.getIntInitPredicates());
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.extractRelevantNumericFluents(this.getIntActions(),this.getIntMethods());
-        }
+
     }
 
 
     protected void postinstantiation() {
+        this.extractRelevantFacts(this.getIntActions(), this.getIntMethods(), this.getIntInitPredicates());
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.extractRelevantNumericFluents(this.getIntActions(),this.getIntMethods());
+        }
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            this.extractRelevantTasks();
+        }
 
         this.initOfMapFluentIndex();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {

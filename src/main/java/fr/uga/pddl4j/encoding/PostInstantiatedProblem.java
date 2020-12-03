@@ -20,6 +20,31 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private List<Method> methods;
 
+    /**
+     * The table of the relevant fluents.
+     */
+    private List<IntExpression> tableOfRelevantFluents;
+
+    private List<Fluent> relevantFluents;
+
+    public List<Fluent> getRelevantFluents() {
+        return this.relevantFluents;
+    }
+    public List<Task> relevantTasks;
+
+    public List<Task> getRelevantTasks() {
+        return this.relevantTasks;
+    }
+    /**
+     * The table of the relevant fluents.
+     */
+    private List<IntExpression> tableOfRelevantNumericFluents;
+
+    //private List<Fluent> relevantNumericFluents;
+
+
+
+
     private Map<IntExpression, Integer> mapOfFluentIndex;
 
     private Map<IntExpression, Integer> mapOfNumericFluentIndex;
@@ -79,6 +104,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     public InitialState getInitialState() {
         return init;
     }
+    public List<IntExpression> getRelevantIntExpFluents() {
+        return tableOfRelevantFluents;
+    }
+
+    public List<IntExpression> getTableOfRelevantNumericFluents() {
+        return tableOfRelevantNumericFluents;
+    }
 
 
 
@@ -118,24 +150,256 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
     }*/
 
+    /**
+     * Extracts the relevant facts from the instantiated actions. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     * @param init    the initial state.
+     */
+    protected void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods,
+                                        final Set<IntExpression> init) {
+        final Set<IntExpression> facts = new LinkedHashSet<>(10000);
+        for (IntAction a : actions) {
+            extractRelevantFacts(a.getPreconditions(), facts, init);
+            extractRelevantFacts(a.getEffects(), facts, init);
+        }
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            for (IntMethod m : methods) {
+                extractRelevantFacts(m.getPreconditions(), facts, init);
+            }
+        }
+        for (IntExpression p : init) {
+            Inertia inertia = this.getTableOfGroundInertia().get(p);
+            if (inertia == null) {
+                inertia = Inertia.INERTIA;
+            }
+            if (init.contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
+                facts.add(p);
+            }
+        }
+        this.tableOfRelevantFluents = new ArrayList<>(facts.size());
+        this.relevantFluents = new ArrayList<>(facts.size());
+        for (IntExpression exp : facts) {
+            final IntExpression relevant = new IntExpression(exp);
+            this.tableOfRelevantFluents.add(relevant);
+            this.relevantFluents.add(new Fluent(exp.getPredicate(), exp.getArguments()));
+        }
+    }
+
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param facts the set of relevant facts.
+     * @param init  the initial state.
+     */
+    private void extractRelevantFacts(final IntExpression exp, final Set<IntExpression> facts,
+                                      final Set<IntExpression> init) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                Inertia inertia = this.getTableOfGroundInertia().get(exp);
+                if (inertia == null) {
+                    inertia = Inertia.INERTIA;
+                }
+                if ((init.contains(exp) && !inertia.equals(Inertia.NEGATIVE))
+                    || (!init.contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
+                    facts.add(exp);
+                }
+                break;
+            case FN_HEAD:
+                break;
+            case EQUAL_ATOM:
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.extractRelevantFacts(e, facts, init);
+                }
+                break;
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case UMINUS:
+            case ALWAYS:
+            case OVER_ALL:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case NOT:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                break;
+            case F_EXP_T:
+            case F_EXP:
+                if (!exp.getChildren().isEmpty()) {
+                    extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                }
+                break;
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                extractRelevantFacts(exp.getChildren().get(3), facts, init);
+                break;
+            case FN_ATOM:
+            case NUMBER:
+            case DURATION_ATOM:
+            case TIME_VAR:
+            case IS_VIOLATED:
+            case MINIMIZE:
+            case MAXIMIZE:
+                break;
+            default:
+                // do nothing
+        }
+    }
+
+    /**
+     * Extracts the relevant numeric fluents.
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     */
+    protected void extractRelevantNumericFluents(final List<IntAction> actions, List<IntMethod> methods) {
+        final Set<IntExpression> fluents = new LinkedHashSet<>(100);
+        for (IntAction a : actions) {
+            if (a.isDurative()) {
+                this.extractRelevantNumericFluents(a.getDuration(), fluents);
+            }
+            this.extractRelevantNumericFluents(a.getPreconditions(), fluents);
+            this.extractRelevantNumericFluents(a.getEffects(), fluents);
+        }
+        this.tableOfRelevantNumericFluents = new ArrayList<>(fluents.size());
+        for (IntExpression exp : fluents) {
+            final IntExpression relevant = new IntExpression(exp);
+            this.tableOfRelevantNumericFluents.add(relevant);
+        }
+    }
+
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param fluents the set of relevant facts.
+     */
+    private void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
+        switch (exp.getConnective()) {
+            case FN_HEAD:
+                fluents.add(exp);
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.extractRelevantNumericFluents(e, fluents);
+                }
+                break;
+            case UMINUS:
+            case NOT:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                this.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
+                break;
+            case F_EXP:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case TIME_VAR:
+            case NUMBER:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+
+        }
+    }
+
+    public void extractRelevantTasks() {
+        this.relevantTasks = new ArrayList<>();
+        for (IntExpression task : this.getTableOfRelevantPrimitiveTasks()) {
+            this.relevantTasks.add(new Task(task.getPredicate(), task.getArguments(), true));
+        }
+        for (IntExpression task : this.getTableOfRelevantCompundTasks()) {
+            this.relevantTasks.add(new Task(task.getPredicate(), task.getArguments(), false));
+        }
+    }
+
     protected void initOfMapFluentIndex() {
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
-        this.mapOfFluentIndex = new LinkedHashMap<>(this.getRelevantFluents().size());
+        this.mapOfFluentIndex = new LinkedHashMap<>(this.getRelevantIntExpFluents().size());
         int index = 0;
-        for (IntExpression fluent : this.getRelevantFluents()) {
+        for (IntExpression fluent : this.getRelevantIntExpFluents()) {
             this.mapOfFluentIndex.put(fluent, index);
             index++;
         }
     }
 
     protected void initMapOfTaskIndex() {
+        List<IntExpression> tasks = new ArrayList<>();
+        tasks.addAll(this.getTableOfRelevantPrimitiveTasks());
+        tasks.addAll(this.getTableOfRelevantCompundTasks());
+
         // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
-        this.mapOfTasksIndex = new LinkedHashMap<>(this.getRelevantTasks().size());
+        this.mapOfTasksIndex = new LinkedHashMap<>(tasks.size());
         int index = 0;
-        for (IntExpression task : this.getRelevantTasks()) {
+        for (IntExpression task : tasks) {
             this.mapOfTasksIndex.put(task, index);
             index++;
-
         }
     }
 
@@ -433,8 +697,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
                 dummyGoal.setPredicate(dummyPredicateIndex);
                 dummyGoal.setArguments(new int[0]);
-                final int dummyGoalIndex = this.getRelevantFluents().size();
-                this.getRelevantFluents().add(dummyGoal);
+                final int dummyGoalIndex = this.getRelevantIntExpFluents().size();
+                this.getRelevantIntExpFluents().add(dummyGoal);
                 this.mapOfNumericFluentIndex.put(dummyGoal, dummyGoalIndex);
                 Effect effect = new Effect();
                 effect.getPositiveFluents().set(dummyGoalIndex);
@@ -781,4 +1045,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             this.init.addNumericFluent(fluent);
         }
     }
+
+
+
+
 }
