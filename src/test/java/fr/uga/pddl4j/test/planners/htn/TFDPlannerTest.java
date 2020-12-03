@@ -52,7 +52,7 @@ public class TFDPlannerTest {
     /**
      * Computation timeout.
      */
-    private static final int TIMEOUT = 5;
+    private static final int TIMEOUT = 10;
 
     /**
      * Default Trace level.

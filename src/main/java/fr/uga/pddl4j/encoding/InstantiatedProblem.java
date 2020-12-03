@@ -7,47 +7,98 @@ import java.util.*;
 /**
  * Created by pellier on 02/12/2020.
  */
-public abstract class InstantiatedProblem extends IntProblem {
+public abstract class InstantiatedProblem extends PreInstantiatedProblem {
 
     /**
-     * The table that defines for each predicates its type of inertia.
+     * The table that contains the ground inertia.
      */
-    private List<Inertia> tableOfInertia;
-
-    private List<Inertia> tableOfNumericInertia;
+    private Map<IntExpression, Inertia> tableOfGroundInertia;
 
     /**
-     * The table of inferred domains based on unary inertia encoding.
+     * The table that contains the ground inertia.
      */
-    private List<Set<Integer>> tableOfInferredDomains;
+    private Map<IntExpression, Inertia> tableOfNumericGroundInertia;
 
     /**
-     * The list of predicates tables used to count the occurrence of a specified predicate in the
-     * initial state.
+     * The list of relevant methods for a specific task.
      */
-    private List<List<IntMatrix>> predicatesTables;
+    private List<List<Integer>> relevantMethods;
 
-    public List<Inertia> getInertia() {
-        return tableOfInertia;
-    }
+    /**
+     * The list of relevant primitive tasks.
+     */
+    private List<IntExpression> tableOfRelevantPrimitiveTasks;
 
-    public List<Inertia> getTableOfNumericInertia() {
-        return tableOfNumericInertia;
-    }
+    /**
+     * The list of relevant compund tasks.
+     */
+    private List<IntExpression> tableOfRelevantCompundTasks;
 
-    public List<Set<Integer>> getTableOfInferredDomains() {
-        return tableOfInferredDomains;
-    }
+    /**
+     * The list of relevant action for a specific task.
+     */
+    private List<Integer> relevantActions;
 
-    public List<List<IntMatrix>> getPredicatesTables() {
-        return predicatesTables;
-    }
+    /**
+     * The table of the relevant fluents.
+     */
+    private List<IntExpression> tableOfRelevantFluents;
+
+    /**
+     * The table of the relevant fluents.
+     */
+    private List<IntExpression> tableOfRelevantNumericFluents;
 
     public InstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
 
-    public void instantiate() {
+    public Map<IntExpression, Inertia> getTableOfGroundInertia() {
+        return tableOfGroundInertia;
+    }
+
+    public Map<IntExpression, Inertia> getTableOfNumericGroundInertia() {
+        return tableOfNumericGroundInertia;
+    }
+
+    public List<IntExpression> getTableOfRelevantPrimitiveTasks() {
+        return tableOfRelevantPrimitiveTasks;
+    }
+
+    public List<IntExpression> getTableOfRelevantCompundTasks() {
+        return tableOfRelevantCompundTasks;
+    }
+
+    public List<Integer> getRelevantActions() {
+        return relevantActions;
+    }
+
+    public List<List<Integer>> getRelevantMethods() {
+        return relevantMethods;
+    }
+
+    public List<IntExpression> getRelevantFluents() {
+        return tableOfRelevantFluents;
+    }
+
+    public List<IntExpression> getTableOfRelevantNumericFluents() {
+        return tableOfRelevantNumericFluents;
+    }
+
+
+    //----
+
+
+
+    public List<IntExpression> getRelevantTasks() {
+        List<IntExpression> tasks = new ArrayList<>(this.tableOfRelevantPrimitiveTasks.size()
+            + this.tableOfRelevantCompundTasks.size());
+        tasks.addAll(this.tableOfRelevantPrimitiveTasks);
+        tasks.addAll(this.tableOfRelevantCompundTasks);
+        return tasks;
+    }
+
+    /*public void instantiate() {
         this.extractInertia();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             this.extractNumericInertia();
@@ -67,1030 +118,24 @@ public abstract class InstantiatedProblem extends IntProblem {
             this.expandTemporalActions(this.getIntActions());
         }
         this.instantiateActions();
-    }
 
-
-    /*
- * This method proceeds over the actions of the domain and checks for all atom which kind of
- * inertia it is. For each atom it checks if it satisfies one of the following definitions:
- * <p>
- * <i>Definition:</i> A relation is a positive inertia iff it does not occur positively in an
- * unconditional effect or the consequent of a conditional effect of an action.
- * </p>
- * <p>
- * <i>Definition:</i> A relation is a negative inertia iff it does not occur negatively in an
- * unconditional effect or the consequent of a conditional effect of an action.
- * </p>
- * <p>
- * Relations, which are positive as well as negative inertia, are simply called inertia.
- * Relations, which are neither positive nor negative inertia, are called fluents. The detection
- * of inertia and fluents is easy because in ADL, effects are restricted to conjunctions of
- * literals. Furthermore, this information can be obtained with a single pass over the domain
- * description, which takes almost no time at all.
- * </p>
- * <p>
- * Note: before calling this method the domain must be encode into integer and the negation must
- * be move inward the expression.
- * </p>
- *
- * @param actions the list of actions to simplified.
- */
-    protected void extractInertia() {
-        final int nbPredicates = this.getPredicateSymbols().size();
-        this.tableOfInertia = new ArrayList<>(nbPredicates);
-        for (int i = 0; i < nbPredicates; i++) {
-            this.tableOfInertia.add(Inertia.INERTIA);
+        this.extractGroundInertia();
+        this.extractGroundNumericInertia();
+        this.simplyActionsWithGroundInertia();
+        this.instantiateGoal();
+        this.simplifyGoalWithGroundInertia();
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            this.instantiateInitialTaskNetwork();
+            this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
+            this.simplyMethodsWithGroundInertia();
         }
-        for (final IntAction action : super.getIntActions()) {
-            this.extract(action.getEffects());
+        this.extractRelevantFacts(this.getIntActions(), this.getIntMethods(), this.getIntInitPredicates());
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.extractRelevantNumericFluents(this.getIntActions(),this.getIntMethods());
         }
+    }*/
 
-    }
 
-    /**
-     * Do a pass over the effects of an action and update the inertia table.
-     *
-     * @param exp the effect.
-     */
-    private void extract(final IntExpression exp) {
-        switch (exp.getConnective()) {
-            case ATOM:
-                int predicate = exp.getPredicate();
-                switch (this.tableOfInertia.get(predicate)) {
-                    case INERTIA:
-                        this.tableOfInertia.set(predicate, Inertia.NEGATIVE);
-                        break;
-                    case POSITIVE:
-                        this.tableOfInertia.set(predicate, Inertia.FLUENT);
-                        break;
-                    default:
-                        // do nothing
-                }
-                break;
-            case AND:
-            case OR:
-                exp.getChildren().forEach(this::extract);
-                break;
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-            case OVER_ALL:
-                this.extract(exp.getChildren().get(0));
-                break;
-            case WHEN:
-                this.extract(exp.getChildren().get(1));
-                break;
-            case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
-                    predicate = neg.getPredicate();
-                    switch (this.tableOfInertia.get(predicate)) {
-                        case INERTIA:
-                            this.tableOfInertia.set(predicate, Inertia.POSITIVE);
-                            break;
-                        case NEGATIVE:
-                            this.tableOfInertia.set(predicate, Inertia.FLUENT);
-                            break;
-                        default:
-                            // do nothing
-                    }
-                }
-                break;
-            case F_EXP_T:
-            case EQUAL_ATOM:
-            case FN_HEAD:
-            case FN_ATOM:
-            case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case MUL:
-            case DIV:
-            case MINUS:
-            case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
-            case TIME_VAR:
-            case IS_VIOLATED:
-            case NUMBER:
-            case MINIMIZE:
-            case MAXIMIZE:
-            case UMINUS:
-            case ALWAYS:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case F_EXP:
-                // do nothing
-                break;
-            default:
-                // do nothing
-        }
-    }
-
-    /**
-     * Extract the numeric inertia from the list of actions. A numeric fluent is a inertia iff it never appears in the
-     * effect of an action.
-     */
-    private void extractNumericInertia() {
-        final int nbFunctions = this.getFunctionSymbols().size();
-        this.tableOfNumericInertia = new ArrayList<>(nbFunctions);
-        for (int i = 0; i < nbFunctions; i++) {
-            this.tableOfNumericInertia.add(Inertia.INERTIA);
-        }
-        for (final IntAction a : super.getIntActions()) {
-            this.extractNumericInertia(a.getEffects());
-        }
-
-    }
-
-    /**
-     * Do a pass over the effects of an action and update the numeric inertia table.
-     * A numeric inertia is a function that is never change by any action of the problem.
-     *
-     * @param exp the effect.
-     */
-    private void extractNumericInertia(final IntExpression exp) {
-        switch (exp.getConnective()) {
-            case AND:
-                exp.getChildren().forEach(this::extractNumericInertia);
-                break;
-            case WHEN:
-                extractNumericInertia(exp.getChildren().get(1));
-                break;
-            case NOT:
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-            case OVER_ALL:
-                this.extractNumericInertia(exp.getChildren().get(0));
-                break;
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-                this.tableOfNumericInertia.set(exp.getChildren().get(0).getPredicate(), Inertia.FLUENT);
-                break;
-            case ATOM:
-                // Do nothing
-                break;
-            default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
-        }
-    }
-    /**
-     * Infer type from unary inertia contained in the initial state.
-     */
-    private void inferTypesFromInertia() {
-        this.tableOfInferredDomains = new ArrayList<>(this.getPredicateSymbols().size());
-        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
-            if (this.getPredicateSignatures().get(i).size() == 1
-                && this.getInertia().get(i).equals(Inertia.INERTIA)) {
-                final Set<Integer> newTypeDomain = new LinkedHashSet<>();
-                for (IntExpression fact : this.getIntInitPredicates()) {
-                    if (fact.getConnective().equals(PDDLConnective.NOT)) {
-                        fact = fact.getChildren().get(0);
-                    }
-                    if (fact.getPredicate() == i) {
-                        newTypeDomain.add(fact.getArguments()[0]);
-                    }
-                }
-                this.tableOfInferredDomains.add(newTypeDomain);
-            } else {
-                this.tableOfInferredDomains.add(null);
-            }
-        }
-    }
-
-    /**
-     * Symplify the actions with the infered types.
-     */
-    private void simplifyActionsWithInferredTypes() {
-        final List<IntAction> actions = new LinkedList<>();
-        for (final IntAction action : super.getIntActions()) {
-            actions.addAll(this.simplifyActionsWithInferredTypes(action));
-        }
-        super.getIntActions().clear();
-        super.getIntActions().addAll(actions);
-    }
-
-    private List<IntAction> simplifyActionsWithInferredTypes(final IntAction action) {
-        final List<IntExpression> unaryInertia = new ArrayList<>();
-        unaryInertia.addAll(this.collectUnaryInertia(action.getPreconditions()));
-        unaryInertia.addAll(this.collectUnaryInertia(action.getEffects()));
-
-        List<IntAction> actions = new LinkedList<>();
-        actions.add(action);
-
-        if (action.arity() == 0) {
-            return actions;
-        }
-
-        for (final IntExpression inertia : unaryInertia) {
-            final List<IntAction> newActions = new ArrayList<>();
-            for (final IntAction o : actions) {
-                if (o.arity() > 0) {
-
-                    int index = -inertia.getArguments()[0] - 1;
-                    // Hack add for constant in predicate
-                    //if (index < 0) {
-                    //    break;
-                    //}
-
-                    final int dtIndex = action.getTypeOfParameters(index);
-
-                    final String declaredType = this.getTypeSymbols().get(dtIndex);
-                    final int itIndex = inertia.getPredicate();
-                    final String inertiaType = this.getPredicateSymbols().get(itIndex);
-
-                    final String sti = declaredType + "^" + inertiaType;
-                    int ti = this.getTypeSymbols().indexOf(sti);
-                    if (ti == -1) {
-                        ti = this.getTypeSymbols().size();
-                        this.getTypeSymbols().add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
-                        dt1.retainAll(this.getTableOfInferredDomains().get(itIndex));
-                        this.getDomains().add(dt1);
-                    }
-
-                    final String sts = declaredType + "\\" + inertiaType;
-                    int ts = this.getTypeSymbols().indexOf(sts);
-                    if (ts == -1) {
-                        ts = this.getTypeSymbols().size();
-                        this.getTypeSymbols().add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
-                        dt2.removeAll(this.getTableOfInferredDomains().get(itIndex));
-                        this.getDomains().add(dt2);
-                    }
-                    final IntAction op1 = new IntAction(o);
-                    op1.setTypeOfParameter(index, ti);
-                    this.replace(op1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
-                    this.replace(op1.getEffects(), inertia, PDDLConnective.TRUE, ti, ts);
-                    if (!op1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
-                        && !op1.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                        newActions.add(op1);
-                    }
-
-                    final IntAction op2 = new IntAction(o);
-                    op2.setTypeOfParameter(index, ts);
-                    this.replace(op2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
-                    this.replace(op2.getEffects(), inertia, PDDLConnective.FALSE, ti, ts);
-
-                    if (!op2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
-                        && !op2.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
-                        newActions.add(op2);
-                    }
-                }
-            }
-            actions.clear();
-            actions.addAll(newActions);
-        }
-        return actions;
-    }
-
-    /**
-     * Replace all the occurrences of a specified unary inertia contained in the a specified
-     * expression by <code>TRUE</code> or <code>FALSE</code>.
-     *
-     * @param exp        the expression.
-     * @param inertia    the unary inertia.
-     * @param connective the connective.
-     * @param ti         the type intersection.
-     * @param ts         the type substract.
-     */
-    private void replace(final IntExpression exp, final IntExpression inertia, final PDDLConnective connective,
-                         final int ti, final int ts) {
-        switch (exp.getConnective()) {
-            case ATOM:
-                if (exp.equals(inertia)) {
-                    exp.setConnective(connective);
-                }
-                break;
-            case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
-                    this.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        i.remove();
-                    }
-                }
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                }
-                break;
-            case OR:
-                i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
-                    this.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        i.remove();
-                    }
-                }
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                }
-                break;
-            case FORALL:
-            case EXISTS:
-                if (inertia.getArguments()[0] == exp.getVariable()) {
-                    final IntExpression ei = new IntExpression(exp);
-                    ei.setType(ti);
-                    this.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
-                    final IntExpression es = new IntExpression(exp);
-                    es.setType(ts);
-                    this.replace(es, inertia, PDDLConnective.FALSE, ti, ts);
-                    exp.getChildren().clear();
-                    if (exp.getConnective().equals(PDDLConnective.FORALL)) {
-                        exp.setConnective(PDDLConnective.AND);
-                    } else {
-                        exp.setConnective(PDDLConnective.OR);
-                    }
-                    exp.getChildren().add(ei);
-                    exp.getChildren().add(es);
-                } else {
-                    this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                }
-                break;
-            case NOT:
-                this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else {
-                    exp.setConnective(PDDLConnective.TRUE);
-                }
-                break;
-            case AT_START:
-            case AT_END:
-            case ALWAYS:
-            case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
-            case WHEN:
-                this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
-                this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                this.replace(exp.getChildren().get(1), inertia, connective, ti, ts);
-                this.replace(exp.getChildren().get(3), inertia, connective, ti, ts);
-                break;
-            case EQUAL_ATOM:
-            case FN_HEAD:
-            case FN_ATOM:
-            case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case MUL:
-            case DIV:
-            case MINUS:
-            case PLUS:
-            case F_EXP_T:
-            case NUMBER:
-            case MINIMIZE:
-            case MAXIMIZE:
-            case UMINUS:
-            case F_EXP:
-            case TIME_VAR:
-            case IS_VIOLATED:
-                // do nothing
-                break;
-            default:
-                // do nothing
-        }
-    }
-
-    /**
-     * Collect all unary inertia from a specified expression.
-     *
-     * @param exp the expression.
-     * @return the list of unary inertia expression collected.
-     */
-    private List<IntExpression> collectUnaryInertia(final IntExpression exp) {
-        final List<IntExpression> unaryInertia = new ArrayList<>();
-        switch (exp.getConnective()) {
-            case ATOM:
-                if (this.getTableOfInferredDomains().get(exp.getPredicate()) != null) {
-                    unaryInertia.add(exp);
-                }
-                break;
-            case AND:
-            case OR:
-                for (final IntExpression ei : exp.getChildren()) {
-                    unaryInertia.addAll(this.collectUnaryInertia(ei));
-                }
-                break;
-            case FORALL:
-            case EXISTS:
-                final IntExpression qExp = exp.getChildren().get(0);
-                unaryInertia.addAll(this.collectUnaryInertia(qExp));
-                break;
-            case AT_START:
-            case AT_END:
-            case NOT:
-            case ALWAYS:
-            case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
-            case WHEN:
-                unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(0)));
-                break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
-                unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(0)));
-                unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(1)));
-                unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(3)));
-                break;
-            case EQUAL_ATOM:
-            case FN_HEAD:
-            case FN_ATOM:
-            case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case MUL:
-            case DIV:
-            case MINUS:
-            case PLUS:
-            case F_EXP_T:
-            case NUMBER:
-            case MINIMIZE:
-            case MAXIMIZE:
-            case UMINUS:
-            case F_EXP:
-            case TIME_VAR:
-            case IS_VIOLATED:
-                // do nothing
-                break;
-            default:
-                // do nothing
-        }
-        return unaryInertia;
-    }
-
-    /**
-     * This method creates the predicates predicatesTables used to simplify atomic expression.
-     */
-    private void createPredicatesTables() {
-        final int tableSize = this.getConstantSymbols().size();
-        final int nbPredicate = this.getPredicateSymbols().size();
-        this.predicatesTables = new ArrayList<>(nbPredicate);
-        for (final List<Integer> arguments : this.getPredicateSignatures()) {
-            final int arity = arguments.size();
-            final int nbTables = (int) Math.pow(2, arity);
-            final List<IntMatrix> pTables = new ArrayList<>(nbTables);
-            for (int j = 0; j < nbTables; j++) {
-                final int dimension = Integer.bitCount(j);
-                pTables.add(new IntMatrix(tableSize, dimension));
-            }
-            this.predicatesTables.add(pTables);
-        }
-
-        for (IntExpression fact : this.getIntInitPredicates()) {
-            if (fact.getConnective().equals(PDDLConnective.NOT)) {
-                fact = fact.getChildren().get(0);
-            }
-            final int arity = this.getPredicateSignatures().get(fact.getPredicate()).size();
-            final List<IntMatrix> pTables = this.predicatesTables.get(fact.getPredicate());
-            final int[] set = new int[arity];
-            final int[] args = fact.getArguments();
-            for (final IntMatrix intMatrix : pTables) {
-                int indexSize = 0;
-                for (int aSet : set) {
-                    if (aSet == 1) {
-                        indexSize++;
-                    }
-                }
-                final int[] index = new int[indexSize];
-                int j = 0;
-                for (int i = 0; i < set.length; i++) {
-                    if (set[i] == 1) {
-                        index[j] = args[i];
-                        j++;
-                    }
-                }
-                intMatrix.increment(index);
-                this.incrementMask(set);
-            }
-        }
-    }
-
-    /**
-     * Return an integer representation of the specified array of integer. For example, if
-     * <code>mask = [0, 1, 1]</code> then the method will return 3.
-     *
-     * @param mask an array of integer that can only contain 0 or 1.
-     * @return the integer representation of the specified array.
-     */
-    protected int toInt(final int[] mask) {
-        final int len = mask.length;
-        if (len > 0) {
-            int res = mask[0];
-            for (int i = 1; i < len; i++) {
-                res = res << 1 | mask[i];
-            }
-            return res;
-        }
-        return 0;
-    }
-
-    private int[] incrementMask(final int[] set) {
-        boolean overflow = false;
-        for (int i = set.length - 1; i >= 0; i--) {
-            if (set[i] == 0) {
-                set[i] = 1;
-                break;
-            } else {
-                set[i] = 0;
-                overflow = i == 0;
-            }
-        }
-        return overflow ? null : set;
-    }
-
-    /**
-     * Print the predicates tables.
-     *
-     * @param tables predicates tables.
-     */
-    void printPredicatesTables(final List<List<IntMatrix>> tables) {
-        for (int predicate = 0; predicate < tables.size(); predicate++) {
-            final List<IntMatrix> pTables = tables.get(predicate);
-            final int arity = this.getPredicateSignatures().get(predicate).size();
-            final int[] mask = new int[arity];
-            for (int i = 0; i < pTables.size(); i++) {
-                this.print(predicate, arity, mask, new int[0], tables);
-                this.incrementMask(mask);
-            }
-        }
-    }
-
-    /**
-     * Print a specified predicate table.
-     *
-     * @param predicate the predicate.
-     * @param arity     the arity of the predicate.
-     * @param mask      the mask that indicate where the constants are.
-     * @param index     the index in construction.
-     * @param tables    the predicates tables.
-     */
-    private void print(final int predicate, final int arity, final int[] mask, final int[] index,
-                       final List<List<IntMatrix>> tables) {
-        if (index.length == arity) {
-            final StringBuilder str = new StringBuilder();
-            str.append("(");
-            str.append(this.getPredicateSymbols().get(predicate));
-            int var = 0;
-            int realIndexSize = 0;
-            for (int anIndex : index) {
-                if (anIndex == -1) {
-                    str.append(" X").append(var);
-                    var++;
-                } else {
-                    realIndexSize++;
-                    str.append(" ").append(this.getConstantSymbols().get(anIndex));
-                }
-            }
-            str.append(")");
-            final int[] realIndex = new int[realIndexSize];
-            int j = 0;
-            for (int anIndex : index) {
-                if (anIndex != -1) {
-                    realIndex[j] = anIndex;
-                    j++;
-                }
-            }
-            final int counter = tables.get(predicate).get(this.toInt(mask)).get(realIndex);
-            if (counter != 0) {
-                str.append(" : ").append(counter);
-            }
-        } else if (mask[index.length] == 0) {
-            final int[] newIndex = new int[index.length + 1];
-            System.arraycopy(index, 0, newIndex, 0, index.length);
-            newIndex[index.length] = -1;
-            this.print(predicate, arity, mask, newIndex, tables);
-        } else {
-            for (int i = 0; i < this.getConstantSymbols().size(); i++) {
-                final int[] newIndex = new int[index.length + 1];
-                System.arraycopy(index, 0, newIndex, 0, index.length);
-                newIndex[index.length] = i;
-                this.print(predicate, arity, mask, newIndex, tables);
-            }
-        }
-    }
-
-    /**
-     * Expands the temporal actions.
-     */
-    protected void expandTemporalActions(List<IntAction> actions) {
-        List<IntAction> expandedActions = new ArrayList<>();
-
-        for (IntAction a : actions) {
-            // System.out.println("******************************************************");
-            //System.out.println(Encoder.toString(a));
-
-            Instantiation.expandQuantifiedExpression(a.getPreconditions(), false);
-            a.getPreconditions().moveTimeSpecifierInward();
-            a.getPreconditions().moveNegationInward();
-
-            //System.out.println("*** Precondition ***");
-            //System.out.println(Encoder.toString(a.getPreconditions()));
-
-            final IntExpression startPrecondition = new IntExpression(a.getPreconditions());
-            this.extract(startPrecondition, PDDLConnective.AT_START);
-            //System.out.println("*** At start precondition ***");
-            //System.out.println(Encoder.toString(startPrecondition));
-            Instantiation.simplify(startPrecondition);
-            //System.out.println("*** At start precondition ***");
-            //System.out.println(Encoder.toString(startPrecondition));
-            BitEncoding.toDNF(startPrecondition);
-
-            //System.out.println("*** At start precondition ***");
-            //System.out.println(Encoder.toString(startPrecondition));
-
-            final IntExpression endPrecondition = new IntExpression(a.getPreconditions());
-            this.extract(endPrecondition, PDDLConnective.AT_END);
-            Instantiation.simplify(endPrecondition);
-            BitEncoding.toDNF(endPrecondition);
-
-            //System.out.println("*** At end precondition ***");
-            //System.out.println(Encoder.toString(endPrecondition));
-
-            final IntExpression overAllPrecondition = new IntExpression(a.getPreconditions());
-            this.extract(overAllPrecondition, PDDLConnective.OVER_ALL);
-            //System.out.println("*** Over all precondition AV Simplify ***");
-            //System.out.println(Encoder.toString(overAllPrecondition));
-            Instantiation.simplify(overAllPrecondition);
-            BitEncoding.toDNF(overAllPrecondition);
-
-            //System.out.println("*** Over all precondition ***");
-            //System.out.println(Encoder.toString(overAllPrecondition));
-
-
-            // Expands the quantified expression on the effect of the action
-            Instantiation.expandQuantifiedExpression(a.getEffects(), false);
-            a.getEffects().moveTimeSpecifierInward();
-            a.getEffects().moveNegationInward();
-            BitEncoding.toCNF(a.getEffects());
-            //this.simplify(a.getEffects());
-
-            //System.out.println("*** EFFECT ***");
-            //System.out.println(Encoder.toString(a.getEffects()));
-
-            //try {
-            //    System.out.println("Press enter...");
-            //    System.in.read();
-            //} catch (IOException e) {
-            //    e.printStackTrace();
-            //}
-            // The list of monitoring action need to deal with over all condition in conditional effect
-            final List<IntAction> monitoringActions = new ArrayList<>();
-            // The effect of the start action
-            final IntExpression startEffect = new IntExpression(PDDLConnective.AND);
-            // The effect of the end action
-            final IntExpression endEffect = new IntExpression(PDDLConnective.AND);
-
-            // Iterate over the effect of the action the action to initialize the start and end effect and the list of
-            // monitoring actions needed to deal with over all condition in conditional effects.
-            // We suppose that the effect is a conjunction of at_start or at_end or when.
-            for (IntExpression effect : a.getEffects().getChildren()) {
-                //System.out.println("EFFECT : "+ this.toString(effect));
-                switch (effect.getConnective()) {
-                    case AT_START:
-                        startEffect.addChild(effect.getChildren().get(0));
-                        break;
-                    case AT_END:
-                        endEffect.addChild(effect.getChildren().get(0));
-                        break;
-                    case WHEN:
-                        // Extract the start effect condition of the conditional effect
-                        final IntExpression ps = new IntExpression(effect.getChildren().get(0));
-                        this.extract(ps, PDDLConnective.AT_START);
-                        // Extract the end effect condition of the conditional effect
-                        final IntExpression pe = new IntExpression(effect.getChildren().get(0));
-                        this.extract(pe, PDDLConnective.AT_END);
-                        // Extract the overall effect condition of the conditional effect
-                        final IntExpression pi = new IntExpression(effect.getChildren().get(0));
-                        this.extract(pi, PDDLConnective.OVER_ALL);
-                        // Extract the start effect of the conditional effect
-                        final IntExpression qs = new IntExpression(effect.getChildren().get(1));
-                        this.extract(qs, PDDLConnective.AT_START);
-                        // Extract the end effect of the conditional effect
-                        final IntExpression qe = new IntExpression(effect.getChildren().get(1));
-                        this.extract(qe, PDDLConnective.AT_END);
-
-
-                        // CASE at start only in condition and at start only in effects
-                        // We add the condition of the effect to the start action and the effect to the start action.
-                        if (!ps.getChildren().isEmpty()
-                            && pe.getChildren().isEmpty()
-                            && pi.getChildren().isEmpty()
-                            && !qs.getChildren().isEmpty()
-                            && qe.getChildren().isEmpty()) {
-
-                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
-                            when.addChild(ps);
-                            when.addChild(ps);
-                            startEffect.addChild(when);
-                        }
-
-                        // CASE at end only in condition and at end only in effects
-                        // We add the condition of the effect to the end action and the effect to the end action.
-                        else if (ps.getChildren().isEmpty()
-                            && !pe.getChildren().isEmpty()
-                            && pi.getChildren().isEmpty()
-                            && qs.getChildren().isEmpty()
-                            && !qe.getChildren().isEmpty()) {
-
-                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
-                            when.addChild(pe);
-                            when.addChild(qe);
-                            endEffect.addChild(when);
-                        }
-
-                        // CASE at star and possibly at end but no overall in condition and at end in effects
-                        else if (!ps.getChildren().isEmpty()
-                            && pi.getChildren().isEmpty()
-                            && !qe.getChildren().isEmpty()) {
-
-                            // Create the conditional effect for the start action
-                            final IntExpression startWhen = new IntExpression(PDDLConnective.WHEN);
-                            startWhen.addChild(ps);
-                            // Create the dummy predicate to memorize the effect at end
-                            final IntExpression mps = this.createDummyPredicate();
-                            startWhen.addChild(mps);
-                            startEffect.addChild(startWhen);
-
-                            // Create the conditional effect for the end action
-                            final IntExpression endWhen = new IntExpression(PDDLConnective.WHEN);
-                            if (pe.getChildren().isEmpty()) {
-                                endWhen.addChild(mps);
-                            } else {
-                                final IntExpression and = new IntExpression(PDDLConnective.AND);
-                                and.addChild(pe);
-                                and.addChild(mps);
-                                endWhen.addChild(and);
-                            }
-                            endWhen.addChild(endEffect);
-                            endEffect.addChild(endWhen);
-                        }
-
-                        // CASE overall in condition with possibly no at start and no at end and at end in effect
-                        // (when (and (at start ps) (over all pi) (at end pe)) (at end q))
-                        else if (!pi.getChildren().isEmpty()
-                            && qe.getChildren().isEmpty()) {
-
-                            // Create the monitoring action with no precondition but effects of the form
-                            // (when (and (Mpi) (not pi)) (not (Mpi)))
-                            final IntAction monitoring = this.createMonitoringAction();
-                            final IntExpression when = new IntExpression(PDDLConnective.WHEN);
-                            IntExpression and = new IntExpression(PDDLConnective.AND);
-                            final IntExpression mpi = this.createDummyPredicate();
-                            and.addChild(mpi);
-                            final IntExpression notPi = new IntExpression(PDDLConnective.NOT);
-                            notPi.addChild(pi);
-                            notPi.moveNegationInward();
-                            and.addChild(notPi);
-                            when.addChild(and);
-                            final IntExpression notMpi = new IntExpression(PDDLConnective.NOT);
-                            notMpi.addChild(mpi);
-                            when.addChild(notMpi);
-                            monitoring.getEffects().addChild(when);
-                            monitoringActions.add(monitoring);
-
-                            // Create the start effect: (when ps (Mps))
-                            IntExpression mps = this.createDummyPredicate();
-                            if (!ps.getChildren().isEmpty()) {
-                                IntExpression startWhen = new IntExpression(PDDLConnective.WHEN);
-                                startWhen.addChild(ps);
-                                startWhen.addChild(mps);
-                                startEffect.addChild(startWhen);
-                            } else {
-                                startEffect.addChild(mps);
-                            }
-
-                            // Create the start effect: (when (and (Mps) (Mpi) pe) q).
-                            IntExpression endWhen = new IntExpression(PDDLConnective.WHEN);
-                            and = new IntExpression(PDDLConnective.AND);
-                            and.addChild(mps);
-                            and.addChild(mpi);
-                            if (!pe.getChildren().isEmpty()) {
-                                and.addChild(pe);
-                            }
-                            endWhen.addChild(and);
-                            endWhen.addChild(qe);
-                            endEffect.addChild(endWhen);
-                        }
-                    default:
-                        // Do nothing
-                }
-            }
-            //System.out.println("START PRECOND AVANT  SIM: ");
-            //System.out.println(this.toString(startPrecondition));
-            //this.simplify(startPrecondition);
-            //System.out.println("START PRECOND APRES  SIM: ");
-            //System.out.println(this.toString(startPrecondition));
-            //start.
-
-            //this.simplify(endPrecondition);
-            //this.simplify(overallPrecondition);
-
-            //System.out.println("START EFFECT AVANT  SIM: ");
-            //System.out.println(Encoder.toString(startEffect));
-            Instantiation.simplify(startEffect);
-            //startEffect.toConjunctiveNormalForm(this);
-            //System.out.println("START EFFECT APRES SIM: ");
-            //System.out.println(Encoder.toString(startEffect));
-
-            //System.out.println("END EFFECT AVANT  SIM: ");
-            //System.out.println(Encoder.toString(endEffect));
-            Instantiation.simplify(endEffect);
-            //endEffect.toConjunctiveNormalForm(this);
-            //System.out.println("END EFFECT APRES  SIM: ");
-            //System.out.println(Encoder.toString(endEffect));
-
-            // Create a start action for each conjunction of the start precondition
-            for (IntExpression precondition : startPrecondition.getChildren()) {
-                IntAction startAction = new IntAction(a.getName() + "_" + "start", a.arity());
-                startAction.setCost(a.getCost());
-                startAction.setDuration(new IntExpression(a.getDuration()));
-                for (int i = 0; i < a.arity(); i++) {
-                    startAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
-                }
-                for (int i = 0; i < a.arity(); i++) {
-                    startAction.setValueOfParameter(i, a.getValueOfParameter(i));
-                }
-                startAction.setPreconditions(precondition);
-                startAction.setEffects(new IntExpression(startEffect));
-                expandedActions.add(startAction);
-
-                //System.out.println("*"+Encoder.toString(startAction));
-                //try {
-                //    System.out.println("Press enter...");
-                //    System.in.read();
-                //} catch (IOException e) {
-                //    e.printStackTrace();
-                //}
-            }
-
-            for (IntExpression precondition : endPrecondition.getChildren()) {
-                IntAction endAction = new IntAction(a.getName() + "_" + "end", a.arity());
-                endAction.setCost(a.getCost());
-                endAction.setDuration(new IntExpression(a.getDuration()));
-                for (int i = 0; i < a.arity(); i++) {
-                    endAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
-                }
-                for (int i = 0; i < a.arity(); i++) {
-                    endAction.setValueOfParameter(i, a.getValueOfParameter(i));
-                }
-                endAction.setPreconditions(precondition);
-                endAction.setEffects(new IntExpression(endEffect));
-                expandedActions.add(endAction);
-
-                /*System.out.println("*"+Encoder.toString(endAction));
-                try {
-                    System.out.println("Press enter...");
-                    System.in.read();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
-            }
-            //System.out.println(Encoder.toString(overAllPrecondition));
-            for (IntExpression precondition : overAllPrecondition.getChildren()) {
-                if (!precondition.getConnective().equals(PDDLConnective.FALSE)) {
-                    IntAction invAction = new IntAction(a.getName() + "_" + "inv", a.arity());
-                    invAction.setCost(a.getCost());
-                    invAction.setDuration(new IntExpression(a.getDuration()));
-                    for (int i = 0; i < a.arity(); i++) {
-                        invAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
-                    }
-                    for (int i = 0; i < a.arity(); i++) {
-                        invAction.setValueOfParameter(i, a.getValueOfParameter(i));
-                    }
-                    invAction.setPreconditions(precondition);
-                    expandedActions.add(invAction);
-                    /*System.out.println("*" + Encoder.toString(invAction));
-                    try {
-                        System.out.println("Press enter...");
-                        System.in.read();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }*/
-                }
-            }
-
-            // Add the monitoring actions
-            for (IntAction m : monitoringActions) {
-                expandedActions.add(m);
-                /*
-                System.out.println(this.toString(m));
-                try {
-                    System.in.read();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
-            }
-
-        }
-        actions.clear();
-        actions.addAll(expandedActions);
-
-    }
-
-
-    /**
-     * Extract the subexpression having the timespecifier.
-     *
-     * Warning the time specidier must be move inward
-     */
-    private void extract(IntExpression exp, PDDLConnective timeSpecifier) {
-        switch (exp.getConnective()) {
-            case OR:
-            case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
-                while (i.hasNext()) {
-                    IntExpression e = i.next();
-                    this.extract(e, timeSpecifier);
-                    if (e.getConnective().equals(PDDLConnective.AND)
-                        && e.getChildren().isEmpty()) {
-                        i.remove();
-                    }
-                }
-                break;
-            case AT_END:
-            case AT_START:
-            case OVER_ALL:
-                if (!exp.getConnective().equals(timeSpecifier)) {
-                    exp.setConnective(PDDLConnective.AND);
-                    exp.getChildren().clear();
-                } else {
-                    exp.affect(exp.getChildren().get(0));
-                }
-                break;
-            default:
-
-        }
-
-    }
-
-    private int dummyPredicateCounter = 0;
-    private IntExpression createDummyPredicate() {
-        this.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
-        this.dummyPredicateCounter++;
-        final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
-        atom.setPredicate(this.getPredicateSymbols().size() - 1);
-        return atom;
-
-    }
-
-    private int monitoringActionCounter = 0;
-
-    private IntAction createMonitoringAction() {
-        IntAction monitoring = new IntAction("monitoring_action" + this.monitoringActionCounter, 0);
-        this.monitoringActionCounter++;
-        return monitoring;
-    }
 
     /**
      * Instantiates a specified list of actions.
@@ -1124,11 +169,11 @@ public abstract class InstantiatedProblem extends IntProblem {
      */
     private List<IntAction> instantiate(final IntAction action, final int bound) {
         final List<IntAction> instOps = new ArrayList<>(100);
-        Instantiation.expandQuantifiedExpression(action.getPreconditions(), true);
-        Instantiation.simplify(action.getPreconditions());
+        this.expandQuantifiedExpression(action.getPreconditions(), true);
+        this.simplify(action.getPreconditions());
         if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
-            Instantiation.expandQuantifiedExpression(action.getEffects(), true);
-            Instantiation.simplify(action.getEffects());
+            this.expandQuantifiedExpression(action.getEffects(), true);
+            this.simplify(action.getEffects());
             if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                 this.instantiate(action, 0, bound, instOps);
             }
@@ -1171,10 +216,10 @@ public abstract class InstantiatedProblem extends IntProblem {
         final int arity = action.arity();
         if (index == arity) {
             final IntExpression precond = action.getPreconditions();
-            Instantiation.simplify(precond);
+            this.simplify(precond);
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 final IntExpression effect = action.getEffects();
-                Instantiation.simplify(effect);
+                this.simplify(effect);
                 if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
                     actions.add(action);
                 }
@@ -1211,115 +256,95 @@ public abstract class InstantiatedProblem extends IntProblem {
         }
     }
 
+
+
+
     /**
-     * Expands the quantified expressions contained in a specified expression.
+     * Do a pass over the effects of a specified list of instantiated actions and update the ground
+     * inertia table.
      *
-     * @param exp the expression.
-     * @param simplify the flag to indicate if logical simplifications must be done during the expansion.
      */
-    protected void expandQuantifiedExpression(final IntExpression exp, boolean simplify) {
+    protected void extractGroundInertia() {
+        this.tableOfGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
+        for (IntAction a : this.getIntActions()) {
+            extractGroundInertia(a.getEffects());
+        }
+    }
+
+    /**
+     * Instantiate the goal.
+     */
+    protected void instantiateGoal() {
+        // Expand the quantified expression in the goal
+        this.expandQuantifiedExpression(this.getIntGoal(), true);
+    }
+
+    /**
+     * Simplify a specified goal expression based on the ground inertia information.
+     *
+     */
+    protected void simplifyGoalWithGroundInertia() {
+        this.simplifyWithGroundInertia(this.getIntGoal(), false);
+        this.simplifyWithGroundNumericInertia(this.getIntGoal(), false);
+        this.simplify(this.getIntGoal());
+    }
+
+    /**
+     * Do a pass over the effects of an instantiated action and update the ground inertia table.
+     *
+     * @param exp the effect.
+     */
+    private void extractGroundInertia(final IntExpression exp) {
         switch (exp.getConnective()) {
-            case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
-                    // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(PDDLConnective.FORALL)
-                        || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && this.getDomains().get(ei.getType()).isEmpty()) {
-                        i.remove();
-                        continue;
-                    }
-                    Instantiation.expandQuantifiedExpression(ei, simplify);
-                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (simplify && ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    }
+            case ATOM:
+                Inertia inertia = this.tableOfGroundInertia.get(exp);
+                if (inertia == null) {
+                    inertia = Inertia.INERTIA;
+                }
+                switch (inertia) {
+                    case INERTIA:
+                        this.tableOfGroundInertia.put(exp, Inertia.NEGATIVE);
+                        break;
+                    case POSITIVE:
+                        this.tableOfGroundInertia.put(exp, Inertia.FLUENT);
+                        break;
+                    default:
+                        // do nothing
                 }
                 break;
+            case AND:
             case OR:
-                i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
-                    // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(PDDLConnective.FORALL)
-                        || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && this.getDomains().get(ei.getType()).isEmpty()) {
-                        i.remove();
-                        continue;
-                    }
-                    Instantiation.expandQuantifiedExpression(ei, simplify);
-                    // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (simplify && ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    }
-                }
+                exp.getChildren().forEach(this::extractGroundInertia);
                 break;
             case FORALL:
-                Set<Integer> constants = this.getDomains().get(exp.getType());
-                IntExpression qExp = exp.getChildren().get(0);
-                int var = exp.getVariable();
-                exp.setConnective(PDDLConnective.AND);
-                exp.getChildren().clear();
-                Iterator<Integer> it = constants.iterator();
-                while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    int cons = it.next();
-                    IntExpression copy = new IntExpression(qExp);
-                    this.substitute(copy, var, cons, simplify);
-                    exp.getChildren().add(copy);
-                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (simplify && copy.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    }
-                }
-                Instantiation.expandQuantifiedExpression(exp, simplify);
-                break;
             case EXISTS:
-                constants = this.getDomains().get(exp.getType());
-                qExp = exp.getChildren().get(0);
-                var = exp.getVariable();
-                exp.setConnective(PDDLConnective.OR);
-                exp.getChildren().clear();
-                it = constants.iterator();
-                while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    int cons = it.next();
-                    IntExpression copy = new IntExpression(qExp);
-                    this.substitute(copy, var, cons, simplify);
-                    exp.getChildren().add(copy);
-                    // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (simplify && copy.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    }
-                }
-                this.expandQuantifiedExpression(exp, simplify);
-                break;
-
             case AT_START:
             case AT_END:
-            case NOT:
-            case ALWAYS:
-            case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-                Instantiation.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
+                extractGroundInertia(exp.getChildren().get(0));
                 break;
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
             case WHEN:
-                this.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
-                this.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
+                extractGroundInertia(exp.getChildren().get(1));
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
-                this.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
-                this.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
-                this.expandQuantifiedExpression(exp.getChildren().get(3), simplify);
+            case NOT:
+                final IntExpression neg = exp.getChildren().get(0);
+                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
+                    inertia = this.tableOfGroundInertia.get(neg);
+                    if (inertia == null) {
+                        inertia = Inertia.INERTIA;
+                    }
+                    switch (inertia) {
+                        case INERTIA:
+                            this.tableOfGroundInertia.put(neg, Inertia.POSITIVE);
+                            break;
+                        case NEGATIVE:
+                            this.tableOfGroundInertia.put(neg, Inertia.FLUENT);
+                            break;
+                        default:
+                            // do nothing
+                    }
+                }
                 break;
-            case ATOM:
-                this.simplyAtom(exp);
-                break;
+            case F_EXP_T:
             case EQUAL_ATOM:
             case FN_HEAD:
             case FN_ATOM:
@@ -1338,15 +363,23 @@ public abstract class InstantiatedProblem extends IntProblem {
             case DIV:
             case MINUS:
             case PLUS:
-            case F_EXP_T:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+            case WITHIN:
+            case HOLD_AFTER:
+            case ALWAYS_WITHIN:
+            case HOLD_DURING:
+            case TIME_VAR:
+            case IS_VIOLATED:
             case NUMBER:
             case MINIMIZE:
             case MAXIMIZE:
             case UMINUS:
+            case ALWAYS:
+            case OVER_ALL:
+            case SOMETIME:
+            case AT_MOST_ONCE:
             case F_EXP:
-            case TIME_VAR:
-            case IS_VIOLATED:
-                // do nothing
                 break;
             default:
                 // do nothing
@@ -1354,206 +387,173 @@ public abstract class InstantiatedProblem extends IntProblem {
     }
 
     /**
-     * This method simplify a specified expression. The rules of simplification are as below:
-     * <ul>
-     * <li> not true eqv false </li>
-     * <li> true ^ phi eqv phi </li>
-     * <li> false ^ phi eqv false </li>
-     * <li> true v phi eqv true </li>
-     * <li> false v phi eqv false </li>
-     * <li> not false eqv true </li>
-     * <li> phi ^ phi eqv phi </li>
-     * <li> phi v phi eqv phi </li>
-     * <li> phi ^ not phi eqv false </li>
-     * <li> phi v not phi eqv true </li>
-     * <li> x = x eqv true </li>
-     * <li> x = y eqv false </li>
-     * </ul>
-     *
-     * @param exp the expression to simplify.
+     * Do a pass over the effects of a specified list of instantiated actions and update the ground
+     * inertia table.
      */
-    protected void simplify(final IntExpression exp) {
+    protected void extractGroundNumericInertia() {
+        this.tableOfNumericGroundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
+        for (IntAction a : this.getIntActions()) {
+            this.extractGroundNumericInertia(a.getEffects());
+        }
+    }
+
+    /**
+     * Do a pass over the effects of an instantiated action and update the ground numeric inertia table.
+     * A numeric inertia is a function that is never change by any action of the problem.
+     * PDDLConnetive checks.
+     *
+     * @param exp the effect.
+     */
+    private void extractGroundNumericInertia(final IntExpression exp) {
+        switch (exp.getConnective()) {
+            case AND:
+                exp.getChildren().forEach(this::extractGroundNumericInertia);
+                break;
+            case WHEN:
+                extractGroundNumericInertia(exp.getChildren().get(1));
+                break;
+            case NOT:
+                extractGroundNumericInertia(exp.getChildren().get(0));
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.getTableOfNumericGroundInertia().put(exp.getChildren().get(0), Inertia.FLUENT);
+                break;
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().getImage());
+        }
+    }
+
+
+    /**
+     * Do a pass over the preconditions and the effects of all the instantiated actions and update the ground inertia
+     * table. Then, simplify the actions according to the extracted ground inertia.*
+     */
+    protected void simplyActionsWithGroundInertia() {
+
+        final List<IntAction> toAdd = new ArrayList<>(this.getIntActions().size());
+        final Set<Integer> toRemove = new HashSet<>(this.getIntActions().size());
+        int index = 0;
+        for (IntAction a : this.getIntActions()) {
+            if (a.isDurative()) {
+                this.simplifyWithGroundNumericInertia(a.getDuration(), false);
+                if (a.getDuration().getConnective().equals(PDDLConnective.FALSE)) {
+                    toRemove.add(index);
+                    index++;
+                    continue;
+                }
+            }
+            this.simplifyWithGroundInertia(a.getPreconditions(), false);
+            // ADD to symplified Numeric function
+            this.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
+            this.simplify(a.getPreconditions());
+            if (!a.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+                this.simplifyWithGroundInertia(a.getEffects(), true);
+                // ADD for numeric fluents
+                this.simplifyWithGroundNumericInertia(a.getEffects(), true);
+                this.simplify(a.getEffects());
+                if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                    toAdd.add(a);
+                } else {
+                    toRemove.add(index);
+                }
+            } else {
+                toRemove.add(index);
+            }
+            index++;
+        }
+
+        this.getIntActions().clear();
+        this.getIntActions().addAll(toAdd);
+    }
+
+
+    /**
+     * Simplify a specified expression based on the ground inertia information.
+     * <p>
+     * <i>Definition:</i> A ground fact is a positive ground inertia iff it does not occur positively in
+     * an unconditional effect or the consequent of a conditional effect of an action.
+     * </p>
+     * <p>
+     * <i>Definition:</i> A ground fact is a negative ground inertia iff it does not occur negatively in
+     * an unconditional effect or the consequent of a conditional effect of an action.
+     * </p>
+     * An initial fact, which is a negative ground inertia, is never made FALSE and thus always
+     * satisfied in all reachable world states. It can be removed from the state description. All
+     * its occurrences in the preconditions of actions and in the antecedents of conditional effects
+     * can be simplified to TRUE. A fact, which is a positive ground inertia and not contained in
+     * the initial state, is never satisfied in any reachable world state. All its occurrences in
+     * the preconditions of actions and in the antecedents of conditional effects can be simplified
+     * to FALSE. The remaining facts are fluents that, roughly speaking, can possibly change their
+     * truth value during the planning process. They are therefore relevant to the representation of
+     * the planning problem.
+     *
+     * @param exp    the expression to simply.
+     * @param effect a boolean to indicate if the expression is an effect or a precondition.
+     */
+    private void simplifyWithGroundInertia(final IntExpression exp, final boolean effect) {
         switch (exp.getConnective()) {
             case ATOM:
-                break;
-            case FN_HEAD:
-                break;
-            case EQUAL_ATOM:
-                int[] args = exp.getArguments();
-                // Get and substitute the first argument
-                final int arg1 = args[0];
-                // Get and substitute the second argument
-                final int arg2 = args[1];
-                if (arg1 == arg2) {
-                    // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
+                Inertia inertia = this.getTableOfGroundInertia().get(exp);
+                if (inertia == null) {
+                    inertia = Inertia.INERTIA;
+                }
+                // An initial fact, which is a negative ground inertia, is never made FALSE and thus
+                // always satisfied in all reachable world states. All its occurrences in the
+                // preconditions of actions and in the
+                // antecedents of conditional effects can be simplified to TRUE.
+                if (!effect && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.NEGATIVE))
+                    && this.getIntInitPredicates().contains(exp)) {
                     exp.setConnective(PDDLConnective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0) {
-                    // The equality is ground and the equality is FALSE because arg1 != arg2
+                } else if (!effect
+                    && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.POSITIVE))
+                    && !this.getIntInitPredicates().contains(exp)) {
+                    // If the antecedent of a conditional effect becomes TRUE, the conditional
+                    // effect
+                    // becomes unconditional.
                     exp.setConnective(PDDLConnective.FALSE);
                 }
                 break;
             case AND:
-                int i = 0;
-                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = exp.getChildren().get(i);
-                    Instantiation.simplify(ei);
+                Iterator<IntExpression> i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                    final IntExpression ei = i.next();
+                    this.simplifyWithGroundInertia(ei, effect);
+                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        // If a child expression is FALSE, the whole conjunction becomes FALSE.
                         exp.setConnective(PDDLConnective.FALSE);
-                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        // If a child expression is TRUE, we can remove the child expression.
-                        exp.getChildren().remove(i);
-                    } else if (ei.getConnective().equals(PDDLConnective.AND)) {
-                        // If the child expression to add is a conjunction, we can simplify the expression by
-                        exp.getChildren().remove(i); // removing the inner conjunction.
-                        int j = 0;
-                        int added = 0;
-                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
-                            final IntExpression ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                exp.setConnective(PDDLConnective.FALSE);
-                            } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                exp.getChildren().add(i + added, ej);
-                                added++;
-                            }
-                            j++;
-                        }
-                        i += added + 1;
-                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
-                        // Simplification of the conditional expression.
-                        final IntExpression antecedent = ei.getChildren().get(0);
-                        final IntExpression consequent = ei.getChildren().get(1);
-                        // If the antecedent of a conditional effect becomes FALSE , the conditional
-                        // effect is removed from the action. In this case, the effect is never applicable
-                        // because it requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the antecedent of a conditional effect becomes TRUE, the conditional
-                            // effect becomes unconditional.
-                            if (consequent.getConnective().equals(PDDLConnective.AND)) {
-                                exp.getChildren().remove(i);
-                                int j = 0;
-                                int added = 0;
-                                while (j < consequent.getChildren().size()
-                                    && exp.getConnective().equals(PDDLConnective.AND)) {
-
-                                    final IntExpression ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                        exp.setConnective(PDDLConnective.FALSE);
-                                    } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                        exp.getChildren().add(i + added, ej);
-                                        added++;
-                                    }
-                                    j++;
-                                }
-                                i += added + 1;
-                            } else {
-                                exp.getChildren().set(i, consequent);
-                                i++;
-                            }
-                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the consequent of a conditional effect becomes TRUE, the conditional
-                            // effect is removed because it does not lead to any state transition.
-                            exp.getChildren().remove(i);
-                        } else {
-                            i++;
-                        }
-                    } else {
-                        i++;
+                    }
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        i.remove();
                     }
                 }
-                // Finally, if the conjunction is empty, the expression becomes TRUE.
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (exp.getChildren().size() == 1) {
+                if (exp.getChildren().size() == 1) {
                     exp.affect(exp.getChildren().get(0));
                 }
                 break;
             case OR:
-                i = 0;
-                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = exp.getChildren().get(i);
-                    Instantiation.simplify(ei);
+                i = exp.getChildren().iterator();
+                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                    final IntExpression ei = i.next();
+                    this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
-                    } else if (ei.getConnective().equals(PDDLConnective.OR)) {
-                        // If the child expression to add is a disjunction, we can simplify the expression by
-                        // removing the inner disjunction.
-                        exp.getChildren().remove(i);
-                        int j = 0;
-                        int added = 0;
-                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
-                            final IntExpression ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                exp.setConnective(PDDLConnective.TRUE);
-                            } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                exp.getChildren().add(i + added, ej);
-                                added++;
-                            }
-                            j++;
-                        }
-                        i += added + 1;
-                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
-                        // Simplification of the conditional expression.
-                        final IntExpression antecedent = ei.getChildren().get(0);
-                        final IntExpression consequent = ei.getChildren().get(1);
-                        // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
-                        // removed from the action. In this case, the effect is never applicable because it
-                        // requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the antecedent of a conditional effect becomes TRUE, the conditional effect
-                            // becomes unconditional.
-                            if (consequent.getConnective().equals(PDDLConnective.OR)) {
-                                exp.getChildren().remove(i);
-                                int j = 0;
-                                int added = 0;
-                                while (j < consequent.getChildren().size()
-                                    && exp.getConnective().equals(PDDLConnective.OR)) {
-
-                                    final IntExpression ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                        exp.setConnective(PDDLConnective.TRUE);
-                                    } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                        exp.getChildren().add(i + added, ej);
-                                        added++;
-                                    }
-                                    j++;
-                                }
-                                i += added + 1;
-                            } else {
-                                exp.getChildren().set(i, consequent);
-                                i++;
-                            }
-                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the consequent of a conditional effect becomes TRUE, the conditional
-                            // effect is removed because it does not lead to any state transition.
-                            exp.getChildren().remove(i);
-                        } else {
-                            i++;
-                        }
-                    } else {
-                        i++;
+                    }
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        i.remove();
                     }
                 }
-                // Finally, if the disjunction is empty, the expression becomes TRUE.
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (exp.getChildren().size() == 1) {
+                if (exp.getChildren().size() == 1) {
                     exp.affect(exp.getChildren().get(0));
-                } else {
-                    final Iterator<IntExpression> it = exp.getChildren().iterator();
-                    while (it.hasNext()) {
-                        if (it.next().getConnective().equals(PDDLConnective.FALSE)) {
-                            it.remove();
-                        }
-                    }
-                    if (exp.getChildren().isEmpty()) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    }
                 }
                 break;
             case FORALL:
@@ -1565,18 +565,25 @@ public abstract class InstantiatedProblem extends IntProblem {
             case OVER_ALL:
             case SOMETIME:
             case AT_MOST_ONCE:
-                Instantiation.simplify(exp.getChildren().get(0));
+                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 break;
             case NOT:
                 final IntExpression neg = exp.getChildren().get(0);
-                Instantiation.simplify(neg);
-                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                this.simplifyWithGroundInertia(neg, effect);
+                if (!effect) {
+                    if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    }
                 }
                 break;
             case WHEN:
+                this.simplifyWithGroundInertia(exp.getChildren().get(0), false);
+                this.simplifyWithGroundInertia(exp.getChildren().get(1), true);
+                break;
+            case EQUAL_ATOM:
+                break;
             case LESS:
             case LESS_OR_EQUAL:
             case EQUAL:
@@ -1595,18 +602,18 @@ public abstract class InstantiatedProblem extends IntProblem {
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                Instantiation.simplify(exp.getChildren().get(0));
-                Instantiation.simplify(exp.getChildren().get(1));
+                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(1), effect);
                 break;
             case F_EXP_T:
             case F_EXP:
-                Instantiation.simplify(exp.getChildren().get(0));
+                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                Instantiation.simplify(exp.getChildren().get(0));
-                Instantiation.simplify(exp.getChildren().get(1));
-                Instantiation.simplify(exp.getChildren().get(3));
+                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(1), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(3), effect);
                 break;
             case FN_ATOM:
             case NUMBER:
@@ -1615,104 +622,788 @@ public abstract class InstantiatedProblem extends IntProblem {
             case IS_VIOLATED:
             case MINIMIZE:
             case MAXIMIZE:
+            case FN_HEAD:
                 break;
             default:
                 // do nothing
         }
     }
 
+
+
     /**
-     * Substitutes all occurrence of a specified variable into an expression by a constant.
+     * Simplify a specified expression based on the ground inertia information.
      *
-     * @param exp  the expression.
-     * @param var  the variable.
-     * @param cons the constant.
+     *
+     * @param exp    the expression to simply.
+     * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
-    protected void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
-        boolean updated = false;
+    private void simplifyWithGroundNumericInertia(final IntExpression exp, final boolean effect) {
+        //System.out.println(exp.getConnective() + " " + Encoder.toString(exp));
         switch (exp.getConnective()) {
-            case ATOM:
-                int[] args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == var) {
-                        args[i] = cons;
-                        updated = true;
-                    }
-                }
-                if (updated) {
-                    this.simplyAtom(exp);
-                }
-                break;
-            case TASK:
-                args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == var) {
-                        args[i] = cons;
-                    }
-                }
-                break;
-            case FN_HEAD:
-                args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == var) {
-                        args[i] = cons;
-                        updated = true;
-                    }
-                }
-                //if (updated) {
-                //    Instantiation.simplyFunction(exp);
-                //}
-                break;
-            case EQUAL_ATOM:
-                args = exp.getArguments();
-                // Get and substitute the first argument
-                final int arg1 = args[0];
-                if (arg1 == var) {
-                    args[0] = cons;
-                }
-                // Get and substitute the second argument
-                final int arg2 = args[1];
-                if (arg2 == var) {
-                    args[1] = cons;
-                }
-                // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
-                if (arg1 == arg2) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0) {
-                    // The equality is ground and the equality is FALSE because arg1 != arg2
-                    exp.setConnective(PDDLConnective.FALSE);
-                }
-                break;
             case AND:
                 Iterator<IntExpression> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     final IntExpression ei = i.next();
-                    this.substitute(ei, var, cons, simplify);
+                    this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (simplify && ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         exp.setConnective(PDDLConnective.FALSE);
+                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                        i.remove();
                     }
+                }
+                if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
                 }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     final IntExpression ei = i.next();
-                    this.substitute(ei, var, cons, simplify);
+                    this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (simplify && ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
+                    } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                        i.remove();
                     }
+                }
+                if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
                 }
                 break;
             case NOT:
                 final IntExpression neg = exp.getChildren().get(0);
-                this.substitute(neg, var, cons, simplify);
-                if (simplify && neg.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else if (simplify && neg.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                this.simplifyWithGroundNumericInertia(neg, effect);
+                if (!effect) {
+                    if (neg.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                    }
                 }
+                break;
+            case WHEN:
+                this.simplifyWithGroundNumericInertia(exp.getChildren().get(0), false);
+                this.simplifyWithGroundNumericInertia(exp.getChildren().get(1), true);
+                break;
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.simplifyWithGroundNumericInertia(exp.getChildren().get(1), effect);
+                if (exp.getChildren().get(1).getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                }
+                break;
+            case PLUS:
+            case MINUS:
+            case MUL:
+            case DIV:
+                IntExpression op1 = exp.getChildren().get(0);
+                IntExpression op2 = exp.getChildren().get(1);
+                this.simplifyWithGroundNumericInertia(op1, effect);
+                this.simplifyWithGroundNumericInertia(op2, effect);
+                if (op1.getConnective().equals(PDDLConnective.FALSE)
+                    || op2.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
+                    && op2.getConnective().equals(PDDLConnective.NUMBER)) {
+                    switch (exp.getConnective()) {
+                        case PLUS:
+                            exp.setValue(op1.getValue() + op2.getValue());
+                            break;
+                        case MINUS:
+                            exp.setValue(op1.getValue() - op2.getValue());
+                            break;
+                        case MUL:
+                            exp.setValue(op1.getValue() * op2.getValue());
+                            break;
+                        case DIV:
+                            exp.setValue(op1.getValue() / op2.getValue());
+                            break;
+                    }
+                    exp.setConnective(PDDLConnective.NUMBER);
+
+                }
+                break;
+            case UMINUS:
+                op1 = exp.getChildren().get(0);
+                if (op1.getConnective().equals(PDDLConnective.NUMBER)) {
+                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.setValue(-op1.getValue());
+                    exp.getChildren().clear();
+                } else if (op1.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                }
+                break;
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+                op1 = exp.getChildren().get(0);
+                op2 = exp.getChildren().get(1);
+                this.simplifyWithGroundNumericInertia(op1, effect);
+                this.simplifyWithGroundNumericInertia(op2, effect);
+                if (op1.getConnective().equals(PDDLConnective.FALSE)
+                    || op2.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
+                    && op2.getConnective().equals(PDDLConnective.NUMBER)) {
+                    switch (exp.getConnective()) {
+                        case LESS:
+                            if (op1.getValue() < op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case LESS_OR_EQUAL:
+                            if (op1.getValue() <= op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case GREATER:
+                            if (op1.getValue() > op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case GREATER_OR_EQUAL:
+                            if (op1.getValue() >= op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                        case EQUAL:
+                            if (op1.getValue() == op2.getValue()) {
+                                exp.setConnective(PDDLConnective.TRUE);
+                            } else {
+                                exp.setConnective(PDDLConnective.FALSE);
+                            }
+                            break;
+                    }
+                }
+                break;
+            case F_EXP:
+                IntExpression fexp = exp.getChildren().get(0);
+                this.simplifyWithGroundNumericInertia(fexp, effect);
+                if (fexp.getConnective().equals(PDDLConnective.NUMBER)) {
+                    exp.setValue(fexp.getValue());
+                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.getChildren().clear();
+                } else if (fexp.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.getChildren().clear();
+                }
+                break;
+            case FN_HEAD:
+                Inertia inertia = this.getTableOfNumericGroundInertia().get(exp);
+                if (inertia == null) {
+                    Double value = this.getIntInitFunctionCost().get(exp);
+                    // The numeric fluent is never modified and does not appear in the initial state
+                    if (value == null) {
+                        exp.setConnective(PDDLConnective.FALSE);
+                    } else {
+                        exp.setConnective(PDDLConnective.NUMBER);
+                        exp.setValue(value);
+                    }
+                }
+                break;
+            case NUMBER:
+            case TIME_VAR:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+    }
+
+    protected void instantiateInitialTaskNetwork() {
+        final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
+        if (taskNetworks.size() > 1) {
+            IntExpression root = new IntExpression(PDDLConnective.TASK);
+            root.setPredicate(this.getTaskSymbols().size());
+            this.getTaskSymbols().add("__top");
+            this.getCompoundTaskSymbols().add("__top");
+            root.setPrimtive(false);
+            int index = 0;
+            for (IntTaskNetwork tn : taskNetworks) {
+                IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
+                for (int i = 0; i < tn.arity(); i++) {
+                    method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < tn.arity(); i++) {
+                    method.setValueOfParameter(i, tn.getValueOfParameter(i));
+                }
+                method.setTask(new IntExpression(root));
+                method.setPreconditions(new IntExpression(PDDLConnective.AND));
+                method.setTaskNetwork(tn);
+                this.getIntMethods().add(method);
+                index++;
+            }
+
+            // Creates the abstract initial task network
+            IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
+            newTaskNetwork.getTasks().addChild(new IntExpression(root));
+            this.setIntInitialTaskNetwork(newTaskNetwork);
+        } else {
+            this.setIntInitialTaskNetwork(taskNetworks.get(0));
+        }
+    }
+
+
+
+    /**
+     * Instantiates a specified task network.
+     *
+     * @param network the task network to instantiate.
+     * @return the list of task netwok instantiated corresponding the specified network.
+     */
+    private List<IntTaskNetwork> instantiate(final IntTaskNetwork network) {
+        final List<IntTaskNetwork> instNetwork = new ArrayList<>(100);
+        this.instantiate(network, 0, instNetwork);
+        return instNetwork;
+    }
+
+    /**
+     * Instantiates a specified task network.
+     *
+     * @param network  the action.
+     * @param index   the index of the parameter to instantiate.
+     * @param networks the list of tasknetwork already instantiated.
+     * @see IntAction
+     */
+    private void instantiate(final IntTaskNetwork network, final int index, final List<IntTaskNetwork> networks) {
+
+        final int arity = network.arity();
+        if (index == arity) {
+            networks.add(network);
+        } else {
+            final Set<Integer> values = this.getDomains().get(network.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntTaskNetwork copy = new IntTaskNetwork(arity);
+                copy.setOrderingConstraints(new IntExpression(network.getOrderingConstraints()));
+
+                final IntExpression tasksCopy = new IntExpression(network.getTasks());
+                this.substitute(tasksCopy, varIndex, value, true);
+                copy.setTasks(tasksCopy);
+
+                for (int i = 0; i < arity; i++) {
+                    copy.setTypeOfParameter(i, network.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < arity; i++) {
+                    copy.setValueOfParameter(i, network.getValueOfParameter(i));
+                }
+
+                copy.setValueOfParameter(index, value);
+                this.instantiate(copy, index + 1, networks);
+            }
+        }
+    }
+
+    /**
+     * Make the instantiation of a list of methods.
+     *
+     * @param methods             the method to instantiate.
+     * @param initialTasksNetwork the initial tasks network.
+     * @param actions             the list of action already instantiate.
+     */
+    protected void instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork,
+                                      List<IntAction> actions) {
+
+        // Init the list of instantiated methods or ground methods
+        final List<IntMethod> instMethods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
+
+        // Init the set used to store the compound tasks
+        final Set<IntExpression> compound = new LinkedHashSet<>();
+
+        // Init the set used to store the primtive tasks
+        final Set<IntExpression> primtive = new LinkedHashSet<>();
+
+        // Init the table used to store for each task the list of methods that are relevant
+        this.relevantMethods = new ArrayList<List<Integer>>();
+
+        // Init the list of methods to instantiate
+        List<IntMethod> meths = new ArrayList<>();
+        for (IntMethod m : methods) {
+            // If a method has a parameter with a empty domain the method must be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < m.arity() && toInstantiate) {
+                toInstantiate = !this.getDomains().get(m.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (toInstantiate) {
+                meths.add(m);
+            }
+        }
+
+        // Filter methods with a parameter with an empty domain
+        this.filterMethodWithEmptyDomainParameter(methods);
+
+        // Expand the quantified expression contains in the the method precondition
+        this.expandQuantifiedExpressionAndSimplyMethods(meths);
+
+        // Compute the set of primitive task from the action already instantiated
+        LinkedHashSet<IntExpression> primitiveTaskSet = this.computePrimitiveTaskSet(actions);
+
+        // TInit the list of pending tasks to decompose
+        final LinkedList<IntExpression> tasks = new LinkedList<>();
+
+        // Add the task of the initial task network with the compound tasks
+        for (IntExpression subtasks : initialTasksNetwork.getTasks().getChildren()) {
+            if (!tasks.contains(subtasks)) {
+                if (!subtasks.isPrimtive()) {
+                    tasks.add(subtasks);
+                    compound.add(subtasks);
+                } else {
+                    primtive.add(subtasks);
+                }
+            }
+        }
+
+        // Start exploring the task tree
+        int indexMethod = 0;
+        while (!tasks.isEmpty()) {
+            final IntExpression task = tasks.pop();
+            final List<IntMethod> relevant = new ArrayList<>();
+            final List<Integer> relevantIndex = new ArrayList<>();
+            for (IntMethod method : meths) {
+                if (method.getTask().getPredicate() == task.getPredicate()
+                    && method.getTask().getArguments().length == task.getArguments().length) {
+                    final List<IntMethod> instantiated = new ArrayList<>(100);
+                    this.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
+                    for (IntMethod instance : instantiated) {
+                        final Iterator<IntExpression> i = instance.getSubTasks().getChildren().iterator();
+                        final Set<IntExpression> primitiveSet = new LinkedHashSet<>();
+                        final Set<IntExpression> compoundSet = new LinkedHashSet<>();
+                        boolean stop = false;
+                        while (i.hasNext() && !stop) {
+                            final IntExpression subtask = i.next();
+                            if (subtask.isPrimtive()) {
+                                if (!primitiveTaskSet.contains(subtask)) {
+                                    stop = true;
+                                } else {
+                                    primitiveSet.add(subtask);
+                                }
+                            } else {
+                                if (!compound.contains(subtask)) {
+                                    compoundSet.add(subtask);
+                                }
+                            }
+                        }
+                        if (!stop) {
+                            primtive.addAll(primitiveSet);
+                            tasks.addAll(compoundSet);
+                            compound.addAll(compoundSet);
+                            relevant.add(instance);
+                            relevantIndex.add(indexMethod);
+                            indexMethod++;
+                        }
+                    }
+                }
+            }
+
+            this.relevantMethods.add(relevantIndex);
+            instMethods.addAll(relevant);
+        }
+
+        // Initialize the table of relevant methods for each compund task and the table of relevant compound tasks
+        this.tableOfRelevantCompundTasks = new ArrayList<>(compound.size());
+        this.tableOfRelevantCompundTasks.addAll(compound);
+
+        // Initialize the table of relevant actions for each primitive task and the table of relevant primitive tasks
+        this.relevantActions = new ArrayList<Integer>(primitiveTaskSet.size());
+        this.tableOfRelevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
+        int index = 0;
+        Iterator<IntExpression> i = primitiveTaskSet.iterator();
+        while (i.hasNext()) {
+            // The action at index i can be remove because it not reachable from the initial task network.
+            IntExpression primitiveTask = i.next();
+            if (!primtive.contains(primitiveTask)) {
+                actions.remove(index);
+                i.remove();
+            } else {
+                this.relevantActions.add(index);
+                this.tableOfRelevantPrimitiveTasks.add(primitiveTask);
+                index++;
+            }
+        }
+        methods.clear();
+        methods.addAll(instMethods);
+    }
+
+    /**
+     * Filter methods with a parameter with a empty domain.
+     *
+     * @param methods the list of methods to filter.
+     */
+    private void filterMethodWithEmptyDomainParameter(List<IntMethod> methods) {
+        Iterator<IntMethod> it = methods.iterator();
+        while (it.hasNext()) {
+            final IntMethod method = it.next();
+            // If an method has a parameter with a empty domain the method can be removed
+            boolean toInstantiate = true;
+            int i = 0;
+            while (i < method.arity() && toInstantiate) {
+                toInstantiate = !this.getDomains().get(method.getTypeOfParameters(i)).isEmpty();
+                i++;
+            }
+            if (!toInstantiate) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
+     * Expands the quantified expression contained in the preconditions of the methods in parameter and simplify the
+     * their precondition. If the preconditions can be simplied to false, the method simplified is removed.
+     *
+     * @param methods the list of methods to process.
+     */
+    private void expandQuantifiedExpressionAndSimplyMethods(List<IntMethod> methods) {
+        final Iterator<IntMethod> i = methods.iterator();
+        while (i.hasNext()) {
+            final IntMethod method = i.next();
+            this.expandQuantifiedExpression(method.getPreconditions(), true);
+            this.simplify(method.getPreconditions());
+            if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+                i.remove();
+            }
+        }
+    }
+
+    /**
+     * Computes the list of possible primitive tasks from the action already instantiated.
+     *
+     * @param actions the list of actions altready instantiated.
+     * @return the list of possible primitive tasks from the action already instantiated.
+     */
+    private LinkedHashSet<IntExpression> computePrimitiveTaskSet(List<IntAction> actions) {
+        LinkedHashSet<IntExpression> tasks = new LinkedHashSet<>();
+        for (IntAction a : actions) {
+            IntExpression task = new IntExpression(PDDLConnective.TASK);
+            task.setPrimtive(true);
+            task.setPredicate(this.getTaskSymbols().indexOf(a.getName()));
+            task.setArguments(a.getInstantiations());
+            tasks.add(task);
+        }
+        return tasks;
+
+    }
+
+    /**
+     * Make the preinstantion of a method based on the argument used in the tasks accomplish by the method.
+     *
+     * @param method the method to instantiate.
+     * @param index  the index of the parameter to instantiate. Initially, the index is set to 0.
+     * @param bound  a bound on the number of methods to instantiate.
+     * @param task   the tasks that accomplish the method.
+     */
+    private void instantiate(final IntMethod method, final int index, final int bound,
+                             final List<IntMethod> methods, final IntExpression task) {
+        final IntExpression t = method.getTask();
+        final IntMethod copy = new IntMethod(method);
+        boolean instantiable = true;
+        int i = 0;
+        while (i < t.getArguments().length && instantiable) {
+            final int var = t.getArguments()[i];
+            final int cons = task.getArguments()[i];
+            final int type = copy.getTypeOfParameters((-var - 1));
+            final Set<Integer> domain = this.getDomains().get(type);
+            if (domain.contains(cons)) {
+                this.substitute(copy.getPreconditions(), var, cons, true);
+                this.substitute(copy.getTask(), var, cons, true);
+                this.substitute(copy.getSubTasks(), var, cons, true);
+                copy.setValueOfParameter((-var - 1), cons);
+            } else {
+                instantiable = false;
+            }
+            i++;
+        }
+        // This case may occur when variables are identical in the tasks
+        if (copy.getTask().equals(task) && instantiable) {
+            this.instantiate(copy, index, bound, methods);
+        }
+    }
+
+    /**
+     * Instantiates a specified method. This method used brut force.
+     * <p>
+     * The assumption is made that different method parameters are instantiated with different
+     * constants, i.e., the planner never generates methods like move(a,a) because we consider this
+     * as a bad domain representation that should be revised. In fact, in methods with identical
+     * constant parameters, all but one of the constants are superfluous and can be skipped from the
+     * representation without loss of information. Warning this assumption make the process no-sound.
+     * </p>
+     *
+     * @param method  the method.
+     * @param index   the index of the parameter to instantiate.
+     * @param bound   the bound of methods to instantiate.
+     * @param methods the list of methods already instantiated.
+     * @see IntMethod
+     */
+    private void instantiate(final IntMethod method, final int index, final int bound,
+                             final List<IntMethod> methods) {
+        if (bound == methods.size()) {
+            return;
+        }
+        final int arity = method.arity();
+        if (index == arity) {
+            final IntExpression precond = method.getPreconditions();
+            this.simplify(precond);
+            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                methods.add(method);
+            }
+        } else if (method.getValueOfParameter(index) >= 0) {
+            this.instantiate(method, index + 1, bound, methods);
+        } else {
+            final Set<Integer> values = this.getDomains().get(method.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
+
+                this.substitute(preconditionCopy, varIndex, value, true);
+                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
+                    final IntMethod copy = new IntMethod(method.getName(), arity);
+                    copy.setPreconditions(preconditionCopy);
+                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
+
+                    final IntExpression taskCopy = new IntExpression(method.getTask());
+                    this.substitute(taskCopy, varIndex, value, true);
+                    copy.setTask(taskCopy);
+
+                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
+                    this.substitute(subTasksCopy, varIndex, value, true);
+                    copy.setSubTasks(subTasksCopy);
+
+                    for (int i = 0; i < arity; i++) {
+                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
+                    }
+                    for (int i = 0; i < arity; i++) {
+                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
+                    }
+
+                    copy.setValueOfParameter(index, value);
+                    this.instantiate(copy, index + 1, bound, methods);
+                }
+            }
+        }
+    }
+
+    /**
+     * Simply recursively the methods by removing unreachable tasks.
+     *
+     * @param methods the list of method to simplify.
+     * @param tasks   the set of compound tasks which are no more reachable.
+     * @return the list of task no more reachable.
+     */
+    private void simplyRecursivelyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
+                                                                  final Set<IntExpression> tasks) {
+        while (!tasks.isEmpty()) {
+            this.simplyMethodsWithTasksNoMoreReachable(methods, tasks);
+        }
+    }
+
+    /**
+     * Simply the method by removing unreachable tasks.
+     *
+     * @param methods the list of method to simplify.
+     * @param tasks   the set of compound tasks which are no more reachable.
+     * @return the list of task no more reachable.
+     */
+    private void simplyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
+                                                       final Set<IntExpression> tasks) {
+        final Set<IntExpression> tasksNoMoreReachable = new LinkedHashSet<>();
+        for (int i = 0; i < methods.size(); i++) {
+            final IntMethod method = methods.get(i);
+            if (this.isSimplified(method, tasks)) {
+                methods.remove(i);
+                for (int j = 0; j < this.getRelevantMethods().size(); j++) {
+                    final List<Integer> relevant = this.getRelevantMethods().get(j);
+                    if (relevant.remove(new Integer(i))) {
+                        //System.out.println("remove " + i);
+                        this.updateRelevantMethods(i);
+                        // There is no more relevant method for the compound task
+                        if (relevant.isEmpty()) {
+                            tasksNoMoreReachable.add(this.getTableOfRelevantCompundTasks().get(j));
+                            this.getTableOfRelevantCompundTasks().remove(j);
+                            this.getRelevantMethods().remove(j);
+                            //System.out.println("A task is no more reachable");
+                            j--;
+                        }
+                        break;
+                    }
+                }
+                i--;
+            }
+        }
+        tasks.clear();
+        tasks.addAll(tasksNoMoreReachable);
+    }
+
+    /**
+     * Returns if a method can be simplified. A method can be simplified if it is relevant for a task that is no more
+     * reachable or has a child that is no more reachable. The set of no more reachable set of tasks is given as
+     * parameter of the methods.
+     *
+     * @param method the method to test.
+     * @param tasks  the set of tasks that are no more reachable.
+     * @return <code>true</code> if the method is simplified, <code>false</code>
+     */
+    private boolean isSimplified(IntMethod method, Set<IntExpression> tasks) {
+        boolean isSimplified = true;
+        if (!tasks.contains(method.getTask())) {
+            final List<IntExpression> subtasks = method.getSubTasks().getChildren();
+            final Iterator<IntExpression> i = subtasks.iterator();
+            isSimplified = false;
+            while (i.hasNext() && !isSimplified) {
+                isSimplified = tasks.contains(i.next());
+            }
+        }
+        return isSimplified;
+    }
+
+    /**
+     * Update the index of the relevant method when a method is removed.
+     *
+     * @param index the index of the method removed.
+     */
+    private void updateRelevantMethods(final int index) {
+        for (List<Integer> relevant : this.getRelevantMethods()) {
+            int i = 0;
+            for (Integer m : relevant) {
+                if (m > index) {
+                    relevant.set(i, --m);
+                }
+                i++;
+            }
+
+        }
+    }
+
+    /**
+     * Do a pass over the preconditions of all the instantiated methods and update the ground inertia
+     * table. Then, simplify the methods according to the extracted ground inertia.
+     */
+    protected void simplyMethodsWithGroundInertia() {
+        final List<IntMethod> toAdd = new ArrayList<>(this.getIntMethods().size());
+        final Set<IntExpression> toRemove = new HashSet<>();
+        for (IntMethod m : this.getIntMethods()) {
+            this.simplifyWithGroundInertia(m.getPreconditions(), false);
+            this.simplify(m.getPreconditions());
+            if (!m.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+                toAdd.add(m);
+            } else {
+                toRemove.add(m.getTask());
+            }
+        }
+        this.simplyRecursivelyMethodsWithTasksNoMoreReachable(this.getIntMethods(), toRemove);
+    }
+
+
+    /**
+     * Extracts the relevant facts from the instantiated actions. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
+     * @param init    the initial state.
+     */
+    protected void extractRelevantFacts(final List<IntAction> actions, List<IntMethod> methods,
+                                        final Set<IntExpression> init) {
+        final Set<IntExpression> facts = new LinkedHashSet<>(10000);
+        for (IntAction a : actions) {
+            extractRelevantFacts(a.getPreconditions(), facts, init);
+            extractRelevantFacts(a.getEffects(), facts, init);
+        }
+        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+            for (IntMethod m : methods) {
+                extractRelevantFacts(m.getPreconditions(), facts, init);
+            }
+        }
+        for (IntExpression p : init) {
+            Inertia inertia = this.getTableOfGroundInertia().get(p);
+            if (inertia == null) {
+                inertia = Inertia.INERTIA;
+            }
+            if (init.contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
+                facts.add(p);
+            }
+        }
+        this.tableOfRelevantFluents = new ArrayList<>(facts.size());
+        for (IntExpression exp : facts) {
+            final IntExpression relevant = new IntExpression(exp);
+            this.tableOfRelevantFluents.add(relevant);
+        }
+    }
+
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param facts the set of relevant facts.
+     * @param init  the initial state.
+     */
+    private void extractRelevantFacts(final IntExpression exp, final Set<IntExpression> facts,
+                                      final Set<IntExpression> init) {
+        switch (exp.getConnective()) {
+            case ATOM:
+                Inertia inertia = this.getTableOfGroundInertia().get(exp);
+                if (inertia == null) {
+                    inertia = Inertia.INERTIA;
+                }
+                if ((init.contains(exp) && !inertia.equals(Inertia.NEGATIVE))
+                    || (!init.contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
+                    facts.add(exp);
+                }
+                break;
+            case FN_HEAD:
+                break;
+            case EQUAL_ATOM:
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.extractRelevantFacts(e, facts, init);
+                }
+                break;
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case UMINUS:
+            case ALWAYS:
+            case OVER_ALL:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case NOT:
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 break;
             case WHEN:
             case LESS:
@@ -1729,35 +1420,25 @@ public abstract class InstantiatedProblem extends IntProblem {
             case DIV:
             case MINUS:
             case PLUS:
+
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                this.substitute(exp.getChildren().get(0), var, cons, simplify);
-                this.substitute(exp.getChildren().get(1), var, cons, simplify);
-                break;
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-            case UMINUS:
-            case ALWAYS:
-            case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case F_EXP:
-                this.substitute(exp.getChildren().get(0), var, cons, simplify);
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
                 break;
             case F_EXP_T:
+            case F_EXP:
                 if (!exp.getChildren().isEmpty()) {
-                    this.substitute(exp.getChildren().get(0), var, cons, simplify);
+                    extractRelevantFacts(exp.getChildren().get(0), facts, init);
                 }
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                this.substitute(exp.getChildren().get(0), var, cons, simplify);
-                this.substitute(exp.getChildren().get(1), var, cons, simplify);
-                this.substitute(exp.getChildren().get(3), var, cons, simplify);
+                extractRelevantFacts(exp.getChildren().get(0), facts, init);
+                extractRelevantFacts(exp.getChildren().get(1), facts, init);
+                extractRelevantFacts(exp.getChildren().get(3), facts, init);
                 break;
             case FN_ATOM:
             case NUMBER:
@@ -1773,62 +1454,85 @@ public abstract class InstantiatedProblem extends IntProblem {
     }
 
     /**
-     * This method simplifies an atomic specified expression. Two cased must be considered:
-     * <ul>
-     * <li>1. If the expression is a positive inertia and the number of unifying ground instances of
-     * the specified expression that are contained in the initial state is equal to 0 then the
-     * expression is simplified to FALSE.</li>
-     * <li>2. If the expression is a negative inertia and then the number of all possible
-     * type-consistent ground instances of the specified expression then the expression is
-     * simplified to TRUE.
-     * </ul>
+     * Extracts the relevant numeric fluents.
      *
-     * @param exp the atomic expression to simplify.
+     * @param actions the list of instantiated actions.
+     * @param methods the list of instantiated methods
      */
-    private void simplyAtom(final IntExpression exp) {
-        final int predicate = exp.getPredicate();
-        // Compute the mask i.e., the vector used to indicate where the constant are located in the
-        // atomic expression.
-        int indexSize = 0;
-        final int[] args = exp.getArguments();
-        final int[] mask = new int[args.length];
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] >= 0) {
-                mask[i] = 1;
-                indexSize++;
+    protected void extractRelevantNumericFluents(final List<IntAction> actions, List<IntMethod> methods) {
+        final Set<IntExpression> fluents = new LinkedHashSet<>(100);
+        for (IntAction a : actions) {
+            if (a.isDurative()) {
+                this.extractRelevantNumericFluents(a.getDuration(), fluents);
             }
+            this.extractRelevantNumericFluents(a.getPreconditions(), fluents);
+            this.extractRelevantNumericFluents(a.getEffects(), fluents);
         }
-        // Compute the index to access to the predicates table and compute the product (max) of the
-        // tableOfDomains of the non instantiated arguments of the atomic expression.
-        int j = 0;
-        int max = 1;
-        final int[] index = new int[indexSize];
-        final List<Integer> predArg = this.getPredicateSignatures().get(predicate);
-        for (int i = 0; i < mask.length; i++) {
-            if (mask[i] == 0) {
-                max *= this.getDomains().get(predArg.get(i)).size();
-            } else {
-                index[j] = args[i];
-                j++;
-            }
-
-        }
-        // Get the number of unifying ground instances of the specified expression that are
-        // contained in the initial state.
-        final int n = this.getPredicatesTables().get(predicate).get(this.toInt(mask)).get(index);
-        // CASE 1: If the expression is a positive inertia and the number of unifying ground
-        // instances of the specified expression that are contained in the initial state is equal to
-        // 0 then the expression is simplified to FALSE.
-        final Inertia inertia = this.getInertia().get(predicate);
-        if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
-            exp.setConnective(PDDLConnective.FALSE);
-        } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
-            // CASE 2: If the expression is a negative inertia and then the number of all possible
-            // type-consistent ground instances of the specified expression then the expression is
-            // simplified to TRUE.
-            exp.setConnective(PDDLConnective.TRUE);
+        this.tableOfRelevantNumericFluents = new ArrayList<>(fluents.size());
+        for (IntExpression exp : fluents) {
+            final IntExpression relevant = new IntExpression(exp);
+            this.tableOfRelevantNumericFluents.add(relevant);
         }
     }
 
+    /**
+     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * only if:
+     * <ul>
+     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
+     * </ul>
+     *
+     * @param exp   the expression.
+     * @param fluents the set of relevant facts.
+     */
+    private void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
+        switch (exp.getConnective()) {
+            case FN_HEAD:
+                fluents.add(exp);
+                break;
+            case AND:
+            case OR:
+                for (IntExpression e : exp.getChildren()) {
+                    this.extractRelevantNumericFluents(e, fluents);
+                }
+                break;
+            case UMINUS:
+            case NOT:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                this.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
+                break;
+            case F_EXP:
+                this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
+                break;
+            case TIME_VAR:
+            case NUMBER:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+
+        }
+    }
 
 }

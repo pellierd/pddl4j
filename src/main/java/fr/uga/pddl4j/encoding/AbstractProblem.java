@@ -1,9 +1,7 @@
 package fr.uga.pddl4j.encoding;
 
-import fr.uga.pddl4j.encoding.*;
 import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.problem.*;
-import fr.uga.pddl4j.util.BitMatrix;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Created by pellier on 01/12/2020.
  */
-public abstract class IntProblem implements Problem {
+public abstract class AbstractProblem implements Problem {
 
     /**
      * The PDDL domain.
@@ -95,6 +93,8 @@ public abstract class IntProblem implements Problem {
 
     private IntExpression intGoal;
     public IntTaskNetwork intInitialTaskNetwork;
+
+
 
     /**
      * Returns the requirements of the problem.
@@ -226,61 +226,48 @@ public abstract class IntProblem implements Problem {
         return intInitFunctions;
     }
 
+    protected PDDLDomain getDomain() {
+        return domain;
+    }
+
+    protected PDDLProblem getProblem() {
+        return problem;
+    }
+
+
+
+
     /**
      * The set compund task symbols, i.e., the set of task symbols used in methods.
      */
     private Set<String> compoundTaskSymbols;
 
-    public IntProblem(final PDDLDomain domain, final PDDLProblem problem) {
+    public AbstractProblem(final PDDLDomain domain, final PDDLProblem problem) {
         this.domain = domain;
         this.problem = problem;
         this.checkRequirements();
-        this.init();
     }
+
+    /**
+     *
+     */
+    public void instantiate(int timeout) {
+        this.init();
+        this.preinstantiation();
+        this.instantiation();
+        this.postinstantiation();
+    }
+
 
     /**
      * This method is called by the constructor.
      */
-    protected void init () {
+    protected abstract void init ();
+    protected abstract void preinstantiation();
+    protected abstract void instantiation();
+    protected abstract void postinstantiation();
 
-        // Standardize the variables symbol contained in the domain
-        this.domain.standardize();
-        // Standardize the variables symbol contained in the domain
-        this.problem.standardize();
 
-        // Collect the information on the type declared in the domain
-        this.collectTypeInformation();
-        // Collect the constants (symbols and types) declared in the domain
-        this.collectConstantInformation();
-        // Collect the either types of the domain
-        this.collectEitherTypeInformation();
-        // Collect the predicate information (symbols and signatures)
-        this.collectPredicateInformation();
-        // Collect the function information (symbols and signatures)
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.collectFunctionInformation();
-        }
-        // Collect the tasks information (symbols and signatures)
-        this.collectTaskInformation();
-
-        // Encode the actions of the domain into integer representation
-        this.encodeActions();
-
-        // Encode the methods of the domain into integer representation
-        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            this.encodeMethods();
-        }
-
-        // Encode the initial state in integer representation
-        this.encodeInit();
-        // Encode the goal in integer representation
-        this.encodeGoal();
-
-        // Encode the initial task network in integer representation
-        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            this.encodeInitialTaskNetwork();
-        }
-    }
 
     /**
      * Check that the domain and the problem are ADL otherwise the encoding is not
@@ -327,7 +314,7 @@ public abstract class IntProblem implements Problem {
      * Collects the list of type symbols form the list declared in the domain. The corresponding domain of values
      * of the type is created. The domain is empty.
      */
-    private void collectTypeInformation() {
+    protected void collectTypeInformation() {
         final List<PDDLTypedSymbol> types = this.domain.getTypes();
         final int nbTypes = types.size();
         this.typeSymbols = new ArrayList<>(nbTypes);
@@ -341,7 +328,7 @@ public abstract class IntProblem implements Problem {
     /**
      * Collects the constants declared in the domain and the problem and initialise the domains of values of each type.
      */
-    private void collectConstantInformation() {
+    protected void collectConstantInformation() {
         final List<PDDLTypedSymbol> constants = this.domain.getConstants();
         this.constantSymbols = new ArrayList<>(this.domain.getConstants().size());
         constants.addAll(this.problem.getObjects());
@@ -509,7 +496,7 @@ public abstract class IntProblem implements Problem {
     /**
      * Collects predicates information (symbols and signatures) declared in the domain.
      */
-    private void collectPredicateInformation() {
+    protected void collectPredicateInformation() {
         final List<PDDLNamedTypedList> predicates = this.domain.getPredicates();
         final int nbPredicates = predicates.size();
         this.predicateSymbols = new ArrayList<>(nbPredicates);
@@ -538,7 +525,7 @@ public abstract class IntProblem implements Problem {
     /**
      * Collects function information (symbols and signatures) declared in the domain.
      */
-    private void collectFunctionInformation() {
+    protected void collectFunctionInformation() {
         final List<PDDLNamedTypedList> functions = this.domain.getFunctions();
         this.functionSymbols = new ArrayList<>(functions.size());
         this.functionSignatures = new ArrayList<>(functions.size());
@@ -566,7 +553,7 @@ public abstract class IntProblem implements Problem {
     /**
      * Collects tasks information (symbols and signatures) declared in the domain.
      */
-    private void collectTaskInformation() {
+    protected void collectTaskInformation() {
         final List<PDDLNamedTypedList> tasks = this.domain.getTasks();
         final int nbTasks = tasks.size();
         this.taskSymbols = new ArrayList<>(nbTasks);
@@ -596,25 +583,25 @@ public abstract class IntProblem implements Problem {
     /**
      * Encodes the actions of the domain into a compact integer representation.
      */
-    private void encodeActions() {
+    protected void encodeIntActions() {
         this.primitiveTaskSymbols = new LinkedHashSet<>();
-        this.intActions = this.domain.getActions().stream().map(this::encodeActions).collect(Collectors.toList());
+        this.intActions = this.domain.getActions().stream().map(this::encodeIntActions).collect(Collectors.toList());
     }
 
     /**
      * Encodes the methods of the domain into a compact integer representation.
      */
-    private void encodeMethods() {
+    protected void encodeIntMethods() {
         this.compoundTaskSymbols = new LinkedHashSet<>();
-        this.intMethods = this.domain.getMethods().stream().map(this::encodeMethod).collect(Collectors.toList());
+        this.intMethods = this.domain.getMethods().stream().map(this::encodeIntMethod).collect(Collectors.toList());
     }
 
 
     /**
      * Encodes a specified initial state into its integer representation.
      */
-    private void encodeInit() {
-        Set<IntExpression> init =  this.problem.getInit().stream().map(this::encodeExp)
+    protected void encodeIntInit() {
+        Set<IntExpression> init =  this.problem.getInit().stream().map(this::encodeIntExp)
             .collect(Collectors.toCollection(LinkedHashSet::new));
         this.intInitPredicates = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
@@ -638,17 +625,17 @@ public abstract class IntProblem implements Problem {
     /**
      * Encodes a specified goal into its integer representation.
      **/
-    private void encodeGoal() {
+    protected void encodeIntGoal() {
         this.intGoal = new IntExpression(PDDLConnective.AND);
         if (this.problem.getGoal() != null) {
-            this.intGoal = this.encodeExp(this.problem.getGoal());
+            this.intGoal = this.encodeIntExp(this.problem.getGoal());
         }
     }
 
     /**
      * Encodes a specified task network into its integer representation.
      */
-    private void encodeInitialTaskNetwork() {
+    protected void encodeIntInitialTaskNetwork() {
         // Encode the parameters of the task network
         final PDDLTaskNetwork taskNetwork = this.problem.getInitialTaskNetwork();
         final int numberOfParameters = taskNetwork.getParameters().size();
@@ -662,7 +649,7 @@ public abstract class IntProblem implements Problem {
             variables.add(parameter.getImage());
         }
         // Encode the tasks of the task network
-        this.intInitialTaskNetwork.setTasks(this.encodeExp(taskNetwork.getTasks(), variables));
+        this.intInitialTaskNetwork.setTasks(this.encodeIntExp(taskNetwork.getTasks(), variables));
         // Encode the ordering constraints of the task network
         IntExpression orderingConstraints = null;
         IntExpression subtasks = this.intInitialTaskNetwork.getTasks();
@@ -719,7 +706,7 @@ public abstract class IntProblem implements Problem {
      * @param action the operator to encode.
      * @return encoded operator.
      */
-    private IntAction encodeActions(final PDDLAction action) {
+    private IntAction encodeIntActions(final PDDLAction action) {
         final IntAction intAction = new IntAction(action.getName().getImage(), action.getArity());
         this.primitiveTaskSymbols.add(action.getName().getImage());
         // Encode the parameters of the operator
@@ -733,14 +720,14 @@ public abstract class IntProblem implements Problem {
         }
         // Encode the duration of the action
         if (action.isDurative()) {
-            final IntExpression duration = this.encodeExp(action.getDuration(), variables);
+            final IntExpression duration = this.encodeIntExp(action.getDuration(), variables);
             intAction.setDuration(duration);
         }
         // Encode the preconditions of the operator
-        final IntExpression preconditions = this.encodeExp(action.getPreconditions(), variables);
+        final IntExpression preconditions = this.encodeIntExp(action.getPreconditions(), variables);
         intAction.setPreconditions(preconditions);
         // Encode the effects of the operator
-        final IntExpression effects = this.encodeExp(action.getEffects(), variables);
+        final IntExpression effects = this.encodeIntExp(action.getEffects(), variables);
         intAction.setEffects(effects);
         return intAction;
     }
@@ -751,7 +738,7 @@ public abstract class IntProblem implements Problem {
      * @param method the metho to encode.
      * @return encoded method.
      */
-    private IntMethod encodeMethod(final PDDLMethod method) {
+    private IntMethod encodeIntMethod(final PDDLMethod method) {
         final IntMethod intMeth = new IntMethod(method.getName().getImage(), method.getArity());
         this.compoundTaskSymbols.add(method.getTask().getAtom().get(0).getImage());
         // Encode the parameters of the operator
@@ -764,13 +751,13 @@ public abstract class IntProblem implements Problem {
             variables.add(parameter.getImage());
         }
         // Encode the task carried out by the method
-        final IntExpression task = this.encodeExp(method.getTask(), variables);
+        final IntExpression task = this.encodeIntExp(method.getTask(), variables);
         intMeth.setTask(task);
         // Encode the preconditions of the method
-        final IntExpression preconditions = this.encodeExp(method.getPreconditions(), variables);
+        final IntExpression preconditions = this.encodeIntExp(method.getPreconditions(), variables);
         intMeth.setPreconditions(preconditions);
         // Encode the subtasks of the method
-        final IntExpression subtasks = this.encodeExp(method.getSubTasks(), variables);
+        final IntExpression subtasks = this.encodeIntExp(method.getSubTasks(), variables);
         intMeth.setSubTasks(subtasks);
         // Encode the ordering constraints of the method
         IntExpression orderingConstraints = null;
@@ -861,8 +848,8 @@ public abstract class IntProblem implements Problem {
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
-    private IntExpression encodeExp(final PDDLExpression exp) {
-        return this.encodeExp(exp, new ArrayList<>());
+    private IntExpression encodeIntExp(final PDDLExpression exp) {
+        return this.encodeIntExp(exp, new ArrayList<>());
     }
 
     /**
@@ -879,8 +866,8 @@ public abstract class IntProblem implements Problem {
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
      */
-    private IntExpression encodeExp(final PDDLExpression exp,
-                                    final List<String> variables) {
+    private IntExpression encodeIntExp(final PDDLExpression exp,
+                                       final List<String> variables) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
@@ -945,7 +932,7 @@ public abstract class IntProblem implements Problem {
             case AND:
             case OR:
                 for (int i = 0; i < exp.getChildren().size(); i++) {
-                    intExp.getChildren().add(this.encodeExp(exp.getChildren().get(i), variables));
+                    intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(i), variables));
                 }
                 break;
             case FORALL:
@@ -958,10 +945,10 @@ public abstract class IntProblem implements Problem {
                 intExp.setVariable(-variables.size() - 1);
                 newVariables.add(qvar.get(0).getImage());
                 if (qvar.size() == 1) {
-                    intExp.getChildren().add(this.encodeExp(exp.getChildren().get(0), newVariables));
+                    intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(0), newVariables));
                 } else {
                     qvar.remove(0);
-                    intExp.getChildren().add(this.encodeExp(exp, newVariables));
+                    intExp.getChildren().add(this.encodeIntExp(exp, newVariables));
                 }
                 break;
             case FN_ATOM:
@@ -985,8 +972,8 @@ public abstract class IntProblem implements Problem {
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                intExp.getChildren().add(this.encodeExp(exp.getChildren().get(0), variables));
-                intExp.getChildren().add(this.encodeExp(exp.getChildren().get(1), variables));
+                intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(0), variables));
+                intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(1), variables));
                 break;
             case AT_START:
             case AT_END:
@@ -1000,16 +987,16 @@ public abstract class IntProblem implements Problem {
             case AT_MOST_ONCE:
             case F_EXP:
             case F_EXP_T:
-                intExp.getChildren().add(this.encodeExp(exp.getChildren().get(0), variables));
+                intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(0), variables));
                 break;
             case NUMBER:
                 intExp.setValue(exp.getValue());
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                intExp.getChildren().add(this.encodeExp(exp.getChildren().get(0), variables));
-                intExp.getChildren().add(this.encodeExp(exp.getChildren().get(1), variables));
-                intExp.getChildren().add(this.encodeExp(exp.getChildren().get(2), variables));
+                intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(0), variables));
+                intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(1), variables));
+                intExp.getChildren().add(this.encodeIntExp(exp.getChildren().get(2), variables));
                 break;
             case TIME_VAR:
             case IS_VIOLATED:
@@ -1040,6 +1027,7 @@ public abstract class IntProblem implements Problem {
         }
         return str.toString();
     }
+
 
     /**
      * Returns a string representation of the specified action.
