@@ -17,12 +17,13 @@ package fr.uga.pddl4j.planners.htn.stn.pfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.problem.operator.Action;
+import fr.uga.pddl4j.problem.operator.Method;
 
 import java.io.File;
 import java.io.IOException;

@@ -16,9 +16,9 @@
 package fr.uga.pddl4j.heuristics;
 
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.Fluent;
-import fr.uga.pddl4j.problem.Condition;
+import fr.uga.pddl4j.problem.operator.Condition;
 
 import java.util.List;
 

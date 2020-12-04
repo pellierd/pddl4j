@@ -21,11 +21,11 @@
 		<Method name="parseString" />
 	</Match>
     <Match>
-        <Class name="fr.uga.pddl4j.encoding.IntExpression" />
+        <Class name="fr.uga.pddl4j.problem.operator.IntExpression" />
         <Method name="getArguments" />
     </Match>
     <Match>
-        <Class name="fr.uga.pddl4j.encoding.IntExpression" />
+        <Class name="fr.uga.pddl4j.problem.operator.IntExpression" />
         <Method name="setArguments" />
     </Match>
 </FindBugsFilter>

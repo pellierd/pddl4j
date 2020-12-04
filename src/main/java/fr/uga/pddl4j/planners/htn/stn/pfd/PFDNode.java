@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn.pfd;
 
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.TaskNetwork;
+import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
 import java.util.Objects;
 

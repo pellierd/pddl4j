@@ -21,6 +21,10 @@ package fr.uga.pddl4j.plan;
 
 import fr.uga.pddl4j.problem.*;
 
+import fr.uga.pddl4j.problem.operator.Action;
+import fr.uga.pddl4j.problem.operator.Condition;
+import fr.uga.pddl4j.problem.operator.ConditionalEffect;
+import fr.uga.pddl4j.problem.operator.Effect;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 

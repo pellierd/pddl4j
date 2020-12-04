@@ -21,6 +21,9 @@ package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.problem.operator.Action;
+import fr.uga.pddl4j.problem.operator.Condition;
+import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 

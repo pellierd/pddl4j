@@ -22,7 +22,7 @@ package fr.uga.pddl4j.heuristics.graph;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.Condition;
+import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
  * This class implements the SUM_ID mutex heuristic is an adaptation of the sum heuristic where mutual

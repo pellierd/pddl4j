@@ -1,21 +1,39 @@
 package fr.uga.pddl4j.problem;
+/*
+ * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
 
-import fr.uga.pddl4j.encoding.PostInstantiatedProblem;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
-
-import java.util.Iterator;
+import fr.uga.pddl4j.problem.numeric.NumericVariable;
 
 /**
- * Created by pellier on 03/12/2020.
+ * This class implements a ADL problem.
+ *
+ * @author D. Pellier
+ * @version 4.0 - 04.12.2020
  */
 public class ADLProblem extends PostInstantiatedProblem {
 
     public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
-
 
     /**
      * This method is called by the constructor.
@@ -100,9 +118,9 @@ public class ADLProblem extends PostInstantiatedProblem {
 
 
     protected void postinstantiation() {
-        this.extractRelevantFacts(this.getIntActions(), this.getIntMethods(), this.getIntInitPredicates());
+        this.extractRelevantFacts();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.extractRelevantNumericFluents(this.getIntActions(),this.getIntMethods());
+            this.extractRelevantNumericFluents(this.getIntActions());
         }
         //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
         //    this.extractRelevantTasks();
@@ -154,32 +172,15 @@ public class ADLProblem extends PostInstantiatedProblem {
      */
     public final boolean isSolvable() {
         boolean isSovable = true;
-        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+        /*if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             Iterator<Integer> i = this.getInitialTaskNetwork().getTasks().iterator();
             while (i.hasNext() && isSovable) {
                 isSovable = i.next() != null;
             }
-        } else {
+        } else {*/
             isSovable = this.getGoal() != null;
-        }
+        //}
         return isSovable;
-    }
-
-    /**
-     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchic.
-     * A hierarchical problem is totally ordered if and only the subtasks of each method of the problem are totally
-     * ordered and the initial task network is totally ordered.
-     *
-     * @return true if the problem is totally ordered, false otherwise.
-     */
-    public final boolean isTotallyOrederd() {
-        boolean totallyOrdered = true;
-        Iterator<Method> i = this.getMethods().iterator();
-        while (i.hasNext() && totallyOrdered) {
-            Method m = i.next();
-            totallyOrdered = m.getTaskNetwork().isTotallyOrdered();
-        }
-        return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
     }
 
 }

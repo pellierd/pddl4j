@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.operator.Action;
 
 import java.util.ArrayList;
 import java.util.HashSet;

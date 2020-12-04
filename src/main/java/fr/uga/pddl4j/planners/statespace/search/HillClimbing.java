@@ -18,7 +18,7 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.util.MemoryAgent;
 

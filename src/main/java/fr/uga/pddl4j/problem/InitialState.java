@@ -1,5 +1,8 @@
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.problem.numeric.NumericVariable;
+import fr.uga.pddl4j.problem.operator.AbstractFluentDescription;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

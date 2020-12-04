@@ -22,7 +22,7 @@ package fr.uga.pddl4j.heuristics.graph;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.Condition;
+import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
  * This heuristic returns the level of the planning graph where all the propositions of the goal are

@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.problem.Action;
-import fr.uga.pddl4j.problem.Method;
+import fr.uga.pddl4j.problem.operator.Action;
+import fr.uga.pddl4j.problem.operator.Method;
 
 import java.io.Serializable;
 import java.util.ArrayList;

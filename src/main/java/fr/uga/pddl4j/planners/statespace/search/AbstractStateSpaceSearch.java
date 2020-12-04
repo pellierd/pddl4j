@@ -20,7 +20,7 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.Action;
+import fr.uga.pddl4j.problem.operator.Action;
 
 import java.util.Objects;
 

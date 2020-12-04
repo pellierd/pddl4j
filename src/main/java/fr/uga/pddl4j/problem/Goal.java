@@ -1,5 +1,7 @@
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.problem.operator.Condition;
+
 /**
  * Created by pellier on 10/11/2020.
  */

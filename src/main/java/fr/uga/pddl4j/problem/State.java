@@ -19,6 +19,9 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.problem.operator.Condition;
+import fr.uga.pddl4j.problem.operator.ConditionalEffect;
+import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.util.List;

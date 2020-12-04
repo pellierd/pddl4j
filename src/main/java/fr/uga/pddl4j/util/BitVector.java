@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.util;
 
-import fr.uga.pddl4j.problem.Condition;
+import fr.uga.pddl4j.problem.operator.Condition;
 
 import java.lang.reflect.Field;
 import java.util.BitSet;
