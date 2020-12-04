@@ -37,7 +37,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
  */
-public final class HSP extends AbstractStateSpacePlanner {
+public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
 
     /**
      * The A* strategy.

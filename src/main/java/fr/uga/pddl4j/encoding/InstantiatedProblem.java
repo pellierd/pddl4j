@@ -448,6 +448,22 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             index++;
         }
 
+        // Simplification for HTN
+        /*if (this.relevantActions != null) {
+            final Set<IntExpression> primitiveTasksNoMoreReachable = new HashSet<IntExpression>();
+            // Update the relevant actions for the tasks
+            for (int i = 0; i < this.relevantActions.size(); i++) {
+                if (toRemove.contains(this.relevantActions.get(i))) {
+                    primitiveTasksNoMoreReachable.add(this.tableOfRelevantPrimitiveTasks.remove(i));
+                    this.relevantActions.remove(i);
+                    i--;
+                } else {
+                    this.relevantActions.set(i, i);
+                }
+            }
+        }*/
+
+
         this.getIntActions().clear();
         this.getIntActions().addAll(toAdd);
     }

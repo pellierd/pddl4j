@@ -18,6 +18,7 @@ package fr.uga.pddl4j.planners;
 import fr.uga.pddl4j.plan.Plan;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,7 +32,7 @@ import java.util.Properties;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public interface Planner extends Serializable {
+public interface Planner<T extends Problem> extends Serializable {
 
     /**
      * The logger of the class.
@@ -125,7 +126,7 @@ public interface Planner extends Serializable {
      * @param problem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null is no solution was found.
      */
-    Plan search(final ADLProblem problem);
+    Plan search(final T problem);
 
     /**
      * Returns the statistics of the planner.

@@ -169,4 +169,7 @@ public class ProblemFactory {
         return this.traceLevel;
     }
 
+    public PDDLParser getParser() {
+        return this.parser;
+    }
 }

@@ -25,6 +25,7 @@ import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
@@ -36,7 +37,7 @@ import java.util.Objects;
  * @author E. Hermellin
  * @version 1.0 - 28.09.2018
  */
-public final class GenericPlanner extends AbstractStateSpacePlanner {
+public final class GenericPlanner extends AbstractStateSpacePlanner<ADLProblem> {
 
     /**
      * The search strategy.
@@ -95,4 +96,5 @@ public final class GenericPlanner extends AbstractStateSpacePlanner {
             return null;
         }
     }
+
 }

@@ -15,6 +15,8 @@
 
 package fr.uga.pddl4j.planners;
 
+import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -24,7 +26,7 @@ import org.apache.logging.log4j.Logger;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public abstract class AbstractPlanner implements Planner {
+public abstract class AbstractPlanner<T extends  Problem> implements Planner<T> {
 
     /**
      * The trace level.

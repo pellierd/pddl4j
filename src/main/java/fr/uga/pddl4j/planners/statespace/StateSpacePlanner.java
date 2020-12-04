@@ -19,6 +19,7 @@ import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.Properties;
  * @version 1.0 - 07.06.2016
  * @since 3.6
  */
-public interface StateSpacePlanner extends Planner {
+public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
 
     /**
      * The default planner.

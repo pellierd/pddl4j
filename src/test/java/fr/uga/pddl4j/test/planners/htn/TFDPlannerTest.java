@@ -22,6 +22,7 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner;
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -360,7 +361,8 @@ public class TFDPlannerTest {
                 // Encodes and instantiates the problem in a compact representation
                 System.out.println("* Encoding [" + currentProblem + "]" + "...");
                 try {
-                    final ADLProblem pb = factory.encode();
+                    HTNProblem pb = new HTNProblem(factory.getParser().getDomain(), factory.getParser().getProblem());
+                    pb.instantiate(100);
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"

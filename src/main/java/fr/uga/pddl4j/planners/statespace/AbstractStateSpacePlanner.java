@@ -17,6 +17,7 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
+import fr.uga.pddl4j.problem.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public abstract class AbstractStateSpacePlanner extends AbstractPlanner implements StateSpacePlanner {
+public abstract class AbstractStateSpacePlanner<T extends Problem> extends AbstractPlanner<T> implements StateSpacePlanner<T> {
 
     /**
      * The serial id of the class.

@@ -42,7 +42,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 2.0 - 24.01.2018
  */
-public final class FF extends AbstractStateSpacePlanner {
+public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
 
     /**
      * The Enforced Hill Climbing strategy.
