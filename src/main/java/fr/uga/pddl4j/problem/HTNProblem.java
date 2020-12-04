@@ -29,8 +29,15 @@ import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
-import fr.uga.pddl4j.problem.operator.*;
+import fr.uga.pddl4j.problem.operator.Action;
+import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
+import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.problem.operator.IntMethod;
+import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
+import fr.uga.pddl4j.problem.operator.Method;
+import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
+import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
 
 import java.util.ArrayList;
@@ -71,33 +78,11 @@ public class HTNProblem extends PostInstantiatedProblem {
     /**
      * The initial task network into its integer representation.
      */
-    public IntTaskNetwork intInitialTaskNetwork;
+    private IntTaskNetwork intInitialTaskNetwork;
 
-    
-    public IntTaskNetwork getIntInitialTaskNetwork() {
-        return intInitialTaskNetwork;
-    }
-
-    public void setIntInitialTaskNetwork(IntTaskNetwork intInitialTaskNetwork) {
-        this.intInitialTaskNetwork = intInitialTaskNetwork;
-    }
-
-    public Set<String> getPrimitiveTaskSymbols() {
-        return primitiveTaskSymbols;
-    }
-
-    public List<IntMethod> getIntMethods() {
-        return intMethods;
-    }
-
-    public Set<String> getCompoundTaskSymbols() {
-        return compoundTaskSymbols;
-    }
-
-    public HTNProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
-    }
-
+    /**
+     * Returns the map used to encode the task into integer.
+     */
     private Map<IntExpression, Integer> mapOfTasksIndex;
 
     /**
@@ -106,19 +91,80 @@ public class HTNProblem extends PostInstantiatedProblem {
     private TaskNetwork initialTaskNetwork;
 
     /**
-     * The table containing for each relevant task its set of resolvers, i.e., action or methods
+     * The list containing for each relevant task at a specified the set of resolvers, i.e., action or methods.
      */
-    private List<List<Integer>> tableOfRelevantOperators;
+    private List<List<Integer>> taskResolvers;
 
-    public Map<IntExpression, Integer> getMapOfTasksIndex() {
-        return mapOfTasksIndex;
+    /**
+     * The list of instantiated methods encoded into bit sets.
+     */
+    private List<Method> methods;
+
+    /**
+     * Creates a new problem from a domain and problem.
+     *
+     * @param domain the domain.
+     * @param problem the problem.
+     */
+    public HTNProblem(final PDDLDomain domain, final PDDLProblem problem) {
+        super(domain, problem);
+    }
+
+    /**
+     * Returns the initial task network into its integer representation.
+     *
+     * @return the initial task network into its integer representation.
+     */
+    protected IntTaskNetwork getIntInitialTaskNetwork() {
+        return this.intInitialTaskNetwork;
+    }
+
+    /**
+     * Returns the list of primitive task symbols of the problem.
+     *
+     * @return the list of primitive task symbols of the problem.
+     */
+    protected Set<String> getPrimitiveTaskSymbols() {
+        return this.primitiveTaskSymbols;
+    }
+
+    /**
+     * Returns the list of methods of the problem into its integer representation.
+     *
+     * @return the list of methods of the problem into its integer representation.
+     */
+    protected List<IntMethod> getIntMethods() {
+        return this.intMethods;
+    }
+
+    /**
+     * Returns the list of compound tasks symbols of the problem.
+     *
+     * @return the list of compound tasks symbols of the problem.
+     */
+    protected Set<String> getCompoundTaskSymbols() {
+        return this.compoundTaskSymbols;
+    }
+
+
+    /**
+     * Returns the map used to encode the task into integer.
+     *
+     * @return the map used to encode the task into integer.
+     */
+    protected Map<IntExpression, Integer> getMapOfTasksIndex() {
+        return this.mapOfTasksIndex;
     }
 
     public List<List<Integer>> getRelevantOperators() {
-        return tableOfRelevantOperators;
+        return taskResolvers;
     }
 
-
+    /**
+     * Returns the initial task network of the problem.
+     *
+     * @return the initial task network of the problem.
+     */
     public TaskNetwork getInitialTaskNetwork() {
         return initialTaskNetwork;
     }
@@ -143,29 +189,30 @@ public class HTNProblem extends PostInstantiatedProblem {
      */
     private List<Integer> relevantActions;
 
-    public List<IntExpression> getTableOfRelevantPrimitiveTasks() {
+    protected List<IntExpression> getTableOfRelevantPrimitiveTasks() {
         return tableOfRelevantPrimitiveTasks;
     }
 
-    public List<IntExpression> getTableOfRelevantCompundTasks() {
+    protected List<IntExpression> getTableOfRelevantCompundTasks() {
         return tableOfRelevantCompundTasks;
     }
 
-    public List<Integer> getRelevantActions() {
+    protected List<Integer> getRelevantActions() {
         return relevantActions;
     }
 
-    public List<List<Integer>> getRelevantMethods() {
+    protected List<List<Integer>> getRelevantMethods() {
         return relevantMethods;
     }
 
-    /**
-     * The list of instantiated methods encoded into bit sets.
-     */
-    private List<Method> methods;
 
+
+    /**
+     * Returns the list of instantiated methods of the problem.
+     * @return
+     */
     public List<Method> getMethods() {
-        return methods;
+        return this.methods;
     }
 
     /**
@@ -173,26 +220,17 @@ public class HTNProblem extends PostInstantiatedProblem {
      */
     private List<Task> relevantTasks;
 
+    /**
+     * The list of relevant tasks of the problem.
+     */
     public List<Task> getRelevantTasks() {
         return this.relevantTasks;
     }
 
     public void instantiate(int timeout) {
         super.instantiate(timeout);
-
-        /*for (Method method : this.getMethods()) {
-            System.out.println(this.toString(method));
-        }
-
-        for (Action action : this.getActions()) {
-            System.out.println(this.toString(action));
-        }
-
-        System.out.println(this.toString(this.getInitialTaskNetwork()));*/
-
-        //System.exit(0);
-
     }
+
     /**
      * This method is called by the constructor.
      */
@@ -1064,13 +1102,13 @@ public class HTNProblem extends PostInstantiatedProblem {
     }
 
     protected void initRelevantOperators() {
-        this.tableOfRelevantOperators = new ArrayList<>();
+        this.taskResolvers = new ArrayList<>();
         for (Integer a : this.getRelevantActions()) {
             List<Integer> l = new ArrayList<>(1);
             l.add(a);
-            this.tableOfRelevantOperators.add(l);
+            this.taskResolvers.add(l);
         }
-        this.tableOfRelevantOperators.addAll(this.getRelevantMethods());
+        this.taskResolvers.addAll(this.getRelevantMethods());
     }
 
     protected void encodeInitialTaskNetwork() {

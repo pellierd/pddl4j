@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.problem.operator;
+package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.parser.PDDLAction;
@@ -31,6 +31,10 @@ import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
+import fr.uga.pddl4j.problem.operator.IntAction;
+import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.problem.operator.IntMethod;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,6 +64,11 @@ public abstract class AbstractProblem implements Problem {
      * The PDDL problem.
      */
     private PDDLProblem problem;
+
+    /**
+     * The set of accepted PDDL requirements of the problem.
+     */
+    private Set<PDDLRequireKey> acceptedRequirements;
 
     /**
      * The set of requirements of the problem.
@@ -151,6 +160,15 @@ public abstract class AbstractProblem implements Problem {
         this.domain = domain;
         this.problem = problem;
         this.checkRequirements();
+    }
+
+    /**
+     * Returns the accepted requirements of the problem.
+     *
+     * @return the accepted requirements of the problem.
+     */
+    public final Set<PDDLRequireKey> getAcceptedRequirements() {
+        return this.acceptedRequirements;
     }
 
     /**

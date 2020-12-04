@@ -23,6 +23,8 @@ import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 
+import java.util.Set;
+
 /**
  * This class implements a ADL problem.
  *
@@ -34,6 +36,7 @@ public class ADLProblem extends PostInstantiatedProblem {
     public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
+
 
     /**
      * This method is called by the constructor.

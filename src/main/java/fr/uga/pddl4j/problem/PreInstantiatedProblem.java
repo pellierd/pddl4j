@@ -20,7 +20,6 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
-import fr.uga.pddl4j.problem.operator.AbstractProblem;
 import fr.uga.pddl4j.util.IntMatrix;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
