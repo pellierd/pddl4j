@@ -14,7 +14,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+;; along with PDDL4J.  If not, see <http:www.gnu.org/licenses/>
 ;;
 
 (define (problem p01)
@@ -26,7 +26,12 @@
         left right - hand
         shot1 shot2 shot3 shot4 shot5 shot6 shot7 shot8 shot9 shot10 shot11 shot12 shot13 shot14 shot15 - shot
         ingredient1 ingredient2 ingredient3 ingredient4 - ingredient
-        cocktail1 cocktail2 cocktail3 cocktail4 cocktail5 cocktail6 cocktail7 cocktail8 cocktail9 cocktail10 cocktail11 - cocktail
+        cocktail1 cocktail2 cocktail3
+        cocktail4
+        cocktail5
+        cocktail6
+        cocktail7 cocktail8 cocktail9 cocktail10 cocktail11
+        - cocktail
         dispenser1 dispenser2 dispenser3 dispenser4 - dispenser
         l0 l1 l2 - level
     )

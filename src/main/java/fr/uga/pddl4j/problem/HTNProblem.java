@@ -1,31 +1,79 @@
 package fr.uga.pddl4j.problem;
+/*
+ * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
 
-import fr.uga.pddl4j.parser.*;
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLExpression;
+import fr.uga.pddl4j.parser.PDDLMethod;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.PDDLTaskNetwork;
+import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.problem.operator.*;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.util.BitMatrix;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Created by pellier on 03/12/2020.
+/*
+ * This class contains all the methods needed to manipulate a HTN problem.
+ *
+ * @author D. Pellier
+ * @version 4.0 - 04.12.2020
  */
 public class HTNProblem extends PostInstantiatedProblem {
+
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
      */
     private Set<String> primitiveTaskSymbols;
+
     /**
-     * The set compund task symbols, i.e., the set of task symbols used in methods.
+     * The set compound task symbols, i.e., the set of task symbols used in methods.
      */
     private Set<String> compoundTaskSymbols;
 
+    /**
+     * The list of methods in the
+     */
     private List<IntMethod> intMethods;
 
+    /**
+     * The initial task network into its integer representation.
+     */
     public IntTaskNetwork intInitialTaskNetwork;
 
+    
     public IntTaskNetwork getIntInitialTaskNetwork() {
         return intInitialTaskNetwork;
     }
@@ -129,6 +177,22 @@ public class HTNProblem extends PostInstantiatedProblem {
         return this.relevantTasks;
     }
 
+    public void instantiate(int timeout) {
+        super.instantiate(timeout);
+
+        /*for (Method method : this.getMethods()) {
+            System.out.println(this.toString(method));
+        }
+
+        for (Action action : this.getActions()) {
+            System.out.println(this.toString(action));
+        }
+
+        System.out.println(this.toString(this.getInitialTaskNetwork()));*/
+
+        //System.exit(0);
+
+    }
     /**
      * This method is called by the constructor.
      */
@@ -346,7 +410,7 @@ public class HTNProblem extends PostInstantiatedProblem {
         for (int i = 0; i < numberOfParameters; i++) {
             final PDDLTypedSymbol parameter = taskNetwork.getParameters().get(i);
             final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTaskSymbols().indexOf(typeImage);
+            final int type = this.getTypeSymbols().indexOf(typeImage);
             this.intInitialTaskNetwork.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
@@ -415,12 +479,39 @@ public class HTNProblem extends PostInstantiatedProblem {
         this.extractGroundInertia();
         this.extractGroundNumericInertia();
         this.simplyActionsWithGroundInertia();
+
+
+
         this.instantiateGoal();
         this.simplifyGoalWithGroundInertia();
+
+
 
         this.instantiateInitialTaskNetwork();
         this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
         this.simplyMethodsWithGroundInertia();
+
+    }
+
+    protected void postinstantiation() {
+
+        this.extractRelevantFacts();
+        this.extractRelevantTasks();
+
+        this.initOfMapFluentIndex();
+
+        this.initRelevantOperators();
+        this.initMapOfTaskIndex();
+
+        this.encodeGoal();
+
+        this.encodeInitialTaskNetwork();
+        this.encodeMethods();
+        this.encodeInit();
+
+
+        this.encodeActions();
+
 
     }
 
@@ -451,9 +542,9 @@ public class HTNProblem extends PostInstantiatedProblem {
             // Creates the abstract initial task network
             IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
             newTaskNetwork.getTasks().addChild(new IntExpression(root));
-            this.setIntInitialTaskNetwork(newTaskNetwork);
+            this.intInitialTaskNetwork = newTaskNetwork;
         } else {
-            this.setIntInitialTaskNetwork(taskNetworks.get(0));
+            this.intInitialTaskNetwork = taskNetworks.get(0);
         }
     }
 
@@ -906,24 +997,7 @@ public class HTNProblem extends PostInstantiatedProblem {
     }
 
 
-    protected void postinstantiation() {
-        this.extractRelevantFacts();
-        this.extractRelevantTasks();
 
-        this.initOfMapFluentIndex();
-
-        this.initRelevantOperators();
-        this.initMapOfTaskIndex();
-
-        this.encodeGoal();
-
-        this.encodeInitialTaskNetwork();
-        this.encodeMethods();
-        this.encodeInit();
-
-        this.encodeActions(this.getIntActions());
-
-    }
 
 
     /**

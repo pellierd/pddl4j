@@ -30,6 +30,7 @@ import fr.uga.pddl4j.problem.operator.*;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.IntAction;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
@@ -143,6 +144,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
     /**
      * Returns the map used to encode fluents into bit set representation.
+     *
      *
      * @return the map used to encode fluents into bit set representation.
      */
@@ -408,16 +410,17 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * map is used to speed-up the search by mapping the an expression to this index.
      *
      */
-    protected void encodeActions(final List<IntAction> actions)
+    protected void encodeActions()
         throws UnexpectedExpressionException {
-        this.actions = new ArrayList<>(actions.size());
+        this.actions = new ArrayList<>(this.getIntActions().size());
         final List<Action> addedActions = new ArrayList<>();
         int actionIndex = 0;
-        for (IntAction intAction : actions) {
+        for (IntAction intAction : this.getIntActions()) {
             List<IntAction> normalized = this.normalizeAction(intAction);
+            if (normalized.size() > 1) System.out.println("ERREUR Disjunction Preconditions in encoding ");
             this.actions.add(this.encodeAction(normalized.get(0)));
             for (int i  = 1; i < normalized.size(); i++) {
-                // UPdate the index of the relevant action must push in the HTN problem class
+                // update the index of the relevant action must push in the HTN problem class
                 //if (this.getRelevantOperators() != null) {
                 //    this.getRelevantOperators().get(actionIndex).add(actions.size() + addedActions.size());
                 //}
@@ -434,14 +437,16 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @return the expression in bit set representation.
      */
-    private Effect encodeEffect(final IntExpression exp)
-        throws UnexpectedExpressionException {
+    private Effect encodeEffect(final IntExpression exp) throws UnexpectedExpressionException {
         final Effect effect = new Effect();
+        System.out.println("EXP " + this.toString(exp));
         switch (exp.getConnective()) {
             case ATOM:
                 Integer index = this.mapOfFluentIndex.get(exp);
                 if (index != null) {
                     effect.getPositiveFluents().set(index);
+                } else {
+                    System.out.println(this.toString(exp) + " not found");
                 }
                 break;
             case NOT:
@@ -596,13 +601,20 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         encoded.setPrecondition(this.encodeCondition(action.getPreconditions()));
 
         // Initialize the effects of the action
-        final List<IntExpression> effects = action.getEffects().getChildren();
+        final List<IntExpression> effects = new ArrayList<>();
+        if (action.getEffects().getConnective().equals(PDDLConnective.ATOM)) {
+            effects.add(action.getEffects());
+        } else {
+            effects.addAll(action.getEffects().getChildren());
+        }
 
+        //System.out.println(this.toString(action));
         final ConditionalEffect unCondEffects = new ConditionalEffect();
         boolean hasUnConditionalEffects = false;
         for (IntExpression ei : effects) {
             final PDDLConnective connective = ei.getConnective();
             final List<IntExpression> children = ei.getChildren();
+            //System.out.println("EXP " + this.toString(ei));
             switch (connective) {
                 case WHEN:
                     // NumericAssignement not encoded in conditional effect.
@@ -616,6 +628,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                     if (index != null) {
                         unCondEffects.getEffect().getPositiveFluents().set(index);
                         hasUnConditionalEffects = true;
+                    } else {
+                        //System.out.println(this.toString(ei) + " not found");
                     }
                     break;
                 case NOT:
@@ -643,6 +657,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         if (hasUnConditionalEffects) {
             encoded.getConditionalEffects().add(unCondEffects);
         }
+        /*try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
         return encoded;
     }
 
