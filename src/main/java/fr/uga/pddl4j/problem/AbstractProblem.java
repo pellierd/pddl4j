@@ -531,6 +531,7 @@ public abstract class AbstractProblem implements Problem {
             case FN_HEAD:
             case TIME_VAR:
             case EQUAL:
+            case EQUAL_ATOM:
             case FN_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
@@ -553,7 +554,7 @@ public abstract class AbstractProblem implements Problem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.toString());
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
 

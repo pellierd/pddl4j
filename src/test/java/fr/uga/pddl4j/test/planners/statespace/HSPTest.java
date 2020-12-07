@@ -93,7 +93,7 @@ public class HSPTest {
      * Failure
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_HSP_IPC1998_Assembly_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -121,7 +121,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Gripper_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -163,7 +163,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Logistics_STRIPS_Round1() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -205,7 +205,7 @@ public class HSPTest {
      * Ok
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Movie_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -219,7 +219,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Blocks_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -233,7 +233,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Blocks_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -247,7 +247,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -261,7 +261,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -275,7 +275,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_STRIPS_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -303,7 +303,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Freecell_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -317,7 +317,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Freecell_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -331,7 +331,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Logistics_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -387,7 +387,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Depots_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -415,7 +415,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Driverlog_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -443,7 +443,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Freecell_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/freecell/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -485,7 +485,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Satellite_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -499,7 +499,7 @@ public class HSPTest {
      * OK to hard in 10 seconds
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Satellite_STRIPS_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -513,7 +513,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Zenotravel_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -527,7 +527,7 @@ public class HSPTest {
      * OK to hard in 10 seconds
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Zenotravel_STRIPS_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -639,7 +639,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Satellite_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/satellite/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -653,7 +653,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2006_Openstacks_Propositional() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/propositional" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

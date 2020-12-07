@@ -448,7 +448,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private Effect encodeEffect(final IntExpression exp) throws UnexpectedExpressionException {
         final Effect effect = new Effect();
-        System.out.println("EXP " + this.toString(exp));
         switch (exp.getConnective()) {
             case ATOM:
                 Integer index = this.mapOfFluentIndex.get(exp);
