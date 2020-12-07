@@ -23,6 +23,7 @@ import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -37,6 +38,26 @@ public class ADLProblem extends PostInstantiatedProblem {
         super(domain, problem);
     }
 
+    /**
+     * Returns the list of PDDL requirements accepted by the problem.
+     */
+    public Set<PDDLRequireKey> getAcceptedRequirements() {
+        Set<PDDLRequireKey> accepted = new HashSet<>();
+        accepted.add(PDDLRequireKey.ADL);
+        accepted.add(PDDLRequireKey.STRIPS);
+        accepted.add(PDDLRequireKey.TYPING);
+        accepted.add(PDDLRequireKey.EQUALITY);
+        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
+        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
+        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
+        return accepted;
+    }
 
     /**
      * This method is called by the constructor.

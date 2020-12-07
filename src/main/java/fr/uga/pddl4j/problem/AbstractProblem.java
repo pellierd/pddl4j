@@ -66,11 +66,6 @@ public abstract class AbstractProblem implements Problem {
     private PDDLProblem problem;
 
     /**
-     * The set of accepted PDDL requirements of the problem.
-     */
-    private Set<PDDLRequireKey> acceptedRequirements;
-
-    /**
      * The set of requirements of the problem.
      */
     private Set<PDDLRequireKey> requirements;
@@ -159,16 +154,7 @@ public abstract class AbstractProblem implements Problem {
     public AbstractProblem(final PDDLDomain domain, final PDDLProblem problem) {
         this.domain = domain;
         this.problem = problem;
-        this.checkRequirements();
-    }
-
-    /**
-     * Returns the accepted requirements of the problem.
-     *
-     * @return the accepted requirements of the problem.
-     */
-    public final Set<PDDLRequireKey> getAcceptedRequirements() {
-        return this.acceptedRequirements;
+        this.initRequirements();
     }
 
     /**
@@ -370,33 +356,13 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Check that the domain and the problem are ADL otherwise the encoding is not
      */
-    protected void checkRequirements() {
-        // Check that the domain and the problem are ADL otherwise the encoding is not
-        // implemented for the moment.
-        Set<PDDLRequireKey> accepted = new HashSet<>();
-        accepted.add(PDDLRequireKey.ADL);
-        accepted.add(PDDLRequireKey.STRIPS);
-        accepted.add(PDDLRequireKey.TYPING);
-        accepted.add(PDDLRequireKey.EQUALITY);
-        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
-        accepted.add(PDDLRequireKey.ACTION_COSTS);
-        accepted.add(PDDLRequireKey.HIERARCHY);
-        accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
-        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
-        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
-
+    protected void initRequirements() {
         this.requirements = new LinkedHashSet<>();
         this.requirements.addAll(this.domain.getRequirements());
         this.requirements.addAll(this.problem.getRequirements());
 
-        if (!accepted.containsAll(this.requirements)) {
-            this.requirements.removeAll(accepted);
+        if (!this.getAcceptedRequirements().containsAll(this.requirements)) {
+            this.requirements.removeAll(this.getAcceptedRequirements());
             StringBuilder str = new StringBuilder();
             str.append("Requirements not supported:");
             for (PDDLRequireKey requirement : this.requirements) {

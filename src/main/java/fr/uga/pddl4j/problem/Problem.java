@@ -47,9 +47,11 @@ public interface Problem extends Serializable {
     Set<PDDLRequireKey> getRequirements();
 
     /**
-     * Returns the set of accepted requirements by the by the problem.
+     * Returns the accepted requirements of the problem.
+     *
+     * @return the accepted requirements of the problem.
      */
-    //Set<PDDLRequireKey> getAcceptedRequirement();
+    Set<PDDLRequireKey> getAcceptedRequirements();
 
     /**
      * Returns the list of the type symbols of the problem.

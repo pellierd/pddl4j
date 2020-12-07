@@ -232,6 +232,26 @@ public class HTNProblem extends PostInstantiatedProblem {
     }
 
     /**
+     * Returns the list of PDDL requirements accepted by the problem.
+     */
+    public Set<PDDLRequireKey> getAcceptedRequirements() {
+        Set<PDDLRequireKey> accepted = new HashSet<>();
+        accepted.add(PDDLRequireKey.ADL);
+        accepted.add(PDDLRequireKey.STRIPS);
+        accepted.add(PDDLRequireKey.TYPING);
+        accepted.add(PDDLRequireKey.EQUALITY);
+        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(PDDLRequireKey.HIERARCHY);
+        accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+        return accepted;
+    }
+
+    /**
      * This method is called by the constructor.
      */
     protected void init () {
