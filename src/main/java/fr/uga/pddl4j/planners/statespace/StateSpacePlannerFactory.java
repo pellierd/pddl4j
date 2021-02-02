@@ -290,9 +290,6 @@ public class StateSpacePlannerFactory implements Serializable {
                     } else if (heuristic == 8) {
                         arguments.put(AbstractStateSpacePlanner.HEURISTIC,
                             PlanningGraphHeuristic.Type.SET_LEVEL);
-                    } else {
-                        arguments.put(AbstractStateSpacePlanner.HEURISTIC,
-                            PlanningGraphHeuristic.Type.MIN_COST);
                     }
                 } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                     final double weight = Double.parseDouble(args[i + 1]);

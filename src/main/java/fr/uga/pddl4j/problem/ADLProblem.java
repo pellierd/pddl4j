@@ -34,6 +34,11 @@ import java.util.Set;
  */
 public class ADLProblem extends PostInstantiatedProblem {
 
+    /**
+     * Create a new ADL problem from a domain and problem.
+     * @param domain The domain.
+     * @param problem The problem.
+     */
     public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }

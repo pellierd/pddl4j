@@ -73,9 +73,6 @@ public class PlanningGraphHeuristicFactory implements Serializable {
             case MAX:
                 heuristic = new Max(problem);
                 break;
-            case MIN_COST:
-                heuristic = new MinCost(problem);
-                break;
             case SET_LEVEL:
                 heuristic = new SetLevel(problem);
                 break;

@@ -68,10 +68,6 @@ public interface PlanningGraphHeuristic extends GoalCostHeuristic {
          */
         MAX,
         /**
-         * The type for the <code>Min Cost</code> heuristic.
-         */
-        MIN_COST,
-        /**
          * The type for the <code>FF</code> heuristic.
          */
         FAST_FORWARD,

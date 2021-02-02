@@ -40,13 +40,7 @@ import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * This class contains all the methods needed to final bit encoding of the problem.
@@ -609,7 +603,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         encoded.setPrecondition(this.encodeCondition(action.getPreconditions()));
 
         // Initialize the effects of the action
-        final List<IntExpression> effects = new ArrayList<>();
+        final LinkedList<IntExpression> effects = new LinkedList<>();
         if (action.getEffects().getConnective().equals(PDDLConnective.ATOM)) {
             effects.add(action.getEffects());
         } else {
@@ -619,7 +613,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         //System.out.println(this.toString(action));
         final ConditionalEffect unCondEffects = new ConditionalEffect();
         boolean hasUnConditionalEffects = false;
-        for (IntExpression ei : effects) {
+        while (!effects.isEmpty()) { //for (IntExpression ei : effects) {
+            IntExpression ei = effects.poll();
             final PDDLConnective connective = ei.getConnective();
             final List<IntExpression> children = ei.getChildren();
             //System.out.println("EXP " + this.toString(ei));
@@ -658,8 +653,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                     NumericAssignment assignment = this.encodeNumericAssignment(ei);
                     unCondEffects.getEffect().addNumericAssignment(assignment);
                     break;
+                case AND:
+                    effects.addAll(ei.getChildren());
+                    break;
                 default:
-                    throw new UnexpectedExpressionException(ei.getConnective().toString());
+                    throw new UnexpectedExpressionException(this.toString(ei));
             }
         }
         if (hasUnConditionalEffects) {

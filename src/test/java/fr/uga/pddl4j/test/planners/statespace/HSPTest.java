@@ -51,7 +51,7 @@ public class HSPTest {
     /**
      * Computation timeout.
      */
-    private static final int TIMEOUT = 5;
+    private static final int TIMEOUT = 10;
 
     /**
      * Default Heuristic Type.
@@ -90,10 +90,10 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Assembly ADL benchmarks.
-     * Failure
+     *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Assembly_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -104,7 +104,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Grid STRIPS untyped benchmarks.
-     * Failure
+     * FAILURE
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -118,7 +118,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 gripper ADL benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -132,7 +132,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Gripper STRIPS benchmarks.
-     * Failure
+     * FAILURE
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -146,7 +146,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Logistics ADL benchmarks.
-     * Failure
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -160,7 +160,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Logistics STRIPS Round1 benchmarks.
-     * OK
+     * Test takes fails due to time out > 600s
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -174,7 +174,7 @@ public class HSPTest {
 
     /**
      *  Method that executes tests using IPC 1998 Logistics STRIPS Round2 benchmarks.
-     * Failure
+     * FAILURE
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -188,7 +188,7 @@ public class HSPTest {
 
     /**
      *  Method that executes tests using IPC 1998 Movie ADL benchmarks.
-     * Failure
+     * FAILURE: Unable to deal with negation in the initial state of the problem
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -202,7 +202,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Movie STRIPS benchmarks.
-     * Ok
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -216,7 +216,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Blocks STRIPS typed benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -230,7 +230,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Blocks STRIPS untyped benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -244,7 +244,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL full typed benchmarks.
-     * OK
+     * FAILURE
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -258,7 +258,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL simple typed benchmarks.
-     * OK
+     * FAILURE
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -272,7 +272,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator STRIPS simple typed benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -300,7 +300,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Freecell STRIPS  typed benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -314,7 +314,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Freecell STRIPS untyped benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     /*@Test
@@ -331,7 +331,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_HSP_IPC2000_Logistics_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

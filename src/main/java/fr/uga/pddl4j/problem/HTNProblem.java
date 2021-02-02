@@ -1067,7 +1067,7 @@ public class HTNProblem extends PostInstantiatedProblem {
      * </ul>
      *
      */
-    protected void extractRelevantFacts() {
+    /*protected void extractRelevantFacts() {
         final Set<IntExpression> facts = new LinkedHashSet<>(10000);
         for (IntAction a : this.getIntActions()) {
             extractRelevantFacts(a.getPreconditions(), facts);
@@ -1094,7 +1094,7 @@ public class HTNProblem extends PostInstantiatedProblem {
             this.intExpRelevantFluents.add(relevant);
             this.relevantFluents.add(new Fluent(exp.getPredicate(), exp.getArguments()));
         }
-    }
+    }*/
 
 
     public void extractRelevantTasks() {
