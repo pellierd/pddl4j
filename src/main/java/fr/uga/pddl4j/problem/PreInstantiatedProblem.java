@@ -40,7 +40,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
  */
-public abstract class PreInstantiatedProblem extends AbstractProblem {
+public abstract class PreInstantiatedProblem extends IntProblem {
 
     /**
      * The table that defines for each predicates its type of inertia.

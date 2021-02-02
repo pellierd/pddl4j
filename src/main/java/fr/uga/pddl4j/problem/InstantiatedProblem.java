@@ -588,7 +588,6 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
 
-
     /**
      * Simplify a specified expression based on the ground inertia information.
      *

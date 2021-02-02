@@ -20,13 +20,9 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLExpression;
-import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
-import fr.uga.pddl4j.parser.PDDLTaskNetwork;
-import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -50,7 +46,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /*
  * This class contains all the methods needed to manipulate a HTN problem.
@@ -60,25 +55,6 @@ import java.util.stream.Collectors;
  */
 public class HTNProblem extends PostInstantiatedProblem {
 
-    /**
-     * The set primitive task symbols, i.e., the set of action symbol.
-     */
-    private Set<String> primitiveTaskSymbols;
-
-    /**
-     * The set compound task symbols, i.e., the set of task symbols used in methods.
-     */
-    private Set<String> compoundTaskSymbols;
-
-    /**
-     * The list of methods in the
-     */
-    private List<IntMethod> intMethods;
-
-    /**
-     * The initial task network into its integer representation.
-     */
-    private IntTaskNetwork intInitialTaskNetwork;
 
     /**
      * Returns the map used to encode the task into integer.
@@ -108,42 +84,6 @@ public class HTNProblem extends PostInstantiatedProblem {
      */
     public HTNProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
-    }
-
-    /**
-     * Returns the initial task network into its integer representation.
-     *
-     * @return the initial task network into its integer representation.
-     */
-    protected IntTaskNetwork getIntInitialTaskNetwork() {
-        return this.intInitialTaskNetwork;
-    }
-
-    /**
-     * Returns the list of primitive task symbols of the problem.
-     *
-     * @return the list of primitive task symbols of the problem.
-     */
-    protected Set<String> getPrimitiveTaskSymbols() {
-        return this.primitiveTaskSymbols;
-    }
-
-    /**
-     * Returns the list of methods of the problem into its integer representation.
-     *
-     * @return the list of methods of the problem into its integer representation.
-     */
-    protected List<IntMethod> getIntMethods() {
-        return this.intMethods;
-    }
-
-    /**
-     * Returns the list of compound tasks symbols of the problem.
-     *
-     * @return the list of compound tasks symbols of the problem.
-     */
-    protected Set<String> getCompoundTaskSymbols() {
-        return this.compoundTaskSymbols;
     }
 
 
@@ -254,7 +194,7 @@ public class HTNProblem extends PostInstantiatedProblem {
     /**
      * This method is called by the constructor.
      */
-    protected void init () {
+    protected void init() {
 
         // Standardize the variables symbol contained in the domain
         this.getDomain().standardize();
@@ -262,20 +202,23 @@ public class HTNProblem extends PostInstantiatedProblem {
         this.getProblem().standardize();
 
         // Collect the information on the type declared in the domain
-        this.collectTypeInformation();
+        this.initTypes();
         // Collect the constants (symbols and types) declared in the domain
-        this.collectConstantInformation();
+        this.initConstants();
         // Collect the either types of the domain
-        this.collectEitherTypeInformation();
+        this.initEitherTypes();
         // Collect the predicate information (symbols and signatures)
-        this.collectPredicateInformation();
+        this.initPredicates();
 
         // Collect the tasks information (symbols and signatures)
-        this.collectTaskInformation();
+        this.initTasks();
+
+        this.initPrimitiveTaskSymbols();
+
+        this.initCompundTaskSymbols();
 
         // Encode the actions of the domain into integer representation
         this.encodeIntActions();
-        this.encodePrimitiveTaskSymbols();
 
         // Encode the methods of the domain into integer representation
         this.encodeIntMethods();
@@ -288,241 +231,6 @@ public class HTNProblem extends PostInstantiatedProblem {
         this.encodeIntInitialTaskNetwork();
     }
 
-    /**
-     * Encodes the methods of the domain into a compact integer representation.
-     */
-    protected void encodeIntMethods() {
-        this.compoundTaskSymbols = new LinkedHashSet<>();
-        this.intMethods = this.getDomain().getMethods().stream().map(this::encodeIntMethod).collect(Collectors.toList());
-    }
-
-    protected void encodePrimitiveTaskSymbols() {
-        this.primitiveTaskSymbols = new LinkedHashSet<>();
-        for (IntAction a : this.getIntActions()) {
-            this.primitiveTaskSymbols.add(a.getName());
-        }
-    }
-
-    /**
-     * Encode an method into its integer representation.
-     *
-     * @param method the metho to encode.
-     * @return encoded method.
-     */
-    private IntMethod encodeIntMethod(final PDDLMethod method) {
-        final IntMethod intMeth = new IntMethod(method.getName().getImage(), method.getArity());
-        this.compoundTaskSymbols.add(method.getTask().getAtom().get(0).getImage());
-        // Encode the parameters of the operator
-        final List<String> variables = new ArrayList<>(method.getArity());
-        for (int i = 0; i < method.getArity(); i++) {
-            final PDDLTypedSymbol parameter = method.getParameters().get(i);
-            final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTypeSymbols().indexOf(typeImage);
-            intMeth.setTypeOfParameter(i, type);
-            variables.add(parameter.getImage());
-        }
-        // Encode the task carried out by the method
-        final IntExpression task = this.encodeIntExp(method.getTask(), variables);
-        intMeth.setTask(task);
-        // Encode the preconditions of the method
-        final IntExpression preconditions = this.encodeIntExp(method.getPreconditions(), variables);
-        intMeth.setPreconditions(preconditions);
-        // Encode the subtasks of the method
-        final IntExpression subtasks = this.encodeIntExp(method.getSubTasks(), variables);
-        intMeth.setSubTasks(subtasks);
-        // Encode the ordering constraints of the method
-        IntExpression orderingConstraints = null;
-        // Express the total ordering into explicites constraints
-        if (method.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-            orderingConstraints = new IntExpression(PDDLConnective.AND);
-            for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
-                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(i));
-                constraint.addChild(t1);
-                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(i + 1));
-                constraint.addChild(t2);
-                orderingConstraints.addChild(constraint);
-            }
-        } else {
-            final int size = subtasks.getChildren().size();
-            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = this.encodeOrderingConstraints(method.getOrderingConstraints());
-            for (IntExpression c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
-            }
-            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
-                for (int i = 0; i < size; i++) {
-                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
-                    constraints.removeRow(subtaskIndex);
-                    constraints.removeColumn(subtaskIndex);
-                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
-                    subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(i);
-                    orderedSubtasks.addChild(st);
-                }
-                intMeth.setSubTasks(orderedSubtasks);
-                orderingConstraints = new IntExpression(PDDLConnective.AND);
-                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
-                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new Integer(i));
-                    constraint.addChild(t1);
-                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new Integer(i + 1));
-                    constraint.addChild(t2);
-                    orderingConstraints.addChild(constraint);
-                }
-            }
-        }
-        intMeth.setOrderingConstraints(orderingConstraints);
-        return intMeth;
-    }
-
-    /**
-     * Encode the ordering constraints of method. The index used to encode a task in the ordering constraints
-     * expression returned is the index of the task in the AND expression of the tasks list of a method.
-     *
-     * @param exp the constraints to encode. The constraints must be an AND expression.
-     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
-     *      LESS_ORDERING_CONSTRAINTS are expected.
-     */
-    private IntExpression encodeOrderingConstraints(final PDDLExpression exp) {
-        final IntExpression intExp = new IntExpression(exp.getConnective());
-        switch (exp.getConnective()) {
-            case AND:
-                for (int i = 0; i < exp.getChildren().size(); i++) {
-                    intExp.addChild(this.encodeOrderingConstraints(exp.getChildren().get(i)));
-                }
-                break;
-            case LESS_ORDERING_CONSTRAINT:
-                IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(exp.getAtom().get(0).getImage().substring(1)));
-                intExp.addChild(t1);
-                IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(exp.getAtom().get(1).getImage().substring(1)));
-                intExp.addChild(t2);
-                break;
-            default:
-                throw new UnexpectedExpressionException(exp.toString());
-        }
-        return intExp;
-    }
-
-    /**
-     * Encodes an specified expression into its integer representation.
-     *
-     * <p>Notes:
-     * <ul>
-     * <li>equal predicate used specified value of -1.</li>
-     * <li>variables used negative values in [-1,-infinity[.</li>
-     * </ul>
-     * </p>
-     *
-     * @param exp       the expression to encode.
-     * @param variables the list of variable already encoded.
-     * @return the integer representation of the specified expression.
-     */
-    protected IntExpression encodeIntExp(final PDDLExpression exp,
-                                         final List<String> variables) {
-        IntExpression intExp;
-        switch (exp.getConnective()) {
-            case TASK:
-                intExp = new IntExpression(exp.getConnective());
-                final String task = exp.getAtom().get(0).getImage();
-                intExp.setPredicate(this.getTaskSymbols().indexOf(task));
-                intExp.setPrimtive(this.primitiveTaskSymbols.contains(task));
-                int[] args = new int[exp.getAtom().size() - 1];
-                for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final PDDLSymbol argument = exp.getAtom().get(i);
-                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
-                        args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
-                    } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
-                    }
-                }
-                if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
-                    intExp.setTaskID(new Integer(exp.getTaskID().getImage().substring(1)));
-                }
-                intExp.setArguments(args);
-                break;
-            default:
-                intExp = super.encodeIntExp(exp, variables);
-        }
-        return intExp;
-
-    }
-
-
-    /**
-     * Encodes a specified task network into its integer representation.
-     */
-    protected void encodeIntInitialTaskNetwork() {
-        // Encode the parameters of the task network
-        final PDDLTaskNetwork taskNetwork = this.getProblem().getInitialTaskNetwork();
-        final int numberOfParameters = taskNetwork.getParameters().size();
-        this.intInitialTaskNetwork = new IntTaskNetwork(numberOfParameters);
-        final List<String> variables = new ArrayList<>(numberOfParameters);
-        for (int i = 0; i < numberOfParameters; i++) {
-            final PDDLTypedSymbol parameter = taskNetwork.getParameters().get(i);
-            final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTypeSymbols().indexOf(typeImage);
-            this.intInitialTaskNetwork.setTypeOfParameter(i, type);
-            variables.add(parameter.getImage());
-        }
-        // Encode the tasks of the task network
-        this.intInitialTaskNetwork.setTasks(this.encodeIntExp(taskNetwork.getTasks(), variables));
-        // Encode the ordering constraints of the task network
-        IntExpression orderingConstraints = null;
-        IntExpression subtasks = this.intInitialTaskNetwork.getTasks();
-        if (taskNetwork.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-            orderingConstraints = new IntExpression(PDDLConnective.AND);
-            for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
-                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(i));
-                constraint.addChild(t1);
-                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(i + 1));
-                constraint.addChild(t2);
-                orderingConstraints.addChild(constraint);
-            }
-        } else {
-            final int size = subtasks.getChildren().size();
-            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = this.encodeOrderingConstraints(taskNetwork.getOrderingConstraints());
-            for (IntExpression c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
-            }
-            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
-                for (int i = 0; i < size; i++) {
-                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
-                    constraints.removeRow(subtaskIndex);
-                    constraints.removeColumn(subtaskIndex);
-                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
-                    subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(i);
-                    orderedSubtasks.addChild(st);
-                }
-                this.intInitialTaskNetwork.setTasks(orderedSubtasks);
-                orderingConstraints = new IntExpression(PDDLConnective.AND);
-                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
-                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new Integer(i));
-                    constraint.addChild(t1);
-                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new Integer(i + 1));
-                    constraint.addChild(t2);
-                    orderingConstraints.addChild(constraint);
-                }
-            }
-        }
-        this.intInitialTaskNetwork.setOrderingConstraints(orderingConstraints);
-    }
 
     protected void preinstantiation() {
         this.extractInertia();
@@ -600,9 +308,8 @@ public class HTNProblem extends PostInstantiatedProblem {
             // Creates the abstract initial task network
             IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
             newTaskNetwork.getTasks().addChild(new IntExpression(root));
-            this.intInitialTaskNetwork = newTaskNetwork;
         } else {
-            this.intInitialTaskNetwork = taskNetworks.get(0);
+            this.setIntInitialTaskNetwork(taskNetworks.get(0));
         }
     }
 
@@ -1057,46 +764,6 @@ public class HTNProblem extends PostInstantiatedProblem {
 
 
 
-
-    /**
-     * Extracts the relevant facts from the instantiated actions. A ground fact is relevant if and
-     * only if:
-     * <ul>
-     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
-     * <li>2. it is not an initial fact and not a positive ground inertia.</li>
-     * </ul>
-     *
-     */
-    /*protected void extractRelevantFacts() {
-        final Set<IntExpression> facts = new LinkedHashSet<>(10000);
-        for (IntAction a : this.getIntActions()) {
-            extractRelevantFacts(a.getPreconditions(), facts);
-            extractRelevantFacts(a.getEffects(), facts);
-        }
-        if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            for (IntMethod m : this.getIntMethods()) {
-                extractRelevantFacts(m.getPreconditions(), facts);
-            }
-        }
-        for (IntExpression p : this.getIntInitPredicates()) {
-            Inertia inertia = this.getGroundInertia().get(p);
-            if (inertia == null) {
-                inertia = Inertia.INERTIA;
-            }
-            if (this.getIntInitPredicates().contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
-                facts.add(p);
-            }
-        }
-        this.intExpRelevantFluents = new ArrayList<>(facts.size());
-        this.relevantFluents = new ArrayList<>(facts.size());
-        for (IntExpression exp : facts) {
-            final IntExpression relevant = new IntExpression(exp);
-            this.intExpRelevantFluents.add(relevant);
-            this.relevantFluents.add(new Fluent(exp.getPredicate(), exp.getArguments()));
-        }
-    }*/
-
-
     public void extractRelevantTasks() {
         this.relevantTasks = new ArrayList<>();
         for (IntExpression task : this.getTableOfRelevantPrimitiveTasks()) {
@@ -1303,42 +970,6 @@ public class HTNProblem extends PostInstantiatedProblem {
             totallyOrdered = m.getTaskNetwork().isTotallyOrdered();
         }
         return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
-    }
-
-    /**
-     * Returns a string representation of the specified task network.
-     *
-     * @param taskNetwork the task network to print.
-     * @return a string representation of the specified method.
-     */
-    protected String toString(final IntTaskNetwork taskNetwork) {
-        final StringBuilder str = new StringBuilder();
-        str.append("Parameters:\n");
-        for (int i = 0; i < taskNetwork.arity(); i++) {
-            final int index = taskNetwork.getValueOfParameter(i);
-            final String type = this.getTypeSymbols().get(taskNetwork.getTypeOfParameters(i));
-            if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ? \n");
-            } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
-                str.append(" \n");
-            }
-        }
-        str.append("Tasks:\n");
-        str.append(toString(taskNetwork.getTasks()));
-        str.append("\n");
-        str.append("Ordering constraints:\n");
-        str.append(toString(taskNetwork.getOrderingConstraints()));
-        str.append("\n");
-        return str.toString();
     }
 
     /**

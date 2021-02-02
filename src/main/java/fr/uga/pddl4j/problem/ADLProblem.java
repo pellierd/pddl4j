@@ -74,20 +74,22 @@ public class ADLProblem extends PostInstantiatedProblem {
         // Standardize the variables symbol contained in the domain
         this.getProblem().standardize();
 
+        this.initRequirements();
+
         // Collect the information on the type declared in the domain
-        this.collectTypeInformation();
+        this.initTypes();
         // Collect the constants (symbols and types) declared in the domain
-        this.collectConstantInformation();
+        this.initConstants();
         // Collect the either types of the domain
-        this.collectEitherTypeInformation();
+        this.initEitherTypes();
         // Collect the predicate information (symbols and signatures)
-        this.collectPredicateInformation();
+        this.initPredicates();
         // Collect the function information (symbols and signatures)
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.collectFunctionInformation();
+            this.initFunctions();
         }
         // Collect the tasks information (symbols and signatures)
-        this.collectTaskInformation();
+        this.initTasks();
 
         // Encode the actions of the domain into integer representation
         this.encodeIntActions();
