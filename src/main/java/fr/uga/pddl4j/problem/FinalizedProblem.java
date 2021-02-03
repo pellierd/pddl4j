@@ -68,7 +68,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The list of relevant fluents.
      */
-    protected List<Fluent> relevantFluents;
+    private List<Fluent> relevantFluents;
 
     /**
      * The initial state of the problem encoded in its final bit set representation.
@@ -83,7 +83,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The table of the relevant fluents in the form of <code>IntExpression</code>.
      */
-    protected List<IntExpression> intExpRelevantFluents;
+    private List<IntExpression> intExpRelevantFluents;
 
     /**
      * The map used to encode fluents into bit set representation.
@@ -176,7 +176,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant fluents of the problem in the form of <code>IntExpression</code>.
      */
-    protected List<IntExpression> getRelevantIntExpFluents() {
+    private List<IntExpression> getRelevantIntExpFluents() {
         return this.intExpRelevantFluents;
     }
 
@@ -186,7 +186,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the map used to encode fluents into bit set representation.
      */
-    protected Map<IntExpression, Integer> getMapOfFluentIndex() {
+    private Map<IntExpression, Integer> getMapOfFluentIndex() {
         return this.mapOfFluentIndex;
     }
 
@@ -195,7 +195,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant numericfluents of the problem in the form of <code>IntExpression</code>.
      */
-    protected List<IntExpression> getIntExpRelevantNumericFluents() {
+    private List<IntExpression> getIntExpRelevantNumericFluents() {
         return this.intExpRelevantNumericFluents;
     }
 
@@ -204,7 +204,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the map used to encode numeric fluents into bit set representation.
      */
-    protected Map<IntExpression, Integer> getMapOfNumericFluentIndex() {
+    private Map<IntExpression, Integer> getMapOfNumericFluentIndex() {
         return this.mapOfNumericFluentIndex;
     }
 
@@ -213,11 +213,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the map used to encode the task into integer.
      */
-    protected Map<IntExpression, Integer> getMapOfTasksIndex() {
+    private Map<IntExpression, Integer> getMapOfTasksIndex() {
         return this.mapOfTasksIndex;
     }
 
-    public List<List<Integer>> getRelevantOperators() {
+    /**
+     * Returns the relevant operators for a task.
+     *
+     * @return the relevant operators for a task.
+     */
+    protected List<List<Integer>> getRelevantOperators() {
         return taskResolvers;
     }
 
@@ -226,14 +231,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the initial task network of the problem.
      */
-    public TaskNetwork getInitialTaskNetwork() {
+    protected TaskNetwork getInitialTaskNetwork() {
         return initialTaskNetwork;
     }
 
     /**
      * The list of relevant tasks of the problem.
      */
-    public List<Task> getRelevantTasks() {
+    protected List<Task> getRelevantTasks() {
         return this.relevantTasks;
     }
 
@@ -241,12 +246,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Returns the list of instantiated methods of the problem.
      * @return
      */
-    public List<Method> getMethods() {
+    protected List<Method> getMethods() {
         return this.methods;
     }
 
     /**
-     * Extracts the relevant facts from the instantiated actions. A ground fact is relevant if and
+     * Extracts the relevant fluents from the instantiated actions. A fluents is relevant if and
      * only if:
      * <ul>
      * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
@@ -254,11 +259,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * </ul>
      *
      */
-    protected void extractRelevantFacts() {
+    protected void extractRelevantFluents() {
         final Set<IntExpression> facts = new LinkedHashSet<>(10000);
         for (IntAction a : this.getIntActions()) {
-            extractRelevantFacts(a.getPreconditions(), facts);
-            extractRelevantFacts(a.getEffects(), facts);
+            extractRelevantFluents(a.getPreconditions(), facts);
+            extractRelevantFluents(a.getEffects(), facts);
         }
         for (IntExpression p : this.getIntInitPredicates()) {
             Inertia inertia = this.getGroundInertia().get(p);
@@ -289,7 +294,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param exp   the expression.
      * @param facts the set of relevant facts.
      */
-    protected void extractRelevantFacts(final IntExpression exp, final Set<IntExpression> facts) {
+    protected void extractRelevantFluents(final IntExpression exp, final Set<IntExpression> facts) {
         switch (exp.getConnective()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
@@ -308,7 +313,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case AND:
             case OR:
                 for (IntExpression e : exp.getChildren()) {
-                    this.extractRelevantFacts(e, facts);
+                    this.extractRelevantFluents(e, facts);
                 }
                 break;
             case FORALL:
@@ -321,7 +326,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case SOMETIME:
             case AT_MOST_ONCE:
             case NOT:
-                extractRelevantFacts(exp.getChildren().get(0), facts);
+                extractRelevantFluents(exp.getChildren().get(0), facts);
                 break;
             case WHEN:
             case LESS:
@@ -343,20 +348,20 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case SOMETIME_BEFORE:
             case WITHIN:
             case HOLD_AFTER:
-                extractRelevantFacts(exp.getChildren().get(0), facts);
-                extractRelevantFacts(exp.getChildren().get(1), facts);
+                extractRelevantFluents(exp.getChildren().get(0), facts);
+                extractRelevantFluents(exp.getChildren().get(1), facts);
                 break;
             case F_EXP_T:
             case F_EXP:
                 if (!exp.getChildren().isEmpty()) {
-                    extractRelevantFacts(exp.getChildren().get(0), facts);
+                    extractRelevantFluents(exp.getChildren().get(0), facts);
                 }
                 break;
             case ALWAYS_WITHIN:
             case HOLD_DURING:
-                extractRelevantFacts(exp.getChildren().get(0), facts);
-                extractRelevantFacts(exp.getChildren().get(1), facts);
-                extractRelevantFacts(exp.getChildren().get(3), facts);
+                extractRelevantFluents(exp.getChildren().get(0), facts);
+                extractRelevantFluents(exp.getChildren().get(1), facts);
+                extractRelevantFluents(exp.getChildren().get(3), facts);
                 break;
             case FN_ATOM:
             case NUMBER:
@@ -475,8 +480,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             this.mapOfNumericFluentIndex.put(fluent, index);
         }
     }
-
-
 
     /**
      * Encode a list of specified actions into <code>BitSet</code> representation. The specified
@@ -1212,9 +1215,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         return str.toString();
     }
 
-    /*******************************************************************************************************************
-     * Methods add to del with HTN problems.
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // Methods added to deal with HDDL problem.
+    //
 
     /**
      * Extract all the relevant task of the problem from the list of primitive and compund tasks of the problem.
@@ -1256,8 +1259,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         this.taskResolvers.addAll(this.getRelevantMethods());
     }
 
-    protected void encodeInitialTaskNetwork() {
-        this.initialTaskNetwork = this.encodeTaskNetwork(this.getIntInitialTaskNetwork());
+    /**
+     * Encode the initial task networl into its compact bit set representation.
+     */
+    protected void finalizeInitialTaskNetwork() {
+        this.initialTaskNetwork = this.finalizeTaskNetwork(this.getIntInitialTaskNetwork());
     }
 
     /**
@@ -1266,18 +1272,18 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of methods encoded into final compact representation.
      */
-    protected void encodeMethods() throws UnexpectedExpressionException {
+    protected void finalizeMethods() throws UnexpectedExpressionException {
         this.methods = new ArrayList<>(this.getIntMethods().size());
         final List<Method> addedMethods = new ArrayList<>();
         int methodIndex = this.getRelevantActions().size();
         for (IntMethod intMethod : this.getIntMethods()) {
             List<IntMethod> normalized = this.normalizeMethod(intMethod);
-            this.methods.add(this.encodeMethod(normalized.get(0), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
+            this.methods.add(this.finalizeMethod(normalized.get(0), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
             for (int i  = 1; i < normalized.size(); i++) {
                 if (this.getRelevantOperators() != null) {
                     this.getRelevantOperators().get(methodIndex).add(methods.size() + addedMethods.size());
                 }
-                this.methods.add(this.encodeMethod(normalized.get(i), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
+                this.methods.add(this.finalizeMethod(normalized.get(i), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
             }
             methodIndex++;
         }
@@ -1293,8 +1299,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param taskMap the map that associates at a specified task its index in the table of relevant tasks.
      * @return the list of methods encoded into final compact representation.
      */
-    protected Method encodeMethod(final IntMethod method, final Map<IntExpression, Integer> factMap,
-                                  final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
+    private Method finalizeMethod(final IntMethod method, final Map<IntExpression, Integer> factMap,
+                                    final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
 
         final int arity = method.arity();
         final Method encoded = new Method(method.getName(), arity);
@@ -1308,19 +1314,18 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         // Encode the preconditions of the method
         encoded.setPrecondition(this.finalizeCondition(method.getPreconditions()));
         // Encode the task network of the method
-        encoded.setTaskNetwork(this.encodeTaskNetwork(method.getTaskNetwork()));
+        encoded.setTaskNetwork(this.finalizeTaskNetwork(method.getTaskNetwork()));
         return encoded;
     }
 
     /**
      * Encode a specified task network.
-     * map is used to speed-up the search by mapping the an expression to this index.
      *
      * @param taskNetwork the tasknetwork to encode.
-     * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
-     * <code>BitExp</code>.
+     * @return the task network into its final bit set representation.
+     * @see TaskNetwork
      */
-    protected TaskNetwork encodeTaskNetwork(IntTaskNetwork taskNetwork) {
+    private TaskNetwork finalizeTaskNetwork(IntTaskNetwork taskNetwork) {
         // We encode first the tasks
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);

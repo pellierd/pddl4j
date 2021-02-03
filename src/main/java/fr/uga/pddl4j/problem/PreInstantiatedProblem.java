@@ -23,6 +23,7 @@ import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -37,7 +38,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
  */
-public abstract class PreInstantiatedProblem extends IntProblem {
+public abstract class PreInstantiatedProblem extends AbstractProblem {
 
     /**
      * The table that defines for each predicates its type of inertia.
@@ -98,15 +99,15 @@ public abstract class PreInstantiatedProblem extends IntProblem {
     }
 
     /**
-     * Returns the predicates tables.
+     * Returns the predicates table.
      *
-     * @return
+     * @return  the predicated tables.
      */
     private List<List<IntMatrix>> getPredicatesTables() {
-        return predicatesTables;
+        return this.predicatesTables;
     }
 
-    /*
+    /**
      * This method proceeds over the actions of the domain and checks for all atom which kind of
      * inertia it is. For each atom it checks if it satisfies one of the following definitions:
      * <p>
@@ -129,7 +130,6 @@ public abstract class PreInstantiatedProblem extends IntProblem {
      * be move inward the expression.
      * </p>
      *
-     * @param actions the list of actions to simplified.
      */
     protected void extractInertia() {
         final int nbPredicates = this.getPredicateSymbols().size();
@@ -607,7 +607,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
     }
 
     /**
-     * This method creates the predicates predicatesTables used to simplify atomic expression.
+     * This method creates the predicates predicates tables used to simplify atomic expression.
      */
     protected void createPredicatesTables() {
         final int tableSize = this.getConstantSymbols().size();
@@ -660,7 +660,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
      * @param mask an array of integer that can only contain 0 or 1.
      * @return the integer representation of the specified array.
      */
-    protected int toInt(final int[] mask) {
+    private int toInt(final int[] mask) {
         final int len = mask.length;
         if (len > 0) {
             int res = mask[0];
@@ -691,7 +691,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
      *
      * @param tables predicates tables.
      */
-    void printPredicatesTables(final List<List<IntMatrix>> tables) {
+    protected void printPredicatesTables(final List<List<IntMatrix>> tables) {
         for (int predicate = 0; predicate < tables.size(); predicate++) {
             final List<IntMatrix> pTables = tables.get(predicate);
             final int arity = this.getPredicateSignatures().get(predicate).size();

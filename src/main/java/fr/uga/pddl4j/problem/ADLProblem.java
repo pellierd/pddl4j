@@ -67,9 +67,9 @@ public class ADLProblem extends FinalizedProblem {
     protected void initialization() {
 
         // Standardize the variables symbol contained in the domain
-        this.getDomain().standardize();
+        this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
-        this.getProblem().standardize();
+        this.getPDDLProblem().standardize();
 
         this.initRequirements();
 
@@ -89,21 +89,21 @@ public class ADLProblem extends FinalizedProblem {
         this.initTasks();
 
         // Encode the actions of the domain into integer representation
-        this.encodeIntActions();
+        this.initActions();
 
         // Encode the methods of the domain into integer representation
         //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.encodeIntMethods();
+        //    this.initMethods();
         //}
 
         // Encode the initial state in integer representation
-        this.encodeIntInit();
+        this.initInitialState();
         // Encode the goal in integer representation
-        this.encodeIntGoal();
+        this.initGoal();
 
         // Encode the initial task network in integer representation
         //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.encodeIntInitialTaskNetwork();
+        //    this.initInitialTaskNetwork();
         //}
     }
 
@@ -150,7 +150,7 @@ public class ADLProblem extends FinalizedProblem {
     }
 
     protected void finalization() {
-        this.extractRelevantFacts();
+        this.extractRelevantFluents();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             this.extractRelevantNumericFluents(this.getIntActions());
         }
@@ -171,8 +171,8 @@ public class ADLProblem extends FinalizedProblem {
         this.finalizeGoal();
 
         //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.encodeInitialTaskNetwork();
-        //    this.encodeMethods();
+        //    this.finalizeInitialTaskNetwork();
+        //    this.finalizeMethods();
         //}
 
         this.finalizeInitialState();

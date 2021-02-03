@@ -1,30 +1,30 @@
-package fr.uga.pddl4j.problem;
+
 /*
- * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License.
  *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License along with PDDL4J.
+ * If not, see <http://www.gnu.org/licenses/>
  */
+
+package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.problem.operator.Method;
+import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /*
@@ -34,9 +34,6 @@ import java.util.Set;
  * @version 4.0 - 04.12.2020
  */
 public class HTNProblem extends FinalizedProblem {
-
-
-
 
     /**
      * Creates a new problem from a domain and problem.
@@ -48,11 +45,10 @@ public class HTNProblem extends FinalizedProblem {
         super(domain, problem);
     }
 
-
-
-
-
-
+    /**
+     * Insatnatiate
+     * @param timeout the time allocated to the instantiation.
+     */
     public void instantiate(int timeout) {
         super.instantiate(timeout);
     }
@@ -78,14 +74,65 @@ public class HTNProblem extends FinalizedProblem {
     }
 
     /**
+     * Returns the list of task symbols of the problem.
+     *
+     * @return the list of task symbols of the problem.
+     */
+    public List<String> getTaskSymbols() {
+        return super.getTaskSymbols();
+    }
+
+    /**
+     * Returns the signatures of the task defined in the problem.
+     *
+     * @return the signatures of the task defined in the problem.
+     */
+    public List<List<Integer>> getTaskSignatures() {
+        return super.getTaskSignatures();
+    }
+
+    /**
+     * Returns the relevant operators for a task.
+     *
+     * @return the relevant operators for a task.
+     */
+    public List<List<Integer>> getRelevantOperators() {
+        return super.getRelevantOperators();
+    }
+
+    /**
+     * Returns the initial task network of the problem.
+     *
+     * @return the initial task network of the problem.
+     */
+    public TaskNetwork getInitialTaskNetwork() {
+        return super.getInitialTaskNetwork();
+    }
+
+    /**
+     * The list of relevant tasks of the problem.
+     */
+    public List<Task> getRelevantTasks() {
+        return super.getRelevantTasks();
+    }
+
+    /**
+     * Returns the list of instantiated methods of the problem.
+     * @return
+     */
+    public List<Method> getMethods() {
+        return super.getMethods();
+    }
+
+    /**
      * This method is called by the
      */
     protected void initialization() {
 
         // Standardize the variables symbol contained in the domain
-        this.getDomain().standardize();
+        this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
-        this.getProblem().standardize();
+        this.getPDDLProblem().standardize();
 
         // Collect the information on the type declared in the domain
         this.initTypes();
@@ -104,17 +151,17 @@ public class HTNProblem extends FinalizedProblem {
         this.initCompundTaskSymbols();
 
         // Encode the actions of the domain into integer representation
-        this.encodeIntActions();
+        this.initActions();
 
         // Encode the methods of the domain into integer representation
-        this.encodeIntMethods();
+        this.initMethods();
 
         // Encode the initial state in integer representation
-        this.encodeIntInit();
+        this.initInitialState();
         // Encode the goal in integer representation
-        this.encodeIntGoal();
+        this.initGoal();
 
-        this.encodeIntInitialTaskNetwork();
+        this.initInitialTaskNetwork();
     }
 
 
@@ -136,14 +183,14 @@ public class HTNProblem extends FinalizedProblem {
         this.simplifyGoalWithGroundInertia();
 
         this.instantiateInitialTaskNetwork();
-        this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
+        this.instantiateMethods();
         this.simplyMethodsWithGroundInertia();
 
 
     }
 
     protected void finalization() {
-        this.extractRelevantFacts();
+        this.extractRelevantFluents();
         this.extractRelevantTasks();
 
         this.initOfMapFluentIndex();
@@ -153,8 +200,8 @@ public class HTNProblem extends FinalizedProblem {
 
         this.finalizeGoal();
 
-        this.encodeInitialTaskNetwork();
-        this.encodeMethods();
+        this.finalizeInitialTaskNetwork();
+        this.finalizeMethods();
         this.finalizeInitialState();
 
 

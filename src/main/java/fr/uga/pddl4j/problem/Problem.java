@@ -15,6 +15,8 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.plan.Plan;
@@ -34,6 +36,20 @@ import java.util.Set;
  * @version 4.0 - 26.11.2020
  */
 public interface Problem extends Serializable {
+
+    /**
+     * Returns the PDDL domain of the problem.
+     *
+     * @return the PDDL domain of the problem.
+     */
+    PDDLDomain getPDDLDomain();
+
+    /**
+     * Returns the PDDL problem of the problem.
+     *
+     * @return the PDDL problem of the problem.
+     */
+    PDDLProblem getPDDLProblem();
 
     /**
      * Returns the requirements of the problem.
@@ -83,34 +99,6 @@ public interface Problem extends Serializable {
      * @return the signatures of the predicates defined in the problem.
      */
     List<List<Integer>> getPredicateSignatures();
-
-    /**
-     * Returns the list of task symbols of the problem.
-     *
-     * @return the list of task symbols of the problem.
-     */
-    List<String> getTaskSymbols();
-
-    /**
-     * Returns the signatures of the task defined in the problem.
-     *
-     * @return the signatures of the task defined in the problem.
-     */
-    List<List<Integer>> getTaskSignatures();
-
-    /**
-     * Returns the list of function symbols of the problem.
-     *
-     * @return the list of function symbols of the problem.
-     */
-    List<String> getFunctionSymbols();
-
-    /**
-     * Returns the signatures of the functions defined in the problem.
-     *
-     * @return the signatures of the functions defined in the problem.
-     */
-    List<List<Integer>> getFunctionSignatures();
 
     /**
      * Returns the list of relevant fluents used the problem.

@@ -235,10 +235,13 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
 
-    /*******************************************************************************************************************
-     * Methods added to deal with HDDL problem.
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // Methods added to deal with HDDL problem.
+    //
 
+    /**
+     * Instantiates the initial task network.
+     */
     protected void instantiateInitialTaskNetwork() {
         final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
         if (taskNetworks.size() > 1) {
@@ -322,14 +325,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
     /**
-     * Make the instantiation of a list of methods.
-     *
-     * @param methods             the method to instantiate.
-     * @param initialTasksNetwork the initial tasks network.
-     * @param actions             the list of action already instantiate.
+     * Instantiate the methods of the problem.
      */
-    protected void instantiateMethods(List<IntMethod> methods, IntTaskNetwork initialTasksNetwork,
-                                      List<IntAction> actions) {
+    protected void instantiateMethods() {
 
         // Init the list of instantiated methods or ground methods
         final List<IntMethod> instMethods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
@@ -345,7 +343,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
 
         // Init the list of methods to instantiate
         List<IntMethod> meths = new ArrayList<>();
-        for (IntMethod m : methods) {
+        for (IntMethod m : this.getIntMethods()) {
             // If a method has a parameter with a empty domain the method must be removed
             boolean toInstantiate = true;
             int i = 0;
@@ -358,20 +356,17 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             }
         }
 
-        // Filter methods with a parameter with an empty domain
-        this.filterMethodWithEmptyDomainParameter(methods);
-
         // Expand the quantified expression contains in the the method precondition
         this.expandQuantifiedExpressionAndSimplyMethods(meths);
 
         // Compute the set of primitive task from the action already instantiated
-        LinkedHashSet<IntExpression> primitiveTaskSet = this.computePrimitiveTaskSet(actions);
+        LinkedHashSet<IntExpression> primitiveTaskSet = this.computePrimitiveTaskSet(this.getIntActions());
 
         // TInit the list of pending tasks to decompose
         final LinkedList<IntExpression> tasks = new LinkedList<>();
 
         // Add the task of the initial task network with the compound tasks
-        for (IntExpression subtasks : initialTasksNetwork.getTasks().getChildren()) {
+        for (IntExpression subtasks : this.getIntInitialTaskNetwork().getTasks().getChildren()) {
             if (!tasks.contains(subtasks)) {
                 if (!subtasks.isPrimtive()) {
                     tasks.add(subtasks);
@@ -441,7 +436,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             // The action at index i can be remove because it not reachable from the initial task network.
             IntExpression primitiveTask = i.next();
             if (!primtive.contains(primitiveTask)) {
-                actions.remove(index);
+                this.getIntActions().remove(index);
                 i.remove();
             } else {
                 this.relevantActions.add(index);
@@ -449,8 +444,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 index++;
             }
         }
-        methods.clear();
-        methods.addAll(instMethods);
+        this.getIntMethods().clear();
+        this.getIntMethods().addAll(instMethods);
     }
 
     /**
@@ -610,9 +605,5 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             }
         }
     }
-
-
-
-
 
 }
