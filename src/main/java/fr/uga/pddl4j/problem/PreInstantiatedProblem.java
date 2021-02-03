@@ -1,22 +1,19 @@
-package fr.uga.pddl4j.problem;
 /*
- * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License.
  *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License along with PDDL4J.
+ * If not, see <http://www.gnu.org/licenses/>
  */
+
+package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
@@ -34,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains all the methods needed to the pre-treatments carried out before the insertion of the problem:
+ * This class contains all the methods needed to the pre-treatments carried out before the instantiation of a problem:
  * type inference for non-typed domains and inertia extraction to speed up the instantiation process.
  *
  * @author D. Pellier
@@ -290,6 +287,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
+
     /**
      * Infer type from unary inertia contained in the initial state.
      */
@@ -315,7 +313,7 @@ public abstract class PreInstantiatedProblem extends IntProblem {
     }
 
     /**
-     * Symplify the actions with the infered types.
+     * Simplify the actions with the inferred types.
      */
     protected void simplifyActionsWithInferredTypes() {
         final List<IntAction> actions = new LinkedList<>();

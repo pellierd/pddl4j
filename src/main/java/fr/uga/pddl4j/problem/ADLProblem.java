@@ -1,21 +1,18 @@
 package fr.uga.pddl4j.problem;
+
 /*
- * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License.
  *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License along with PDDL4J.
+ * If not, see <http://www.gnu.org/licenses/>
  */
 
 import fr.uga.pddl4j.parser.PDDLDomain;
@@ -32,7 +29,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
  */
-public class ADLProblem extends PostInstantiatedProblem {
+public class ADLProblem extends FinalizedProblem {
 
     /**
      * Create a new ADL problem from a domain and problem.
@@ -67,7 +64,7 @@ public class ADLProblem extends PostInstantiatedProblem {
     /**
      * This method is called by the constructor.
      */
-    protected void init () {
+    protected void initialization() {
 
         // Standardize the variables symbol contained in the domain
         this.getDomain().standardize();
@@ -133,12 +130,8 @@ public class ADLProblem extends PostInstantiatedProblem {
 
     protected void instantiation() {
         this.instantiateActions();
-
-        this.extractGroundInertia();
-        this.extractGroundNumericInertia();
-        this.simplyActionsWithGroundInertia();
         this.instantiateGoal();
-        this.simplifyGoalWithGroundInertia();
+
         /*if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             this.instantiateInitialTaskNetwork();
             this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
@@ -149,6 +142,14 @@ public class ADLProblem extends PostInstantiatedProblem {
 
 
     protected void postinstantiation() {
+        this.extractGroundInertia();
+        this.extractGroundNumericInertia();
+        this.simplyActionsWithGroundInertia();
+
+        this.simplifyGoalWithGroundInertia();
+    }
+
+    protected void finalization() {
         this.extractRelevantFacts();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             this.extractRelevantNumericFluents(this.getIntActions());
@@ -167,23 +168,22 @@ public class ADLProblem extends PostInstantiatedProblem {
         //    this.initMapOfTaskIndex();
         //}
 
-        this.encodeGoal();
+        this.finalizeGoal();
 
         //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
         //    this.encodeInitialTaskNetwork();
         //    this.encodeMethods();
         //}
 
-        this.encodeInit();
+        this.finalizeInitialState();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.encodeInitNumericFluent();
+            this.finalizeInitialNumericFluent();
         }
         if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
             this.getInitialState().addNumericFluent(duration);
         }
-        this.encodeActions();
-
+        this.finalizeActions();
     }
 
     /**

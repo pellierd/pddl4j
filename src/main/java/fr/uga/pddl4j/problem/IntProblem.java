@@ -537,7 +537,7 @@ public abstract class IntProblem extends AbstractProblem {
             case IS_VIOLATED:
                 // Do nothing
                 break;
-            case TASK:
+            case TASK: // ADD TO DEAL WITH HTN
                 final String task = exp.getAtom().get(0).getImage();
                 intExp.setPredicate(this.getTaskSymbols().indexOf(task));
                 intExp.setPrimtive(this.getPrimitiveTaskSymbols().contains(task));
@@ -607,7 +607,7 @@ public abstract class IntProblem extends AbstractProblem {
     /**
      * Returns a string representation of the specified method.
      *
-     * @param method       the method to print.
+     * @param method the method to print.
      * @return a string representation of the specified method.
      */
     protected String toString(final IntMethod method) {

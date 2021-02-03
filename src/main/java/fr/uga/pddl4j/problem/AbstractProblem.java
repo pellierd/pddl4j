@@ -1,25 +1,31 @@
 /*
- * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License.
  *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License along with PDDL4J.
+ * If not, see <http://www.gnu.org/licenses/>
  */
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.*;
+import fr.uga.pddl4j.parser.PDDLAction;
+import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLExpression;
+import fr.uga.pddl4j.parser.PDDLMethod;
+import fr.uga.pddl4j.parser.PDDLNamedTypedList;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -109,18 +115,18 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The empty constructor to block the default constructor of object.
      */
-    private AbstractProblem() {}
+    private AbstractProblem() {
+    }
 
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain the domain.
+     * @param domain  the domain.
      * @param problem the problem.
      */
     public AbstractProblem(final PDDLDomain domain, final PDDLProblem problem) {
         this.domain = domain;
         this.problem = problem;
-        this.init();
     }
 
     /**
@@ -250,43 +256,58 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initiates the problem. This method calls in this order the methods init(), preinstantiation(), instantiation()
-     * and postinstantiation().
+     * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
+     * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
      *
      * @param timeout the time allocated to the instantiation.
      */
     public void instantiate(int timeout) {
+        this.initialization();
         this.preinstantiation();
         this.instantiation();
         this.postinstantiation();
+        this.finalization();
     }
 
     /**
-     * This abstract method must me override by subclass. The init method initializes the
+     * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
+     * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
+     * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
+     * network of the problem into compact int representation.
      */
-    protected abstract void init();
+    protected abstract void initialization();
 
     /**
-     *
+     * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
+     * the static properties (Inretia) of the problem in order to prune as soon as possible the actions that can never
+     * be triggered.
      */
     protected abstract void preinstantiation();
 
     /**
-     *
+     * This methods carries out the instantiation of the planning operators and the goal of the problem in to actions.
      */
     protected abstract void instantiation();
 
     /**
-     *
+     * This method carries out all the necessary treatment to postinstantiate the problem. In particular, it simplifies
+     * the actions instantiated based on static properties based on the initial state information of the problem in
+     * order to prune the actions that can never be triggered.
      */
     protected abstract void postinstantiation();
 
-
+    /**
+     * This methods finalize the domain, i.e., it encode the planning problem into it final compact representation using
+     * bit set.
+     */
+    protected abstract void finalization();
 
     /**
-     * Check that the domain and the problem are ADL otherwise the encoding is not
+     * Init the list of requirement of the problem.
+     *
+     * @throws RequirementNotSupportedException if the requirements of the domain and the problem are not supported.
      */
-    protected void initRequirements() {
+    protected void initRequirements() throws RequirementNotSupportedException {
         this.requirements = new LinkedHashSet<>();
         this.requirements.addAll(this.domain.getRequirements());
         this.requirements.addAll(this.problem.getRequirements());
@@ -299,13 +320,13 @@ public abstract class AbstractProblem implements Problem {
                 str.append(" ");
                 str.append(requirement.getImage());
             }
-            throw new IllegalArgumentException(str.toString());
+            throw new RequirementNotSupportedException(str.toString());
         }
     }
 
 
     /**
-     * Collects the list of type symbols form the list declared in the domain. The corresponding domain of values
+     * Initializes the list of type symbols form the list declared in the domain. The corresponding domain of values
      * of the type is created. The domain is empty.
      */
     protected void initTypes() {
@@ -320,7 +341,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects the constants declared in the domain and the problem and initialise the domains of values of each type.
+     * Initializes the constants declared in the domain and the problem and initialise the domains of values of each type.
      */
     protected void initConstants() {
         final List<PDDLTypedSymbol> constants = this.domain.getConstants();
@@ -343,7 +364,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects composite type, i.e., type of the form (either t1 t2), through a specified domain and
+     * Initializes the composite type, i.e., type of the form (either t1 t2), through a specified domain and
      * problem and creates their respective domain. Warning: constants must be collected before using this method. It
      * is necessary to correctly initialized the domain of the either types collected.
      */
@@ -385,7 +406,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects the information types from a list of PDDL typed symbols.
+     * Initializes the information types from a list of PDDL typed symbols.
      *
      * @param list the list of typed symbol.
      */
@@ -416,7 +437,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects the either type from a specified expression.
+     * Initializes the either type from a specified expression.
      *
      * @param exp the expression.
      */
@@ -489,8 +510,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects predicates information (symbols and signatures) declared in the domain.
-     *
+     * Initializes the predicates information (symbols and signatures) declared in the domain.
      */
     protected void initPredicates() {
         final List<PDDLNamedTypedList> predicates = this.domain.getPredicates();
@@ -519,7 +539,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects function information (symbols and signatures) declared in the domain.
+     * Initializes the function information (symbols and signatures) declared in the domain.
      */
     protected void initFunctions() {
         final List<PDDLNamedTypedList> functions = this.domain.getFunctions();
@@ -546,7 +566,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects tasks information (symbols and signatures) declared in the domain.
+     * Initializes the tasks information (symbols and signatures) declared in the domain.
      */
     protected void initTasks() {
         final List<PDDLNamedTypedList> tasks = this.domain.getTasks();
@@ -575,7 +595,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects the primitive task symbols from the actions of the domain.
+     * Initializes the primitive task symbols from the actions of the domain.
      */
     protected void initPrimitiveTaskSymbols() {
         this.primitiveTaskSymbols = new LinkedHashSet<>();
@@ -585,7 +605,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Collects the compound task symbols from the methods of the domain.
+     * Initializes the compound task symbols from the methods of the domain.
      */
     protected void initCompundTaskSymbols() {
         this.compoundTaskSymbols = new LinkedHashSet<>();
