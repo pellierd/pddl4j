@@ -303,7 +303,7 @@ public abstract class AbstractProblem implements Problem {
 
     /**
      * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
-     * the static properties (Inretia) of the problem in order to prune as soon as possible the actions that can never
+     * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
      * be triggered.
      */
     protected abstract void preinstantiation();

@@ -68,8 +68,12 @@ public class NumericProblem extends ADLProblem {
     }
 
     /**
-     * This method is called by the constructor.
+     * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
+     * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
+     * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
+     * network of the problem into compact int representation.
      */
+    @Override
     protected void initialization() {
 
         // Standardize the variables symbol contained in the domain
@@ -77,9 +81,8 @@ public class NumericProblem extends ADLProblem {
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
 
-        //
+        // Initialize the requirements of the problem
         this.initRequirements();
-
         // Collect the information on the type declared in the domain
         this.initTypes();
         // Collect the constants (symbols and types) declared in the domain
@@ -93,14 +96,18 @@ public class NumericProblem extends ADLProblem {
 
         // Encode the actions of the domain into integer representation
         this.initActions();
-
         // Encode the initial state in integer representation
         this.initInitialState();
         // Encode the goal in integer representation
         this.initGoal();
-
     }
 
+    /**
+     * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
+     * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
+     * be triggered and infer of the domain that are not typing.
+     */
+    @Override
     protected void preinstantiation() {
         this.extractInertia();
         this.extractNumericInertia();
@@ -113,12 +120,21 @@ public class NumericProblem extends ADLProblem {
         this.createPredicatesTables();
     }
 
+    /**
+     * This methods carries out the instantiation of the planning operators and the goal of the problem in to actions.
+     */
+    @Override
     protected void instantiation() {
         this.instantiateActions();
         this.instantiateGoal();
-
     }
 
+    /**
+     * This method carries out all the necessary treatment to postinstantiate the problem. In particular, it simplifies
+     * the actions instantiated based on static properties based on the initial state information of the problem in
+     * order to prune the actions that can never be triggered.
+     */
+    @Override
     protected void postinstantiation() {
         this.extractGroundInertia();
         this.extractGroundNumericInertia();
@@ -126,17 +142,18 @@ public class NumericProblem extends ADLProblem {
         this.simplifyGoalWithGroundInertia();
     }
 
+    /**
+     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation
+     * using bit set.
+     */
+    @Override
     protected void finalization() {
         this.extractRelevantFluents();
         this.extractRelevantNumericFluents(this.getIntActions());
-
         this.initOfMapFluentIndex();
         this.initMapOfNumericFluentIndex();
-
         this.finalizeGoal();
-
         this.finalizeInitialState();
-
         this.finalizeInitialNumericFluent();
         this.finalizeActions();
     }
