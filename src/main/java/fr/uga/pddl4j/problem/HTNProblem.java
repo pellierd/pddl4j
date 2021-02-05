@@ -164,56 +164,62 @@ public class HTNProblem extends FinalizedProblem {
         this.initInitialTaskNetwork();
     }
 
-
+    /**
+     * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
+     * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
+     * be triggered and infer of the domain that are not typing.
+     */
+    @Override
     protected void preinstantiation() {
         this.extractInertia();
-        // Create the predicates tables used to count the occurrences of the predicates in the
-        // initial state
+        // Create the predicates tables used to count the occurrences of the predicates in the initial state/
         this.createPredicatesTables();
     }
 
+    /**
+     * This methods carries out the instantiation of the planning operators and the goal of the problem in to actions.
+     */
+    @Override
     protected void instantiation() {
         this.instantiateActions();
         this.instantiateGoal();
     }
 
+    /**
+     * This method carries out all the necessary treatment to postinstantiate the problem. In particular, it simplifies
+     * the actions instantiated based on static properties based on the initial state information of the problem in
+     * order to prune the actions that can never be triggered.
+     */
+    @Override
     protected void postinstantiation() {
         this.extractGroundInertia();
         this.simplyActionsWithGroundInertia();
         this.simplifyGoalWithGroundInertia();
-
         this.instantiateInitialTaskNetwork();
         this.instantiateMethods();
         this.simplyMethodsWithGroundInertia();
-
-
     }
 
+    /**
+     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation
+     * using bit set.
+     */
+    @Override
     protected void finalization() {
         this.extractRelevantFluents();
         this.extractRelevantTasks();
-
         this.initOfMapFluentIndex();
-
         this.initRelevantOperators();
         this.initMapOfTaskIndex();
-
         this.finalizeGoal();
-
         this.finalizeInitialTaskNetwork();
         this.finalizeMethods();
         this.finalizeInitialState();
-
-
         this.finalizeActions();
     }
-
-
-
+    
     /**
-     * Returns <code>true</code> if this problem is solvable. In the case of STRIPS planning, the method returns
-     * <code>false</code> if the goal is simplified to <code>false</code> during the encoding process, otherwise the
-     * method returns <code>true</code>. In the case of HTN planning, the method returns <code>false</code> if at least
+     * Returns <code>true</code> if this problem is solvable. The method returns <code>false</code> if at least
      * one of the task of the initial task network is not reachable after the encoding process, i.e., as a task is set
      * to null in the tasks list of the initial task network, otherwise the method returns <code>true</code>.
      * <p>
