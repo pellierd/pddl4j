@@ -58,12 +58,15 @@ public interface HTN extends Problem {
 
     /**
      * The list of relevant tasks of the problem.
+     *
+     * @return the list of relevant tasks of the problem.
      */
     List<Task> getRelevantTasks();
 
     /**
      * Returns the list of instantiated methods of the problem.
-     * @return
+     *
+     * @return the list of instantiated methods of the problem.
      */
     List<Method> getMethods();
 

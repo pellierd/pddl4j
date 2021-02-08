@@ -57,7 +57,7 @@ public final class IntMethod extends AbstractIntOperator {
      * the task network is set to an empty task network.
      *
      * @param name  the name of the method.
-     * @param arity the arity of the method. The arity must be > 0.
+     * @param arity the arity of the method. The arity must be greater than 0.
      */
     public IntMethod(final String name, final int arity) {
         super(name, arity);

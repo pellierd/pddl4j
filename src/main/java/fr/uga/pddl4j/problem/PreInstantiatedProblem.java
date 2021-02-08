@@ -963,6 +963,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp  the expression.
      * @param var  the variable.
      * @param cons the constant.
+     * @param simplify a flag to indicate if the expression must be simplified during the subtitution process.
      */
     protected void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
         boolean updated = false;

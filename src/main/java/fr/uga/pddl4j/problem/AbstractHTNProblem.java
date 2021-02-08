@@ -117,7 +117,8 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
 
     /**
      * Returns the list of instantiated methods of the problem.
-     * @return
+     *
+     * @return the list of instantiated methods of the problem.
      */
     public List<Method> getMethods() {
         return super.getMethods();

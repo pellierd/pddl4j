@@ -30,11 +30,6 @@ import java.io.Serializable;
 public final class IntMatrix implements Serializable {
 
     /**
-     * The serial version id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The integer array used to store the matrix.
      */
     private int[] matrix;
@@ -54,7 +49,7 @@ public final class IntMatrix implements Serializable {
      *
      * @param size      the size of the matrix.
      * @param dimension the dimension of the matrix.
-     * @throws IllegalArgumentException if size <= 0.
+     * @throws IllegalArgumentException if size &le; 0.
      */
     public IntMatrix(final int size, final int dimension) {
         if (size < 0) {
@@ -71,8 +66,8 @@ public final class IntMatrix implements Serializable {
      * @param index the index.
      * @return the integer contained in the matrix at the specified index or null if no element is
      *          at the specified index.
-     * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
-     *                                        index[i] < size does not hold.
+     * @throws ArrayIndexOutOfBoundsException if index.length &ne; dimension and for all i 0 &le;
+     *                                        index[i] &lt; size does not hold.
      */
     public final int get(final int[] index) {
         return this.matrix[index(index)];
@@ -83,8 +78,8 @@ public final class IntMatrix implements Serializable {
      *
      * @param index the index.
      * @param value the integer value to put.
-     * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
-     *                                        index[i] < size does not hold.
+     * @throws ArrayIndexOutOfBoundsException if index.length &ne; dimension and for all i 0 &le;
+     *                                        index[i] &lt; size does not hold.
      */
     public final void put(final int[] index, final int value) {
         this.matrix[index(index)] = value;
@@ -94,8 +89,8 @@ public final class IntMatrix implements Serializable {
      * Increment the value at a specified index.
      *
      * @param index the index.
-     * @throws ArrayIndexOutOfBoundsException if index.length != dimension and for all i 0 <=
-     *                                        index[i] < size does not hold.
+     * @throws ArrayIndexOutOfBoundsException if index.length &ne; dimension and for all i 0 &le;
+     *                                        index[i] &lt; size does not hold.
      */
     public final void increment(final int[] index) {
         this.matrix[index(index)]++;

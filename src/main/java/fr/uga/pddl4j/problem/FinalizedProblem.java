@@ -237,6 +237,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
     /**
      * The list of relevant tasks of the problem.
+     *
+     * @return the list of relevant tasks of the problem.
      */
     protected List<Task> getRelevantTasks() {
         return this.relevantTasks;
@@ -244,7 +246,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
     /**
      * Returns the list of instantiated methods of the problem.
-     * @return
+     *
+     * @return the list of instantiated methods of the problem.
      */
     protected List<Method> getMethods() {
         return this.methods;
@@ -746,9 +749,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * Encode a specified goal in a disjunction of <code>BitExp</code>. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
-     *
-     * @return a list of <code>BitExp</code> that represents the goal as a disjunction of
-     * <code>BitExp</code>.
      */
     protected void finalizeGoal() {
 
@@ -797,10 +797,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
-     * specified map is used to speed-up the search by mapping the an expression to this index.
+     * Encode an specified <code>IntExpression</code> that represents a condition in its <code>BitExp</code>
+     * representation. The map of fluent index is used to speed-up the encoding.
      *
      * @param exp the <code>IntExpression</code>.
+     * @return the condition encoded.
      */
     protected Condition finalizeCondition(final IntExpression exp) throws UnexpectedExpressionException {
         final Condition condition = new Condition();
@@ -953,10 +954,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode a specified initial state in it <code>BitExp</code> representation. The specified
-     * map is used to speed-up the search by mapping the an expression to this index.
-     *
-     * @return the <code>BitExp</code> that represents the initial encoded.
+     * Encode a specified initial state in it bit compact representation. The map of the fluent index is used to speedup
+     * the encoding.
      */
     protected void finalizeInitialState() {
         this.initialState = new InitialState();
@@ -1269,8 +1268,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * Encode a list of specified methods into the final compact representation. The specified
      * maps are used to speed-up the search by mapping the an expression to this index.
-     *
-     * @return the list of methods encoded into final compact representation.
      */
     protected void finalizeMethods() throws UnexpectedExpressionException {
         this.methods = new ArrayList<>(this.getIntMethods().size());

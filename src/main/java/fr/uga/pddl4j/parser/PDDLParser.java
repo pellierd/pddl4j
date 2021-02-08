@@ -85,6 +85,11 @@ import java.util.stream.Collectors;
  * }
  * </pre>
  *
+ * To generate the PDDL BNF accepted by the parser use the commande line:
+ * <pre>
+ *     ./gradlew jjdoc
+ * </pre>
+ * The BNF description is available in build/doc/PDD4J_BNF.
  *
  * @author D Pellier
  * @version 2.0 - 28.01.10

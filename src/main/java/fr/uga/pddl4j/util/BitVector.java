@@ -26,12 +26,11 @@ import java.util.BitSet;
 
 /**
  * This class implements a bit vector.
- * <p>
+ * <br>
  * Revisions:
  * <ul>
  * <li>26.06.2020: Add shift methods.</li>
  * </ul>
- * </p>
  *
  * @author D. Pellier
  * @version 1.2 - 13.04.2010

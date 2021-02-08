@@ -205,7 +205,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
     /**
      * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
      * follow:
-     * <p>
+     *
      * <pre>
      * usage of TFDPlanner:
      *
@@ -217,7 +217,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * -h              print this message
      *
      * </pre>
-     * </p>
+     *
      * <p>
      * Commande line example:
      * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner</code><br>

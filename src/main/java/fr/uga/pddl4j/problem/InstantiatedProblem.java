@@ -108,9 +108,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
     /**
-     * Instantiates a specified list of actions.
-     *
-     * @return the list of instantiated actions.
+     * Instantiates the actions of the problem.
      */
     protected void instantiateActions() {
         final List<IntAction> instActions = new ArrayList<>(Constants.DEFAULT_ACTION_TABLE_SIZE);

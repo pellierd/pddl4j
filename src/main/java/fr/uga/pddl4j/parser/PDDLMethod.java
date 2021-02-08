@@ -130,7 +130,6 @@ public class PDDLMethod extends PDDLAbstractOperator {
     /**
      * Returns the ordering constraints between the tasks of the task network.
      *
-     *
      * @return the ordering constraints of the task network.
      */
     public final PDDLExpression getOrderingConstraints() {
@@ -184,8 +183,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
 
     /**
      * Normalizes the method.
-     * <p>
-     * </p>
+     *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @see PDDLExpression#renameVariables()
      * @see PDDLExpression#moveNegationInward()

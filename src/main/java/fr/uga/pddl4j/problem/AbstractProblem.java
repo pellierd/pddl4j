@@ -716,7 +716,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Sets the integer initial task network of thi problem.
      *
-     * @return the initial task network into its integer representation.
+     * @param taskNetwork the task network to set.
      */
     protected final void setIntInitialTaskNetwork(IntTaskNetwork taskNetwork) {
         this.intInitialTaskNetwork = taskNetwork;
@@ -990,12 +990,11 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Encodes an specified expression into its integer representation.
      *
-     * <p>Notes:
+     * Notes:
      * <ul>
      * <li>equal predicate used specified value of -1.</li>
      * <li>variables used negative values in [-1,-infinity[.</li>
      * </ul>
-     * </p>
      *
      * @param exp       the expression to encode.
      * @param variables the list of variable already encoded.
@@ -1276,7 +1275,8 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Returns a string representation of an expression.
      *
-     * @param exp        the expression.
+     * @param exp the expression.
+     * @param separator the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression.
      */
     protected String toString(final IntExpression exp, final String separator) {
@@ -1286,7 +1286,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Returns a string representation of an expression.
      *
-     * @param exp        the expression.
+     * @param exp the expression.
      * @param baseOffset the offset white space from the left used for indentation.
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.

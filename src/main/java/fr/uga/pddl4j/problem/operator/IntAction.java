@@ -74,7 +74,7 @@ public final class IntAction extends AbstractIntOperator {
      * Create a new action with a specified name.
      *
      * @param name  the name of the action.
-     * @param arity the arity of the action. Arity must be > 0.
+     * @param arity the arity of the action. Arity must be greater than 0.
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);

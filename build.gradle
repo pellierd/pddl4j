@@ -38,7 +38,7 @@ compileJavacc {
 
 jjdoc {
     inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
-    outputDirectory = file('build/doc')
+    outputDirectory = file('build/docs/PDDL4J_BNF')
     arguments = [BNF: 'true', TEXT: 'true', ONE_TABLE: 'true']
 
 }
