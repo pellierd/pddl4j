@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This interface describes the interface of all planning problem.
+ * This interface describes the interface of all ADL planning problem.
  *
  * @author D. Pellier
  * @version 4.0 - 26.11.2020

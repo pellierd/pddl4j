@@ -25,7 +25,6 @@ import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;

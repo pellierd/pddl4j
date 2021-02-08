@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class implements a numeric ADL problem.
+ * This class implements a numeric problem.
  *
  * @author D. Pellier
  * @version 4.0 - 03.02.2021.
  */
-public class NumericProblem extends ADLProblem {
+public class NumericProblem extends AbstractNumericProblem {
 
     /**
      * Create a new numeric problem from a domain and problem.
@@ -41,33 +41,6 @@ public class NumericProblem extends ADLProblem {
     }
 
     /**
-     * Returns the list of PDDL requirements accepted by the problem.
-     */
-    public Set<PDDLRequireKey> getAcceptedRequirements() {
-        Set<PDDLRequireKey> accepted = super.getAcceptedRequirements();
-        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
-        return accepted;
-    }
-
-    /**
-     * Returns the list of function symbols of the problem.
-     *
-     * @return the list of function symbols of the problem.
-     */
-    public List<String> getFunctionSymbols() {
-        return super.getFunctionSymbols();
-    }
-
-    /**
-     * Returns the signatures of the functions defined in the problem.
-     *
-     * @return the signatures of the functions defined in the problem.
-     */
-    public List<List<Integer>> getFunctionSignatures() {
-        return super.getFunctionSignatures();
-    }
-
-    /**
      * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
      * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
      * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
@@ -75,12 +48,10 @@ public class NumericProblem extends ADLProblem {
      */
     @Override
     protected void initialization() {
-
         // Standardize the variables symbol contained in the domain
         this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
-
         // Initialize the requirements of the problem
         this.initRequirements();
         // Collect the information on the type declared in the domain
@@ -93,7 +64,6 @@ public class NumericProblem extends ADLProblem {
         this.initPredicates();
         // Collect the function information (symbols and signatures)
         this.initFunctions();
-
         // Encode the actions of the domain into integer representation
         this.initActions();
         // Encode the initial state in integer representation
@@ -157,6 +127,5 @@ public class NumericProblem extends ADLProblem {
         this.finalizeInitialNumericFluent();
         this.finalizeActions();
     }
-
 
 }

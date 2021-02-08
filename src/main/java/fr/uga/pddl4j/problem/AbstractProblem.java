@@ -18,7 +18,13 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.*;
 import fr.uga.pddl4j.problem.operator.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**

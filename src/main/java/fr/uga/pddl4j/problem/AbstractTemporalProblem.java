@@ -1,5 +1,3 @@
-package fr.uga.pddl4j.problem;
-
 /*
  * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
@@ -15,27 +13,31 @@ package fr.uga.pddl4j.problem;
  * If not, see <http://www.gnu.org/licenses/>
  */
 
+package fr.uga.pddl4j.problem;
+
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.problem.numeric.NumericVariable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * This class implements an ADL problem.
+ * This class implements a temporal problem.
  *
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
  */
-public class ADLProblem extends FinalizedProblem {
+public abstract class AbstractTemporalProblem extends ADLProblem implements Numeric, Temporal {
 
     /**
-     * Create a new ADL problem from a domain and problem.
+     * Create a new temporal problem from a domain and problem.
      * @param domain The domain.
      * @param problem The problem.
      */
-    public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
+    public AbstractTemporalProblem(final PDDLDomain domain, final PDDLProblem problem) {
         super(domain, problem);
     }
 
@@ -54,24 +56,44 @@ public class ADLProblem extends FinalizedProblem {
         accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
         accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
         accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
-        //accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
-        //accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
-        //accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
+        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
+        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
+        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
         return accepted;
     }
+
+    /**
+     * Returns the list of function symbols of the problem.
+     *
+     * @return the list of function symbols of the problem.
+     */
+    public List<String> getFunctionSymbols() {
+        return super.getFunctionSymbols();
+    }
+
+    /**
+     * Returns the signatures of the functions defined in the problem.
+     *
+     * @return the signatures of the functions defined in the problem.
+     */
+    public List<List<Integer>> getFunctionSignatures() {
+        return super.getFunctionSignatures();
+    }
+
+    /**
+     * This method is called to convert durative actions into no durative actions.
+     */
+    protected abstract void expandDurativeActions();
 
     /**
      * This method is called by the constructor.
      */
     protected void initialization() {
-
         // Standardize the variables symbol contained in the domain
         this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
-
         this.initRequirements();
-
         // Collect the information on the type declared in the domain
         this.initTypes();
         // Collect the constants (symbols and types) declared in the domain
@@ -81,124 +103,73 @@ public class ADLProblem extends FinalizedProblem {
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
         // Collect the function information (symbols and signatures)
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.initFunctions();
-        //}
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.initFunctions();
+        }
         // Collect the tasks information (symbols and signatures)
-        //this.initTasks();
-
+        this.initTasks();
         // Encode the actions of the domain into integer representation
         this.initActions();
-
-        // Encode the methods of the domain into integer representation
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.initMethods();
-        //}
-
         // Encode the initial state in integer representation
         this.initInitialState();
         // Encode the goal in integer representation
         this.initGoal();
-
-        // Encode the initial task network in integer representation
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.initInitialTaskNetwork();
-        //}
     }
 
     protected void preinstantiation() {
         this.extractInertia();
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.extractNumericInertia();
-        //}
-
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.extractNumericInertia();
+        }
         // Infer the type from the unary inertia
         if (!this.getRequirements().contains(PDDLRequireKey.TYPING)) {
             //&&!this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             this.inferTypesFromInertia();
             this.simplifyActionsWithInferredTypes();
         }
-        // Create the predicates tables used to count the occurrences of the predicates in the
-        // initial state
+        // Create the predicates tables used to count the occurrences of the predicates in the initial state.
         this.createPredicatesTables();
 
-        //if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-        //    this.expandTemporalActions(this.getIntActions());
-        //}
+        if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            this.expandDurativeActions();
+        }
     }
 
     protected void instantiation() {
         this.instantiateActions();
         this.instantiateGoal();
-
-        /*if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            this.instantiateInitialTaskNetwork();
-            this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
-            this.simplyMethodsWithGroundInertia();
-        }*/
-
     }
 
 
     protected void postinstantiation() {
         this.extractGroundInertia();
-        //this.extractGroundNumericInertia();
+        this.extractGroundNumericInertia();
         this.simplyActionsWithGroundInertia();
-
         this.simplifyGoalWithGroundInertia();
     }
 
     protected void finalization() {
         this.extractRelevantFluents();
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.extractRelevantNumericFluents(this.getIntActions());
-        //}
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.extractRelevantTasks();
-        //}
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.extractRelevantNumericFluents(this.getIntActions());
+        }
 
         this.initOfMapFluentIndex();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
             this.initMapOfNumericFluentIndex();
         }
 
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.initRelevantOperators();
-        //    this.initMapOfTaskIndex();
-        //}
-
         this.finalizeGoal();
 
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.finalizeInitialTaskNetwork();
-        //    this.finalizeMethods();
-        //}
-
         this.finalizeInitialState();
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.finalizeInitialNumericFluent();
-        //}
-        //if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-        //    NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
-        //    this.getInitialState().addNumericFluent(duration);
-        //}
+        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+            this.finalizeInitialNumericFluent();
+        }
+        if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+            NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
+            this.getInitialState().addNumericFluent(duration);
+        }
         this.finalizeActions();
-    }
-
-    /**
-     * Returns <code>true</code> if this problem is solvable. The method returns <code>false</code> if the goal is
-     * simplified to <code>false</code> during the instantiation process, otherwise the method returns
-     * <code>true</code>.
-     *
-     * <p>
-     * Warning, it is not because the method returns <code>true</code> that the problem is solvable. It just means that
-     * the encoding process can not exclude the fact that the problem is solvable.
-     * </p>
-     *
-     * @return <code>true</code> if this problem is solvable; <code>false</code>.
-     */
-    public boolean isSolvable() {
-        return this.getGoal() != null;
     }
 
 }
