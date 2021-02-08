@@ -571,7 +571,8 @@ public class HSPTest {
      */
     /*@Test
     public void test_HSP_IPC2004_Pipesworld_No_Tankage_Non_Temporal_STRIPS() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-nontemporal-strips" + File.separator;
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-nontemporal-strips"
+            + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
@@ -585,7 +586,8 @@ public class HSPTest {
      */
     /*@Test
     public void test_HSP_IPC2004_Pipesworld_Tankage_Non_Temporal_STRIPS() throws Exception {
-        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/tankage-nontemporal-strips" + File.separator;
+        final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/tankage-nontemporal-strips"
+            + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
