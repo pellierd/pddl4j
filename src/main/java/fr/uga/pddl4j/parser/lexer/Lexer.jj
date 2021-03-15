@@ -1,0 +1,3885 @@
+/*
+ * Copyright (c) 2010 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
+
+options {
+    STATIC=false;
+    IGNORE_CASE=true;
+}
+
+PARSER_BEGIN(Lexer)
+
+package fr.uga.pddl4j.parser.lexer;
+
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.PDDLExpression;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLNamedTypedList;
+import fr.uga.pddl4j.parser.PDDLAction;
+import fr.uga.pddl4j.parser.PDDLMethod;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.PDDLTaskNetwork;
+import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
+
+import java.io.FileInputStream;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+public class Lexer {
+
+	private static final int PRIMITIVE_TYPE = 0;
+	private static final int VARIABLE = 1;
+	private static final int CONSTANT = 2;
+	private static final int TERM = 3;
+	private static final int ATOMIC_FUNCTION_SKELETON = 4;
+	private static final int PARSER_DOMAIN = 5;
+	private static final int PARSER_PROBLEM = 6;
+
+	private PDDLDomain domain = null;
+	public PDDLDomain getDomain() { return this.domain; }
+
+	private PDDLProblem problem = null;
+	public PDDLProblem getProblem() { return this.problem; }
+
+    private File file;
+	public File getFile() { return this.file; }
+	public void setFile(File file) { this.file = file; }
+
+	private ErrorManager mgr;
+	public ErrorManager getErrorManager() { return this.mgr; }
+	public void setErrorManager(ErrorManager mgr) { this.mgr = mgr; }
+
+	private void error(Throwable e, int line, int column) {
+		String message = new String();
+		if (e.getClass().equals(TokenMgrError.class)) {
+			String[] tmp = e.getMessage().split(" ");
+			int l = -1;
+			int c = -1;
+			int i = 0;
+  			for (i = 0 ; i < tmp.length; i++) {
+  				if (tmp[i].equals("line") && i+1 < tmp.length) {
+  					l = Integer.parseInt(tmp[i+1].substring(0, tmp[i+1].length()-1));
+  				}
+  				if (tmp[i].equals("column") && i+1 < tmp.length) {
+  					c = Integer.parseInt(tmp[i+1].substring(0, tmp[i+1].length()-1));
+  				}
+  			}
+			message = e.getMessage().split(".  ")[1];
+			this.mgr.logLexicalError(message, this.file, l, c);
+		} else if (e.getClass().equals(ParseException.class)) {
+  			ParseException pe = (ParseException) e;
+  			message = generateErrorMesssage(pe);
+  			this.mgr.logLexicalError(message, this.file,
+  				pe.currentToken.beginLine, pe.currentToken.beginColumn);
+  		}
+  		this.skipToNextBlock();
+	}
+
+	public boolean isRequirement(PDDLRequireKey key) {
+		if (domain != null && this.problem != null) {
+			return this.domain.getRequirements().contains(key)
+			|| this.problem.getRequirements().contains(key);
+		} else if (domain != null && this.problem == null) {
+			return this.domain.getRequirements().contains(key);
+		} else if (problem != null && this.domain == null) {
+			return this.problem.getRequirements().contains(key);
+		} else {
+			return false;
+		}
+	}
+
+	public Set<PDDLRequireKey> getRequirements() {
+		return this.domain.getRequirements();
+	}
+
+	private void skipToNextBlock() {
+		Token t1;
+		Token t2;
+		do {
+  			t1 = getNextToken();
+  			t2 = getToken(2);
+  		} while (t1.kind != EOF
+  			&& t2 != null
+	  		&& t2.kind != REQUIREMENTS
+	  		&& t2.kind != PREDICATES
+	  		&& t2.kind != TYPES
+	  		&& t2.kind != CONSTANTS
+	  		&& t2.kind != FUNCTIONS
+	  		&& t2.kind != ACTION
+	  		&& t2.kind != DURATIVE_ACTION
+	  		&& t2.kind != DERIVED
+	  		&& t2.kind != OBJECTS
+	  		&& t2.kind != INIT
+	  		&& t2.kind != GOAL
+  			&& t2.kind != METRIC
+  			&& t2.kind != EOF);
+	}
+
+	private String generateErrorMesssage(ParseException pe) {
+        StringBuffer expected = new StringBuffer();
+        boolean expectedSeq = false;
+        int maxSize = 0;
+        for (int i = 0; i < pe.expectedTokenSequences.length; i++) {
+            if (maxSize < pe.expectedTokenSequences[i].length) {
+                maxSize = pe.expectedTokenSequences[i].length;
+            }
+            for (int j = 0; j < pe.expectedTokenSequences[i].length; j++) {
+                expected.append(pe.tokenImage[pe.expectedTokenSequences[i][j]]).append(" ");
+                expectedSeq = true;
+            }
+            if (pe.expectedTokenSequences[i][pe.expectedTokenSequences[i].length - 1] != 0) {
+                expected.append("...");
+            }
+            if (i < pe.expectedTokenSequences.length - 1) {
+                expected.append("\n").append("    ");
+            }
+        }
+        String retval = "unexpected token \"" + pe.currentToken.next.image + "\".";
+        if (expectedSeq) {
+        	if (pe.expectedTokenSequences.length == 1) {
+            	retval += "\nWas expecting:" + "\n" + "    ";
+        	} else {
+            	retval += "\nWas expecting one of:" + "\n" + "    ";
+        	}
+        	retval += expected.toString();
+        }
+        return retval;
+    }
+
+}
+PARSER_END(Lexer)
+
+
+SKIP :
+{
+	" "
+| 	"\t"
+|	"\n"
+| 	"\r"
+}
+MORE :
+{
+	"//" : IN_SINGLE_LINE_COMMENT
+|	";" : IN_SINGLE_LINE_COMMENT
+|	<"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+|	"/*" : IN_MULTI_LINE_COMMENT
+}
+<IN_SINGLE_LINE_COMMENT>
+	SPECIAL_TOKEN : {
+		<SINGLE_LINE_COMMENT: "\n" | "\r" | "\r\n" > : DEFAULT
+	}
+<IN_FORMAL_COMMENT>
+	SPECIAL_TOKEN :	{
+		<FORMAL_COMMENT: "*/" > : DEFAULT
+	}
+<IN_MULTI_LINE_COMMENT>
+	SPECIAL_TOKEN : {
+		<MULTI_LINE_COMMENT: "*/" > : DEFAULT
+	}
+<IN_SINGLE_LINE_COMMENT,IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>
+	MORE : {
+		< ~[] >
+}
+
+TOKEN :
+{
+  	< LEFT_BRACKET: "(">
+| 	< RIGHT_BRACKET: ")">
+|   < ALIAS : "@" >
+}
+
+TOKEN : {
+	< DEFINE : "define" >
+|	< DOMAIN : "domain" >
+|	< REQUIREMENTS : ":requirements" >
+|	< TYPES : ":types" >
+|	< EITHER : "either" >
+|	< CONSTANTS : ":constants" >
+|	< PREDICATES : ":predicates" >
+|	< FUNCTIONS : ":functions" >
+|	< ACTION : ":action" >
+|	< PARAMETERS : ":parameters" >
+|	< PRECONDITION : ":precondition" >
+|	< EFFECT : ":effect" >
+|	< PREFERENCE : "preference" >
+|	< WHEN : "when" >
+|	< DURATIVE_ACTION : ":durative-action" >
+|	< DURATION : ":duration" >
+|	< CONDITION : ":condition" >
+|	< DERIVED : ":derived" >
+|	< PROBLEM : "problem" >
+|	< P_DOMAIN : ":domain" >
+|	< OBJECTS	: ":objects" >
+|	< INIT : ":init" >
+|	< GOAL: ":goal" >
+|	< METRIC : ":metric" >
+|   < METHOD : ":method" > // ADD HDDL
+|   < TASK : ":task" > // ADD HDDL
+}
+
+TOKEN : {
+	< STRIPS : ":strips" >
+|	< TYPING : ":typing" >
+|	< NEGATIVE_PRECONDITIONS : ":negative-preconditions" >
+|	< DISJUNCTIVE_PRECONDITIONS : ":disjunctive-preconditions" >
+|	< EQUALITY : ":equality" >
+|	< EXISTENTIAL_PRECONDITIONS : ":existential-preconditions" >
+|	< UNIVERSAL_PRECONDITIONS : ":universal-preconditions" >
+|	< QUANTIFIED_PRECONDITIONS : ":quantified-preconditions" >
+|	< CONDITIONAL_EFFECTS : ":conditional-effects" >
+|	< ACTION_COSTS : ":action-costs" >
+|   < FLUENTS : ":fluents" >
+|   < NUMERIC_FLUENTS : ":numeric-fluents" >
+|   < OBJECT_FLUENTS : ":object-fluents" >
+|   < GOAL_UTILITIES : ":goal-utilities" >
+|	< ADL : ":adl" >
+|	< DURATIVE_ACTIONS : ":durative-actions" >
+|	< DERIVED_PREDICATES : ":derived-predicates" >
+|	< TIMED_INITIAL_LITERALS : ":timed-initial-literals" >
+|	< PREFERENCES : ":preferences" >
+|	< CONSTRAINTS : ":constraints" >
+|	< CONTINUS_EFFECTS : ":continus-effects" >
+|	< DURATION_INEQUALITIES : ":duration-inequalities" >
+|	< HIERARCHY : ":hierarchy" > // ADD HDDL
+|	< HTN : ":htn" > // ADD HDDL
+|   < METHOD_PRECONDITIONS : ":method-preconditions" > // ADD HDDL
+|   < ORDERED_SUBTASKS : ":ordered-subtasks" > // ADD HDDL
+|   < ORDERED_TASKS : ":ordered-tasks" > // ADD HDDL
+|   < TASKS : ":tasks" >
+|   < SUBTASKS : ":subtasks" >// ADD HDDL
+|   < ORDERING : ":ordering" > // ADD HDDL
+|   < SORTOF : "sortof" > // ADD HDDL
+}
+
+TOKEN :
+{
+	< GREATER : ">" >
+|	< LESS : "<" >
+|	< GEQUAL : ">=" >
+|	< LEQUAL : "<=" >
+|	< EQUAL : "=" >
+}
+
+TOKEN :
+{
+	< MUL : "*" >
+|	< DIV : "/" >
+|	< ADD : "+" >
+|	< SUB : "-" >
+}
+
+TOKEN :
+{
+	<ASSIGN : "assign" >
+|	<SCALE_UP : "scale-up" >
+|	<SCALE_DOWN : "scale-down" >
+|	<INCREASE : "increase" >
+|	<DECREASE : "decrease" >
+}
+
+TOKEN :
+{
+    < OR : "or" >
+|   < AND : "and" >
+|   < IMPLY : "imply" >
+| 	< NOT : "not" >
+|	< FORALL : "forall" >
+|	< EXISTS : "exists" >
+}
+
+TOKEN :
+{
+	< ALWAYS : "always" >
+|	< SOMETIME : "sometime" >
+|	< WITHIN : "within" >
+|	< AT_MOST_ONCE : "at-most-once" >
+|	< SOMETIME_AFTER : "sometime-after" >
+|	< SOMETIME_BEFORE : "sometime-before" >
+|	< ALWAYS_WITHIN : "always-within" >
+|	< HOLD_DURING : "hold-during" >
+|	< HOLD_AFTER : "hold-after" >
+|	< HOLD_BEFORE : "hold-before" >
+|	< HOLD_BETWEEN : "hold-between" >
+|	< AT: "at" >
+|	< START : "start">
+|	< END : "end">
+|	< OVER : "over">
+|	< ALL : "all">
+|	< TOTAL_TIME : "total-time" >
+|	< TOTAL_COST : "total-cost" >
+|	< MAXIMIZE : "maximize" >
+|	< MINIMIZE : "minimize" >
+|	< IS_VIOLATED : "is-violated" >
+|	< BEFORE : "before" >
+|	< AFTER : "after" >
+|	< BETWEEN : "between" >
+
+}
+
+TOKEN :
+{
+	< VAR_DURATION : "?duration" >
+|	< CONTINUOUS_VARIABLE : "#t" >
+}
+
+TOKEN :
+{
+	< NUMBER_TYPE : "number" >
+|	< OBJECT_TYPE : "object" >
+}
+
+
+TOKEN :
+{
+	< VARIABLE_SYMBOL : ("?" <LETTER> (<LETTER> | <SEPARATOR> | <DIGIT>)*) >
+|	< SYMBOL : ((<LETTER> (<LETTER> | "-" | <DIGIT>)*)) >
+|	< NUMBER :  (<DIGIT>)+ ("." (<DIGIT>)*)? >
+|	< #DIGIT : ["0"-"9"] >
+|	< #LETTER : ["a"-"z","A"-"Z","_"] >
+|	< #SEPARATOR : ["_","-"] >
+}
+
+Token right_bracket() :
+{
+	Token t = null;
+}
+{
+	t=<RIGHT_BRACKET> { return t;}
+}
+
+Token left_bracket() :
+{
+	Token t = null;
+}
+{
+	t=<LEFT_BRACKET> { return t;}
+}
+
+void domain() :
+{
+	PDDLExpression node = null;
+	PDDLSymbol name = null;
+}
+{
+	try {
+		left_bracket() <DEFINE> left_bracket() <DOMAIN>
+			name=domain_name() {
+				this.domain = new PDDLDomain(name);
+			}
+		right_bracket()
+		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
+		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
+		[LOOKAHEAD(2) constants_def()]
+		[LOOKAHEAD(2) predicates_def()]
+		[LOOKAHEAD(2, {
+			this.isRequirement(PDDLRequireKey.FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)
+		}) functions_def()]
+		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+		(structure_def())+
+		right_bracket()
+		<EOF>
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void domain_and_problem() :
+{
+	PDDLExpression node = null;
+	PDDLSymbol name = null;
+}
+{
+	try {
+    	left_bracket() <DEFINE> left_bracket() <DOMAIN>
+            name=domain_name() {
+                this.domain = new PDDLDomain(name);
+            }
+        right_bracket()
+        [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
+        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
+        [LOOKAHEAD(2) constants_def()]
+        [LOOKAHEAD(2) predicates_def()]
+        [LOOKAHEAD(2, {
+            this.isRequirement(PDDLRequireKey.FLUENTS)
+            || this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+            || this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
+            || this.isRequirement(PDDLRequireKey.ACTION_COSTS)
+        }) functions_def()]
+        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+        (structure_def())+
+        right_bracket()
+    	//Problem file
+    	problem()
+    } catch(Throwable e) {
+    	this.error(e, token.beginLine, token.beginColumn);
+    }
+}
+
+void require_def(int type) :
+{
+	Token t = null;
+	Set<PDDLRequireKey> requirements = null;
+	if (type == Lexer.PARSER_DOMAIN) {
+		this.domain.addRequirement(PDDLRequireKey.STRIPS);
+	}
+}
+{
+	try {
+		t=left_bracket() <REQUIREMENTS>
+			(requirements=require_key() {
+				if (type == Lexer.PARSER_DOMAIN) {
+					for (PDDLRequireKey r : requirements) {
+						this.domain.addRequirement(r);
+					}
+				} else {
+					for (PDDLRequireKey r : requirements) {
+						this.problem.addRequirement(r);
+					}
+				}
+			})+ right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+Set<PDDLRequireKey> require_key() :
+{
+	Set<PDDLRequireKey> requirements = new LinkedHashSet<PDDLRequireKey>();
+}
+{
+	(	<STRIPS> {
+			requirements.add(PDDLRequireKey.STRIPS);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	| 	<TYPING> {
+			requirements.add(PDDLRequireKey.TYPING);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	| 	<NEGATIVE_PRECONDITIONS> {
+			requirements.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<DISJUNCTIVE_PRECONDITIONS> {
+			requirements.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<EQUALITY> {
+			requirements.add(PDDLRequireKey.EQUALITY);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<EXISTENTIAL_PRECONDITIONS> {
+			requirements.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
+			if (requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)) {
+				requirements.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+			}
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<UNIVERSAL_PRECONDITIONS> {
+			requirements.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
+			if (requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)) {
+				requirements.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+			}
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<QUANTIFIED_PRECONDITIONS> {
+			requirements.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+			requirements.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
+			requirements.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<CONDITIONAL_EFFECTS> {
+			requirements.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+			if (requirements.contains(PDDLRequireKey.STRIPS)
+					&& requirements.contains(PDDLRequireKey.TYPING)
+					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EQUALITY)
+					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(PDDLRequireKey.ADL);
+			}
+		}
+	|	<FLUENTS> {
+			requirements.add(PDDLRequireKey.FLUENTS);
+			requirements.add(PDDLRequireKey.NUMERIC_FLUENTS);
+			requirements.add(PDDLRequireKey.OBJECT_FLUENTS);
+		}
+	|	<NUMERIC_FLUENTS> {
+			requirements.add(PDDLRequireKey.NUMERIC_FLUENTS);
+			if (requirements.contains(PDDLRequireKey.OBJECT_FLUENTS)) {
+				requirements.add(PDDLRequireKey.FLUENTS);
+			}
+		}
+	|	<OBJECT_FLUENTS> {
+			requirements.add(PDDLRequireKey.OBJECT_FLUENTS);
+			if (requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+				requirements.add(PDDLRequireKey.FLUENTS);
+			}
+		}
+	|	<GOAL_UTILITIES> {
+			requirements.add(PDDLRequireKey.GOAL_UTILITIES);
+		}
+	|	<ADL> {
+			requirements.add(PDDLRequireKey.ADL);
+			requirements.add(PDDLRequireKey.STRIPS);
+			requirements.add(PDDLRequireKey.TYPING);
+			requirements.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
+			requirements.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
+			requirements.add(PDDLRequireKey.EQUALITY);
+			requirements.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
+			requirements.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
+			requirements.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+		}
+	|	<ACTION_COSTS> {
+			requirements.add(PDDLRequireKey.ACTION_COSTS);
+		}
+	|	<DURATIVE_ACTIONS> {
+			requirements.add(PDDLRequireKey.DURATIVE_ACTIONS);
+			requirements.add(PDDLRequireKey.DURATION_INEQUALITIES);
+		}
+	|	<DERIVED_PREDICATES> {
+			requirements.add(PDDLRequireKey.DERIVED_PREDICATES);
+		}
+	| 	<TIMED_INITIAL_LITERALS> {
+			requirements.add(PDDLRequireKey.TIMED_INITIAL_LITERALS);
+		}
+	|	<PREFERENCES> {
+			requirements.add(PDDLRequireKey.PREFERENCES);
+		}
+	|	<CONSTRAINTS> {
+			requirements.add(PDDLRequireKey.CONSTRAINTS);
+		}
+	|	<CONTINUS_EFFECTS> {
+			requirements.add(PDDLRequireKey.CONTINOUS_EFFECTS);
+		}
+	|	<DURATION_INEQUALITIES> {
+			requirements.add(PDDLRequireKey.DURATION_INEQUALITIES);
+		}
+	|	<HIERARCHY> { // ADD HDDL
+    		requirements.add(PDDLRequireKey.HIERARCHY);
+        }
+    |   <METHOD_PRECONDITIONS> { // ADD HDDL
+            requirements.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+    }
+)
+	{ return requirements; }
+}
+
+
+void type_def():
+{
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	try {
+		left_bracket() <TYPES>
+			typedList=typed_list(Lexer.PRIMITIVE_TYPE)
+		right_bracket()  {
+			for (PDDLTypedSymbol type : typedList) {
+				this.domain.addType(type);
+			}
+//			for (PDDLTypedSymbol token : this.types_def) {
+//				if (token.getTypes().isEmpty()) {
+//					token.addType(PDDLParser.OBJECT);
+//				}
+//			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+List<PDDLTypedSymbol> typed_list(int kind) :
+{
+	PDDLSymbol t;
+	List<PDDLSymbol> types = null;
+	List<PDDLTypedSymbol> typedList = new ArrayList<PDDLTypedSymbol>();
+	List<PDDLSymbol> tmp = new ArrayList<PDDLSymbol>();
+	List<PDDLTypedSymbol> nextTypedList = null;
+}
+{
+    (   LOOKAHEAD(2)
+        <LEFT_BRACKET> <RIGHT_BRACKET>
+	|   LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
+			(t=primitive_type() {
+				tmp.add(t);
+			})*
+			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
+				<SUB> types=type() nextTypedList=typed_list(kind))? {
+				if (types == null) {
+					types = new ArrayList<PDDLSymbol>();
+				}
+				for (PDDLSymbol s : tmp) {
+					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
+					for (PDDLSymbol type : types) {
+						ts.addType(type);
+					}
+					typedList.add(ts);
+				}
+				if (nextTypedList != null) {
+					typedList.addAll(nextTypedList);
+				}
+			}
+	|	LOOKAHEAD(2, {kind == Lexer.CONSTANT})
+			(t=constant() {
+				tmp.add(t);
+			})*
+			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
+				<SUB> types=type() nextTypedList=typed_list(kind))? {
+				if (types == null) {
+					types = new ArrayList<PDDLSymbol>();
+				}
+				for (PDDLSymbol s : tmp) {
+					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
+					for (PDDLSymbol type : types) {
+						ts.addType(type);
+					}
+					typedList.add(ts);
+				}
+				if (nextTypedList != null) {
+					typedList.addAll(nextTypedList);
+				}
+			}
+	|	LOOKAHEAD(2, {kind == Lexer.VARIABLE})
+			(t=variable() {
+				tmp.add(t);
+			})*
+			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
+				<SUB> types=type() nextTypedList=typed_list(kind))? {
+				if (types == null) {
+					types = new ArrayList<PDDLSymbol>();
+					types.add(PDDLParser.OBJECT);
+				}
+				for (PDDLSymbol s : tmp) {
+					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
+					for (PDDLSymbol type : types) {
+						ts.addType(type);
+					}
+					typedList.add(ts);
+				}
+				if (nextTypedList != null) {
+					typedList.addAll(nextTypedList);
+				}
+			}
+	) {
+		return typedList;
+	}
+}
+
+List<PDDLSymbol> type() :
+{
+	PDDLSymbol s;
+	List<PDDLSymbol> type = new ArrayList<PDDLSymbol>();
+}
+{
+	(	left_bracket() <EITHER>
+		(LOOKAHEAD(2) s=primitive_type() {
+			type.add(s);
+		})+
+	right_bracket()
+	|	s=primitive_type() {
+		type.add(s);
+	}) {
+		return type;
+	}
+}
+
+PDDLSymbol primitive_type() :
+{
+	Token t = token;
+}
+{
+(	t=<OBJECT_TYPE>
+|	t=<NUMBER_TYPE>
+| 	t=<SYMBOL>)
+	{
+		return new PDDLSymbol(PDDLSymbol.Kind.TYPE, t);
+	}
+}
+
+void constants_def() :
+{
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	try {
+		left_bracket() <CONSTANTS>
+			typedList=typed_list(Lexer.CONSTANT)
+		right_bracket() {
+			for (PDDLTypedSymbol constant : typedList) {
+				this.domain.addConstant(constant);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+PDDLSymbol constant() :
+{
+	Token t;
+}
+{
+	(	t=<SYMBOL>
+	|	t=<AT>
+	| 	t=<END>
+	| 	t=<START>
+	| 	t=<OVER>) {
+		return new PDDLSymbol(PDDLSymbol.Kind.CONSTANT, t);
+	}
+}
+
+void predicates_def() :
+{
+	PDDLNamedTypedList predicate = null;
+}
+{
+	try {
+		left_bracket() <PREDICATES>
+			(LOOKAHEAD(2) predicate=atomic_formula_skeleton() {
+				this.domain.addPredicate(predicate);
+			})+
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+PDDLNamedTypedList comp_task_def() : // ADD HDDL
+{
+    PDDLNamedTypedList taskID;
+}
+{
+    left_bracket() <TASK> taskID=task_def() right_bracket() {
+        return taskID;
+    }
+}
+
+PDDLNamedTypedList task_def() : // ADD HDDL
+{
+    PDDLSymbol name;
+    List<PDDLTypedSymbol> typedList = null;
+}
+{
+    name=task_symbol()
+    <PARAMETERS>
+    left_bracket()
+    typedList=typed_list(Lexer.VARIABLE)
+    right_bracket() {
+        PDDLNamedTypedList l = new PDDLNamedTypedList(name);
+        for (PDDLTypedSymbol s : typedList) {
+            l.add(s);
+        }
+        return l;
+    }
+}
+
+PDDLSymbol task_symbol() : // ADD HDDL
+ {
+ 	Token t = token;
+ }
+ {
+ 	t=<SYMBOL> {
+ 		return new PDDLSymbol(PDDLSymbol.Kind.TASK, t);
+ 	}
+ }
+
+
+PDDLNamedTypedList atomic_formula_skeleton() :
+{
+	PDDLSymbol predicate = null;
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	<LEFT_BRACKET>
+		predicate=predicate()
+		typedList=typed_list(Lexer.VARIABLE)
+	right_bracket() {
+		PDDLNamedTypedList l = new PDDLNamedTypedList(predicate);
+		for (PDDLTypedSymbol s : typedList) {
+			l.add(s);
+		}
+		return l;
+	}
+}
+
+PDDLSymbol predicate() :
+{
+	Token t;
+}
+{
+	(t=<SYMBOL>
+| 	t=<AT>
+| 	t=<END>
+| 	t=<START>
+| 	t=<OVER>) {
+		return new PDDLSymbol(PDDLSymbol.Kind.PREDICATE, t);
+	}
+}
+
+PDDLSymbol variable() :
+{
+	Token t = token;
+}
+{
+	t=<VARIABLE_SYMBOL> { return new PDDLSymbol(PDDLSymbol.Kind.VARIABLE, t); }
+}
+
+void functions_def():
+{
+	List<PDDLNamedTypedList> functions = null;
+}
+{
+	try {
+		left_bracket() <FUNCTIONS>
+			functions=function_typed_list(Lexer.ATOMIC_FUNCTION_SKELETON)
+		right_bracket() {
+			for (PDDLNamedTypedList function: functions) {
+				this.domain.addFunction(function);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+PDDLNamedTypedList atomic_function_skeleton() :
+{
+	PDDLSymbol functor = null;
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	left_bracket()
+		functor=functor()
+		typedList=typed_list(Lexer.VARIABLE)
+	<RIGHT_BRACKET>
+	{
+		PDDLNamedTypedList l = new PDDLNamedTypedList(functor);
+		for (PDDLTypedSymbol s : typedList) {
+			l.add(s);
+		}
+		return l;
+	}
+}
+
+PDDLSymbol functor() :
+{
+	Token t;
+}
+{
+	( t=<SYMBOL>
+	| t=<TOTAL_COST>
+	| t=<AT>
+	| t=<END>
+    | t=<START>
+    | t=<OVER>) {
+	    return new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t);
+	}
+}
+
+List<PDDLNamedTypedList> function_typed_list(int type) :
+{
+	PDDLNamedTypedList namedTypedList = null;
+	List<PDDLNamedTypedList> typedListList = new ArrayList<PDDLNamedTypedList>();
+	List<PDDLNamedTypedList> nextNamedTypedList = null;
+	List<PDDLSymbol> typeList = null;
+}
+{
+	(LOOKAHEAD(2) namedTypedList=atomic_function_skeleton() {
+		typedListList.add(namedTypedList);
+	})*
+	(<SUB> typeList=function_type() {
+			for (PDDLSymbol t : typeList) {
+				namedTypedList.addType(t);
+			}
+		}
+		nextNamedTypedList=function_typed_list(type) {
+			typedListList.addAll(nextNamedTypedList);
+		}
+	)?
+	{
+		// To keep compatibility with PDDL 3.0: if no type is set it is number
+		for (PDDLNamedTypedList ntl : typedListList) {
+			if (ntl.getTypes().isEmpty()) {
+				ntl.addType(PDDLParser.NUMBER);
+			}
+		}
+		return typedListList;
+	}
+}
+
+List<PDDLSymbol> function_type() :
+{
+	Token token;
+	PDDLSymbol symbol;
+	List<PDDLSymbol> typesList = new ArrayList<PDDLSymbol>();
+}
+{
+		LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)})
+		token=<NUMBER_TYPE> {
+			typesList.add(new PDDLSymbol(PDDLSymbol.Kind.TYPE, token));
+			return typesList;
+		}
+	| 	LOOKAHEAD(2, {(this.isRequirement(PDDLRequireKey.TYPING) && this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS))
+        	                    || this.isRequirement(PDDLRequireKey.FLUENTS)})
+		    typesList=type() {
+		        return typesList;
+        }
+}
+
+PDDLExpression con_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=and_con_gd()
+	|	LOOKAHEAD(2) node=forall_con_gd()
+	|	LOOKAHEAD(2) node=at_end_con_gd()
+	|	LOOKAHEAD(2) node=always_con_gd()
+	|	LOOKAHEAD(2) node=sometime_con_gd()
+	|	LOOKAHEAD(2) node=within_con_gd()
+	|	LOOKAHEAD(2) node=at_most_once_con_gd()
+	|	LOOKAHEAD(2) node=sometime_after_con_gd()
+	|	LOOKAHEAD(2) node=sometime_before_con_gd()
+	|	LOOKAHEAD(2) node=always_within_con_gd()
+	|	LOOKAHEAD(2) node=hold_during_con_gd()
+	|	LOOKAHEAD(2) node=hold_after_con_gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression and_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AND>
+		(LOOKAHEAD(2) child=con_gd() {
+			conGD.addChild(child);
+		})* right_bracket()
+	{
+		return conGD;
+	}
+}
+
+PDDLExpression forall_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.FORALL);
+	PDDLExpression child = null;
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	left_bracket() <FORALL>
+		left_bracket()
+			typedList=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		child=con_gd()
+	right_bracket()
+	{
+		conGD.setVariables(typedList);
+		conGD.addChild(child);
+		return conGD;
+	}
+}
+
+PDDLExpression at_end_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression node = null;
+}
+{
+		left_bracket() <AT> <END>
+			node=gd()
+		right_bracket()
+	{
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression always_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS);
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <ALWAYS>
+		node=gd()
+	right_bracket()
+	{
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression sometime_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME);
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <SOMETIME>
+		node=gd()
+	right_bracket()
+	{
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression within_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.WITHIN);
+	Token token = null;
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <WITHIN>
+		token=<NUMBER>
+		node=gd()
+	right_bracket()
+	{
+		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
+		n1.setValue(Double.parseDouble(token.image));
+		conGD.addChild(n1);
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression at_most_once_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_MOST_ONCE);
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <AT_MOST_ONCE>
+		node=gd()
+	right_bracket()
+	{
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression sometime_after_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_AFTER);
+	PDDLExpression gd1 = null;
+	PDDLExpression gd2 = null;
+}
+{
+	left_bracket() <SOMETIME_AFTER>
+		gd1=gd()
+		gd2=gd()
+	right_bracket()
+	{
+		conGD.addChild(gd1);
+		conGD.addChild(gd2);
+		return conGD;
+	}
+}
+
+PDDLExpression sometime_before_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE);
+	PDDLExpression gd1 = null;
+	PDDLExpression gd2 = null;
+}
+{
+	left_bracket() <SOMETIME_BEFORE>
+		gd1=gd()
+		gd2=gd()
+	right_bracket()
+	{
+		conGD.addChild(gd1);
+		conGD.addChild(gd2);
+		return conGD;
+	}
+}
+
+PDDLExpression always_within_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_WITHIN);
+	Token token = null;
+	PDDLExpression gd1 = null;
+	PDDLExpression gd2 = null;
+}
+{
+	left_bracket() <ALWAYS_WITHIN>
+		token=<NUMBER>
+		gd1=gd()
+		gd2=gd()
+	right_bracket()
+	{
+		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
+		n1.setValue(Double.parseDouble(token.image));
+		conGD.addChild(n1);
+		conGD.addChild(gd1);
+		conGD.addChild(gd2);
+		return conGD;
+	}
+}
+
+PDDLExpression hold_during_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_DURING);
+	Token token1 = null;
+	Token token2 = null;
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <HOLD_DURING>
+		token1=<NUMBER>
+		token2=<NUMBER>
+		node=gd()
+	right_bracket()
+	{
+		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
+		n1.setValue(Double.parseDouble(token1.image));
+		conGD.addChild(n1);
+		PDDLExpression n2 = new PDDLExpression(PDDLConnective.NUMBER);
+		n2.setValue(Double.parseDouble(token2.image));
+		conGD.addChild(n2);
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression hold_after_con_gd() :
+{
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_AFTER);
+	Token token = null;
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <HOLD_AFTER>
+		token=<NUMBER>
+		node=gd()
+	right_bracket()
+	{
+		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
+		n1.setValue(Double.parseDouble(token.image));
+		conGD.addChild(n1);
+		conGD.addChild(node);
+		return conGD;
+	}
+}
+
+PDDLExpression gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2)
+			node=atomic_formula(Lexer.TERM)
+	|	LOOKAHEAD(2)
+			node=and_gd()
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)})
+			node=or_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.NEGATIVE_PRECONDITIONS)})
+			node=not_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
+				&& this.isRequirement(PDDLRequireKey.NEGATIVE_PRECONDITIONS)})
+			node=imply_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)})
+			node=exists_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
+			node=forall_gd()
+	| 	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.EQUALITY)})
+			node=equal_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)})
+			node=f_comp()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression equal_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(LOOKAHEAD(2)
+		node=not_equal_atomic_formula()
+|	LOOKAHEAD(2)
+		node=equal_atomic_formula()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression not_equal_atomic_formula() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.NOT);
+	PDDLExpression c = null;
+}
+{
+	left_bracket()
+		<NOT>
+		c=equal_gd()
+	right_bracket() {
+	 	node.addChild(c);
+		return node;
+	}
+}
+
+PDDLExpression equal_atomic_formula() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL_ATOM);
+	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
+	PDDLSymbol t1 = null;
+	PDDLSymbol t2 = null;
+}
+{
+	left_bracket() <EQUAL>
+		t1=term()
+		t2=term()
+	right_bracket() {
+	 	atom.add(t1);
+	 	atom.add(t2);
+	 	node.setAtom(atom);
+		return node;
+	}
+}
+
+PDDLExpression and_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <AND> (LOOKAHEAD(2) s=gd() {
+		node.addChild(s);
+	})* right_bracket()
+	{
+		return node;
+	}
+}
+
+PDDLExpression or_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.OR);
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <OR> (LOOKAHEAD(2) s=gd() {
+		node.addChild(s);
+	})* right_bracket()
+	{
+		return node;
+	}
+}
+
+PDDLExpression not_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.NOT);
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <NOT> s=gd() right_bracket()
+	{
+		node.addChild(s);
+		return node;
+	}
+}
+
+PDDLExpression imply_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.OR);
+	PDDLExpression p = null;
+	PDDLExpression q = null;
+}
+{
+	left_bracket() <IMPLY> p=gd() q=gd() right_bracket()
+	{
+		PDDLExpression not_p = new PDDLExpression(PDDLConnective.NOT);
+		not_p.addChild(p);
+		node.addChild(not_p);
+		node.addChild(q);
+		return node;
+	}
+}
+
+PDDLExpression exists_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.EXISTS);
+	List<PDDLTypedSymbol> typedList = null;
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <EXISTS>
+		left_bracket()
+			typedList=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		s=gd()
+	right_bracket() {
+		node.setVariables(typedList);
+		node.addChild(s);
+		return node;
+	}
+}
+
+PDDLExpression forall_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> typedList = null;
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <FORALL>
+		left_bracket()
+			typedList=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		s=gd()
+	right_bracket() {
+		node.setVariables(typedList);
+		node.addChild(s);
+		return node;
+	}
+}
+
+PDDLExpression atomic_formula(int type) :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.ATOM);
+	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
+	PDDLSymbol t = null;
+}
+{
+	left_bracket() t=predicate() {
+		atom.add(t);
+	}
+	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
+			atom.add(t);
+		})*
+	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
+			atom.add(t);
+		})*
+	) right_bracket() {
+		node.setAtom(atom);
+		return node;
+	}
+}
+
+PDDLSymbol term() :
+{
+	PDDLSymbol t = null;
+}
+{
+	(	t=constant()
+	|	t=variable()
+	) {
+		return t;
+	}
+}
+
+PDDLExpression literal(int type) :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=atomic_formula(type)
+	| 	LOOKAHEAD(2) node=not_atomic_formula(type)
+	) {
+		return node;
+	}
+}
+
+PDDLExpression not_atomic_formula(int type) :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.NOT);
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <NOT>
+		s=atomic_formula(type)
+	right_bracket() {
+		node.addChild(s);
+		return node;
+	}
+}
+
+PDDLExpression f_comp() :
+{
+	PDDLExpression node = null;
+}
+{
+	node=binary_comp() {
+		return node;
+	}
+}
+
+PDDLExpression binary_comp() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=greater_comp()
+	|	LOOKAHEAD(2) node=less_comp()
+	|	LOOKAHEAD(2) node=greater_equal_comp()
+	|	LOOKAHEAD(2) node=less_equal_comp()
+	|	LOOKAHEAD(2) node=equal_comp()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression greater_comp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <GREATER>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression greater_equal_comp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <GEQUAL>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression less_equal_comp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <LEQUAL>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression less_comp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <LESS>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression equal_comp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <EQUAL>
+		op1=f_exp()
+		op2=f_exp()
+
+	right_bracket() {
+	 	node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression f_exp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.F_EXP);
+	PDDLExpression child = null;
+}
+{
+	(	child=number()
+	|	LOOKAHEAD(2) child=op()
+	|	LOOKAHEAD(2) child=f_head()
+	) {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression number() :
+{
+	Token t = null;
+}
+{
+	t=<NUMBER>
+	{
+		PDDLExpression node = new PDDLExpression(PDDLConnective.NUMBER);
+		node.setValue(Double.parseDouble(t.image));
+		return node;
+	}
+}
+
+PDDLExpression op() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=binary_operation()
+	|	LOOKAHEAD(2) node=unary_op()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression binary_operation():
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=add_op()
+	|	LOOKAHEAD(2) node=substract_op()
+	|	LOOKAHEAD(2) node=multiply_op()
+	|	LOOKAHEAD(2) node=divide_op()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression add_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.PLUS);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <ADD>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket()
+	{
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression substract_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MINUS);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <SUB>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression multiply_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <MUL>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression divide_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <DIV>
+		op1=f_exp()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression unary_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.UMINUS);
+	PDDLExpression op1 = null;
+}
+{
+	left_bracket() <SUB>
+		op1=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		return node;
+	}
+}
+
+PDDLExpression f_head() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+	List<PDDLSymbol> tokenList = new ArrayList<PDDLSymbol>();
+	PDDLSymbol s = null;
+}
+{
+	(left_bracket() s=functor() {
+		tokenList.add(s);
+	} (LOOKAHEAD(2) s=term() {
+		tokenList.add(s);
+	})* right_bracket()
+| 	s=functor() { tokenList.add(s); }) {
+		node.setAtom(tokenList);
+		return node;
+	}
+}
+
+void structure_def() :
+{
+	PDDLAction op = null;
+	PDDLMethod meth = null;
+	PDDLDerivedPredicate dp = null;
+	PDDLNamedTypedList task = null;
+}
+{
+	( 	LOOKAHEAD(2)
+			op = action_def() {
+				this.domain.addAction(op);
+			}
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
+			op = durative_action_def() {
+				this.domain.addAction(op);
+			}
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DERIVED_PREDICATES)})
+			dp = derived_def() {
+				this.domain.addDerivedPredicate(dp);
+			}
+    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+            op = htn_action_def() {
+                this.domain.addAction(op);
+            }
+    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+            task = comp_task_def() {
+                this.domain.addTask(task);
+            }
+    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+            meth = method_def() {
+                this.domain.addMethod(meth);
+            }
+	)
+}
+
+PDDLMethod method_def() : // ADD HDDL
+{
+	PDDLSymbol name = null;
+	List<PDDLTypedSymbol> parameters = null;
+	PDDLExpression taskID = null;
+	PDDLExpression precondition = new PDDLExpression(PDDLConnective.AND);
+	PDDLTaskNetwork tn = null;
+}
+{
+	try {
+		left_bracket() <METHOD> name=method_name()
+			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+			<TASK> taskID=task_formula(Lexer.TERM)
+			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
+			    <PRECONDITION> precondition=pre_gd()
+			]
+            tn = task_network()
+			right_bracket()
+	} catch(Throwable e) {
+	    this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new PDDLMethod(name, parameters, taskID, precondition, tn);
+	}
+}
+
+
+PDDLTaskNetwork task_network() : // ADD HDDL
+{
+    PDDLExpression tasks = null;
+    PDDLExpression ordering = new PDDLExpression(PDDLConnective.AND);
+    PDDLExpression logical = new PDDLExpression(PDDLConnective.AND);
+    PDDLTaskNetwork tn = null;
+}
+{
+    LOOKAHEAD (1)
+        (<TASKS> | <SUBTASKS>)
+        tasks = subtask_def()
+   	    [<ORDERING> ordering = ordering_constraint_def()]
+   	    [<CONSTRAINTS> logical = logical_constraint_def()]
+   	    {
+            return new PDDLTaskNetwork(tasks, ordering, logical, false);
+        }
+    | LOOKAHEAD (1)
+        (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
+        tasks = subtask_def()
+        [<ORDERING> ordering = ordering_constraint_def()]
+        [<CONSTRAINTS> logical = logical_constraint_def()]
+        {
+            return new PDDLTaskNetwork(tasks, ordering, logical, true);
+        }
+}
+
+PDDLSymbol method_name() : // ADD HDDL
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> {
+		return new PDDLSymbol(PDDLSymbol.Kind.ACTION, t);
+	}
+}
+
+PDDLExpression subtask_def() : // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+    PDDLExpression taskID = null;
+}
+{
+    (   LOOKAHEAD(2)
+            taskID=subtask() {
+                exp = new PDDLExpression(PDDLConnective.AND);
+                exp.addChild(taskID);
+            }
+    |   LOOKAHEAD(2)
+            exp=and_subtask()
+    |   LOOKAHEAD(3)
+            <LEFT_BRACKET> <RIGHT_BRACKET>)
+    {
+        return exp;
+    }
+}
+
+PDDLExpression and_subtask() : // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+    PDDLExpression task = null;
+    int i = 0;
+}
+{
+    <LEFT_BRACKET> <AND> (LOOKAHEAD (2) task=subtask() {
+        exp.addChild(task);
+    })* <RIGHT_BRACKET> {
+        return exp;
+    }
+}
+
+PDDLExpression subtask() :  // ADD HDDL
+{
+    PDDLSymbol taskID;
+    PDDLExpression task;
+}
+{
+    (   LOOKAHEAD(3)
+            <LEFT_BRACKET>
+                taskID=subtask_id()
+                task=task_formula(Lexer.TERM)
+            <RIGHT_BRACKET> {
+                task.setTaskID(taskID);
+            }
+    |   LOOKAHEAD(2)
+            task=task_formula(Lexer.TERM)
+    ) {
+        return task;
+    }
+}
+PDDLExpression task_formula(int type) : // ADD HDDL
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.TASK);
+	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
+	PDDLSymbol t = null;
+}
+{
+	left_bracket() t=task_symbol() {
+		atom.add(t);
+	}
+	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
+			atom.add(t);
+		})*
+	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
+			atom.add(t);
+		})*
+	) right_bracket() {
+		node.setAtom(atom);
+		return node;
+	}
+}
+
+
+PDDLSymbol subtask_id() : // ADD HDDL
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> {
+		return new PDDLSymbol(PDDLSymbol.Kind.TASK_ID, t);
+	}
+}
+
+PDDLExpression ordering_constraint_def() : // ADD HDDL
+{
+    PDDLExpression exp = null;
+    PDDLExpression taskID = null;
+}
+{
+    (   LOOKAHEAD(2)
+            exp=empty_and()
+    |   LOOKAHEAD(2)
+            taskID=ordering_constraint() {
+                exp = new PDDLExpression(PDDLConnective.AND);
+                exp.addChild(taskID);
+            }
+    |   LOOKAHEAD(2)
+            exp = and_ordering_constraint()
+    ) {
+        return exp;
+    }
+}
+
+PDDLExpression and_ordering_constraint() : // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+    PDDLExpression ordering = null;
+}
+{
+    <LEFT_BRACKET> <AND> (ordering = ordering_constraint() {
+        exp.addChild(ordering);
+    })+ <RIGHT_BRACKET> {
+        return exp;
+    }
+}
+
+PDDLExpression ordering_constraint() : // ADD HDDL
+{
+    PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+    List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
+    PDDLSymbol id1 = null;
+    PDDLSymbol id2 = null;
+}
+{
+    <LEFT_BRACKET> <LESS> id1=subtask_id() id2=subtask_id() <RIGHT_BRACKET> {
+        tasks.add(id1);
+        tasks.add(id2);
+        node.setAtom(tasks);
+        return node;
+    }
+}
+
+PDDLExpression logical_constraint_def() : // ADD HDDL
+{
+    PDDLExpression node = null;
+    PDDLExpression c = null;
+}
+{
+    (   LOOKAHEAD(2)
+            node = empty_and()
+    |   LOOKAHEAD(2)
+            c = htn_constraint() {
+                node = new PDDLExpression(PDDLConnective.AND);
+                node.addChild(c);
+            }
+    |   LOOKAHEAD(2)
+            node = and_htn_constraint()
+    )
+    {
+        return node;
+    }
+}
+
+PDDLExpression and_htn_constraint() :  // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+    PDDLExpression c = null;
+}
+{
+    <LEFT_BRACKET> <AND> (c = htn_constraint() {
+        exp.addChild(c);
+    })+ <RIGHT_BRACKET> {
+        return exp;
+    }
+}
+
+PDDLExpression htn_constraint() : // ADD HDDL
+{
+    PDDLExpression node = null;
+}
+{
+    (   LOOKAHEAD(4)
+            node = equal_atomic_formula()
+    |   LOOKAHEAD(4)
+            node = not_equal_atomic_formula()
+//    |   LOOKAHEAD(4)
+//            node = sortof_constraints()
+//    |   LOOKAHEAD(4)
+//          node = not_sortof_constraints()
+    ) {
+        return node;
+    }
+}
+
+/*PDDLExpression sortof_constraints() : // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SORT_OF_CONSTRAINT);
+    PDDLSymbol variable = null;
+    List<PDDLSymbol> types = null;
+}
+{
+    <LEFT_BRACKET> <SORTOF> variable=variable() <SUB> types=type() <RIGHT_BRACKET> {
+        PDDLTypedSymbol typedVariable = new PDDLTypedSymbol(variable);
+        for (PDDLSymbol type : types) {
+            typedVariable.addType(type);
+        }
+        List<PDDLTypedSymbol> variables = new ArrayList<PDDLTypedSymbol>();
+        variables.add(typedVariable);
+        exp.setVariables(variables);
+        return exp;
+    }
+}
+
+PDDLExpression not_sortof_constraints() : // ADD HDDL
+{
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SORT_OF_CONSTRAINT);
+}
+{
+    <LEFT_BRACKET> <NOT> exp=sortof_constraints() <RIGHT_BRACKET> {
+        return exp;
+    }
+}*/
+
+
+PDDLDerivedPredicate derived_def() :
+{
+	PDDLNamedTypedList head = null;
+	PDDLExpression body = null;
+}
+{
+	try {
+		<LEFT_BRACKET>  <DERIVED>
+			head=atomic_formula_skeleton()
+			body=gd()
+		<RIGHT_BRACKET>
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new PDDLDerivedPredicate(head, body);
+	}
+}
+
+PDDLAction action_def() :
+{
+	PDDLSymbol name = null;
+	List<PDDLTypedSymbol> parameters = null;
+	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+}
+{
+	try {
+		left_bracket() <ACTION> name=action_name()
+			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+		    <PRECONDITION> preconds=pre_gd()
+		    <EFFECT> effects=effect()
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new PDDLAction(name, parameters, preconds, effects);
+	}
+}
+
+PDDLAction htn_action_def() :
+{
+	PDDLSymbol name = null;
+	List<PDDLTypedSymbol> parameters = null;
+	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+}
+{
+	try {
+		left_bracket() <ACTION> name=action_name()
+			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+		    [LOOKAHEAD(2) <PRECONDITION> preconds=pre_gd()]
+			[LOOKAHEAD(2) <EFFECT> effects=effect()]
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new PDDLAction(name, parameters, preconds, effects);
+	}
+}
+
+PDDLSymbol action_name() :
+{
+	Token t = token;
+}
+{
+	t=<SYMBOL> {
+		return new PDDLSymbol(PDDLSymbol.Kind.ACTION, t);
+	}
+}
+
+PDDLExpression pre_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.PREFERENCES)}) node=pref_gd()
+	|	LOOKAHEAD(2) node=and_pre_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)}) node=forall_pre_gd()
+	|	LOOKAHEAD(2) node=empty_or()
+	|	LOOKAHEAD(2) node=gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression empty_or() :
+{
+	Token t = token;
+}
+{
+	t=<LEFT_BRACKET> <RIGHT_BRACKET>
+	{
+		return new PDDLExpression(PDDLConnective.OR);
+	}
+}
+
+PDDLExpression empty_and() :
+{
+	Token t = token;
+}
+{
+	t=<LEFT_BRACKET> <RIGHT_BRACKET>
+	{
+		return new PDDLExpression(PDDLConnective.AND);
+	}
+}
+
+PDDLExpression and_pre_gd() :
+{
+	Token t = token;
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression s;
+}
+{
+	t=left_bracket() <AND>
+		(s=pre_gd() {
+			node.addChild(s);
+		})* right_bracket()
+	{
+		return node;
+	}
+}
+
+PDDLExpression forall_pre_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> vars = null;
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <FORALL>
+		left_bracket()
+			vars=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		s=pre_gd()
+	right_bracket()
+	{
+		node.setVariables(vars);
+		node.addChild(s);
+		return node;
+	}
+}
+
+PDDLExpression pref_gd() :
+{
+	PDDLSymbol pref_name = null;
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <PREFERENCE>
+		[pref_name=pref_name()]
+		node=gd()
+	right_bracket() {
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+PDDLSymbol pref_name() :
+{
+	Token t = null;
+}
+{
+	t=<SYMBOL> {
+		return new PDDLSymbol(PDDLSymbol.Kind.PREFERENCE, t);
+	}
+}
+
+PDDLExpression effect() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=empty_or()
+	|   LOOKAHEAD(2) node=and_c_effect()
+	|	LOOKAHEAD(2) node=c_effect()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression and_c_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <AND> (LOOKAHEAD(2) s=c_effect() {
+		node.addChild(s);
+	})* right_bracket()
+	{
+		return node;
+	}
+}
+
+PDDLExpression c_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) node=forall_effect()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) node=when_con_effect()
+	|	LOOKAHEAD(2) node=p_effect()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression forall_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> vars = null;
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <FORALL>
+		left_bracket()
+			vars=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		s=effect()
+	right_bracket() {
+		node.setVariables(vars);
+		node.addChild(s);
+		return node;
+	}
+}
+
+PDDLExpression when_con_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.WHEN);
+	PDDLExpression condition = null;
+	PDDLExpression effects = null;
+}
+{
+	left_bracket() <WHEN>
+		condition=gd()
+		effects=cond_effect()
+	right_bracket() {
+		node.addChild(condition);
+		node.addChild(effects);
+		return node;
+	}
+}
+
+PDDLExpression cond_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=and_p_effect()
+	|	LOOKAHEAD(2) node=p_effect()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression and_p_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression s = null;
+}
+{
+	left_bracket() <AND> (LOOKAHEAD(2) s=p_effect() {
+		node.addChild(s);
+	})* right_bracket()
+	{
+		return node;
+	}
+}
+
+PDDLExpression p_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+ 	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
+    			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+    			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) node=assign_op()
+    	|   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.ACTION_COSTS) }) node=increase_total_cost()
+
+
+    	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
+    	) {
+    		return node;
+    	}
+
+}
+
+PDDLExpression increase_total_cost() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.INCREASE);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <INCREASE>
+		op1=total_cost()
+		op2=numeric_term()
+	right_bracket()
+	{
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression total_cost() :
+{
+	Token t;
+}
+{
+	<LEFT_BRACKET> t=<TOTAL_COST> <RIGHT_BRACKET> {
+		PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+		List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
+		function.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
+		node.setAtom(function);
+		return node;
+	}
+}
+
+PDDLExpression numeric_term() :
+{
+	List<PDDLSymbol> tokenList = new ArrayList<PDDLSymbol>();
+	PDDLSymbol s = null;
+	PDDLExpression node = null;
+}
+{
+	(left_bracket() s=functor() {
+		tokenList.add(s);
+	} (LOOKAHEAD(2) s=term() {
+		tokenList.add(s);
+	})* right_bracket() {
+		node = new PDDLExpression(PDDLConnective.FN_HEAD);
+		node.setAtom(tokenList);
+		return node;
+	}
+    | 	node=number() {
+		return node;
+	})
+}
+
+PDDLExpression assign_op() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=assign()
+	|	LOOKAHEAD(2) node=scale_up()
+	|	LOOKAHEAD(2) node=scale_down()
+	|	LOOKAHEAD(2) node=increase()
+	|	LOOKAHEAD(2) node=decrease()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression assign() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <ASSIGN>
+		op1=f_head()
+		op2=f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression scale_up() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_UP);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <SCALE_UP>
+		op1=f_head()
+		op2=f_exp()
+	right_bracket()
+	{
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression scale_down() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_DOWN);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <SCALE_DOWN>
+		op1=f_head()
+		op2=f_exp()
+	right_bracket()
+	{
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression increase() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.INCREASE);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <INCREASE>
+		op1=f_head()
+		op2=f_exp()
+	right_bracket()
+	{
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression decrease() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.DECREASE);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <DECREASE>
+		op1=f_head()
+		op2=f_exp()
+	right_bracket()
+	{
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLAction durative_action_def() :
+{
+	PDDLSymbol name = null;
+	List<PDDLTypedSymbol> parameters = null;
+	PDDLExpression duration = null;
+	PDDLExpression condition = null;
+	PDDLExpression effect = null;
+}
+{
+	try {
+		left_bracket() <DURATIVE_ACTION> name=da_symbol()
+			<PARAMETERS>
+				left_bracket()
+					parameters=typed_list(Lexer.VARIABLE)
+				right_bracket()
+			<DURATION> duration=duration_constraint()
+			<CONDITION> condition=da_gd()
+			<EFFECT> effect=da_effect()
+			right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		return new PDDLAction(name, parameters, condition, effect, duration);
+	}
+}
+
+PDDLSymbol da_symbol() :
+{
+	Token t = null;
+}
+{
+	t=<SYMBOL> {
+		return new PDDLSymbol(PDDLSymbol.Kind.ACTION, t);
+	}
+}
+
+PDDLExpression duration_constraint() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=empty_or()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) node=and_simple_duration_constraint()
+	|	LOOKAHEAD(2) node=simple_duration_constraint()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression and_simple_duration_constraint() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AND>
+		(LOOKAHEAD(2) child=simple_duration_constraint(){
+			node.addChild(child);
+		})+
+	right_bracket() {
+		return node;
+	}
+}
+
+PDDLExpression simple_duration_constraint() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=d_op()
+	|	LOOKAHEAD(2) node=at_simple_duration_constraint()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression at_simple_duration_constraint() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(3) node=at_start_simple_duration_constraint()
+	| 	LOOKAHEAD(3) node=at_end_simple_duration_constraint()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression at_start_simple_duration_constraint() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression child;
+}
+{
+	left_bracket() <AT> <START>
+		child=simple_duration_constraint()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression at_end_simple_duration_constraint() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression child;
+}
+{
+	<LEFT_BRACKET> <AT> <END>
+		child=simple_duration_constraint()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression d_op() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2)
+			node=equal_d_op()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+			node=gequal_d_op()
+	| 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+			node=lequal_d_op()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression equal_d_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <EQUAL>
+		op1=var_duration()
+		op2=d_value()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression gequal_d_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	<LEFT_BRACKET> <GEQUAL>
+		op1=var_duration()
+		op2=d_value()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression lequal_d_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <LEQUAL>
+		op1=var_duration()
+		op2=d_value()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression var_duration() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.TIME_VAR);
+	Token t = null;
+}
+{
+	t=<VAR_DURATION>
+	{
+		node.setVariable(new PDDLSymbol(PDDLSymbol.Kind.DURATION_VARIABLE, t));
+		return node;
+	}
+}
+
+PDDLExpression d_value() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=number()
+	| 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) node=f_exp()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression da_gd():
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=pref_timed_gd()
+	|	LOOKAHEAD(2) node=and_da_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
+			node=forall_da_gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression forall_da_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	PDDLExpression child = null;
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	<LEFT_BRACKET> <FORALL>
+		left_bracket()
+			typedList=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		child=da_gd()
+	right_bracket()
+	{
+		node.setVariables(typedList);
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression and_da_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child = null;
+}
+{
+	<LEFT_BRACKET> <AND>
+		(LOOKAHEAD(2) child=da_gd() {
+			node.addChild(child);
+		})*
+	right_bracket() {
+		return node;
+	}
+}
+
+PDDLExpression pref_timed_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2)
+			node=timed_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.PREFERENCES)})
+			node=named_pref_timed_gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression named_pref_timed_gd() :
+{
+	PDDLSymbol pref_name = null;
+	PDDLExpression node = null;
+}
+{
+	left_bracket() <PREFERENCE>
+		[pref_name=pref_name()]
+		node=timed_gd()
+	right_bracket() {
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+PDDLExpression timed_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=at_timed_gd()
+	|	LOOKAHEAD(2) node=over_timed_gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression over_timed_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.OVER_ALL);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <OVER> <ALL>
+		child=gd()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression at_timed_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(3) node=at_start_timed_gd()
+	|	LOOKAHEAD(2) node=at_end_timed_gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression at_start_timed_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AT> <START>
+		child=gd()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression at_end_timed_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AT> <END>
+		child=gd()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression da_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+	(
+		LOOKAHEAD(2)
+			node=and_da_effect()
+	| 	LOOKAHEAD(2)
+			node=timed_effect()
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)})
+			node=forall_da_effect()
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)})
+			node=when_da_effect()
+	| 	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)})
+			node=da_assign_op()
+
+	) {
+		return node;
+	}
+}
+
+PDDLExpression da_assign_op() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_assign()
+	|	LOOKAHEAD(2) node=da_scale_up()
+	|	LOOKAHEAD(2) node=da_scale_down()
+	|	LOOKAHEAD(2) node=da_increase()
+	|	LOOKAHEAD(2) node=da_decrease()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression da_assign() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <ASSIGN>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_scale_up() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_UP);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <SCALE_UP>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_scale_down() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_DOWN);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <SCALE_DOWN>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_increase() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.INCREASE);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <INCREASE>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_decrease() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.DECREASE);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <DECREASE>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression when_da_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.WHEN);
+	PDDLExpression condition = null;
+	PDDLExpression effect = null;
+}
+{
+	left_bracket() <WHEN>
+		condition=da_gd()
+		effect=da_effect()
+	right_bracket() {
+		node.addChild(condition);
+		node.addChild(effect);
+		return node;
+	}
+}
+
+
+PDDLExpression forall_da_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> typedList = null;
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <FORALL>
+		left_bracket()
+			typedList=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		child=da_effect()
+	right_bracket() {
+		node.setVariables(typedList);
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression and_da_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AND>
+		(LOOKAHEAD(2) child=da_effect() {
+			node.addChild(child);
+		})*
+	right_bracket() {
+		return node;
+	}
+}
+
+PDDLExpression timed_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2)
+			node=at_a_effect()
+	|	LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.CONTINOUS_EFFECTS)})
+			node=assign_op_t()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression at_f_assign_da() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(3) node=at_start_f_assign_da()
+	|	LOOKAHEAD(3) node=at_end_f_assign_da()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression at_start_f_assign_da() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression child;
+}
+{
+	left_bracket() <AT> <START>
+		child=f_assign_da()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+
+PDDLExpression at_end_f_assign_da() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression child;
+}
+{
+	left_bracket() <AT> <END>
+		child=f_assign_da()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression at_a_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(4) node=at_start_a_effect()
+	|	LOOKAHEAD(4) node=at_end_a_effect()
+	) {
+		return node;
+	}
+}
+
+
+PDDLExpression a_effect() :
+{
+	PDDLExpression node = null;
+}
+{
+ 	(	LOOKAHEAD(2) node=f_assign_da()
+	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
+	|	LOOKAHEAD(2) node=when_con_effect()
+	|	LOOKAHEAD(2) node=forall_effect()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression at_start_a_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AT> <START>
+		child=a_effect()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+
+PDDLExpression at_end_a_effect() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <AT> <END>
+		child=a_effect()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression assign_op_t() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=increase_assign_op_t()
+	|	LOOKAHEAD(2) node=decrease_assign_op_t()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression increase_assign_op_t() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <INCREASE>
+		op1=f_head()
+		op2=f_exp_t()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression decrease_assign_op_t() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <DECREASE>
+		op1=f_head()
+		op2=f_exp_t()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression f_exp_t() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.F_EXP_T);
+	PDDLSymbol continuous_variable_name = null;
+	PDDLExpression child = null;
+}
+{
+	(	LOOKAHEAD(2)
+			left_bracket() <MUL>
+				continuous_variable_name=continuous_variable()
+				child=f_exp()
+			right_bracket()
+	| 	LOOKAHEAD(2)
+			left_bracket() <MUL>
+				child=f_exp()
+				continuous_variable_name=continuous_variable()
+			right_bracket()
+	| 	LOOKAHEAD(2)
+		continuous_variable_name=continuous_variable()
+	) {
+		node.setVariable(continuous_variable_name);
+		if (child != null) node.addChild(child);
+		return node;
+	}
+}
+
+PDDLSymbol continuous_variable() :
+{
+	Token t = null;
+}
+{
+	t=<CONTINUOUS_VARIABLE>  {
+		return new PDDLSymbol(PDDLSymbol.Kind.CONTINUOUS_VARIABLE, t);
+	}
+}
+
+PDDLExpression f_assign_da() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_assign()
+	|	LOOKAHEAD(2) node=da_scale_up()
+	|	LOOKAHEAD(2) node=da_scale_down()
+	|	LOOKAHEAD(2) node=da_increase()
+	|	LOOKAHEAD(2) node=da_decrease()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression f_exp_da() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_op()
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) node=var_duration()
+	|	LOOKAHEAD(2) node=f_exp()
+	) {
+		return node;
+	}
+}
+
+
+PDDLExpression da_op() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=da_add_op()
+	|	LOOKAHEAD(2) node=da_substract_op()
+	|	LOOKAHEAD(2) node=da_multiply_op()
+	|	LOOKAHEAD(2) node=da_divide_op()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression da_add_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.PLUS);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <ADD>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_substract_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MINUS);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <SUB>
+		(	LOOKAHEAD(3) (op1=f_head() [op2=f_exp_da()])
+	| 	LOOKAHEAD(3) ([LOOKAHEAD(2) op2=f_exp_da()] op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		if (op2 != null) node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_multiply_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <MUL>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression da_divide_op() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <DIV>
+	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+void problem() :
+{
+}
+{
+    (   LOOKAHEAD({this.isRequirement(PDDLRequireKey.HIERARCHY)})
+            htn_problem()
+    |    pddl_problem()
+    )
+}
+
+void pddl_problem() :
+{
+	PDDLSymbol name = null;
+}
+{
+	try {
+		left_bracket() <DEFINE>
+		left_bracket() <PROBLEM>
+			name=problem_name() {
+				this.problem = new PDDLProblem(name);
+			}
+		right_bracket()
+		left_bracket() <P_DOMAIN>
+			domain_problem_name()
+		right_bracket()
+		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) object_declaration()]
+        init()
+		goal()
+		[LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) metric_spec()]
+		// [length-spec()] not implemented
+		right_bracket()
+		<EOF>
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void htn_problem() : // ADD HDDL
+{
+	PDDLSymbol name = null;
+	PDDLTaskNetwork taskNetwork = null;
+	List<PDDLTypedSymbol> parameters = new ArrayList<PDDLTypedSymbol>();
+}
+{
+	try {
+		left_bracket() <DEFINE>
+		left_bracket() <PROBLEM>
+			name=problem_name() {
+				this.problem = new PDDLProblem(name);
+			}
+		right_bracket()
+		left_bracket() <P_DOMAIN>
+			domain_problem_name()
+		right_bracket()
+		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) object_declaration()]
+        left_bracket() <HTN>
+            [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
+            taskNetwork = task_network() {
+                taskNetwork.setParameters(parameters);
+                this.problem.setInitialTaskNetwork(taskNetwork);
+            }
+        right_bracket()
+		init()
+		[LOOKAHEAD(2) goal()]
+		[LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2) metric_spec()]
+		// [length-spec()] not implemented
+		right_bracket()
+		<EOF>
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+
+}
+
+
+PDDLSymbol problem_name() :
+{ Token t = null; }
+{
+	t=<SYMBOL> {  return new PDDLSymbol(PDDLSymbol.Kind.PROBLEM, t); }
+}
+
+void domain_problem_name() :
+{ Token t = null; }
+{
+	t=<SYMBOL> {  this.problem.setDomain(new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, t)); }
+}
+
+PDDLSymbol domain_name() :
+{ Token t = null; }
+{
+	t=<SYMBOL> { return new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, t); }
+}
+
+void object_declaration() :
+{
+	List<PDDLTypedSymbol> typedList = null;
+}
+{
+	try {
+		left_bracket() <OBJECTS>
+			typedList=typed_list(Lexer.CONSTANT)
+		right_bracket() {
+			for (PDDLTypedSymbol object : typedList) {
+				this.problem.addObject(object);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void init() :
+{
+	PDDLExpression node = null;
+}
+{
+	try {
+		left_bracket() <INIT>
+			(LOOKAHEAD(2) node=init_el() {
+				this.problem.addInitialFact(node);
+			})*
+		right_bracket()
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+
+PDDLExpression init_el() :
+{
+	PDDLExpression node = null;
+}
+{
+	(
+		LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.TIMED_INITIAL_LITERALS)}) node=timed_literal()
+	|	LOOKAHEAD(2) node=literal(Lexer.CONSTANT)
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
+			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)}) node=equal_init_el()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression equal_init_el() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_ATOM);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <EQUAL>
+		op1=constant_f_head()
+		op2=number()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression timed_literal() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.DURATION_ATOM);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket() <AT>
+		op1=number()
+		op2=literal(Lexer.CONSTANT)
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+
+void goal() :
+{
+
+}
+{
+    left_bracket() <GOAL>
+    pddl_goal()
+    right_bracket()
+}
+
+void pddl_goal() :
+{
+	PDDLExpression node = null;
+	Boolean goal_utilities = false;
+	if (this.isRequirement(PDDLRequireKey.GOAL_UTILITIES)
+			&& !this.isRequirement(PDDLRequireKey.PREFERENCES)) {
+		this.getRequirements().add(PDDLRequireKey.PREFERENCES);
+		goal_utilities = true;
+	}
+
+}
+{
+	try {
+		node=pre_gd() {
+			this.problem.setGoal(node);
+			if (goal_utilities) {
+				this.getRequirements().remove(PDDLRequireKey.PREFERENCES);
+			}
+	   	}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+void pddl_const(int type) :
+{
+	PDDLExpression conGD = null;
+}
+{
+	try {
+		<LEFT_BRACKET> <CONSTRAINTS>
+			conGD=pref_con_gd()
+		right_bracket() {
+			if (type == Lexer.PARSER_DOMAIN) {
+				this.domain.setConstraints(conGD);
+			} else {
+				this.problem.setConstraints(conGD);
+			}
+		}
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+}
+
+
+PDDLExpression pref_con_gd() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2)
+			node=and_pref_con_gd()
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
+			node=forall_pref_con_gd()
+	| 	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.PREFERENCES)})
+			node=named_pref_con_gd()
+	|	LOOKAHEAD(2)
+			node=con_gd()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression and_pref_con_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child;
+}
+{
+	left_bracket() <AND>
+		(LOOKAHEAD(2) child=pref_con_gd() {
+			node.addChild(child);
+		})* right_bracket()
+	{
+		return node;
+	}
+}
+
+PDDLExpression named_pref_con_gd() :
+{
+	PDDLExpression node = null;
+	PDDLSymbol pref_name = null;
+}
+{
+	left_bracket() <PREFERENCE>
+		[pref_name=pref_name()]
+		node=con_gd()
+	right_bracket() {
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+PDDLExpression forall_pref_con_gd() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> typedList = null;
+	PDDLExpression child = null;
+}
+{
+	left_bracket() <FORALL>
+		left_bracket()
+			typedList=typed_list(Lexer.VARIABLE)
+		right_bracket()
+		child=pref_con_gd()
+	right_bracket() {
+		node.setVariables(typedList);
+		node.addChild(child);
+		return node;
+	}
+}
+
+void metric_spec() :
+{
+	PDDLExpression node = null;
+}
+{
+	try {
+		(	LOOKAHEAD(3) node=maximize()
+		| 	LOOKAHEAD(3) node=minimize()
+		)
+	} catch(Throwable e) {
+		this.error(e, token.beginLine, token.beginColumn);
+	}
+	{
+		this.problem.setMetric(node);
+	}
+}
+
+PDDLExpression maximize() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MAXIMIZE);
+	PDDLExpression child = null;
+}
+{
+	left_bracket()
+		<METRIC>
+		<MAXIMIZE>
+		child=metric_f_exp()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression minimize() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MINIMIZE);
+	PDDLExpression child = null;
+}
+{
+	left_bracket()
+		<METRIC>
+		<MINIMIZE>
+		child=metric_f_exp()
+	right_bracket() {
+		node.addChild(child);
+		return node;
+	}
+}
+
+PDDLExpression metric_f_exp() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=op_metric_f_exp()
+	|	LOOKAHEAD(2) node=number()
+	|	LOOKAHEAD(2) node=constant_f_head()
+	|	LOOKAHEAD(2) node=total_time()
+	|	LOOKAHEAD(2) node=violated_pref_exp()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression violated_pref_exp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.IS_VIOLATED);
+	PDDLSymbol pref_name = null;
+}
+{
+	left_bracket()
+		<IS_VIOLATED>
+		pref_name=pref_name()
+	right_bracket() {
+		node.setPrefName(pref_name);
+		return node;
+	}
+}
+
+PDDLExpression constant_f_head() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+	List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
+	PDDLSymbol functor = null;
+	PDDLSymbol argument = null;
+}
+{
+	left_bracket()
+		functor=functor() { function.add(functor); }
+		(LOOKAHEAD(2) argument=constant(){
+			function.add(argument);
+		})*
+	right_bracket() {
+		node.setAtom(function);
+		return node;
+	}
+}
+
+PDDLExpression total_time() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+	Token t;
+}
+{
+	(LOOKAHEAD(3)
+		left_bracket() t=<TOTAL_TIME> right_bracket()
+| 	LOOKAHEAD(2)
+		t=<TOTAL_TIME>) {
+			List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
+			atom.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
+			node.setAtom(atom);
+			return node;
+		}
+}
+
+PDDLExpression op_metric_f_exp() :
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node=add_op_metric_f_exp()
+	|	LOOKAHEAD(2) node=substract_op_metric_f_exp()
+	| 	LOOKAHEAD(2) node=multi_op_metric_f_exp()
+	| 	LOOKAHEAD(2) node=div_op_metric_f_exp()
+	) {
+		return node;
+	}
+}
+
+PDDLExpression add_op_metric_f_exp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.PLUS);
+	PDDLExpression op = null;
+}
+{
+	left_bracket()
+		<ADD>
+		op=metric_f_exp() { node.addChild(op); }
+		(LOOKAHEAD(2) op=metric_f_exp() {
+			node.addChild(op);
+		})+
+	right_bracket() {
+		return node;
+	}
+}
+
+PDDLExpression substract_op_metric_f_exp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MINUS);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket()
+		<SUB>
+		op1=metric_f_exp()
+		[op2=metric_f_exp()]
+	right_bracket() {
+		node.addChild(op1);
+		if (op2 != null) node.addChild(op2);
+		return node;
+	}
+}
+
+PDDLExpression div_op_metric_f_exp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression op1 = null;
+	PDDLExpression op2 = null;
+}
+{
+	left_bracket()
+		<DIV>
+		op1=metric_f_exp()
+		op2=metric_f_exp()
+	right_bracket() {
+		node.addChild(op1);
+		node.addChild(op2);
+		return node;
+	}
+}
+
+
+PDDLExpression multi_op_metric_f_exp() :
+{
+	PDDLExpression node = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression op = null;
+}
+{
+	left_bracket()
+		<MUL>
+		op=metric_f_exp() { node.addChild(op); }
+		(LOOKAHEAD(2) op=metric_f_exp() {
+			node.addChild(op);
+		})+
+	right_bracket() {
+		return node;
+	}
+}
