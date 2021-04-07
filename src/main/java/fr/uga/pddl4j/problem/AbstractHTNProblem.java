@@ -45,11 +45,9 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
 
     /**
      * Instantiate the HTN problem.
-     *
-     * @param timeout the time allocated to the instantiation.
      */
     public void instantiate(int timeout) {
-        super.instantiate(timeout);
+        super.instantiate();
     }
 
     /**
@@ -123,4 +121,5 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
     public List<Method> getMethods() {
         return super.getMethods();
     }
+
 }

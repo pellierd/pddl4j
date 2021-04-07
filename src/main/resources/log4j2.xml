@@ -21,10 +21,7 @@
         <logger name="fr.uga.pddl4j.planners.ProblemFactory" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
-        <logger name="fr.uga.pddl4j.problem.instantiation.Encoder" level="trace" additivity="false">
-            <AppenderRef ref="traceConsole"/>
-        </logger>
-        <logger name="fr.uga.pddl4j.problem.instantiation.PreInstantiation" level="trace" additivity="false">
+        <logger name="fr.uga.pddl4j.problem.AbstractProblem" level="trace" additivity="false">
             <AppenderRef ref="traceConsole"/>
         </logger>
         <logger name="fr.uga.pddl4j.parser.ErrorManager" level="trace" additivity="false">

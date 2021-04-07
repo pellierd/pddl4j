@@ -32,11 +32,6 @@ import java.util.List;
 public abstract class AbstractStateSpacePlanner<T extends Problem> extends AbstractPlanner<T> implements StateSpacePlanner<T> {
 
     /**
-     * The serial id of the class.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * The anytime state of the planner.
      */
     private boolean anytime;

@@ -15,8 +15,26 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.*;
-import fr.uga.pddl4j.problem.operator.*;
+import fr.uga.pddl4j.parser.PDDLAction;
+import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLExpression;
+import fr.uga.pddl4j.parser.PDDLMethod;
+import fr.uga.pddl4j.parser.PDDLNamedTypedList;
+import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.PDDLTaskNetwork;
+import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
+import fr.uga.pddl4j.problem.operator.IntAction;
+import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.problem.operator.IntMethod;
+import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
+import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,6 +45,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Logger;
+
+
 /**
  * This class contains all the methods needed to encode the a planning problem into int representation before
  * instantiation.
@@ -35,6 +56,11 @@ import java.util.stream.Collectors;
  * @version 4.0 - 04.12.2020
  */
 public abstract class AbstractProblem implements Problem {
+
+    /**
+     * The logger of the class.
+     */
+    private Logger logger;
 
     /**
      * The PDDL domain.
@@ -114,7 +140,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The set of fluents of the initial state of the problem.
      */
-    private Set<IntExpression> intInitPredicates;
+    private Set<IntExpression> intInitialState;
 
     /**
      * The set of numeric fluent of the initial state of the problem.
@@ -141,11 +167,16 @@ public abstract class AbstractProblem implements Problem {
      */
     private IntTaskNetwork intInitialTaskNetwork;
 
+    /**
+     * The log level of the instnatiation process.
+     */
+    private int logLevel;
 
     /**
      * The empty constructor to block the default constructor of object.
      */
     private AbstractProblem() {
+        this.logger = LogManager.getLogger(AbstractProblem.class);
     }
 
     /**
@@ -155,10 +186,15 @@ public abstract class AbstractProblem implements Problem {
      * @param problem the problem.
      */
     public AbstractProblem(final PDDLDomain domain, final PDDLProblem problem) {
+        this();
         this.domain = domain;
         this.problem = problem;
+        this.logLevel = Problem.DEFAULT_TRACE_LEVEL;
     }
 
+    protected Logger getLogger() {
+        return this.logger;
+    }
     /**
      * Returns the parsed domain used to create of this problem.
      *
@@ -286,12 +322,13 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
+     * Returns the logger of the class
+     */
+    /**
      * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
      * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
-     *
-     * @param timeout the time allocated to the instantiation.
      */
-    public void instantiate(int timeout) {
+    public void instantiate() {
         this.initialization();
         this.preinstantiation();
         this.instantiation();
@@ -331,6 +368,24 @@ public abstract class AbstractProblem implements Problem {
      * bit set.
      */
     protected abstract void finalization();
+
+    /**
+     * Set the log level of the instantiation of the instantiation process.
+     *
+     * @param level the log level of the instantiation.
+     */
+    final public void setTraceLevel(final int level) {
+        this.logLevel = level;
+    }
+
+    /**
+     * Returns the log level of instantiation process.
+     *
+     * @return the log level of instantiation process.
+     */
+    final public int getTraceLevel() {
+        return this.logLevel;
+    }
 
     /**
      * Init the list of requirement of the problem.
@@ -659,8 +714,8 @@ public abstract class AbstractProblem implements Problem {
      * @return the list of fluent in the form of <code>IntExpression</code> of the initial state.
      * @see IntExpression
      */
-    protected Set<IntExpression> getIntInitPredicates() {
-        return this.intInitPredicates;
+    protected Set<IntExpression> getIntInitialState() {
+        return this.intInitialState;
     }
 
     /**
@@ -735,7 +790,7 @@ public abstract class AbstractProblem implements Problem {
     protected void initInitialState() {
         Set<IntExpression> init =  this.getPDDLProblem().getInit().stream().map(this::initExpression)
             .collect(Collectors.toCollection(LinkedHashSet::new));
-        this.intInitPredicates = new LinkedHashSet<>();
+        this.intInitialState = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
         this.intInitFunctions = new LinkedHashSet<>();
         for (IntExpression exp : init) {
@@ -745,7 +800,7 @@ public abstract class AbstractProblem implements Problem {
                     this.intInitFunctionCost.put(exp.getChildren().get(0), exp.getChildren().get(1).getValue());
                     break;
                 case ATOM:
-                    this.intInitPredicates.add(exp);
+                    this.intInitialState.add(exp);
                     break;
                 default:
                     throw new UnexpectedExpressionException(exp.getConnective().toString());
@@ -1500,4 +1555,117 @@ public abstract class AbstractProblem implements Problem {
         return str.toString();
     }
 
+    /**
+     * Print the types of the problem.
+     */
+    final protected void traceTypes() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Types table:\n");
+        for (int i = 0; i < this.getTypeSymbols().size(); i++) {
+            str.append(i).append(": ").append(this.getTypeSymbols().get(i)).append(":");
+            Set<Integer> domain = this.getDomains().get(i);
+            for (Integer constant : domain) {
+                str.append(" ").append(constant);
+            }
+            str.append("\n");
+        }
+        str.append("\n");
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the constants of the problem.
+     */
+    final protected void traceConstants() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Constants table:\n");
+        for (int i = 0; i < this.getConstantSymbols().size(); i++) {
+            str.append(i).append(": ");
+            str.append(this.getConstantSymbols().get(i));
+            str.append(System.lineSeparator());
+        }
+        str.append(System.lineSeparator());
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the predicates of the problem.
+     */
+    final protected void tracePredicates() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Predicates table:\n");
+        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
+            String predicate = this.getPredicateSymbols().get(i);
+            str.append(i);
+            str.append(": ");
+            str.append(predicate);
+            str.append(" :");
+            for (int j = 0; j < this.getPredicateSignatures().get(i).size(); j++) {
+                str.append(" ");
+                str.append(this.getTypeSymbols().get(this.getPredicateSignatures().get(i).get(j)));
+            }
+            str.append("\n");
+        }
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the functions of the problem.
+     */
+    final protected void traceFunctions() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Functions table:\n");
+        for (int i = 0; i < this.getFunctionSymbols().size(); i++) {
+            String predicate = this.getFunctionSymbols().get(i);
+            str.append(i);
+            str.append(": ");
+            str.append(predicate);
+            str.append(":");
+            for (int j = 0; j < this.getFunctionSignatures().get(i).size(); j++) {
+                str.append(" ");
+                str.append(this.getTypeSymbols().get(this.getFunctionSignatures().get(i).get(j)));
+            }
+            str.append("\n");
+        }
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the integer representation of the actions of the problem.
+     */
+    final protected void traceIntActions() {
+        final StringBuilder str = new StringBuilder();
+        str.append("\n\nCoded actions:\n\n");
+        for (IntAction a : this.getIntActions()) {
+            str.append(this.toString(a));
+            str.append(System.lineSeparator());
+        }
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the integer representation of goal state of the problem.
+     */
+    final protected void traceIntGoal() {
+        final StringBuilder str = new StringBuilder();
+        str.append(")");
+        str.append("\n\nCoded goal state:\n");
+        str.append(this.toString(this.getIntGoal()));
+        str.append(System.lineSeparator());
+        str.append(System.lineSeparator());
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the integer representation of the initial state.
+     */
+    final protected void traceIntInitialState() {
+        final StringBuilder str = new StringBuilder();
+        str.append("\nCoded initial state:\n");
+        str.append("(and");
+        for (IntExpression e : this.getIntInitialState()) {
+            str.append("\n ").append(this.toString(e));
+        }
+        this.getLogger().trace(str);
+    }
 }

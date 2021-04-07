@@ -343,11 +343,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // preconditions of actions and in the
                 // antecedents of conditional effects can be simplified to TRUE.
                 if (!effect && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.NEGATIVE))
-                    && this.getIntInitPredicates().contains(exp)) {
+                    && this.getIntInitialState().contains(exp)) {
                     exp.setConnective(PDDLConnective.TRUE);
                 } else if (!effect
                     && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.POSITIVE))
-                    && !this.getIntInitPredicates().contains(exp)) {
+                    && !this.getIntInitialState().contains(exp)) {
                     // If the antecedent of a conditional effect becomes TRUE, the conditional
                     // effect
                     // becomes unconditional.
@@ -772,8 +772,26 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 i++;
             }
-
         }
     }
 
+    /**
+     * Print the table of ground inertia.
+     */
+    final protected void traceGroundInertia() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Ground inertia table:\n");
+        int i = 0;
+        for (Map.Entry<IntExpression, Inertia> e : this.getGroundInertia().entrySet()) {
+            str.append(i);
+            str.append(": ");
+            str.append(this.toString(e.getKey()));
+            str.append(" : ");
+            str.append(e.getValue());
+            str.append(System.lineSeparator());
+            i++;
+        }
+        str.append(System.lineSeparator());
+        this.getLogger().trace(str);
+    }
 }

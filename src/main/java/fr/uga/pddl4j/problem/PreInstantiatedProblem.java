@@ -23,7 +23,6 @@ import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -297,7 +296,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             if (this.getPredicateSignatures().get(i).size() == 1
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
-                for (IntExpression fact : this.getIntInitPredicates()) {
+                for (IntExpression fact : this.getIntInitialState()) {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
@@ -624,7 +623,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             this.predicatesTables.add(pTables);
         }
 
-        for (IntExpression fact : this.getIntInitPredicates()) {
+        for (IntExpression fact : this.getIntInitialState()) {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
@@ -1520,4 +1519,22 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         }
     }
 
+    /**
+     * Print the table of inertia.
+     */
+    final protected void traceInertia() {
+        final StringBuilder str = new StringBuilder();
+        str.append("Inertia table:\n");
+        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
+            String predicate = this.getPredicateSymbols().get(i);
+            str.append(i);
+            str.append(": ");
+            str.append(predicate);
+            str.append(" : ");
+            str.append(this.getInertia().get(i));
+            str.append(System.lineSeparator());
+        }
+        str.append(System.lineSeparator());
+        this.getLogger().trace(str);
+    }
 }

@@ -38,6 +38,11 @@ import java.util.Set;
 public interface Problem extends Serializable {
 
     /**
+     * The default log level.
+     */
+    static final int DEFAULT_TRACE_LEVEL = 0;
+
+    /**
      * Returns the PDDL domain of the problem.
      *
      * @return the PDDL domain of the problem.
@@ -122,6 +127,13 @@ public interface Problem extends Serializable {
     Condition getGoal();
 
     /**
+     * Returns the initial state of the problem.
+     *
+     * @return the initial state of the problem.
+     */
+    InitialState getInitialState();
+
+    /**
      * Returns <code>true</code> if this problem is solvable. It is not because the method returns <code>true</code>
      * that the problem is solvable. It just means that instantiation process can not exclude the fact that the problem
      * is solvable.
@@ -132,10 +144,22 @@ public interface Problem extends Serializable {
 
     /**
      * Instantiate the problem.
-     *
-     * @param timeout the time in second allocated to the instantiation.
      */
-    void instantiate(final int timeout);
+    void instantiate();
+
+    /**
+     * Set the trace level of the instantiation of the instantiation process.
+     *
+     * @param level the trace level of the instantiation.
+     */
+    void setTraceLevel(final int level);
+
+    /**
+     * Returns the trace level of instantiation process.
+     *
+     * @return the trace level of instantiation process.
+     */
+    int getTraceLevel();
 
     /**
      * Returns a string representation of a specified operator.
@@ -170,13 +194,20 @@ public interface Problem extends Serializable {
     String toString(final State state);
 
     /**
+     * Returns a string representation of a initial state.
+     *
+     * @param state the state.
+     * @return a string representation of the specified expression.
+     */
+    String toString(final InitialState state);
+
+    /**
      * Returns a string representation of a fluent.
      *
      * @param fluent the formula.
      * @return a string representation of the specified expression.
      */
     String toString(final Fluent fluent);
-
 
     /**
      * Return a string representation of a search.
@@ -202,5 +233,6 @@ public interface Problem extends Serializable {
      * @return a string representation of the specified operator.
      */
     String toShortString(final AbstractGroundOperator operator);
+
 
 }

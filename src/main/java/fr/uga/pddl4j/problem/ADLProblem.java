@@ -54,14 +54,14 @@ public class ADLProblem extends FinalizedProblem {
         accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
         accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
         accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
-        //accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
-        //accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
-        //accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
         return accepted;
     }
 
     /**
-     * This method is called by the constructor.
+     * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
+     * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
+     * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
+     * network of the problem into compact int representation.
      */
     protected void initialization() {
 
@@ -70,6 +70,7 @@ public class ADLProblem extends FinalizedProblem {
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
 
+        // Collect the requirements of the problem.
         this.initRequirements();
 
         // Collect the information on the type declared in the domain
@@ -78,111 +79,107 @@ public class ADLProblem extends FinalizedProblem {
         this.initConstants();
         // Collect the either types of the domain
         this.initEitherTypes();
+
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
-        // Collect the function information (symbols and signatures)
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.initFunctions();
-        //}
-        // Collect the tasks information (symbols and signatures)
-        //this.initTasks();
 
         // Encode the actions of the domain into integer representation
         this.initActions();
 
-        // Encode the methods of the domain into integer representation
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.initMethods();
-        //}
-
         // Encode the initial state in integer representation
         this.initInitialState();
+
         // Encode the goal in integer representation
         this.initGoal();
 
-        // Encode the initial task network in integer representation
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.initInitialTaskNetwork();
-        //}
+        // Print trace level
+        if (this.getTraceLevel() == 1) {
+            this.traceTypes();
+            this.traceConstants();
+            this.traceIntActions();
+            this.traceIntInitialState();
+            this.traceIntGoal();
+        }
     }
 
+    /**
+     * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
+     * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
+     * be triggered.
+     */
     protected void preinstantiation() {
+        // Extract the inertia from the list of actions
         this.extractInertia();
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.extractNumericInertia();
-        //}
-
         // Infer the type from the unary inertia
         if (!this.getRequirements().contains(PDDLRequireKey.TYPING)) {
-            //&&!this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
             this.inferTypesFromInertia();
             this.simplifyActionsWithInferredTypes();
         }
         // Create the predicates tables used to count the occurrences of the predicates in the
         // initial state
         this.createPredicatesTables();
-
-        //if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-        //    this.expandTemporalActions(this.getIntActions());
-        //}
+        // Trace for debug
+        if (this.getTraceLevel() == 2) {
+            this.traceTypes();
+            this.traceConstants();
+            this.traceInertia();
+            this.traceIntActions();
+            this.traceIntInitialState();
+            this.traceIntGoal();
+        }
     }
 
+    /**
+     * This methods carries out the instantiation of the planning operators and the goal of the problem in to actions.
+     */
     protected void instantiation() {
+        // Instantiate the actions and the goal
         this.instantiateActions();
         this.instantiateGoal();
-
-        /*if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-            this.instantiateInitialTaskNetwork();
-            this.instantiateMethods(this.getIntMethods(), this.getIntInitialTaskNetwork(), this.getIntActions());
-            this.simplyMethodsWithGroundInertia();
-        }*/
-
+        // Trace for debug
+        if (this.getTraceLevel() == 3) {
+            this.traceIntActions();
+            this.traceIntInitialState();
+            this.traceIntGoal();
+        }
     }
 
-
+    /**
+     * This method carries out all the necessary treatment to postinstantiate the problem. In particular, it simplifies
+     * the actions instantiated based on static properties based on the initial state information of the problem in
+     * order to prune the actions that can never be triggered.
+     */
     protected void postinstantiation() {
+        // Extract the ground inertia and simplify the actions and the goal
         this.extractGroundInertia();
-        //this.extractGroundNumericInertia();
         this.simplyActionsWithGroundInertia();
-
         this.simplifyGoalWithGroundInertia();
+        // Trace for debug
+        if (this.getTraceLevel() == 4) {
+            this.traceGroundInertia();
+            this.traceIntActions();
+            this.traceIntInitialState();
+            this.traceIntGoal();
+        }
     }
 
+    /**
+     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation
+     * using bit set.
+     */
     protected void finalization() {
         this.extractRelevantFluents();
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.extractRelevantNumericFluents(this.getIntActions());
-        //}
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.extractRelevantTasks();
-        //}
-
         this.initOfMapFluentIndex();
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.initMapOfNumericFluentIndex();
-        }
-
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.initRelevantOperators();
-        //    this.initMapOfTaskIndex();
-        //}
-
         this.finalizeGoal();
-
-        //if (this.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
-        //    this.finalizeInitialTaskNetwork();
-        //    this.finalizeMethods();
-        //}
-
         this.finalizeInitialState();
-        //if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-        //    this.finalizeInitialNumericFluent();
-        //}
-        //if (this.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
-        //    NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
-        //    this.getInitialState().addNumericFluent(duration);
-        //}
         this.finalizeActions();
+        // Trace for debug
+        if (this.getTraceLevel() == 5) {
+            this.traceRelevantFluents();
+            this.traceIntActions();
+            this.traceIntInitialState();
+            this.traceIntGoal();
+        }
     }
 
     /**

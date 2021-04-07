@@ -189,7 +189,7 @@ public class StateSpacePlannerFactory implements Serializable {
             .append("     9      min cost heuristic\n")
             .append("-i <num>    run-time information level (preset: 1)\n")
             .append("     0      nothing\n")
-            .append("     1      info on action number, search and search\n")
+            .append("     1      info on action number, search\n")
             .append("     2      1 + info on problem constants, types and predicates\n")
             .append("     3      1 + 2 + loaded operators, initial and goal state\n")
             .append("     4      1 + predicates and their inertia status\n")
@@ -357,7 +357,7 @@ public class StateSpacePlannerFactory implements Serializable {
      *      9      min cost heuristic
      * -i <i>num</i>   run-time information level (preset: 1)
      *      0      nothing
-     *      1      info on action number, search and search
+     *      1      info on action number
      *      2      1 + info on problem constants, types and predicates
      *      3      1 + 2 + loaded operators, initial and goal state
      *      4      1 + predicates and their inertia status
@@ -409,7 +409,7 @@ public class StateSpacePlannerFactory implements Serializable {
             // Creates the problem factory
             final ProblemFactory factory = ProblemFactory.getInstance();
             final int factoryTraceLevel = (traceLevel == 8) ? 0 : Math.max(0, traceLevel - 1);
-            factory.setTraceLevel(factoryTraceLevel);
+            factory.setTraceLevel(traceLevel);
 
             // Parses the PDDL domain and problem description
             long begin = System.currentTimeMillis();
@@ -442,7 +442,7 @@ public class StateSpacePlannerFactory implements Serializable {
 
                 if (traceLevel > 0 && traceLevel != 8) {
                     StringBuilder strb = new StringBuilder();
-                    strb.append("\nencoding problem done successfully (")
+                    strb.append("\nproblem instantiation done successfully (")
                         .append(planner.getStatistics().getNumberOfActions()).append(" ops, ")
                         .append(planner.getStatistics().getNumberOfRelevantFluents()).append(" facts)\n");
                     LOGGER.trace(strb);

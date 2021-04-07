@@ -41,7 +41,9 @@ import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
+import fr.uga.pddl4j.util.BitVector;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
@@ -268,12 +270,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             extractRelevantFluents(a.getPreconditions(), facts);
             extractRelevantFluents(a.getEffects(), facts);
         }
-        for (IntExpression p : this.getIntInitPredicates()) {
+        for (IntExpression p : this.getIntInitialState()) {
             Inertia inertia = this.getGroundInertia().get(p);
             if (inertia == null) {
                 inertia = Inertia.INERTIA;
             }
-            if (this.getIntInitPredicates().contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
+            if (this.getIntInitialState().contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
                 facts.add(p);
             }
         }
@@ -304,8 +306,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 if (inertia == null) {
                     inertia = Inertia.INERTIA;
                 }
-                if ((this.getIntInitPredicates().contains(exp) && !inertia.equals(Inertia.NEGATIVE))
-                    || (!this.getIntInitPredicates().contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
+                if ((this.getIntInitialState().contains(exp) && !inertia.equals(Inertia.NEGATIVE))
+                    || (!this.getIntInitialState().contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
                     facts.add(exp);
                 }
                 break;
@@ -593,9 +595,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final List<IntAction> normalisedActions = new ArrayList<>();
         this.toCNF(action.getEffects());
         this.simplify(action.getEffects());
-        final IntExpression precond = action.getPreconditions();
+        final IntExpression precond = new IntExpression(action.getPreconditions());
         this.toDNF(precond);
-        if (precond.getChildren().size() > 0) {
+        if (precond.getChildren().size() > 1) {
             for (final IntExpression ei : precond.getChildren()) {
                 final String name = action.getName();
                 final int arity = action.arity();
@@ -959,7 +961,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void finalizeInitialState() {
         this.initialState = new InitialState();
-        for (final IntExpression fact : this.getIntInitPredicates()) {
+        for (final IntExpression fact : this.getIntInitialState()) {
             switch (fact.getConnective()) {
                 case ATOM:
                     Integer i = this.mapOfFluentIndex.get(fact);
@@ -1116,7 +1118,34 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         return str.toString();
     }
 
+    /**
+     * Returns a string representation of a initial state.
+     *
+     * @param state the state.
+     * @return a string representation of the specified expression.
+     */
+    public String toString(final InitialState state) {
+        final StringBuilder str = new StringBuilder("(and");
+        final BitVector positive = state.getPositiveFluents();
+        for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append("\n");
+        }
+        final BitVector negative = state.getNegativeFluents();
+        for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+            str.append(" ");
+            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append("\n");
+        }
+        /*for (NumericVariable var : state.getNumericFluents()) {
+            str.append(" ");
+            str.append(this.toString(var));
+        }*/
 
+        str.append(")");
+        return str.toString();
+    }
 
     /**
      * Returns a string representation of a fluent.
@@ -1135,8 +1164,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append(")");
         return str.toString();
     }
-
-
 
     /**
      * Returns a short string representation of the specified operator, i.e., its name and its
@@ -1341,13 +1368,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * disjunctive preconditions, a new method is created such all methods after normalization have only conjunctive
      * precondition.
      *
-     * @param method the list of methods to normalizeActions.
+     * @param method the list of methods to normalized.
      */
     private List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
         final List<IntMethod> normalisedMethods = new ArrayList<>();
-        final IntExpression precond = method.getPreconditions();
+        final IntExpression precond = new IntExpression(method.getPreconditions());
         this.toDNF(precond);
-        if (precond.getChildren().size() > 0) {
+        if (precond.getChildren().size() > 1) {
             for (final IntExpression ei : precond.getChildren()) {
                 final String name = method.getName();
                 final int arity = method.arity();
@@ -1526,5 +1553,56 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("<==\n");
         return str.toString();
 
+    }
+
+    /**
+     * Print the list of the relevant fluents of the problem.
+     */
+    protected void traceRelevantFluents() {
+        StringBuilder str = new StringBuilder();
+        str.append("Table of relevant fluents:\n");
+        int index = 0;
+        for (Fluent fluent : this.getRelevantFluents()) {
+            str.append(index);
+            str.append(": ");
+            str.append(this.toString(fluent));
+            str.append(System.lineSeparator());
+            index++;
+        }
+    }
+
+    /**
+     * Print the list of the actions of the problem.
+     */
+    protected void printActions() {
+        StringBuilder str = new StringBuilder();
+        str.append("List of finalized actions:\n");
+        for (Action action : this.getActions()) {
+            str.append(this.toString(action));
+            str.append(System.lineSeparator());
+        }
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the goal of the problem.
+     */
+    protected void printGoal() {
+        StringBuilder str = new StringBuilder();
+        str.append("Goal :\n");
+        str.append(this.toString(this.getGoal()));
+        str.append(System.lineSeparator());
+        this.getLogger().trace(str);
+    }
+
+    /**
+     * Print the initial state of the problem.
+     */
+    protected void printInitialState() {
+        StringBuilder str = new StringBuilder();
+        str.append("Initial state :\n");
+        str.append(this.toString(this.getInitialState()));
+        str.append(System.lineSeparator());
+        this.getLogger().trace(str);
     }
 }
