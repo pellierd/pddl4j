@@ -17,13 +17,14 @@ package fr.uga.pddl4j.planners.htn.stn.tfd;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.*;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +71,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         // Create the root node of the search space
         final State init = new State(problem.getInitialState());
         final TFDNode root = new TFDNode(init, problem.getInitialTaskNetwork().getTasks());
-        //root.getState().getNegative().set(0, problem.getRelevantFluents().size());
+        //root.getState().getNegative().set(0, problem.getFluents().size());
         //root.getState().getNegative().andNot(root.getState().getPositive());
 
         // Add the root node to the list of the pending nodes to explore.
@@ -99,7 +100,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 System.out.println("\n=> Tasks to be excuted:");
                 System.out.println(currentNode.getTasks());
                 for (int i = 0; i < currentNode.getTasks().size(); i++) {
-                    System.out.println(problem.toString(problem.getRelevantTasks().get(currentNode.getTasks().get(i))));
+                    System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
             }
             // If the task network is empty we've got a solution
@@ -122,14 +123,14 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 // Get the current state of the search
                 final State state = currentNode.getState();
                 // Get the relevant operators, i.e., action or method that are relevant for this task.
-                final List<Integer> relevantOperators = problem.getRelevantOperators().get(task);
+                final List<Integer> relevantOperators = problem.getTaskResolvers().get(task);
                 // Case of primitive task
-                if (problem.getRelevantTasks().get(task).isPrimtive()) {
+                if (problem.getTasks().get(task).isPrimtive()) {
                     for (Integer operator : relevantOperators) {
                         final Action action = problem.getActions().get(operator);
                         if (debug) {
                             System.out.println("\n======> Try to decompose primitive tasks "
-                                + problem.toString(problem.getRelevantTasks().get(task)) + " with \n\n"
+                                + problem.toString(problem.getTasks().get(task)) + " with \n\n"
                                 + problem.toString(action));
                         }
                         if (state.satisfy(action.getPrecondition())) {
@@ -143,7 +144,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                                 System.out.println("=====> Decomposition succeeded push node:");
                                 System.out.println(problem.toString(childNode.getState()));
                                 for (int t : childNode.getTasks()) {
-                                    System.out.println(problem.toString(problem.getRelevantTasks().get(t)));
+                                    System.out.println(problem.toString(problem.getTasks().get(t)));
                                 }
                             }
                         } else {
@@ -164,7 +165,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                         final Method method = problem.getMethods().get(operator);
                         if (debug) {
                             System.out.println("\n======> Try to decompose compound tasks "
-                                + problem.toString(problem.getRelevantTasks().get(task)) + " with\n\n"
+                                + problem.toString(problem.getTasks().get(task)) + " with\n\n"
                                 + problem.toString(method));
                         }
                         if (state.satisfy(method.getPrecondition())) {
@@ -179,7 +180,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                                 System.out.println("=====>\n" + problem.toString(childNode.getState()));
                                 System.out.println("=====>\n");
                                 for (int t : childNode.getTasks()) {
-                                    System.out.println(problem.toString(problem.getRelevantTasks().get(t)));
+                                    System.out.println(problem.toString(problem.getTasks().get(t)));
                                 }
                             }
                         } else {
@@ -236,20 +237,17 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             System.exit(0);
         }
 
-        // Create an instance of the problem factory to parse and encode the domain and problem file
-        final ProblemFactory factory = ProblemFactory.getInstance();
-
         // Get the domain file and problem file and parse the hddl files.
-        File domain = (File) arguments.get(Planner.DOMAIN);
-        File problem = (File) arguments.get(Planner.PROBLEM);
-        ErrorManager errorManager = null;
+        final File domain = (File) arguments.get(Planner.DOMAIN);
+        final File problem = (File) arguments.get(Planner.PROBLEM);
+        final PDDLParser parser = new PDDLParser();
         try {
-            errorManager = factory.parse(domain, problem);
+            parser.parse(domain, problem);
         } catch (IOException e) {
             System.out.println("\nunexpected error when parsing the PDDL planning problem description.");
             System.exit(0);
         }
-
+        final ErrorManager errorManager = parser.getErrorManager();
         // Print the syntax errors if detected
         if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
             || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
@@ -263,17 +261,10 @@ public final class TFDPlanner extends AbstractSTNPlanner {
 
         // Encode the problem into compact representation
         final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
-        factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
-        HTNProblem pb = new HTNProblem(factory.getParser().getDomain(), factory.getParser().getProblem());
-        pb.instantiate(100);
-        /*ADLProblem pb =  null;
-        try {
-            pb = factory.encode();
-        } catch (OutOfMemoryError err) {
-            System.out.println("Out of memory during problem instantiation !");
-            System.exit(0);
-        }*/
+        HTNProblem pb = new HTNProblem(parser.getDomain(), parser.getProblem());
+        pb.instantiate(Level.ALL);
+
         long end = System.currentTimeMillis();
         final double encodingTime = (end - start) / 1000.0;
         System.out.print("\nEncoding ");
@@ -285,8 +276,8 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         System.out.println("problem done successfully ("
             + pb.getActions().size() + " actions, "
             + pb.getMethods().size() + " methods, "
-            + pb.getRelevantFluents().size() + " fluents, "
-            + pb.getRelevantTasks().size() + " tasks)\n");
+            + pb.getFluents().size() + " fluents, "
+            + pb.getTasks().size() + " tasks)\n");
 
         if (!pb.isTotallyOrederd()) {
             System.out.println("Unable to solve a problem that isn't totally ordered.\n");

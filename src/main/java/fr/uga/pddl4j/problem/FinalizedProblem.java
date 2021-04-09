@@ -43,7 +43,6 @@ import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
@@ -151,7 +150,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant fluents of the problem.
      */
-    public final List<Fluent> getRelevantFluents() {
+    public final List<Fluent> getFluents() {
         return this.relevantFluents;
     }
 
@@ -224,7 +223,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the relevant operators for a task.
      */
-    protected List<List<Integer>> getRelevantOperators() {
+    protected List<List<Integer>> getTaskResolvers() {
         return taskResolvers;
     }
 
@@ -501,8 +500,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             this.actions.add(this.finalizeAction(normalized.get(0)));
             for (int i  = 1; i < normalized.size(); i++) {
                 // update the index of the relevant action must push in the HTN problem class
-                if (this.getRelevantOperators() != null) {
-                    this.getRelevantOperators().get(actionIndex).add(actions.size() + addedActions.size());
+                if (this.getTaskResolvers() != null) {
+                    this.getTaskResolvers().get(actionIndex).add(actions.size() + addedActions.size());
                 }
                 addedActions.add(this.finalizeAction(normalized.get(i)));
             }
@@ -770,8 +769,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             }
             if (goals.size() > 1) {
                 // Create a new dummy fact to encode the goal
-                final int dummyPredicateIndex = this.getPredicateSymbols().size();
-                this.getPredicateSymbols().add(Constants.DUMMY_GOAL);
+                final int dummyPredicateIndex = this.getPredicates().size();
+                this.getPredicates().add(Constants.DUMMY_GOAL);
                 this.getPredicateSignatures().add(new ArrayList<>());
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
                 dummyGoal.setPredicate(dummyPredicateIndex);
@@ -1003,7 +1002,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
         for (int i = 0; i < action.arity(); i++) {
             final int index = action.getValueOfParameter(i);
-            final String type = this.getTypeSymbols().get(action.getTypeOfParameters(i));
+            final String type = this.getTypes().get(action.getTypeOfParameters(i));
             if (index == -1) {
                 str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
@@ -1016,7 +1015,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
+                str.append(this.getConstants().get(index));
                 str.append(" \n");
             }
         }
@@ -1044,13 +1043,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final BitSet positive = state.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ");
-            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append(this.toString(this.getFluents().get(j)));
             str.append("\n");
         }
         final BitSet negative = state.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ");
-            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(this.toString(this.getFluents().get(i)));
             str.append(")\n");
         }
         str.append(")");
@@ -1088,13 +1087,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final BitSet positive = state.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ");
-            str.append(this.toString(this.getRelevantFluents().get(j)));
+            str.append(this.toString(this.getFluents().get(j)));
             str.append("\n");
         }
         final BitSet negative = state.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ");
-            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(this.toString(this.getFluents().get(i)));
             str.append(")\n");
         }
         str.append(")");
@@ -1111,7 +1110,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final StringBuilder str = new StringBuilder("(and");
         for (int i = state.nextSetBit(0); i >= 0; i = state.nextSetBit(i + 1)) {
             str.append(" ");
-            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(this.toString(this.getFluents().get(i)));
             str.append("\n");
         }
         str.append(")");
@@ -1129,13 +1128,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final BitVector positive = state.getPositiveFluents();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
             str.append(" ");
-            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(this.toString(this.getFluents().get(i)));
             str.append("\n");
         }
         final BitVector negative = state.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" ");
-            str.append(this.toString(this.getRelevantFluents().get(i)));
+            str.append(this.toString(this.getFluents().get(i)));
             str.append("\n");
         }
         /*for (NumericVariable var : state.getNumericFluents()) {
@@ -1156,10 +1155,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     public String toString(final Fluent fluent) {
         final StringBuffer str = new StringBuffer();
         str.append("(");
-        str.append(this.getPredicateSymbols().get(fluent.getSymbol()));
+        str.append(this.getPredicates().get(fluent.getSymbol()));
         for (Integer arg : fluent.getArguments()) {
             str.append(" ");
-            str.append(this.getConstantSymbols().get(arg));
+            str.append(this.getConstants().get(arg));
         }
         str.append(")");
         return str.toString();
@@ -1181,7 +1180,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" ?");
             } else {
                 str.append(" ");
-                str.append(this.getConstantSymbols().get(index));
+                str.append(this.getConstants().get(index));
             }
         }
         return str.toString();
@@ -1275,7 +1274,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
     }
 
-    protected void initRelevantOperators() {
+    /**
+     * Init the resolvers for each tasks.
+     */
+    protected void initTaskResolvers() {
         this.taskResolvers = new ArrayList<>();
         for (Integer a : this.getRelevantActions()) {
             List<Integer> l = new ArrayList<>(1);
@@ -1304,8 +1306,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             List<IntMethod> normalized = this.normalizeMethod(intMethod);
             this.methods.add(this.finalizeMethod(normalized.get(0), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
             for (int i  = 1; i < normalized.size(); i++) {
-                if (this.getRelevantOperators() != null) {
-                    this.getRelevantOperators().get(methodIndex).add(methods.size() + addedMethods.size());
+                if (this.getTaskResolvers() != null) {
+                    this.getTaskResolvers().get(methodIndex).add(methods.size() + addedMethods.size());
                 }
                 this.methods.add(this.finalizeMethod(normalized.get(i), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
             }
@@ -1432,7 +1434,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Instantiations:\n");
         for (int i = 0; i < method.arity(); i++) {
             final int index = method.getValueOfParameter(i);
-            final String type = this.getTypeSymbols().get(method.getTypeOfParameters(i));
+            final String type = this.getTypes().get(method.getTypeOfParameters(i));
             if (index == -1) {
                 str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i).append(" - ");
@@ -1443,7 +1445,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
+                str.append(this.getConstants().get(index));
                 str.append(" \n");
             }
         }
@@ -1510,7 +1512,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append(this.getTaskSymbols().get(task.getSymbol()));
         for (Integer arg : task.getArguments()) {
             str.append(" ");
-            str.append(this.getConstantSymbols().get(arg));
+            str.append(this.getConstants().get(arg));
         }
         str.append(")");
         return str.toString();
@@ -1556,53 +1558,78 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Print the list of the relevant fluents of the problem.
+     * Returns a string representation of the internal data structure used during instantiation process.
+     *
+     * @param data the internal data structure.
+     * @return a string representation of the internal data structure used during instantiation process.
      */
-    protected void traceRelevantFluents() {
-        StringBuilder str = new StringBuilder();
-        str.append("Table of relevant fluents:\n");
-        int index = 0;
-        for (Fluent fluent : this.getRelevantFluents()) {
-            str.append(index);
-            str.append(": ");
-            str.append(this.toString(fluent));
-            str.append(System.lineSeparator());
-            index++;
+    protected String toString(final Data data) {
+        final StringBuilder str = new StringBuilder();
+        switch (data) {
+            case FLUENTS:
+                int index = 0;
+                for (Fluent fluent : this.getFluents()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(this.toString(fluent));
+                    str.append(System.lineSeparator());
+                    index++;
+                }
+                break;
+            case ACTIONS:
+                for (Action action : this.getActions()) {
+                    str.append(this.toString(action));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case METHODS:
+                for (Method method : this.getMethods()) {
+                    str.append(this.toString(method));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case GOAL:
+                str.append(this.toString(this.getGoal()));
+                str.append(System.lineSeparator());
+                break;
+            case INITIAL_STATE:
+                str.append(this.toString(this.getInitialState()));
+                str.append(System.lineSeparator());
+                break;
+            case INITIAL_TASK_NETWORK:
+                str.append(this.toString(this.getInitialTaskNetwork()));
+                str.append(System.lineSeparator());
+                break;
+            case TASKS:
+                index = 0;
+                for (Task task : this.getRelevantTasks()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(this.toString(task));
+                    if (task.isPrimtive()) {
+                        str.append(" : primitive");
+                    } else {
+                        str.append(" : compound");
+                    }
+                    str.append(System.lineSeparator());
+                    index++;
+                }
+                break;
+            case TASK_RESOLVERS:
+                for (int i = 0; i < this.getTaskResolvers().size(); i++) {
+                    str.append(i).append(": ");
+                    str.append(this.toString(this.getRelevantTasks().get(i)));
+                    str.append(":");
+                    List<Integer> resolvers = this.getTaskResolvers().get(i);
+                    for (int j = 0; j < resolvers.size(); j++) {
+                        str.append(" ").append(resolvers.get(j));
+                    }
+                    str.append("\n");
+                }
+                break;
+            default:
+                return super.toString(data);
         }
-    }
-
-    /**
-     * Print the list of the actions of the problem.
-     */
-    protected void printActions() {
-        StringBuilder str = new StringBuilder();
-        str.append("List of finalized actions:\n");
-        for (Action action : this.getActions()) {
-            str.append(this.toString(action));
-            str.append(System.lineSeparator());
-        }
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the goal of the problem.
-     */
-    protected void printGoal() {
-        StringBuilder str = new StringBuilder();
-        str.append("Goal :\n");
-        str.append(this.toString(this.getGoal()));
-        str.append(System.lineSeparator());
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the initial state of the problem.
-     */
-    protected void printInitialState() {
-        StringBuilder str = new StringBuilder();
-        str.append("Initial state :\n");
-        str.append(this.toString(this.getInitialState()));
-        str.append(System.lineSeparator());
-        this.getLogger().trace(str);
+        return str.toString();
     }
 }

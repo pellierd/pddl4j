@@ -3,7 +3,11 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
- * Created by pellier on 10/11/2020.
+ * This class implements a goal, i.e., a set of positives and negative fluents.
+ *
+ * @author D. Pellier
+ * @version 1.0 - 28.04.2020
+ * @since 4.0
  */
 public class Goal extends Condition {
 

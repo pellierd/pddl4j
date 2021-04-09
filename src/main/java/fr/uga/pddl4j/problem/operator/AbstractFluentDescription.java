@@ -107,4 +107,14 @@ public abstract class AbstractFluentDescription implements FluentDescription {
         return this.positive.cardinality() + this.negative.cardinality();
     }
 
+    /**
+     * Returns if this abstract fluent description is consistent. A fluent description is consistent a fluent is at the
+     * same postive and negative.
+     *
+     * @return <code>true</code> if this abstract fluent description is consistent <code>false</code> otherwise.
+     */
+    public final boolean isConsistent() {
+        return !this.getPositiveFluents().intersects(this.getNegativeFluents());
+    }
+
 }

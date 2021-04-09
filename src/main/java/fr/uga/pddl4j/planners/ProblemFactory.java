@@ -22,6 +22,7 @@ import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -129,8 +130,7 @@ public class ProblemFactory {
         final PDDLDomain domain = this.parser.getDomain();
         final PDDLProblem problem = this.parser.getProblem();
         ADLProblem pb = new ADLProblem(domain, problem);
-        pb.setTraceLevel(this.getTraceLevel());
-        pb.instantiate();
+        pb.instantiate(Level.ALL);
         return pb;
     }
 

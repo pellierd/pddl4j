@@ -24,6 +24,7 @@ import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Effect;
+import org.apache.logging.log4j.Level;
 
 import java.io.Serializable;
 import java.util.List;
@@ -36,11 +37,6 @@ import java.util.Set;
  * @version 4.0 - 26.11.2020
  */
 public interface Problem extends Serializable {
-
-    /**
-     * The default log level.
-     */
-    static final int DEFAULT_TRACE_LEVEL = 0;
 
     /**
      * Returns the PDDL domain of the problem.
@@ -75,7 +71,7 @@ public interface Problem extends Serializable {
      *
      * @return the list of the type symbols of the problem.
      */
-    List<String> getTypeSymbols();
+    List<String> getTypes();
 
     /**
      * Returns the domains for each type of the problem.
@@ -89,14 +85,14 @@ public interface Problem extends Serializable {
      *
      * @return the list of constant symbols of the problem.
      */
-    List<String> getConstantSymbols();
+    List<String> getConstants();
 
     /**
      * Returns the list of predicate symbols of the problem.
      *
      * @return the list predicate symbols of the problem.
      */
-    List<String> getPredicateSymbols();
+    List<String> getPredicates();
 
     /**
      * Returns the signatures of the predicates defined in the problem.
@@ -110,7 +106,7 @@ public interface Problem extends Serializable {
      *
      * @return the list of relevant fluents used the problem.
      */
-    List<Fluent> getRelevantFluents();
+    List<Fluent> getFluents();
 
     /**
      * Returns the list of instantiated actions of the problem.
@@ -148,18 +144,11 @@ public interface Problem extends Serializable {
     void instantiate();
 
     /**
-     * Set the trace level of the instantiation of the instantiation process.
+     * Instantiate the problem.
      *
-     * @param level the trace level of the instantiation.
+     * @param level the log level.
      */
-    void setTraceLevel(final int level);
-
-    /**
-     * Returns the trace level of instantiation process.
-     *
-     * @return the trace level of instantiation process.
-     */
-    int getTraceLevel();
+    void instantiate(final Level level);
 
     /**
      * Returns a string representation of a specified operator.

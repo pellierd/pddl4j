@@ -66,4 +66,12 @@ public interface FluentDescription extends Serializable {
      */
     int cardinality();
 
+    /**
+     * Returns if this abstract fluent description is consistent. A fluent description is consistent a fluent is at the
+     * same postive and negative.
+     *
+     * @return <code>true</code> if this abstract fluent description is consistent <code>false</code> otherwise.
+     */
+    boolean isConsistent();
+
 }

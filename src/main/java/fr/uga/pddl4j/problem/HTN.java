@@ -43,11 +43,11 @@ public interface HTN extends Problem {
     List<List<Integer>> getTaskSignatures();
 
     /**
-     * Returns the relevant operators for a task.
+     * Returns the relevant operators or resolver for a task.
      *
-     * @return the relevant operators for a task.
+     * @return the relevant operators or resolver for a task.
      */
-    List<List<Integer>> getRelevantOperators();
+    List<List<Integer>> getTaskResolvers();
 
     /**
      * Returns the initial task network of the problem.
@@ -61,7 +61,7 @@ public interface HTN extends Problem {
      *
      * @return the list of relevant tasks of the problem.
      */
-    List<Task> getRelevantTasks();
+    List<Task> getTasks();
 
     /**
      * Returns the list of instantiated methods of the problem.

@@ -56,7 +56,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain the domain.
+     * @param domain  the domain.
      * @param problem the problem.
      */
     public PostInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
@@ -86,7 +86,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     /**
      * Do a pass over the effects of a specified list of instantiated actions and update the ground
      * inertia table.
-     *
      */
     protected void extractGroundInertia() {
         this.groundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
@@ -97,7 +96,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
     /**
      * Simplify a specified goal expression based on the ground inertia information.
-     *
      */
     protected void simplifyGoalWithGroundInertia() {
         this.simplifyWithGroundInertia(this.getIntGoal(), false);
@@ -465,7 +463,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     /**
      * Simplify a specified expression based on the ground inertia information.
      *
-     *
      * @param exp    the expression to simply.
      * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
@@ -665,7 +662,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     }
 
 
-
     /**
      * Do a pass over the preconditions of all the instantiated methods and update the ground inertia
      * table. Then, simplify the methods according to the extracted ground inertia.
@@ -776,22 +772,29 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     }
 
     /**
-     * Print the table of ground inertia.
+     * Returns a string representation of the internal data structure used during instantiation process.
+     *
+     * @param data the internal data structure.
+     * @return a string representation of the internal data structure used during instantiation process.
      */
-    final protected void traceGroundInertia() {
+    protected String toString(final Data data) {
         final StringBuilder str = new StringBuilder();
-        str.append("Ground inertia table:\n");
-        int i = 0;
-        for (Map.Entry<IntExpression, Inertia> e : this.getGroundInertia().entrySet()) {
-            str.append(i);
-            str.append(": ");
-            str.append(this.toString(e.getKey()));
-            str.append(" : ");
-            str.append(e.getValue());
-            str.append(System.lineSeparator());
-            i++;
+        switch (data) {
+            case GROUND_INERTIA:
+                int i = 0;
+                for (Map.Entry<IntExpression, Inertia> e : this.getGroundInertia().entrySet()) {
+                    str.append(i);
+                    str.append(": ");
+                    str.append(this.toString(e.getKey()));
+                    str.append(" : ");
+                    str.append(e.getValue());
+                    str.append(System.lineSeparator());
+                    i++;
+                }
+                break;
+            default:
+                return super.toString(data);
         }
-        str.append(System.lineSeparator());
-        this.getLogger().trace(str);
+        return str.toString();
     }
 }

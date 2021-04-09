@@ -109,7 +109,7 @@ public class JsonAdapter implements Serializable {
                 for (int j = 0; j < action.arity(); j++) {
                     final int index = action.getValueOfParameter(j);
                     if (index != -1) {
-                        parameters.add(this.problem.getConstantSymbols().get(index));
+                        parameters.add(this.problem.getConstants().get(index));
                     }
                 }
 
@@ -196,12 +196,12 @@ public class JsonAdapter implements Serializable {
 
         final BitSet positive = exp.getPositiveFluents();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
+            fluentsPos.add(this.problem.toString(this.problem.getFluents().get(i)));
         }
 
         final BitSet negative = exp.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
+            fluentsNeg.add(this.problem.toString(this.problem.getFluents().get(i)));
         }
 
         fluents.add(fluentsPos);
@@ -222,12 +222,12 @@ public class JsonAdapter implements Serializable {
 
         final BitSet positive = exp.getPositiveFluents();
         for (int i = positive.nextSetBit(0); i >= 0; i = positive.nextSetBit(i + 1)) {
-            fluentsPos.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
+            fluentsPos.add(this.problem.toString(this.problem.getFluents().get(i)));
         }
 
         final BitSet negative = exp.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            fluentsNeg.add(this.problem.toString(this.problem.getRelevantFluents().get(i)));
+            fluentsNeg.add(this.problem.toString(this.problem.getFluents().get(i)));
         }
 
         fluents.add(fluentsPos);

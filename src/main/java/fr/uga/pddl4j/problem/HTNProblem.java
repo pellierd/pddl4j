@@ -43,8 +43,8 @@ public class HTNProblem extends AbstractHTNProblem {
     /**
      * This method is called by the
      */
+    @Override
     protected void initialization() {
-
         // Standardize the variables symbol contained in the domain
         this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
@@ -56,28 +56,66 @@ public class HTNProblem extends AbstractHTNProblem {
         this.initConstants();
         // Collect the either types of the domain
         this.initEitherTypes();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Types declared:\n"
+                + this.toString(Data.TYPES) + "\n");
+            this.getLogger().debug("Constants declared in the problem:\n"
+                + this.toString(Data.CONSTANT_SYMBOLS) + "\n");
+        }
+
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Predicates declared:\n"
+                + this.toString(Data.PREDICATE_SIGNATURES) + "\n");
+        }
 
         // Collect the tasks information (symbols and signatures)
         this.initTasks();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Tasks declared:\n"
+                + this.toString(Data.TASK_SIGNATURES) + "\n");
+        }
 
+        // Init the list of primitive task symbols
         this.initPrimitiveTaskSymbols();
-
-        this.initCompundTaskSymbols();
+        // Init the list of compound task symbols
+        this.initCompoundTaskSymbols();
 
         // Encode the actions of the domain into integer representation
         this.initActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions declared:\n\n"
+                + this.toString(Data.INT_ACTIONS));
+        }
 
         // Encode the methods of the domain into integer representation
         this.initMethods();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Methods declared:\n\n"
+                + this.toString(Data.INT_METHODS));
+        }
 
         // Encode the initial state in integer representation
         this.initInitialState();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial state declared :\n"
+                + this.toString(Data.INT_INITIAL_STATE) + "\n");
+        }
+
+        // Encode the initial task network
+        this.initInitialTaskNetwork();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial task network declared:\n"
+                + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
+        }
+
         // Encode the goal in integer representation
         this.initGoal();
-
-        this.initInitialTaskNetwork();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal declared:\n"
+                + this.toString(Data.INT_GOAL) + "\n");
+        }
     }
 
     /**
@@ -88,6 +126,10 @@ public class HTNProblem extends AbstractHTNProblem {
     @Override
     protected void preinstantiation() {
         this.extractInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Inertia detected:\n"
+                + this.toString(Data.INERTIA) + "\n");
+        }
         // Create the predicates tables used to count the occurrences of the predicates in the initial state/
         this.createPredicatesTables();
     }
@@ -97,8 +139,7 @@ public class HTNProblem extends AbstractHTNProblem {
      */
     @Override
     protected void instantiation() {
-        this.instantiateActions();
-        this.instantiateGoal();
+        super.instantiation();
     }
 
     /**
@@ -108,12 +149,23 @@ public class HTNProblem extends AbstractHTNProblem {
      */
     @Override
     protected void postinstantiation() {
-        this.extractGroundInertia();
-        this.simplyActionsWithGroundInertia();
-        this.simplifyGoalWithGroundInertia();
+        super.postinstantiation();
         this.instantiateInitialTaskNetwork();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial tasknetwork instantiated:\n"
+                + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
+        }
+
         this.instantiateMethods();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Methods instantiated:\n\n"
+                + this.toString(Data.INT_METHODS));
+        }
         this.simplyMethodsWithGroundInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Methods simplified based on ground inertia:\n\n"
+                + this.toString(Data.INT_METHODS));
+        }
     }
 
     /**
@@ -123,15 +175,52 @@ public class HTNProblem extends AbstractHTNProblem {
     @Override
     protected void finalization() {
         this.extractRelevantFluents();
-        this.extractRelevantTasks();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Relevant fluents:\n"
+                + this.toString(Data.FLUENTS) + "\n");
+        }
         this.initOfMapFluentIndex();
-        this.initRelevantOperators();
-        this.initMapOfTaskIndex();
-        this.finalizeGoal();
-        this.finalizeInitialTaskNetwork();
-        this.finalizeMethods();
-        this.finalizeInitialState();
         this.finalizeActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions:\n\n"
+                + this.toString(Data.ACTIONS) + "\n");
+        }
+        this.extractRelevantTasks();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Relevant tasks:\n"
+                + this.toString(Data.TASKS) + "\n");
+        }
+
+        this.initTaskResolvers();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Task resolvers:\n\n"
+                + this.toString(Data.TASK_RESOLVERS) + "\n");
+        }
+
+        this.initMapOfTaskIndex();
+        this.finalizeMethods();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Methods:\n\n"
+                + this.toString(Data.METHODS) + "\n");
+        }
+
+        this.finalizeInitialState();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial state:\n"
+                + this.toString(Data.INITIAL_STATE) + "\n");
+        }
+
+        this.finalizeInitialTaskNetwork();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial tasknetwork:\n"
+                + this.toString(Data.INITIAL_TASK_NETWORK));
+        }
+
+        this.finalizeGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal:\n"
+                + this.toString(Data.GOAL));
+        }
     }
 
     /**

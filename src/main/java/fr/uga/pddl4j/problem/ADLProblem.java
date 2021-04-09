@@ -63,6 +63,7 @@ public class ADLProblem extends FinalizedProblem {
      * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
      * network of the problem into compact int representation.
      */
+    @Override
     protected void initialization() {
 
         // Standardize the variables symbol contained in the domain
@@ -79,27 +80,41 @@ public class ADLProblem extends FinalizedProblem {
         this.initConstants();
         // Collect the either types of the domain
         this.initEitherTypes();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Types declared:\n"
+                + this.toString(Data.TYPES) + "\n");
+            this.getLogger().debug("Constants declared in the problem:\n"
+                + this.toString(Data.CONSTANT_SYMBOLS) + "\n");
+        }
 
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Predicates declared:\n"
+                + this.toString(Data.PREDICATE_SIGNATURES) + "\n");
+        }
 
         // Encode the actions of the domain into integer representation
         this.initActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions declared:\n\n"
+                + this.toString(Data.INT_ACTIONS));
+        }
 
         // Encode the initial state in integer representation
         this.initInitialState();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial state declared :\n"
+                + this.toString(Data.INT_INITIAL_STATE) + "\n");
+        }
 
         // Encode the goal in integer representation
         this.initGoal();
-
-        // Print trace level
-        if (this.getTraceLevel() == 1) {
-            this.traceTypes();
-            this.traceConstants();
-            this.traceIntActions();
-            this.traceIntInitialState();
-            this.traceIntGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal declared:\n"
+                + this.toString(Data.INT_GOAL) + "\n");
         }
+
     }
 
     /**
@@ -107,40 +122,43 @@ public class ADLProblem extends FinalizedProblem {
      * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
      * be triggered.
      */
+    @Override
     protected void preinstantiation() {
         // Extract the inertia from the list of actions
         this.extractInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Inertia detected:\n"
+                + this.toString(Data.INERTIA) + "\n");
+        }
         // Infer the type from the unary inertia
         if (!this.getRequirements().contains(PDDLRequireKey.TYPING)) {
             this.inferTypesFromInertia();
             this.simplifyActionsWithInferredTypes();
+            if (this.getLogger().isDebugEnabled()) {
+                this.getLogger().debug("Actions with inferred types:\n\n"
+                    + this.toString(Data.INT_ACTIONS) + "\n");
+            }
         }
         // Create the predicates tables used to count the occurrences of the predicates in the
         // initial state
         this.createPredicatesTables();
-        // Trace for debug
-        if (this.getTraceLevel() == 2) {
-            this.traceTypes();
-            this.traceConstants();
-            this.traceInertia();
-            this.traceIntActions();
-            this.traceIntInitialState();
-            this.traceIntGoal();
-        }
     }
 
     /**
      * This methods carries out the instantiation of the planning operators and the goal of the problem in to actions.
      */
+    @Override
     protected void instantiation() {
         // Instantiate the actions and the goal
         this.instantiateActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions instantiated:\n\n"
+                + this.toString(Data.INT_ACTIONS) + "\n");
+        }
         this.instantiateGoal();
-        // Trace for debug
-        if (this.getTraceLevel() == 3) {
-            this.traceIntActions();
-            this.traceIntInitialState();
-            this.traceIntGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal instantiated:\n"
+                + this.toString(Data.INT_GOAL) + "\n");
         }
     }
 
@@ -149,17 +167,23 @@ public class ADLProblem extends FinalizedProblem {
      * the actions instantiated based on static properties based on the initial state information of the problem in
      * order to prune the actions that can never be triggered.
      */
+    @Override
     protected void postinstantiation() {
         // Extract the ground inertia and simplify the actions and the goal
         this.extractGroundInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Ground inertia detected:\n\n"
+                + this.toString(Data.GROUND_INERTIA) + "\n");
+        }
         this.simplyActionsWithGroundInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions simplified base on ground intertia detected:\n\n"
+                + this.toString(Data.INT_ACTIONS) + "\n");
+        }
         this.simplifyGoalWithGroundInertia();
-        // Trace for debug
-        if (this.getTraceLevel() == 4) {
-            this.traceGroundInertia();
-            this.traceIntActions();
-            this.traceIntInitialState();
-            this.traceIntGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal simplified base on ground intertia detected:\n"
+                + this.toString(Data.INT_GOAL) + "\n");
         }
     }
 
@@ -169,17 +193,27 @@ public class ADLProblem extends FinalizedProblem {
      */
     protected void finalization() {
         this.extractRelevantFluents();
-        this.initOfMapFluentIndex();
-        this.finalizeGoal();
-        this.finalizeInitialState();
-        this.finalizeActions();
-        // Trace for debug
-        if (this.getTraceLevel() == 5) {
-            this.traceRelevantFluents();
-            this.traceIntActions();
-            this.traceIntInitialState();
-            this.traceIntGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Relevant fluents:\n"
+                + this.toString(Data.FLUENTS) + "\n");
         }
+        this.initOfMapFluentIndex();
+        this.finalizeActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions:\n\n"
+                + this.toString(Data.ACTIONS) + "\n");
+        }
+        this.finalizeInitialState();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial state:\n"
+                + this.toString(Data.INITIAL_STATE) + "\n");
+        }
+        this.finalizeGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal:\n"
+                + this.toString(Data.GOAL) + "\n");
+        }
+
     }
 
     /**
@@ -197,5 +231,6 @@ public class ADLProblem extends FinalizedProblem {
     public boolean isSolvable() {
         return this.getGoal() != null;
     }
+
 
 }

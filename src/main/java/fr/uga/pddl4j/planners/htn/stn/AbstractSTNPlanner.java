@@ -81,9 +81,9 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
      * @param problem the planning problem
      */
     private void initTasksCosts(HTNProblem problem) {
-        this.costs = new int[problem.getRelevantOperators().size()];
+        this.costs = new int[problem.getTaskResolvers().size()];
         Arrays.fill(this.costs, -1);
-        for (int i = 0; i < problem.getRelevantTasks().size(); i++) {
+        for (int i = 0; i < problem.getTasks().size(); i++) {
             Set<Integer> closed =  new HashSet<Integer>();
             cost(i, problem, closed);
         }
@@ -101,11 +101,11 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         closed.add(task);
         if (this.costs[task] != -1) {
             return this.costs[task];
-        } else if (problem.getRelevantTasks().get(task).isPrimtive()) {
+        } else if (problem.getTasks().get(task).isPrimtive()) {
             this.costs[task] = 1;
             return 1;
         } else {
-            List<Integer> relevant = problem.getRelevantOperators().get(task);
+            List<Integer> relevant = problem.getTaskResolvers().get(task);
             int max = java.lang.Integer.MIN_VALUE;
             for (int i = 0; i < relevant.size(); i++) {
                 Method m = problem.getMethods().get(relevant.get(i));
@@ -224,7 +224,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
 
         while (!open.isEmpty()) {
             final Node tmpn = open.removeFirst();
-            if (!problem.getRelevantTasks().get(tmpn.task).isPrimtive()) {
+            if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
                 final Method method = methods.removeFirst();
                 final Integer task = method.getTask();
                 tmpn.tasksynonym = taskDictionary.get(task).removeFirst();
@@ -277,7 +277,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
                     hierarchy.getRootTasks().add(child.tasksynonym);
                 }
             } else {
-                if (!problem.getRelevantTasks().get(tmpn.task).isPrimtive()) {
+                if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
                     hierarchy.getCounpoudTasks().put(tmpn.tasksynonym, tmpn.method);
                     List<Integer> decomposition = new ArrayList<>();
                     hierarchy.getDecomposition().put(tmpn.tasksynonym, decomposition);

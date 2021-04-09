@@ -93,8 +93,8 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
      *
      * @return the relevant operators for a task.
      */
-    public List<List<Integer>> getRelevantOperators() {
-        return super.getRelevantOperators();
+    public List<List<Integer>> getTaskResolvers() {
+        return super.getTaskResolvers();
     }
 
     /**
@@ -109,7 +109,7 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
     /**
      * The list of relevant tasks of the problem.
      */
-    public List<Task> getRelevantTasks() {
+    public List<Task> getTasks() {
         return super.getRelevantTasks();
     }
 

@@ -390,10 +390,10 @@ public abstract class Tools {
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
                         System.out.println(" * PDDLProblem encoded (" + pb.getActions().size() + " actions, "
-                            + pb.getRelevantFluents().size() + " fluents) is solvable.");
+                            + pb.getFluents().size() + " fluents) is solvable.");
                     } else {
                         System.out.println(" * PDDLProblem encoded (" + pb.getActions().size() + " actions, "
-                            + pb.getRelevantFluents().size() + " fluents) is not solvable.");
+                            + pb.getFluents().size() + " fluents) is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
@@ -486,10 +486,10 @@ public abstract class Tools {
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
                         System.out.println(" * HDDLProblem encoded (" + pb.getActions().size() + " actions, "
-                            + pb.getRelevantFluents().size() + " fluents) is solvable.");
+                            + pb.getFluents().size() + " fluents) is solvable.");
                     } else {
                         System.out.println(" * HDDLProblem encoded (" + pb.getActions().size() + " actions, "
-                            + pb.getRelevantFluents().size() + " fluents) is not solvable.");
+                            + pb.getFluents().size() + " fluents) is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");

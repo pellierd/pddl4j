@@ -28,13 +28,7 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
-import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
-import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
-import fr.uga.pddl4j.problem.operator.IntMethod;
-import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
-import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
-import org.apache.logging.log4j.LogManager;
+import fr.uga.pddl4j.problem.operator.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -45,8 +39,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.apache.logging.log4j.core.config.Configurator;
 
 /**
  * This class contains all the methods needed to encode the a planning problem into int representation before
@@ -56,6 +52,11 @@ import org.apache.logging.log4j.Logger;
  * @version 4.0 - 04.12.2020
  */
 public abstract class AbstractProblem implements Problem {
+
+    /**
+     * The default log level.
+     */
+    private static final Level DEFAULT_LOG_LEVEL = Level.OFF;
 
     /**
      * The logger of the class.
@@ -168,11 +169,6 @@ public abstract class AbstractProblem implements Problem {
     private IntTaskNetwork intInitialTaskNetwork;
 
     /**
-     * The log level of the instnatiation process.
-     */
-    private int logLevel;
-
-    /**
      * The empty constructor to block the default constructor of object.
      */
     private AbstractProblem() {
@@ -189,9 +185,13 @@ public abstract class AbstractProblem implements Problem {
         this();
         this.domain = domain;
         this.problem = problem;
-        this.logLevel = Problem.DEFAULT_TRACE_LEVEL;
     }
 
+    /**
+     * Returns the logger of the problem.
+     *
+     * @return the logger of the problem.
+     */
     protected Logger getLogger() {
         return this.logger;
     }
@@ -227,7 +227,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the list of the type symbols of the problem.
      */
-    public final List<String> getTypeSymbols() {
+    public final List<String> getTypes() {
         return this.typeSymbols;
     }
 
@@ -245,7 +245,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the list of constant symbols of the problem.
      */
-    public final List<String> getConstantSymbols() {
+    public final List<String> getConstants() {
         return this.constantSymbols;
     }
 
@@ -254,7 +254,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the list predicate symbols of the problem.
      */
-    public final List<String> getPredicateSymbols() {
+    public final List<String> getPredicates() {
         return this.predicateSymbols;
     }
 
@@ -321,14 +321,24 @@ public abstract class AbstractProblem implements Problem {
         return this.compoundTaskSymbols;
     }
 
-    /**
-     * Returns the logger of the class
-     */
+
     /**
      * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
      * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
      */
-    public void instantiate() {
+    public final void instantiate() {
+        instantiate(AbstractProblem.DEFAULT_LOG_LEVEL);
+
+    }
+
+    /**
+     * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
+     * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
+     *
+     * @param level the log level.
+     */
+    public final void instantiate(final Level level) {
+        Configurator.setLevel(logger.getName(), level);
         this.initialization();
         this.preinstantiation();
         this.instantiation();
@@ -368,24 +378,6 @@ public abstract class AbstractProblem implements Problem {
      * bit set.
      */
     protected abstract void finalization();
-
-    /**
-     * Set the log level of the instantiation of the instantiation process.
-     *
-     * @param level the log level of the instantiation.
-     */
-    final public void setTraceLevel(final int level) {
-        this.logLevel = level;
-    }
-
-    /**
-     * Returns the log level of instantiation process.
-     *
-     * @return the log level of instantiation process.
-     */
-    final public int getTraceLevel() {
-        return this.logLevel;
-    }
 
     /**
      * Init the list of requirement of the problem.
@@ -691,7 +683,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Initializes the compound task symbols from the methods of the domain.
      */
-    protected void initCompundTaskSymbols() {
+    protected void initCompoundTaskSymbols() {
         this.compoundTaskSymbols = new LinkedHashSet<>();
         for (PDDLMethod m : this.getPDDLDomain().getMethods()) {
             this.compoundTaskSymbols.add(m.getTask().getAtom().get(0).getImage());
@@ -832,7 +824,7 @@ public abstract class AbstractProblem implements Problem {
         for (int i = 0; i < action.getArity(); i++) {
             final PDDLTypedSymbol parameter = action.getParameters().get(i);
             final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTypeSymbols().indexOf(typeImage);
+            final int type = this.getTypes().indexOf(typeImage);
             intAction.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
@@ -870,7 +862,7 @@ public abstract class AbstractProblem implements Problem {
         for (int i = 0; i < method.getArity(); i++) {
             final PDDLTypedSymbol parameter = method.getParameters().get(i);
             final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTypeSymbols().indexOf(typeImage);
+            final int type = this.getTypes().indexOf(typeImage);
             intMeth.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
@@ -946,7 +938,7 @@ public abstract class AbstractProblem implements Problem {
         for (int i = 0; i < numberOfParameters; i++) {
             final PDDLTypedSymbol parameter = taskNetwork.getParameters().get(i);
             final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTypeSymbols().indexOf(typeImage);
+            final int type = this.getTypes().indexOf(typeImage);
             this.intInitialTaskNetwork.setTypeOfParameter(i, type);
             variables.add(parameter.getImage());
         }
@@ -1067,7 +1059,7 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args[i] = this.getConstants().indexOf(argument.getImage());
                     }
                 }
                 intExp.setArguments(args);
@@ -1081,21 +1073,21 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args[i - 1] = this.getConstants().indexOf(argument.getImage());
                     }
                 }
                 intExp.setArguments(args);
                 break;
             case ATOM:
                 final String predicate = exp.getAtom().get(0).getImage();
-                intExp.setPredicate(this.getPredicateSymbols().indexOf(predicate));
+                intExp.setPredicate(this.getPredicates().indexOf(predicate));
                 args = new int[exp.getAtom().size() - 1];
                 for (int i = 1; i < exp.getAtom().size(); i++) {
                     final PDDLSymbol argument = exp.getAtom().get(i);
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args[i - 1] = this.getConstants().indexOf(argument.getImage());
                     }
                 }
                 intExp.setArguments(args);
@@ -1111,7 +1103,7 @@ public abstract class AbstractProblem implements Problem {
                 final List<String> newVariables = new ArrayList<>(variables);
                 final List<PDDLTypedSymbol> qvar = exp.getVariables();
                 final String type = this.toStringType(qvar.get(0).getTypes());
-                int typeIndex = this.getTypeSymbols().indexOf(type);
+                int typeIndex = this.getTypes().indexOf(type);
                 intExp.setType(typeIndex);
                 intExp.setVariable(-variables.size() - 1);
                 newVariables.add(qvar.get(0).getImage());
@@ -1183,7 +1175,7 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                         args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
                     } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args[i - 1] = this.getConstants().indexOf(argument.getImage());
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
@@ -1209,7 +1201,7 @@ public abstract class AbstractProblem implements Problem {
         str.append("Instantiations:\n");
         for (int i = 0; i < action.arity(); i++) {
             final int index = action.getValueOfParameter(i);
-            final String type = this.getTypeSymbols().get(action.getTypeOfParameters(i));
+            final String type = this.getTypes().get(action.getTypeOfParameters(i));
             if (index == -1) {
                 str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
@@ -1222,7 +1214,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstantSymbols().get(index)).append(" \n");
+                str.append(this.getConstants().get(index)).append(" \n");
             }
         }
         if (action.isDurative()) {
@@ -1252,7 +1244,7 @@ public abstract class AbstractProblem implements Problem {
         str.append("Instantiations:\n");
         for (int i = 0; i < method.arity(); i++) {
             final int index = method.getValueOfParameter(i);
-            final String type = this.getTypeSymbols().get(method.getTypeOfParameters(i));
+            final String type = this.getTypes().get(method.getTypeOfParameters(i));
             if (index == -1) {
                 str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
@@ -1264,7 +1256,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
+                str.append(this.getConstants().get(index));
                 str.append(" \n");
             }
         }
@@ -1283,6 +1275,22 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
+     * Returns a  string representation of the specified operator
+     *
+     * @param operator  the operator.
+     * @return a string representation of the specified operator.
+     */
+    protected String toString(final AbstractIntOperator operator) {
+        final StringBuilder str = new StringBuilder();
+        if (operator instanceof IntAction) {
+            str.append(this.toString((IntAction) operator));
+        } else if (operator instanceof IntMethod) {
+            str.append(this.toString((IntMethod) operator));
+        }
+        return str.toString();
+    }
+
+    /**
      * Returns a string representation of the specified task network.
      *
      * @param taskNetwork the task network to print.
@@ -1293,7 +1301,7 @@ public abstract class AbstractProblem implements Problem {
         str.append("Parameters:\n");
         for (int i = 0; i < taskNetwork.arity(); i++) {
             final int index = taskNetwork.getValueOfParameter(i);
-            final String type = this.getTypeSymbols().get(taskNetwork.getTypeOfParameters(i));
+            final String type = this.getTypes().get(taskNetwork.getTypeOfParameters(i));
             if (index == -1) {
                 str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
@@ -1305,7 +1313,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
+                str.append(this.getConstants().get(index));
                 str.append(" \n");
             }
         }
@@ -1351,13 +1359,13 @@ public abstract class AbstractProblem implements Problem {
         switch (exp.getConnective()) {
             case ATOM:
                 str.append("(");
-                str.append(this.getPredicateSymbols().get(exp.getPredicate()));
+                str.append(this.getPredicates().get(exp.getPredicate()));
                 int[] args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
                         str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" ").append(this.getConstantSymbols().get(index));
+                        str.append(" ").append(this.getConstants().get(index));
                     }
                 }
                 str.append(")");
@@ -1369,7 +1377,7 @@ public abstract class AbstractProblem implements Problem {
                     if (index < 0) {
                         str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" ").append(this.getConstantSymbols().get(index));
+                        str.append(" ").append(this.getConstants().get(index));
                     }
                 }
                 str.append(")");
@@ -1387,7 +1395,7 @@ public abstract class AbstractProblem implements Problem {
                     if (index < 0) {
                         str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" ").append(this.getConstantSymbols().get(index));
+                        str.append(" ").append(this.getConstants().get(index));
                     }
                 }
                 if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
@@ -1402,7 +1410,7 @@ public abstract class AbstractProblem implements Problem {
                     if (index < 0) {
                         str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);
                     } else {
-                        str.append(" ").append(this.getConstantSymbols().get(index));
+                        str.append(" ").append(this.getConstants().get(index));
                     }
                 }
                 str.append(")");
@@ -1429,7 +1437,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(-exp.getVariable() - 1);
                 str.append(" - ");
                 String offsetEx = baseOffset + baseOffset + "  ";
-                str.append(this.getTypeSymbols().get(exp.getType())).append(")\n").append(offsetEx);
+                str.append(this.getTypes().get(exp.getType())).append(")\n").append(offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(toString(exp.getChildren().get(0), offsetEx));
                 }
@@ -1555,117 +1563,188 @@ public abstract class AbstractProblem implements Problem {
         return str.toString();
     }
 
-    /**
-     * Print the types of the problem.
-     */
-    final protected void traceTypes() {
-        final StringBuilder str = new StringBuilder();
-        str.append("Types table:\n");
-        for (int i = 0; i < this.getTypeSymbols().size(); i++) {
-            str.append(i).append(": ").append(this.getTypeSymbols().get(i)).append(":");
-            Set<Integer> domain = this.getDomains().get(i);
-            for (Integer constant : domain) {
-                str.append(" ").append(constant);
-            }
-            str.append("\n");
-        }
-        str.append("\n");
-        this.getLogger().trace(str);
+
+    protected enum Data {
+        TYPES,
+        TYPE_SYMBOLS,
+        CONSTANT_SYMBOLS,
+        FUNCTION_SYMBOLS,
+        PREDICATS_SYMBOLS,
+        PRIMITIVE_TASKS_SYMBOLS,
+        COMPOUND_TASKS_SYMBOLS,
+        TASKS_SYMBOLS,
+        PREDICATE_SIGNATURES,
+        FUNCTION_SIGNATURES,
+        TASK_SIGNATURES,
+        INT_ACTIONS,
+        INT_METHODS,
+        INT_GOAL,
+        INT_INITIAL_STATE,
+        INT_INITIAL_TASK_NETWORK,
+        INERTIA,
+        GROUND_INERTIA,
+        ACTIONS,
+        METHODS,
+        FLUENTS,
+        TASKS,
+        TASK_RESOLVERS,
+        INITIAL_TASK_NETWORK,
+        GOAL,
+        INITIAL_STATE,
+
     }
 
     /**
-     * Print the constants of the problem.
+     * Returns a string representation of the internal data structure used during instantiation process.
+     *
+     * @param data the internal data structure.
+     * @return a string representation of the internal data structure used during instantiation process.
      */
-    final protected void traceConstants() {
+    protected String toString(final Data data) {
         final StringBuilder str = new StringBuilder();
-        str.append("Constants table:\n");
-        for (int i = 0; i < this.getConstantSymbols().size(); i++) {
-            str.append(i).append(": ");
-            str.append(this.getConstantSymbols().get(i));
-            str.append(System.lineSeparator());
+        switch (data) {
+            case TYPES:
+                for (int i = 0; i < this.getTypes().size(); i++) {
+                    str.append(i);
+                    str.append(": ");
+                    str.append(this.getTypes().get(i));
+                    str.append(":");
+                    Set<Integer> domain = this.getDomains().get(i);
+                    for (Integer constant : domain) {
+                        str.append(" ");
+                        str.append(constant);
+                    }
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case TYPE_SYMBOLS:
+                for (int i = 0; i < this.getTypes().size(); i++) {
+                    str.append(i).append(": ");
+                    str.append(this.getTypes().get(i));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case CONSTANT_SYMBOLS:
+                for (int i = 0; i < this.getConstants().size(); i++) {
+                    str.append(i).append(": ");
+                    str.append(this.getConstants().get(i));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case PREDICATS_SYMBOLS:
+                for (int i = 0; i < this.getPredicates().size(); i++) {
+                    str.append(i).append(": ");
+                    str.append(this.getPredicates().get(i));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case FUNCTION_SYMBOLS:
+                for (int i = 0; i < this.getFunctionSymbols().size(); i++) {
+                    str.append(i).append(": ");
+                    str.append(this.getFunctionSymbols().get(i));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case PRIMITIVE_TASKS_SYMBOLS:
+                int index = 0;
+                for (String symbol : this.getPrimitiveTaskSymbols()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(symbol);
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case COMPOUND_TASKS_SYMBOLS:
+                index = 0;
+                for (String symbol : this.getCompoundTaskSymbols()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(symbol);
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case TASKS_SYMBOLS:
+                index = 0;
+                for (String symbol : this.getTaskSymbols()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(symbol);
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case PREDICATE_SIGNATURES:
+                for (int i = 0; i < this.getPredicates().size(); i++) {
+                    String symbol = this.getPredicates().get(i);
+                    str.append(i);
+                    str.append(": ");
+                    str.append(symbol);
+                    str.append(":");
+                    for (int j = 0; j < this.getPredicateSignatures().get(i).size(); j++) {
+                        str.append(" ");
+                        str.append(this.getTypes().get(this.getPredicateSignatures().get(i).get(j)));
+                    }
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case FUNCTION_SIGNATURES:
+                for (int i = 0; i < this.getFunctionSymbols().size(); i++) {
+                    String symbol = this.getFunctionSymbols().get(i);
+                    str.append(i);
+                    str.append(": ");
+                    str.append(symbol);
+                    str.append(":");
+                    for (int j = 0; j < this.getFunctionSignatures().get(i).size(); j++) {
+                        str.append(" ");
+                        str.append(this.getTypes().get(this.getFunctionSignatures().get(i).get(j)));
+                    }
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case TASK_SIGNATURES:
+                for (int i = 0; i < this.getTaskSymbols().size(); i++) {
+                    String symbol = this.getTaskSymbols().get(i);
+                    str.append(i);
+                    str.append(": ");
+                    str.append(symbol);
+                    str.append(":");
+                    for (int j = 0; j < this.getTaskSignatures().get(i).size(); j++) {
+                        str.append(" ");
+                        str.append(this.getTypes().get(this.getTaskSignatures().get(i).get(j)));
+                    }
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case INT_ACTIONS:
+                for (IntAction a : this.getIntActions()) {
+                    str.append(this.toString(a));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case INT_METHODS:
+                for (IntMethod m : this.getIntMethods()) {
+                    str.append(this.toString(m));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case INT_GOAL:
+                str.append(this.toString(this.getIntGoal()));
+                str.append(System.lineSeparator());
+                break;
+            case INT_INITIAL_STATE:
+                str.append("(and");
+                for (IntExpression e : this.getIntInitialState()) {
+                    str.append("\n ");
+                    str.append(this.toString(e));
+                }
+                str.append(")\n");
+                break;
+            case INT_INITIAL_TASK_NETWORK:
+                str.append(toString(this.getIntInitialTaskNetwork()));
+                str.append(System.lineSeparator());
+                break;
+            default:
+                str.append("");
         }
-        str.append(System.lineSeparator());
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the predicates of the problem.
-     */
-    final protected void tracePredicates() {
-        final StringBuilder str = new StringBuilder();
-        str.append("Predicates table:\n");
-        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
-            String predicate = this.getPredicateSymbols().get(i);
-            str.append(i);
-            str.append(": ");
-            str.append(predicate);
-            str.append(" :");
-            for (int j = 0; j < this.getPredicateSignatures().get(i).size(); j++) {
-                str.append(" ");
-                str.append(this.getTypeSymbols().get(this.getPredicateSignatures().get(i).get(j)));
-            }
-            str.append("\n");
-        }
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the functions of the problem.
-     */
-    final protected void traceFunctions() {
-        final StringBuilder str = new StringBuilder();
-        str.append("Functions table:\n");
-        for (int i = 0; i < this.getFunctionSymbols().size(); i++) {
-            String predicate = this.getFunctionSymbols().get(i);
-            str.append(i);
-            str.append(": ");
-            str.append(predicate);
-            str.append(":");
-            for (int j = 0; j < this.getFunctionSignatures().get(i).size(); j++) {
-                str.append(" ");
-                str.append(this.getTypeSymbols().get(this.getFunctionSignatures().get(i).get(j)));
-            }
-            str.append("\n");
-        }
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the integer representation of the actions of the problem.
-     */
-    final protected void traceIntActions() {
-        final StringBuilder str = new StringBuilder();
-        str.append("\n\nCoded actions:\n\n");
-        for (IntAction a : this.getIntActions()) {
-            str.append(this.toString(a));
-            str.append(System.lineSeparator());
-        }
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the integer representation of goal state of the problem.
-     */
-    final protected void traceIntGoal() {
-        final StringBuilder str = new StringBuilder();
-        str.append(")");
-        str.append("\n\nCoded goal state:\n");
-        str.append(this.toString(this.getIntGoal()));
-        str.append(System.lineSeparator());
-        str.append(System.lineSeparator());
-        this.getLogger().trace(str);
-    }
-
-    /**
-     * Print the integer representation of the initial state.
-     */
-    final protected void traceIntInitialState() {
-        final StringBuilder str = new StringBuilder();
-        str.append("\nCoded initial state:\n");
-        str.append("(and");
-        for (IntExpression e : this.getIntInitialState()) {
-            str.append("\n ").append(this.toString(e));
-        }
-        this.getLogger().trace(str);
+        return str.toString();
     }
 }

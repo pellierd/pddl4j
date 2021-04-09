@@ -57,7 +57,7 @@ public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
      * @param problem the problem to solve.
      */
     protected AbstractGoalCostHeuristic(final ADLProblem problem) {
-        this.facts = problem.getRelevantFluents();
+        this.facts = problem.getFluents();
         this.goal = problem.getGoal();
         this.actions = problem.getActions();
         this.isAdmissible = true;
