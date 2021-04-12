@@ -55,7 +55,7 @@ public class AbstractNumericProblem extends ADLProblem implements Numeric {
      * @return the list of function symbols of the problem.
      */
     public List<String> getFunctionSymbols() {
-        return super.getFunctionSymbols();
+        return super.getFunctions();
     }
 
     /**

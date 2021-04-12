@@ -60,16 +60,47 @@ public class NumericProblem extends AbstractNumericProblem {
         this.initConstants();
         // Collect the either types of the domain
         this.initEitherTypes();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Types declared:\n"
+                + this.toString(Data.TYPES) + "\n");
+            this.getLogger().debug("Constants declared in the problem:\n"
+                + this.toString(Data.CONSTANT_SYMBOLS) + "\n");
+        }
+
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Predicates declared:\n"
+                + this.toString(Data.PREDICATE_SIGNATURES) + "\n");
+        }
+
         // Collect the function information (symbols and signatures)
         this.initFunctions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Functions declared:\n"
+                + this.toString(Data.FUNCTION_SIGNATURES) + "\n");
+        }
+
         // Encode the actions of the domain into integer representation
         this.initActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions declared:\n\n"
+                + this.toString(Data.INT_ACTIONS));
+        }
+
         // Encode the initial state in integer representation
         this.initInitialState();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial state declared :\n"
+                + this.toString(Data.INT_INITIAL_STATE) + "\n");
+        }
+
         // Encode the goal in integer representation
         this.initGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal declared:\n"
+                + this.toString(Data.INT_GOAL) + "\n");
+        }
     }
 
     /**
@@ -79,15 +110,12 @@ public class NumericProblem extends AbstractNumericProblem {
      */
     @Override
     protected void preinstantiation() {
-        this.extractInertia();
+        super.preinstantiation();
         this.extractNumericInertia();
-        // Infer the type from the unary inertia
-        if (!this.getRequirements().contains(PDDLRequireKey.TYPING)) {
-            this.inferTypesFromInertia();
-            this.simplifyActionsWithInferredTypes();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Numeric inertia detected:\n"
+                + this.toString(Data.NUMERIC_INERTIA) + "\n");
         }
-        // Create the predicates tables used to count the occurrences of the predicates in the initial state
-        this.createPredicatesTables();
     }
 
     /**
@@ -95,8 +123,7 @@ public class NumericProblem extends AbstractNumericProblem {
      */
     @Override
     protected void instantiation() {
-        this.instantiateActions();
-        this.instantiateGoal();
+        super.instantiation();
     }
 
     /**
@@ -107,9 +134,25 @@ public class NumericProblem extends AbstractNumericProblem {
     @Override
     protected void postinstantiation() {
         this.extractGroundInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Ground inertia detected:\n\n"
+                + this.toString(Data.GROUND_INERTIA) + "\n");
+        }
         this.extractGroundNumericInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Ground numeric inertia detected:\n\n"
+                + this.toString(Data.GROUND_NUMERIC_INERTIA) + "\n");
+        }
         this.simplyActionsWithGroundInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions simplified base on ground intertia detected:\n\n"
+                + this.toString(Data.INT_ACTIONS) + "\n");
+        }
         this.simplifyGoalWithGroundInertia();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal simplified base on ground intertia detected:\n"
+                + this.toString(Data.INT_GOAL) + "\n");
+        }
     }
 
     /**
@@ -119,13 +162,40 @@ public class NumericProblem extends AbstractNumericProblem {
     @Override
     protected void finalization() {
         this.extractRelevantFluents();
-        this.extractRelevantNumericFluents(this.getIntActions());
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Relevant fluents:\n"
+                + this.toString(Data.FLUENTS) + "\n");
+        }
+
+        this.extractRelevantNumericFluents();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Relevant numeric fluents:\n"
+                + this.toString(Data.NUMERIC_FLUENTS) + "\n");
+        }
+
         this.initOfMapFluentIndex();
         this.initMapOfNumericFluentIndex();
-        this.finalizeGoal();
+
+        this.finalizeActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Actions:\n\n"
+                + this.toString(Data.ACTIONS) + "\n");
+        }
+
         this.finalizeInitialState();
         this.finalizeInitialNumericFluent();
-        this.finalizeActions();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Initial state:\n"
+                + this.toString(Data.INITIAL_STATE) + "\n");
+        }
+
+        this.finalizeGoal();
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug("Goal:\n"
+                + this.toString(Data.GOAL) + "\n");
+        }
+
     }
+
 
 }

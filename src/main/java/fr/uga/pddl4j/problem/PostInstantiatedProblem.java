@@ -78,7 +78,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @return the list of numeric ground inertia of the problem.
      */
-    protected Map<IntExpression, Inertia> getNumericGroundInertia() {
+    protected Map<IntExpression, Inertia> getGroundNumericInertia() {
         return this.numericGroundInertia;
     }
 
@@ -234,7 +234,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-                this.getNumericGroundInertia().put(exp.getChildren().get(0), Inertia.FLUENT);
+                this.getGroundNumericInertia().put(exp.getChildren().get(0), Inertia.FLUENT);
                 break;
             case ATOM:
             case TRUE:
@@ -637,7 +637,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 break;
             case FN_HEAD:
-                Inertia inertia = this.getNumericGroundInertia().get(exp);
+                Inertia inertia = this.getGroundNumericInertia().get(exp);
                 if (inertia == null) {
                     Double value = this.getIntInitFunctionCost().get(exp);
                     // The numeric fluent is never modified and does not appear in the initial state
@@ -783,6 +783,18 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case GROUND_INERTIA:
                 int i = 0;
                 for (Map.Entry<IntExpression, Inertia> e : this.getGroundInertia().entrySet()) {
+                    str.append(i);
+                    str.append(": ");
+                    str.append(this.toString(e.getKey()));
+                    str.append(" : ");
+                    str.append(e.getValue());
+                    str.append(System.lineSeparator());
+                    i++;
+                }
+                break;
+            case GROUND_NUMERIC_INERTIA:
+                i = 0;
+                for (Map.Entry<IntExpression, Inertia> e : this.getGroundNumericInertia().entrySet()) {
                     str.append(i);
                     str.append(": ");
                     str.append(this.toString(e.getKey()));

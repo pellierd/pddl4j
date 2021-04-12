@@ -1,3 +1,32 @@
+/*
+ * Copyright (c) 2021 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.
+ * If not, see <http://www.gnu.org/licenses/>
+ */
+/*
+ * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with PDDL4J.
+ * If not, see <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
@@ -8,14 +37,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by pellier on 07/11/2020.
+ * This class implements an initial syaye, i.e., the set of known positives and negative fluents.
+ *
+ * @author D. Pellier
+ * @version 1.0 - 28.04.2020
+ * @since 4.0
  */
 public class InitialState extends AbstractFluentDescription {
 
     /**
      * The list numeric variables and their values.
      */
-    private List<NumericVariable> numericFluents;
+    private List<NumericVariable> numericVariables;
 
     /**
      * Creates a new initial state from a other initial state.
@@ -24,8 +57,8 @@ public class InitialState extends AbstractFluentDescription {
      */
     public InitialState(final InitialState other) {
         super(other);
-        this.numericFluents = new ArrayList<>();
-        this.numericFluents.addAll(other.getNumericFluents().stream().map(NumericVariable::new)
+        this.numericVariables = new ArrayList<>();
+        this.numericVariables.addAll(other.getNumericVariables().stream().map(NumericVariable::new)
             .collect(Collectors.toList()));
     }
 
@@ -34,34 +67,34 @@ public class InitialState extends AbstractFluentDescription {
      */
     public InitialState() {
         super();
-        this.numericFluents = new ArrayList<>();
+        this.numericVariables = new ArrayList<>();
     }
 
     /**
-     * Returns the list of numeric fluents of this initial state.
+     * Returns the list of numeric variables of this initial state.
      *
-     * @return the list of numeric fluents of this initial state.
+     * @return the list of numeric variables of this initial state.
      */
-    public final List<NumericVariable> getNumericFluents() {
-        return this.numericFluents;
+    public final List<NumericVariable> getNumericVariables() {
+        return this.numericVariables;
     }
 
     /**
-     * Sets the numeric fluents of the initial state.
+     * Sets the numeric variables of the initial state.
      *
-     * @param fluents the numeric fluents of the state.
+     * @param variables the numeric variables of the state.
      */
-    public final void setNumericFluents(List<NumericVariable> fluents) {
-        this.numericFluents = fluents;
+    public final void setNumericVariables(List<NumericVariable> variables) {
+        this.numericVariables = variables;
     }
 
     /**
-     * Adds a numeric fluent to the initial state.
+     * Adds a numeric variables to the initial state.
      *
-     * @param fluent the fluent to add.
+     * @param variable the variable to add.
      */
-    public void addNumericFluent(NumericVariable fluent) {
-        this.numericFluents.add(fluent);
+    public void addNumericFluent(NumericVariable variable) {
+        this.numericVariables.add(variable);
     }
 
 }

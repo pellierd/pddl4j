@@ -26,6 +26,7 @@ import fr.uga.pddl4j.problem.numeric.ArithmeticExpression;
 import fr.uga.pddl4j.problem.numeric.ArithmeticOperator;
 import fr.uga.pddl4j.problem.numeric.NumericAssignment;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
+import fr.uga.pddl4j.problem.numeric.NumericFluent;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -69,7 +70,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The list of relevant fluents.
      */
-    private List<Fluent> relevantFluents;
+    private List<Fluent> fluents;
+
+    /**
+     * The list of numeric fluents.
+     */
+    private List<NumericFluent> numericFluents;
 
     /**
      * The initial state of the problem encoded in its final bit set representation.
@@ -84,7 +90,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The table of the relevant fluents in the form of <code>IntExpression</code>.
      */
-    private List<IntExpression> intExpRelevantFluents;
+    private List<IntExpression> intExpFluents;
 
     /**
      * The map used to encode fluents into bit set representation.
@@ -94,7 +100,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The table of the relevant numeric fluent in the form of <code>IntExpression</code>.
      */
-    private List<IntExpression> intExpRelevantNumericFluents;
+    private List<IntExpression> intExpNumericFluents;
 
     /**
      * The map used to encode numeric fluents into bit set representation.
@@ -151,7 +157,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return the list of relevant fluents of the problem.
      */
     public final List<Fluent> getFluents() {
-        return this.relevantFluents;
+        return this.fluents;
+    }
+
+    /**
+     * Returns the list of relevant numeric fluents of the problem.
+     *
+     * @return the list of relevant numeric fluents of the problem.
+     */
+    public final List<NumericFluent> getNumericFluents() {
+        return this.numericFluents;
     }
 
     /**
@@ -177,8 +192,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant fluents of the problem in the form of <code>IntExpression</code>.
      */
-    private List<IntExpression> getRelevantIntExpFluents() {
-        return this.intExpRelevantFluents;
+    private List<IntExpression> getIntExpFluents() {
+        return this.intExpFluents;
     }
 
     /**
@@ -196,8 +211,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant numericfluents of the problem in the form of <code>IntExpression</code>.
      */
-    private List<IntExpression> getIntExpRelevantNumericFluents() {
-        return this.intExpRelevantNumericFluents;
+    private List<IntExpression> getIntExpNumericFluents() {
+        return this.intExpNumericFluents;
     }
 
     /**
@@ -278,12 +293,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 facts.add(p);
             }
         }
-        this.intExpRelevantFluents = new ArrayList<>(facts.size());
-        this.relevantFluents = new ArrayList<>(facts.size());
+        this.intExpFluents = new ArrayList<>(facts.size());
+        this.fluents = new ArrayList<>(facts.size());
         for (IntExpression exp : facts) {
             final IntExpression relevant = new IntExpression(exp);
-            this.intExpRelevantFluents.add(relevant);
-            this.relevantFluents.add(new Fluent(exp.getPredicate(), exp.getArguments()));
+            this.intExpFluents.add(relevant);
+            this.fluents.add(new Fluent(exp.getPredicate(), exp.getArguments()));
         }
     }
 
@@ -382,25 +397,24 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
     /**
      * Extracts the relevant numeric fluents.
-     *
-     * @param actions the list of instantiated actions.
-     */
-    protected void extractRelevantNumericFluents(final List<IntAction> actions) {
+     **/
+    protected void extractRelevantNumericFluents() {
         final Set<IntExpression> fluents = new LinkedHashSet<>(100);
-        for (IntAction a : actions) {
+        for (IntAction a : this.getIntActions()) {
             if (a.isDurative()) {
                 this.extractRelevantNumericFluents(a.getDuration(), fluents);
             }
             this.extractRelevantNumericFluents(a.getPreconditions(), fluents);
             this.extractRelevantNumericFluents(a.getEffects(), fluents);
         }
-        this.intExpRelevantNumericFluents = new ArrayList<>(fluents.size());
+        this.intExpNumericFluents = new ArrayList<>(fluents.size());
+        this.numericFluents = new ArrayList<>(fluents.size());
         for (IntExpression exp : fluents) {
             final IntExpression relevant = new IntExpression(exp);
-            this.intExpRelevantNumericFluents.add(relevant);
+            this.intExpNumericFluents.add(relevant);
+            this.numericFluents.add(new NumericFluent(exp.getPredicate(), exp.getArguments()));
         }
     }
-
     /**
      * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
      * only if:
@@ -466,9 +480,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void initOfMapFluentIndex() {
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
-        this.mapOfFluentIndex = new LinkedHashMap<>(this.getRelevantIntExpFluents().size());
+        this.mapOfFluentIndex = new LinkedHashMap<>(this.getIntExpFluents().size());
         int index = 0;
-        for (IntExpression fluent : this.getRelevantIntExpFluents()) {
+        for (IntExpression fluent : this.getIntExpFluents()) {
             this.mapOfFluentIndex.put(fluent, index);
             index++;
         }
@@ -478,9 +492,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Create a map of the relevant numeric fluents with their index to speedup the bit set encoding of the actions.
      */
     protected void initMapOfNumericFluentIndex() {
-        this.mapOfNumericFluentIndex = new LinkedHashMap<>(this.getIntExpRelevantNumericFluents().size());
+        this.mapOfNumericFluentIndex = new LinkedHashMap<>(this.getIntExpNumericFluents().size());
         int index = 0;
-        for (IntExpression fluent : this.getIntExpRelevantNumericFluents()) {
+        for (IntExpression fluent : this.getIntExpNumericFluents()) {
             this.mapOfNumericFluentIndex.put(fluent, index);
         }
     }
@@ -769,14 +783,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             }
             if (goals.size() > 1) {
                 // Create a new dummy fact to encode the goal
-                final int dummyPredicateIndex = this.getPredicates().size();
-                this.getPredicates().add(Constants.DUMMY_GOAL);
+                final int dummyPredicateIndex = this.getPredicateSymbols().size();
+                this.getPredicateSymbols().add(Constants.DUMMY_GOAL);
                 this.getPredicateSignatures().add(new ArrayList<>());
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
                 dummyGoal.setPredicate(dummyPredicateIndex);
                 dummyGoal.setArguments(new int[0]);
-                final int dummyGoalIndex = this.getRelevantIntExpFluents().size();
-                this.getRelevantIntExpFluents().add(dummyGoal);
+                final int dummyGoalIndex = this.getIntExpFluents().size();
+                this.getIntExpFluents().add(dummyGoal);
                 this.mapOfNumericFluentIndex.put(dummyGoal, dummyGoalIndex);
                 Effect effect = new Effect();
                 effect.getPositiveFluents().set(dummyGoalIndex);
@@ -1015,7 +1029,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstants().get(index));
+                str.append(this.getConstantSymbols().get(index));
                 str.append(" \n");
             }
         }
@@ -1137,11 +1151,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             str.append(this.toString(this.getFluents().get(i)));
             str.append("\n");
         }
-        /*for (NumericVariable var : state.getNumericFluents()) {
+        for (NumericVariable var : state.getNumericVariables()) {
             str.append(" ");
             str.append(this.toString(var));
-        }*/
-
+            str.append("\n");
+        }
         str.append(")");
         return str.toString();
     }
@@ -1149,17 +1163,53 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * Returns a string representation of a fluent.
      *
-     * @param fluent the formula.
-     * @return a string representation of the specified expression.
+     * @param fluent the fluent.
+     * @return a string representation of the specified fluent.
      */
     public String toString(final Fluent fluent) {
         final StringBuffer str = new StringBuffer();
         str.append("(");
-        str.append(this.getPredicates().get(fluent.getSymbol()));
+        str.append(this.getPredicateSymbols().get(fluent.getSymbol()));
         for (Integer arg : fluent.getArguments()) {
             str.append(" ");
-            str.append(this.getConstants().get(arg));
+            str.append(this.getConstantSymbols().get(arg));
         }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a numeric fluent.
+     *
+     * @param fluent the numeric fluent.
+     * @return a string representation of the specified numeric fluent.
+     */
+    public String toString(final NumericFluent fluent) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(this.getFunctions().get(fluent.getSymbol()));
+        for (Integer arg : fluent.getArguments()) {
+            str.append(" ");
+            str.append(this.getConstantSymbols().get(arg));
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a numeric variable.
+     *
+     * @param variable the numeric variable.
+     * @return a string representation of the specified numeric variable.
+     */
+    public String toString(final NumericVariable variable) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(variable.getArithmeticOperator());
+        str.append(" ");
+        str.append(this.toString(this.getNumericFluents().get(variable.getNumericFluent())));
+        str.append(" ");
+        str.append(variable.getValue());
         str.append(")");
         return str.toString();
     }
@@ -1180,7 +1230,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" ?");
             } else {
                 str.append(" ");
-                str.append(this.getConstants().get(index));
+                str.append(this.getConstantSymbols().get(index));
             }
         }
         return str.toString();
@@ -1445,7 +1495,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
-                str.append(this.getConstants().get(index));
+                str.append(this.getConstantSymbols().get(index));
                 str.append(" \n");
             }
         }
@@ -1512,7 +1562,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append(this.getTaskSymbols().get(task.getSymbol()));
         for (Integer arg : task.getArguments()) {
             str.append(" ");
-            str.append(this.getConstants().get(arg));
+            str.append(this.getConstantSymbols().get(arg));
         }
         str.append(")");
         return str.toString();
@@ -1569,6 +1619,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case FLUENTS:
                 int index = 0;
                 for (Fluent fluent : this.getFluents()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(this.toString(fluent));
+                    str.append(System.lineSeparator());
+                    index++;
+                }
+                break;
+            case NUMERIC_FLUENTS:
+                index = 0;
+                for (NumericFluent fluent : this.getNumericFluents()) {
                     str.append(index);
                     str.append(": ");
                     str.append(this.toString(fluent));

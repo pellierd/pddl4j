@@ -131,7 +131,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      */
     protected void extractInertia() {
-        final int nbPredicates = this.getPredicates().size();
+        final int nbPredicates = this.getPredicateSymbols().size();
         this.inertia = new ArrayList<>(nbPredicates);
         for (int i = 0; i < nbPredicates; i++) {
             this.inertia.add(Inertia.INERTIA);
@@ -239,7 +239,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * effect of an action.
      */
     protected void extractNumericInertia() {
-        final int nbFunctions = this.getFunctionSymbols().size();
+        final int nbFunctions = this.getFunctions().size();
         this.numericInertia = new ArrayList<>(nbFunctions);
         for (int i = 0; i < nbFunctions; i++) {
             this.numericInertia.add(Inertia.INERTIA);
@@ -291,8 +291,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * Infer type from unary inertia contained in the initial state.
      */
     protected void inferTypesFromInertia() {
-        this.inferredDomains = new ArrayList<>(this.getPredicates().size());
-        for (int i = 0; i < this.getPredicates().size(); i++) {
+        this.inferredDomains = new ArrayList<>(this.getPredicateSymbols().size());
+        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
             if (this.getPredicateSignatures().get(i).size() == 1
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Integer> newTypeDomain = new LinkedHashSet<>();
@@ -350,7 +350,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
 
                     final String declaredType = this.getTypes().get(dtIndex);
                     final int itIndex = inertia.getPredicate();
-                    final String inertiaType = this.getPredicates().get(itIndex);
+                    final String inertiaType = this.getPredicateSymbols().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
                     int ti = this.getTypes().indexOf(sti);
@@ -609,8 +609,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * This method creates the predicates predicates tables used to simplify atomic expression.
      */
     protected void createPredicatesTables() {
-        final int tableSize = this.getConstants().size();
-        final int nbPredicate = this.getPredicates().size();
+        final int tableSize = this.getConstantSymbols().size();
+        final int nbPredicate = this.getPredicateSymbols().size();
         this.predicatesTables = new ArrayList<>(nbPredicate);
         for (final List<Integer> arguments : this.getPredicateSignatures()) {
             final int arity = arguments.size();
@@ -716,7 +716,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         if (index.length == arity) {
             final StringBuilder str = new StringBuilder();
             str.append("(");
-            str.append(this.getPredicates().get(predicate));
+            str.append(this.getPredicateSymbols().get(predicate));
             int var = 0;
             int realIndexSize = 0;
             for (int anIndex : index) {
@@ -725,7 +725,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     var++;
                 } else {
                     realIndexSize++;
-                    str.append(" ").append(this.getConstants().get(anIndex));
+                    str.append(" ").append(this.getConstantSymbols().get(anIndex));
                 }
             }
             str.append(")");
@@ -747,7 +747,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             newIndex[index.length] = -1;
             this.print(predicate, arity, mask, newIndex, tables);
         } else {
-            for (int i = 0; i < this.getConstants().size(); i++) {
+            for (int i = 0; i < this.getConstantSymbols().size(); i++) {
                 final int[] newIndex = new int[index.length + 1];
                 System.arraycopy(index, 0, newIndex, 0, index.length);
                 newIndex[index.length] = i;
@@ -1526,8 +1526,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         final StringBuilder str = new StringBuilder();
         str.append("###########################################################\n");
         str.append("# INERTIA\n\n");
-        for (int i = 0; i < this.getPredicates().size(); i++) {
-            String predicate = this.getPredicates().get(i);
+        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
+            String predicate = this.getPredicateSymbols().get(i);
             str.append(i);
             str.append(": ");
             str.append(predicate);
@@ -1549,8 +1549,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         final StringBuilder str = new StringBuilder();
         switch (data) {
             case INERTIA:
-                for (int i = 0; i < this.getPredicates().size(); i++) {
-                    String predicate = this.getPredicates().get(i);
+                for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
+                    String predicate = this.getPredicateSymbols().get(i);
                     str.append(i);
                     str.append(": ");
                     str.append(predicate);
@@ -1559,6 +1559,17 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     str.append("\n");
                 }
             break;
+            case NUMERIC_INERTIA:
+                for (int i = 0; i < this.getFunctions().size(); i++) {
+                    String function = this.getFunctions().get(i);
+                    str.append(i);
+                    str.append(": ");
+                    str.append(function);
+                    str.append(" : ");
+                    str.append(this.getNumericInertia().get(i));
+                    str.append("\n");
+                }
+                break;
             default:
                 return super.toString(data);
         }

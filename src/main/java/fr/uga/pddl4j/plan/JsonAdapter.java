@@ -109,7 +109,7 @@ public class JsonAdapter implements Serializable {
                 for (int j = 0; j < action.arity(); j++) {
                     final int index = action.getValueOfParameter(j);
                     if (index != -1) {
-                        parameters.add(this.problem.getConstants().get(index));
+                        parameters.add(this.problem.getConstantSymbols().get(index));
                     }
                 }
 

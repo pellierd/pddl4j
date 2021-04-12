@@ -68,7 +68,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
      * @return the list of function symbols of the problem.
      */
     public List<String> getFunctionSymbols() {
-        return super.getFunctionSymbols();
+        return super.getFunctions();
     }
 
     /**
@@ -151,7 +151,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
     protected void finalization() {
         this.extractRelevantFluents();
         if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-            this.extractRelevantNumericFluents(this.getIntActions());
+            this.extractRelevantNumericFluents();
         }
 
         this.initOfMapFluentIndex();

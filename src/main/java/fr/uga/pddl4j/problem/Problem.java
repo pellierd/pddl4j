@@ -85,14 +85,14 @@ public interface Problem extends Serializable {
      *
      * @return the list of constant symbols of the problem.
      */
-    List<String> getConstants();
+    List<String> getConstantSymbols();
 
     /**
      * Returns the list of predicate symbols of the problem.
      *
      * @return the list predicate symbols of the problem.
      */
-    List<String> getPredicates();
+    List<String> getPredicateSymbols();
 
     /**
      * Returns the signatures of the predicates defined in the problem.

@@ -76,7 +76,7 @@ public class ArithmeticExpression extends AbstractNumericExpression {
         this.setType(other.getType());
         this.setArithmeticOpertor(other.getArithmeticOperator());
         this.setValue(other.getValue());
-        this.setNumericFluents(other.getNumericFluents());
+        this.setNumericFluents(other.getNumericFluent());
         if (other.getLeftExpression() != null) {
             this.setLeftExpression(new ArithmeticExpression(other.getLeftExpression()));
         }
@@ -167,7 +167,7 @@ public class ArithmeticExpression extends AbstractNumericExpression {
      *
      * @return the index of the numeric fluent of this arithmetic expression.
      */
-    public final int getNumericFluents() {
+    public final int getNumericFluent() {
         return this.numericFluents;
     }
 
@@ -230,7 +230,7 @@ public class ArithmeticExpression extends AbstractNumericExpression {
             case NUMBER:
                 value = this.getValue();
             case VARIABLE:
-                value = context.get(this.getNumericFluents()).getValue();
+                value = context.get(this.getNumericFluent()).getValue();
                 break;
             case OPERATOR:
                 switch (this.getArithmeticOperator()) {
@@ -278,7 +278,7 @@ public class ArithmeticExpression extends AbstractNumericExpression {
                 case NUMBER:
                     return Double.compare(other.getValue(), getValue()) == 0;
                 case VARIABLE:
-                    return this.getNumericFluents() == other.getNumericFluents()
+                    return this.getNumericFluent() == other.getNumericFluent()
                         && Double.compare(other.getValue(), getValue()) == 0;
                 case OPERATOR:
                     return this.getArithmeticOperator() == other.getArithmeticOperator()
@@ -302,7 +302,7 @@ public class ArithmeticExpression extends AbstractNumericExpression {
                 hashcode = Objects.hash(this.getType(),this.getValue());
                 break;
             case VARIABLE:
-                hashcode = Objects.hash(this.getType(),this.getNumericFluents());
+                hashcode = Objects.hash(this.getType(),this.getNumericFluent());
                 break;
             case OPERATOR:
                 hashcode = Objects.hash(this.getType(),this.getArithmeticOperator(), this.getLeftExpression(),
@@ -326,7 +326,7 @@ public class ArithmeticExpression extends AbstractNumericExpression {
                 break;
             case VARIABLE:
                 str.append("X");
-                str.append(this.getNumericFluents());
+                str.append(this.getNumericFluent());
                 str.append("[");
                 str.append(this.getValue());
                 str.append("]");

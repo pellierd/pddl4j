@@ -115,7 +115,7 @@ public final class NumericAssignment extends AbstractNumericExpression {
     public NumericVariable assign(List<NumericVariable> context) {
         final ArithmeticExpression left = super.getLeftExpression();
         final ArithmeticExpression right = super.getRightExpression();
-        NumericVariable variable = context.get(left.getNumericFluents());
+        NumericVariable variable = context.get(left.getNumericFluent());
         switch (this.getOperator()) {
             case ASSIGN:
                 variable.setValue(right.evaluate(context));

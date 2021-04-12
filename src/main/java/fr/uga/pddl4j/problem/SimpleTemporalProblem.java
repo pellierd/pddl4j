@@ -400,10 +400,10 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
 
     private int dummyPredicateCounter = 0;
     private IntExpression createDummyPredicate() {
-        this.getPredicates().add("^M" + this.dummyPredicateCounter);
+        this.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
         this.dummyPredicateCounter++;
         final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
-        atom.setPredicate(this.getPredicates().size() - 1);
+        atom.setPredicate(this.getPredicateSymbols().size() - 1);
         return atom;
 
     }
