@@ -225,64 +225,102 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
     /**
-     * Instantiate the goal.
+     * Make the preinstantion of a method based on the argument used in the tasks accomplish by the method.
+     *
+     * @param method the method to instantiate.
+     * @param index  the index of the parameter to instantiate. Initially, the index is set to 0.
+     * @param bound  a bound on the number of methods to instantiate.
+     * @param task   the tasks that accomplish the method.
      */
-    protected void instantiateGoal() {
-        // Expand the quantified expression in the goal
-        this.expandQuantifiedExpression(this.getIntGoal(), true);
-    }
-
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Methods added to deal with HDDL problem.
-    //
-
-    /**
-     * Instantiates the initial task network.
-     */
-    protected void instantiateInitialTaskNetwork() {
-        final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
-        if (taskNetworks.size() > 1) {
-            IntExpression root = new IntExpression(PDDLConnective.TASK);
-            root.setPredicate(this.getTaskSymbols().size());
-            this.getTaskSymbols().add("__top");
-            this.getCompoundTaskSymbols().add("__top");
-            root.setPrimtive(false);
-            int index = 0;
-            for (IntTaskNetwork tn : taskNetworks) {
-                IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
-                for (int i = 0; i < tn.arity(); i++) {
-                    method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
-                }
-                for (int i = 0; i < tn.arity(); i++) {
-                    method.setValueOfParameter(i, tn.getValueOfParameter(i));
-                }
-                method.setTask(new IntExpression(root));
-                method.setPreconditions(new IntExpression(PDDLConnective.AND));
-                method.setTaskNetwork(tn);
-                this.getIntMethods().add(method);
-                index++;
+    private void instantiate(final IntMethod method, final int index, final int bound,
+                             final List<IntMethod> methods, final IntExpression task) {
+        final IntExpression t = method.getTask();
+        final IntMethod copy = new IntMethod(method);
+        boolean instantiable = true;
+        int i = 0;
+        while (i < t.getArguments().length && instantiable) {
+            final int var = t.getArguments()[i];
+            final int cons = task.getArguments()[i];
+            final int type = copy.getTypeOfParameters((-var - 1));
+            final Set<Integer> domain = this.getDomains().get(type);
+            if (domain.contains(cons)) {
+                this.substitute(copy.getPreconditions(), var, cons, true);
+                this.substitute(copy.getTask(), var, cons, true);
+                this.substitute(copy.getSubTasks(), var, cons, true);
+                copy.setValueOfParameter((-var - 1), cons);
+            } else {
+                instantiable = false;
             }
-
-            // Creates the abstract initial task network
-            IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
-            newTaskNetwork.getTasks().addChild(new IntExpression(root));
-        } else {
-            this.setIntInitialTaskNetwork(taskNetworks.get(0));
+            i++;
+        }
+        // This case may occur when variables are identical in the tasks
+        if (copy.getTask().equals(task) && instantiable) {
+            this.instantiate(copy, index, bound, methods);
         }
     }
 
-
     /**
-     * Instantiates a specified task network.
+     * Instantiates a specified method. This method used brut force.
+     * <p>
+     * The assumption is made that different method parameters are instantiated with different
+     * constants, i.e., the planner never generates methods like move(a,a) because we consider this
+     * as a bad domain representation that should be revised. In fact, in methods with identical
+     * constant parameters, all but one of the constants are superfluous and can be skipped from the
+     * representation without loss of information. Warning this assumption make the process no-sound.
+     * </p>
      *
-     * @param network the task network to instantiate.
-     * @return the list of task netwok instantiated corresponding the specified network.
+     * @param method  the method.
+     * @param index   the index of the parameter to instantiate.
+     * @param bound   the bound of methods to instantiate.
+     * @param methods the list of methods already instantiated.
+     * @see IntMethod
      */
-    private List<IntTaskNetwork> instantiate(final IntTaskNetwork network) {
-        final List<IntTaskNetwork> instNetwork = new ArrayList<>(100);
-        this.instantiate(network, 0, instNetwork);
-        return instNetwork;
+    private void instantiate(final IntMethod method, final int index, final int bound,
+                             final List<IntMethod> methods) {
+        if (bound == methods.size()) {
+            return;
+        }
+        final int arity = method.arity();
+        if (index == arity) {
+            final IntExpression precond = method.getPreconditions();
+            this.simplify(precond);
+            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                methods.add(method);
+            }
+        } else if (method.getValueOfParameter(index) >= 0) {
+            this.instantiate(method, index + 1, bound, methods);
+        } else {
+            final Set<Integer> values = this.getDomains().get(method.getTypeOfParameters(index));
+            for (Integer value : values) {
+                final int varIndex = -index - 1;
+                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
+
+                this.substitute(preconditionCopy, varIndex, value, true);
+                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
+                    final IntMethod copy = new IntMethod(method.getName(), arity);
+                    copy.setPreconditions(preconditionCopy);
+                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
+
+                    final IntExpression taskCopy = new IntExpression(method.getTask());
+                    this.substitute(taskCopy, varIndex, value, true);
+                    copy.setTask(taskCopy);
+
+                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
+                    this.substitute(subTasksCopy, varIndex, value, true);
+                    copy.setSubTasks(subTasksCopy);
+
+                    for (int i = 0; i < arity; i++) {
+                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
+                    }
+                    for (int i = 0; i < arity; i++) {
+                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
+                    }
+
+                    copy.setValueOfParameter(index, value);
+                    this.instantiate(copy, index + 1, bound, methods);
+                }
+            }
+        }
     }
 
     /**
@@ -319,6 +357,61 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 copy.setValueOfParameter(index, value);
                 this.instantiate(copy, index + 1, networks);
             }
+        }
+    }
+
+    /**
+     * Instantiates a specified task network.
+     *
+     * @param network the task network to instantiate.
+     * @return the list of task netwok instantiated corresponding the specified network.
+     */
+    private List<IntTaskNetwork> instantiate(final IntTaskNetwork network) {
+        final List<IntTaskNetwork> instNetwork = new ArrayList<>(100);
+        this.instantiate(network, 0, instNetwork);
+        return instNetwork;
+    }
+
+    /**
+     * Instantiate the goal.
+     */
+    protected void instantiateGoal() {
+        // Expand the quantified expression in the goal
+        this.expandQuantifiedExpression(this.getIntGoal(), true);
+    }
+
+    /**
+     * Instantiates the initial task network.
+     */
+    protected void instantiateInitialTaskNetwork() {
+        final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
+        if (taskNetworks.size() > 1) {
+            IntExpression root = new IntExpression(PDDLConnective.TASK);
+            root.setPredicate(this.getTaskSymbols().size());
+            this.getTaskSymbols().add("__top");
+            this.getCompoundTaskSymbols().add("__top");
+            root.setPrimtive(false);
+            int index = 0;
+            for (IntTaskNetwork tn : taskNetworks) {
+                IntMethod method = new IntMethod("__to_method_" + index, tn.arity());
+                for (int i = 0; i < tn.arity(); i++) {
+                    method.setTypeOfParameter(i, tn.getTypeOfParameters(i));
+                }
+                for (int i = 0; i < tn.arity(); i++) {
+                    method.setValueOfParameter(i, tn.getValueOfParameter(i));
+                }
+                method.setTask(new IntExpression(root));
+                method.setPreconditions(new IntExpression(PDDLConnective.AND));
+                method.setTaskNetwork(tn);
+                this.getIntMethods().add(method);
+                index++;
+            }
+
+            // Creates the abstract initial task network
+            IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
+            newTaskNetwork.getTasks().addChild(new IntExpression(root));
+        } else {
+            this.setIntInitialTaskNetwork(taskNetworks.get(0));
         }
     }
 
@@ -504,104 +597,4 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         return tasks;
 
     }
-
-    /**
-     * Make the preinstantion of a method based on the argument used in the tasks accomplish by the method.
-     *
-     * @param method the method to instantiate.
-     * @param index  the index of the parameter to instantiate. Initially, the index is set to 0.
-     * @param bound  a bound on the number of methods to instantiate.
-     * @param task   the tasks that accomplish the method.
-     */
-    private void instantiate(final IntMethod method, final int index, final int bound,
-                             final List<IntMethod> methods, final IntExpression task) {
-        final IntExpression t = method.getTask();
-        final IntMethod copy = new IntMethod(method);
-        boolean instantiable = true;
-        int i = 0;
-        while (i < t.getArguments().length && instantiable) {
-            final int var = t.getArguments()[i];
-            final int cons = task.getArguments()[i];
-            final int type = copy.getTypeOfParameters((-var - 1));
-            final Set<Integer> domain = this.getDomains().get(type);
-            if (domain.contains(cons)) {
-                this.substitute(copy.getPreconditions(), var, cons, true);
-                this.substitute(copy.getTask(), var, cons, true);
-                this.substitute(copy.getSubTasks(), var, cons, true);
-                copy.setValueOfParameter((-var - 1), cons);
-            } else {
-                instantiable = false;
-            }
-            i++;
-        }
-        // This case may occur when variables are identical in the tasks
-        if (copy.getTask().equals(task) && instantiable) {
-            this.instantiate(copy, index, bound, methods);
-        }
-    }
-
-    /**
-     * Instantiates a specified method. This method used brut force.
-     * <p>
-     * The assumption is made that different method parameters are instantiated with different
-     * constants, i.e., the planner never generates methods like move(a,a) because we consider this
-     * as a bad domain representation that should be revised. In fact, in methods with identical
-     * constant parameters, all but one of the constants are superfluous and can be skipped from the
-     * representation without loss of information. Warning this assumption make the process no-sound.
-     * </p>
-     *
-     * @param method  the method.
-     * @param index   the index of the parameter to instantiate.
-     * @param bound   the bound of methods to instantiate.
-     * @param methods the list of methods already instantiated.
-     * @see IntMethod
-     */
-    private void instantiate(final IntMethod method, final int index, final int bound,
-                             final List<IntMethod> methods) {
-        if (bound == methods.size()) {
-            return;
-        }
-        final int arity = method.arity();
-        if (index == arity) {
-            final IntExpression precond = method.getPreconditions();
-            this.simplify(precond);
-            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
-                methods.add(method);
-            }
-        } else if (method.getValueOfParameter(index) >= 0) {
-            this.instantiate(method, index + 1, bound, methods);
-        } else {
-            final Set<Integer> values = this.getDomains().get(method.getTypeOfParameters(index));
-            for (Integer value : values) {
-                final int varIndex = -index - 1;
-                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
-
-                this.substitute(preconditionCopy, varIndex, value, true);
-                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
-                    final IntMethod copy = new IntMethod(method.getName(), arity);
-                    copy.setPreconditions(preconditionCopy);
-                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
-
-                    final IntExpression taskCopy = new IntExpression(method.getTask());
-                    this.substitute(taskCopy, varIndex, value, true);
-                    copy.setTask(taskCopy);
-
-                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
-                    this.substitute(subTasksCopy, varIndex, value, true);
-                    copy.setSubTasks(subTasksCopy);
-
-                    for (int i = 0; i < arity; i++) {
-                        copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
-                    }
-                    for (int i = 0; i < arity; i++) {
-                        copy.setValueOfParameter(i, method.getValueOfParameter(i));
-                    }
-
-                    copy.setValueOfParameter(index, value);
-                    this.instantiate(copy, index + 1, bound, methods);
-                }
-            }
-        }
-    }
-
 }

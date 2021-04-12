@@ -21,7 +21,8 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
-import fr.uga.pddl4j.problem.*;
+import fr.uga.pddl4j.problem.HTNProblem;
+import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
 
@@ -274,7 +275,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         factory.setTraceLevel(traceLevel - 1);
         long start = System.currentTimeMillis();
         HTNProblem pb = new HTNProblem(factory.getParser().getDomain(), factory.getParser().getProblem());
-        pb.instantiate(100);
+        pb.instantiate();
         long end = System.currentTimeMillis();
         final double encodingTime = (end - start) / 1000.0;
         System.out.print("\nEncoding ");

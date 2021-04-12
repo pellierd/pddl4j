@@ -95,15 +95,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     }
 
     /**
-     * Simplify a specified goal expression based on the ground inertia information.
-     */
-    protected void simplifyGoalWithGroundInertia() {
-        this.simplifyWithGroundInertia(this.getIntGoal(), false);
-        this.simplifyWithGroundNumericInertia(this.getIntGoal(), false);
-        this.simplify(this.getIntGoal());
-    }
-
-    /**
      * Do a pass over the effects of an instantiated action and update the ground inertia table.
      *
      * @param exp the effect.
@@ -198,6 +189,15 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             default:
                 // do nothing
         }
+    }
+
+    /**
+     * Simplify a specified goal expression based on the ground inertia information.
+     */
+    protected void simplifyGoalWithGroundInertia() {
+        this.simplifyWithGroundInertia(this.getIntGoal(), false);
+        this.simplifyWithGroundNumericInertia(this.getIntGoal(), false);
+        this.simplify(this.getIntGoal());
     }
 
     /**
@@ -554,6 +554,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                         case DIV:
                             exp.setValue(op1.getValue() / op2.getValue());
                             break;
+                        default:
+                            throw new UnexpectedExpressionException(this.toString(exp));
                     }
                     exp.setConnective(PDDLConnective.NUMBER);
 
@@ -621,6 +623,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                                 exp.setConnective(PDDLConnective.FALSE);
                             }
                             break;
+                        default:
+                            throw new UnexpectedExpressionException(this.toString(exp));
                     }
                 }
                 break;

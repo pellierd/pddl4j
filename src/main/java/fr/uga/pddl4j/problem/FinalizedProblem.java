@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/*
+/**
  * This class contains all the methods needed to post instantiation process of a planning problem. In particular, this
  * class contains the methods necessary to compactly encode the problem in susing compact bit set representation.
  *
@@ -130,7 +130,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The list of relevant tasks of the problem.
      */
-    private List<Task> relevantTasks;
+    private List<Task> tasks;
 
     /**
      * Creates a new problem from a domain and problem.
@@ -256,8 +256,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant tasks of the problem.
      */
-    protected List<Task> getRelevantTasks() {
-        return this.relevantTasks;
+    protected List<Task> getTasks() {
+        return this.tasks;
     }
 
     /**
@@ -415,6 +415,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             this.numericFluents.add(new NumericFluent(exp.getPredicate(), exp.getArguments()));
         }
     }
+
     /**
      * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
      * only if:
@@ -915,13 +916,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
         return constraint;
     }
+
     /**
      * Encodes an arithmetic expression.
      *
      * @param exp the expression to encode.
      */
     private ArithmeticExpression finalizeArithmeticExpression(final IntExpression exp) {
-
         ArithmeticExpression arithmeticExpression;
         ArithmeticExpression left;
         ArithmeticExpression right;
@@ -988,6 +989,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                         this.initialState.getNegativeFluents().set(i);
                     }
                     break;
+                default:
+                    throw new UnexpectedExpressionException(this.toString(fact));
             }
         }
     }
@@ -1215,6 +1218,256 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
+     * Return a string representation of a search.
+     *
+     * @param plan the search.
+     * @return a string representation of the specified search.
+     */
+    public final String toString(final Plan plan) {
+        int max = Integer.MIN_VALUE;
+        for (Integer t : plan.timeSpecifiers()) {
+            for (Action a : plan.getActionSet(t)) {
+                int length = this.toShortString(a).length();
+                if (max < length) {
+                    max = length;
+                }
+            }
+        }
+        final int actionSize = max;
+        final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
+
+        final StringBuilder str = new StringBuilder();
+        plan.timeSpecifiers().forEach(time ->
+            plan.getActionSet(time).forEach(a ->
+                str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%d]%n",
+                    time, this.toShortString(a), (int) a.getDuration().getValue()))));
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param method the method.
+     * @return a string representation of the specified method.
+     */
+    public final String toString(final Method method) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Method ");
+        str.append(method.getName());
+        str.append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < method.arity(); i++) {
+            final int index = method.getValueOfParameter(i);
+            final String type = this.getTypes().get(method.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i).append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
+        str.append("Preconditions:\n");
+        str.append(this.toString(method.getPrecondition()));
+        str.append("\n");
+        str.append(this.toString(method.getTaskNetwork()));
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified task network.
+     *
+     * @param tasknetwork the task network.
+     * @return a string representation of the specified task network.
+     */
+    public final String toString(final TaskNetwork tasknetwork) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Tasks:\n");
+        if (tasknetwork.getTasks().isEmpty()) {
+            str.append(" ()\n");
+        } else {
+            for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
+                str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
+                str.append(this.toString(this.getTasks().get(tasknetwork.getTasks().get(i))));
+                str.append("\n");
+            }
+        }
+        str.append("Ordering constraints:\n");
+        if (tasknetwork.getOrderingConstraints().cardinality() == 0) {
+            str.append(" ()");
+        } else {
+            BitMatrix constraints = tasknetwork.getOrderingConstraints();
+            int index = 0;
+            for (int r = 0; r < constraints.rows(); r++) {
+                BitSet row = constraints.getRow(r);
+                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
+                    str.append(" C");
+                    str.append(index);
+                    str.append(": ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r);
+                    str.append(" ");
+                    str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage());
+                    str.append(" ");
+                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c);
+                    str.append("\n");
+                    index++;
+                }
+            }
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a task.
+     *
+     * @param task the formula.
+     * @return a string representation of the specified expression.
+     */
+    public String toString(final Task task) {
+        final StringBuffer str = new StringBuffer();
+        str.append("(");
+        str.append(this.getTaskSymbols().get(task.getSymbol()));
+        for (Integer arg : task.getArguments()) {
+            str.append(" ");
+            str.append(this.getConstantSymbols().get(arg));
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+
+    /**
+     * Returns a string representation of a hierarchical decomposition of plan.
+     *
+     * @param hierarchy the hierarchical decomposition to convert into string represention.
+     * @return the string representation of the he hierarchical decomposition in parameter.
+     */
+    public String toString(final Hierarchy hierarchy) {
+        StringBuilder str = new StringBuilder();
+        str.append("==>\n");
+        for (Map.Entry<Integer, Action> a : hierarchy.getPrimtiveTasks().entrySet()) {
+            str.append(a.getKey());
+            str.append(" ");
+            str.append(this.toShortString(a.getValue()));
+            str.append("\n");
+        }
+        str.append("root");
+        for (Integer rootTask : hierarchy.getRootTasks()) {
+            str.append(" ");
+            str.append(rootTask);
+        }
+        str.append("\n");
+        for (Map.Entry<Integer, Method> m : hierarchy.getCounpoudTasks().entrySet()) {
+            str.append(m.getKey());
+            str.append(" ");
+            str.append(this.toString(this.getTasks().get(m.getValue().getTask())));
+            str.append(" -> ");
+            str.append(m.getValue().getName());
+            for (Integer t : hierarchy.getDecomposition().get(m.getKey())) {
+                str.append(" ");
+                str.append(t);
+            }
+            str.append("\n");
+        }
+        str.append("<==\n");
+        return str.toString();
+
+    }
+
+    /**
+     * Returns a string representation of the internal data structure used during instantiation process.
+     *
+     * @param data the internal data structure.
+     * @return a string representation of the internal data structure used during instantiation process.
+     */
+    protected String toString(final Data data) {
+        final StringBuilder str = new StringBuilder();
+        switch (data) {
+            case FLUENTS:
+                int index = 0;
+                for (Fluent fluent : this.getFluents()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(this.toString(fluent));
+                    str.append(System.lineSeparator());
+                    index++;
+                }
+                break;
+            case NUMERIC_FLUENTS:
+                index = 0;
+                for (NumericFluent fluent : this.getNumericFluents()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(this.toString(fluent));
+                    str.append(System.lineSeparator());
+                    index++;
+                }
+                break;
+            case ACTIONS:
+                for (Action action : this.getActions()) {
+                    str.append(this.toString(action));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case METHODS:
+                for (Method method : this.getMethods()) {
+                    str.append(this.toString(method));
+                    str.append(System.lineSeparator());
+                }
+                break;
+            case GOAL:
+                str.append(this.toString(this.getGoal()));
+                str.append(System.lineSeparator());
+                break;
+            case INITIAL_STATE:
+                str.append(this.toString(this.getInitialState()));
+                str.append(System.lineSeparator());
+                break;
+            case INITIAL_TASK_NETWORK:
+                str.append(this.toString(this.getInitialTaskNetwork()));
+                str.append(System.lineSeparator());
+                break;
+            case TASKS:
+                index = 0;
+                for (Task task : this.getTasks()) {
+                    str.append(index);
+                    str.append(": ");
+                    str.append(this.toString(task));
+                    if (task.isPrimtive()) {
+                        str.append(" : primitive");
+                    } else {
+                        str.append(" : compound");
+                    }
+                    str.append(System.lineSeparator());
+                    index++;
+                }
+                break;
+            case TASK_RESOLVERS:
+                for (int i = 0; i < this.getTaskResolvers().size(); i++) {
+                    str.append(i).append(": ");
+                    str.append(this.toString(this.getTasks().get(i)));
+                    str.append(":");
+                    List<Integer> resolvers = this.getTaskResolvers().get(i);
+                    for (int j = 0; j < resolvers.size(); j++) {
+                        str.append(" ").append(resolvers.get(j));
+                    }
+                    str.append("\n");
+                }
+                break;
+            default:
+                return super.toString(data);
+        }
+        return str.toString();
+    }
+
+    /**
      * Returns a short string representation of the specified operator, i.e., its name and its
      * instantiated parameters. This method can be used for actions and methods.
      *
@@ -1263,33 +1516,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         return str.toString();
     }
 
-    /**
-     * Return a string representation of a search.
-     *
-     * @param plan the search.
-     * @return a string representation of the specified search.
-     */
-    public final String toString(final Plan plan) {
-        int max = Integer.MIN_VALUE;
-        for (Integer t : plan.timeSpecifiers()) {
-            for (Action a : plan.getActionSet(t)) {
-                int length = this.toShortString(a).length();
-                if (max < length) {
-                    max = length;
-                }
-            }
-        }
-        final int actionSize = max;
-        final int timeSpecifierSize = (int) Math.log10(plan.timeSpecifiers().size()) + 1;
-
-        final StringBuilder str = new StringBuilder();
-        plan.timeSpecifiers().forEach(time ->
-            plan.getActionSet(time).forEach(a ->
-                str.append(String.format("%0" + timeSpecifierSize + "d: (%" + actionSize + "s) [%d]%n",
-                    time, this.toShortString(a), (int) a.getDuration().getValue()))));
-        return str.toString();
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Methods added to deal with HDDL problem.
     //
@@ -1298,17 +1524,17 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Extract all the relevant task of the problem from the list of primitive and compund tasks of the problem.
      */
     protected void extractRelevantTasks() {
-        this.relevantTasks = new ArrayList<>();
+        this.tasks = new ArrayList<>();
         for (IntExpression task : this.getRelevantPrimitiveTasks()) {
-            this.relevantTasks.add(new Task(task.getPredicate(), task.getArguments(), true));
+            this.tasks.add(new Task(task.getPredicate(), task.getArguments(), true));
         }
         for (IntExpression task : this.getRelevantCompundTasks()) {
-            this.relevantTasks.add(new Task(task.getPredicate(), task.getArguments(), false));
+            this.tasks.add(new Task(task.getPredicate(), task.getArguments(), false));
         }
     }
 
     /**
-     * Creates
+     * Creates the map index for the task.
      */
     protected void initMapOfTaskIndex() {
         List<IntExpression> tasks = new ArrayList<>();
@@ -1359,7 +1585,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 if (this.getTaskResolvers() != null) {
                     this.getTaskResolvers().get(methodIndex).add(methods.size() + addedMethods.size());
                 }
-                this.methods.add(this.finalizeMethod(normalized.get(i), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
+                this.methods.add(this.finalizeMethod(normalized.get(i), this.getMapOfFluentIndex(),
+                    this.mapOfTasksIndex));
             }
             methodIndex++;
         }
@@ -1468,228 +1695,5 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             default:
                 // Do nothing
         }
-    }
-
-    /**
-     * Returns a string representation of the specified method.
-     *
-     * @param method the method.
-     * @return a string representation of the specified method.
-     */
-    public final String toString(final Method method) {
-        final StringBuilder str = new StringBuilder();
-        str.append("Method ");
-        str.append(method.getName());
-        str.append("\n");
-        str.append("Instantiations:\n");
-        for (int i = 0; i < method.arity(); i++) {
-            final int index = method.getValueOfParameter(i);
-            final String type = this.getTypes().get(method.getTypeOfParameters(i));
-            if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(i).append(" - ");
-                str.append(type);
-                str.append(" : ? \n");
-            } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
-                str.append(" \n");
-            }
-        }
-        str.append("Task: " + this.toString(this.getRelevantTasks().get(method.getTask())) + "\n");
-        str.append("Preconditions:\n");
-        str.append(this.toString(method.getPrecondition()));
-        str.append("\n");
-        str.append(this.toString(method.getTaskNetwork()));
-        return str.toString();
-    }
-
-    /**
-     * Returns a string representation of the specified task network.
-     *
-     * @param tasknetwork the task network.
-     * @return a string representation of the specified task network.
-     */
-    public final String toString(final TaskNetwork tasknetwork) {
-        final StringBuilder str = new StringBuilder();
-        str.append("Tasks:\n");
-        if (tasknetwork.getTasks().isEmpty()) {
-            str.append(" ()\n");
-        } else {
-            for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
-                str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
-                str.append(this.toString(this.getRelevantTasks().get(tasknetwork.getTasks().get(i))));
-                str.append("\n");
-            }
-        }
-        str.append("Ordering constraints:\n");
-        if (tasknetwork.getOrderingConstraints().cardinality() == 0) {
-            str.append(" ()");
-        } else {
-            BitMatrix constraints = tasknetwork.getOrderingConstraints();
-            int index = 0;
-            for (int r = 0; r < constraints.rows(); r++) {
-                BitSet row = constraints.getRow(r);
-                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
-                    str.append(" C");
-                    str.append(index);
-                    str.append(": ");
-                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r);
-                    str.append(" ");
-                    str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage());
-                    str.append(" ");
-                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c);
-                    str.append("\n");
-                    index++;
-                }
-            }
-        }
-        return str.toString();
-    }
-
-    /**
-     * Returns a string representation of a task.
-     *
-     * @param task the formula.
-     * @return a string representation of the specified expression.
-     */
-    public String toString(final Task task) {
-        final StringBuffer str = new StringBuffer();
-        str.append("(");
-        str.append(this.getTaskSymbols().get(task.getSymbol()));
-        for (Integer arg : task.getArguments()) {
-            str.append(" ");
-            str.append(this.getConstantSymbols().get(arg));
-        }
-        str.append(")");
-        return str.toString();
-    }
-
-
-    /**
-     * Returns a string representation of a hierarchical decomposition of plan.
-     *
-     * @param hierarchy the hierarchical decomposition to convert into string represention.
-     * @return the string representation of the he hierarchical decomposition in parameter.
-     */
-    public String toString(final Hierarchy hierarchy) {
-        StringBuilder str = new StringBuilder();
-        str.append("==>\n");
-        for (Map.Entry<Integer, Action> a : hierarchy.getPrimtiveTasks().entrySet()) {
-            str.append(a.getKey());
-            str.append(" ");
-            str.append(this.toShortString(a.getValue()));
-            str.append("\n");
-        }
-        str.append("root");
-        for (Integer rootTask : hierarchy.getRootTasks()) {
-            str.append(" ");
-            str.append(rootTask);
-        }
-        str.append("\n");
-        for (Map.Entry<Integer, Method> m : hierarchy.getCounpoudTasks().entrySet()) {
-            str.append(m.getKey());
-            str.append(" ");
-            str.append(this.toString(this.getRelevantTasks().get(m.getValue().getTask())));
-            str.append(" -> ");
-            str.append(m.getValue().getName());
-            for (Integer t : hierarchy.getDecomposition().get(m.getKey())) {
-                str.append(" ");
-                str.append(t);
-            }
-            str.append("\n");
-        }
-        str.append("<==\n");
-        return str.toString();
-
-    }
-
-    /**
-     * Returns a string representation of the internal data structure used during instantiation process.
-     *
-     * @param data the internal data structure.
-     * @return a string representation of the internal data structure used during instantiation process.
-     */
-    protected String toString(final Data data) {
-        final StringBuilder str = new StringBuilder();
-        switch (data) {
-            case FLUENTS:
-                int index = 0;
-                for (Fluent fluent : this.getFluents()) {
-                    str.append(index);
-                    str.append(": ");
-                    str.append(this.toString(fluent));
-                    str.append(System.lineSeparator());
-                    index++;
-                }
-                break;
-            case NUMERIC_FLUENTS:
-                index = 0;
-                for (NumericFluent fluent : this.getNumericFluents()) {
-                    str.append(index);
-                    str.append(": ");
-                    str.append(this.toString(fluent));
-                    str.append(System.lineSeparator());
-                    index++;
-                }
-                break;
-            case ACTIONS:
-                for (Action action : this.getActions()) {
-                    str.append(this.toString(action));
-                    str.append(System.lineSeparator());
-                }
-                break;
-            case METHODS:
-                for (Method method : this.getMethods()) {
-                    str.append(this.toString(method));
-                    str.append(System.lineSeparator());
-                }
-                break;
-            case GOAL:
-                str.append(this.toString(this.getGoal()));
-                str.append(System.lineSeparator());
-                break;
-            case INITIAL_STATE:
-                str.append(this.toString(this.getInitialState()));
-                str.append(System.lineSeparator());
-                break;
-            case INITIAL_TASK_NETWORK:
-                str.append(this.toString(this.getInitialTaskNetwork()));
-                str.append(System.lineSeparator());
-                break;
-            case TASKS:
-                index = 0;
-                for (Task task : this.getRelevantTasks()) {
-                    str.append(index);
-                    str.append(": ");
-                    str.append(this.toString(task));
-                    if (task.isPrimtive()) {
-                        str.append(" : primitive");
-                    } else {
-                        str.append(" : compound");
-                    }
-                    str.append(System.lineSeparator());
-                    index++;
-                }
-                break;
-            case TASK_RESOLVERS:
-                for (int i = 0; i < this.getTaskResolvers().size(); i++) {
-                    str.append(i).append(": ");
-                    str.append(this.toString(this.getRelevantTasks().get(i)));
-                    str.append(":");
-                    List<Integer> resolvers = this.getTaskResolvers().get(i);
-                    for (int j = 0; j < resolvers.size(); j++) {
-                        str.append(" ").append(resolvers.get(j));
-                    }
-                    str.append("\n");
-                }
-                break;
-            default:
-                return super.toString(data);
-        }
-        return str.toString();
     }
 }

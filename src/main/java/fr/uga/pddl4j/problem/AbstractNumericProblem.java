@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains all the methods shared by all numeric problem.
+ * This class contains all the methods shared by all numeric problems.
  *
  * @author D. Pellier
  * @version 4.0 - 08.02.2021
@@ -42,6 +42,8 @@ public class AbstractNumericProblem extends ADLProblem implements Numeric {
 
     /**
      * Returns the list of PDDL requirements accepted by the problem.
+     *
+     * @return the list of PDDL requirements accepted by the problem.
      */
     public Set<PDDLRequireKey> getAcceptedRequirements() {
         Set<PDDLRequireKey> accepted = super.getAcceptedRequirements();

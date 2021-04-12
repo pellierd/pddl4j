@@ -17,13 +17,14 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Effect;
+
 import org.apache.logging.log4j.Level;
 
 import java.io.Serializable;

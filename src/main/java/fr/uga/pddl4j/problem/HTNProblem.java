@@ -21,8 +21,8 @@ import fr.uga.pddl4j.problem.operator.Method;
 
 import java.util.Iterator;
 
-/*
- * This class contains all the methods needed to manipulate a HTN problem.
+/**
+ * This class contains all the methods needed to manipulate a HTN problems.
  *
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
@@ -40,7 +40,10 @@ public class HTNProblem extends AbstractHTNProblem {
     }
 
     /**
-     * This method is called by the
+     * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
+     * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
+     * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
+     * network of the problem into compact int representation.
      */
     @Override
     protected void initialization() {

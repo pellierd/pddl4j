@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 /**
  * Implements the <tt>PDDLParser</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
+ *
  * <p>
  * A simple example of how to use the parser:
  * </p>
@@ -83,9 +84,10 @@ import java.util.stream.Collectors;
  *      System.out.println(&quot;-f &lt;str&gt;    fact file name\n&quot;);
  *    }
  * }
- * </pre>
  *
+ * </pre>
  * To generate the PDDL BNF accepted by the parser use the commande line:
+ *
  * <pre>
  *     ./gradlew jjdoc
  * </pre>

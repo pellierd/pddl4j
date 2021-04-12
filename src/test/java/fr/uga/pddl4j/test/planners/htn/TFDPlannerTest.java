@@ -362,7 +362,7 @@ public class TFDPlannerTest {
                 System.out.println("* Encoding [" + currentProblem + "]" + "...");
                 try {
                     HTNProblem pb = new HTNProblem(factory.getParser().getDomain(), factory.getParser().getProblem());
-                    pb.instantiate(100);
+                    pb.instantiate();
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"

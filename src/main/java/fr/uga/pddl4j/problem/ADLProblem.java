@@ -41,7 +41,10 @@ public class ADLProblem extends FinalizedProblem {
 
     /**
      * Returns the list of PDDL requirements accepted by the problem.
+     *
+     * @return the list of PDDL requirements accepted by the problem.
      */
+    @Override
     public Set<PDDLRequireKey> getAcceptedRequirements() {
         Set<PDDLRequireKey> accepted = new HashSet<>();
         accepted.add(PDDLRequireKey.ADL);
@@ -114,7 +117,6 @@ public class ADLProblem extends FinalizedProblem {
             this.getLogger().debug("Goal declared:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
-
     }
 
     /**
@@ -177,12 +179,12 @@ public class ADLProblem extends FinalizedProblem {
         }
         this.simplyActionsWithGroundInertia();
         if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions simplified base on ground intertia detected:\n\n"
+            this.getLogger().debug("Actions simplified base on ground inertia detected:\n\n"
                 + this.toString(Data.INT_ACTIONS) + "\n");
         }
         this.simplifyGoalWithGroundInertia();
         if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal simplified base on ground intertia detected:\n"
+            this.getLogger().debug("Goal simplified base on ground in‡ertia detected:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
     }

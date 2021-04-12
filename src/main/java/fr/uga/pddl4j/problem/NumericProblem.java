@@ -145,12 +145,12 @@ public class NumericProblem extends AbstractNumericProblem {
         }
         this.simplyActionsWithGroundInertia();
         if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions simplified base on ground intertia detected:\n\n"
+            this.getLogger().debug("Actions simplified base on ground inertia detected:\n\n"
                 + this.toString(Data.INT_ACTIONS) + "\n");
         }
         this.simplifyGoalWithGroundInertia();
         if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal simplified base on ground intertia detected:\n"
+            this.getLogger().debug("Goal simplified base on ground inertia detected:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
     }

@@ -30,12 +30,12 @@ public class ArithmeticExpression extends AbstractNumericExpression {
     /**
      * The default numeric fluent index.
      */
-    public final static int DEFAULT_NUMERIC_FLUENT = -1;
+    public static final int DEFAULT_NUMERIC_FLUENT = -1;
 
     /**
      * The default value of the arithmetic expression.
      */
-    public final static double DEFAULT_VALUE = 0.0;
+    public static final double DEFAULT_VALUE = 0.0;
 
     /**
      * The type of the arithmetic operators.
@@ -229,27 +229,39 @@ public class ArithmeticExpression extends AbstractNumericExpression {
         switch (this.getType()) {
             case NUMBER:
                 value = this.getValue();
+                break;
             case VARIABLE:
                 value = context.get(this.getNumericFluent()).getValue();
                 break;
             case OPERATOR:
                 switch (this.getArithmeticOperator()) {
                     case PLUS:
-                        value = this.getLeftExpression().evaluate(context) + this.getRightExpression().evaluate(context);
+                        value = this.getLeftExpression().evaluate(context)
+                            + this.getRightExpression().evaluate(context);
                         break;
                     case MINUS:
-                        value = this.getLeftExpression().evaluate(context) - this.getRightExpression().evaluate(context);
+                        value = this.getLeftExpression().evaluate(context)
+                            - this.getRightExpression().evaluate(context);
                         break;
                     case DIV:
-                        value = this.getLeftExpression().evaluate(context) / this.getRightExpression().evaluate(context);
+                        value = this.getLeftExpression().evaluate(context)
+                            / this.getRightExpression().evaluate(context);
                         break;
                     case MUL:
-                        value = this.getLeftExpression().evaluate(context) * this.getRightExpression().evaluate(context);
+                        value = this.getLeftExpression().evaluate(context)
+                            * this.getRightExpression().evaluate(context);
                         break;
                     case UMINUS:
                         value = -this.getLeftExpression().evaluate(context);
                         break;
+                    default:
+                        // do nothing
+                        break;
                 }
+                break;
+            default:
+                // do nothing
+                break;
         }
         return value;
     }
@@ -284,6 +296,9 @@ public class ArithmeticExpression extends AbstractNumericExpression {
                     return this.getArithmeticOperator() == other.getArithmeticOperator()
                         && Objects.equals(this.getLeftExpression(), other.getLeftExpression())
                         && Objects.equals(this.getRightExpression(), other.getRightExpression());
+                default:
+                    // do nothing
+                    break;
             }
         }
         return false;
@@ -307,6 +322,9 @@ public class ArithmeticExpression extends AbstractNumericExpression {
             case OPERATOR:
                 hashcode = Objects.hash(this.getType(),this.getArithmeticOperator(), this.getLeftExpression(),
                     this.getRightExpression());
+                break;
+            default:
+                // do nothing
                 break;
         }
         return hashcode;
@@ -352,7 +370,14 @@ public class ArithmeticExpression extends AbstractNumericExpression {
                         str.append(this.getRightExpression().toString());
                         str.append(")");
                         break;
+                    default:
+                        // do nothing
+                        break;
                 }
+                break;
+            default:
+                // do nothing
+                break;
         }
         return str.toString();
     }

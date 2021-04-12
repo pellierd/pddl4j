@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class implements a bit matrix.
- *
- * This class introspection mechanism not more allowed with jre version superior to 1.8.
+ * This class implements a bit matrix. This class introspection mechanism not more allowed with jre version superior
+ * to 1.8.
  * <br>
  * Revisions:
  * <ul>

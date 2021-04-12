@@ -19,8 +19,7 @@
 
 package fr.uga.pddl4j.plan;
 
-import fr.uga.pddl4j.problem.*;
-
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;

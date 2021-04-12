@@ -44,15 +44,11 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
     }
 
     /**
-     * Instantiate the HTN problem.
-     */
-    public void instantiate(int timeout) {
-        super.instantiate();
-    }
-
-    /**
      * Returns the list of PDDL requirements accepted by the problem.
+     *
+     * @return the list of PDDL requirements accepted by the problem.
      */
+    @Override
     public Set<PDDLRequireKey> getAcceptedRequirements() {
         Set<PDDLRequireKey> accepted = new HashSet<>();
         accepted.add(PDDLRequireKey.ADL);
@@ -108,9 +104,11 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
 
     /**
      * The list of relevant tasks of the problem.
+     *
+     * @return the list of relevant tasks of the problem.
      */
     public List<Task> getTasks() {
-        return super.getRelevantTasks();
+        return super.getTasks();
     }
 
     /**

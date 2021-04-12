@@ -18,8 +18,8 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
@@ -95,12 +95,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
                     // Test if a specified operator is applicable in the current state
                     if (op.isApplicable(current)) {
                         final State nextState = new State(current);
-
-                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
-                                // Apply the effect to the successor node
-                                nextState.apply(ce.getEffect())
-                        );
-
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition()))
+                            .forEach(ce -> nextState.apply(ce.getEffect()));
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
                         this.setCreatedNodes(this.getCreatedNodes() + 1);

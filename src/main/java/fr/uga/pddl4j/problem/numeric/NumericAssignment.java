@@ -106,6 +106,7 @@ public final class NumericAssignment extends AbstractNumericExpression {
             && super.getLeftExpression().equals(other.getLeftExpression())
             && super.getRightExpression().equals(other.getRightExpression());
     }
+
     /**
      * Returns the value assigned.
      *
@@ -132,6 +133,8 @@ public final class NumericAssignment extends AbstractNumericExpression {
             case SCALE_DOWN:
                 variable.setValue(left.evaluate(context) / right.evaluate(context));
                 break;
+            default:
+                // do nothing
         }
         return variable;
     }
@@ -191,6 +194,8 @@ public final class NumericAssignment extends AbstractNumericExpression {
                 str.append(right);
                 str.append(")");
                 break;
+            default:
+                // do nothing
         }
         return str.toString();
     }

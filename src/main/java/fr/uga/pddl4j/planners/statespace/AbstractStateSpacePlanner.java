@@ -29,7 +29,8 @@ import java.util.List;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public abstract class AbstractStateSpacePlanner<T extends Problem> extends AbstractPlanner<T> implements StateSpacePlanner<T> {
+public abstract class AbstractStateSpacePlanner<T extends Problem> extends AbstractPlanner<T>
+        implements StateSpacePlanner<T> {
 
     /**
      * The anytime state of the planner.

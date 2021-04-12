@@ -113,6 +113,9 @@ public final class NumericConstraint extends AbstractNumericExpression {
             case GREATER_OR_EQUAL:
                 eval = left >= right;
                 break;
+            default:
+                // do nothing
+                break;
         }
         return eval;
     }
@@ -196,6 +199,9 @@ public final class NumericConstraint extends AbstractNumericExpression {
                 str.append(" ");
                 str.append(right);
                 str.append(")");
+                break;
+            default:
+                // do nothing
                 break;
         }
         return str.toString();

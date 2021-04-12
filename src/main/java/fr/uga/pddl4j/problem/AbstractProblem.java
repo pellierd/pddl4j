@@ -28,7 +28,18 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
-import fr.uga.pddl4j.problem.operator.*;
+import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
+import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
+import fr.uga.pddl4j.problem.operator.IntAction;
+import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.problem.operator.IntMethod;
+import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
+import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -38,11 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 
 /**
  * This class contains all the methods needed to encode the a planning problem into int representation before
@@ -159,7 +165,7 @@ public abstract class AbstractProblem implements Problem {
     private IntExpression intGoal;
 
     /**
-     * The list of methods in the
+     * The list of methods defined in the problem.
      */
     private List<IntMethod> intMethods;
 
@@ -167,6 +173,41 @@ public abstract class AbstractProblem implements Problem {
      * The initial task network into its integer representation.
      */
     private IntTaskNetwork intInitialTaskNetwork;
+
+    /**
+     * The enum used to list the set of internal data structures needed by the instantiation process.
+     */
+    protected enum Data {
+        TYPES,
+        TYPE_SYMBOLS,
+        CONSTANT_SYMBOLS,
+        FUNCTION_SYMBOLS,
+        PREDICATE_SYMBOLS,
+        PRIMITIVE_TASKS_SYMBOLS,
+        COMPOUND_TASKS_SYMBOLS,
+        TASKS_SYMBOLS,
+        PREDICATE_SIGNATURES,
+        FUNCTION_SIGNATURES,
+        TASK_SIGNATURES,
+        INT_ACTIONS,
+        INT_METHODS,
+        INT_GOAL,
+        INT_INITIAL_STATE,
+        INT_INITIAL_TASK_NETWORK,
+        INERTIA,
+        NUMERIC_INERTIA,
+        GROUND_INERTIA,
+        GROUND_NUMERIC_INERTIA,
+        ACTIONS,
+        METHODS,
+        FLUENTS,
+        NUMERIC_FLUENTS,
+        TASKS,
+        TASK_RESOLVERS,
+        INITIAL_TASK_NETWORK,
+        GOAL,
+        INITIAL_STATE,
+    }
 
     /**
      * The empty constructor to block the default constructor of object.
@@ -195,6 +236,7 @@ public abstract class AbstractProblem implements Problem {
     protected Logger getLogger() {
         return this.logger;
     }
+
     /**
      * Returns the parsed domain used to create of this problem.
      *
@@ -328,7 +370,6 @@ public abstract class AbstractProblem implements Problem {
      */
     public final void instantiate() {
         instantiate(AbstractProblem.DEFAULT_LOG_LEVEL);
-
     }
 
     /**
@@ -374,8 +415,8 @@ public abstract class AbstractProblem implements Problem {
     protected abstract void postinstantiation();
 
     /**
-     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation using
-     * bit set.
+     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation
+     * using bit set.
      */
     protected abstract void finalization();
 
@@ -417,7 +458,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the constants declared in the domain and the problem and initialise the domains of values of each type.
+     * Initializes the constants declared in the domain and the problem and initialise the domains of values of each
+     * type.
      */
     protected void initConstants() {
         final List<PDDLTypedSymbol> constants = this.domain.getConstants();
@@ -715,7 +757,7 @@ public abstract class AbstractProblem implements Problem {
      * initial state.
      *
      * @return the map that store the value of the numeric fluents in the form of <code>IntExpression</code> of the
-     * initial state.
+     *      initial state.
      * @see IntExpression
      */
     protected Map<IntExpression, Double> getIntInitFunctionCost() {
@@ -770,21 +812,14 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Encodes the actions of the domain into a compact integer representation.
-     */
-    protected void initActions() {
-        this.intActions = this.getPDDLDomain().getActions().stream().map(this::initActions).collect(Collectors.toList());
-    }
-
-    /**
      * Encodes a specified initial state into its integer representation.
      */
     protected void initInitialState() {
-        Set<IntExpression> init =  this.getPDDLProblem().getInit().stream().map(this::initExpression)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
         this.intInitialState = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
         this.intInitFunctions = new LinkedHashSet<>();
+        final Set<IntExpression> init =  this.getPDDLProblem().getInit().stream().map(this::initExpression)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
         for (IntExpression exp : init) {
             switch (exp.getConnective()) {
                 case FN_ATOM:
@@ -809,6 +844,14 @@ public abstract class AbstractProblem implements Problem {
         if (this.getPDDLProblem().getGoal() != null) {
             this.intGoal = this.initExpression(this.getPDDLProblem().getGoal());
         }
+    }
+
+    /**
+     * Encodes the actions of the domain into a compact integer representation.
+     */
+    protected void initActions() {
+        this.intActions = this.getPDDLDomain().getActions().stream().map(this::initActions)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1037,12 +1080,13 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Encodes an specified expression into its integer representation.
      *
+     * <p>
      * Notes:
      * <ul>
      * <li>equal predicate used specified value of -1.</li>
      * <li>variables used negative values in [-1,-infinity[.</li>
      * </ul>
-     *
+     * </p>
      * @param exp       the expression to encode.
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
@@ -1275,7 +1319,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns a  string representation of the specified operator
+     * Returns a  string representation of the specified operator.
      *
      * @param operator  the operator.
      * @return a string representation of the specified operator.
@@ -1325,6 +1369,7 @@ public abstract class AbstractProblem implements Problem {
         str.append("\n");
         return str.toString();
     }
+
     /**
      * Returns a string representation of an expression.
      *
@@ -1515,85 +1560,9 @@ public abstract class AbstractProblem implements Problem {
                 str.append(")");
                 break;
             default:
-                str.append("DEFAULT");
-                break;
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
         return str.toString();
-    }
-
-    /**
-     * Returns a short string representation of the specified operator, i.e., its name and its
-     * instantiated parameters.
-     *
-     * @param operator  the operator.
-     * @param constants the table of constants.
-     * @return a string representation of the specified operator.
-     */
-    public String toShortString(final AbstractGroundOperator operator, final List<String> constants) {
-        final StringBuilder str = new StringBuilder();
-        str.append(operator.getName());
-        for (int i = 0; i < operator.arity(); i++) {
-            final int index = operator.getValueOfParameter(i);
-            if (index == -1) {
-                str.append(" ?");
-            } else {
-                str.append(" ").append(constants.get(index));
-            }
-        }
-        return str.toString();
-    }
-
-    /**
-     * Returns the string representation of a list of types.
-     *
-     * @param types the list of types.
-     * @return the string representation of this type.
-     */
-    private String toStringType(final List<PDDLSymbol> types) {
-        final StringBuilder str = new StringBuilder();
-        if (types.size() > 1) {
-            str.append("either");
-            for (PDDLSymbol type : types) {
-                str.append("~");
-                str.append(type.getImage());
-            }
-        } else {
-            str.append(types.get(0).getImage());
-        }
-        return str.toString();
-    }
-
-
-    protected enum Data {
-        TYPES,
-        TYPE_SYMBOLS,
-        CONSTANT_SYMBOLS,
-        FUNCTION_SYMBOLS,
-        PREDICATE_SYMBOLS,
-        PRIMITIVE_TASKS_SYMBOLS,
-        COMPOUND_TASKS_SYMBOLS,
-        TASKS_SYMBOLS,
-        PREDICATE_SIGNATURES,
-        FUNCTION_SIGNATURES,
-        TASK_SIGNATURES,
-        INT_ACTIONS,
-        INT_METHODS,
-        INT_GOAL,
-        INT_INITIAL_STATE,
-        INT_INITIAL_TASK_NETWORK,
-        INERTIA,
-        NUMERIC_INERTIA,
-        GROUND_INERTIA,
-        GROUND_NUMERIC_INERTIA,
-        ACTIONS,
-        METHODS,
-        FLUENTS,
-        NUMERIC_FLUENTS,
-        TASKS,
-        TASK_RESOLVERS,
-        INITIAL_TASK_NETWORK,
-        GOAL,
-        INITIAL_STATE,
     }
 
     /**
@@ -1738,6 +1707,12 @@ public abstract class AbstractProblem implements Problem {
                     str.append("\n ");
                     str.append(this.toString(e));
                 }
+                if (this.getIntInitFunctions() != null) {
+                    for (IntExpression e : this.getIntInitFunctions()) {
+                        str.append("\n ");
+                        str.append(this.toString(e));
+                    }
+                }
                 str.append(")\n");
                 break;
             case INT_INITIAL_TASK_NETWORK:
@@ -1746,6 +1721,48 @@ public abstract class AbstractProblem implements Problem {
                 break;
             default:
                 str.append("");
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a short string representation of the specified operator, i.e., its name and its
+     * instantiated parameters.
+     *
+     * @param operator  the operator.
+     * @param constants the table of constants.
+     * @return a string representation of the specified operator.
+     */
+    public String toShortString(final AbstractGroundOperator operator, final List<String> constants) {
+        final StringBuilder str = new StringBuilder();
+        str.append(operator.getName());
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            if (index == -1) {
+                str.append(" ?");
+            } else {
+                str.append(" ").append(constants.get(index));
+            }
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns the string representation of a list of types.
+     *
+     * @param types the list of types.
+     * @return the string representation of this type.
+     */
+    private String toStringType(final List<PDDLSymbol> types) {
+        final StringBuilder str = new StringBuilder();
+        if (types.size() > 1) {
+            str.append("either");
+            for (PDDLSymbol type : types) {
+                str.append("~");
+                str.append(type.getImage());
+            }
+        } else {
+            str.append(types.get(0).getImage());
         }
         return str.toString();
     }

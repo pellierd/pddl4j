@@ -15,13 +15,13 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
-import fr.uga.pddl4j.util.IntMatrix;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.problem.operator.IntAction;
+import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.util.IntMatrix;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -1429,6 +1429,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
+
     /**
      * Convert an expression in disjunctive normal form (DNF).
      *
@@ -1520,26 +1521,6 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     }
 
     /**
-     * Print the table of inertia.
-     */
-    final protected void traceInertia() {
-        final StringBuilder str = new StringBuilder();
-        str.append("###########################################################\n");
-        str.append("# INERTIA\n\n");
-        for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
-            String predicate = this.getPredicateSymbols().get(i);
-            str.append(i);
-            str.append(": ");
-            str.append(predicate);
-            str.append(" : ");
-            str.append(this.getInertia().get(i));
-            str.append(System.lineSeparator());
-        }
-        str.append(System.lineSeparator());
-        this.getLogger().trace(str);
-    }
-
-    /**
      * Returns a string representation of the internal data structure used during instantiation process.
      *
      * @param data the internal data structure.
@@ -1558,7 +1539,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     str.append(this.getInertia().get(i));
                     str.append("\n");
                 }
-            break;
+                break;
             case NUMERIC_INERTIA:
                 for (int i = 0; i < this.getFunctions().size(); i++) {
                     String function = this.getFunctions().get(i);

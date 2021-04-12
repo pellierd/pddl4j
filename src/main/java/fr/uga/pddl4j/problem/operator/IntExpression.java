@@ -460,7 +460,7 @@ public class IntExpression implements Serializable {
             default:
                 this.children.forEach(IntExpression::moveNegationInward);
                 break;
-            // do nothing
+                // do nothing
         }
     }
 

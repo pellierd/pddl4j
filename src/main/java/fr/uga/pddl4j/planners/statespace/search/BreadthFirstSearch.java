@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.State;
+import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.HashSet;
@@ -91,10 +91,8 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
                         // Apply the effect of the applicable operator
                         // Test if the condition of the effect is satisfied in the current state
                         // Apply the effect to the successor node
-                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition())).forEach(ce ->
-                                // Apply the effect to the successor node
-                                nextState.apply(ce.getEffect())
-                        );
+                        op.getConditionalEffects().stream().filter(ce -> current.satisfy(ce.getCondition()))
+                            .forEach(ce -> nextState.apply(ce.getEffect()));
 
                         // Apply the effect of the applicable operator
                         final Node successor = new Node(nextState);
