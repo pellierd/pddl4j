@@ -160,19 +160,21 @@ public final class PDDLParser {
      * Parses a planning domain from a specific file path.
      *
      * @param domain the path to the domain file.
+     * @return a the pddl domain parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified domain does not exist.
      */
-    public void parseDomain(String domain) throws FileNotFoundException {
-        this.parseDomain(new File(domain));
+    public PDDLDomain parseDomain(String domain) throws FileNotFoundException {
+        return this.parseDomain(new File(domain));
     }
 
     /**
      * Parses a planning domain from a specific file.
      *
      * @param domain the file that contains the planning domain.
+     * @return a the pddl domain parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified domain file does not exist.
      */
-    public void parseDomain(File domain) throws FileNotFoundException {
+    public PDDLDomain parseDomain(File domain) throws FileNotFoundException {
         if (!domain.exists()) {
             throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.");
         }
@@ -188,48 +190,43 @@ public final class PDDLParser {
             lexer.setFile(domain);
             this.lexer.domain();
             this.domain = this.lexer.getDomain();
-            try {
-                this.checkRequirements();
-                this.checkTypesDeclaration();
-                this.checkConstantsDeclaration();
-                this.checkPredicatesDeclaration();
-                this.checkFunctionsDeclaration();
-                this.checkDomainConstraints();
-                this.checkTaskDeclaration();
-                this.checkActionDeclaration();
-                this.checkMethodDeclaration();
-                this.checkDerivedPredicateDeclaration();
-            } catch (NullPointerException exception) {
-                LOGGER.error("domain file is not valid\n");
-                exception.printStackTrace();
-                this.domain = new PDDLDomain(new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, "domain"));
-            } finally {
-                inputStream.close();
-            }
-        } catch (IOException | RuntimeException exception) {
-            LOGGER.fatal(UNEXP_ERROR_MESSAGE, exception);
-        } catch (TokenMgrError | ParseException pe) {
-            LOGGER.error("parse error in domain() call\n");
+            this.checkRequirements();
+            this.checkTypesDeclaration();
+            this.checkConstantsDeclaration();
+            this.checkPredicatesDeclaration();
+            this.checkFunctionsDeclaration();
+            this.checkDomainConstraints();
+            this.checkTaskDeclaration();
+            this.checkActionDeclaration();
+            this.checkMethodDeclaration();
+            this.checkDerivedPredicateDeclaration();
+        } catch (Throwable t) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, t.getMessage());
+            return null;
         }
+        return (this.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+                && this.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()) ? this.domain : null;
     }
 
     /**
      * Parses a planning problem from a specific file path.
      *
      * @param problem the path to the planning problem.
+     * @return a the pddl problem parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
-    public void parseProblem(String problem) throws FileNotFoundException {
-        this.parseProblem(new File(problem));
+    public PDDLProblem parseProblem(String problem) throws FileNotFoundException {
+        return this.parseProblem(new File(problem));
     }
 
     /**
      * Parses a planning problem from a specific file.
      *
      * @param problem the file that contains the planning problem.
+     * @return a the pddl problem parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
-    public void parseProblem(File problem) throws FileNotFoundException {
+    public PDDLProblem parseProblem(File problem) throws FileNotFoundException {
         if (!problem.exists()) {
             throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.");
         }
@@ -244,26 +241,19 @@ public final class PDDLParser {
             this.lexer.setFile(problem);
             this.lexer.problem();
             this.problem = this.lexer.getProblem();
-            try {
-                this.checkDomainName();
-                this.checkRequirements();
-                this.checkObjectsDeclaration();
-                this.checkInitialTaskNetwork();
-                this.checkInitialFacts();
-                this.checkGoal();
-                this.checkProblemConstraints();
-                this.checkMetric();
-            } catch (NullPointerException exception) {
-                exception.printStackTrace();
-                LOGGER.error("problem file is not valid\n");
-            } finally {
-                inputStream.close();
-            }
-        } catch (IOException | RuntimeException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-        } catch (TokenMgrError | ParseException pe) {
-            LOGGER.error("parse error in problem() call\n");
+            this.checkDomainName();
+            this.checkRequirements();
+            this.checkObjectsDeclaration();
+            this.checkInitialTaskNetwork();
+            this.checkInitialFacts();
+            this.checkGoal();
+            this.checkProblemConstraints();
+            this.checkMetric();
+        } catch (Throwable t) {
+            LOGGER.error(UNEXP_ERROR_MESSAGE, t.getMessage());
         }
+        return (this.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+            && this.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()) ? this.problem : null;
     }
 
     /**
@@ -427,8 +417,8 @@ public final class PDDLParser {
      * @param problem the path of the file that contains the planning problem.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    public void parse(String domain, String problem) throws FileNotFoundException {
-        this.parse(new File(domain), new File(problem));
+    public PDDLProblem parse(String domain, String problem) throws FileNotFoundException {
+        return this.parse(new File(domain), new File(problem));
     }
 
     /**
@@ -436,9 +426,10 @@ public final class PDDLParser {
      *
      * @param domain  the file that contains the planning domains.
      * @param problem the file that contains the planning problem.
+     * @return the problem parsed or null if an error occurred while parsing domain or problem.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    public void parse(File domain, File problem) throws FileNotFoundException {
+    public PDDLProblem parse(File domain, File problem) throws FileNotFoundException {
         if (!domain.exists()) {
             throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.");
         }
@@ -447,12 +438,14 @@ public final class PDDLParser {
         }
         try {
             // Parse and check the domain
-            this.parseDomain(domain);
+            PDDLDomain pddlDomain = this.parseDomain(domain);
             // Parse and check the problem
-            this.parseProblem(problem);
+            PDDLProblem pddlProblem = this.parseProblem(problem);
+            return (pddlDomain != null && pddlProblem != null) ? new PDDLProblem(pddlDomain, pddlProblem) : null;
         } catch (Throwable t) {
             LOGGER.error(UNEXP_ERROR_MESSAGE, t);
         }
+        return null;
     }
 
     /**
@@ -460,7 +453,7 @@ public final class PDDLParser {
      *
      * @return the domain parsed.
      */
-    public final PDDLDomain getDomain() {
+    private final PDDLDomain getDomain() {
         return this.domain;
     }
 
@@ -469,7 +462,7 @@ public final class PDDLParser {
      *
      * @return the problem parsed.
      */
-    public final PDDLProblem getProblem() {
+    private final PDDLProblem getProblem() {
         return this.problem;
     }
 
@@ -749,12 +742,12 @@ public final class PDDLParser {
     private boolean checkDomainName() {
         boolean checked = true;
 
-        if (this.domain.getName() != null
+        if (this.domain.getDomainName() != null
             && this.problem.getName() != null
-            && !this.domain.getName().equals(this.problem.getDomain())) {
-            this.mgr.logParserWarning("domain name \"" + this.problem.getDomain()
+            && !this.domain.getDomainName().equals(this.problem.getDomainName())) {
+            this.mgr.logParserWarning("domain name \"" + this.problem.getDomainName()
                 + "\" used in problem doest not match.", this.lexer.getFile(), this.problem
-                .getDomain().getBeginLine(), this.problem.getDomain().getBeginColumn());
+                .getDomainName().getBeginLine(), this.problem.getDomainName().getBeginColumn());
             checked = false;
         }
         return checked;

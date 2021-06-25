@@ -15,12 +15,8 @@
 
 package fr.uga.pddl4j.planners.htn.stn.pfd;
 
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
@@ -31,12 +27,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Properties;
 
 /**
  * This class implement a simple task network planner enable to deal with partial ordered htn representation. The

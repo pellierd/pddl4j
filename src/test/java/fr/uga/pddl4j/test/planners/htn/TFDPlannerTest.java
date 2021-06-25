@@ -17,10 +17,9 @@ package fr.uga.pddl4j.test.planners.htn;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.test.Tools;
@@ -37,8 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import java.util.Properties;
 
 /**
  * Implements the <tt>TFDPlannerTest</tt> of the PDD4L library. The class executes the junit tests with TFDPlanner on
@@ -309,7 +306,6 @@ public class TFDPlannerTest {
      */
     private void generateValOutputPlans(String currentTestPath) {
         Tools.cleanValPlan(currentTestPath);
-        final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + Tools.HDDL_DOMAIN;
 
         String currentProblem;
@@ -347,7 +343,8 @@ public class TFDPlannerTest {
 
             // Parses the HDDL domain and problem description
             try {
-                ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                PDDLProblem parsedProblem = this.planner.parse(currentDomain, currentProblem);
+                ErrorManager errorManager = this.planner.getParserErrorManager();
                 if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
                     errorManager.print(Message.Type.LEXICAL_ERROR);
                 }
@@ -361,8 +358,7 @@ public class TFDPlannerTest {
                 // Encodes and instantiates the problem in a compact representation
                 System.out.println("* Encoding [" + currentProblem + "]" + "...");
                 try {
-                    HTNProblem pb = new HTNProblem(factory.getParser().getDomain(), factory.getParser().getProblem());
-                    pb.instantiate();
+                    HTNProblem pb = this.planner.instantiate(parsedProblem);
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"

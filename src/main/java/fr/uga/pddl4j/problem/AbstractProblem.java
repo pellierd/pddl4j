@@ -70,7 +70,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The PDDL domain.
      */
-    private PDDLDomain domain;
+    //private PDDLDomain domain;
 
     /**
      * The PDDL problem.
@@ -218,12 +218,11 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain  the domain.
      * @param problem the problem.
      */
-    public AbstractProblem(final PDDLDomain domain, final PDDLProblem problem) {
+    public AbstractProblem(final PDDLProblem problem) {
         this();
-        this.domain = domain;
+        //this.domain = domain;
         this.problem = problem;
     }
 
@@ -233,9 +232,9 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the parsed domain used to create of this problem.
      */
-    public final PDDLDomain getPDDLDomain() {
-        return this.domain;
-    }
+    //public final PDDLDomain getPDDLDomain() {
+    //    return this.domain;
+    //}
 
     /**
      * Returns the parsed problem used to create this problem.
@@ -423,7 +422,6 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initRequirements() throws RequirementNotSupportedException {
         this.requirements = new LinkedHashSet<>();
-        this.requirements.addAll(this.domain.getRequirements());
         this.requirements.addAll(this.problem.getRequirements());
 
         if (!this.getAcceptedRequirements().containsAll(this.requirements)) {
@@ -443,7 +441,7 @@ public abstract class AbstractProblem implements Problem {
      * of the type is created. The domain is empty.
      */
     protected void initTypes() {
-        final List<PDDLTypedSymbol> types = this.domain.getTypes();
+        final List<PDDLTypedSymbol> types = this.problem.getTypes();
         final int nbTypes = types.size();
         this.typeSymbols = new ArrayList<>(nbTypes);
         this.domains = new ArrayList<>(nbTypes);
@@ -458,8 +456,8 @@ public abstract class AbstractProblem implements Problem {
      * type.
      */
     protected void initConstants() {
-        final List<PDDLTypedSymbol> constants = this.domain.getConstants();
-        this.constantSymbols = new ArrayList<>(this.domain.getConstants().size());
+        final List<PDDLTypedSymbol> constants = this.problem.getConstants();
+        this.constantSymbols = new ArrayList<>(this.problem.getConstants().size());
         constants.addAll(this.problem.getObjects());
         for (PDDLTypedSymbol constant : constants) {
             int ic = this.constantSymbols.indexOf(constant.getImage());
@@ -471,7 +469,7 @@ public abstract class AbstractProblem implements Problem {
             while (!types.isEmpty()) {
                 PDDLSymbol type = types.poll();
                 final int it = this.typeSymbols.indexOf(type.getImage());
-                types.addAll(this.domain.getType(type).getTypes());
+                types.addAll(this.problem.getType(type).getTypes());
                 this.domains.get(it).add(ic);
             }
         }
@@ -484,24 +482,24 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initEitherTypes() {
         // Collect the types from the predicates declaration
-        for (PDDLNamedTypedList predicate : this.domain.getPredicates()) {
+        for (PDDLNamedTypedList predicate : this.problem.getPredicates()) {
             this.initEitherTypes(predicate.getArguments());
         }
         // Collect the types from the functions declaration
-        for (PDDLNamedTypedList function : this.domain.getFunctions()) {
+        for (PDDLNamedTypedList function : this.problem.getFunctions()) {
             this.initEitherTypes(function.getArguments());
         }
         // Collect the types from the constraints declaration of the domain
-        if (this.domain.getConstraints() != null) {
-            this.initEitherTypes(this.domain.getConstraints());
+        if (this.problem.getConstraints() != null) {
+            this.initEitherTypes(this.problem.getConstraints());
         }
         // Collect the types from the derived predicates
-        for (PDDLDerivedPredicate axiom : this.domain.getDerivesPredicates()) {
+        for (PDDLDerivedPredicate axiom : this.problem.getDerivesPredicates()) {
             this.initEitherTypes(axiom.getHead().getArguments());
             this.initEitherTypes(axiom.getBody());
         }
         // Collect the type from the actions
-        for (PDDLAction op : this.domain.getActions()) {
+        for (PDDLAction op : this.problem.getActions()) {
             this.initEitherTypes(op.getParameters());
             if (op.getDuration() != null) {
                 this.initEitherTypes(op.getDuration());
@@ -627,7 +625,7 @@ public abstract class AbstractProblem implements Problem {
      * Initializes the predicates information (symbols and signatures) declared in the domain.
      */
     protected void initPredicates() {
-        final List<PDDLNamedTypedList> predicates = this.domain.getPredicates();
+        final List<PDDLNamedTypedList> predicates = this.problem.getPredicates();
         final int nbPredicates = predicates.size();
         this.predicateSymbols = new ArrayList<>(nbPredicates);
         this.predicateSignatures = new ArrayList<>(nbPredicates);
@@ -656,7 +654,7 @@ public abstract class AbstractProblem implements Problem {
      * Initializes the function information (symbols and signatures) declared in the domain.
      */
     protected void initFunctions() {
-        final List<PDDLNamedTypedList> functions = this.domain.getFunctions();
+        final List<PDDLNamedTypedList> functions = this.problem.getFunctions();
         this.functionSymbols = new ArrayList<>(functions.size());
         this.functionSignatures = new ArrayList<>(functions.size());
         for (PDDLNamedTypedList function : functions) {
@@ -683,7 +681,7 @@ public abstract class AbstractProblem implements Problem {
      * Initializes the tasks information (symbols and signatures) declared in the domain.
      */
     protected void initTasks() {
-        final List<PDDLNamedTypedList> tasks = this.domain.getTasks();
+        final List<PDDLNamedTypedList> tasks = this.problem.getTasks();
         final int nbTasks = tasks.size();
         this.taskSymbols = new ArrayList<>(nbTasks);
         this.taskSignatures = new ArrayList<>(nbTasks);
@@ -713,7 +711,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initPrimitiveTaskSymbols() {
         this.primitiveTaskSymbols = new LinkedHashSet<>();
-        for (PDDLAction a : this.getPDDLDomain().getActions()) {
+        for (PDDLAction a : this.getPDDLProblem().getActions()) {
             this.primitiveTaskSymbols.add(a.getName().getImage());
         }
     }
@@ -723,7 +721,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initCompoundTaskSymbols() {
         this.compoundTaskSymbols = new LinkedHashSet<>();
-        for (PDDLMethod m : this.getPDDLDomain().getMethods()) {
+        for (PDDLMethod m : this.getPDDLProblem().getMethods()) {
             this.compoundTaskSymbols.add(m.getTask().getAtom().get(0).getImage());
         }
     }
@@ -846,7 +844,7 @@ public abstract class AbstractProblem implements Problem {
      * Encodes the actions of the domain into a compact integer representation.
      */
     protected void initActions() {
-        this.intActions = this.getPDDLDomain().getActions().stream().map(this::initActions)
+        this.intActions = this.getPDDLProblem().getActions().stream().map(this::initActions)
             .collect(Collectors.toList());
     }
 
@@ -885,7 +883,7 @@ public abstract class AbstractProblem implements Problem {
      * Encodes the methods of the domain into a compact integer representation.
      */
     protected void initMethods() {
-        this.intMethods = this.getPDDLDomain().getMethods().stream().map(this::initMethod).collect(Collectors.toList());
+        this.intMethods = this.getPDDLProblem().getMethods().stream().map(this::initMethod).collect(Collectors.toList());
     }
 
     /**

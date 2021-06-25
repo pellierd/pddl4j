@@ -36,11 +36,11 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain the domain.
+     *
      * @param problem the problem.
      */
-    public AbstractHTNProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public AbstractHTNProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**

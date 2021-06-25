@@ -41,11 +41,11 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
 
     /**
      * Create a new temporal problem from a domain and problem.
-     * @param domain The domain.
+     *
      * @param problem The problem.
      */
-    public AbstractTemporalProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public AbstractTemporalProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**
@@ -102,8 +102,6 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
      */
     @Override
     protected void initialization() {
-        // Standardize the variables symbol contained in the domain
-        this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
         this.initRequirements();

@@ -153,7 +153,7 @@ test {
     scanForTestClasses = false
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
     //includes = ['**/TFDPlannerTest.class']
-    includes = ['**/PDDLParserTest.class']
+    includes = ['**/HSPTest.class']
 }
 
 defaultTasks 'clean', 'build', 'test'

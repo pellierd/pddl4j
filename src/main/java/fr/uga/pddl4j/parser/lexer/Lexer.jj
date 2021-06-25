@@ -3391,17 +3391,18 @@ void problem() :
 void pddl_problem() :
 {
 	PDDLSymbol name = null;
+	PDDLSymbol domain = null;
 }
 {
 	try {
 		left_bracket() <DEFINE>
 		left_bracket() <PROBLEM>
-			name=problem_name() {
-				this.problem = new PDDLProblem(name);
-			}
+			name=problem_name()
 		right_bracket()
 		left_bracket() <P_DOMAIN>
-			domain_problem_name()
+			domain = domain_problem_name() {
+                this.problem = new PDDLProblem(name, domain);
+            }
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
@@ -3420,6 +3421,7 @@ void pddl_problem() :
 void htn_problem() : // ADD HDDL
 {
 	PDDLSymbol name = null;
+	PDDLSymbol domain = null;
 	PDDLTaskNetwork taskNetwork = null;
 	List<PDDLTypedSymbol> parameters = new ArrayList<PDDLTypedSymbol>();
 }
@@ -3427,12 +3429,13 @@ void htn_problem() : // ADD HDDL
 	try {
 		left_bracket() <DEFINE>
 		left_bracket() <PROBLEM>
-			name=problem_name() {
-				this.problem = new PDDLProblem(name);
-			}
+			name=problem_name()
 		right_bracket()
 		left_bracket() <P_DOMAIN>
-			domain_problem_name()
+			domain = domain_problem_name() {
+			    this.problem = new PDDLProblem(name, domain);
+		    }
+
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
@@ -3463,10 +3466,10 @@ PDDLSymbol problem_name() :
 	t=<SYMBOL> {  return new PDDLSymbol(PDDLSymbol.Kind.PROBLEM, t); }
 }
 
-void domain_problem_name() :
+PDDLSymbol domain_problem_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> {  this.problem.setDomain(new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, t)); }
+	t=<SYMBOL> {  return new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, t); }
 }
 
 PDDLSymbol domain_name() :

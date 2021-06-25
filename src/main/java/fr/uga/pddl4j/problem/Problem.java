@@ -45,7 +45,7 @@ public interface Problem extends Serializable {
      *
      * @return the PDDL domain of the problem.
      */
-    PDDLDomain getPDDLDomain();
+    //PDDLDomain getPDDLDomain();
 
     /**
      * Returns the PDDL problem of the problem.

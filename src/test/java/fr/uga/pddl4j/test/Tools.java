@@ -3,8 +3,9 @@ package fr.uga.pddl4j.test;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
-import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.HTNProblem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -135,10 +136,11 @@ public abstract class Tools {
         try {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
-            final ProblemFactory factory = ProblemFactory.getInstance();
-            final ErrorManager errorManager = factory.parse(domain, problem);
+            PDDLParser parser = new PDDLParser();
+            PDDLProblem parsedProblem = parser.parse(domain, problem);
+            ErrorManager errorManager = parser.getErrorManager();
             if (errorManager.isEmpty()) {
-                return factory.encode();
+                return new ADLProblem(parsedProblem);
             }
         } catch (IOException ioExcepion) {
             System.err.println(ioExcepion + " test files not found !");
@@ -325,7 +327,6 @@ public abstract class Tools {
      * @param level the trace level.
      */
     public static void encodePDDLProblems(String currentTestPath, int level) {
-        final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -372,8 +373,9 @@ public abstract class Tools {
 
             // Parses the PDDL domain and problem description
             try {
-                factory.setTraceLevel(level);
-                ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                PDDLParser parser = new PDDLParser();
+                PDDLProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
                     || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
                     errorManager.printAll();
@@ -386,7 +388,7 @@ public abstract class Tools {
                 try {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println(" * Encoding [" + currentProblem + "]" + "...");
-                    pb = factory.encode();
+                    pb = new ADLProblem(problemParsed);
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
                         System.out.println(" * PDDLProblem encoded (" + pb.getActions().size() + " actions, "
@@ -419,7 +421,6 @@ public abstract class Tools {
      * @param level the trace level.
      */
     public static void encodeHDDLProblems(String currentTestPath, int level) {
-        final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + Tools.HDDL_DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -466,9 +467,9 @@ public abstract class Tools {
 
             // Parses the PDDL domain and problem description
             try {
-                factory.setTraceLevel(level);
-
-                ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                PDDLParser parser = new PDDLParser();
+                PDDLProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
                     || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
                     errorManager.printAll();
@@ -482,7 +483,7 @@ public abstract class Tools {
                 try {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println(" * Encoding [" + currentProblem + "]" + "...");
-                    pb = factory.encode();
+                    pb = new HTNProblem(problemParsed);
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
                         System.out.println(" * HDDLProblem encoded (" + pb.getActions().size() + " actions, "

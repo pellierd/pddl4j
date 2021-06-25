@@ -107,8 +107,8 @@ public final class GenericPlanner extends AbstractStateSpacePlanner<ADLProblem> 
     }
 
     @Override
-    public ADLProblem instantiate() {
-        ADLProblem pb = new ADLProblem(this.getParser().getDomain(), this.getParser().getProblem());
+    public ADLProblem instantiate(final PDDLProblem problem) {
+        ADLProblem pb = new ADLProblem(problem);
         pb.instantiate();
         return pb;
     }

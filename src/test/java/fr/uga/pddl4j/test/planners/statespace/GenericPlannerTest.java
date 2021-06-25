@@ -15,10 +15,9 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.GenericPlanner;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
@@ -231,7 +230,6 @@ public class GenericPlannerTest {
      */
     private void generateValOutputPlans(String currentTestPath, String strategy) {
         Tools.cleanValPlan(currentTestPath);
-        final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -267,9 +265,8 @@ public class GenericPlannerTest {
             }
             // Parses the PDDL domain and problem description
             try {
-                factory.setTraceLevel(TRACE_LEVEL);
-
-                ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                PDDLProblem parsedProblem = this.planner.parse(currentDomain, currentProblem);
+                ErrorManager errorManager = this.planner.getParserErrorManager();
                 Assert.assertTrue(errorManager.isEmpty());
 
                 ADLProblem pb = null;
@@ -277,7 +274,7 @@ public class GenericPlannerTest {
                 try {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println("* Encoding [" + currentProblem + "]" + "...");
-                    pb = factory.encode();
+                    pb = this.planner.instantiate(parsedProblem);
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"

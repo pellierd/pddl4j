@@ -359,7 +359,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
         PDDLParser parser = this.getParser();
-        parser.parse(config.getDomain(), config.getProblem());
+        PDDLProblem parsedProblem = parser.parse(config.getDomain(), config.getProblem());
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -391,7 +391,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
 
         // Encodes and instantiates the problem in a compact representation
         begin = System.currentTimeMillis();
-        HTNProblem pb = this.instantiate();
+        HTNProblem pb = this.instantiate(parsedProblem);
         this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
         //this.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
         long end = System.currentTimeMillis();
@@ -468,8 +468,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     }
 
     @Override
-    public HTNProblem instantiate() {
-        HTNProblem pb = new HTNProblem(this.getParser().getDomain(), this.getParser().getProblem());
+    public HTNProblem instantiate(final PDDLProblem problem) {
+        HTNProblem pb = new HTNProblem(problem);
         pb.instantiate();
         return pb;
     }

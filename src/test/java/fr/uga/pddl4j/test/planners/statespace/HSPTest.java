@@ -15,12 +15,11 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
-import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.HSP;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -343,6 +342,7 @@ public class HSPTest {
             Tools.isBenchmarkExist(localTestPath));
         this.generateValOutputPlans(localTestPath);
         Tools.validatePDDLPlans(localTestPath);
+
     }
 
     /**
@@ -718,7 +718,6 @@ public class HSPTest {
      */
     private void generateValOutputPlans(String currentTestPath) {
         Tools.cleanValPlan(currentTestPath);
-        final ProblemFactory factory = new ProblemFactory();
         String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -769,7 +768,8 @@ public class HSPTest {
                 config.setDomain(currentDomain);
                 config.setProblem(currentProblem);
 
-                ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
+                PDDLProblem parsedProblem = this.planner.parse();
+                ErrorManager errorManager = this.planner.getParserErrorManager();
                 if (!errorManager.isEmpty()) {
                     errorManager.printAll();
                 }
@@ -781,7 +781,7 @@ public class HSPTest {
                 // Encodes and instantiates the problem in a compact representation
                 System.out.println("* Encoding [" + currentProblem + "]" + "...");
                 try {
-                    pb = factory.encode();
+                    pb = this.planner.instantiate(parsedProblem);
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"

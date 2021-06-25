@@ -41,11 +41,10 @@ public class ADLProblem extends FinalizedProblem {
 
     /**
      * Create a new ADL problem from a domain and problem.
-     * @param domain The domain.
      * @param problem The problem.
      */
-    public ADLProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public ADLProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**
@@ -78,8 +77,6 @@ public class ADLProblem extends FinalizedProblem {
     @Override
     protected void initialization() {
 
-        // Standardize the variables symbol contained in the domain
-        this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
 

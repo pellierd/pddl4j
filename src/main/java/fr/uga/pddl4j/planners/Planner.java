@@ -51,29 +51,6 @@ public interface Planner<T extends Problem> extends Serializable {
     void setConfiguration(Configuration configuration);
 
     /**
-     * Search a plan for the specified planning problem.
-     *
-     * @param problem the problem to be solved. The problem cannot be null.
-     * @return the solution plan or null is no solution was found.
-     */
-    Plan solve(final T problem);
-
-    /**
-     * Search a plan for the current planner configuration.
-     *
-     * @return the solution plan or null is no solution was found.
-     */
-    Plan solve() throws FileNotFoundException;
-
-    /**
-     * Returns the statistics of the planner.
-     *
-     * @return the statistics of the planner.
-     * @see Statistics
-     */
-    Statistics getStatistics();
-
-    /**
      * This method return the default arguments of the planner.
      *
      * @return the default arguments of the planner.
@@ -88,26 +65,58 @@ public interface Planner<T extends Problem> extends Serializable {
      *
      * @param domain the path to the PDDL domain file.
      * @param problem the path to the PDDL problem file.
+     * @return the problem parsed or null if an error occurred while parsing.
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
-    ErrorManager parse(final String domain, final String problem) throws IOException;
+    PDDLProblem parse(final String domain, final String problem) throws IOException;
 
     /**
      * Parses the domain and the problem description given ine the planner configuration.
      *
+     * @return the problem parsed or null if an error occurred while parsing.
      * @throws FileNotFoundException if the domain or the problem file was not found.
-     * @throws IOException           if an error occur during parsing.
+     * @throws IOException if an error occur during parsing.
      */
-    ErrorManager parse() throws IOException;
+    //PDDLProblem parse() throws IOException;
 
     /**
-     * Instantiates the planning problem from the 
+     * Returns the parser error manager to get the messages generated while parsing.
+     *
+     * @return the parser error manger.
+     */
+    ErrorManager getParserErrorManager();
+
+    /**
+     * Instantiates the planning problem from the
      *
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
-    T instantiate();
+    T instantiate(PDDLProblem problem);
 
+    /**
+     * Search a plan for the specified planning problem.
+     *
+     * @param problem the problem to be solved. The problem cannot be null.
+     * @return the solution plan or null is no solution was found.
+     */
+    Plan solve(final T problem);
+
+    /**
+     * Search a plan for the current planner configuration.
+     *
+     * @return the solution plan or null is no solution was found.
+     */
+    Plan solve() throws FileNotFoundException;
+
+
+    /**
+     * Returns the statistics of the planner.
+     *
+     * @return the statistics of the planner.
+     * @see Statistics
+     */
+    Statistics getStatistics();
 
 
 }

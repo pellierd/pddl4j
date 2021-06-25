@@ -18,6 +18,7 @@ package fr.uga.pddl4j.planners;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Level;
@@ -54,6 +55,16 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     private PDDLParser parser;
 
     /**
+     * The parsed problem.
+     */
+    private PDDLProblem parsedProblem;
+
+    /**
+     * The instantiated problem.
+     */
+    private Problem instantiateProblem;
+
+    /**
      * The statistics of the planner.
      */
     private Statistics statistics;
@@ -67,6 +78,8 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
         this.parser = new PDDLParser();
         this.statistics = new Statistics();
         this.setConfiguration(Planner.getDefaultConfiguration());
+        this.parsedProblem = null;
+        this.instantiateProblem = null;
     }
 
     /**
@@ -88,9 +101,9 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException           if an error occur during parsing.
      */
-    public ErrorManager parse(final String domain, final String problem) throws IOException {
-        this.parser.parse(domain, problem);
-        return parser.getErrorManager();
+    public PDDLProblem parse(final String domain, final String problem) throws IOException {
+        this.parsedProblem = this.parser.parse(domain, problem);
+        return this.parsedProblem;
     }
 
     /**
@@ -99,9 +112,18 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
-    public ErrorManager parse() throws IOException {
-        this.parser.parse(this.configuration.getDomain(), this.configuration.getProblem());
-        return parser.getErrorManager();
+    public PDDLProblem parse() throws IOException {
+        this.parsedProblem = this.parser.parse(this.configuration.getDomain(), this.configuration.getProblem());
+        return this.parsedProblem;
+    }
+
+    /*
+     * Returns the parser error manager to get the messages generated while parsing.
+     *
+     * @return the parser error manger.
+     */
+    public ErrorManager getParserErrorManager() {
+        return this.parser.getErrorManager();
     }
 
 
@@ -111,7 +133,6 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
-        //this.setTraceLevel(configuration.getTraceLevel());
     }
 
     protected PDDLParser getParser() {
@@ -160,7 +181,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        this.parser.parse(config.getDomain(), config.getProblem());
+        PDDLProblem parsedProblem = this.parser.parse(config.getDomain(), config.getProblem());
         ErrorManager errorManager = this.parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -194,7 +215,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
         begin = System.currentTimeMillis();
 
-        T pb = this.instantiate();
+        T pb = this.instantiate(parsedProblem);
         this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
         //this.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
 

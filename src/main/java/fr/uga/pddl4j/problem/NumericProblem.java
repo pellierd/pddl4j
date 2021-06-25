@@ -40,11 +40,10 @@ public class NumericProblem extends AbstractNumericProblem {
     /**
      * Create a new numeric problem from a domain and problem.
      *
-     * @param domain  The domain.
      * @param problem The problem.
      */
-    public NumericProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public NumericProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**
@@ -55,8 +54,6 @@ public class NumericProblem extends AbstractNumericProblem {
      */
     @Override
     protected void initialization() {
-        // Standardize the variables symbol contained in the domain
-        this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
         // Initialize the requirements of the problem

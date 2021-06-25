@@ -40,11 +40,10 @@ public class HTNProblem extends AbstractHTNProblem {
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain the domain.
      * @param problem the problem.
      */
-    public HTNProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public HTNProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**
@@ -55,8 +54,6 @@ public class HTNProblem extends AbstractHTNProblem {
      */
     @Override
     protected void initialization() {
-        // Standardize the variables symbol contained in the domain
-        this.getPDDLDomain().standardize();
         // Standardize the variables symbol contained in the domain
         this.getPDDLProblem().standardize();
 

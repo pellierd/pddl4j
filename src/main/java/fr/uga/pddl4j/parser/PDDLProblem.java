@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.problem.Problem;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -34,17 +36,12 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLProblem implements Serializable {
+public class PDDLProblem extends PDDLDomain {
 
     /**
      * The name of the problem.
      */
     private PDDLSymbol name;
-
-    /**
-     * The name of the domain.
-     */
-    private PDDLSymbol domain;
 
     /**
      * The set of requirements.
@@ -81,20 +78,69 @@ public class PDDLProblem implements Serializable {
      */
     private PDDLExpression metric;
 
+
     /**
-     * Creates a new problem.
+     * Creates a new problem from a specific domain and problem.
+     *
+     * @param domain the domain.
+     * @param problem the problem.
      */
-    private PDDLProblem() {
-        super();
+    public PDDLProblem(final PDDLDomain domain, PDDLProblem problem) {
+        this(domain.getDomainName(), problem.getName());
+        this.requirements = new LinkedHashSet<>();
+        this.requirements.addAll(domain.getRequirements());
+        this.requirements.addAll(problem.getRequirements());
+
+        for (PDDLTypedSymbol type : domain.getTypes()) {
+            this.addType(type);
+        }
+
+        for (PDDLTypedSymbol constant : domain.getConstants()) {
+            this.addConstant(constant);
+        }
+
+        for (PDDLNamedTypedList predicate : domain.getPredicates()) {
+            this.addPredicate(predicate);
+        }
+
+        for (PDDLNamedTypedList function : domain.getFunctions()) {
+            this.addFunction(function);
+        }
+
+        for (PDDLNamedTypedList task : domain.getTasks()) {
+            this.addTask(task);
+        }
+
+        this.constraints = domain.getConstraints();
+
+        for (PDDLAction action : domain.getActions()) {
+            this.addAction(action);
+        }
+
+        for (PDDLMethod method : domain.getMethods()) {
+            this.addMethod(method);
+        }
+
+        for (PDDLDerivedPredicate derived : domain.getDerivesPredicates()) {
+            this.addDerivedPredicate(derived);
+        }
+
+        this.objects = problem.getObjects();
+        this.initialTaskNetwork = problem.getInitialTaskNetwork();
+        this.initialFacts = problem.getInit();
+        this.goal = problem.getGoal();
+        this.constraints = problem.getConstraints();
+        this.metric = problem.getMetric();
     }
 
     /**
      * Creates a new problem with a specific name.
      *
      * @param name the name of the problem.
+     * @param domain the name of the domain.
      */
-    public PDDLProblem(final PDDLSymbol name) {
-        this();
+    public PDDLProblem(final PDDLSymbol name, final PDDLSymbol domain) {
+        super(domain);
         this.name = name;
         this.requirements = new LinkedHashSet<>();
         this.objects = new ArrayList<>();
@@ -121,43 +167,6 @@ public class PDDLProblem implements Serializable {
      */
     public final void setName(final PDDLSymbol name) {
         this.name = name;
-    }
-
-    /**
-     * Returns the name of the domain declared in the problem.
-     *
-     * @return the name of the domain declared in the problem.
-     */
-    public final PDDLSymbol getDomain() {
-        return this.domain;
-    }
-
-    /**
-     * Sets the domain of the problem.
-     *
-     * @param domain the domain to set.
-     */
-    public final void setDomain(final PDDLSymbol domain) {
-        this.domain = domain;
-    }
-
-    /**
-     * Returns the set of requirements.
-     *
-     * @return the set of requirements.
-     */
-    public Set<PDDLRequireKey> getRequirements() {
-        return this.requirements;
-    }
-
-    /**
-     * Adds a requirement to the problem.
-     *
-     * @param requirement the requirement to add.
-     * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
-     */
-    public final boolean addRequirement(final PDDLRequireKey requirement) {
-        return this.requirements.add(requirement);
     }
 
     /**
@@ -226,30 +235,12 @@ public class PDDLProblem implements Serializable {
     }
 
     /**
-     * Sets the goal of the problem.
+     * Set the goal of this problem.
      *
-     * @param goal the goal to set.
+     * @param goal the goal of this problem.
      */
-    public final void setGoal(final PDDLExpression goal) {
+    public void setGoal(final PDDLExpression goal) {
         this.goal = goal;
-    }
-
-    /**
-     * Returns the problem constraints loaded or <code>null</code> if the problem has no constraints.
-     *
-     * @return the problem constraints loaded or <code>null</code> if the problem has no constraints.
-     */
-    public PDDLExpression getConstraints() {
-        return this.constraints;
-    }
-
-    /**
-     * Sets the constraints of the problem.
-     *
-     * @param constraints the constraints to set.
-     */
-    public final void setConstraints(final PDDLExpression constraints) {
-        this.constraints = constraints;
     }
 
     /**
@@ -289,6 +280,7 @@ public class PDDLProblem implements Serializable {
      * @see PDDLDerivedPredicate#normalize()
      */
     public void standardize() {
+        super.standardize();
         // Rename the constraints of the problem
         if (this.getConstraints() != null) {
             this.getConstraints().renameVariables();
@@ -333,7 +325,7 @@ public class PDDLProblem implements Serializable {
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append("(define (problem ").append(this.name).append(")").append("\n(:domain ")
-            .append(this.domain).append(")").append("\n(:requirements");
+            .append(this.getDomainName()).append(")").append("\n(:requirements");
         for (PDDLRequireKey r : this.requirements) {
             str.append(" ").append(r);
         }

@@ -56,11 +56,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain  the domain.
      * @param problem the problem.
      */
-    public PostInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public PostInstantiatedProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
 

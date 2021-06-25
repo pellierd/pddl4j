@@ -9,28 +9,6 @@
     </Console>
 </Appenders>
 <Loggers>
-    <!--       <logger name="fr.uga.pddl4j.util.MemoryAgent" level="trace" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           <logger name="fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory" level="off" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           <logger name="fr.uga.pddl4j.planners.Planner" level="trace" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           <logger name="fr.uga.pddl4j.planners.ProblemFactory" level="trace" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           <logger name="fr.uga.pddl4j.problem.AbstractProblem" level="off" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           <logger name="fr.uga.pddl4j.parser.ErrorManager" level="trace" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           <logger name="fr.uga.pddl4j.parser.PDDLParser" level="trace" additivity="false">
-               <AppenderRef ref="traceConsole"/>
-           </logger>
-           -->
     <Root level="off">
         <AppenderRef ref="traceConsole" />
     </Root>

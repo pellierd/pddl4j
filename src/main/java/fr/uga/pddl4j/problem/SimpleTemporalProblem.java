@@ -39,11 +39,11 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
 
     /**
      * Create a new temporal problem from a domain and problem.
-     * @param domain The domain.
+     *
      * @param problem The problem.
      */
-    public SimpleTemporalProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public SimpleTemporalProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**

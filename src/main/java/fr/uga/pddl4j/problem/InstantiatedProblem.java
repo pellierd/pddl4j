@@ -62,11 +62,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     /**
      * Creates a new problem from a domain and problem.
      *
-     * @param domain the domain.
      * @param problem the problem.
      */
-    public InstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public InstantiatedProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**
@@ -582,7 +581,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     /**
      * Computes the list of possible primitive tasks from the action already instantiated.
      *
-     * @param actions the list of actions altready instantiated.
+     * @param actions the list of actions already instantiated.
      * @return the list of possible primitive tasks from the action already instantiated.
      */
     private LinkedHashSet<IntExpression> computePrimitiveTaskSet(List<IntAction> actions) {

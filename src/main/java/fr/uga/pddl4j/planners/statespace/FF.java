@@ -130,12 +130,6 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
         return true;
     }
 
-    @Override
-    public ADLProblem instantiate() {
-        ADLProblem pb = new ADLProblem(this.getParser().getDomain(), this.getParser().getProblem());
-        pb.instantiate();
-        return pb;
-    }
 
     public static Configuration getDefaultConfiguration() {
         Configuration config = new Configuration();
@@ -148,6 +142,13 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
         config.setSearchStrategy(Setting.SearchStrategy.NONE);
         config.setTraceLevel(Level.INFO);
         return config;
+    }
+
+    @Override
+    public ADLProblem instantiate(final PDDLProblem problem) {
+        ADLProblem pb = new ADLProblem(problem);
+        pb.instantiate();
+        return pb;
     }
 
     /**

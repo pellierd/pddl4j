@@ -15,9 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Problem;
 
 import java.util.ArrayList;
@@ -63,4 +65,6 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
     public List<StateSpaceStrategy> getStateSpaceStrategies() {
         return this.stateSpaceStrategiesList;
     }
+
+
 }

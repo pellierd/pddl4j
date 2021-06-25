@@ -63,11 +63,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     /**
      * Creates a new problem from a specific domain and problem.
      *
-     * @param domain the domain.
      * @param problem the problem.
      */
-    public PreInstantiatedProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public PreInstantiatedProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**

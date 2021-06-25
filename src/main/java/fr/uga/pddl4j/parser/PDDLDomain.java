@@ -38,7 +38,7 @@ public class PDDLDomain implements Serializable {
     /**
      * The name of the domain.
      */
-    private PDDLSymbol name;
+    private PDDLSymbol domainName;
 
     /**
      * The set of requirements.
@@ -106,7 +106,7 @@ public class PDDLDomain implements Serializable {
         if (name == null) {
             throw new NullPointerException();
         }
-        this.name = name;
+        this.domainName = name;
         this.requirements = new LinkedHashSet<>();
         this.types = new ArrayList<>();
         this.types.add(new PDDLTypedSymbol(PDDLParser.OBJECT));
@@ -125,8 +125,8 @@ public class PDDLDomain implements Serializable {
      *
      * @return the name of the domain.
      */
-    public final PDDLSymbol getName() {
-        return this.name;
+    public final PDDLSymbol getDomainName() {
+        return this.domainName;
     }
 
     /**
@@ -134,8 +134,8 @@ public class PDDLDomain implements Serializable {
      *
      * @param name the name to set.
      */
-    public final void setName(final PDDLSymbol name) {
-        this.name = name;
+    public final void setDomainName(final PDDLSymbol name) {
+        this.domainName = name;
     }
 
     /**
@@ -390,7 +390,7 @@ public class PDDLDomain implements Serializable {
     public boolean equals(final Object object) {
         if (object != null && object instanceof PDDLDomain) {
             PDDLDomain other = (PDDLDomain) object;
-            return this.name.equals(other.name);
+            return this.domainName.equals(other.domainName);
         }
         return false;
     }
@@ -402,7 +402,7 @@ public class PDDLDomain implements Serializable {
      */
     @Override
     public int hashCode() {
-        return this.name.hashCode();
+        return this.domainName.hashCode();
     }
 
     /**
@@ -482,7 +482,7 @@ public class PDDLDomain implements Serializable {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append("(define (domain ").append(this.name).append(")").append("\n(:requirements");
+        str.append("(define (domain ").append(this.domainName).append(")").append("\n(:requirements");
         for (PDDLRequireKey r : this.requirements) {
             str.append(" ").append(r);
         }

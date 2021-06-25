@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.Configuration;
@@ -103,12 +104,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
         return true;
     }
 
-    @Override
-    public ADLProblem instantiate() {
-        ADLProblem pb = new ADLProblem(this.getParser().getDomain(), this.getParser().getProblem());
-        pb.instantiate();
-        return pb;
-    }
+
 
     public static Configuration getDefaultConfiguration() {
         Configuration config = new Configuration();
@@ -121,6 +117,13 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
         config.setSearchStrategy(Setting.SearchStrategy.ASTAR);
         config.setTraceLevel(Level.INFO);
         return config;
+    }
+
+    @Override
+    public ADLProblem instantiate(PDDLProblem problem) {
+        ADLProblem pb = new ADLProblem(problem);
+        pb.instantiate();
+        return pb;
     }
 
     /**

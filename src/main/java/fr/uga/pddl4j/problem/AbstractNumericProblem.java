@@ -33,11 +33,11 @@ public class AbstractNumericProblem extends ADLProblem implements Numeric {
     /**
      * Create a new numeric problem from a domain and problem.
      *
-     * @param domain  The domain.
+     *
      * @param problem The problem.
      */
-    public AbstractNumericProblem(final PDDLDomain domain, final PDDLProblem problem) {
-        super(domain, problem);
+    public AbstractNumericProblem(final PDDLProblem problem) {
+        super(problem);
     }
 
     /**
