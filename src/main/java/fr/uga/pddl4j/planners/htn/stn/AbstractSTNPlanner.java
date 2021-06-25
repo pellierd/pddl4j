@@ -15,16 +15,23 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,10 +52,10 @@ import java.util.Spliterator;
  */
 public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
 
-    /*
-     * The arguments of the planner.
+    /**
+     * The logger of the class.
      */
-    private Properties arguments;
+    private static final Logger LOGGER = LogManager.getLogger(AbstractSTNPlanner.class);
 
     /**
      * The cost of each task of the problem.
@@ -56,22 +63,12 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     private int[] costs;
 
     /**
-     * Creates a new abstract STN planner with the default parameters.
+     * Creates a new abstract STN planner with a specific configuration.
      *
-     * @param arguments the arguments of the planner.
+     * @param configuration the configuration of the planner.
      */
-    public AbstractSTNPlanner(final Properties arguments) {
-        super();
-        this.arguments = arguments;
-    }
-
-    /**
-     * Returns the arguments of the planner.
-     *
-     * @return the arguments of the planner.
-     */
-    public Properties getArguments() {
-        return this.arguments;
+    public AbstractSTNPlanner(final Configuration configuration) {
+        super(configuration);
     }
 
     /**
@@ -303,18 +300,18 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             .append("-l <num>    trace level\n")
             .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
             .append("-h          print this message\n\n");
-        Planner.getLogger().trace(strb.toString());
+        System.out.println(strb.toString());
     }
 
-    /**
+    /*/**
      * Parse the command line and return the planner's arguments.
      *
      * @param args the command line.
      * @return the planner arguments or null if an invalid argument is encountered.
      */
-    protected static Properties parseCommandLine(String[] args) {
+    /*protected static Properties parseCommandLine(String[] args) {
         // Get the default arguments from the super class
-        final Properties arguments = Planner.getDefaultArguments();
+        final Properties arguments = Planner.getDefaultConfiguration();
         try {
             // Parse the command line and update the default argument value
             for (int i = 0; i < args.length; i += 2) {
@@ -349,6 +346,132 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         return (arguments.get(Planner.DOMAIN) == null
                 || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
 
+    }*/
+
+
+    public Plan solve() throws FileNotFoundException {
+        if (!this.checkConfiguration()) {
+            throw new RuntimeException("Invalid planner configuration");
+        }
+
+        final Configuration config = this.getConfiguration();
+
+        // Parses the PDDL domain and problem description
+        long begin = System.currentTimeMillis();
+        PDDLParser parser = this.getParser();
+        parser.parse(config.getDomain(), config.getProblem());
+        ErrorManager errorManager = parser.getErrorManager();
+        this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
+        if (!errorManager.isEmpty()) {
+            for (Message m : errorManager.getMessages()) {
+                if (LOGGER.isFatalEnabled()
+                    && (m.getType().equals(Message.Type.LEXICAL_ERROR)
+                    || m.getType().equals(Message.Type.PARSER_ERROR))) {
+                    LOGGER.fatal(m.toString());
+                } else if (LOGGER.isWarnEnabled()
+                    && m.getType().equals(Message.Type.PARSER_WARNING)) {
+                    LOGGER.warn(m.toString());
+                }
+            }
+            if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+                || errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
+                return null;
+            }
+        } else if (LOGGER.isInfoEnabled()) {
+            StringBuilder strb = new StringBuilder();
+            strb.append("\nparsing domain file \"");
+            strb.append(config.getDomainFile().getName());
+            strb.append("\" done successfully");
+            strb.append("\nparsing problem file \"");
+            strb.append(config.getProblemFile().getName());
+            strb.append("\" done successfully");
+            strb.append("\n");
+            LOGGER.info(strb);
+        }
+
+        // Encodes and instantiates the problem in a compact representation
+        begin = System.currentTimeMillis();
+        HTNProblem pb = this.instantiate();
+        this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
+        //this.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
+        long end = System.currentTimeMillis();
+        final double instantiationTime = (end - begin) / 1000.0;
+
+        // Print instantiation information
+        if (LOGGER.isInfoEnabled()) {
+            StringBuilder strb = new StringBuilder();
+            strb.append("\nEncoding ");
+            if (pb.isTotallyOrederd()) {
+                strb.append("totally ordered ");
+            } else {
+                strb.append("partially ordered ");
+            }
+            strb.append("problem done successfully (");
+            strb.append(pb.getActions().size() + " actions, ");
+            strb.append(pb.getMethods().size() + " methods, ");
+            strb.append(pb.getFluents().size() + " fluents, ");
+            strb.append(pb.getTasks().size() + " tasks)\n");
+            if (!pb.isTotallyOrederd()) {
+                strb.append("Unable to solve a problem that isn't totally ordered.\n");
+            }
+            LOGGER.info(strb);
+        }
+
+        // Case where the problem is solvable after instantiation
+        if (pb.isSolvable()) {
+            Plan plan = null;
+            double searchTime = 0.0;
+            try {
+                System.out.println("Searching a solution plan....\n");
+                begin = System.currentTimeMillis();
+                plan = this.solve(pb);
+                end = System.currentTimeMillis();
+                searchTime = (end - begin) / 1000.0;
+            } catch (OutOfMemoryError err) {
+                if (LOGGER.isFatalEnabled()) {
+                    LOGGER.fatal("Out of memory during search !");
+                }
+                System.exit(0);
+            }
+
+            // Print plan solution
+            if (plan != null) {
+                if (LOGGER.isInfoEnabled()) {
+                    StringBuilder strb = new StringBuilder();
+                    //strb.append(pb.toString(plan.getHierarchy()));
+                    strb.append("Found plan as follows:\n");
+                    strb.append(pb.toString(plan));
+                    strb.append(String.format("%nPlan total cost      : %4.2f%n", plan.cost()));
+                    strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
+                    strb.append(String.format("Searching time       : %4.3fs%n", searchTime));
+                    strb.append(String.format("Total time           : %4.3fs%n%n", searchTime + instantiationTime));
+                    LOGGER.info(strb);
+                }
+                return plan;
+            }
+        }
+
+        if (LOGGER.isInfoEnabled()) {
+            StringBuilder strb = new StringBuilder();
+            strb.append(String.format(String.format("\n%nproblem with no solution plan found%n%n")));
+            strb.append(String.format("Encoding time        : %4.3fs", instantiationTime));
+            strb.append(String.format("Searching time       : %4.3fs", 0.0));
+            strb.append(String.format("Total time           : %4.3fs%n%n", instantiationTime));
+            LOGGER.info(strb);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean checkConfiguration() {
+        return true;
+    }
+
+    @Override
+    public HTNProblem instantiate() {
+        HTNProblem pb = new HTNProblem(this.getParser().getDomain(), this.getParser().getProblem());
+        pb.instantiate();
+        return pb;
     }
 
     /**
@@ -358,8 +481,6 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     private class Node {
         private Integer task;
         private Integer tasksynonym;
-        private String taskname;
-        private String methodname;
         private Method method;
         private Node parent;
         private List<Node> children = new LinkedList<Node>();

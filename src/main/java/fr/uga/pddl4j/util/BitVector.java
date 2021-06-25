@@ -21,8 +21,7 @@ package fr.uga.pddl4j.util;
 
 import fr.uga.pddl4j.problem.operator.Condition;
 
-import java.lang.reflect.Field;
-import java.util.BitSet;
+import java.util.Arrays;
 
 /**
  * This class implements a bit vector.
@@ -38,36 +37,12 @@ import java.util.BitSet;
 public class BitVector extends BitSet {
 
     /**
-     * The words used to store bitset.
-     */
-    private long[] words;
-
-    /**
-     * The worlds field used to store the value of bit vector.
-     */
-    private static Field wordsField;
-
-    static {
-        try {
-            BitVector.wordsField = BitSet.class.getDeclaredField("words");
-        } catch (NoSuchFieldException e) {
-            throw new IllegalStateException(e);
-        }
-        BitVector.wordsField.setAccessible(true);
-    }
-
-    /**
      * Creates a new <code>BitVector</code> with a specific size.
      *
      * @param size the size of the bit vector.
      */
     public BitVector(final int size) {
         super(size);
-        try {
-            this.words = (long[]) this.wordsField.get(this);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     /**
@@ -75,11 +50,6 @@ public class BitVector extends BitSet {
      */
     public BitVector() {
         super();
-        try {
-            this.words = (long[]) this.wordsField.get(this);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     /**
@@ -170,7 +140,7 @@ public class BitVector extends BitSet {
                 this.words[i] <<= n; // Shift current word
                 this.words[i] |= this.words[i - 1] >>> (64 - n); // Do the carry
             }
-            this.words[0] <<= n; // shift [0] separately, since no carry
+            words[0] <<= n; // shift [0] separately, since no carry
         }
     }
 
@@ -201,24 +171,6 @@ public class BitVector extends BitSet {
                 this.words[i] |= this.words[i + 1] << (64 - n); // Do the carry
             }
             this.words[this.words.length - 1] >>>= n; // shift [words.length-1] separately, since no carry
-        }
-    }
-
-    /**
-     * Updates the capacity of the bit vector of n bits.
-     *
-     * @param n the number of bits to increase.
-     */
-    private void ensureCapacity(final int n) {
-        if (this.words[words.length - 1] >>> n > 0) {
-            final long[] tmp = new long[this.words.length + 3];
-            System.arraycopy(this.words, 0, tmp, 0, this.words.length);
-            this.words = tmp;
-            try {
-                this.wordsField.set(this, tmp);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
         }
     }
 }

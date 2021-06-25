@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -36,7 +36,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
     /**
      * The heuristic of the planner.
      */
-    private PlanningGraphHeuristic.Type heuristic;
+    private Setting.Heuristic heuristic;
 
     /**
      * The heuristic weight.
@@ -74,24 +74,24 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
     private int createdNodes;
 
     /**
-     * Returns the heuristicType to use to solve the planning problem.
+     * Returns the heuristic to use to solve the planning problem.
      *
-     * @return the heuristicType to use to solve the planning problem.
+     * @return the heuristic to use to solve the planning problem.
      */
     @Override
-    public final PlanningGraphHeuristic.Type getHeuristicType() {
+    public final Setting.Heuristic getHeuristic() {
         return this.heuristic;
     }
 
     /**
-     * Sets the heuristicType to use to solved the problem.
+     * Sets the heuristic to use to solved the problem.
      *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
+     * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
     @Override
-    public final void setHeuristicType(final PlanningGraphHeuristic.Type heuristicType) {
-        Objects.requireNonNull(heuristicType);
-        this.heuristic = heuristicType;
+    public final void setHeuristic(final Setting.Heuristic heuristic) {
+        Objects.requireNonNull(heuristic);
+        this.heuristic = heuristic;
     }
 
     /**
@@ -239,9 +239,9 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      */
     public AbstractStateSpaceSearch() {
         super();
-        this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
-        this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
-        this.timeout = StateSpacePlanner.DEFAULT_TIMEOUT;
+        this.heuristic = Setting.Heuristic.FAST_FORWARD;
+        this.weight = Setting.DEFAULT_HEURISTIC_WEIGHT;
+        this.timeout = Setting.DEFAULT_TIMEOUT * 1000;
         this.searchingTime = 0;
         this.memoryUsed = 0;
         resetNodesStatistics();
@@ -250,13 +250,13 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
     /**
      * Create a new search strategy.
      *
-     * @param timeout   the time out of the planner.
+     * @param timeout   the time out of the planner in seconds.
      */
     public AbstractStateSpaceSearch(int timeout) {
         super();
-        this.heuristic = StateSpacePlanner.DEFAULT_HEURISTIC;
-        this.weight = StateSpacePlanner.DEFAULT_WEIGHT;
-        this.timeout = timeout;
+        this.heuristic = Setting.Heuristic.FAST_FORWARD;
+        this.weight = Setting.DEFAULT_HEURISTIC_WEIGHT;
+        this.timeout = timeout * 1000;
         this.searchingTime = 0;
         this.memoryUsed = 0;
         resetNodesStatistics();
@@ -266,12 +266,12 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * Create a new search strategy.
      *
      * @param heuristic the heuristicType to use to solve the planning problem.
-     * @param timeout   the time out of the planner.
+     * @param timeout   the time out of the planner in seconds
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceSearch(int timeout, PlanningGraphHeuristic.Type heuristic, double weight) {
+    public AbstractStateSpaceSearch(int timeout, Setting.Heuristic heuristic, double weight) {
         super();
-        this.timeout = timeout;
+        this.timeout = timeout * 1000;
         this.heuristic = heuristic;
         this.weight = weight;
         this.searchingTime = 0;

@@ -18,11 +18,14 @@ package fr.uga.pddl4j.test.planners.statespace;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.FF;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.test.Tools;
 
+import org.apache.logging.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -56,7 +59,7 @@ public class FFTest {
     /**
      * Default Heuristic Type.
      */
-    private static final PlanningGraphHeuristic.Type HEURISTIC_TYPE = PlanningGraphHeuristic.Type.FAST_FORWARD;
+    private static final Setting.Heuristic HEURISTIC = Setting.Heuristic.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.
@@ -84,7 +87,12 @@ public class FFTest {
     @Before
     public void initTest() {
         // Creates the planner
-        planner = new FF(TIMEOUT * 1000, HEURISTIC_TYPE, HEURISTIC_WEIGHT, STATISTICS, TRACE_LEVEL);
+        Configuration config = FF.getDefaultConfiguration();
+        config.setTimeout(FFTest.TIMEOUT);
+        config.setHeuristic(FFTest.HEURISTIC);
+        config.setHeuristicWeight(FFTest.HEURISTIC_WEIGHT);
+        config.setTraceLevel(Level.OFF);
+        planner = new FF(config);
         Tools.changeVALPerm();
     }
 
@@ -451,7 +459,7 @@ public class FFTest {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"
                             + " in " + TIMEOUT + " seconds");
-                        plan = planner.search(pb);
+                        plan = planner.solve(pb);
                     } else {
                         System.err.println("* PDDLProblem [" + currentProblem + "]" + " not solvable.");
                     }

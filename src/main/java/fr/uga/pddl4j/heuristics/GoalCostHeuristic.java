@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public interface GoalCostHeuristic extends Serializable {
+public interface GoalCostHeuristic extends Heuristic {
 
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is

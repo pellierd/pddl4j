@@ -28,7 +28,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 19.10.2020
  */
-public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic {
+public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic  {
 
     /**
      * The goal to reached.

@@ -26,6 +26,7 @@ import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Effect;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.List;
@@ -224,5 +225,29 @@ public interface Problem extends Serializable {
      */
     String toShortString(final AbstractGroundOperator operator);
 
+
+    /**
+     * Returns the LOGGER of the Planner class.
+     *
+     * @return the Planner class.
+     */
+    //Logger getLogger();
+
+    //void setLogger(Logger logger);
+
+
+    /**
+     * Sets the trace level of the planner.
+     *
+     * @param level the trace level of the planner.
+     */
+    //void setTraceLevel(final Level level);
+
+    /**
+     * Returns the trace level of the planner.
+     *
+     * @return the trace level of the planner.
+     */
+    //Level getTraceLevel();
 
 }

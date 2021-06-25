@@ -18,6 +18,8 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.problem.operator.Method;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Iterator;
 
@@ -28,6 +30,12 @@ import java.util.Iterator;
  * @version 4.0 - 04.12.2020
  */
 public class HTNProblem extends AbstractHTNProblem {
+
+    /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(HTNProblem.class.getName());
+
 
     /**
      * Creates a new problem from a domain and problem.
@@ -58,24 +66,24 @@ public class HTNProblem extends AbstractHTNProblem {
         this.initConstants();
         // Collect the either types of the domain
         this.initEitherTypes();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Types declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Types declared:\n"
                 + this.toString(Data.TYPES) + "\n");
-            this.getLogger().debug("Constants declared in the problem:\n"
+            LOGGER.debug("Constants declared in the problem:\n"
                 + this.toString(Data.CONSTANT_SYMBOLS) + "\n");
         }
 
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Predicates declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Predicates declared:\n"
                 + this.toString(Data.PREDICATE_SIGNATURES) + "\n");
         }
 
         // Collect the tasks information (symbols and signatures)
         this.initTasks();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Tasks declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Tasks declared:\n"
                 + this.toString(Data.TASK_SIGNATURES) + "\n");
         }
 
@@ -86,36 +94,36 @@ public class HTNProblem extends AbstractHTNProblem {
 
         // Encode the actions of the domain into integer representation
         this.initActions();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions declared:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Actions declared:\n\n"
                 + this.toString(Data.INT_ACTIONS));
         }
 
         // Encode the methods of the domain into integer representation
         this.initMethods();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Methods declared:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods declared:\n\n"
                 + this.toString(Data.INT_METHODS));
         }
 
         // Encode the initial state in integer representation
         this.initInitialState();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial state declared :\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial state declared :\n"
                 + this.toString(Data.INT_INITIAL_STATE) + "\n");
         }
 
         // Encode the initial task network
         this.initInitialTaskNetwork();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial task network declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial task network declared:\n"
                 + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
         }
 
         // Encode the goal in integer representation
         this.initGoal();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Goal declared:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
     }
@@ -128,8 +136,8 @@ public class HTNProblem extends AbstractHTNProblem {
     @Override
     protected void preinstantiation() {
         this.extractInertia();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Inertia detected:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inertia detected:\n"
                 + this.toString(Data.INERTIA) + "\n");
         }
         // Create the predicates tables used to count the occurrences of the predicates in the initial state/
@@ -153,19 +161,19 @@ public class HTNProblem extends AbstractHTNProblem {
     protected void postinstantiation() {
         super.postinstantiation();
         this.instantiateInitialTaskNetwork();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial tasknetwork instantiated:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial tasknetwork instantiated:\n"
                 + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
         }
 
         this.instantiateMethods();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Methods instantiated:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods instantiated:\n\n"
                 + this.toString(Data.INT_METHODS));
         }
         this.simplyMethodsWithGroundInertia();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Methods simplified based on ground inertia:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods simplified based on ground inertia:\n\n"
                 + this.toString(Data.INT_METHODS));
         }
     }
@@ -177,50 +185,50 @@ public class HTNProblem extends AbstractHTNProblem {
     @Override
     protected void finalization() {
         this.extractRelevantFluents();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Relevant fluents:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Relevant fluents:\n"
                 + this.toString(Data.FLUENTS) + "\n");
         }
         this.initOfMapFluentIndex();
         this.finalizeActions();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Actions:\n\n"
                 + this.toString(Data.ACTIONS) + "\n");
         }
         this.extractRelevantTasks();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Relevant tasks:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Relevant tasks:\n"
                 + this.toString(Data.TASKS) + "\n");
         }
 
         this.initTaskResolvers();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Task resolvers:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Task resolvers:\n\n"
                 + this.toString(Data.TASK_RESOLVERS) + "\n");
         }
 
         this.initMapOfTaskIndex();
         this.finalizeMethods();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Methods:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods:\n\n"
                 + this.toString(Data.METHODS) + "\n");
         }
 
         this.finalizeInitialState();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial state:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial state:\n"
                 + this.toString(Data.INITIAL_STATE) + "\n");
         }
 
         this.finalizeInitialTaskNetwork();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial tasknetwork:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial tasknetwork:\n"
                 + this.toString(Data.INITIAL_TASK_NETWORK));
         }
 
         this.finalizeGoal();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Goal:\n"
                 + this.toString(Data.GOAL));
         }
     }

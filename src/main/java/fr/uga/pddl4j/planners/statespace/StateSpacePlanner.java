@@ -15,12 +15,13 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
+import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.Problem;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 
 import java.util.List;
 import java.util.Properties;
@@ -35,45 +36,6 @@ import java.util.Properties;
 public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
 
     /**
-     * The default planner.
-     */
-    Name DEFAULT_STATE_SPACE_PLANNER = Name.HSP;
-
-    /**
-     * The heuristic key for properties.
-     */
-    String HEURISTIC = "HEURISTIC";
-
-    /**
-     * The default heuristicType.
-     */
-    PlanningGraphHeuristic.Type DEFAULT_HEURISTIC = PlanningGraphHeuristic.Type.FAST_FORWARD;
-
-    /**
-     * The weight key for properties.
-     */
-    String WEIGHT = "WEIGHT";
-
-    /**
-     * The default weight of the heuristic.
-     */
-    double DEFAULT_WEIGHT = 1.0;
-
-    /**
-     * The default anytime value.
-     */
-    boolean DEFAULT_ANYTIME = false;
-
-    /**
-     * Returns the LOGGER of the Planner class.
-     *
-     * @return the Planner class
-     */
-    static Logger getLogger() {
-        return Planner.getLogger();
-    }
-
-    /**
      * Returns the state space strategies used in the planner.
      *
      * @return the state space strategies used in the planner
@@ -81,29 +43,22 @@ public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
     List<StateSpaceStrategy> getStateSpaceStrategies();
 
     /**
-     * Is planner anytime or not.
+     * This method return the default configuration of the planner. The default configuration is as follow:
+     * <ul>
+     *     <li>Planner: HSP</li>
+     *     <li>Heuristic: Fast Forward</li>
+     *     <li>Heuristic weight: 1.0</li>
+     *     <li>Trace level: INFO</li>
+     * </ul>
      *
-     * @return true if planner is anytime, false otherwise
+     * @return the default configuration of the planner.
      */
-    boolean isAnytime();
-
-    /**
-     * Set the anytime state value.
-     *
-     * @param anytimeState the anytime state value
-     */
-    void setAnytime(final boolean anytimeState);
-
-    /**
-     * This method return the default arguments of the planner.
-     *
-     * @return the default arguments of the planner
-     */
-    static Properties getDefaultArguments() {
-        final Properties options = Planner.getDefaultArguments();
-        options.put(StateSpacePlanner.PLANNER, StateSpacePlanner.DEFAULT_STATE_SPACE_PLANNER);
-        options.put(StateSpacePlanner.HEURISTIC, StateSpacePlanner.DEFAULT_HEURISTIC);
-        options.put(StateSpacePlanner.WEIGHT, StateSpacePlanner.DEFAULT_WEIGHT);
-        return options;
+    static Configuration getDefaultConfiguration() {
+        final Configuration config = Planner.getDefaultConfiguration();
+        config.setPlanner(Setting.Planner.HSP);
+        config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
+        config.setHeuristicWeight(1.0);
+        config.setTraceLevel(Level.INFO);
+        return config;
     }
 }

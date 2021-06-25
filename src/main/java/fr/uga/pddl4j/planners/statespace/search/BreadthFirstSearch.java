@@ -18,7 +18,6 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -117,7 +116,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
+        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
         this.setSearchingTime(searchingTime);
 
         return solution;

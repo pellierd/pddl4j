@@ -19,13 +19,17 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +50,17 @@ import java.util.Properties;
 public final class TFDPlanner extends AbstractSTNPlanner {
 
     /**
-     * Creates a new abstract STN planner with the default parameters.
-     *
-     * @param arguments the arguments of the planner.
+     * The logger of the class.
      */
-    public TFDPlanner(final Properties arguments) {
-        super(arguments);
+    private static final Logger LOGGER = LogManager.getLogger(TFDPlanner.class.getName());
+
+    /**
+     * Creates a new abstract STN planner with the default configuration.
+     *
+     * @param configuration the configuration of the planner.
+     */
+    public TFDPlanner(final Configuration configuration) {
+        super(configuration);
     }
 
     /**
@@ -62,7 +71,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public Plan search(final HTNProblem problem) {
+    public Plan solve(final HTNProblem problem) {
         // Create the list of pending nodes to explore
         final PriorityQueue<TFDNode> open = new PriorityQueue<>(1000, new Comparator<TFDNode>() {
             public int compare(TFDNode n1, TFDNode n2) {
@@ -82,7 +91,7 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         Plan plan = null;
 
         // Get the timeout for searching
-        final int timeout = (int) super.getArguments().get(Planner.TIMEOUT);
+        final int timeout = this.getConfiguration().getTimeout();
         final long start = System.currentTimeMillis();
         long elapsedTime = 0;
 
@@ -107,10 +116,9 @@ public final class TFDPlanner extends AbstractSTNPlanner {
             // If the task network is empty we've got a solution
             if (currentNode.getTasks().isEmpty()) {
                 if (currentNode.getState().satisfy(problem.getGoal())) {
-                    int traceLevel = (Integer) this.getArguments().get(Planner.TRACE_LEVEL);
                     return super.extractPlan(currentNode, problem);
                 }  else {
-                    if (this.getTraceLevel() == 10) {
+                    if (LOGGER.isDebugEnabled()) {
                         Plan p = super.extractPlan(currentNode, problem);
                         System.out.println("\nFound plan as follows:\n" + problem.toString(p));
                         System.out.println(" But plan does does not reach the goal:\n");
@@ -204,6 +212,20 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         return plan;
     }
 
+
+    public static Configuration getDefaultConfiguration() {
+        Configuration config = new Configuration();
+        config.setPlanner(Setting.Planner.TFD);
+        config.setDomain(Setting.DEFAULT_DOMAIN);
+        config.setProblem(Setting.DEFAULT_PROBLEM);
+        config.setTimeout(Setting.DEFAULT_TIMEOUT);
+        config.setHeuristic(Setting.Heuristic.NONE);
+        config.setHeuristicWeight(Setting.DEFAULT_HEURISTIC_WEIGHT);
+        config.setSearchStrategy(Setting.SearchStrategy.DEPTH_FIRST);
+        config.setTraceLevel(Level.INFO);
+        return config;
+    }
+
     /**
      * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
      * follow:
@@ -230,101 +252,13 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
-
-        // Parse the commande line and initialize the arguments of the planner.
-        final Properties arguments = AbstractSTNPlanner.parseCommandLine(args);
-        if (arguments == null) {
-            AbstractSTNPlanner.printUsage();
-            System.exit(0);
-        }
-
-        // Get the domain file and problem file and parse the hddl files.
-        final File domain = (File) arguments.get(Planner.DOMAIN);
-        final File problem = (File) arguments.get(Planner.PROBLEM);
-        final PDDLParser parser = new PDDLParser();
         try {
-            parser.parse(domain, problem);
-        } catch (IOException e) {
-            System.out.println("\nunexpected error when parsing the PDDL planning problem description.");
-            System.exit(0);
-        }
-        final ErrorManager errorManager = parser.getErrorManager();
-        // Print the syntax errors if detected
-        if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
-            || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
-            errorManager.printAll();
-            System.exit(0);
+            final Configuration config = new Configuration(args, TFDPlanner.getDefaultConfiguration());
+            final TFDPlanner planner = new TFDPlanner(config);
+            planner.solve();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
 
-        System.out.println("\nParsing domain (" + domain.getName()
-            + ") and problem (" + problem.getName() + ") done successfully");
-
-
-        // Encode the problem into compact representation
-        final int traceLevel = (Integer) arguments.get(Planner.TRACE_LEVEL);
-        long start = System.currentTimeMillis();
-        HTNProblem pb = new HTNProblem(parser.getDomain(), parser.getProblem());
-        pb.instantiate(Level.ALL);
-
-        long end = System.currentTimeMillis();
-        final double encodingTime = (end - start) / 1000.0;
-        System.out.print("\nEncoding ");
-        if (pb.isTotallyOrederd()) {
-            System.out.print("totally ordered ");
-        } else {
-            System.out.print("partially ordered ");
-        }
-        System.out.println("problem done successfully ("
-            + pb.getActions().size() + " actions, "
-            + pb.getMethods().size() + " methods, "
-            + pb.getFluents().size() + " fluents, "
-            + pb.getTasks().size() + " tasks)\n");
-
-        if (!pb.isTotallyOrederd()) {
-            System.out.println("Unable to solve a problem that isn't totally ordered.\n");
-        }
-
-        if (pb.isSolvable()) {
-            try {
-                System.out.println("Searching a solution plan....\n");
-                start = System.currentTimeMillis();
-                // Create an instance of the TFDPlanner Planner
-                final Planner planner = new TFDPlanner(arguments);
-                final Plan plan = planner.search(pb);
-                end = System.currentTimeMillis();
-                final double searchTime = (end - start) / 1000.0;
-                if (plan != null) {
-                    // Print plan information
-                    if (traceLevel == 9) {
-                        System.out.println(pb.toString(plan.getHierarchy()));
-                    } else {
-                        System.out.println("Found plan as follows:\n" + pb.toString(plan));
-                    }
-                    System.out.println(String.format("Plan total cost      : %4.2f", plan.cost()));
-                    System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
-                    System.out.println(String.format("Searching time       : %4.3fs", searchTime));
-                    System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
-
-                } else {
-                    if (traceLevel == 9) {
-                        System.out.println("==>");
-                        System.out.println("<==\n");
-                    } else {
-                        System.out.println(String.format(String.format("\n%nno plan found%n%n")));
-                    }
-                    System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
-                    System.out.println(String.format("Searching time       : %4.3fs", searchTime));
-                    System.out.println(String.format("Total time           : %4.3fs%n", searchTime + encodingTime));
-                }
-            } catch (OutOfMemoryError err) {
-                System.out.println("Out of memory during search !");
-                System.exit(0);
-            }
-        } else {
-            System.out.println(String.format(String.format("\n%nproblem with no solution plan found%n%n")));
-            System.out.println(String.format("Encoding time        : %4.3fs", encodingTime));
-            System.out.println(String.format("Searching time       : %4.3fs", 0.0));
-            System.out.println(String.format("Total time           : %4.3fs%n", encodingTime));
-        }
     }
 }

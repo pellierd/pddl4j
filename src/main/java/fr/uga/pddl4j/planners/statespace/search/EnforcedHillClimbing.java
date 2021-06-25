@@ -21,10 +21,10 @@ package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -50,10 +50,10 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
      * Creates a new Enforced Hill Climbing search strategy.
      *
      * @param timeout   the time out of the planner.
-     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public EnforcedHillClimbing(int timeout, PlanningGraphHeuristic.Type heuristic, double weight) {
+    public EnforcedHillClimbing(int timeout, Setting.Heuristic heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -69,7 +69,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
 
         final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
         final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
-            getHeuristicType(), codedProblem);
+            getHeuristic(), codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
         final int timeout = getTimeout();
 
@@ -109,7 +109,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
             searchingTime = end - begin;
         }
 
-        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(openList) + MemoryAgent.getDeepSizeOf(heuristic));
+        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(openList) + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
         return solution;

@@ -15,11 +15,10 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.SearchStrategy;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
-
-import java.io.Serializable;
 
 /**
  * This interface defines the main methods for search strategies.
@@ -28,21 +27,21 @@ import java.io.Serializable;
  * @version 1.0 - 11.06.2018
  * @since 3.6
  */
-public interface StateSpaceStrategy extends Serializable {
+public interface StateSpaceStrategy extends SearchStrategy {
 
     /**
-     * Returns the heuristicType to use to solve the planning problem.
+     * Returns the heuristic to use to solve the planning problem.
      *
-     * @return the heuristicType to use to solve the planning problem.
+     * @return the heuristic to use to solve the planning problem.
      */
-    PlanningGraphHeuristic.Type getHeuristicType();
+    Setting.Heuristic getHeuristic();
 
     /**
-     * Sets the heuristicType to use to solved the problem.
+     * Sets the heuristic to use to solved the problem.
      *
-     * @param heuristicType the heuristicType to use to solved the problem. The heuristicType cannot be null.
+     * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
-    void setHeuristicType(final PlanningGraphHeuristic.Type heuristicType);
+    void setHeuristic(final Setting.Heuristic heuristic);
 
     /**
      * Returns the weight set to the heuristic.

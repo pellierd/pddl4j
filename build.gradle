@@ -1,20 +1,31 @@
 buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+    }
     configurations.all {
         resolutionStrategy.force 'net.java.dev.javacc:javacc:6.1.2'
     }
 }
 
+
 plugins {
     id "ca.coglinc.javacc" version "2.4.0"
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java'
 }
 
 apply plugin: 'base'
 apply plugin: 'java'
-apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'fr.uga'
 version '4.0'
+//mainClassName 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
+
 sourceCompatibility = 1.8
 
 repositories {
@@ -22,11 +33,11 @@ repositories {
 }
 
 dependencies {
-    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
-    testCompile group: 'junit', name: 'junit', version: '4.13'
-    testImplementation 'junit:junit:4.13'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
+//    testImplementation 'junit:junit:4.13'
 }
 
 
@@ -60,15 +71,23 @@ checkstyle {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'Gradle Quickstart',
-                'Implementation-Version': version,
-                'Gradle-Version':'Gradle 4.8',
+        attributes 'Implementation-Title': 'PDDL4J',
+                'Implementation-Version': archiveVersion,
                 'Built-By': 'Damien Pellier',
                 'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
                 'Main-Class': 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
     }
-    doFirst {
-        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+shadowJar {
+    archiveBaseName.set('pddl4j')
+    archiveVersion.set('4.0')
+    manifest {
+        attributes 'Implementation-Title': 'PDDL4J',
+                'Implementation-Version': archiveVersion,
+                'Built-By': 'Damien Pellier',
+                'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
+                'Main-Class': 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
     }
 }
 
@@ -87,19 +106,6 @@ task run (type: JavaExec, dependsOn: build){
 
 clean{
     delete 'build', 'out', fileTree(dir: "src/main/java/fr/uga/pddl4j/parser/lexer", exclude:"Lexer.jj")
-}
-
-findbugsMain.onlyIf() { project.hasProperty('findbug') }
-findbugsTest.onlyIf() { project.hasProperty('findbug') }
-
-findbugsMain.doLast() {
-    println("Find bug process completed without finding an issue")
-}
-
-findbugs {
-    effort= "max"
-    reportLevel = "low"
-    excludeFilter = file("$rootProject.projectDir/config/findbugs/excludeFilter.xml")
 }
 
 javadoc.doFirst() {
@@ -147,7 +153,7 @@ test {
     scanForTestClasses = false
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
     //includes = ['**/TFDPlannerTest.class']
-    includes = ['**/HSPTest.class']
+    includes = ['**/PDDLParserTest.class']
 }
 
 defaultTasks 'clean', 'build', 'test'

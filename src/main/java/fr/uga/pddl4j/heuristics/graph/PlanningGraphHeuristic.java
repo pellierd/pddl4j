@@ -36,54 +36,6 @@ import java.io.Serializable;
  * @version 1.0 - 10.06.2010
  */
 public interface PlanningGraphHeuristic extends GoalCostHeuristic {
-
-    //TODO work on that part to make more generic the addition of MIN_COST
-
-    /**
-     * The type of heuristic implemented.
-     *
-     * @author D. Pellier
-     * @version 1.0 - 09.02.2011
-     */
-    enum Type {
-
-        /**
-         * The type for the <code>AdjustedSum</code> heuristic.
-         */
-        AJUSTED_SUM,
-        /**
-         * The type for the <code>AdjustedSum2</code> heuristic.
-         */
-        AJUSTED_SUM2,
-        /**
-         * The type for the <code>AdjustedSum2M</code> heuristic.
-         */
-        AJUSTED_SUM2M,
-        /**
-         * The type for the <code>Combo</code> heuristic.
-         */
-        COMBO,
-        /**
-         * The type for the <code>Max</code> heuristic.
-         */
-        MAX,
-        /**
-         * The type for the <code>FF</code> heuristic.
-         */
-        FAST_FORWARD,
-        /**
-         * The type for the <code>SetLevel</code> heuristic.
-         */
-        SET_LEVEL,
-        /**
-         * The type for the <code>Sum</code> heuristic.
-         */
-        SUM,
-        /**
-         * The type for the <code>SumMutex</code> heuristic.
-         */
-        SUM_MUTEX,
-
-    }
+    
 
 }

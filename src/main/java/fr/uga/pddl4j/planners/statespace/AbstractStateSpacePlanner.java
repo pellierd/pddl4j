@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 import fr.uga.pddl4j.problem.Problem;
 
@@ -33,11 +34,6 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
         implements StateSpacePlanner<T> {
 
     /**
-     * The anytime state of the planner.
-     */
-    private boolean anytime;
-
-    /**
      * The liste of state space strategies used in the planner.
      */
     private List<StateSpaceStrategy> stateSpaceStrategiesList;
@@ -48,19 +44,14 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
     public AbstractStateSpacePlanner() {
         super();
         this.stateSpaceStrategiesList = new ArrayList<>();
-        this.anytime = StateSpacePlanner.DEFAULT_ANYTIME;
     }
 
     /**
-     * Creates a new planner.
-     *
-     * @param statisticState the statistics generation value.
-     * @param traceLevel     the trace level of the planner.
+     * Creates a new planner with a specific configuration.
      */
-    public AbstractStateSpacePlanner(final boolean statisticState, final int traceLevel) {
-        super(statisticState, traceLevel);
+    public AbstractStateSpacePlanner(Configuration configuration) {
+        super(configuration);
         this.stateSpaceStrategiesList = new ArrayList<>();
-        this.anytime = StateSpacePlanner.DEFAULT_ANYTIME;
     }
 
     /**
@@ -71,25 +62,5 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
     @Override
     public List<StateSpaceStrategy> getStateSpaceStrategies() {
         return this.stateSpaceStrategiesList;
-    }
-
-    /**
-     * Set the anytime state value.
-     *
-     * @param anytimeState the anytime state value
-     */
-    @Override
-    public void setAnytime(boolean anytimeState) {
-        this.anytime = anytimeState;
-    }
-
-    /**
-     * Is planner anytime or not.
-     *
-     * @return true if planner is anytime, false otherwise
-     */
-    @Override
-    public boolean isAnytime() {
-        return anytime;
     }
 }

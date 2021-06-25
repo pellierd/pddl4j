@@ -19,14 +19,17 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
@@ -40,6 +43,11 @@ import java.util.Objects;
 public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
 
     /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(HSP.class.getName());
+
+    /**
      * The A* strategy.
      */
     private final StateSpaceStrategy astar;
@@ -48,38 +56,23 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      * Creates a new planner with default parameters.
      */
     public HSP() {
-        astar = new AStar();
-        this.getStateSpaceStrategies().add(astar);
+        super();
+        this.astar = new AStar();
+        this.getStateSpaceStrategies().add(this.astar);
     }
 
     /**
-     * Creates a new planner with default parameters for search strategy.
+     * Creates a new planner with a defualt configuration.
      *
-     * @param statisticState the statistics generation value.
-     * @param traceLevel     the trace level of the planner.
+     * @param configuration the configuration of the planner.
      */
-    public HSP(final boolean statisticState, final int traceLevel) {
-        super(statisticState, traceLevel);
-
-        astar = new AStar();
-        this.getStateSpaceStrategies().add(astar);
-    }
-
-    /**
-     * Creates a new planner.
-     *
-     * @param timeout        the time out of the planner.
-     * @param heuristicType  the heuristicType to use to solve the planning problem.
-     * @param weight         the weight set to the heuristic.
-     * @param statisticState the statistics generation value.
-     * @param traceLevel     the trace level of the planner.
-     */
-    public HSP(final int timeout, final PlanningGraphHeuristic.Type heuristicType, final double weight,
-               final boolean statisticState, final int traceLevel) {
-        super(statisticState, traceLevel);
-
-        astar = new AStar(timeout, heuristicType, weight);
-        this.getStateSpaceStrategies().add(astar);
+    public HSP(Configuration configuration) {
+        super(configuration);
+        final int timeout = this.getConfiguration().getTimeout();
+        final Setting.Heuristic heuristic = this.getConfiguration().getHeuristic();
+        final double weight = this.getConfiguration().getHeuristicWeight();
+        this.astar = new AStar(timeout, heuristic, weight);
+        this.getStateSpaceStrategies().add(this.astar);
     }
 
     /**
@@ -89,22 +82,59 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      * @return a solution search or null if it does not exist.
      */
     @Override
-    public Plan search(final ADLProblem problem) {
-        final Logger logger = this.getLogger();
+    public Plan solve(final ADLProblem problem) {
         Objects.requireNonNull(problem);
 
-        logger.trace("* starting A*\n");
+        LOGGER.info("* starting A*\n");
         final Node solutionNode = astar.searchSolutionNode(problem);
-        if (isSaveState()) {
-            this.getStatistics().setTimeToSearch(astar.getSearchingTime());
-            this.getStatistics().setMemoryUsedToSearch(astar.getMemoryUsed());
-        }
+        this.getStatistics().setTimeToSearch(astar.getSearchingTime());
+        this.getStatistics().setMemoryUsedToSearch(astar.getMemoryUsed());
         if (solutionNode != null) {
-            logger.trace("* A* succeeded\n");
+            LOGGER.info("* A* succeeded\n");
             return (SequentialPlan) astar.extractPlan(solutionNode, problem);
         } else {
-            logger.trace("* A* failed\n");
+            LOGGER.info("* A* failed\n");
             return null;
         }
+    }
+
+    @Override
+    public boolean checkConfiguration() {
+        return true;
+    }
+
+    @Override
+    public ADLProblem instantiate() {
+        ADLProblem pb = new ADLProblem(this.getParser().getDomain(), this.getParser().getProblem());
+        pb.instantiate();
+        return pb;
+    }
+
+    public static Configuration getDefaultConfiguration() {
+        Configuration config = new Configuration();
+        config.setPlanner(Setting.Planner.HSP);
+        config.setDomain(Setting.DEFAULT_DOMAIN);
+        config.setProblem(Setting.DEFAULT_PROBLEM);
+        config.setTimeout(Setting.DEFAULT_TIMEOUT);
+        config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
+        config.setHeuristicWeight(Setting.DEFAULT_HEURISTIC_WEIGHT);
+        config.setSearchStrategy(Setting.SearchStrategy.ASTAR);
+        config.setTraceLevel(Level.INFO);
+        return config;
+    }
+
+    /**
+     * The
+     * @param args
+     */
+    public static void main(String[] args) {
+        try {
+            Configuration config = new Configuration(args, HSP.getDefaultConfiguration());
+            HSP planner = new HSP(config);
+            planner.solve();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
     }
 }

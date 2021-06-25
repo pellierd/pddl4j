@@ -18,6 +18,10 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +33,11 @@ import java.util.Set;
  * @version 4.0 - 04.12.2020
  */
 public class ADLProblem extends FinalizedProblem {
+
+    /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(ADLProblem.class.getName());
 
     /**
      * Create a new ADL problem from a domain and problem.
@@ -83,38 +92,38 @@ public class ADLProblem extends FinalizedProblem {
         this.initConstants();
         // Collect the either types of the domain
         this.initEitherTypes();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Types declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Types declared:\n"
                 + this.toString(Data.TYPES) + "\n");
-            this.getLogger().debug("Constants declared in the problem:\n"
+            LOGGER.debug("Constants declared in the problem:\n"
                 + this.toString(Data.CONSTANT_SYMBOLS) + "\n");
         }
 
         // Collect the predicate information (symbols and signatures)
         this.initPredicates();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Predicates declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Predicates declared:\n"
                 + this.toString(Data.PREDICATE_SIGNATURES) + "\n");
         }
 
         // Encode the actions of the domain into integer representation
         this.initActions();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions declared:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Actions declared:\n\n"
                 + this.toString(Data.INT_ACTIONS));
         }
 
         // Encode the initial state in integer representation
         this.initInitialState();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial state declared :\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial state declared :\n"
                 + this.toString(Data.INT_INITIAL_STATE) + "\n");
         }
 
         // Encode the goal in integer representation
         this.initGoal();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal declared:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Goal declared:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
     }
@@ -128,16 +137,16 @@ public class ADLProblem extends FinalizedProblem {
     protected void preinstantiation() {
         // Extract the inertia from the list of actions
         this.extractInertia();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Inertia detected:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Inertia detected:\n"
                 + this.toString(Data.INERTIA) + "\n");
         }
         // Infer the type from the unary inertia
         if (!this.getRequirements().contains(PDDLRequireKey.TYPING)) {
             this.inferTypesFromInertia();
             this.simplifyActionsWithInferredTypes();
-            if (this.getLogger().isDebugEnabled()) {
-                this.getLogger().debug("Actions with inferred types:\n\n"
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Actions with inferred types:\n\n"
                     + this.toString(Data.INT_ACTIONS) + "\n");
             }
         }
@@ -153,13 +162,13 @@ public class ADLProblem extends FinalizedProblem {
     protected void instantiation() {
         // Instantiate the actions and the goal
         this.instantiateActions();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions instantiated:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Actions instantiated:\n\n"
                 + this.toString(Data.INT_ACTIONS) + "\n");
         }
         this.instantiateGoal();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal instantiated:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Goal instantiated:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
     }
@@ -173,18 +182,18 @@ public class ADLProblem extends FinalizedProblem {
     protected void postinstantiation() {
         // Extract the ground inertia and simplify the actions and the goal
         this.extractGroundInertia();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Ground inertia detected:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Ground inertia detected:\n\n"
                 + this.toString(Data.GROUND_INERTIA) + "\n");
         }
         this.simplyActionsWithGroundInertia();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions simplified base on ground inertia detected:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Actions simplified base on ground inertia detected:\n\n"
                 + this.toString(Data.INT_ACTIONS) + "\n");
         }
         this.simplifyGoalWithGroundInertia();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal simplified base on ground in‡ertia detected:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Goal simplified base on ground in‡ertia detected:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
     }
@@ -195,24 +204,24 @@ public class ADLProblem extends FinalizedProblem {
      */
     protected void finalization() {
         this.extractRelevantFluents();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Relevant fluents:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Relevant fluents:\n"
                 + this.toString(Data.FLUENTS) + "\n");
         }
         this.initOfMapFluentIndex();
         this.finalizeActions();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Actions:\n\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Actions:\n\n"
                 + this.toString(Data.ACTIONS) + "\n");
         }
         this.finalizeInitialState();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Initial state:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial state:\n"
                 + this.toString(Data.INITIAL_STATE) + "\n");
         }
         this.finalizeGoal();
-        if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug("Goal:\n"
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Goal:\n"
                 + this.toString(Data.GOAL) + "\n");
         }
 

@@ -43,9 +43,9 @@ import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitVector;
+import fr.uga.pddl4j.util.BitSet;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;

@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.graph;
 
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
 
 import java.io.Serializable;
@@ -45,8 +46,7 @@ public class PlanningGraphHeuristicFactory implements Serializable {
      * @param problem the problem for which the heuristic is created.
      * @return the heuristic created.
      */
-    public PlanningGraphHeuristic createRelaxtionHeuristic(final PlanningGraphHeuristic.Type type,
-                                                           final ADLProblem problem) {
+    public PlanningGraphHeuristic createRelaxtionHeuristic(final Setting.Heuristic type, final ADLProblem problem) {
         PlanningGraphHeuristic heuristic = null;
         switch (type) {
             case FAST_FORWARD:

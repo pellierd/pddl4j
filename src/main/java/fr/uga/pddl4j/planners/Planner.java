@@ -15,14 +15,17 @@
 
 package fr.uga.pddl4j.planners;
 
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
 
 import fr.uga.pddl4j.problem.Problem;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.Properties;
 
 /**
  * This interface defines the main methods of to access a planner.
@@ -34,90 +37,18 @@ import java.util.Properties;
 public interface Planner<T extends Problem> extends Serializable {
 
     /**
-     * The logger of the class.
-     */
-    Logger LOGGER = LogManager.getLogger(Planner.class);
-
-    /**
-     * The planner key for properties.
-     */
-    String PLANNER = "PLANNER";
-
-    /**
-     * The default planner.
-     */
-    Name DEFAULT_PLANNER = Name.HSP;
-
-    /**
-     * The domain key for properties.
-     */
-    String DOMAIN = "DOMAIN";
-
-    /**
-     * The problem key for properties.
-     */
-    String PROBLEM = "PROBLEM";
-
-    /**
-     * The timeout key for properties.
-     */
-    String TIMEOUT = "TIMEOUT";
-
-    /**
-     * The default CPU time allocated to the search in seconds.
-     */
-    int DEFAULT_TIMEOUT = 600;
-
-    /**
-     * The trace level key for properties.
-     */
-    String TRACE_LEVEL = "TRACE_LEVEL";
-
-    /**
-     * The default trace level.
-     */
-    int DEFAULT_TRACE_LEVEL = 1;
-
-    /**
-     * The statistics key for properties.
-     */
-    String STATISTICS = "STATISTICS";
-
-    /**
-     * The default statistics value.
-     */
-    boolean DEFAULT_STATISTICS = true;
-
-    /**
-     * This enumeration used to specified the name of the planner implemented in the library.
-     */
-    enum Name {
-        /**
-         * The HSP (Heuristic Search Planner).
-         */
-        HSP,
-        /**
-         * The FF (Fast Forward Planner).
-         */
-        FF,
-        /**
-         * The FF Anytime (Fast Forward Anytime Planner).
-         */
-        FFAnytime,
-        /**
-         * The HC Anytime (Hill Climbing Anytime Planner).
-         */
-        HCAnytime
-    }
-
-    /**
-     * Returns the LOGGER of the Planner class.
+     * Returns the configuration of the planner.
      *
-     * @return the Planner class.
+     * @return the configuration of the planner.
      */
-    static Logger getLogger() {
-        return LOGGER;
-    }
+    Configuration getConfiguration();
+
+    /**
+     * Sets the configuration of the planner.
+     *
+     * @param configuration the configuration to set.
+     */
+    void setConfiguration(Configuration configuration);
 
     /**
      * Search a plan for the specified planning problem.
@@ -125,7 +56,14 @@ public interface Planner<T extends Problem> extends Serializable {
      * @param problem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null is no solution was found.
      */
-    Plan search(final T problem);
+    Plan solve(final T problem);
+
+    /**
+     * Search a plan for the current planner configuration.
+     *
+     * @return the solution plan or null is no solution was found.
+     */
+    Plan solve() throws FileNotFoundException;
 
     /**
      * Returns the statistics of the planner.
@@ -136,43 +74,40 @@ public interface Planner<T extends Problem> extends Serializable {
     Statistics getStatistics();
 
     /**
-     * Sets the trace level of the planner.
-     *
-     * @param level the trace level of the planner.
-     */
-    void setTraceLevel(final int level);
-
-    /**
-     * Returns the trace level of the planner.
-     *
-     * @return the trace level of the planner.
-     */
-    int getTraceLevel();
-
-    /**
-     * Set the statistics generation value.
-     *
-     * @param saveState the new statistics computation value
-     */
-    void setSaveState(boolean saveState);
-
-    /**
-     * Is statistics generate or not.
-     *
-     * @return true if statistics are compute and save, false otherwise
-     */
-    boolean isSaveState();
-
-    /**
      * This method return the default arguments of the planner.
      *
      * @return the default arguments of the planner.
+     * @see Configuration
      */
-    static Properties getDefaultArguments() {
-        final Properties options = new Properties();
-        options.put(Planner.TIMEOUT, Planner.DEFAULT_TIMEOUT * 1000);
-        options.put(Planner.TRACE_LEVEL, Planner.DEFAULT_TRACE_LEVEL);
-        options.put(Planner.STATISTICS, Planner.DEFAULT_STATISTICS);
-        return options;
+    static Configuration getDefaultConfiguration() {
+        return new Configuration();
     }
+
+    /**
+     * Parses the domain and the problem description specified in parameters.
+     *
+     * @param domain the path to the PDDL domain file.
+     * @param problem the path to the PDDL problem file.
+     * @throws FileNotFoundException if the domain or the problem file was not found.
+     * @throws IOException if an error occur during parsing.
+     */
+    ErrorManager parse(final String domain, final String problem) throws IOException;
+
+    /**
+     * Parses the domain and the problem description given ine the planner configuration.
+     *
+     * @throws FileNotFoundException if the domain or the problem file was not found.
+     * @throws IOException           if an error occur during parsing.
+     */
+    ErrorManager parse() throws IOException;
+
+    /**
+     * Instantiates the planning problem from the 
+     *
+     * @return the instantiated planning problem or null if the problem cannot be instantiated.
+     */
+    T instantiate();
+
+
+
 }

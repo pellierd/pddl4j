@@ -39,7 +39,10 @@ import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -60,14 +63,9 @@ import java.util.stream.Collectors;
 public abstract class AbstractProblem implements Problem {
 
     /**
-     * The default log level.
-     */
-    private static final Level DEFAULT_LOG_LEVEL = Level.OFF;
-
-    /**
      * The logger of the class.
      */
-    private Logger logger;
+    private static final Logger LOGGER = LogManager.getLogger(AbstractProblem.class.getName());
 
     /**
      * The PDDL domain.
@@ -213,8 +211,9 @@ public abstract class AbstractProblem implements Problem {
      * The empty constructor to block the default constructor of object.
      */
     private AbstractProblem() {
-        this.logger = LogManager.getLogger(AbstractProblem.class);
+        super();
     }
+
 
     /**
      * Creates a new problem from a domain and problem.
@@ -228,14 +227,6 @@ public abstract class AbstractProblem implements Problem {
         this.problem = problem;
     }
 
-    /**
-     * Returns the logger of the problem.
-     *
-     * @return the logger of the problem.
-     */
-    protected Logger getLogger() {
-        return this.logger;
-    }
 
     /**
      * Returns the parsed domain used to create of this problem.
@@ -369,7 +360,12 @@ public abstract class AbstractProblem implements Problem {
      * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
      */
     public final void instantiate() {
-        instantiate(AbstractProblem.DEFAULT_LOG_LEVEL);
+        //instantiate(AbstractProblem.DEFAULT_LOG_LEVEL);
+        this.initialization();
+        this.preinstantiation();
+        this.instantiation();
+        this.postinstantiation();
+        this.finalization();
     }
 
     /**
@@ -379,7 +375,7 @@ public abstract class AbstractProblem implements Problem {
      * @param level the log level.
      */
     public final void instantiate(final Level level) {
-        Configurator.setLevel(logger.getName(), level);
+        //this.setTraceLevel(level);
         this.initialization();
         this.preinstantiation();
         this.instantiation();
@@ -926,10 +922,10 @@ public abstract class AbstractProblem implements Problem {
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                 final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(i));
+                t1.setTaskID(i);
                 constraint.addChild(t1);
                 final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(i + 1));
+                t2.setTaskID(i + 1);
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
             }
@@ -956,10 +952,10 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
                     final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new Integer(i));
+                    t1.setTaskID(i);
                     constraint.addChild(t1);
                     final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new Integer(i + 1));
+                    t2.setTaskID(i + 1);
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }
@@ -1766,4 +1762,40 @@ public abstract class AbstractProblem implements Problem {
         }
         return str.toString();
     }
+
+    /*public Logger getLogger() {
+        return this.logger;
+    }
+
+    public void setLogger(Logger logger) {
+        System.out.println("SET LOGGER ");
+
+        this.logger = logger;
+    }
+
+    /**
+     * Sets the trace level of the planner.
+     *
+     * @param level the trace level of the planner.
+     */
+    /*public void setTraceLevel(final Level level) {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getName());
+        loggerConfig.setLevel(level);
+        context.updateLoggers();
+        System.out.println("LEVEL SET TO " + level +  " " + getLogger().getName());
+    }
+
+    /**
+     * Returns the trace level of the planner.
+     *
+     * @return the trace level of the planner.
+     */
+   /* public Level getTraceLevel() {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getName());
+        return loggerConfig.getLevel();
+    }*/
 }

@@ -19,19 +19,24 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
+import fr.uga.pddl4j.parser.PDDLDomain;
+import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm and
@@ -43,6 +48,11 @@ import java.util.Objects;
  * @version 2.0 - 24.01.2018
  */
 public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
+
+    /**
+     * The logger of the class.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(FF.class.getName());
 
     /**
      * The Enforced Hill Climbing strategy.
@@ -59,48 +69,25 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      */
     public FF() {
         super();
-
         this.enforcedHillClimbing = new EnforcedHillClimbing();
         this.astar = new AStar();
-
         this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
         this.getStateSpaceStrategies().add(this.astar);
     }
 
-    /**
-     * Creates a new planner with default parameters for search strategy.
-     *
-     * @param statisticState the statistics generation value.
-     * @param traceLevel     the trace level of the planner.
-     */
-    public FF(final boolean statisticState, final int traceLevel) {
-        super(statisticState, traceLevel);
-
-        this.enforcedHillClimbing = new EnforcedHillClimbing();
-        this.astar = new AStar();
-
-        this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
-        this.getStateSpaceStrategies().add(this.astar);
-    }
 
     /**
      * Creates a new planner.
      *
-     * @param timeout        the time out of the planner.
-     * @param heuristicType  the heuristicType to use to solve the planning problem.
-     * @param weight         the weight set to the heuristic.
-     * @param statisticState the statistics generation value.
-     * @param traceLevel     the trace level of the planner.
+     * @param configuration the configuration of the planner.
      */
-    public FF(final int timeout, final PlanningGraphHeuristic.Type heuristicType, final double weight,
-              final boolean statisticState, final int traceLevel) {
-        super();
-        this.setSaveState(statisticState);
-        this.setTraceLevel(traceLevel);
-
-        this.enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristicType, weight);
-        this.astar = new GreedyBestFirstSearch(timeout, heuristicType, weight);
-
+    public FF(Configuration configuration) {
+        super(configuration);
+        final int timeout = this.getConfiguration().getTimeout();
+        final Setting.Heuristic heuristic = this.getConfiguration().getHeuristic();
+        final double weight = this.getConfiguration().getHeuristicWeight();
+        this.enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristic, weight);
+        this.astar = new AStar(timeout, heuristic, weight);
         this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
         this.getStateSpaceStrategies().add(this.astar);
     }
@@ -111,35 +98,70 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      * @param pb the problem to solve.
      */
     @Override
-    public Plan search(final ADLProblem pb) {
-        final Logger logger = this.getLogger();
+    public Plan solve(final ADLProblem pb) {
         Objects.requireNonNull(pb);
 
-        logger.trace("* starting enforced hill climbing\n");
+        LOGGER.info("* starting enforced hill climbing\n");
         Node solutionNode = this.enforcedHillClimbing.searchSolutionNode(pb);
 
         if (solutionNode != null) {
-            logger.trace("* enforced hill climbing succeeded\n");
-            if (isSaveState()) {
-                this.getStatistics().setTimeToSearch(this.enforcedHillClimbing.getSearchingTime());
-                this.getStatistics().setMemoryUsedToSearch(this.enforcedHillClimbing.getMemoryUsed());
-            }
+            LOGGER.info("* enforced hill climbing succeeded\n");
+            this.getStatistics().setTimeToSearch(this.enforcedHillClimbing.getSearchingTime());
+            this.getStatistics().setMemoryUsedToSearch(this.enforcedHillClimbing.getMemoryUsed());
             return (SequentialPlan) this.enforcedHillClimbing.extractPlan(solutionNode, pb);
         } else {
-            logger.trace("* enforced hill climbing failed\n");
-            logger.trace("* starting A* first search\n");
+            LOGGER.info("* enforced hill climbing failed\n");
+            LOGGER.info("* starting A* search\n");
             solutionNode = astar.searchSolutionNode(pb);
-            if (isSaveState()) {
-                this.getStatistics().setTimeToSearch(this.astar.getSearchingTime());
-                this.getStatistics().setMemoryUsedToSearch(this.astar.getMemoryUsed());
-            }
+            this.getStatistics().setTimeToSearch(this.astar.getSearchingTime());
+            this.getStatistics().setMemoryUsedToSearch(this.astar.getMemoryUsed());
             if (solutionNode == null) {
-                logger.trace("* A* search failed\n");
+                LOGGER.info("* A* search failed\n");
                 return null;
             } else {
-                logger.trace("* A* search succeeded\n");
+                LOGGER.info("* A* search succeeded\n");
                 return (SequentialPlan) this.astar.extractPlan(solutionNode, pb);
             }
         }
+    }
+
+    @Override
+    public boolean checkConfiguration() {
+        return true;
+    }
+
+    @Override
+    public ADLProblem instantiate() {
+        ADLProblem pb = new ADLProblem(this.getParser().getDomain(), this.getParser().getProblem());
+        pb.instantiate();
+        return pb;
+    }
+
+    public static Configuration getDefaultConfiguration() {
+        Configuration config = new Configuration();
+        config.setPlanner(Setting.Planner.FF);
+        config.setDomain(Setting.DEFAULT_DOMAIN);
+        config.setProblem(Setting.DEFAULT_PROBLEM);
+        config.setTimeout(Setting.DEFAULT_TIMEOUT);
+        config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
+        config.setHeuristicWeight(Setting.DEFAULT_HEURISTIC_WEIGHT);
+        config.setSearchStrategy(Setting.SearchStrategy.NONE);
+        config.setTraceLevel(Level.INFO);
+        return config;
+    }
+
+    /**
+     * The
+     * @param args
+     */
+    public static void main(String[] args) {
+        try {
+            Configuration config = new Configuration(args, FF.getDefaultConfiguration());
+            FF planner = new FF(config);
+            planner.solve();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
     }
 }

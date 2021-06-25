@@ -17,10 +17,10 @@ package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,10 +47,10 @@ public final class AStar extends AbstractStateSpaceSearch {
      * Creates a new AStar search strategy.
      *
      * @param timeout   the time out of the planner.
-     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public AStar(int timeout, PlanningGraphHeuristic.Type heuristic, double weight) {
+    public AStar(int timeout, Setting.Heuristic heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -65,7 +65,7 @@ public final class AStar extends AbstractStateSpaceSearch {
         final long begin = System.currentTimeMillis();
         final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
         final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
-            getHeuristicType(), codedProblem);
+            getHeuristic(), codedProblem);
         // Get the initial state from the planning problem
         final State init = new State(codedProblem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)
@@ -149,7 +149,7 @@ public final class AStar extends AbstractStateSpaceSearch {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
+        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
         this.setSearchingTime(time);
 
         // return the search computed or null if no search was found

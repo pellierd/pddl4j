@@ -18,7 +18,6 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -113,7 +112,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
+        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
         this.setSearchingTime(searchingTime);
 
         return solution;

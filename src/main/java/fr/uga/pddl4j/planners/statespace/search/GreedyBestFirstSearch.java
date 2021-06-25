@@ -17,10 +17,10 @@ package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
-import fr.uga.pddl4j.util.MemoryAgent;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,10 +48,10 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
      * Creates a new Greedy best First Search search strategy.
      *
      * @param timeout   the time out of the planner.
-     * @param heuristic the heuristicType to use to solve the planning problem.
+     * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public GreedyBestFirstSearch(int timeout, PlanningGraphHeuristic.Type heuristic, double weight) {
+    public GreedyBestFirstSearch(int timeout, Setting.Heuristic heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -68,7 +68,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
 
         final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
         final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
-            getHeuristicType(), codedProblem);
+            getHeuristic(), codedProblem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
         final int timeout = getTimeout();
@@ -117,8 +117,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet)
-            + MemoryAgent.getDeepSizeOf(heuristic));
+        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet)
+        //    + MemoryAgent.getDeepSizeOf(heuristic));
         this.setSearchingTime(searchingTime);
 
         return solution;

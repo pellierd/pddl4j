@@ -19,6 +19,7 @@ import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.GenericPlanner;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.BreadthFirstSearch;
@@ -65,7 +66,7 @@ public class GenericPlannerTest {
     /**
      * Default Heuristic Type.
      */
-    private static final PlanningGraphHeuristic.Type HEURISTIC_TYPE = PlanningGraphHeuristic.Type.FAST_FORWARD;
+    private static final Setting.Heuristic HEURISTIC = Setting.Heuristic.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.
@@ -94,7 +95,7 @@ public class GenericPlannerTest {
     @Test
     public void testGenericPlanner_Astar_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new AStar(TIMEOUT * 1000,
-            HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+            HEURISTIC, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
@@ -161,7 +162,7 @@ public class GenericPlannerTest {
     @Test
     public void testGenericPlanner_EHC_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000,
-            HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+            HEURISTIC, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
@@ -184,7 +185,7 @@ public class GenericPlannerTest {
     @Test
     public void testGenericPlanner_GBFS_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000,
-            HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+            HEURISTIC, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
@@ -207,7 +208,7 @@ public class GenericPlannerTest {
     @Test
     public void testGenericPlanner_HC_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000,
-            HEURISTIC_TYPE, HEURISTIC_WEIGHT);
+            HEURISTIC, HEURISTIC_WEIGHT);
         planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
@@ -281,7 +282,7 @@ public class GenericPlannerTest {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"
                             + " in " + TIMEOUT + " seconds");
-                        plan = planner.search(pb);
+                        plan = planner.solve(pb);
                     } else {
                         System.err.println("* PDDLProblem [" + currentProblem + "]" + " not solvable.");
                     }

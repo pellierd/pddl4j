@@ -18,13 +18,14 @@ package fr.uga.pddl4j.test.planners.htn;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner;
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.test.Tools;
 
+import org.apache.logging.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -58,7 +59,7 @@ public class TFDPlannerTest {
     /**
      * Default Trace level.
      */
-    private static final int TRACE_LEVEL = 0;
+    private static final Level TRACE_LEVEL = Level.OFF;
 
     /**
      * The TFDPlanner planner reference.
@@ -70,10 +71,10 @@ public class TFDPlannerTest {
      */
     @Before
     public void initTest() {
-        Properties arguments = Planner.getDefaultArguments();
-        arguments.put(Planner.TIMEOUT, TFDPlannerTest.TIMEOUT * 1000);
-        arguments.put(Planner.TRACE_LEVEL, TFDPlannerTest.TRACE_LEVEL);
-        this.planner = new TFDPlanner(arguments);
+        Configuration config = TFDPlanner.getDefaultConfiguration();
+        config.setTimeout(TFDPlannerTest.TIMEOUT);
+        config.setTraceLevel(TFDPlannerTest.TRACE_LEVEL);
+        this.planner = new TFDPlanner(config);
         Tools.changeVALPerm();
     }
 
@@ -346,7 +347,6 @@ public class TFDPlannerTest {
 
             // Parses the HDDL domain and problem description
             try {
-                factory.setTraceLevel(TRACE_LEVEL);
                 ErrorManager errorManager = factory.parse(new File(currentDomain), new File(currentProblem));
                 if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
                     errorManager.print(Message.Type.LEXICAL_ERROR);
@@ -367,7 +367,7 @@ public class TFDPlannerTest {
                         // Searches for a solution plan
                         System.out.println("* Trying to solve [" + currentProblem + "]"
                             + " in " + TIMEOUT + " seconds");
-                        plan = this.planner.search(pb);
+                        plan = this.planner.solve(pb);
                     } else {
                         System.err.println("* HDDLProblem [" + currentProblem + "]" + " not solvable.");
                     }
