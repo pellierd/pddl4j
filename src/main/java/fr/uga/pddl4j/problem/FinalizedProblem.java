@@ -293,6 +293,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 facts.add(p);
             }
         }
+
         this.intExpFluents = new ArrayList<>(facts.size());
         this.fluents = new ArrayList<>(facts.size());
         for (IntExpression exp : facts) {

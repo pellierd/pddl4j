@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -346,7 +347,7 @@ public class IntExpression implements Serializable {
             return this.connective.equals(other.connective)
                 && this.predicate == other.predicate
                 && Arrays.equals(this.arguments, other.arguments)
-                && Double.compare(this.value, other.value) == 0
+                && Double.compare(this.value, other.value) == 0.0
                 && this.variable == other.variable
                 && this.type == other.type
                 && this.children.equals(other.children)
@@ -365,15 +366,15 @@ public class IntExpression implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(this.arguments);
-        result = prime * result + this.children.hashCode();
         result = prime * result + this.connective.hashCode();
         result = prime * result + this.predicate;
-        result = prime * result + this.type;
+        result = prime * result + Arrays.hashCode(this.arguments);
         long temp;
         temp = Double.doubleToLongBits(this.value);
         result = prime * result + (int) (temp ^ (temp >>> 32));
         result = prime * result + this.variable;
+        result = prime * result + this.type;
+        result = prime * result + this.children.hashCode();
         return result;
     }
 

@@ -56,7 +56,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(AbstractSTNPlanner.class);
+    private static final Logger LOGGER = LogManager.getLogger(AbstractSTNPlanner.class.getName());
 
     /**
      * The cost of each task of the problem.
@@ -356,6 +356,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         }
 
         final Configuration config = this.getConfiguration();
+        this.setTraceLevel(config.getTraceLevel());
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
@@ -434,7 +435,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
                 }
                 System.exit(0);
             }
-
+            //System.out.println(pb.toString(plan));
             // Print plan solution
             if (plan != null) {
                 if (LOGGER.isInfoEnabled()) {

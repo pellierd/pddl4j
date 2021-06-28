@@ -25,6 +25,7 @@ import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -410,6 +411,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             // Creates the abstract initial task network
             IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
             newTaskNetwork.getTasks().addChild(new IntExpression(root));
+            this.setIntInitialTaskNetwork(newTaskNetwork);
         } else {
             this.setIntInitialTaskNetwork(taskNetworks.get(0));
         }

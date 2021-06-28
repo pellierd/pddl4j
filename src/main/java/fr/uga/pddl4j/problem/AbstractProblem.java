@@ -18,11 +18,9 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLAction;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
-import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLExpression;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLNamedTypedList;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
@@ -40,10 +38,6 @@ import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -242,7 +236,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the parsed problem used to create this problem.
      */
-    public final ParsedProblem getPDDLProblem() {
+    public final ParsedProblem getParsedProblem() {
         return this.problem;
     }
 
@@ -712,7 +706,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initPrimitiveTaskSymbols() {
         this.primitiveTaskSymbols = new LinkedHashSet<>();
-        for (PDDLAction a : this.getPDDLProblem().getActions()) {
+        for (PDDLAction a : this.getParsedProblem().getActions()) {
             this.primitiveTaskSymbols.add(a.getName().getImage());
         }
     }
@@ -722,7 +716,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initCompoundTaskSymbols() {
         this.compoundTaskSymbols = new LinkedHashSet<>();
-        for (PDDLMethod m : this.getPDDLProblem().getMethods()) {
+        for (PDDLMethod m : this.getParsedProblem().getMethods()) {
             this.compoundTaskSymbols.add(m.getTask().getAtom().get(0).getImage());
         }
     }
@@ -813,7 +807,7 @@ public abstract class AbstractProblem implements Problem {
         this.intInitialState = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
         this.intInitFunctions = new LinkedHashSet<>();
-        final Set<IntExpression> init =  this.getPDDLProblem().getInit().stream().map(this::initExpression)
+        final Set<IntExpression> init =  this.getParsedProblem().getInit().stream().map(this::initExpression)
             .collect(Collectors.toCollection(LinkedHashSet::new));
         for (IntExpression exp : init) {
             switch (exp.getConnective()) {
@@ -836,8 +830,8 @@ public abstract class AbstractProblem implements Problem {
      **/
     protected void initGoal() {
         this.intGoal = new IntExpression(PDDLConnective.AND);
-        if (this.getPDDLProblem().getGoal() != null) {
-            this.intGoal = this.initExpression(this.getPDDLProblem().getGoal());
+        if (this.getParsedProblem().getGoal() != null) {
+            this.intGoal = this.initExpression(this.getParsedProblem().getGoal());
         }
     }
 
@@ -845,7 +839,7 @@ public abstract class AbstractProblem implements Problem {
      * Encodes the actions of the domain into a compact integer representation.
      */
     protected void initActions() {
-        this.intActions = this.getPDDLProblem().getActions().stream().map(this::initActions)
+        this.intActions = this.getParsedProblem().getActions().stream().map(this::initActions)
             .collect(Collectors.toList());
     }
 
@@ -884,7 +878,7 @@ public abstract class AbstractProblem implements Problem {
      * Encodes the methods of the domain into a compact integer representation.
      */
     protected void initMethods() {
-        this.intMethods = this.getPDDLProblem().getMethods().stream().map(this::initMethod).collect(Collectors.toList());
+        this.intMethods = this.getParsedProblem().getMethods().stream().map(this::initMethod).collect(Collectors.toList());
     }
 
     /**
@@ -969,7 +963,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initInitialTaskNetwork() {
         // Encode the parameters of the task network
-        final PDDLTaskNetwork taskNetwork = this.getPDDLProblem().getInitialTaskNetwork();
+        final PDDLTaskNetwork taskNetwork = this.getParsedProblem().getInitialTaskNetwork();
         final int numberOfParameters = taskNetwork.getParameters().size();
         this.intInitialTaskNetwork = new IntTaskNetwork(numberOfParameters);
         final List<String> variables = new ArrayList<>(numberOfParameters);
@@ -990,10 +984,10 @@ public abstract class AbstractProblem implements Problem {
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                 final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(i));
+                t1.setTaskID(i);
                 constraint.addChild(t1);
                 final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(i + 1));
+                t2.setTaskID(i + 1);
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
             }
@@ -1020,10 +1014,10 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
                     final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new Integer(i));
+                    t1.setTaskID(i);
                     constraint.addChild(t1);
                     final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new Integer(i + 1));
+                    t2.setTaskID(i + 1);
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }

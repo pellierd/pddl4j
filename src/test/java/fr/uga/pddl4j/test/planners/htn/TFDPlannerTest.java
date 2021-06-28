@@ -81,7 +81,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_TFDPlanner_IPC2020_HDDL_Feature_Test1() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -95,7 +95,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_TFDPlanner_IPC2020_HDDL_Feature_Test2() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -109,7 +109,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_TFDPlanner_IPC2020_HDDL_Feature_Test3() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test3" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -123,7 +123,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_TFDPlanner_IPC2020_HDDL_Feature_Test4() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test4" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -137,7 +137,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_TFDPlanner_IPC2020_HDDL_Feature_Test5() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test5" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
@@ -165,7 +165,7 @@ public class TFDPlannerTest {
      *
      * @throws Exception if something went wrong.
      */
-    /*@Test
+    @Test
     public void test_TFDPlanner_IPC2020_HDDL_Childsnack() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

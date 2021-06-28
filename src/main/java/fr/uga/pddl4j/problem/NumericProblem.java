@@ -15,15 +15,9 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * This class implements a numeric problem.
@@ -56,7 +50,7 @@ public class NumericProblem extends AbstractNumericProblem {
     @Override
     protected void initialization() {
         // Standardize the variables symbol contained in the domain
-        this.getPDDLProblem().standardize();
+        this.getParsedProblem().standardize();
         // Initialize the requirements of the problem
         this.initRequirements();
         // Collect the information on the type declared in the domain

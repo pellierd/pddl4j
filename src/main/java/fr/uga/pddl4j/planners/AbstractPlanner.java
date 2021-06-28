@@ -145,7 +145,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      *
      //* @param level the trace level of the planner.
      */
-    private void setTraceLevel(final Level level) {
+    protected void setTraceLevel(final Level level) {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
         LoggerConfig loggerConfig = config.getRootLogger();

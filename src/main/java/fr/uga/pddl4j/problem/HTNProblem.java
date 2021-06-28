@@ -15,8 +15,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
@@ -55,7 +53,7 @@ public class HTNProblem extends AbstractHTNProblem {
     @Override
     protected void initialization() {
         // Standardize the variables symbol contained in the domain
-        this.getPDDLProblem().standardize();
+        this.getParsedProblem().standardize();
 
         // Collect the information on the type declared in the domain
         this.initTypes();

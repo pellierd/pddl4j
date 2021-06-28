@@ -21,9 +21,11 @@ package fr.uga.pddl4j.parser;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -706,34 +708,34 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         for (int i = 0; i < this.getMethods().size(); i++) {
             this.getMethods().get(i).normalize();
         }
-        // Rename all the variables from the predicates declaration
-        for (int i = 0; i < this.getPredicates().size(); i++) {
-            this.getPredicates().get(i).renameVariables();
+
+        // Rename the goal of the problem
+        if (this.getGoal() != null) {
+            this.getGoal().renameVariables();
+            this.getGoal().moveNegationInward();
         }
-        // Rename all the variables from the functions declaration
-        for (int i = 0; i < this.getFunctions().size(); i++) {
-            this.getFunctions().get(i).renameVariables();
-        }
-        // Rename all the variables from the tasks declaration
-        for (int i = 0; i < this.getTasks().size(); i++) {
-            this.getTasks().get(i).renameVariables();
-        }
-        // Rename all the variables from the constraints declaration of the domain
-        if (this.getConstraints() != null) {
-            this.getConstraints().renameVariables();
-            this.getConstraints().moveNegationInward();
-        }
-        // Rename all the variables from the derived predicates
-        for (int i = 0; i < this.getDerivesPredicates().size(); i++) {
-            this.getDerivesPredicates().get(i).normalize();
-        }
-        // Rename all the variable from the actions
-        for (int i = 0; i < this.getActions().size(); i++) {
-            this.getActions().get(i).normalize();
-        }
-        // Rename all the variable from the methods
-        for (int i = 0; i < this.getMethods().size(); i++) {
-            this.getMethods().get(i).normalize();
+        // Standardize the initial task network
+        if (this.getInitialTaskNetwork() != null) {
+            final PDDLTaskNetwork tn = this.getInitialTaskNetwork();
+            if (tn.getTasks().getChildren().size() == 1) {
+                tn.setTotallyOrdered(true);
+            }
+            // Rename task id the tasks contained the method.
+            final Map<String, String> taskIDCtx = new LinkedHashMap<>();
+            tn.getTasks().renameTaskIDs(taskIDCtx);
+            // Rename the tag ID used in the ordering constraints of the method
+            tn.getOrderingConstraints().renameTaskIDs(taskIDCtx);
+            // In this case enumerate the orderings contraints in the cas of totally ordered
+            if (tn.isTotallyOrdered()) {
+                tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
+                for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
+                    PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    c.setAtom(new LinkedList<PDDLSymbol>());
+                    c.getAtom().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
+                    c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
+                    tn.getOrderingConstraints().addChild(c);
+                }
+            }
         }
     }
 

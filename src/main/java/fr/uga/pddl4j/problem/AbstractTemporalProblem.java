@@ -15,8 +15,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
@@ -104,7 +102,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
     @Override
     protected void initialization() {
         // Standardize the variables symbol contained in the domain
-        this.getPDDLProblem().standardize();
+        this.getParsedProblem().standardize();
         this.initRequirements();
         // Collect the information on the type declared in the domain
         this.initTypes();

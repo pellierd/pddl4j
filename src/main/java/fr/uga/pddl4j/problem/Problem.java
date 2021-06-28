@@ -53,7 +53,7 @@ public interface Problem extends Serializable {
      *
      * @return the PDDL problem of the problem.
      */
-    ParsedProblem getPDDLProblem();
+    ParsedProblem getParsedProblem();
 
     /**
      * Returns the requirements of the problem.
