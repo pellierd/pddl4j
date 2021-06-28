@@ -21,6 +21,7 @@ package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.Configuration;
@@ -145,7 +146,7 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     @Override
-    public ADLProblem instantiate(final PDDLProblem problem) {
+    public ADLProblem instantiate(final ParsedProblem problem) {
         ADLProblem pb = new ADLProblem(problem);
         pb.instantiate();
         return pb;

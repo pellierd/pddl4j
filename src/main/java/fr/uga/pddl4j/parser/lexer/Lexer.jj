@@ -26,9 +26,10 @@ PARSER_BEGIN(Lexer)
 
 package fr.uga.pddl4j.parser.lexer;
 
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
-import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLExpression;
 import fr.uga.pddl4j.parser.PDDLDomain;
@@ -379,7 +380,7 @@ Token left_bracket() :
 	t=<LEFT_BRACKET> { return t;}
 }
 
-void domain() :
+PDDLDomain domain() :
 {
 	PDDLExpression node = null;
 	PDDLSymbol name = null;
@@ -388,7 +389,7 @@ void domain() :
 	try {
 		left_bracket() <DEFINE> left_bracket() <DOMAIN>
 			name=domain_name() {
-				this.domain = new PDDLDomain(name);
+				this.domain = new ParsedProblem(name);
 			}
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
@@ -408,9 +409,12 @@ void domain() :
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
+	{
+	    return this.domain;
+    }
 }
 
-void domain_and_problem() :
+ParsedProblem domain_and_problem() :
 {
 	PDDLExpression node = null;
 	PDDLSymbol name = null;
@@ -419,7 +423,7 @@ void domain_and_problem() :
 	try {
     	left_bracket() <DEFINE> left_bracket() <DOMAIN>
             name=domain_name() {
-                this.domain = new PDDLDomain(name);
+                this.domain = new ParsedProblem(name);
             }
         right_bracket()
         [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
@@ -439,6 +443,9 @@ void domain_and_problem() :
     	problem()
     } catch(Throwable e) {
     	this.error(e, token.beginLine, token.beginColumn);
+    }
+    {
+        return new ParsedProblem(this.domain, this.problem);
     }
 }
 
@@ -3378,17 +3385,19 @@ PDDLExpression da_divide_op() :
 	}
 }
 
-void problem() :
+PDDLProblem problem() :
 {
 }
 {
     (   LOOKAHEAD({this.isRequirement(PDDLRequireKey.HIERARCHY)})
             htn_problem()
     |    pddl_problem()
-    )
+    ) {
+    return this.problem;
+    }
 }
 
-void pddl_problem() :
+PDDLProblem pddl_problem() :
 {
 	PDDLSymbol name = null;
 	PDDLSymbol domain = null;
@@ -3401,7 +3410,7 @@ void pddl_problem() :
 		right_bracket()
 		left_bracket() <P_DOMAIN>
 			domain = domain_problem_name() {
-                this.problem = new PDDLProblem(name, domain);
+                this.problem = new ParsedProblem(name, domain);
             }
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
@@ -3416,9 +3425,12 @@ void pddl_problem() :
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
+	{
+	    return this.problem;
+    }
 }
 
-void htn_problem() : // ADD HDDL
+PDDLProblem htn_problem() : // ADD HDDL
 {
 	PDDLSymbol name = null;
 	PDDLSymbol domain = null;
@@ -3433,7 +3445,7 @@ void htn_problem() : // ADD HDDL
 		right_bracket()
 		left_bracket() <P_DOMAIN>
 			domain = domain_problem_name() {
-			    this.problem = new PDDLProblem(name, domain);
+			    this.problem = new ParsedProblem(name, domain);
 		    }
 
 		right_bracket()
@@ -3456,7 +3468,9 @@ void htn_problem() : // ADD HDDL
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
-
+    {
+        return this.problem;
+    }
 }
 
 

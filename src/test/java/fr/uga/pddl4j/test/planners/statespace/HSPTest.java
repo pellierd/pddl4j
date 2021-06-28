@@ -18,6 +18,7 @@ package fr.uga.pddl4j.test.planners.statespace;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Setting;
@@ -768,7 +769,7 @@ public class HSPTest {
                 config.setDomain(currentDomain);
                 config.setProblem(currentProblem);
 
-                PDDLProblem parsedProblem = this.planner.parse();
+                ParsedProblem parsedProblem = this.planner.parse();
                 ErrorManager errorManager = this.planner.getParserErrorManager();
                 if (!errorManager.isEmpty()) {
                     errorManager.printAll();

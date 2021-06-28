@@ -18,6 +18,7 @@ package fr.uga.pddl4j.planners;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 
 import fr.uga.pddl4j.problem.Problem;
@@ -69,7 +70,7 @@ public interface Planner<T extends Problem> extends Serializable {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
-    PDDLProblem parse(final String domain, final String problem) throws IOException;
+    ParsedProblem parse(final String domain, final String problem) throws IOException;
 
     /**
      * Parses the domain and the problem description given ine the planner configuration.
@@ -78,7 +79,7 @@ public interface Planner<T extends Problem> extends Serializable {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
-    //PDDLProblem parse() throws IOException;
+    ParsedProblem parse() throws IOException;
 
     /**
      * Returns the parser error manager to get the messages generated while parsing.
@@ -92,7 +93,7 @@ public interface Planner<T extends Problem> extends Serializable {
      *
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
-    T instantiate(PDDLProblem problem);
+    T instantiate(ParsedProblem problem);
 
     /**
      * Search a plan for the specified planning problem.

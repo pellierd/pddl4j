@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +44,7 @@ public class ADLProblem extends FinalizedProblem {
      * Create a new ADL problem from a domain and problem.
      * @param problem The problem.
      */
-    public ADLProblem(final PDDLProblem problem) {
+    public ADLProblem(final ParsedProblem problem) {
         super(problem);
     }
 

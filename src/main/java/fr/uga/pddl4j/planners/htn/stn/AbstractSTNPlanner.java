@@ -20,6 +20,7 @@ import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
@@ -359,7 +360,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
         PDDLParser parser = this.getParser();
-        PDDLProblem parsedProblem = parser.parse(config.getDomain(), config.getProblem());
+        ParsedProblem parsedProblem = parser.parse(config.getDomain(), config.getProblem());
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -468,7 +469,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     }
 
     @Override
-    public HTNProblem instantiate(final PDDLProblem problem) {
+    public HTNProblem instantiate(final ParsedProblem problem) {
         HTNProblem pb = new HTNProblem(problem);
         pb.instantiate();
         return pb;

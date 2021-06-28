@@ -17,6 +17,7 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,13 +37,12 @@ public class HTNProblem extends AbstractHTNProblem {
      */
     private static final Logger LOGGER = LogManager.getLogger(HTNProblem.class.getName());
 
-
     /**
      * Creates a new problem from a domain and problem.
      *
      * @param problem the problem.
      */
-    public HTNProblem(final PDDLProblem problem) {
+    public HTNProblem(final ParsedProblem problem) {
         super(problem);
     }
 

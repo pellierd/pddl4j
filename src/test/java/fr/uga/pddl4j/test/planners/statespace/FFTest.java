@@ -17,6 +17,7 @@ package fr.uga.pddl4j.test.planners.statespace;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Setting;
@@ -442,7 +443,7 @@ public class FFTest {
             }
             // Parses the PDDL domain and problem description
             try {
-                PDDLProblem parsedProblem = this.planner.parse(currentDomain, currentProblem);
+                ParsedProblem parsedProblem = this.planner.parse(currentDomain, currentProblem);
                 ErrorManager errorManager = this.planner.getParserErrorManager();
                 Assert.assertTrue(errorManager.isEmpty());
 

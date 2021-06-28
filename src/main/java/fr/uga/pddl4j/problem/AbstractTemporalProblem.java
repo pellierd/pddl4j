@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +45,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
      *
      * @param problem The problem.
      */
-    public AbstractTemporalProblem(final PDDLProblem problem) {
+    public AbstractTemporalProblem(final ParsedProblem problem) {
         super(problem);
     }
 

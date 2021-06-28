@@ -19,164 +19,67 @@
 
 package fr.uga.pddl4j.parser;
 
-import fr.uga.pddl4j.problem.Problem;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
- * This class implements a planning problem read by the parser.
+ * This interface defines the methods of a planning problem read by the parser.
  *
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLProblem extends PDDLDomain {
+public interface PDDLProblem extends Serializable {
 
     /**
-     * The name of the problem.
-     */
-    private PDDLSymbol name;
-
-    /**
-     * The set of requirements.
-     */
-    private Set<PDDLRequireKey> requirements;
-
-    /**
-     * The list of objects declared in the problem.
-     */
-    private List<PDDLTypedSymbol> objects;
-
-    /**
-     * The task network of the problem.
-     */
-    private PDDLTaskNetwork initialTaskNetwork;
-
-    /**
-     * The list of initial facts declared in the problem.
-     */
-    private List<PDDLExpression> initialFacts;
-
-    /**
-     * The goal of the problem.
-     */
-    private PDDLExpression goal;
-
-    /**
-     * The constraints declared in the problem.
-     */
-    private PDDLExpression constraints;
-
-    /**
-     * The metric constraints of the problem.
-     */
-    private PDDLExpression metric;
-
-
-    /**
-     * Creates a new problem from a specific domain and problem.
+     * Returns the name of the domain.
      *
-     * @param domain the domain.
-     * @param problem the problem.
+     * @return the name of the domain.
      */
-    public PDDLProblem(final PDDLDomain domain, PDDLProblem problem) {
-        this(domain.getDomainName(), problem.getName());
-        this.requirements = new LinkedHashSet<>();
-        this.requirements.addAll(domain.getRequirements());
-        this.requirements.addAll(problem.getRequirements());
-
-        for (PDDLTypedSymbol type : domain.getTypes()) {
-            this.addType(type);
-        }
-
-        for (PDDLTypedSymbol constant : domain.getConstants()) {
-            this.addConstant(constant);
-        }
-
-        for (PDDLNamedTypedList predicate : domain.getPredicates()) {
-            this.addPredicate(predicate);
-        }
-
-        for (PDDLNamedTypedList function : domain.getFunctions()) {
-            this.addFunction(function);
-        }
-
-        for (PDDLNamedTypedList task : domain.getTasks()) {
-            this.addTask(task);
-        }
-
-        this.constraints = domain.getConstraints();
-
-        for (PDDLAction action : domain.getActions()) {
-            this.addAction(action);
-        }
-
-        for (PDDLMethod method : domain.getMethods()) {
-            this.addMethod(method);
-        }
-
-        for (PDDLDerivedPredicate derived : domain.getDerivesPredicates()) {
-            this.addDerivedPredicate(derived);
-        }
-
-        this.objects = problem.getObjects();
-        this.initialTaskNetwork = problem.getInitialTaskNetwork();
-        this.initialFacts = problem.getInit();
-        this.goal = problem.getGoal();
-        this.constraints = problem.getConstraints();
-        this.metric = problem.getMetric();
-    }
+    PDDLSymbol getDomainName();
 
     /**
-     * Creates a new problem with a specific name.
+     * Sets a name to the domain.
      *
-     * @param name the name of the problem.
-     * @param domain the name of the domain.
+     * @param name the name to set.
      */
-    public PDDLProblem(final PDDLSymbol name, final PDDLSymbol domain) {
-        super(domain);
-        this.name = name;
-        this.requirements = new LinkedHashSet<>();
-        this.objects = new ArrayList<>();
-        this.initialTaskNetwork = null;
-        this.initialFacts = new ArrayList<>();
-        this.goal = null;
-        this.constraints = null;
-        this.metric = null;
-    }
+    void setDomainName(final PDDLSymbol name);
 
     /**
      * Return the name of the problem.
      *
      * @return the name of the problem.
      */
-    public final PDDLSymbol getName() {
-        return this.name;
-    }
+    PDDLSymbol getProblemName();
 
     /**
      * Sets the name of the problem.
      *
      * @param name the name to set.
      */
-    public final void setName(final PDDLSymbol name) {
-        this.name = name;
-    }
+    void setProblemName(final PDDLSymbol name);
+
+    /**
+     * Returns the set of requirements.
+     *
+     * @return the set of requirements.
+     */
+    Set<PDDLRequireKey> getRequirements();
+
+    /**
+     * Adds a requirements to the domain.
+     *
+     * @param requirement the requirement to add.
+     * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
+     */
+    boolean addRequirement(final PDDLRequireKey requirement);
 
     /**
      * Returns the list of objects declared in the problem file.
      *
      * @return the list of objects declared in the problem file.
      */
-    public List<PDDLTypedSymbol> getObjects() {
-        return this.objects;
-    }
+    List<PDDLTypedSymbol> getObjects();
 
     /**
      * Adds an object to the problem.
@@ -184,36 +87,28 @@ public class PDDLProblem extends PDDLDomain {
      * @param object the object to add.
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
      */
-    public final boolean addObject(final PDDLTypedSymbol object) {
-        return this.objects.add(object);
-    }
+    boolean addObject(final PDDLTypedSymbol object);
 
     /**
      * Set the initial task network of the problem.
      *
      * @param network The task network to set.
      */
-    public final void setInitialTaskNetwork(final PDDLTaskNetwork network) {
-        this.initialTaskNetwork = network;
-    }
+    void setInitialTaskNetwork(final PDDLTaskNetwork network);
 
     /**
      * Returns the task network of the problem.
      *
      * @return the task network of the problem. The task network may null if it is not defined.
      */
-    public final PDDLTaskNetwork getInitialTaskNetwork() {
-        return this.initialTaskNetwork;
-    }
+    PDDLTaskNetwork getInitialTaskNetwork();
 
     /**
      * Returns the list of initial facts defined in the problem file.
      *
      * @return the list of initial facts defined in the problem file.
      */
-    public List<PDDLExpression> getInit() {
-        return this.initialFacts;
-    }
+    List<PDDLExpression> getInit();
 
     /**
      * Adds an initial fact to the problem.
@@ -221,45 +116,49 @@ public class PDDLProblem extends PDDLDomain {
      * @param fact the fact to add.
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
      */
-    public final boolean addInitialFact(final PDDLExpression fact) {
-        return this.initialFacts.add(fact);
-    }
+    boolean addInitialFact(final PDDLExpression fact);
 
     /**
      * Returns the list of goal defined in the problem file.
      *
      * @return the list of goal defined in the problem file.
      */
-    public PDDLExpression getGoal() {
-        return this.goal;
-    }
+    PDDLExpression getGoal();
 
     /**
      * Set the goal of this problem.
      *
      * @param goal the goal of this problem.
      */
-    public void setGoal(final PDDLExpression goal) {
-        this.goal = goal;
-    }
+    void setGoal(final PDDLExpression goal);
 
     /**
      * Returns the metric of the problem or <code>null</code> if the problem has no metric specification.
      *
      * @return the metric of the problem or <code>null</code> if the problem has no metric specification.
      */
-    public PDDLExpression getMetric() {
-        return this.metric;
-    }
+    PDDLExpression getMetric();
+
+    /**
+     * Returns the constraints loaded in the domain file.
+     *
+     * @return the constraints loaded in the domain file or null if the domain has no constraints.
+     */
+    PDDLExpression getConstraints();
+
+    /**
+     * Sets the constraints to the domain.
+     *
+     * @param constraints the constraint of the domain.
+     */
+    void setConstraints(final PDDLExpression constraints);
 
     /**
      * Sets the metric of the problem.
      *
      * @param metric the metric to set.
      */
-    public final void setMetric(final PDDLExpression metric) {
-        this.metric = metric;
-    }
+    void setMetric(final PDDLExpression metric);
 
     /**
      * Returns the object from a specified symbol.
@@ -267,10 +166,7 @@ public class PDDLProblem extends PDDLDomain {
      * @param symbol The symbol.
      * @return the object from a specified symbol or <code>null</code> if no object with this symbol was declared.
      */
-    public final PDDLTypedSymbol getObject(final PDDLSymbol symbol) {
-        final int index = this.objects.indexOf(symbol);
-        return (index == -1) ? null : this.objects.get(index);
-    }
+    PDDLTypedSymbol getObject(final PDDLSymbol symbol);
 
     /**
      * Normalize the problem. This method renames the variables and then move inward the negation of
@@ -279,84 +175,12 @@ public class PDDLProblem extends PDDLDomain {
      * @see PDDLAction#normalize()
      * @see PDDLDerivedPredicate#normalize()
      */
-    public void standardize() {
-        super.standardize();
-        // Rename the constraints of the problem
-        if (this.getConstraints() != null) {
-            this.getConstraints().renameVariables();
-            this.getConstraints().moveNegationInward();
-        }
-        // Rename the goal of the problem
-        if (this.getGoal() != null) {
-            this.getGoal().renameVariables();
-            this.getGoal().moveNegationInward();
-        }
-        // Standardize the initial task network
-        if (this.getInitialTaskNetwork() != null) {
-            final PDDLTaskNetwork tn = this.getInitialTaskNetwork();
-            if (tn.getTasks().getChildren().size() == 1) {
-                tn.setTotallyOrdered(true);
-            }
-            // Rename task id the tasks contained the method.
-            final Map<String, String> taskIDCtx = new LinkedHashMap<>();
-            tn.getTasks().renameTaskIDs(taskIDCtx);
-            // Rename the tag ID used in the ordering constraints of the method
-            tn.getOrderingConstraints().renameTaskIDs(taskIDCtx);
-            // In this case enumerate the orderings contraints in the cas of totally ordered
-            if (tn.isTotallyOrdered()) {
-                tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
-                for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
-                    PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    c.setAtom(new LinkedList<PDDLSymbol>());
-                    c.getAtom().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
-                    c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
-                    tn.getOrderingConstraints().addChild(c);
-                }
-            }
-        }
-    }
+    void standardize();
 
     /**
      * Returns a string representation of this problem.
      *
      * @return a string representation of this problem.
      */
-    @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder();
-        str.append("(define (problem ").append(this.name).append(")").append("\n(:domain ")
-            .append(this.getDomainName()).append(")").append("\n(:requirements");
-        for (PDDLRequireKey r : this.requirements) {
-            str.append(" ").append(r);
-        }
-        str.append(")\n");
-        if (!this.objects.isEmpty()) {
-            str.append("(:objects ");
-            for (PDDLTypedSymbol obj : this.objects) {
-                str.append("\n  ").append(obj);
-            }
-            str.append("\n)\n");
-        }
-        if (this.initialTaskNetwork != null) {
-            str.append("(:htn\n");
-            str.append(this.initialTaskNetwork.toString());
-            str.append("\n)\n");
-        }
-        str.append("(:initialization");
-        for (PDDLExpression fact : this.initialFacts) {
-            str.append("\n  ").append(fact);
-        }
-        str.append("\n)\n");
-        if (this.getGoal() != null) {
-            str.append("\n)\n").append("(:goal ").append("  ").append(this.goal).append(")\n");
-        }
-        if (this.constraints != null) {
-            str.append("(:constraints ").append("  ").append(this.constraints).append(")\n");
-        }
-        if (this.metric != null) {
-            str.append("(:metric ").append("  ").append(this.metric).append(")\n");
-        }
-        str.append(")");
-        return str.toString();
-    }
+    String toString();
 }

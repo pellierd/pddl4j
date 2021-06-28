@@ -4,6 +4,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
 import org.junit.Assert;
@@ -137,7 +138,7 @@ public abstract class Tools {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
             PDDLParser parser = new PDDLParser();
-            PDDLProblem parsedProblem = parser.parse(domain, problem);
+            ParsedProblem parsedProblem = parser.parse(domain, problem);
             ErrorManager errorManager = parser.getErrorManager();
             if (errorManager.isEmpty()) {
                 return new ADLProblem(parsedProblem);
@@ -374,7 +375,7 @@ public abstract class Tools {
             // Parses the PDDL domain and problem description
             try {
                 PDDLParser parser = new PDDLParser();
-                PDDLProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                ParsedProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
                 ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
                     || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
@@ -468,7 +469,7 @@ public abstract class Tools {
             // Parses the PDDL domain and problem description
             try {
                 PDDLParser parser = new PDDLParser();
-                PDDLProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                ParsedProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
                 ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
                     || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {

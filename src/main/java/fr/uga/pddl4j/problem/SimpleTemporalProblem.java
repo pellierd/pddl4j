@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
      *
      * @param problem The problem.
      */
-    public SimpleTemporalProblem(final PDDLProblem problem) {
+    public SimpleTemporalProblem(final ParsedProblem problem) {
         super(problem);
     }
 

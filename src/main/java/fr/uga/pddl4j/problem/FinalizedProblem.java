@@ -19,6 +19,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
@@ -137,7 +138,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param problem the problem.
      */
-    public FinalizedProblem(final PDDLProblem problem) {
+    public FinalizedProblem(final ParsedProblem problem) {
         super(problem);
     }
 

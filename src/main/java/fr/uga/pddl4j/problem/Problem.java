@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -52,7 +53,7 @@ public interface Problem extends Serializable {
      *
      * @return the PDDL problem of the problem.
      */
-    PDDLProblem getPDDLProblem();
+    ParsedProblem getPDDLProblem();
 
     /**
      * Returns the requirements of the problem.

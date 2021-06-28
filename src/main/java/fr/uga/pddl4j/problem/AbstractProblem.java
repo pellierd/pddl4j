@@ -27,6 +27,7 @@ import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
@@ -75,7 +76,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The PDDL problem.
      */
-    private PDDLProblem problem;
+    private ParsedProblem problem;
 
     /**
      * The set of requirements of the problem.
@@ -220,7 +221,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @param problem the problem.
      */
-    public AbstractProblem(final PDDLProblem problem) {
+    public AbstractProblem(final ParsedProblem problem) {
         this();
         //this.domain = domain;
         this.problem = problem;
@@ -241,7 +242,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the parsed problem used to create this problem.
      */
-    public final PDDLProblem getPDDLProblem() {
+    public final ParsedProblem getPDDLProblem() {
         return this.problem;
     }
 
@@ -1779,10 +1780,10 @@ public abstract class AbstractProblem implements Problem {
     /*public void setTraceLevel(final Level level) {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         Configuration config = context.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getName());
+        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getProblemName());
         loggerConfig.setLevel(level);
         context.updateLoggers();
-        System.out.println("LEVEL SET TO " + level +  " " + getLogger().getName());
+        System.out.println("LEVEL SET TO " + level +  " " + getLogger().getProblemName());
     }
 
     /**
@@ -1793,7 +1794,7 @@ public abstract class AbstractProblem implements Problem {
    /* public Level getTraceLevel() {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         Configuration config = context.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getName());
+        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getProblemName());
         return loggerConfig.getLevel();
     }*/
 }

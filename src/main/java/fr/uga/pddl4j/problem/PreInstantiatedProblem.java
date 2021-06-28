@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
+import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
@@ -65,7 +66,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param problem the problem.
      */
-    public PreInstantiatedProblem(final PDDLProblem problem) {
+    public PreInstantiatedProblem(final ParsedProblem problem) {
         super(problem);
     }
 
