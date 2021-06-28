@@ -126,12 +126,22 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
         }
     }
 
+    /**
+     * Returns if the planner configuration is valide or not.
+     *
+     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
+     */
     @Override
-    public boolean checkConfiguration() {
+    public boolean hasValidConfiguration() {
         return true;
     }
 
 
+    /**
+     * Returns the configuration by default of the planner.
+     *
+     * @return the configuration by default of the planner.
+     */
     public static Configuration getDefaultConfiguration() {
         Configuration config = new Configuration();
         config.setPlanner(Setting.Planner.FF);
@@ -145,6 +155,12 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
         return config;
     }
 
+    /**
+     * Instantiates the planning problem from a parsed problem.
+     *
+     * @param problem the problem to instantiate.
+     * @return the instantiated planning problem or null if the problem cannot be instantiated.
+     */
     @Override
     public ADLProblem instantiate(final ParsedProblem problem) {
         ADLProblem pb = new ADLProblem(problem);
@@ -153,8 +169,9 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * The
-     * @param args
+     * The main method of FF planner.
+     *
+     * @param args the command line arguments.
      */
     public static void main(String[] args) {
         try {

@@ -240,12 +240,13 @@ public class HTNProblem extends AbstractHTNProblem {
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
      */
     public final boolean isSolvable() {
-        boolean isSovable = true;
+
+        boolean isSolvable = super.isSolvable();
         Iterator<Integer> i = this.getInitialTaskNetwork().getTasks().iterator();
-        while (i.hasNext() && isSovable) {
-            isSovable = i.next() != null;
+        while (i.hasNext() && isSolvable) {
+            isSolvable = i.next() != null;
         }
-        return isSovable;
+        return isSolvable;
     }
 
     /**

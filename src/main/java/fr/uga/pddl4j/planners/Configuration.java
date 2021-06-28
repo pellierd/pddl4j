@@ -75,7 +75,7 @@ public class Configuration implements Serializable {
     }
 
     /**
-     * Creates a new planner configuration from a command line and a default configuration
+     * Creates a new planner configuration from a command line and a default configuration.
      *
      * @param args the arguments from the command line.
      * @param configuration the default configuration to use.

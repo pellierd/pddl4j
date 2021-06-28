@@ -66,16 +66,6 @@ public class HSPTest {
     private static final double HEURISTIC_WEIGHT = 1.0;
 
     /**
-     * Default Trace level.
-     */
-    private static final int TRACE_LEVEL = 0;
-
-    /**
-     * Default statistics computation.
-     */
-    private static final boolean STATISTICS = false;
-
-    /**
      * The HSP planner reference.
      */
     private HSP planner = null;
@@ -421,7 +411,7 @@ public class HSPTest {
      * OK
      * @throws Exception if something went wrong.
      */
-   /*@Test
+    /*@Test
     public void test_HSP_IPC2002_Driverlog_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

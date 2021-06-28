@@ -878,7 +878,8 @@ public abstract class AbstractProblem implements Problem {
      * Encodes the methods of the domain into a compact integer representation.
      */
     protected void initMethods() {
-        this.intMethods = this.getParsedProblem().getMethods().stream().map(this::initMethod).collect(Collectors.toList());
+        this.intMethods = this.getParsedProblem().getMethods().stream()
+            .map(this::initMethod).collect(Collectors.toList());
     }
 
     /**
@@ -1755,40 +1756,4 @@ public abstract class AbstractProblem implements Problem {
         }
         return str.toString();
     }
-
-    /*public Logger getLogger() {
-        return this.logger;
-    }
-
-    public void setLogger(Logger logger) {
-        System.out.println("SET LOGGER ");
-
-        this.logger = logger;
-    }
-
-    /**
-     * Sets the trace level of the planner.
-     *
-     * @param level the trace level of the planner.
-     */
-    /*public void setTraceLevel(final Level level) {
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getProblemName());
-        loggerConfig.setLevel(level);
-        context.updateLoggers();
-        System.out.println("LEVEL SET TO " + level +  " " + getLogger().getProblemName());
-    }
-
-    /**
-     * Returns the trace level of the planner.
-     *
-     * @return the trace level of the planner.
-     */
-   /* public Level getTraceLevel() {
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig(this.getLogger().getProblemName());
-        return loggerConfig.getLevel();
-    }*/
 }

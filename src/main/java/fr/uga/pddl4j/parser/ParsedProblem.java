@@ -624,9 +624,9 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     public boolean equals(final Object object) {
         if (object != null && object instanceof ParsedProblem) {
             ParsedProblem other = (ParsedProblem) object;
-            return this.problemName == null ?
-                this.domainName.equals(other.domainName) && other.problemName == null :
-                this.domainName.equals(other.domainName) && this.problemName.equals(other.problemName);
+            return this.problemName == null
+                ? this.domainName.equals(other.domainName) && other.problemName == null
+                : this.domainName.equals(other.domainName) && this.problemName.equals(other.problemName);
         }
         return false;
     }

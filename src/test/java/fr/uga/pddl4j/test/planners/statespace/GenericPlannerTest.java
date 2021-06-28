@@ -96,7 +96,7 @@ public class GenericPlannerTest {
     public void testGenericPlanner_Astar_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new AStar(TIMEOUT * 1000,
             HEURISTIC, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericPlanner(stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -118,7 +118,7 @@ public class GenericPlannerTest {
     @Test
     public void testGenericPlanner_BFS_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new BreadthFirstSearch(TIMEOUT * 1000);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericPlanner(stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -140,7 +140,7 @@ public class GenericPlannerTest {
     @Test
     public void testGenericPlanner_DFS_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new DepthFirstSearch(TIMEOUT * 1000);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericPlanner(stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -163,7 +163,7 @@ public class GenericPlannerTest {
     public void testGenericPlanner_EHC_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new EnforcedHillClimbing(TIMEOUT * 1000,
             HEURISTIC, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericPlanner(stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -186,7 +186,7 @@ public class GenericPlannerTest {
     public void testGenericPlanner_GBFS_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new GreedyBestFirstSearch(TIMEOUT * 1000,
             HEURISTIC, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericPlanner(stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
             + File.separator + "gripper"
@@ -209,7 +209,7 @@ public class GenericPlannerTest {
     public void testGenericPlanner_HC_gripper() throws Exception {
         final StateSpaceStrategy stateSpaceStrategy = new HillClimbing(TIMEOUT * 1000,
             HEURISTIC, HEURISTIC_WEIGHT);
-        planner = new GenericPlanner(STATISTICS, TRACE_LEVEL, stateSpaceStrategy);
+        planner = new GenericPlanner(stateSpaceStrategy);
         Tools.changeVALPerm();
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1"
             + File.separator + "gripper"

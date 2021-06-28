@@ -16,8 +16,6 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
@@ -43,8 +41,8 @@ import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.util.BitSet;
+import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

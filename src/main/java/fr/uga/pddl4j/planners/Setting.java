@@ -116,11 +116,11 @@ public enum Setting {
          */
         FF,
         /**
-         * The TFD (Total Fast Downward) HTN Planner
+         * The TFD (Total Fast Downward) HTN Planner.
          */
         TFD,
         /**
-         * The PFD (Partial Fast Downward) HTN Planner
+         * The PFD (Partial Fast Downward) HTN Planner.
          */
         PFD,
         /**

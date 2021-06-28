@@ -17,9 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLParser;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
@@ -39,7 +37,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Spliterator;
 
@@ -304,54 +301,14 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         System.out.println(strb.toString());
     }
 
-    /*/**
-     * Parse the command line and return the planner's arguments.
+    /**
+     * Search a plan for the current planner configuration.
      *
-     * @param args the command line.
-     * @return the planner arguments or null if an invalid argument is encountered.
+     * @return the solution plan or null is no solution was found.
+     * @throws FileNotFoundException if the domain or the problem file does not exist.
      */
-    /*protected static Properties parseCommandLine(String[] args) {
-        // Get the default arguments from the super class
-        final Properties arguments = Planner.getDefaultConfiguration();
-        try {
-            // Parse the command line and update the default argument value
-            for (int i = 0; i < args.length; i += 2) {
-                if ("-d".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    if (!new File(args[i + 1]).exists()) {
-                        return null;
-                    }
-                    arguments.put(Planner.DOMAIN, new File(args[i + 1]));
-                } else if ("-p".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    if (!new File(args[i + 1]).exists()) {
-                        return null;
-                    }
-                    arguments.put(Planner.PROBLEM, new File(args[i + 1]));
-                } else if ("-t".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    final int timeout = java.lang.Integer.parseInt(args[i + 1]) * 1000;
-                    if (timeout < 0) {
-                        return null;
-                    }
-                    arguments.put(Planner.TIMEOUT, timeout);
-                } else if ("-l".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                    final int level = java.lang.Integer.parseInt(args[i + 1]);
-                    arguments.put(Planner.TRACE_LEVEL, level);
-                } else {
-                    return null;
-                }
-            }
-        } catch (Throwable t) {
-            AbstractSTNPlanner.printUsage();
-            System.exit(0);
-        }
-        // Return null if the domain or the problem was not specified
-        return (arguments.get(Planner.DOMAIN) == null
-                || arguments.get(Planner.PROBLEM) == null) ? null : arguments;
-
-    }*/
-
-
     public Plan solve() throws FileNotFoundException {
-        if (!this.checkConfiguration()) {
+        if (!this.hasValidConfiguration()) {
             throw new RuntimeException("Invalid planner configuration");
         }
 
@@ -360,8 +317,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        PDDLParser parser = this.getParser();
-        ParsedProblem parsedProblem = parser.parse(config.getDomain(), config.getProblem());
+        final PDDLParser parser = this.getParser();
+        final ParsedProblem parsedProblem = parser.parse(config.getDomain(), config.getProblem());
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -465,7 +422,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     }
 
     @Override
-    public boolean checkConfiguration() {
+    public boolean hasValidConfiguration() {
         return true;
     }
 

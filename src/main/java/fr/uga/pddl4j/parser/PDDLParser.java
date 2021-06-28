@@ -258,6 +258,7 @@ public final class PDDLParser {
      * Parses a planning domain and a planning problem from the specified file path.
      *
      * @param domainAndProblem the path to the file that contains the planning domain and problem.
+     * @return the problem parsed.
      * @throws FileNotFoundException if the specified file does not exist.
      */
     public ParsedProblem parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
@@ -268,6 +269,7 @@ public final class PDDLParser {
      * Parses a planning domain and a planning problem from the specified file.
      *
      * @param domainAndProblem the file that contains the planning domain and problem.
+     * @return the problem parsed.
      * @throws FileNotFoundException if the specified file does not exist.
      */
     public ParsedProblem parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
@@ -378,7 +380,7 @@ public final class PDDLParser {
      *
      * @param inputDomain  the stream that contains the domain.
      * @param inputProblem the stream that contains the planning problem.
-     * @
+
      */
     public void parseFromStream(InputStream inputDomain, InputStream inputProblem) {
         try {
@@ -416,6 +418,7 @@ public final class PDDLParser {
      *
      * @param domain  the path of the file that contains the planning domains.
      * @param problem the path of the file that contains the planning problem.
+     * @return the problem parsed.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
     public ParsedProblem parse(String domain, String problem) throws FileNotFoundException {

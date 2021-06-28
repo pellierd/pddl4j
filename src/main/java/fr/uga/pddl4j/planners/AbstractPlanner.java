@@ -18,7 +18,6 @@ package fr.uga.pddl4j.planners;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
@@ -86,8 +85,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     /**
      * Creates a new planner with a specific configuration.
      *
-     * @parama config the configuration of the planner.
-     *
+     * @param configuration the configuration of the planner.
      */
     public AbstractPlanner(Configuration configuration) {
         this();
@@ -99,6 +97,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      *
      * @param domain the path to the PDDL domain file.
      * @param problem the path to the PDDL problem file.
+     * @return the problem parsed.
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException           if an error occur during parsing.
      */
@@ -110,6 +109,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     /**
      * Parses the domain and the problem description using the configuration of the planner.
      *
+     * @return the problem parsed.
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
@@ -127,15 +127,29 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
         return this.parser.getErrorManager();
     }
 
-
+    /**
+     * Returns the configuration of the planner.
+     *
+     * @return the configuration of the planner.
+     */
     public Configuration getConfiguration() {
         return this.configuration;
     }
 
+    /**
+     * Sets the configuration of the planner.
+     *
+     * @param configuration the configuration to set.
+     */
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
 
+    /**
+     * Returns the parser used by the planner to parse PDDL domain and problem files.
+     *
+     * @return the parser used by the planner.
+     */
     protected PDDLParser getParser() {
         return this.parser;
     }
@@ -143,7 +157,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     /**
      * Sets the trace level of the planner.
      *
-     //* @param level the trace level of the planner.
+     * @param level the trace level of the planner.
      */
     protected void setTraceLevel(final Level level) {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
@@ -151,7 +165,6 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
         LoggerConfig loggerConfig = config.getRootLogger();
         loggerConfig.setLevel(level);
         context.updateLoggers();
-//        System.out.println("LEVEL SET TO " + level +  " " + getLogger().getProblemName());
     }
 
     /**
@@ -165,15 +178,21 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
         return this.statistics;
     }
 
+    /**
+     * Check the planner configuration and return if the configuration is valide.
+     *
+     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
+     */
+    public abstract boolean hasValidConfiguration();
 
     /**
-     * Check the planner configuration
-     * @return
+     * Solves the problem as defined by the planner configuration.
+     *
+     * @return the solution plan found or null is no solution was found.
+     * @throws FileNotFoundException domain of problem files does not exist.
      */
-    public abstract boolean checkConfiguration();
-
     public Plan solve() throws FileNotFoundException {
-        if (!this.checkConfiguration()) {
+        if (!this.hasValidConfiguration()) {
             throw new RuntimeException("Invalid planner configuration");
         }
 
@@ -182,7 +201,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        ParsedProblem parsedProblem = this.parser.parse(config.getDomain(), config.getProblem());
+        final ParsedProblem parsedProblem = this.parser.parse(config.getDomain(), config.getProblem());
         ErrorManager errorManager = this.parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -211,6 +230,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
             strb.append("\n");
             LOGGER.info(strb);
         }
+
 
         // Encodes and instantiates the problem in a compact representation
 
@@ -260,10 +280,12 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
                 strb.append(String.format("              %8.2f seconds total time%n", totalTimeInSeconds));
 
 
-                double memoryForProblemInMBytes = Statistics.byteToMByte(this.getStatistics().getMemoryUsedForProblemRepresentation());
+                double memoryForProblemInMBytes = Statistics.byteToMByte(
+                    this.getStatistics().getMemoryUsedForProblemRepresentation());
                 strb.append(String.format("%nmemory used:  %8.2f MBytes for problem representation%n",
                     memoryForProblemInMBytes));
-                double memoryUsedToSearchInMBytes = Statistics.byteToMByte(this.getStatistics().getMemoryUsedToSearch());
+                double memoryUsedToSearchInMBytes = Statistics.byteToMByte(
+                    this.getStatistics().getMemoryUsedToSearch());
                 strb.append(String.format("              %8.2f MBytes for searching%n",
                     memoryUsedToSearchInMBytes));
                 double totalMemoryInMBytes = memoryForProblemInMBytes + memoryUsedToSearchInMBytes;

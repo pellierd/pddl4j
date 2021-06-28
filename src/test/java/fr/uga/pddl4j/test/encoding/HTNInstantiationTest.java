@@ -16,7 +16,7 @@ import java.io.File;
  * @version 1.0 - 19.10.20
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class HDDLEncoderTest {
+public class HTNInstantiationTest {
 
     /**
      * Default Trace level.
@@ -33,7 +33,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/barman" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -59,7 +59,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/gripper" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -72,7 +72,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/miconic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -85,7 +85,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/rover" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -98,7 +98,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/satellite" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -111,7 +111,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/smartphone" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -124,7 +124,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/transport" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -137,7 +137,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/umtranslog" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -150,7 +150,7 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/woodworking" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 
     /**
@@ -163,6 +163,6 @@ public class HDDLEncoderTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/zenotravel" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.encodeHDDLProblems(localTestPath, HDDLEncoderTest.TRACE_LEVEL);
+        Tools.encodeHDDLProblems(localTestPath, HTNInstantiationTest.TRACE_LEVEL);
     }
 }

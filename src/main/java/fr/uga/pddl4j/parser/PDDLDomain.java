@@ -108,7 +108,7 @@ public interface PDDLDomain extends Serializable {
      * @return <code>true</code> if the predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */
-    boolean addPredicate(final PDDLNamedTypedList predicate) ;
+    boolean addPredicate(final PDDLNamedTypedList predicate);
 
     /**
      * Returns the parsed functions in the domain file.
@@ -222,7 +222,7 @@ public interface PDDLDomain extends Serializable {
      * @param constant the constant symbol.
      * @return <code>true</code> if the specified symbol is a declared constant; <code>false</code> otherwise.
      */
-    boolean isDeclaredConstant(final PDDLSymbol constant) ;
+    boolean isDeclaredConstant(final PDDLSymbol constant);
 
     /**
      * Returns the constant from a specified symbol.

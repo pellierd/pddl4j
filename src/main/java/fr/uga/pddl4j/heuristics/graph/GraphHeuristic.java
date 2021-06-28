@@ -27,8 +27,8 @@ import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.util.BitVector;
 import fr.uga.pddl4j.util.BitSet;
+import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
 import java.util.Arrays;

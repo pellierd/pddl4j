@@ -89,8 +89,9 @@ public interface Planner<T extends Problem> extends Serializable {
     ErrorManager getParserErrorManager();
 
     /**
-     * Instantiates the planning problem from the
+     * Instantiates the planning problem from a parsed problem.
      *
+     * @param problem the problem to instantiate.
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     T instantiate(ParsedProblem problem);
@@ -107,9 +108,9 @@ public interface Planner<T extends Problem> extends Serializable {
      * Search a plan for the current planner configuration.
      *
      * @return the solution plan or null is no solution was found.
+     * @throws FileNotFoundException if the domain or the problem file does not exist.
      */
     Plan solve() throws FileNotFoundException;
-
 
     /**
      * Returns the statistics of the planner.
@@ -118,6 +119,13 @@ public interface Planner<T extends Problem> extends Serializable {
      * @see Statistics
      */
     Statistics getStatistics();
+
+    /**
+     * Returns if the planner configuration is valide or not.
+     *
+     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
+    */
+    boolean hasValidConfiguration();
 
 
 }

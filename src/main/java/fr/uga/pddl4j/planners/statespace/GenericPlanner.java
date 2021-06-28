@@ -24,6 +24,14 @@ import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.Setting;
+import fr.uga.pddl4j.planners.statespace.search.AStar;
+import fr.uga.pddl4j.planners.statespace.search.BreadthFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.DepthFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
+import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
+import fr.uga.pddl4j.planners.statespace.search.HillClimbing;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
@@ -32,6 +40,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * This class implements a simple generic planner.
@@ -67,15 +76,36 @@ public final class GenericPlanner extends AbstractStateSpacePlanner<ADLProblem> 
     /**
      * Creates a new planner with default parameters for search strategy.
      *
-     * @param statisticState the statistics generation value.
-     * @param searchStrategy the search strategy to use to solve the problem.
+     * @param configuration the configuration of the planner.
      */
-    public GenericPlanner(final boolean statisticState, final int traceLevel,
-                          final StateSpaceStrategy searchStrategy) {
+    public GenericPlanner(final Configuration configuration) {
         super();
-        Objects.requireNonNull(searchStrategy);
-
-        this.searchStrategy = searchStrategy;
+        Setting.SearchStrategy strategy = configuration.getSearchStrategy();
+        final int timeout = this.getConfiguration().getTimeout();
+        final Setting.Heuristic heuristic = this.getConfiguration().getHeuristic();
+        final double weight = this.getConfiguration().getHeuristicWeight();
+        switch (strategy) {
+            case ASTAR:
+                this.searchStrategy = new AStar(timeout, heuristic, weight);
+                break;
+            case ENFORCE_HILL_CLIMBING:
+                this.searchStrategy = new EnforcedHillClimbing(timeout, heuristic, weight);
+                break;
+            case BREADTH_FIRST:
+                this.searchStrategy = new BreadthFirstSearch(timeout);
+                break;
+            case GREEDY_BEST_FIRST:
+                this.searchStrategy = new GreedyBestFirstSearch(timeout, heuristic, weight);
+                break;
+            case DEPTH_FIRST:
+                this.searchStrategy = new DepthFirstSearch(timeout);
+                break;
+            case HILL_CLIMBING:
+                this.searchStrategy = new HillClimbing(timeout, heuristic, weight);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
         this.getStateSpaceStrategies().add(this.searchStrategy);
     }
 
@@ -102,11 +132,22 @@ public final class GenericPlanner extends AbstractStateSpacePlanner<ADLProblem> 
         }
     }
 
+    /**
+     * Returns if the planner configuration is valide or not.
+     *
+     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
+     */
     @Override
-    public boolean checkConfiguration() {
+    public boolean hasValidConfiguration() {
         return true;
     }
 
+    /**
+     * Instantiates the planning problem from a parsed problem.
+     *
+     * @param problem the problem to instantiate.
+     * @return the instantiated planning problem or null if the problem cannot be instantiated.
+     */
     @Override
     public ADLProblem instantiate(final ParsedProblem problem) {
         ADLProblem pb = new ADLProblem(problem);

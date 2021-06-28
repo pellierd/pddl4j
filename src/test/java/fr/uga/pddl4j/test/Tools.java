@@ -7,6 +7,7 @@ import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
+import fr.uga.pddl4j.problem.SimpleTemporalProblem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -327,7 +328,7 @@ public abstract class Tools {
      * @param currentTestPath the current directory to test.
      * @param level the trace level.
      */
-    public static void encodePDDLProblems(String currentTestPath, int level) {
+    public static void instantiatePDDLProblems(String currentTestPath, int level) {
         String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -347,7 +348,7 @@ public abstract class Tools {
             oneDomainPerProblem = true;
         }
 
-        System.out.println("PDDLEncoderTest: Test encoding on " + currentTestPath);
+        System.out.println("PDDLEncoderTest: Test instantiating on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
@@ -388,21 +389,117 @@ public abstract class Tools {
                 final ADLProblem pb;
                 try {
                     // Encodes and instantiates the problem in a compact representation
-                    System.out.println(" * Encoding [" + currentProblem + "]" + "...");
+                    System.out.println(" * Instantiating [" + currentProblem + "]" + "...");
                     pb = new ADLProblem(problemParsed);
+                    pb.instantiate();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println(" * PDDLProblem encoded (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * PDDLProblem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is solvable.");
                     } else {
-                        System.out.println(" * PDDLProblem encoded (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * PDDLProblem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
                 } catch (IllegalArgumentException iaex) {
-                    if (iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
+                    if (iaex.getMessage().equalsIgnoreCase("problem to instantiated not ADL")) {
+                        System.err.println("[" + currentProblem + "]: Not ADL problem!");
+                    } else {
+                        throw iaex;
+                    }
+                }
+
+            } catch (IOException ioEx) {
+                ioEx.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Encode problems targeted in currentTestPath directory and check if they are solvable.
+     *
+     * @param currentTestPath the current directory to test.
+     * @param level the trace level.
+     */
+    public static void instantiateTemporalProblems(String currentTestPath, int level) {
+        String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
+        boolean oneDomainPerProblem = false;
+        String problemFile;
+        String currentProblem;
+
+        // Counting the number of problem files
+        File[] pbFileList = new File(currentTestPath)
+            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"));
+
+        int nbTest = 0;
+        if (pbFileList != null) {
+            nbTest = pbFileList.length;
+        }
+
+        // Check if there is on domain per problem or a shared domain for all
+        if (!new File(currentDomain).exists()) {
+            oneDomainPerProblem = true;
+        }
+
+        System.out.println("PDDLEncoderTest: Test instantiating on " + currentTestPath);
+        // Loop around problems in one category
+        for (int i = 1; i < nbTest + 1; i++) {
+            if (i < 10) {
+                if (nbTest < 100) {
+                    problemFile = "p0" + i + Tools.PDDL_EXT;
+                } else {
+                    problemFile = "p00" + i + Tools.PDDL_EXT;
+                }
+            } else if (i < 100) {
+                if (nbTest < 100) {
+                    problemFile = "p" + i + Tools.PDDL_EXT;
+                } else {
+                    problemFile = "p0" + i + Tools.PDDL_EXT;
+                }
+            } else {
+                problemFile = "p" + i + Tools.PDDL_EXT;
+            }
+
+            currentProblem = currentTestPath + problemFile;
+
+            if (oneDomainPerProblem) {
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.PDDL_DOMAIN;
+            }
+
+            // Parses the PDDL domain and problem description
+            try {
+                PDDLParser parser = new PDDLParser();
+                ParsedProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                ErrorManager errorManager = parser.getErrorManager();
+                if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
+                    || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
+                    errorManager.printAll();
+
+                }
+                Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+                    && errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
+
+                final SimpleTemporalProblem pb;
+                try {
+                    // Encodes and instantiates the problem in a compact representation
+                    System.out.println(" * Instantiating [" + currentProblem + "]" + "...");
+                    pb = new SimpleTemporalProblem(problemParsed);
+                    pb.instantiate();
+                    Assert.assertTrue(pb != null);
+                    if (pb.isSolvable()) {
+                        System.out.println(" * PDDLProblem instantiated (" + pb.getActions().size() + " actions, "
+                            + pb.getFluents().size() + " fluents) is solvable.");
+                    } else {
+                        System.out.println(" * PDDLProblem instantiated (" + pb.getActions().size() + " actions, "
+                            + pb.getFluents().size() + " fluents) is not solvable.");
+                    }
+                } catch (OutOfMemoryError err) {
+                    System.err.println("ERR: " + err.getMessage() + " - test aborted");
+                    return;
+                } catch (IllegalArgumentException iaex) {
+                    if (iaex.getMessage().equalsIgnoreCase("problem to instantiated not ADL")) {
                         System.err.println("[" + currentProblem + "]: Not ADL problem!");
                     } else {
                         throw iaex;
@@ -441,7 +538,7 @@ public abstract class Tools {
             oneDomainPerProblem = true;
         }
 
-        System.out.println("HDDLEncoderTest: Test encoding on " + currentTestPath);
+        System.out.println("HDDLEncoderTest: Test instantiating on " + currentTestPath);
         // Loop around problems in one category
         for (int i = 1; i < nbTest + 1; i++) {
             if (i < 10) {
@@ -485,19 +582,20 @@ public abstract class Tools {
                     // Encodes and instantiates the problem in a compact representation
                     System.out.println(" * Encoding [" + currentProblem + "]" + "...");
                     pb = new HTNProblem(problemParsed);
+                    pb.instantiate();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println(" * HDDLProblem encoded (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * HDDLProblem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is solvable.");
                     } else {
-                        System.out.println(" * HDDLProblem encoded (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * HDDLProblem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
                 } catch (IllegalArgumentException iaex) {
-                    if (iaex.getMessage().equalsIgnoreCase("problem to encode not ADL")) {
+                    if (iaex.getMessage().equalsIgnoreCase("problem to instantiated not ADL")) {
                         System.err.println("[" + currentProblem + "]: Not ADL problem!");
                     } else {
                         throw iaex;

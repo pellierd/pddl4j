@@ -50,6 +50,8 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
 
     /**
      * Creates a new planner with a specific configuration.
+     *
+     * @param configuration the configuration of the planner.
      */
     public AbstractStateSpacePlanner(Configuration configuration) {
         super(configuration);

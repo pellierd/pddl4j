@@ -206,6 +206,11 @@ public final class TFDPlanner extends AbstractSTNPlanner {
     }
 
 
+    /**
+     * Returns the configuration by default of the planner.
+     *
+     * @return the configuration by default of the planner.
+     */
     public static Configuration getDefaultConfiguration() {
         Configuration config = new Configuration();
         config.setPlanner(Setting.Planner.TFD);
