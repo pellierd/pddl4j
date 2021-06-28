@@ -489,10 +489,10 @@ public abstract class Tools {
                     pb.instantiate();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println(" * PDDLProblem instantiated (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * Problem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is solvable.");
                     } else {
-                        System.out.println(" * PDDLProblem instantiated (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * Problem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
@@ -585,10 +585,10 @@ public abstract class Tools {
                     pb.instantiate();
                     Assert.assertTrue(pb != null);
                     if (pb.isSolvable()) {
-                        System.out.println(" * HDDLProblem instantiated (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * Problem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is solvable.");
                     } else {
-                        System.out.println(" * HDDLProblem instantiated (" + pb.getActions().size() + " actions, "
+                        System.out.println(" * Problem instantiated (" + pb.getActions().size() + " actions, "
                             + pb.getFluents().size() + " fluents) is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {

@@ -41,8 +41,17 @@ public class ArithmeticExpression extends AbstractNumericExpression {
      * The type of the arithmetic operators.
      */
     public enum Type {
+        /**
+         * The type operator.
+         */
         OPERATOR,
+        /**
+         * The type number.
+         */
         NUMBER,
+        /**
+         * The type variable.
+         */
         VARIABLE;
     }
 

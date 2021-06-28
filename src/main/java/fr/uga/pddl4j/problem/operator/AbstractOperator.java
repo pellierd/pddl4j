@@ -32,11 +32,11 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
      */
     private Condition precondition;
 
-    /*
-    * Creates a new operator from an other.
-    *
-    * @param other the other operator.
-    */
+    /**
+     * Creates a new operator from an other.
+     *
+     * @param other the other operator.
+     */
     protected AbstractOperator(final AbstractOperator other) {
         super(other);
         this.precondition = other.getPrecondition();

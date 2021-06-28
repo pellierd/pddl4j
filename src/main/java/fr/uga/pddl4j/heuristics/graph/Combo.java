@@ -33,8 +33,8 @@ import fr.uga.pddl4j.problem.operator.Condition;
  * </pre>
  * where
  * <ul>
- * <li> <tt>hsum(S)</tt> is the sum heuristic value and</li>
- * <li> <tt>hlev(S)</tt> the set-level heuristic value.</li>
+ * <li> <code>hsum(S)</code> is the sum heuristic value and</li>
+ * <li> <code>hlev(S)</code> the set-level heuristic value.</li>
  * </ul>
  * <b>Warning:</b> The combo heuristic is not admissible.
  *

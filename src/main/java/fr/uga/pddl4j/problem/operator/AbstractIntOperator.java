@@ -34,11 +34,11 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      */
     private IntExpression preconditions;
 
-    /*
-    * Creates a new operator from an other.
-    *
-    * @param other the other operator.
-    */
+    /**
+     * Creates a new operator from an other.
+     *
+     * @param other the other operator.
+     */
     protected AbstractIntOperator(final AbstractIntOperator other) {
         super(other);
         //this.preconditions = other.getPrecondition();

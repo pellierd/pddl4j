@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-/*
+/**
  * A <code>RequirementNotSupportedException</code> is launch to indicate that a method does not support as input a
  * specific problem requirement.
  *

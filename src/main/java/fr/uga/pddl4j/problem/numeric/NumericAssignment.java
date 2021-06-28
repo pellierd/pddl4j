@@ -32,10 +32,25 @@ public final class NumericAssignment extends AbstractNumericExpression {
      * The assignment that can be used in a numeric assignment.
      */
     public enum Operator {
+        /**
+         * The operator assign.
+         */
         ASSIGN,
+        /**
+         * The operator increase.
+         */
         INCREASE,
+        /**
+         * The operator decrease.
+         */
         DECREASE,
+        /**
+         * The operator scale-up.
+         */
         SCALE_UP,
+        /**
+         * The operator scale-down.
+         */
         SCALE_DOWN;
     }
 

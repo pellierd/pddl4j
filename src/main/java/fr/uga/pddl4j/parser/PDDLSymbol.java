@@ -374,8 +374,9 @@ public class PDDLSymbol implements Serializable {
      * Return if this symbol is equal to another object.
      *
      * @param object the other object.
-     * @return <tt>true</tt> if this symbol is equal to <tt>object</tt>, i.e., <tt>other</tt>
-     *          is not null and of kind <tt>PDDLSymbol</tt> and it has the same image; otherwise return <tt>false</tt>.
+     * @return <code>true</code> if this symbol is equal to <code>object</code>, i.e., <code>other</code>
+     *          is not null and of kind <code>PDDLSymbol</code> and it has the same image; otherwise return
+     *          <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

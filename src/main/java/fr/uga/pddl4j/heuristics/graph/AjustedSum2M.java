@@ -33,12 +33,12 @@ import fr.uga.pddl4j.problem.operator.Condition;
  * </pre>
  * where
  * <ul>
- * <li> <tt>cost(S) := 1 +  cost(S + prec(a) - add(a))</tt></li>
- * <li> <tt>delta(S) := max(lev({p, q} - max{levl(p), level(q)})</tt>for all <tt>p</tt> in
- * <tt>S</tt></li>
+ * <li> <code>cost(S) := 1 +  cost(S + prec(a) - add(a))</code></li>
+ * <li> <code>delta(S) := max(lev({p, q} - max{levl(p), level(q)})</code>for all <code>p</code> in
+ * <code>S</code></li>
  * </ul>
  * <p>
- * Note that computing <tt>delta(S)</tt> is equivalent to compute the set level heuristic.
+ * Note that computing <code>delta(S)</code> is equivalent to compute the set level heuristic.
  * </p>
  * <b>Warning:</b> The adjusted sum 2M heuristic is not admissible.
  *

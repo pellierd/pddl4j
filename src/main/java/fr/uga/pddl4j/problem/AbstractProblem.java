@@ -171,34 +171,121 @@ public abstract class AbstractProblem implements Problem {
      * The enum used to list the set of internal data structures needed by the instantiation process.
      */
     protected enum Data {
+        /**
+         * The types and the domain of the type.
+         */
         TYPES,
+        /**
+         * The type symbols.
+         */
         TYPE_SYMBOLS,
+        /**
+         * The constants symbols.
+         */
         CONSTANT_SYMBOLS,
+        /**
+         * The function symbols.
+         */
         FUNCTION_SYMBOLS,
+        /**
+         * The predicate symbols.
+         */
         PREDICATE_SYMBOLS,
+        /**
+         * The primitive task symbols.
+         */
         PRIMITIVE_TASKS_SYMBOLS,
+        /**
+         * The compound task symbols.
+         */
         COMPOUND_TASKS_SYMBOLS,
+        /**
+         * The primitive and the compound task symbols.
+         */
         TASKS_SYMBOLS,
+        /**
+         * The predicate signature (the predicate symbol and the type of each argument).
+         */
         PREDICATE_SIGNATURES,
+        /**
+         * The function signature (the function symbol and the type of each argument).
+         */
         FUNCTION_SIGNATURES,
+        /**
+         * The task signature (the task symbol and the type of each argument).
+         */
         TASK_SIGNATURES,
+        /**
+         * The list of actions in their integer representation.
+         */
         INT_ACTIONS,
+        /**
+         * The list of methods in their integer representation.
+         */
         INT_METHODS,
+        /**
+         * The goal in its integer representation.
+         */
         INT_GOAL,
+        /**
+         * The initial state in its integer representation.
+         */
         INT_INITIAL_STATE,
+        /**
+         * The initial task netwok in its integer representation.
+         */
         INT_INITIAL_TASK_NETWORK,
+        /**
+         * The list of inertia detected.
+         */
         INERTIA,
+        /**
+         * The list of numeric inertia detected.
+         */
         NUMERIC_INERTIA,
+        /**
+         * The list of ground inertia detected.
+         */
         GROUND_INERTIA,
+        /**
+         * The list of ground numeric inertia detected.
+         */
         GROUND_NUMERIC_INERTIA,
+        /**
+         * The list of actions of the instantiated problem.
+         */
         ACTIONS,
+        /**
+         * The list of methods of the instantiated problem.
+         */
         METHODS,
+        /**
+         * The list of relevant fluents of the instantiated problem.
+         */
         FLUENTS,
+        /**
+         * The list of relevant numeric fluents of the instantiated problem.
+         */
         NUMERIC_FLUENTS,
+        /**
+         * The list of relevant tasks of the instantiated problem.
+         */
         TASKS,
+        /**
+         * The list of task resolvers of the instantiated problem.
+         */
         TASK_RESOLVERS,
+        /**
+         * The initial task network the instantiated problem.
+         */
         INITIAL_TASK_NETWORK,
+        /**
+         * The goal of the instantiated problem.
+         */
         GOAL,
+        /**
+         * The initial state the instantiated problem.
+         */
         INITIAL_STATE,
     }
 
@@ -1070,13 +1157,12 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Encodes an specified expression into its integer representation.
      *
-     * <p>
-     * Notes:
+     * <p>Notes:
      * <ul>
      * <li>equal predicate used specified value of -1.</li>
      * <li>variables used negative values in [-1,-infinity[.</li>
      * </ul>
-     * </p>
+     *
      * @param exp       the expression to encode.
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.

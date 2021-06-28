@@ -23,7 +23,7 @@ import java.util.Objects;
 
 /**
  * This class implements a node for the TFDPlanner of the PDDL4J library. This class is a simplified version of the
- * class <tt>PFDNode</tt>. The task network is modeled using a simple task list to speed up searching and optimize
+ * class <code>PFDNode</code>. The task network is modeled using a simple task list to speed up searching and optimize
  * memory size.
  *
  * @author D. Pellier

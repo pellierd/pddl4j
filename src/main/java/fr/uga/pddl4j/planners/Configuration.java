@@ -79,7 +79,6 @@ public class Configuration implements Serializable {
      *
      * @param args the arguments from the command line.
      * @param configuration the default configuration to use.
-     * @throws FileNotFoundException if files not found
      */
     public Configuration(final String[] args, Configuration configuration) {
         this(configuration);

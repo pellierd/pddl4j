@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Implements the <tt>PDDLParser</tt> of the PDD4L library. The parser accepts only PDDL3.0 language.
+ * Implements the <code>PDDLParser</code> of the PDD4L library. The parser accepts only PDDL3.0 language.
  * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
  *
  * <p>
@@ -149,7 +149,7 @@ public final class PDDLParser {
     private PDDLProblem problem;
 
     /**
-     * Create a new <tt>PDDLParser</tt>.
+     * Create a new <code>PDDLParser</code>.
      */
     public PDDLParser() {
         super();

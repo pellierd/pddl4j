@@ -61,7 +61,7 @@ public class IntExpression implements Serializable {
      */
     public static final int EQUAL_PREDICATE = -1;
 
-    /*
+    /**
      * The constant used to encode the default predicate value.
      */
     public static final int DEFAULT_PREDICATE = -2;

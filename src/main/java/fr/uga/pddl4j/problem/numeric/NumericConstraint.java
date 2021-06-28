@@ -31,10 +31,25 @@ public final class NumericConstraint extends AbstractNumericExpression {
      * The comparator that can be used in numeric constraints.
      */
     public enum Comparator {
+        /**
+         * The comparator equal.
+         */
         EQUAL,
+        /**
+         * The comparator less.
+         */
         LESS,
+        /**
+         * The comparator less or equal.
+         */
         LESS_OR_EQUAL,
+        /**
+         * The comparator greater.
+         */
         GREATER,
+        /**
+         * The comparator greater or equal.
+         */
         GREATER_OR_EQUAL;
     }
 

@@ -39,24 +39,68 @@ import java.util.List;
  * the critical path.
  *
  * @author Aaron Boyd
+ * @author Damien Pellier
  * @version 1.0 20.08.2010
  */
 public final class CriticalPath extends RelaxedGraphHeuristic {
 
+    /**
+     * The precondition set.
+     */
     private Condition[] precond;
+
+    /**
+     * The positive effect set.
+     */
     private Condition[] effect;
+
+    /**
+     * The negative effect set.
+     */
     private Condition[] neffect;
+
+    /**
+     * The positive goal set.
+     */
     private int[] pGoal;
+
+    /**
+     * The negative goal set.
+     */
     private int[] nGoal;
+
+    /**
+     * The size of the set used to compute the critical path heuristic.
+     */
     private static final int COEF = 2;
+
+    /**
+     * The cardinality of the goal.
+     */
     private int goalCard;
+
+    /**
+     * The critival path value.
+     */
     private int critical;
 
+    /**
+     * Creates a new critical pah heuristic for a specific problem.
+     *
+     * @param problem the problem.
+     */
     public CriticalPath(ADLProblem problem) {
         super(problem);
         super.setAdmissible(true);
     }
 
+    /**
+     * Returns a estimation of the distance from a state to a goal.
+     *
+     * @param state the state from which the distance to the goal must be estimated.
+     * @param goal  the goal expression.
+     * @return the estimated distance.
+     */
     @Override
     public int estimate(State state, Condition goal) {
         super.setGoal(goal);

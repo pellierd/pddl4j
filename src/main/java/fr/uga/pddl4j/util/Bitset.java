@@ -42,7 +42,7 @@ import java.util.stream.StreamSupport;
  * {@code BitSet} class defined in the JDK API. It is slightly modified in the PDD4J library to access private
  * attributes of the class.
  *
- * <p></p>bitseEach component of the bit set has a {@code boolean}
+ * <p>Each component of the bit set has a {@code boolean}
  * value. The bits of a {@code BitSet} are indexed by non negative integers. Individual indexed bits can be examined,
  * set, or cleared. One {@code BitSet} may be used to modify the contents of another {@code BitSet} through logical AND,
  * logical inclusive OR, and logical exclusive OR operations.
@@ -1163,6 +1163,9 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * Save the state of the {@code BitSet} instance to a stream (i.e.,
      * serialize it).
+     *
+     * @param s the output stream.
+     * @throws IOException if an error occurred while writing.
      */
     private void writeObject(ObjectOutputStream s)
         throws IOException {
@@ -1181,6 +1184,10 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * Reconstitute the {@code BitSet} instance from a stream (i.e.,
      * deserialize it).
+     *
+     * @param s the input stream.
+     * @throws  IOException if an error occurred when reading.
+     * @throws  ClassNotFoundException if the {@code BitSet} class can not be found.
      */
     private void readObject(ObjectInputStream s)
         throws IOException, ClassNotFoundException {

@@ -139,9 +139,9 @@ public class PDDLNamedTypedList implements Serializable {
      * Return if this named typed list is equal to another object.
      *
      * @param object the other object.
-     * @return <tt>true</tt> if this named typed list is equal to <tt>obj</tt>, i.e.,
-     *          <tt>other</tt> is not null and of type <tt>PDDLNamedTypedList</tt> and it has the
-     *          same name and the same list of arguments and types; otherwise it returns <tt>false</tt>.
+     * @return <code>true</code> if this named typed list is equal to <code>obj</code>, i.e.,
+     *          <code>other</code> is not null and of type <code>PDDLNamedTypedList</code> and it has the
+     *          same name and the same list of arguments and types; otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(Object)
      */
     @Override
