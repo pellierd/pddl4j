@@ -85,7 +85,9 @@ shadowJar {
         attributes 'Implementation-Title': 'PDDL4J',
                 'Implementation-Version': archiveVersion,
                 'Built-By': 'Damien Pellier',
+                "Multi-Release": true,
                 'Main-Class': 'fr.uga.pddl4j.planners.PlannerConfiguration'
+
     }
 }
 
