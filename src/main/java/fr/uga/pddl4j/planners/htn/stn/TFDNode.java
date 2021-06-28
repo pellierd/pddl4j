@@ -13,10 +13,8 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.stn.tfd;
+package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
-import fr.uga.pddl4j.planners.htn.stn.pfd.PFDNode;
 import fr.uga.pddl4j.problem.State;
 
 import java.util.LinkedList;

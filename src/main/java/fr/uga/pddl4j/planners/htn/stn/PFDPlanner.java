@@ -13,12 +13,11 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.stn.pfd;
+package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Setting;
-import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;

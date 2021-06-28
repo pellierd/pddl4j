@@ -13,16 +13,11 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.stn.tfd;
+package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Configuration;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.Setting;
-import fr.uga.pddl4j.planners.htn.stn.AbstractSTNPlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -31,12 +26,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Properties;
 
 /**
  * This class implements the code of the total ordered simple task network planner. The search method is an

@@ -13,9 +13,8 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.planners.htn.stn.pfd;
+package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.planners.htn.stn.AbstractSTNNode;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
