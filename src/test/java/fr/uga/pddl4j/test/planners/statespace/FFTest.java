@@ -16,10 +16,9 @@
 package fr.uga.pddl4j.test.planners.statespace;
 
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.FF;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -87,7 +86,7 @@ public class FFTest {
     @Before
     public void initTest() {
         // Creates the planner
-        Configuration config = FF.getDefaultConfiguration();
+        PlannerConfiguration config = FF.getDefaultConfiguration();
         config.setTimeout(FFTest.TIMEOUT);
         config.setHeuristic(FFTest.HEURISTIC);
         config.setHeuristicWeight(FFTest.HEURISTIC_WEIGHT);

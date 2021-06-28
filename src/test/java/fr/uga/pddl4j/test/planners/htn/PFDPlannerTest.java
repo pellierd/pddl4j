@@ -19,7 +19,7 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.htn.stn.PFDPlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.test.Tools;
@@ -68,7 +68,7 @@ public class PFDPlannerTest {
      */
     @Before
     public void initTest() {
-        Configuration config = PFDPlanner.getDefaultConfiguration();
+        PlannerConfiguration config = PFDPlanner.getDefaultConfiguration();
         config.setTimeout(PFDPlannerTest.TIMEOUT);
         config.setTraceLevel(PFDPlannerTest.TRACE_LEVEL);
         this.planner = new PFDPlanner(config);

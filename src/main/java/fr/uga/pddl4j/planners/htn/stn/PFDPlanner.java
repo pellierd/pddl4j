@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.State;
@@ -52,7 +52,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
      *
      * @param config the configuration of the planner.
      */
-    public PFDPlanner(final Configuration config) {
+    public PFDPlanner(final PlannerConfiguration config) {
         super(config);
     }
 
@@ -219,8 +219,8 @@ public final class PFDPlanner extends AbstractSTNPlanner {
      *
      * @return the configuration by default of the planner.
      */
-    public static Configuration getDefaultConfiguration() {
-        Configuration config = new Configuration();
+    public static PlannerConfiguration getDefaultConfiguration() {
+        PlannerConfiguration config = new PlannerConfiguration();
         config.setPlanner(Setting.Planner.PFD);
         config.setDomain(Setting.DEFAULT_DOMAIN);
         config.setProblem(Setting.DEFAULT_PROBLEM);
@@ -258,7 +258,7 @@ public final class PFDPlanner extends AbstractSTNPlanner {
      */
     public static void main(final String[] args) {
         try {
-            final Configuration config = new Configuration(args, PFDPlanner.getDefaultConfiguration());
+            final PlannerConfiguration config = new PlannerConfiguration(args, PFDPlanner.getDefaultConfiguration());
             final PFDPlanner planner = new PFDPlanner(config);
             planner.solve();
         } catch (Throwable t) {

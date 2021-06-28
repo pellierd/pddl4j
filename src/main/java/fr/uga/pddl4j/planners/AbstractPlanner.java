@@ -47,7 +47,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     /**
      * The configuration of the planner.
      */
-    private Configuration configuration;
+    private PlannerConfiguration configuration;
 
     /**
      * The parser of the planner.
@@ -87,7 +87,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      *
      * @param configuration the configuration of the planner.
      */
-    public AbstractPlanner(Configuration configuration) {
+    public AbstractPlanner(PlannerConfiguration configuration) {
         this();
         this.setConfiguration(configuration);
     }
@@ -132,7 +132,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      *
      * @return the configuration of the planner.
      */
-    public Configuration getConfiguration() {
+    public PlannerConfiguration getConfiguration() {
         return this.configuration;
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      *
      * @param configuration the configuration to set.
      */
-    public void setConfiguration(Configuration configuration) {
+    public void setConfiguration(PlannerConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -196,7 +196,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
             throw new RuntimeException("Invalid planner configuration");
         }
 
-        final Configuration config = this.getConfiguration();
+        final PlannerConfiguration config = this.getConfiguration();
         this.setTraceLevel(config.getTraceLevel());
 
         // Parses the PDDL domain and problem description

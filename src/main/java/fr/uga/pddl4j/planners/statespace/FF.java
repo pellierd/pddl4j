@@ -19,12 +19,10 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
@@ -37,7 +35,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm and
@@ -82,7 +79,7 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      *
      * @param configuration the configuration of the planner.
      */
-    public FF(Configuration configuration) {
+    public FF(PlannerConfiguration configuration) {
         super(configuration);
         final int timeout = this.getConfiguration().getTimeout();
         final Setting.Heuristic heuristic = this.getConfiguration().getHeuristic();
@@ -142,8 +139,8 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      *
      * @return the configuration by default of the planner.
      */
-    public static Configuration getDefaultConfiguration() {
-        Configuration config = new Configuration();
+    public static PlannerConfiguration getDefaultConfiguration() {
+        PlannerConfiguration config = new PlannerConfiguration();
         config.setPlanner(Setting.Planner.FF);
         config.setDomain(Setting.DEFAULT_DOMAIN);
         config.setProblem(Setting.DEFAULT_PROBLEM);
@@ -175,7 +172,7 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      */
     public static void main(String[] args) {
         try {
-            Configuration config = new Configuration(args, FF.getDefaultConfiguration());
+            PlannerConfiguration config = new PlannerConfiguration(args, FF.getDefaultConfiguration());
             FF planner = new FF(config);
             planner.solve();
         } catch (Throwable t) {

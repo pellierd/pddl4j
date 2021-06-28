@@ -19,12 +19,10 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.BreadthFirstSearch;
@@ -40,7 +38,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * This class implements a simple generic planner.
@@ -78,7 +75,7 @@ public final class GenericPlanner extends AbstractStateSpacePlanner<ADLProblem> 
      *
      * @param configuration the configuration of the planner.
      */
-    public GenericPlanner(final Configuration configuration) {
+    public GenericPlanner(final PlannerConfiguration configuration) {
         super();
         Setting.SearchStrategy strategy = configuration.getSearchStrategy();
         final int timeout = this.getConfiguration().getTimeout();

@@ -16,13 +16,10 @@
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 
 import fr.uga.pddl4j.problem.Problem;
-import org.apache.logging.log4j.Level;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,23 +39,23 @@ public interface Planner<T extends Problem> extends Serializable {
      *
      * @return the configuration of the planner.
      */
-    Configuration getConfiguration();
+    PlannerConfiguration getConfiguration();
 
     /**
      * Sets the configuration of the planner.
      *
      * @param configuration the configuration to set.
      */
-    void setConfiguration(Configuration configuration);
+    void setConfiguration(PlannerConfiguration configuration);
 
     /**
      * This method return the default arguments of the planner.
      *
      * @return the default arguments of the planner.
-     * @see Configuration
+     * @see PlannerConfiguration
      */
-    static Configuration getDefaultConfiguration() {
-        return new Configuration();
+    static PlannerConfiguration getDefaultConfiguration() {
+        return new PlannerConfiguration();
     }
 
     /**

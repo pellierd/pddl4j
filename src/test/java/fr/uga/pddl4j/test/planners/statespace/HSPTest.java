@@ -17,10 +17,9 @@ package fr.uga.pddl4j.test.planners.statespace;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.HSP;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -75,7 +74,7 @@ public class HSPTest {
      */
     @Before
     public void initTest() {
-        Configuration config = HSP.getDefaultConfiguration();
+        PlannerConfiguration config = HSP.getDefaultConfiguration();
         config.setTimeout(HSPTest.TIMEOUT);
         config.setHeuristic(HSPTest.HEURISTIC);
         config.setHeuristicWeight(HSPTest.HEURISTIC_WEIGHT);
@@ -755,7 +754,7 @@ public class HSPTest {
             // Parses the PDDL domain and problem description
             try {
 
-                Configuration config = planner.getConfiguration();
+                PlannerConfiguration config = planner.getConfiguration();
                 config.setDomain(currentDomain);
                 config.setProblem(currentProblem);
 

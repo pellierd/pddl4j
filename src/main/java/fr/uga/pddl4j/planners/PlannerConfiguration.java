@@ -16,6 +16,11 @@
 
 package fr.uga.pddl4j.planners;
 
+import fr.uga.pddl4j.planners.htn.stn.PFDPlanner;
+import fr.uga.pddl4j.planners.htn.stn.TFDPlanner;
+import fr.uga.pddl4j.planners.statespace.FF;
+import fr.uga.pddl4j.planners.statespace.GenericPlanner;
+import fr.uga.pddl4j.planners.statespace.HSP;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -33,7 +38,7 @@ import java.util.Properties;
  * @version 1.0 - 18.06.2020
  * @since 4.0
  */
-public class Configuration implements Serializable {
+public class PlannerConfiguration implements Serializable {
 
     /**
      * The properties object used to store the configuration.
@@ -41,11 +46,20 @@ public class Configuration implements Serializable {
     private Properties settings;
 
     /**
+     * Returns the default configuration.
+     *
+     * @return a default configuration.
+     */
+    public static PlannerConfiguration getDefaultConfiguration() {
+        return new PlannerConfiguration();
+    }
+
+    /**
      * Creates a configuration from an other.
      *
      * @param other the other configuration.
      */
-    public Configuration(Configuration other) {
+    public PlannerConfiguration(PlannerConfiguration other) {
         this.settings = new Properties();
         this.setPlanner(other.getPlanner());
         this.setDomain(other.getDomain());
@@ -62,7 +76,7 @@ public class Configuration implements Serializable {
      *
      * @see Setting
      */
-    public Configuration() {
+    public PlannerConfiguration() {
         this.settings = new Properties();
         this.setPlanner(Setting.DEFAULT_PLANNER);
         this.setDomain(Setting.DEFAULT_DOMAIN);
@@ -75,12 +89,21 @@ public class Configuration implements Serializable {
     }
 
     /**
+     * Creates a new planner configuration from a command line.
+     *
+     * @param args the arguments from the command line.
+     */
+    public PlannerConfiguration(final String[] args) {
+        this(args, PlannerConfiguration.getDefaultConfiguration());
+    }
+
+    /**
      * Creates a new planner configuration from a command line and a default configuration.
      *
      * @param args the arguments from the command line.
      * @param configuration the default configuration to use.
      */
-    public Configuration(final String[] args, Configuration configuration) {
+    public PlannerConfiguration(final String[] args, PlannerConfiguration configuration) {
         this(configuration);
         this.initFromCommandLine(args);
     }
@@ -117,7 +140,7 @@ public class Configuration implements Serializable {
             } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                 this.setSearchStrategy(Setting.SearchStrategy.valueOf(args[i + 1]));
             } else {
-                throw new IllegalArgumentException("Unexpected argument or option.");
+                throw new IllegalArgumentException("Unexpected argument or option: " + args[i]);
             }
         }
         if (this.getDomain().equals(Setting.DEFAULT_DOMAIN)) {
@@ -298,11 +321,34 @@ public class Configuration implements Serializable {
     }
 
     /**
+     * Builds a planner with the specific configuration.
+     *
+     * @return the planner built.
+     */
+    public Planner buildPlanner() {
+        switch (this.getPlanner()) {
+            case HSP:
+                return new HSP(this);
+            case FF:
+                return new FF(this);
+            case GENERIC:
+                return new GenericPlanner(this);
+            case TFD:
+                return new TFDPlanner(this);
+            case PFD:
+                return new PFDPlanner(this);
+            default:
+                throw new InvalidConfigurationException();
+        }
+    }
+
+
+    /**
      * Returns the hash code value of this configuration.
      *
      * @return the hash code value of this configuration.
      */
-    public int hascode() {
+    public int hashcode() {
         return Objects.hash(this.settings);
     }
 
@@ -314,8 +360,8 @@ public class Configuration implements Serializable {
      * @return <code>true</code> the object in paremeter is equal to this configuration.
      */
     public boolean equal(final Object object) {
-        if (object instanceof Configuration) {
-            Configuration other = (Configuration) object;
+        if (object instanceof PlannerConfiguration) {
+            PlannerConfiguration other = (PlannerConfiguration) object;
             return other.settings.equals(this.settings);
         }
         return false;
@@ -337,4 +383,18 @@ public class Configuration implements Serializable {
         return str.toString();
     }
 
+    /**
+     * The main method of the PDDL4J library.
+     *
+     * @param args the command line arguments.
+     */
+    public static void main(final String[] args) {
+        try {
+            final PlannerConfiguration config = new PlannerConfiguration(args);
+            final Planner planner = config.buildPlanner();
+            planner.solve();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -74,8 +74,7 @@ jar {
         attributes 'Implementation-Title': 'PDDL4J',
                 'Implementation-Version': archiveVersion,
                 'Built-By': 'Damien Pellier',
-                'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
-                'Main-Class': 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
+                'Main-Class': 'fr.uga.pddl4j.planners.PlannerConfiguration'
     }
 }
 
@@ -86,8 +85,7 @@ shadowJar {
         attributes 'Implementation-Title': 'PDDL4J',
                 'Implementation-Version': archiveVersion,
                 'Built-By': 'Damien Pellier',
-                'Premain-Class': 'fr.uga.pddl4j.util.MemoryAgent',
-                'Main-Class': 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
+                'Main-Class': 'fr.uga.pddl4j.planners.PlannerConfiguration'
     }
 }
 

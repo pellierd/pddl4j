@@ -19,11 +19,10 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
 import fr.uga.pddl4j.planners.statespace.search.Node;
@@ -68,7 +67,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      *
      * @param configuration the configuration of the planner.
      */
-    public HSP(Configuration configuration) {
+    public HSP(PlannerConfiguration configuration) {
         super(configuration);
         final int timeout = this.getConfiguration().getTimeout();
         final Setting.Heuristic heuristic = this.getConfiguration().getHeuristic();
@@ -115,8 +114,8 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      *
      * @return the configuration by default of the planner.
      */
-    public static Configuration getDefaultConfiguration() {
-        Configuration config = new Configuration();
+    public static PlannerConfiguration getDefaultConfiguration() {
+        PlannerConfiguration config = new PlannerConfiguration();
         config.setPlanner(Setting.Planner.HSP);
         config.setDomain(Setting.DEFAULT_DOMAIN);
         config.setProblem(Setting.DEFAULT_PROBLEM);
@@ -148,7 +147,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      */
     public static void main(String[] args) {
         try {
-            Configuration config = new Configuration(args, HSP.getDefaultConfiguration());
+            PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
             HSP planner = new HSP(config);
             planner.solve();
         } catch (Throwable t) {

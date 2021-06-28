@@ -116,6 +116,10 @@ public enum Setting {
          */
         FF,
         /**
+         * The generic planner.
+         */
+        GENERIC,
+        /**
          * The TFD (Total Fast Downward) HTN Planner.
          */
         TFD,

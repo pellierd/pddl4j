@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.planners.Configuration;
 import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
@@ -24,7 +24,6 @@ import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Level;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This interface defines the main methods to access a state space planner.
@@ -53,8 +52,8 @@ public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
      *
      * @return the default configuration of the planner.
      */
-    static Configuration getDefaultConfiguration() {
-        final Configuration config = Planner.getDefaultConfiguration();
+    static PlannerConfiguration getDefaultConfiguration() {
+        final PlannerConfiguration config = Planner.getDefaultConfiguration();
         config.setPlanner(Setting.Planner.HSP);
         config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
         config.setHeuristicWeight(1.0);

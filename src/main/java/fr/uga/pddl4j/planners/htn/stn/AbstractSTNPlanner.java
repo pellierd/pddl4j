@@ -23,7 +23,7 @@ import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
-import fr.uga.pddl4j.planners.Configuration;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
@@ -65,7 +65,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
      *
      * @param configuration the configuration of the planner.
      */
-    public AbstractSTNPlanner(final Configuration configuration) {
+    public AbstractSTNPlanner(final PlannerConfiguration configuration) {
         super(configuration);
     }
 
@@ -312,7 +312,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             throw new RuntimeException("Invalid planner configuration");
         }
 
-        final Configuration config = this.getConfiguration();
+        final PlannerConfiguration config = this.getConfiguration();
         this.setTraceLevel(config.getTraceLevel());
 
         // Parses the PDDL domain and problem description
