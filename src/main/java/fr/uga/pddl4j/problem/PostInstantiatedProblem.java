@@ -715,7 +715,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 methods.remove(i);
                 for (int j = 0; j < this.getRelevantMethods().size(); j++) {
                     final List<Integer> relevant = this.getRelevantMethods().get(j);
-                    if (relevant.remove(new Integer(i))) {
+                    if (relevant.remove(Integer.valueOf(i))) {
                         //System.out.println("remove " + i);
                         this.updateRelevantMethods(i);
                         // There is no more relevant method for the compound task

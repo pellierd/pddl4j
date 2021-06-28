@@ -1044,10 +1044,10 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case LESS_ORDERING_CONSTRAINT:
                 IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new Integer(exp.getAtom().get(0).getImage().substring(1)));
+                t1.setTaskID(Integer.valueOf(exp.getAtom().get(0).getImage().substring(1)));
                 intExp.addChild(t1);
                 IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new Integer(exp.getAtom().get(1).getImage().substring(1)));
+                t2.setTaskID(Integer.valueOf(exp.getAtom().get(1).getImage().substring(1)));
                 intExp.addChild(t2);
                 break;
             default:
@@ -1212,7 +1212,7 @@ public abstract class AbstractProblem implements Problem {
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
-                    intExp.setTaskID(new Integer(exp.getTaskID().getImage().substring(1)));
+                    intExp.setTaskID(Integer.valueOf(exp.getTaskID().getImage().substring(1)));
                 }
                 intExp.setArguments(args);
                 break;
