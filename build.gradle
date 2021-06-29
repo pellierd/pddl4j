@@ -24,7 +24,6 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'fr.uga'
 version '4.0'
-//mainClassName 'fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory'
 
 sourceCompatibility = 1.8
 
@@ -50,7 +49,7 @@ compileJavacc {
 jjdoc {
     inputDirectory = file('src/main/java/fr/uga/pddl4j/parser/lexer/')
     outputDirectory = file('build/docs/PDDL4J_BNF')
-    arguments = [BNF: 'true', TEXT: 'true', ONE_TABLE: 'true']
+    arguments = [TEXT: 'false', ONE_TABLE: 'true']
 
 }
 
@@ -99,8 +98,7 @@ task run (type: JavaExec, dependsOn: build){
 
     jvmArgs = ["-javaagent:"+project.buildDir.name+"/libs/"+project.name+"-"+project.version+".jar", "-server", "-Xms2048m", "-Xmx2048m"]
 
-    description = "Run HSP planning algorithm"
-    main = "fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory"
+    main = "fr.uga.pddl4j.planners.PlannerConfiguration"
     classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -108,11 +106,16 @@ clean{
     delete 'build', 'out', fileTree(dir: "src/main/java/fr/uga/pddl4j/parser/lexer", exclude:"Lexer.jj")
 }
 
-javadoc.doFirst() {
-    excludeLexer(javadoc)
+javadoc {
     failOnError false
     title = "PDDL4J API Documentation"
+    options.setOverview("src/overview.html")
+    options.setWindowTitle("PDDL4J API Documentation");
+    options.showFromProtected()
+    excludeLexer(javadoc)
+    include("**/*.java")
 }
+
 
 checkstyleMain.onlyIf() { !project.hasProperty('noCheckStyle') }
 

@@ -47,8 +47,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Implements the <code>PDDLParser</code> of the PDD4L library. The parser accepts only PDDL3.0 language.
- * See BNF Description of PDDL3.0 - Alfonso Gerevini and Derek Long for more details.
+ * Implements the <code>PDDLParser</code> of the PDD4L library.
  *
  * <p>
  * A simple example of how to use the parser:

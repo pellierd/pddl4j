@@ -273,7 +273,6 @@ TOKEN : {
 |   < TASKS : ":tasks" >
 |   < SUBTASKS : ":subtasks" >// ADD HDDL
 |   < ORDERING : ":ordering" > // ADD HDDL
-|   < SORTOF : "sortof" > // ADD HDDL
 }
 
 TOKEN :
@@ -2063,44 +2062,10 @@ PDDLExpression htn_constraint() : // ADD HDDL
             node = equal_atomic_formula()
     |   LOOKAHEAD(4)
             node = not_equal_atomic_formula()
-//    |   LOOKAHEAD(4)
-//            node = sortof_constraints()
-//    |   LOOKAHEAD(4)
-//          node = not_sortof_constraints()
     ) {
         return node;
     }
 }
-
-/*PDDLExpression sortof_constraints() : // ADD HDDL
-{
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SORT_OF_CONSTRAINT);
-    PDDLSymbol variable = null;
-    List<PDDLSymbol> types = null;
-}
-{
-    <LEFT_BRACKET> <SORTOF> variable=variable() <SUB> types=type() <RIGHT_BRACKET> {
-        PDDLTypedSymbol typedVariable = new PDDLTypedSymbol(variable);
-        for (PDDLSymbol type : types) {
-            typedVariable.addType(type);
-        }
-        List<PDDLTypedSymbol> variables = new ArrayList<PDDLTypedSymbol>();
-        variables.add(typedVariable);
-        exp.setVariables(variables);
-        return exp;
-    }
-}
-
-PDDLExpression not_sortof_constraints() : // ADD HDDL
-{
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SORT_OF_CONSTRAINT);
-}
-{
-    <LEFT_BRACKET> <NOT> exp=sortof_constraints() <RIGHT_BRACKET> {
-        return exp;
-    }
-}*/
-
 
 PDDLDerivedPredicate derived_def() :
 {
