@@ -293,11 +293,10 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         final StringBuilder strb = new StringBuilder();
         strb.append("\nusage of the planner:\n")
             .append("OPTIONS   DESCRIPTIONS\n")
-            .append("-d <str>    hddl domain file name\n")
-            .append("-p <str>    hddl problem file name\n")
-            .append("-l <num>    trace level\n")
-            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 300)\n")
-            .append("-h          print this message\n\n");
+            .append("-o <str>    hddl domain file name\n")
+            .append("-f <str>    hddl problem file name\n")
+            .append("-v <num>    trace level\n")
+            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 600)\n");
         System.out.println(strb.toString());
     }
 
@@ -308,7 +307,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
      * @throws FileNotFoundException if the domain or the problem file does not exist.
      */
     public Plan solve() throws FileNotFoundException {
-        if (!this.hasValidConfiguration()) {
+        if (!this.checkConfiguration()) {
             throw new RuntimeException("Invalid planner configuration");
         }
 
@@ -421,14 +420,26 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         return null;
     }
 
+    /**
+     * Checks the planner configuration and returns if the configuration is valid. A configuration is valid if the
+     * timeout allocated to the search is greter than 0.
+     *
+     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
+     */
     @Override
-    public boolean hasValidConfiguration() {
-        return true;
+    public boolean checkConfiguration() {
+        return this.getConfiguration().getTimeout() > 0;
     }
 
+    /**
+     * Instantiates the planning problem from a parsed problem.
+     *
+     * @param problem the problem to instantiate.
+     * @return the instantiated planning problem or null if the problem cannot be instantiated.
+     */
     @Override
     public HTNProblem instantiate(final ParsedProblem problem) {
-        HTNProblem pb = new HTNProblem(problem);
+        final HTNProblem pb = new HTNProblem(problem);
         pb.instantiate();
         return pb;
     }

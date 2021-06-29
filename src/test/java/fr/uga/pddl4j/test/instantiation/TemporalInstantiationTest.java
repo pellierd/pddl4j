@@ -13,7 +13,7 @@
  * <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.test.encoding;
+package fr.uga.pddl4j.test.instantiation;
 
 import fr.uga.pddl4j.test.Tools;
 

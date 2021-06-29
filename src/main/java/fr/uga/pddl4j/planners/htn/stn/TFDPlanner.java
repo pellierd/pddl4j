@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.HTNProblem;
@@ -26,6 +27,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -36,9 +38,31 @@ import java.util.PriorityQueue;
  * implementation of the total order STN procedure describes in the book of Automated Planning of Ghallab and al.
  * page 239.
  *
+ * <p>The command line to launcg the planner is as follow:</p>
+ *
+ * <pre>
+ * Usage of TFDPlanner:
+ *
+ * OPTIONS   DESCRIPTIONS
+ *
+ * -o <i>str</i>   the path to the domain
+ * -f <i>str</i>   the path to the problem
+ * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
+ * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+ * </pre>
+ *
+ * <p>Commande line example:</p>
+ * <pre>
+ *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner
+ *          -o src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl
+ *          -f src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl
+ * </pre>
+ *
  * @author D. Pellier
  * @version 1.0 - 15.04.2020
  * @since 4.0
+ *
+ * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
 public final class TFDPlanner extends AbstractSTNPlanner {
 
@@ -229,33 +253,34 @@ public final class TFDPlanner extends AbstractSTNPlanner {
      * follow:
      *
      * <pre>
-     * usage of TFDPlanner:
+     * Usage of TFDPlanner:
      *
      * OPTIONS   DESCRIPTIONS
      *
-     * -d <i>str</i>   operator file name
-     * -p <i>str</i>   fact file name
-     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 300)
-     * -h              print this message
-     *
+     * -o <i>str</i>   the path to the domain
+     * -f <i>str</i>   the path to the problem
+     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
+     * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
      * </pre>
      *
-     * <p>
-     * Commande line example:
-     * <code>java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.tfd.TFDPlanner</code><br>
-     * <code>  -d src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl</code><br>
-     * <code>  -p src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl</code><br>
-     * </p>
+     * <p>Commande line example:</p>
+     * <pre>
+     *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner
+     *          -o src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl
+     *          -f src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl
+     * </pre>
      *
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
         try {
             final PlannerConfiguration config = new PlannerConfiguration(args, TFDPlanner.getDefaultConfiguration());
-            final TFDPlanner planner = new TFDPlanner(config);
+            final Planner planner = new TFDPlanner(config);
             planner.solve();
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }  catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
 
     }

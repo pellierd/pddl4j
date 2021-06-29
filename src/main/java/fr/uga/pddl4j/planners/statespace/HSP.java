@@ -22,6 +22,7 @@ package fr.uga.pddl4j.planners.statespace;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
@@ -33,13 +34,41 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 
 /**
- * This class implements a simple forward planner based on A* algorithm.
+ * This class implements a simple state space planner based on A* algorithm. It is possible to choose the heuristic
+ * function used and its weight.
+ *
+ * <p>The command line syntax to launch the planner is as follow:</p>
+ *
+ * <pre>
+ * Usage of HSP:
+ *
+ * OPTIONS   DESCRIPTIONS
+ *
+ * -o <i>str</i>   the path to the domain
+ * -f <i>str</i>   the path to the problem
+ * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
+ * -h <i>heuristic</i>  the heuristics: FAST_FORWARD, MAX, SUM, SUM_MUTEX, SET_LEVEL, COMBO, ADJUSTED_SUM,
+ *                          ADJUSTED_SUM2, ADJUSTED_SUM2M (preset: FAST_FORWARD)
+ * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+ *
+ * </pre>
+ *
+ * <p>Commande line example:</p>
+ * <pre>
+ *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.statespace.HSP
+ *        -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
+ *        -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed//pb01.pddl
+ *        -h FAST_FORWARD
+ * </pre>
  *
  * @author D. Pellier
  * @version 1.0 - 14.06.2010
+ * @see fr.uga.pddl4j.planners.PlannerConfiguration
+ * @see fr.uga.pddl4j.planners.Setting.Heuristic
  */
 public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
 
@@ -100,13 +129,16 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * Returns if the planner configuration is valide or not.
+     * Returns if the planner configuration is valid or not. A configuration is valid is the timeout is greater than 0,
+     * the heuristic weight is greater than 0.0 and the heuristic to use is set.
      *
      * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
      */
     @Override
-    public boolean hasValidConfiguration() {
-        return true;
+    public boolean checkConfiguration() {
+        return this.getConfiguration().getTimeout() > 0
+            && this.getConfiguration().getHeuristicWeight() > 0.0
+            && this.getConfiguration().getHeuristic().equals(Setting.Heuristic.NONE);
     }
 
     /**
@@ -141,17 +173,41 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * The main method of HSP planner.
+     * The main method of the <code>HSP</code> planner. The command line syntax is as follow:
      *
-     * @param args the command line arguments.
+     * <pre>
+     * Usage of HSP:
+     *
+     * OPTIONS   DESCRIPTIONS
+     *
+     * -o <i>str</i>   the path to the domain
+     * -f <i>str</i>   the path to the problem
+     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
+     * -h <i>heuristic</i>  the heuristics: FAST_FORWARD, MAX, SUM, SUM_MUTEX, SET_LEVEL, COMBO, ADJUSTED_SUM,
+     *                          ADJUSTED_SUM2, ADJUSTED_SUM2M (preset: FAST_FORWARD)
+     * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+     *
+     * </pre>
+     *
+     * <p>Commande line example:</p>
+     * <pre>
+     *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.statespace.HSP
+     *        -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
+     *        -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed//pb01.pddl
+     *        -h FAST_FORWARD
+     * </pre>
+     *
+     * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
         try {
-            PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
-            HSP planner = new HSP(config);
+            final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
+            Planner planner = new HSP(config);
             planner.solve();
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            LOGGER.fatal(e.getMessage());
+        }  catch (FileNotFoundException e) {
+            LOGGER.fatal(e.getMessage());
         }
     }
 }

@@ -14,6 +14,8 @@
  */
 
 /**
- * This package contains the classes of the planners implemented inot the PDDL4J Library.
+ * This package contains the classes of the planners implemented in the PDDL4J Library.
+ *
+ * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
 package fr.uga.pddl4j.planners;

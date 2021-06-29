@@ -82,7 +82,7 @@ public enum Setting {
     /**
      * The default value of the heuristic setting (NONE).
      */
-    public static final Setting.Heuristic DEFAULT_HEURISTIC = Setting.Heuristic.NONE;
+    public static final Heuristic DEFAULT_HEURISTIC = Heuristic.NONE;
 
     /**
      * The default value of the heuristic weight setting (1.0).

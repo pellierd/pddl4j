@@ -33,6 +33,26 @@ import java.util.Properties;
 /**
  * This class implements a planner configuration. A planner configuration is used to create a planner.
  *
+ * <p>To create a planner with a specific configuration use the following example code:</p>
+ * <pre>
+ *      PlannerConfiguration config = new PlannerConfiguration();
+ *      config.setPlanner(Setting.Planner.HSP);
+ *      config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
+ *      config.setWeightHeuristic(1.0);
+ *      config.setTraceLevel(Level.INFO);
+ *      Planner planner = config.buildPlanner();
+ *      planner.solve();
+ * </pre>
+ *
+ * <p>Find below a command line example to launch the generic planner with ASTAR search strategy and MAX heuristic:</p>
+ * <pre>
+ *     java -server -Xms2048m -Xmx2048m -jar build/libs/pddl4j-4.0-all.jar
+ *          -p GENERIC
+ *          -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
+ *          -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
+ *          -h MAX
+ *          -s ASTAR
+ * </pre>
  *
  * @author D. Pellier
  * @version 1.0 - 18.06.2020
@@ -128,7 +148,11 @@ public class PlannerConfiguration implements Serializable {
                 }
                 this.setTimeout(timeout);
             } else if ("-h".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                this.setHeuristic(Setting.Heuristic.valueOf(args[i + 1]));
+                try {
+                    this.setHeuristic(Setting.Heuristic.valueOf(args[i + 1]));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid heuristic: " + args[i + 1]);
+                }
             } else if ("-w".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
                 final double weight = Double.parseDouble(args[i + 1]);
                 if (weight < 0) {
@@ -136,9 +160,17 @@ public class PlannerConfiguration implements Serializable {
                 }
                 this.setHeuristicWeight(weight);
             } else if ("-v".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                this.setTraceLevel(Level.valueOf(args[i + 1]));
+                try {
+                    this.setTraceLevel(Level.valueOf(args[i + 1]));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid trace level: " + args[i + 1]);
+                }
             } else if ("-s".equalsIgnoreCase(args[i]) && ((i + 1) < args.length)) {
-                this.setSearchStrategy(Setting.SearchStrategy.valueOf(args[i + 1]));
+                try {
+                    this.setSearchStrategy(Setting.SearchStrategy.valueOf(args[i + 1]));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid search strategy: " + args[i + 1]);
+                }
             } else {
                 throw new IllegalArgumentException("Unexpected argument or option: " + args[i]);
             }
@@ -384,17 +416,46 @@ public class PlannerConfiguration implements Serializable {
     }
 
     /**
-     * The main method of the PDDL4J library.
+     * The main method of the PDDL4J library. The command line syntax is as follow:
      *
-     * @param args the command line arguments.
+     * <pre>
+     * usage of PlannerConfiguration:
+     *
+     * OPTIONS   DESCRIPTIONS
+     *
+     * -p <i>planner</i>    the planner to use: FF, HSP, GENERIC, TFD, PFD
+     * -o <i>str</i>        the path to the domain
+     * -f <i>str</i>        the path to the problem
+     * -t <i>num</i>        specifies the maximum CPU-time in seconds (preset: 600)
+     * -s <i>strategy</i>   the search strategies: ASTAR, ENFORCE_HILL_CLIMBING, HILL_CLIMBING, GREEDY_BEST_FIRST,
+     *                          DEPTH_FIRST, BREADTH_FIRST (preset: ASTAR);
+     * -h <i>heuristic</i>  the heuristics: FAST_FORWARD, MAX, SUM, SUM_MUTEX, SET_LEVEL, COMBO, ADJUSTED_SUM,
+     *                          ADJUSTED_SUM2, ADJUSTED_SUM2M (preset: FAST_FORWARD)
+     * -v <i>level</i>      the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+     *
+     * </pre>
+     *
+     * <p>Commande line example:</p>
+     * <pre>
+     * java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.PlannerConfiguration
+     *      -p HSP
+     *      -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
+     *      -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/pb01.pddl
+     *      -s ASTAR
+     *      -h FAST_FORWARD
+     * </pre>
+     *
+     * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
         try {
             final PlannerConfiguration config = new PlannerConfiguration(args);
             final Planner planner = config.buildPlanner();
             planner.solve();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }  catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

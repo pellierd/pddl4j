@@ -179,11 +179,11 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     }
 
     /**
-     * Check the planner configuration and return if the configuration is valide.
+     * Checks the planner configuration and returns if the configuration is valid.
      *
      * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
      */
-    public abstract boolean hasValidConfiguration();
+    public abstract boolean checkConfiguration();
 
     /**
      * Solves the problem as defined by the planner configuration.
@@ -192,7 +192,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * @throws FileNotFoundException domain of problem files does not exist.
      */
     public Plan solve() throws FileNotFoundException {
-        if (!this.hasValidConfiguration()) {
+        if (!this.checkConfiguration()) {
             throw new RuntimeException("Invalid planner configuration");
         }
 

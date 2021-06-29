@@ -22,6 +22,7 @@ package fr.uga.pddl4j.planners.statespace;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
@@ -34,16 +35,40 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 
 /**
- * This class implements Fast Forward planner based on Enforced Hill Climbing Algorithm and
- * Greedy Best First Search.
+ * This class implements Fast Forward planner based on Enforced Hill Climbing algorithm and AStar search.
+ *
+ *
+ * <p>The command line syntax to launch the planner is as follow:</p>
+ *
+ * <pre>
+ * Usage of FF:
+ *
+ * OPTIONS   DESCRIPTIONS
+ *
+ * -o <i>str</i>   the path to the domain
+ * -f <i>str</i>   the path to the problem
+ * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
+ * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+ *
+ * </pre>
+ *
+ * <p>Commande line example:</p>
+ * <pre>
+ *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.statespace.FF
+ *        -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
+ *        -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed//pb01.pddl
+ * </pre>
  *
  * @author Samuel Aaron Boyd
  * @author E. Hermellin
  * @author D. Pellier
  * @version 2.0 - 24.01.2018
+ *
+ * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
 public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
 
@@ -124,13 +149,15 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * Returns if the planner configuration is valide or not.
+     * Returns if the planner configuration is valid or not. A configuration is valid is the timeout is greater than 0
+     * and the heuristic weight is greater than 0.0.
      *
      * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
      */
     @Override
-    public boolean hasValidConfiguration() {
-        return true;
+    public boolean checkConfiguration() {
+        return this.getConfiguration().getTimeout() > 0
+            && this.getConfiguration().getHeuristicWeight() > 0.0;
     }
 
 
@@ -166,18 +193,38 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * The main method of FF planner.
+     * The main method of the <code>FF</code> planner. The command line syntax is as follow:
      *
-     * @param args the command line arguments.
+     * <pre>
+     * Usage of FF:
+     *
+     * OPTIONS   DESCRIPTIONS
+     *
+     * -o <i>str</i>   the path to the domain
+     * -f <i>str</i>   the path to the problem
+     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
+     * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+     *
+     * </pre>
+     *
+     * <p>Commande line example:</p>
+     * <pre>
+     *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.statespace.FF
+     *        -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
+     *        -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed//pb01.pddl
+     * </pre>
+     *
+     * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
         try {
-            PlannerConfiguration config = new PlannerConfiguration(args, FF.getDefaultConfiguration());
-            FF planner = new FF(config);
+            final PlannerConfiguration config = new PlannerConfiguration(args, FF.getDefaultConfiguration());
+            Planner planner = new FF(config);
             planner.solve();
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }  catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
-
     }
 }

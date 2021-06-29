@@ -122,7 +122,7 @@ public interface Planner<T extends Problem> extends Serializable {
      *
      * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
     */
-    boolean hasValidConfiguration();
+    boolean checkConfiguration();
 
 
 }
