@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
  * @author D. Pellier
  * @version 1.1 - 23.06.16
  */
+@SuppressWarnings({"unchecked"})
 public abstract class Tools {
 
     /**

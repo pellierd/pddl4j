@@ -203,7 +203,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
     public static void main(String[] args) {
         try {
             final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
-            Planner<ADLProblem> planner = new HSP(config);
+            HSP planner = new HSP(config);
             //planner.solve();
             ParsedProblem parsedproblem = planner.parse();
             ADLProblem pb = planner.instantiate(parsedproblem);
