@@ -160,7 +160,8 @@ test {
     //includes = ['**/HTNProblemInstantiationTest.class']
     //includes = ['**/TemporalProblemInstantiationTest.class']
     //includes = ['**/HSPTest.class']
-    includes = ['**/FFTest.class']
+    //includes = ['**/FFTest.class']
+    includes = ['**/GenericPlannerTest.class']
 
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
     //includes = ['**/TFDPlannerTest.class']

@@ -342,7 +342,8 @@ public abstract class Tools {
             oneDomainPerProblem = true;
         }
 
-        System.out.println("Test " + config.getPlanner() + " planner on " + currentTestPath);
+        System.out.println("Test " + config.getPlanner() + " planner (" + config.getSearchStrategy() + ", "
+            + config.getHeuristic() + ") on " + currentTestPath);
         // Loop around problems in one category
         int fillLength = Math.max(Integer.toString(nbTest).length(), 2);
         for (int i = 1; i < nbTest + 1; i++) {
@@ -467,7 +468,7 @@ public abstract class Tools {
         }
         Tools.cleanValPlan(currentTestPath);
     }
-    
+
     /**
      * Encode problems targeted in currentTestPath directory and check if they are solvable.
      *
