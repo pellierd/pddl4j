@@ -42,13 +42,6 @@ import java.util.Set;
 public interface Problem extends Serializable {
 
     /**
-     * Returns the PDDL domain of the problem.
-     *
-     * @return the PDDL domain of the problem.
-     */
-    //PDDLDomain getPDDLDomain();
-
-    /**
      * Returns the PDDL problem of the problem.
      *
      * @return the PDDL problem of the problem.

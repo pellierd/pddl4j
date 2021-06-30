@@ -118,7 +118,7 @@ public interface Planner<T extends Problem> extends Serializable {
     Statistics getStatistics();
 
     /**
-     * Returns if the planner configuration is valide or not.
+     * Returns if the planner configuration is valid or not.
      *
      * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
     */

@@ -111,7 +111,8 @@ public class GenericPlannerTest {
                             this.config.setHeuristic(heuristic);
                             Tools.solve(path, Tools.PDDL_EXT, this.config);
                         }
-                }
+                    }
+                    break;
                 default:
                     break;
             }

@@ -59,19 +59,18 @@ public class TFDPlannerTest {
     private static final Level TRACE_LEVEL = Level.OFF;
 
     /**
-     * The TFDPlanner planner reference.
+     * The planner configuration used to run the tests.
      */
-    private TFDPlanner planner = null;
+    private PlannerConfiguration config;
 
     /**
      * Test initialization.
      */
     @Before
     public void initTest() {
-        PlannerConfiguration config = TFDPlanner.getDefaultConfiguration();
+        this.config = TFDPlanner.getDefaultConfiguration();
         config.setTimeout(TFDPlannerTest.TIMEOUT);
         config.setTraceLevel(TFDPlannerTest.TRACE_LEVEL);
-        this.planner = new TFDPlanner(config);
         Tools.changeVALPerm();
     }
 
@@ -85,8 +84,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -99,8 +97,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -113,8 +110,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test3" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -127,8 +123,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test4" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -141,8 +136,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test5" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -155,8 +149,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/barman" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -169,8 +162,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -183,8 +175,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/gripper" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -197,8 +188,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/miconic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -211,8 +201,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/rover" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -225,8 +214,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/satellite" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -239,8 +227,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/smartphone" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -253,8 +240,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/transport" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -267,8 +253,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/umtranslog" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -281,8 +266,7 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/woodworking" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 
     /**
@@ -295,98 +279,6 @@ public class TFDPlannerTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/zenotravel" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        this.generateValOutputPlans(localTestPath);
-        Tools.validateHDDLPlans(localTestPath);
-    }
-
-    /**
-     * Generate output plan KLC-planning validator formatted.
-     *
-     * @param currentTestPath the current sub dir to test
-     */
-    private void generateValOutputPlans(String currentTestPath) {
-        Tools.cleanValPlan(currentTestPath);
-        String currentDomain = currentTestPath + Tools.HDDL_DOMAIN;
-
-        String currentProblem;
-
-        // Counting the number of problem files
-        File[] pbFileList = new File(currentTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(Tools.HDDL_EXT) && !name.contains("dom"));
-
-        int nbTest = 0;
-        if (pbFileList != null) {
-            nbTest = pbFileList.length;
-        }
-
-        System.out.println("PFDPlannerTest: Test PFD planner on " + currentTestPath + "\n");
-        // Loop around problems in one category
-        for (int i = 1; i < nbTest + 1; i++) {
-            String problemFile;
-            if (i < 10) {
-                if (nbTest < 100) {
-                    problemFile = "p0" + i + Tools.HDDL_EXT;
-                } else {
-                    problemFile = "p00" + i + Tools.HDDL_EXT;
-                }
-            } else if (i < 100) {
-                if (nbTest < 100) {
-                    problemFile = "p" + i + Tools.HDDL_EXT;
-                } else {
-                    problemFile = "p0" + i + Tools.HDDL_EXT;
-                }
-            } else {
-                problemFile = "p" + i + Tools.HDDL_EXT;
-            }
-
-            currentProblem = currentTestPath + problemFile;
-
-            // Parses the HDDL domain and problem description
-            try {
-                ParsedProblem parsedProblem = this.planner.parse(currentDomain, currentProblem);
-                ErrorManager errorManager = this.planner.getParserErrorManager();
-                if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
-                    errorManager.print(Message.Type.LEXICAL_ERROR);
-                }
-                if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
-                    errorManager.print(Message.Type.PARSER_ERROR);
-                }
-                Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty());
-                Assert.assertTrue(errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
-
-                Plan plan = null;
-                // Encodes and instantiates the problem in a compact representation
-                System.out.println("* Encoding [" + currentProblem + "]" + "...");
-                try {
-                    HTNProblem pb = this.planner.instantiate(parsedProblem);
-                    if (pb.isSolvable()) {
-                        // Searches for a solution plan
-                        System.out.println("* Trying to solve [" + currentProblem + "]"
-                            + " in " + TIMEOUT + " seconds");
-                        plan = this.planner.solve(pb);
-                    } else {
-                        System.err.println("* HDDLProblem [" + currentProblem + "]" + " not solvable.");
-                    }
-                    if (plan == null) { // no solution in TIMEOUT computation time
-                        System.out.println("* No solution found in " + TIMEOUT + " seconds for " + currentProblem);
-                        break;
-                    } else if (plan.isEmpty()) { // Empty solution
-                        System.out.println("* Empty solution for " + currentProblem);
-                    } else { // Save output plan
-                        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(currentProblem.substring(0,
-                            currentProblem.length() - Tools.HDDL_EXT.length()) + Tools.VAL_EXT))) {
-                            bw.write(pb.toString(plan.getHierarchy()));
-                        }
-                        System.out.println("* Solution found for " + currentProblem);
-                    }
-                } catch (OutOfMemoryError err) {
-                    System.err.println("ERR: " + err.getMessage() + " - test aborted");
-                    return;
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-            System.out.println();
-        }
+        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
     }
 }

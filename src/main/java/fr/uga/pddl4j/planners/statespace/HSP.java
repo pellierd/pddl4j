@@ -30,6 +30,7 @@ import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -202,11 +203,14 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
     public static void main(String[] args) {
         try {
             final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
-            Planner planner = new HSP(config);
-            planner.solve();
+            Planner<ADLProblem> planner = new HSP(config);
+            //planner.solve();
+            ParsedProblem parsedproblem = planner.parse();
+            ADLProblem pb = planner.instantiate(parsedproblem);
+            planner.solve(pb);
         } catch (IllegalArgumentException e) {
             LOGGER.fatal(e.getMessage());
-        }  catch (FileNotFoundException e) {
+        }  catch (java.io.IOException e) {
             LOGGER.fatal(e.getMessage());
         }
     }

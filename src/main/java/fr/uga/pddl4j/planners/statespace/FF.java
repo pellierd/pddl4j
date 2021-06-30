@@ -45,7 +45,7 @@ import java.util.Objects;
  * <p>The command line syntax to launch the planner is as follow:</p>
  *
  * <pre>
- * Usage of FF:
+ * usage of FF:
  *
  * OPTIONS   DESCRIPTIONS
  *
@@ -196,7 +196,7 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      * The main method of the <code>FF</code> planner. The command line syntax is as follow:
      *
      * <pre>
-     * Usage of FF:
+     * usage of FF:
      *
      * OPTIONS   DESCRIPTIONS
      *

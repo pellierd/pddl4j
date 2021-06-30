@@ -58,10 +58,12 @@ jjdoc {
 // Remove warning about log4j ProcessPlugin raised with --warning-mode=all
 compileJava {
     options.compilerArgs += '-proc:none'
+    options.compilerArgs += '-Xlint:unchecked'
 }
 
 compileTestJava {
     options.compilerArgs += '-proc:none'
+    options.compilerArgs += '-Xlint:unchecked'
 }
 
 checkstyle {
@@ -161,11 +163,10 @@ test {
     //includes = ['**/TemporalProblemInstantiationTest.class']
     //includes = ['**/HSPTest.class']
     //includes = ['**/FFTest.class']
-    includes = ['**/GenericPlannerTest.class']
-
-    //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
+    //includes = ['**/GenericPlannerTest.class']
     //includes = ['**/TFDPlannerTest.class']
-    //includes = ['**/TemporalInstantiationTest.class']
+    includes = ['**/PFDPlannerTest.class']
+
 
 }
 

@@ -308,16 +308,6 @@ public abstract class AbstractProblem implements Problem {
         this.problem = problem;
     }
 
-
-    /**
-     * Returns the parsed domain used to create of this problem.
-     *
-     * @return the parsed domain used to create of this problem.
-     */
-    //public final PDDLDomain getPDDLDomain() {
-    //    return this.domain;
-    //}
-
     /**
      * Returns the parsed problem used to create this problem.
      *
@@ -503,7 +493,7 @@ public abstract class AbstractProblem implements Problem {
      * @throws RequirementNotSupportedException if the requirements of the domain and the problem are not supported.
      */
     protected void initRequirements() throws RequirementNotSupportedException {
-        this.requirements = new LinkedHashSet<>();
+        this.requirements = new LinkedHashSet<PDDLRequireKey>();
         this.requirements.addAll(this.problem.getRequirements());
 
         if (!this.getAcceptedRequirements().containsAll(this.requirements)) {

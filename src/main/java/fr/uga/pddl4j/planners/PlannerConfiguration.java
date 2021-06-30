@@ -21,6 +21,7 @@ import fr.uga.pddl4j.planners.htn.stn.TFDPlanner;
 import fr.uga.pddl4j.planners.statespace.FF;
 import fr.uga.pddl4j.planners.statespace.GenericPlanner;
 import fr.uga.pddl4j.planners.statespace.HSP;
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -438,7 +439,6 @@ public class PlannerConfiguration implements Serializable {
      * <p>Commande line example:</p>
      * <pre>
      * java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.PlannerConfiguration
-     *      -p HSP
      *      -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
      *      -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/pb01.pddl
      *      -s ASTAR

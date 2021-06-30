@@ -396,10 +396,12 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             if (plan != null) {
                 if (LOGGER.isInfoEnabled()) {
                     StringBuilder strb = new StringBuilder();
-                    //strb.append(pb.toString(plan.getHierarchy()));
                     strb.append("Found plan as follows:\n");
                     strb.append(pb.toString(plan));
-                    strb.append(String.format("%nPlan total cost      : %4.2f%n", plan.cost()));
+                    //strb.append("\n\n");
+                    //strb.append("Plan decomposition as follows ");
+                    //strb.append(pb.toString(plan.getHierarchy()));
+                    strb.append(String.format("\nPlan total cost      : %4.2f%n", plan.cost()));
                     strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
                     strb.append(String.format("Searching time       : %4.3fs%n", searchTime));
                     strb.append(String.format("Total time           : %4.3fs%n%n", searchTime + instantiationTime));
@@ -412,6 +414,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         if (LOGGER.isInfoEnabled()) {
             StringBuilder strb = new StringBuilder();
             strb.append(String.format(String.format("\n%nproblem with no solution plan found%n%n")));
+            //strb.append("\n\n");
+            //strb.append("Plan decomposition as follows ==> <==");
             strb.append(String.format("Encoding time        : %4.3fs", instantiationTime));
             strb.append(String.format("Searching time       : %4.3fs", 0.0));
             strb.append(String.format("Total time           : %4.3fs%n%n", instantiationTime));
