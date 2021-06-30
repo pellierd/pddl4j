@@ -21,6 +21,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -35,20 +36,6 @@ import java.util.regex.Pattern;
  * @version 1.1 - 23.06.16
  */
 public abstract class Tools {
-
-    /**
-     * This enumeration defines the type of file: PDDLDomain or PDDLProblem.
-     */
-    public enum FileType {
-        /**
-         * The DOMAIN file.
-         */
-        DOMAIN_FILE,
-        /**
-         * The PROBLEM file.
-         */
-        PROBLEM_FILE,
-    }
 
     /**
      * The path of the pddl benchmarks files.
@@ -317,7 +304,6 @@ public abstract class Tools {
             System.out.println("--");
             Assert.assertEquals(files.length, nbValidated);
         }
-
         Tools.cleanValPlan(currentTestPath);
 
     }
@@ -328,7 +314,7 @@ public abstract class Tools {
      * @param currentTestPath the current directory to test.
      * @param level the trace level.
      */
-    public static void instantiatePDDLProblems(String currentTestPath, int level) {
+    public static void instantiateADLProblems(String currentTestPath, int level) {
         String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -336,7 +322,7 @@ public abstract class Tools {
 
         // Counting the number of problem files
         File[] pbFileList = new File(currentTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"));
+            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(Tools.PDDL_EXT) && !name.contains("dom"));
 
         int nbTest = 0;
         if (pbFileList != null) {
@@ -615,7 +601,30 @@ public abstract class Tools {
      * @return all issues report as a ArrayList of String
      * @throws Exception if something wrong.
      */
-    public static ArrayList<String> parsePDDL(String currentTestPath) throws Exception {
+    public static List<String> parsePDDL(String currentTestPath) throws Exception {
+        return Tools.parse(currentTestPath, Tools.PDDL_EXT);
+    }
+
+    /**
+     * Instantiate the PDDLParser and parse all domains and problems in the specified test path.
+     *
+     * @param currentTestPath the path where try to find domain and problems pddl files.
+     * @return all issues report as a ArrayList of String.
+     * @throws Exception if something wrong.
+     */
+    public static List<String> parseHDDL(String currentTestPath) throws Exception {
+        return Tools.parse(currentTestPath, Tools.HDDL_EXT);
+    }
+
+    /**
+     * Instantiate the PDDLParser and parse all domains and problems in the specified test path.
+     *
+     * @param currentTestPath the path where try to find domain and problems pddl files
+     * @param extension the file extension .pddl or .hddl
+     * @return all issues report as a ArrayList of String
+     * @throws Exception if something wrong.
+     */
+    public static List<String> parse(String currentTestPath, String extension) throws Exception {
 
         if (!Tools.isBenchmarkExist(currentTestPath)) {
             System.out.println("missing benchmark directory + \"" + currentTestPath + "\" test skipped !");
@@ -624,14 +633,14 @@ public abstract class Tools {
 
         final PDDLParser parser = new PDDLParser();
         final ArrayList<String> errors = new ArrayList<>();
-        String currentDomain = currentTestPath + Tools.PDDL_DOMAIN;
+        String currentDomain = currentTestPath + "domain" + extension;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
 
         // Counting the number of problem files
         File[] pbFileList = new File(currentTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(".pddl") && !name.contains("dom"));
+            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(extension) && !name.contains("dom"));
 
         int nbTest = 0;
         if (pbFileList != null) {
@@ -645,27 +654,16 @@ public abstract class Tools {
 
         System.out.println("\nPDDLParserTest: Test parser on " + currentTestPath);
         // Loop around problems in one category
+        int maxLength = Integer.toString(nbTest).length();
         for (int i = 1; i < nbTest + 1; i++) {
-            if (i < 10) {
-                if (nbTest < 100) {
-                    problemFile = "p0" + i + Tools.PDDL_EXT;
-                } else {
-                    problemFile = "p00" + i + Tools.PDDL_EXT;
-                }
-            } else if (i < 100) {
-                if (nbTest < 100) {
-                    problemFile = "p" + i + Tools.PDDL_EXT;
-                } else {
-                    problemFile = "p0" + i + Tools.PDDL_EXT;
-                }
-            } else {
-                problemFile = "p" + i + Tools.PDDL_EXT;
-            }
+            int fillLength = Math.max(maxLength - Integer.toString(i).length() + 1, 2);
+            String format = "p%0" + fillLength + "d" + extension;
+            problemFile = String.format(format, i);
 
             currentProblem = currentTestPath + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.PDDL_DOMAIN;
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-domain" + extension;
             }
 
             try {
@@ -674,7 +672,8 @@ public abstract class Tools {
                 ErrorManager errManager = parser.getErrorManager();
 
                 if (!parser.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()
-                    || !parser.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
+                        || !parser.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
+
                     Set<Message> domainMessages = errManager.getMessages(new File(currentDomain));
                     Set<Message> problemMessages = errManager.getMessages(new File(currentProblem));
 
@@ -683,7 +682,7 @@ public abstract class Tools {
                     domainMessages.forEach(dMsg -> builder.append(dMsg.toString()));
                     problemMessages.forEach(pMsg -> builder.append(pMsg.toString()));
 
-                    System.out.println("PDDLParser test: [FAILURE]");
+                    System.out.println("Parser test: [FAILURE]");
                     System.out.println("   * " + currentProblem);
                     System.out.println("   * " + currentDomain);
                     System.out.println("   * Errors:");
@@ -691,7 +690,7 @@ public abstract class Tools {
                     throw new Exception(builder.toString());
 
                 } else {
-                    System.out.println("PDDLParser test: [PASSED]");
+                    System.out.println("Parser test: [PASSED]");
                     System.out.println("   * " + currentProblem);
                     System.out.println("   * " + currentDomain);
                     if (!parser.getErrorManager().getMessages(Message.Type.PARSER_WARNING).isEmpty()) {
@@ -709,118 +708,10 @@ public abstract class Tools {
                 System.err.println("Test files not found !");
                 System.err.println("  -- " + currentDomain);
                 System.err.println("  -- " + currentProblem);
-                System.err.println("PDDLParser test aborted !");
+                System.err.println("Parser test aborted !");
+                fnfException.printStackTrace();
             }
         }
-
-        return errors;
-    }
-
-    /**
-     * Instantiate the PDDLParser and parse all domains and problems in the specified test path.
-     *
-     * @param currentTestPath the path where try to find domain and problems pddl files.
-     * @return all issues report as a ArrayList of String.
-     * @throws Exception if something wrong.
-     */
-    public static ArrayList<String> parseHDDL(String currentTestPath) throws Exception {
-
-        if (!Tools.isBenchmarkExist(currentTestPath)) {
-            System.out.println("missing benchmark directory + \"" + currentTestPath + "\" test skipped !");
-            return null;
-        }
-
-        final PDDLParser parser = new PDDLParser();
-        final ArrayList<String> errors = new ArrayList<>();
-        String currentDomain = currentTestPath + Tools.HDDL_DOMAIN;
-        boolean oneDomainPerProblem = false;
-        String problemFile;
-        String currentProblem;
-
-        // Counting the number of problem files
-        File[] pbFileList = new File(currentTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(Tools.HDDL_EXT) && !name.contains("dom"));
-
-        int nbTest = 0;
-        if (pbFileList != null) {
-            nbTest = pbFileList.length;
-        }
-
-        // Check if there is on domain per problem or a shared domain for all
-        if (!new File(currentDomain).exists()) {
-            oneDomainPerProblem = true;
-        }
-
-        System.out.println("\nHDDLParserTest: Test parser on " + currentTestPath);
-        // Loop around problems in one category
-        for (int i = 1; i < nbTest + 1; i++) {
-            if (i < 10) {
-                if (nbTest < 100) {
-                    problemFile = "p0" + i + Tools.HDDL_EXT;
-                } else {
-                    problemFile = "p00" + i + Tools.HDDL_EXT;
-                }
-            } else if (i < 100) {
-                if (nbTest < 100) {
-                    problemFile = "p" + i + Tools.HDDL_EXT;
-                } else {
-                    problemFile = "p0" + i + Tools.HDDL_EXT;
-                }
-            } else {
-                problemFile = "p" + i + Tools.HDDL_EXT;
-            }
-
-            currentProblem = currentTestPath + problemFile;
-
-            if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + Tools.HDDL_DOMAIN;
-            }
-
-            try {
-                parser.parse(currentDomain, currentProblem);
-
-                ErrorManager errManager = parser.getErrorManager();
-
-                if (!parser.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()
-                    || !parser.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
-                    Set<Message> domainMessages = errManager.getMessages(new File(currentDomain));
-                    Set<Message> problemMessages = errManager.getMessages(new File(currentProblem));
-
-                    final StringBuilder builder = new StringBuilder();
-
-                    domainMessages.forEach(dMsg -> builder.append(dMsg.toString()));
-                    problemMessages.forEach(pMsg -> builder.append(pMsg.toString()));
-
-                    System.out.println("HDDLParser test: [FAILURE]");
-                    System.out.println("   * " + currentProblem);
-                    System.out.println("   * " + currentDomain);
-                    System.out.println("   * Errors:");
-                    System.out.println(builder.toString());
-                    throw new Exception(builder.toString());
-
-                } else {
-                    System.out.println("HDDLParser test: [PASSED]");
-                    System.out.println("   * " + currentProblem);
-                    System.out.println("   * " + currentDomain);
-                    if (!parser.getErrorManager().getMessages(Message.Type.PARSER_WARNING).isEmpty()) {
-                        Set<Message> domainMessages = errManager.getMessages(new File(currentDomain));
-                        Set<Message> problemMessages = errManager.getMessages(new File(currentProblem));
-                        final StringBuilder builder = new StringBuilder();
-                        domainMessages.forEach(dMsg -> builder.append(dMsg.toString()));
-                        problemMessages.forEach(pMsg -> builder.append(pMsg.toString()));
-                        System.out.println("   * Warnings:");
-                        System.out.println(builder.toString());
-                    }
-                }
-
-            } catch (FileNotFoundException fnfException) {
-                System.err.println("Test files not found !");
-                System.err.println("  -- " + currentDomain);
-                System.err.println("  -- " + currentProblem);
-                System.err.println("HDDLParser test aborted !");
-            }
-        }
-
         return errors;
     }
 

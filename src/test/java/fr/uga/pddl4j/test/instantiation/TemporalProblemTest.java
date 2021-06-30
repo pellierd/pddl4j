@@ -32,7 +32,7 @@ import java.io.File;
  * @version 1.0 - 20.10.2020
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TemporalInstantiationTest {
+public class TemporalProblemTest {
 
     /**
      * Default Trace level.
@@ -50,7 +50,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -63,7 +63,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -76,7 +76,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -89,7 +89,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -102,7 +102,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -115,7 +115,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -128,7 +128,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -141,7 +141,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -154,7 +154,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -167,7 +167,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -180,7 +180,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -193,7 +193,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -206,7 +206,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -219,7 +219,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -232,7 +232,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -245,7 +245,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/time-simple-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -258,7 +258,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -271,7 +271,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -284,7 +284,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/time-simple-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -298,7 +298,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -311,7 +311,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -324,7 +324,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/temporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
      /**
@@ -338,7 +338,7 @@ public class TemporalInstantiationTest {
         + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -352,7 +352,7 @@ public class TemporalInstantiationTest {
         + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -366,7 +366,7 @@ public class TemporalInstantiationTest {
         + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -380,7 +380,7 @@ public class TemporalInstantiationTest {
         + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -394,7 +394,7 @@ public class TemporalInstantiationTest {
             + "ipc2004/pipesworld/no-tankage-temporal-deadlines-compiled-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -408,7 +408,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -422,7 +422,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -436,7 +436,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -449,7 +449,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/satellite/time-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -464,7 +464,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -478,7 +478,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -491,7 +491,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/umts/flaw-temporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -505,7 +505,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -519,7 +519,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -532,7 +532,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/umts/flaw-temporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -546,7 +546,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -560,7 +560,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -574,7 +574,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -588,7 +588,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -601,7 +601,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -614,7 +614,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/time-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -627,7 +627,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/metric-time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -640,7 +640,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pipesworld/metric-time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -654,7 +654,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -667,7 +667,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/rovers/metric-time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -680,7 +680,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/storage/time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -693,7 +693,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/storage/time-constraints" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -706,7 +706,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/tpp/metric-time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -719,7 +719,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/tpp/metric-time-constraints" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -732,7 +732,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/trucks/time" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -745,7 +745,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/trucks/time-constraints" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -759,7 +759,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -772,7 +772,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/trucks/time-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -786,7 +786,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -800,7 +800,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -814,7 +814,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -828,7 +828,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -842,7 +842,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -856,7 +856,7 @@ public class TemporalInstantiationTest {
             + "ipc2008/openstacks/temporal-satisficing-adl-numeric-fluents" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -870,7 +870,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -884,7 +884,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -898,7 +898,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -912,7 +912,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -926,7 +926,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -940,7 +940,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
      /**
@@ -954,7 +954,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -968,7 +968,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -981,7 +981,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/floor-tile/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -995,7 +995,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1008,7 +1008,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/openstacks/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1022,7 +1022,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1035,7 +1035,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/parking/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1049,7 +1049,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1062,7 +1062,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2011/sokoban/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1076,7 +1076,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1090,7 +1090,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1103,7 +1103,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/driver-log/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1116,7 +1116,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/floor-tile/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1130,7 +1130,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1144,7 +1144,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1157,7 +1157,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/parking/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1170,7 +1170,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/satellite/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1183,7 +1183,7 @@ public class TemporalInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2014/storage/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1197,7 +1197,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1211,7 +1211,7 @@ public class TemporalInstantiationTest {
             + "ipc2014/road-traffic-accident-management/temporal-satisficing" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, TimeEncoderTest.TRACE_LEVEL);
     }
 
     /**
@@ -1225,7 +1225,7 @@ public class TemporalInstantiationTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateTemporalProblems(localTestPath, TemporalInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateTemporalProblems(localTestPath, TemporalProblemTest.TRACE_LEVEL);
     }
 
 }

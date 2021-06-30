@@ -33,7 +33,7 @@ import java.io.File;
  * @version 1.2 - 04.07.16
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PDDLInstantiationTest {
+public class ADLProblemTest {
 
     /**
      * Default Trace level.
@@ -50,7 +50,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -63,7 +63,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -76,7 +76,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -89,7 +89,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -102,7 +102,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -115,7 +115,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -128,7 +128,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -141,7 +141,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -154,7 +154,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -167,7 +167,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -180,7 +180,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -193,7 +193,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -206,7 +206,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -219,7 +219,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -232,7 +232,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -245,7 +245,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -258,7 +258,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -271,7 +271,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -284,7 +284,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -297,7 +297,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
     /**
@@ -310,7 +310,7 @@ public class PDDLInstantiationTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiatePDDLProblems(localTestPath, PDDLInstantiationTest.TRACE_LEVEL);
+        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
     }
 
 }
