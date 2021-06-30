@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- * Implements the <tt>HDDLParserTest</tt> of the PDD4L library. The parser is tested on IPC benchmarks. The IPC
+ * This class implements the junit test of the pddl parser of the library on HDDL IPC benchmarks. The IPC
  * benchmarks used for testing are available in <code>test/ressources/benchmarks</code> directory.
  *
  *
@@ -55,7 +55,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/barman" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -68,7 +68,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -81,7 +81,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/gripper" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -94,7 +94,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/miconic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -107,7 +107,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/rover" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -120,7 +120,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/satellite" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -133,7 +133,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/smartphone" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -146,7 +146,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/transport" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -159,7 +159,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/umtranslog" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -172,7 +172,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/woodworking" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
     /**
@@ -185,7 +185,7 @@ public class HDDLParserTest {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/zenotravel" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parseHDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.HDDL_EXT);
     }
 
 }

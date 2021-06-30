@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- * Implements the <tt>PDDLParserTest</tt> of the PDD4L library. The parser is tested on IPC benchmarks. The IPC
+ * This class implements the junit test of the pddl parser of the library on PDDL IPC benchmarks. The IPC
  * benchmarks used for testing are available in <code>test/ressources/benchmarks</code> directory.
  *
  * @author C. Gerard
@@ -55,7 +55,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -68,7 +68,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -81,7 +81,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -94,7 +94,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -107,7 +107,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -120,7 +120,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -133,7 +133,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -146,7 +146,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -159,7 +159,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -172,7 +172,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -185,7 +185,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -198,7 +198,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -211,7 +211,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -224,7 +224,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -237,7 +237,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -250,7 +250,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -263,7 +263,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -276,7 +276,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -289,7 +289,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -302,7 +302,7 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -315,6 +315,6 @@ public class PDDLParserTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.parsePDDL(localTestPath);
+        Tools.parse(localTestPath, Tools.PDDL_EXT);
     }
 }

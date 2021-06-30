@@ -25,20 +25,15 @@ import org.junit.runners.MethodSorters;
 import java.io.File;
 
 /**
- * Implements the <tt>PDDLEncoderTest</tt> of the PDD4L library. The class implements the test of the encoder on IPC
- * benchmarks.
+ * The class test the instantiation process for temporal problem on ADL IPC benchmarks. The IPC
+ * benchmarks used for testing are available in <code>test/ressources/benchmarks</code> directory.
  *
  * @author C. Gerard
  * @author D. Pellier
  * @version 1.2 - 04.07.16
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ADLProblemTest {
-
-    /**
-     * Default Trace level.
-     */
-    private static final int TRACE_LEVEL = 0;
+public class ADLProblemInstantiationTest {
 
     /**
      * Method that executes tests using IPC 1998 Assembly ADL benchmarks.
@@ -46,11 +41,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Assembly_ADL() throws Exception {
+    public void test_Instantiation_IPC1998_Assembly_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -59,11 +54,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Grid_STRIPS_Untyped() throws Exception {
+    public void test_Instantiation_IPC1998_Grid_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -72,11 +67,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Gripper_ADL() throws Exception {
+    public void test_Instantiation_IPC1998_Gripper_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -85,11 +80,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Gripper_STRIPS() throws Exception {
+    public void test_Instantiation_IPC1998_Gripper_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -98,11 +93,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Logistics_ADL() throws Exception {
+    public void test_Instantiation_IPC1998_Logistics_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -111,11 +106,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Logistics_STRIPS_Round1() throws Exception {
+    public void test_Instantiation_IPC1998_Logistics_STRIPS_Round1() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -124,11 +119,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Logistics_STRIPS_Round2() throws Exception {
+    public void test_Instantiation_IPC1998_Logistics_STRIPS_Round2() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -137,11 +132,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Movie_ADL() throws Exception {
+    public void test_Instantiation_IPC1998_Movie_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -150,11 +145,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC1998_Movie_STRIPS() throws Exception {
+    public void test_Instantiation_IPC1998_Movie_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -163,11 +158,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Blocks_STRIPS_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Blocks_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -176,11 +171,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Blocks_STRIPS_Untyped() throws Exception {
+    public void test_Instantiation_IPC2000_Blocks_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -189,11 +184,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -202,11 +197,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -215,11 +210,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Elevator_STRIPS_Simple_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Elevator_STRIPS_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -228,11 +223,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Elevator_STRIPS_Simple_Untyped() throws Exception {
+    public void test_Instantiation_IPC2000_Elevator_STRIPS_Simple_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -241,11 +236,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Freecell_STRIPS_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Freecell_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -254,11 +249,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Freecell_STRIPS_Untyped() throws Exception {
+    public void test_Instantiation_IPC2000_Freecell_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -267,11 +262,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Logistics_STRIPS_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Logistics_STRIPS_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -280,11 +275,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Logistics_STRIPS_Untyped() throws Exception {
+    public void test_Instantiation_IPC2000_Logistics_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -293,11 +288,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Schedule_ADL_Typed() throws Exception {
+    public void test_Instantiation_IPC2000_Schedule_ADL_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
     /**
@@ -306,11 +301,11 @@ public class ADLProblemTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_Encoder_IPC2000_Schedule_ADL_Untyped() throws Exception {
+    public void test_Instantiation_IPC2000_Schedule_ADL_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.instantiateADLProblems(localTestPath, ADLProblemTest.TRACE_LEVEL);
+        Tools.instantiate(localTestPath, Tools.PDDL_EXT);
     }
 
 }
