@@ -156,9 +156,11 @@ test {
     scanForTestClasses = false
     //includes = ['**/PDDLParserTest.class']
     //includes = ['**/HDDLParserTest.class']
-    includes = ['**/ADLProblemInstantiationTest.class']
+    //includes = ['**/ADLProblemInstantiationTest.class']
     //includes = ['**/HTNProblemInstantiationTest.class']
     //includes = ['**/TemporalProblemInstantiationTest.class']
+    //includes = ['**/HSPTest.class']
+    includes = ['**/FFTest.class']
 
     //includes = ['**/ParserTest.class', '**/EncoderTest.class', '**/HSPTest.class', '**/FFTest.class']
     //includes = ['**/TFDPlannerTest.class']

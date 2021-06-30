@@ -6,6 +6,9 @@ import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.NumericProblem;
@@ -14,6 +17,7 @@ import fr.uga.pddl4j.problem.SimpleTemporalProblem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -247,7 +251,6 @@ public abstract class Tools {
         }
 
         Tools.cleanValPlan(currentTestPath);
-
     }
 
 
@@ -309,9 +312,162 @@ public abstract class Tools {
             Assert.assertEquals(files.length, nbValidated);
         }
         Tools.cleanValPlan(currentTestPath);
-
     }
 
+    /**
+     * Solves all the problems in the specified directory with a specified planner configuration.
+     *
+     * @param currentTestPath the current sub dir to test
+     * @param extension the file extension .pddl ou .hddl
+     * @param config the planner configuration to use to solve problems.
+     */
+    public static void solve(String currentTestPath, String extension, PlannerConfiguration config) {
+        Tools.cleanValPlan(currentTestPath);
+        String currentDomain = currentTestPath + "domain" + extension;
+        boolean oneDomainPerProblem = false;
+        String problemFile;
+        String currentProblem;
+
+        // Counting the number of problem files
+        File[] pbFileList = new File(currentTestPath)
+            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(extension) && !name.contains("dom"));
+
+        int nbTest = 0;
+        if (pbFileList != null) {
+            nbTest = pbFileList.length;
+        }
+
+        // Check if there is on domain per problem or a shared domain for all
+        if (!new File(currentDomain).exists()) {
+            oneDomainPerProblem = true;
+        }
+
+        System.out.println("Test " + config.getPlanner() + " planner on " + currentTestPath);
+        // Loop around problems in one category
+        int fillLength = Math.max(Integer.toString(nbTest).length(), 2);
+        for (int i = 1; i < nbTest + 1; i++) {
+            problemFile = String.format("p%0" + fillLength + "d" + extension, i);
+            currentProblem = currentTestPath + problemFile;
+
+            if (oneDomainPerProblem) {
+                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + "domain" + extension;
+            }
+            // Parses the PDDL domain and problem description
+            try {
+                Planner planner = config.buildPlanner();
+
+                ParsedProblem parsedProblem = planner.parse(currentDomain, currentProblem);
+                ErrorManager errorManager = planner.getParserErrorManager();
+                if (!errorManager.isEmpty()) {
+                    errorManager.printAll();
+                }
+                Assert.assertTrue(errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty());
+                Assert.assertTrue(errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty());
+
+                Plan plan = null;
+                // Encodes and instantiates the problem in a compact representation
+                System.out.println("* Instantiation [" + currentProblem + "]" + "...");
+                try {
+                    Problem pb = planner.instantiate(parsedProblem);
+                    if (pb.isSolvable()) {
+                        // Searches for a solution plan
+                        System.out.println("* Trying to solve [" + currentProblem + "]" + " in " + config.getTimeout()
+                            + " seconds");
+                        plan = planner.solve(pb);
+                    } else {
+                        System.err.println("* Problem [" + currentProblem + "]" + " not solvable.");
+                    }
+                    if (plan == null) { // no solution in TIMEOUT computation time
+                        System.out.println("* No solution found in " + config.getTimeout() + " seconds for "
+                            + currentProblem);
+                        break;
+                    } else if (plan.isEmpty()) { // Empty solution
+                        System.out.println("* Empty solution for " + currentProblem);
+                    } else { // Save output plan
+                        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(currentProblem.substring(0,
+                            currentProblem.length() - extension.length()) + Tools.VAL_EXT))) {
+                            bw.write(pb.toString(plan));
+                        }
+                        System.out.println("* Solution found for " + currentProblem);
+                    }
+                } catch (OutOfMemoryError err) {
+                    System.err.println("ERR: " + err.getMessage() + " - test aborted");
+                    return;
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+            System.out.println();
+        }
+        try {
+            Tools.checkPlanValidity(currentTestPath, extension);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Check plan validity.
+     *
+     * @param currentTestPath the current sub dir to test.
+     * @param extension the file extention used .pddl or .hddl.
+     * @throws Exception if something wrong.
+     */
+    public static void checkPlanValidity(String currentTestPath, String extension) throws Exception {
+        final String domain = currentTestPath + "domain" + extension;
+        File dir = new File(currentTestPath);
+        File[] files = dir.listFiles((dir1, name) -> name.endsWith(".val"));
+
+        String validator;
+        if (extension.equals(Tools.HDDL_EXT)) {
+            validator = Tools.HDDL_VAL;
+        } else {
+            validator = Tools.PDDL_VAL;
+        }
+
+        if (files != null) {
+            final StringBuilder output = new StringBuilder();
+            for (File valfile : files) {
+                final String problem = currentTestPath + Tools.removeExtension(valfile.getName()) + extension;
+                String target;
+                if (isWindows()) {
+                    target = validator + "-win.exe -v " + domain + " " + problem + " " + valfile;
+                } else if (isMac()) {
+                    target = validator + "-osx -v " + domain + " " + problem + " " + valfile;
+                } else {
+                    target = validator + "-nux -v " + domain + " " + problem + " " + valfile;
+                }
+
+                final Runtime rt = Runtime.getRuntime();
+                final Process proc = rt.exec(target);
+                proc.waitFor();
+
+                String line;
+                final InputStreamReader inputStreamReader = new InputStreamReader(proc.getInputStream(),
+                    StandardCharsets.UTF_8);
+                final BufferedReader reader = new BufferedReader(inputStreamReader);
+                try {
+                    while ((line = reader.readLine()) != null) {
+                        output.append(line + "\n");
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                } finally {
+                    reader.close();
+                    inputStreamReader.close();
+                    proc.getInputStream().close();
+                }
+            }
+            final int number = Tools.numberValidatedPlans(output.toString());
+            System.out.println("\n-- Plan validator on " + currentTestPath);
+            System.out.println("   Plans found: " + files.length);
+            System.out.println("   Plans validated: " + number);
+            System.out.println("--");
+            Assert.assertEquals(files.length, number);
+        }
+        Tools.cleanValPlan(currentTestPath);
+    }
+    
     /**
      * Encode problems targeted in currentTestPath directory and check if they are solvable.
      *
