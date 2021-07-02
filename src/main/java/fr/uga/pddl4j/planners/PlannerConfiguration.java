@@ -13,7 +13,6 @@
  * <http://www.gnu.org/licenses/>
  */
 
-
 package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.planners.htn.stn.PFDPlanner;
