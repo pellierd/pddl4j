@@ -15,6 +15,7 @@ plugins {
     id "ca.coglinc.javacc" version "2.4.0"
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'java'
+    id "kr.motd.sphinx" version "2.10.0"
 }
 
 apply plugin: 'base'
@@ -64,6 +65,15 @@ compileJava {
 compileTestJava {
     options.compilerArgs += '-proc:none'
     options.compilerArgs += '-Xlint:unchecked'
+}
+
+sphinx {
+    // Change the source directory.
+    sourceDirectory = "docs/"
+    // Change the output directory.
+    outputDirectory = "build/docs/site"
+    configDirectory= "docs/"
+    builder = "html"
 }
 
 checkstyle {
