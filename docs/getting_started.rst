@@ -20,8 +20,8 @@ How to use PDD4J ?
 
 
 It is possible to use the PDDL4J library in three different ways depending on your needs:
-* the user downloads the library or generates it with Gradle.
-* the user integrates PDDL4J in his/her own tools and adds planning functions to his/her code.
+  * the user downloads the library or generates it with Gradle.
+  * the user integrates PDDL4J in his/her own tools and adds planning functions to his/her code.
 
 As a developper, you can contribute to the PDDL4J project and add new features (see the [Contribute](https://github.com/pellierd/pddl4j/wiki/Contribute) dedicated page).
 
