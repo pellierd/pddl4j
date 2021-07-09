@@ -8,7 +8,7 @@ Building from source code
 
 The general command line to build PDDL4J from source code is as follow:
 
-.. prompt:: bash $
+.. code-block:: bash
 
   ./gradlew build [options]
 
@@ -21,7 +21,7 @@ Options are:
 
 The command line to build PDDL4J without test and checkstyle verification is:
 
-  .. prompt:: bash $
+  .. code-block:: bash
 
     ./gradlew build -PnoCheckStyle -PnoTest
 
@@ -39,7 +39,7 @@ Creating a jar of the library
 
 To create a jar of the PDDL4J library *without dependency libraries* just use the command line:
 
-.. prompt:: bash $
+.. code-block:: bash
 
   ./gradlew jar
 
@@ -48,7 +48,7 @@ library is not build, the library is built before.
 
 To create a jar of the PDDL4J library *with the dependency libraries* just use the command line:
 
-.. prompt:: bash $
+.. code-block:: bash
 
   ./gradlew shadowJar
 
@@ -64,7 +64,7 @@ Generating the Java documentation
 
 To generate the java documentation of the library use the following command line:
 
-.. prompt:: bash $
+.. code-block:: bash
 
   ./gradlew javadoc
 
@@ -75,7 +75,7 @@ Generating the BNF of the parser
 
 To generate the BNF (Backus–Naur form) of the PDDL language accepted by the parser use the following command line:
 
-.. prompt:: bash $
+.. code-block:: bash
 
   ./gradlew jjdoc
 

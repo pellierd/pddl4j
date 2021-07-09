@@ -14,7 +14,7 @@ We assume that :
   * `Gradle <https://gradle.org/>`_ is installed on your computer. For more information see the dedicated page `How to install Gradle <https://gradle.org/install/>`_.
   * `Java JDK <https://adoptopenjdk.net/>`_ version 8 or higher is installed. To check, run :
 
-  .. prompt:: bash $
+  .. code-block:: bash
 
     java -version
 
@@ -24,7 +24,7 @@ Getting PDDL4J
 
 To get PDDL4J just checkout the source from git repository:
 
-.. prompt:: bash $
+.. code-block:: bash
 
     git clone https://github.com/pellierd/pddl4j.git
     cd pddl4j
@@ -35,7 +35,7 @@ Creating the executable jar
 
 To build PDDL4J and creating the executable jar use the following command line:
 
-.. prompt:: bash $
+.. code-block:: bash
 
   ./gradlew shadowJar
 
@@ -49,7 +49,7 @@ Example: Running Fast Forward planner
 Several planners are implemented in PDDL4J (see xxx) to have the full list of planners implemented in the library and have the command lines to run them.
 As sample, find below the command line to launch Fast Forward planner implemented in the library.
 
-.. prompt:: text
+.. code-block:: bash
 
   $ java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FF \
      -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \
@@ -59,7 +59,7 @@ This command run the planner FF on the domain logics and the problem 1.
 
 The output produces by the planner is as follow:
 
-.. prompt:: text
+.. code-block:: text
 
   parsing domain file "domain.pddl" done successfully
   parsing problem file "p01.pddl" done successfully
