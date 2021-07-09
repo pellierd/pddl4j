@@ -310,7 +310,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
         // The negative accumulator used to store the set of negative proposition already reached
         final BitVector nAcc = new BitVector();
 
-        // We start building the relaxed planning graph
+        // We start building.rst the relaxed planning graph
         // The graph is expanded until the goal and the fixed point of the graph is not reached
         while (this.goalCounter != this.goalCardinality && (!ppk.isEmpty() || !npk.isEmpty())) {
             // A bit vector used to store the new operator to add
@@ -574,7 +574,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
     /**
      * Select an effect according to the unconditional operators difficulty heuristic. The question
      * is, which achiever should be choose when no NOOP is available ? It is certainly a good idea
-     * to select an achiever whose preconditions seems to be "easy". From the graph building phase,
+     * to select an achiever whose preconditions seems to be "easy". From the graph building.rst phase,
      * we can obtain a simple measure for the operatorsDifficulty of an action's preconditions as
      * follows:
      * <ul>

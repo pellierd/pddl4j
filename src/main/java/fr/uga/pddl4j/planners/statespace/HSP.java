@@ -93,7 +93,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * Creates a new planner with a defualt configuration.
+     * Creates a new planner with a default configuration.
      *
      * @param configuration the configuration of the planner.
      */
@@ -139,7 +139,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
     public boolean checkConfiguration() {
         return this.getConfiguration().getTimeout() > 0
             && this.getConfiguration().getHeuristicWeight() > 0.0
-            && this.getConfiguration().getHeuristic().equals(Setting.Heuristic.NONE);
+            && !this.getConfiguration().getHeuristic().equals(Setting.Heuristic.NONE);
     }
 
     /**

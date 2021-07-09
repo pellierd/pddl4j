@@ -389,7 +389,7 @@ public class PlannerConfiguration implements Serializable {
      * object is an instance of the class <code>Configuration</code> and if both configurations have the same settings.
      *
      * @param object the object to be compared.
-     * @return <code>true</code> the object in paremeter is equal to this configuration.
+     * @return <code>true</code> the object in parameter is equal to this configuration.
      */
     public boolean equal(final Object object) {
         if (object instanceof PlannerConfiguration) {
@@ -450,6 +450,7 @@ public class PlannerConfiguration implements Serializable {
         try {
             final PlannerConfiguration config = new PlannerConfiguration(args);
             final Planner planner = config.buildPlanner();
+            System.out.println(config);
             planner.solve();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());

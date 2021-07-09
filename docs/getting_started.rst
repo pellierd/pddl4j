@@ -1,31 +1,104 @@
-
 *******************
 Getting Started
 *******************
 
-.. contents:: Table of Contents
 
-What is PDDL4J ?
-================
-
-PDDL4J is a software library embedding Artificial Intelligence algorithms to find solutions for planning problems, that
-is to say time organized actions to achieve a goal. Solutions to planning problems are "todo lists" named **plan** representing operational features of actions like **who, how, where, when and what to do**.
-
-PDDL4J uses a description language (Planning Domain Description language) to represent the initial state of the problem, the goal and the list of the available actions. A complete description of the PDDL syntax is available [here](http://pddl4j.imag.fr/repository/wiki/BNF-PDDL-3.1.pdf). The complete description of the PDDL syntax implemented in PDDL4J will be available soon.
-
-PDDL4J is a suite of solvers useful for decision problems that can be solved by a sequence of actions (plan). It is based on a declarative approach: the user **states** a decision problem in PDDL and PDDL4J generates possible solutions. **No programming language and/or background** is required. PDDL4J has lot of application fields like can be use in many industrial fields as smart homes/data/cities, autonomous systems and robotics, logistics, business processes etc.
-
-How to use PDD4J ?
-==================
+This section explains how to download PDDL4J from GitHub, create an executable of the library and run the Fast Forward
+planner implemented in the library.
 
 
-It is possible to use the PDDL4J library in three different ways depending on your needs:
-  * the user downloads the library or generates it with Gradle.
-  * the user integrates PDDL4J in his/her own tools and adds planning functions to his/her code.
+Prerequisites
+-------------
 
-As a developper, you can contribute to the PDDL4J project and add new features (see the [Contribute](https://github.com/pellierd/pddl4j/wiki/Contribute) dedicated page).
+We assume that :
+  * `Gradle <https://gradle.org/>`_ is installed on your computer. For more information see the dedicated page `How to install Gradle <https://gradle.org/install/>`_.
+  * `Java JDK <https://adoptopenjdk.net/>`_ version 8 or higher is installed. To check, run :
 
-Document Section
--------------------
+  .. prompt:: bash $
 
-aaaa
+    java -version
+
+
+Getting PDDL4J
+------------------
+
+To get PDDL4J just checkout the source from git repository:
+
+.. prompt:: bash $
+
+    git clone https://github.com/pellierd/pddl4j.git
+    cd pddl4j
+
+
+Creating the executable jar
+-----------------------------------------------
+
+To build PDDL4J and creating the executable jar use the following command line:
+
+.. prompt:: bash $
+
+  ./gradlew shadowJar
+
+This command build a single jar of the PDDL4J library containing all the dependency libraries used by PDDL4J. The jar
+generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.X is the version of PDDL4J.
+
+
+Example: Running Fast Forward planner
+----------------------------
+
+Several planners are implemented in PDDL4J (see xxx) to have the full list of planners implemented in the library and have the command lines to run them.
+As sample, find below the command line to launch Fast Forward planner implemented in the library.
+
+.. prompt:: text
+
+  $ java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FF \
+     -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \
+     -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
+
+This command run the planner FF on the domain logics and the problem 1.
+
+The output produces by the planner is as follow:
+
+.. prompt:: text
+
+  parsing domain file "domain.pddl" done successfully
+  parsing problem file "p01.pddl" done successfully
+
+  problem instantiation done successfully (140 actions, 56 fluents)
+  * starting enforced hill climbing
+  * enforced hill climbing succeeded
+
+  found plan as follows:
+
+  00: (     load-truck obj23 tru2 pos2) [0]
+  01: (     load-truck obj21 tru2 pos2) [0]
+  02: (     load-truck obj13 tru1 pos1) [0]
+  03: (     load-truck obj11 tru1 pos1) [0]
+  04: (drive-truck tru2 pos2 apt2 cit2) [0]
+  05: (   unload-truck obj23 tru2 apt2) [0]
+  06: (  load-airplane obj23 apn1 apt2) [0]
+  07: (   unload-truck obj21 tru2 apt2) [0]
+  08: (  load-airplane obj21 apn1 apt2) [0]
+  09: (    fly-airplane apn1 apt2 apt1) [0]
+  10: (unload-airplane obj23 apn1 apt1) [0]
+  11: (unload-airplane obj21 apn1 apt1) [0]
+  12: (drive-truck tru1 pos1 apt1 cit1) [0]
+  13: (     load-truck obj23 tru1 apt1) [0]
+  14: (     load-truck obj21 tru1 apt1) [0]
+  15: (   unload-truck obj13 tru1 apt1) [0]
+  16: (   unload-truck obj11 tru1 apt1) [0]
+  17: (drive-truck tru1 apt1 pos1 cit1) [0]
+  18: (   unload-truck obj23 tru1 pos1) [0]
+  19: (   unload-truck obj21 tru1 pos1) [0]
+
+  time spent:       0,02 seconds parsing
+                    0,04 seconds encoding
+                    0,02 seconds searching
+                    0,07 seconds total time
+
+  memory used:      0,00 MBytes for problem representation
+                    0,00 MBytes for searching
+                    0,00 MBytes total
+
+Most of the domains and the problems from IPC (International Planning Competition) are available for testing in the
+directory ``src/test/resources/benchmarks/``. They are classified by year and by competition track.
