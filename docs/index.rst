@@ -35,9 +35,8 @@ Theoretical Artificial Intelligence, 30:1, 143-176, `DOI: 10.1080/0952813X.2017.
    :maxdepth: 2
    :hidden:
 
+   automated_planning_in_a_nutshell
    getting_started
-   building
+   building_the_library
    planners
-   contribute
-
-
+   how_to_contribute

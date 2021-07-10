@@ -35,7 +35,7 @@ import fr.uga.pddl4j.problem.operator.Condition;
  * heuristic value is the number of actions of the relaxed plan extracted. To select an effect
  * according to the unconditional operators difficulty heuristic, the question is, which achiever
  * should be choose when no NOOP is available ? It is certainly a good idea to select an achiever
- * whose preconditions seems to be "easy". From the graph building.rst phase, we can obtain a simple
+ * whose preconditions seems to be "easy". From the graph building_the_library.rst phase, we can obtain a simple
  * measure for the operators_difficulty of an action's preconditions as follows:
  * </p>
  * <pre>

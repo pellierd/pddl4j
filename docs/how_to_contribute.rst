@@ -1,7 +1,7 @@
 .. _contribute_chapter:
 
 *******************
-Contribute
+How to contribute ?
 *******************
 
 To contribute to the project, it is important to consider the following procedure:
