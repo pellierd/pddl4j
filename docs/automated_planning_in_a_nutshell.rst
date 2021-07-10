@@ -1,3 +1,5 @@
+.. _automated_planning_in_a_nutshell_chapter:
+
 Automated Planning in a Nutshell
 ==================================
 
