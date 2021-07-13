@@ -1,3 +1,4 @@
+==================================
 Welcome to PDDL4J's documentation!
 ==================================
 
@@ -6,16 +7,18 @@ Intelligence algorithms to find solutions for planning problems, that is to say 
 goal. Solutions to planning problems are "todo lists" named **plan** representing operational features of actions like
 **who, how, where, when and what to do**.
 
-.. note::
-
-  If you are not familiar with Automated Planning, start :ref:reading chapter automated_planning_in_a_nutshell_chapter`
-
-
 PDDL4J is a suite of solvers useful for decision problems that can be solved by a sequence of actions (plan). It is
 based on a declarative approach: the user **states** a decision problem in PDDL (Planning Domain Description language
 and PDDL4J generates possible solutions. **No programming language and/or background** is required. PDDL4J has lot of
 application fields like can be use in many industrial fields as smart homes/data/cities, autonomous systems and
 robotics, logistics, business processes etc.
+
+.. note::
+
+  If you are not familiar with Automated Planning, start reading the chapter
+  :ref:`automated_planning_in_a_nutshell_chapter`.
+  If you are not familiar with PDDL, start reading
+  :ref:`pddl_tutorial_chapter`.
 
 PDDL was originally developed in 1998. It was inspired by the need to encourage the empirical comparison of planning
 systems and the exchange of planning benchmarks within the community. Its development improved the communication of
@@ -31,16 +34,26 @@ The library contains:
   - A set of already implemented classical heuristics, e.g., relaxed planning graph, critical path, etc.
   - Several examples of planners using PDDL4J.
 
-**The library is open source. If you use it, please cite us:**
+.. note::
 
-D. Pellier & H. Fiorino (2017) PDDL4J: a planning domain description library for java, Journal of Experimental &
-Theoretical Artificial Intelligence, 30:1, 143-176, `DOI: 10.1080/0952813X.2017.1409278 <https://doi.org/10.1080/0952813X.2017.1409278>`_
+  To get PDDL4J and start running a planner start reading the chapter
+  :ref:`getting_started_chapter`.
+
+
+
+.. important::
+
+  The library is open source. If you use it, please cite us:
+
+  D. Pellier & H. Fiorino (2017) PDDL4J: a planning domain description library for java, Journal of Experimental &
+  Theoretical Artificial Intelligence, 30:1, 143-176, `DOI: 10.1080/0952813X.2017.1409278 <https://doi.org/10.1080/0952813X.2017.1409278>`_
 
 .. toctree::
    :maxdepth: 2
    :hidden:
 
    automated_planning_in_a_nutshell
+   introduction_to_pddl
    getting_started
    building_the_library
    planners

@@ -1,11 +1,10 @@
-*******************
-Getting Started
-*******************
+.. _getting_started_chapter:
 
+Getting Started
+===============
 
 This section explains how to download PDDL4J from GitHub, create an executable of the library and run the Fast Forward
 planner implemented in the library.
-
 
 Prerequisites
 -------------
@@ -31,7 +30,7 @@ To get PDDL4J just checkout the source from git repository:
 
 
 Creating the executable jar
------------------------------------------------
+---------------------------
 
 To build PDDL4J and creating the executable jar use the following command line:
 
@@ -44,7 +43,7 @@ generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.
 
 
 Example: Running Fast Forward planner
-----------------------------
+------------------------------------
 
 Several planners are implemented in PDDL4J (see xxx) to have the full list of planners implemented in the library and have the command lines to run them.
 As sample, find below the command line to launch Fast Forward planner implemented in the library.

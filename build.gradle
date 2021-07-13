@@ -37,6 +37,9 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13'
+//    implementation group: 'org.openjdk.jol', name: 'jol-core', version: '0.9'
+//    implementation group: 'com.github.jbellis', name: 'jamm', version: '0.3.0'
+
 //    testImplementation 'junit:junit:4.13'
 }
 
@@ -85,6 +88,8 @@ jar {
         attributes 'Implementation-Title': 'PDDL4J',
                 'Implementation-Version': archiveVersion,
                 'Built-By': 'Damien Pellier',
+                'Premain-Class': 'org.openjdk.jol.vm.InstrumentationSupport',
+                'Launcher-Agent-Class': 'org.openjdk.jol.vm.InstrumentationSupport$Installer',
                 'Main-Class': 'fr.uga.pddl4j.planners.PlannerConfiguration'
     }
 }
@@ -97,6 +102,8 @@ shadowJar {
                 'Implementation-Version': archiveVersion,
                 'Built-By': 'Damien Pellier',
                 "Multi-Release": true,
+                'Premain-Class': 'org.openjdk.jol.vm.InstrumentationSupport',
+                'Launcher-Agent-Class': 'org.openjdk.jol.vm.InstrumentationSupport$Installer',
                 'Main-Class': 'fr.uga.pddl4j.planners.PlannerConfiguration'
 
     }

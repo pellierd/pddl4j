@@ -22,7 +22,6 @@ package fr.uga.pddl4j.planners.statespace;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.search.AStar;
@@ -30,12 +29,10 @@ import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileNotFoundException;
 import java.util.Objects;
 
 /**
@@ -200,14 +197,12 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      *
      * @param args the arguments of the command line.
      */
+    @SuppressWarnings("restriction")
     public static void main(String[] args) {
         try {
             final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
             HSP planner = new HSP(config);
-            //planner.solve();
-            ParsedProblem parsedproblem = planner.parse();
-            ADLProblem pb = planner.instantiate(parsedproblem);
-            planner.solve(pb);
+            planner.solve();
         } catch (IllegalArgumentException e) {
             LOGGER.fatal(e.getMessage());
         }  catch (java.io.IOException e) {
