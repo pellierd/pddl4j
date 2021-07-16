@@ -334,8 +334,8 @@ state is false: In our case:
         (at p2 lhr)
     )
 
-Goal to achieve
-***************
+Goal Description
+****************
 
 The goal is to have *at(p1, north)* and *at(p2, south)* in the final state (no matter the truth value of the other
 predicates). In PDDL, we write:
@@ -694,6 +694,9 @@ Let start by creating the problem file, e.g., ``rsc_problem_easy.pdd``. The prob
 type of pieces, a single tray, robot and conveyor; two units, a stocker storing this tray at the initial state and a
 processing unit. The goal is for the unit to perform three operations (*op10* > *op20* > *op30*) on the tray.
 
+Objects
+*******
+
 Hence, the types and objects are as follows:
 
 .. code-block:: text
@@ -708,6 +711,9 @@ Hence, the types and objects are as follows:
 
         op10 op20 op30 - operation
     )
+
+Initial State
+*************
 
 This snippet of code is the initial state:
 
@@ -748,6 +754,9 @@ This snippet of code is the initial state:
         ;; Setup robot
         (robot_available robot1)
   )
+
+Goal Description
+****************
 
 The goal is simply the completion of *tray1*:
 
