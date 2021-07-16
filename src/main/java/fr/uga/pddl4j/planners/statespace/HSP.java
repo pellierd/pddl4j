@@ -32,7 +32,9 @@ import fr.uga.pddl4j.problem.ADLProblem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openjdk.jol.info.GraphLayout;
 
+import java.io.PrintStream;
 import java.util.Objects;
 
 /**
@@ -197,12 +199,15 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem> {
      *
      * @param args the arguments of the command line.
      */
-    @SuppressWarnings("restriction")
     public static void main(String[] args) {
+
         try {
+            //System.setOut(new PrintStream("/dev/null"));
             final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
+            System.out.println("qhjgdjqshdg");
             HSP planner = new HSP(config);
             planner.solve();
+            System.out.println(GraphLayout.parseInstance(planner).totalSize());
         } catch (IllegalArgumentException e) {
             LOGGER.fatal(e.getMessage());
         }  catch (java.io.IOException e) {

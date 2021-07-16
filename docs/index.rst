@@ -53,8 +53,8 @@ The library contains:
    :hidden:
 
    automated_planning_in_a_nutshell
-   introduction_to_pddl
    getting_started
    building_the_library
    planners
+   pddl_tutorial
    how_to_contribute

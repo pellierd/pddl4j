@@ -37,7 +37,7 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13'
-//    implementation group: 'org.openjdk.jol', name: 'jol-core', version: '0.9'
+    implementation group: 'org.openjdk.jol', name: 'jol-core', version: '0.9'
 //    implementation group: 'com.github.jbellis', name: 'jamm', version: '0.3.0'
 
 //    testImplementation 'junit:junit:4.13'
@@ -62,7 +62,7 @@ jjdoc {
 // Remove warning about log4j ProcessPlugin raised with --warning-mode=all
 compileJava {
     options.compilerArgs += '-proc:none'
-    options.compilerArgs += '-Xlint:unchecked'
+//    options.compilerArgs += '-Xlint:none'
 }
 
 compileTestJava {
