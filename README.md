@@ -4,7 +4,7 @@
 ### 1. Contact
 
 - Damien Pellier (damien.pellier@imag.fr)
-- http://lig-membres.imag.fr/pellier/
+- https://lig-membres.imag.fr/pellier/
 
 ### 2. Description
 
