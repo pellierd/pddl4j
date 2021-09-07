@@ -690,7 +690,7 @@ and the unit becomes available to process another tray.
 Defining the problem
 ~~~~~~~~~~~~~~~~~~~~
 
-Let start by creating the problem file, e.g., ``rsc_problem_easy.pdd``. The problem we wish to define is a simple problem with one
+Let start by creating the problem file, e.g., ``rsc_problem_easy.pddl``. The problem we wish to define is a simple problem with one
 type of pieces, a single tray, robot and conveyor; two units, a stocker storing this tray at the initial state and a
 processing unit. The goal is for the unit to perform three operations (*op10* > *op20* > *op30*) on the tray.
 
