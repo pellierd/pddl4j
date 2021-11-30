@@ -15,16 +15,10 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.planners.statespace.HSP;
-import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -33,12 +27,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Set;
 
 /**
  * Implements the <tt>HSPTest</tt> of the PDD4L library. The class executes the junit tests with HSP on ADL and STRIPS
@@ -60,7 +49,7 @@ public class HSPTest {
     /**
      * Default Heuristic Type.
      */
-    private static final Setting.Heuristic HEURISTIC = Setting.Heuristic.FAST_FORWARD;
+    private static final GoalCostHeuristic.Name HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.
@@ -78,10 +67,9 @@ public class HSPTest {
     @Before
     public void initTest() {
         this.config = HSP.getDefaultConfiguration();
-        this.config.setPlanner(Setting.Planner.HSP);
-        this.config.setTimeout(HSPTest.TIMEOUT);
-        this.config.setHeuristic(HSPTest.HEURISTIC);
-        this.config.setHeuristicWeight(HSPTest.HEURISTIC_WEIGHT);
+        this.config.setProperty(HSP.TIME_OUT_SETTING, HSPTest.TIMEOUT);
+        this.config.setProperty(HSP.HEURISTIC_SETTING, HSPTest.HEURISTIC);
+        this.config.setProperty(HSP.WEIGHT_HEURISTIC_SETTING, HSPTest.HEURISTIC_WEIGHT);
         Tools.changeVALPerm();
     }
 
@@ -95,7 +83,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/assembly/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -108,7 +96,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -121,7 +109,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -134,7 +122,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -147,7 +135,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -160,7 +148,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -173,7 +161,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -186,7 +174,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -199,7 +187,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -212,7 +200,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -225,7 +213,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/blocks/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -238,7 +226,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -251,7 +239,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -264,7 +252,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -277,7 +265,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -290,7 +278,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -303,7 +291,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/freecell/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -316,7 +304,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -329,7 +317,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -342,7 +330,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -355,7 +343,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -368,7 +356,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -381,7 +369,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -394,7 +382,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -407,7 +395,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -420,7 +408,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/freecell/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -433,7 +421,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -446,7 +434,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -459,7 +447,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -472,7 +460,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/satellite/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -485,7 +473,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -498,7 +486,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/zenotravel/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -511,7 +499,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -524,7 +512,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -538,7 +526,7 @@ public class HSPTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -552,7 +540,7 @@ public class HSPTest {
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -565,7 +553,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/promela-dining-philosophers/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -578,7 +566,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/psr/middle-compiled-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -591,7 +579,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/psr/small-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -604,7 +592,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/satellite/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -617,7 +605,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/propositional" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -630,7 +618,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/propositional-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -643,7 +631,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
     /**
@@ -656,7 +644,7 @@ public class HSPTest {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.PDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
     }
 
 }

@@ -15,7 +15,17 @@
 
 package fr.uga.pddl4j.heuristics;
 
+import fr.uga.pddl4j.heuristics.graph.AdjustedSum;
+import fr.uga.pddl4j.heuristics.graph.AdjustedSum2;
+import fr.uga.pddl4j.heuristics.graph.AjustedSum2M;
+import fr.uga.pddl4j.heuristics.graph.Combo;
+import fr.uga.pddl4j.heuristics.graph.FastForward;
+import fr.uga.pddl4j.heuristics.graph.Max;
+import fr.uga.pddl4j.heuristics.graph.SetLevel;
+import fr.uga.pddl4j.heuristics.graph.Sum;
+import fr.uga.pddl4j.heuristics.graph.SumMutex;
 import fr.uga.pddl4j.planners.statespace.search.Node;
+import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
@@ -32,6 +42,48 @@ import fr.uga.pddl4j.problem.operator.Condition;
  * @version 1.0 - 10.06.2010
  */
 public interface GoalCostHeuristic extends Heuristic {
+
+    /**
+     * The name of heuristics.
+     */
+    public enum Name {
+        /**
+         * The type for the <code>AdjustedSum</code> heuristic.
+         */
+        AJUSTED_SUM,
+        /**
+         * The type for the <code>AdjustedSum2</code> heuristic.
+         */
+        AJUSTED_SUM2,
+        /**
+         * The type for the <code>AdjustedSum2M</code> heuristic.
+         */
+        AJUSTED_SUM2M,
+        /**
+         * The type for the <code>Combo</code> heuristic.
+         */
+        COMBO,
+        /**
+         * The type for the <code>Max</code> heuristic.
+         */
+        MAX,
+        /**
+         * The type for the <code>FF</code> heuristic.
+         */
+        FAST_FORWARD,
+        /**
+         * The type for the <code>SetLevel</code> heuristic.
+         */
+        SET_LEVEL,
+        /**
+         * The type for the <code>Sum</code> heuristic.
+         */
+        SUM,
+        /**
+         * The type for the <code>SumMutex</code> heuristic.
+         */
+        SUM_MUTEX,
+    }
 
     /**
      * Return the estimated distance to the goal to reach the specified state. If the return value is
@@ -61,5 +113,37 @@ public interface GoalCostHeuristic extends Heuristic {
      * @return <code>true</code> if this heuristic is admissible.
      */
     boolean isAdmissible();
+
+    /**
+     * Create an instance of a goal cost heuristic for a specified problem.
+     *
+     * @param name    the name of the heuristic to create.
+     * @param problem the problem for which the heuristic is created.
+     * @return the heuristic created.
+     */
+    public static GoalCostHeuristic getInstance(final GoalCostHeuristic.Name name, final ADLProblem problem) {
+        switch (name) {
+            case FAST_FORWARD:
+                return new FastForward(problem);
+            case SUM:
+                return new Sum(problem);
+            case SUM_MUTEX:
+                return new SumMutex(problem);
+            case AJUSTED_SUM:
+                return new AdjustedSum(problem);
+            case AJUSTED_SUM2:
+                return new AdjustedSum2(problem);
+            case AJUSTED_SUM2M:
+                return new AjustedSum2M(problem);
+            case COMBO:
+                return new Combo(problem);
+            case MAX:
+                return new Max(problem);
+            case SET_LEVEL:
+                return new SetLevel(problem);
+            default:
+                return null;
+        }
+    }
 
 }

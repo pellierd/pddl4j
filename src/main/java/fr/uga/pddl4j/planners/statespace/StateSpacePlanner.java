@@ -15,14 +15,13 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.Setting;
-import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
 
+import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.problem.Problem;
-import org.apache.logging.log4j.Level;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,29 +34,33 @@ import java.util.List;
 public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
 
     /**
-     * Returns the state space strategies used in the planner.
-     *
-     * @return the state space strategies used in the planner
+     * The search strategies setting used for planner configuration.
      */
-    List<StateSpaceStrategy> getStateSpaceStrategies();
+    static final String SEARCH_STRATEGIES_SETTING = "SEARCH_STRATEGIES";
 
     /**
-     * This method return the default configuration of the planner. The default configuration is as follow:
-     * <ul>
-     *     <li>Planner: HSP</li>
-     *     <li>Heuristic: Fast Forward</li>
-     *     <li>Heuristic weight: 1.0</li>
-     *     <li>Trace level: INFO</li>
-     * </ul>
-     *
-     * @return the default configuration of the planner.
+     * The default value of the SEARCH_STRATEGIES setting used for planner configuration.
      */
-    static PlannerConfiguration getDefaultConfiguration() {
-        final PlannerConfiguration config = Planner.getDefaultConfiguration();
-        config.setPlanner(Setting.Planner.HSP);
-        config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
-        config.setHeuristicWeight(1.0);
-        config.setTraceLevel(Level.INFO);
-        return config;
-    }
+    static final List<SearchStrategy.Name> DEFAULT_SEARCH_STRATEGIES = Arrays.asList(SearchStrategy.Name.ASTAR);
+
+    /**
+     * The HEURISTIC property used for planner configuration.
+     */
+    static final String HEURISTIC_SETTING = "HEURISTIC";
+
+    /**
+     * The default value of the HEURISTIC property used for planner configuration.
+     */
+    static final GoalCostHeuristic.Name DEFAULT_HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
+
+    /**
+     * The WEIGHT_HEURISTIC property used for planner configuration.
+     */
+    static final String WEIGHT_HEURISTIC_SETTING = "WEIGHT_HEURISTIC";
+
+    /**
+     * The default value of the WEIGHT_HEURISTIC property used for planner configuration.
+     */
+    static final double DEFAULT_WEIGHT_HEURISTIC = 1.0;
+
 }

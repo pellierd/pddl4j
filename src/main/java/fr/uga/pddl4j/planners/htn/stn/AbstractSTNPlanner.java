@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
@@ -23,14 +24,20 @@ import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.htn.AbstractHTNPlanner;
+import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
+import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import picocli.CommandLine;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.concurrent.Callable;
 
 /**
  * This abstract class implements the common methods of all Simple Task Network planners.
@@ -48,7 +56,7 @@ import java.util.Spliterator;
  * @version 1.0 - 25.06.2020
  * @since 4.0
  */
-public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
+public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> implements STNPlanner<HTNProblem> {
 
     /**
      * The logger of the class.
@@ -56,21 +64,94 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     private static final Logger LOGGER = LogManager.getLogger(AbstractSTNPlanner.class.getName());
 
     /**
+     * The boolean used to indicate that the planner is in an interactive mode.
+     */
+    private boolean interactive;
+
+    /**
      * The cost of each task of the problem.
      */
     private int[] costs;
 
     /**
-     * Creates a new abstract STN planner with a specific configuration.
+     * Creates a new planner with a default configuration.
+     */
+    public AbstractSTNPlanner() {
+        this(Planner.getDefaultConfiguration());
+    }
+
+    /**
+     * Creates a new planner with a specific configuration.
      *
      * @param configuration the configuration of the planner.
      */
     public AbstractSTNPlanner(final PlannerConfiguration configuration) {
         super(configuration);
+        this.interactive = false;
     }
 
     /**
-     * Computes for each tasks of a planning problem the maximum number of primitive tasks needed to accomplish this
+     * Returns if the planner is in interactive mode.
+     *
+     * @return <code>true</code> if the planner is in interactive mode; <code>false</code> otherwise.
+     */
+    public final boolean isInteractive() {
+        return this.interactive;
+    }
+
+    /**
+     * Sets the planner in the interactive mode.
+     *
+     * @param interactive the flag to indicate if the planner is in interactive mode or not.
+     */
+    @CommandLine.Option(names = {"-i", "--interactive"}, description = "Set the planner in interactive mode for debug")
+    public final void setInteractive(final boolean interactive) {
+        this.interactive = interactive;
+    }
+
+    /**
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
+     * @see PlannerConfiguration
+     */
+    public static PlannerConfiguration getDefaultConfiguration() {
+        PlannerConfiguration config = Planner.getDefaultConfiguration();
+        config.setProperty(STNPlanner.INTERACTIVE_MODE_SETTING,
+            Boolean.toString(STNPlanner.DEFAULT_INTERACTIVE_MODE));
+        return config;
+    }
+
+    /**
+     * Returns the configuration of the planner.
+     *
+     * @return the configuration of the planner.
+     */
+    @Override
+    public PlannerConfiguration getConfiguration() {
+        final PlannerConfiguration config =  super.getConfiguration();
+        config.setProperty(STNPlanner.INTERACTIVE_MODE_SETTING, Boolean.toString(this.isInteractive()));
+        return config;
+    }
+
+    /**
+     * Sets the configuration of the planner. If a planner setting is not defined in the specified configuration, the
+     * setting is initialized with its default value.
+     *
+     * @param configuration the configuration to set.
+     */
+    @Override
+    public void setConfiguration(final PlannerConfiguration configuration) {
+        super.setConfiguration(configuration);
+        if (configuration.getProperty(STNPlanner.INTERACTIVE_MODE_SETTING) == null) {
+            this.setInteractive(STNPlanner.DEFAULT_INTERACTIVE_MODE);
+        } else {
+            this.setInteractive(Boolean.valueOf(configuration.getProperty(STNPlanner.INTERACTIVE_MODE_SETTING)));
+        }
+    }
+
+    /**
+     * Computes for each task of a planning problem the maximum number of primitive tasks needed to accomplish this
      * task.
      *
      * @param problem the planning problem
@@ -79,7 +160,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         this.costs = new int[problem.getTaskResolvers().size()];
         Arrays.fill(this.costs, -1);
         for (int i = 0; i < problem.getTasks().size(); i++) {
-            Set<Integer> closed =  new HashSet<Integer>();
+            Set<Integer> closed = new HashSet<>();
             cost(i, problem, closed);
         }
     }
@@ -222,7 +303,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
                 final Method method = methods.removeFirst();
                 final Integer task = method.getTask();
-                tmpn.tasksynonym = taskDictionary.get(task).removeFirst();
+                tmpn.taskSynonym = taskDictionary.get(task).removeFirst();
                 tmpn.method = method;
                 final List<Integer> subtasks = method.getSubTasks();
                 for (Integer subtask : subtasks) {
@@ -258,7 +339,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
                 }
                 children.clear();
             } else {
-                tmpn.tasksynonym = taskDictionary.get(tmpn.task).removeFirst();
+                tmpn.taskSynonym = taskDictionary.get(tmpn.task).removeFirst();
             }
         }
 
@@ -269,35 +350,20 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             open.addAll(0, children);
             if (tmpn.parent == null) {
                 for (Node child : children) {
-                    hierarchy.getRootTasks().add(child.tasksynonym);
+                    hierarchy.getRootTasks().add(child.taskSynonym);
                 }
             } else {
                 if (!problem.getTasks().get(tmpn.task).isPrimtive()) {
-                    hierarchy.getCounpoudTasks().put(tmpn.tasksynonym, tmpn.method);
+                    hierarchy.getCounpoudTasks().put(tmpn.taskSynonym, tmpn.method);
                     List<Integer> decomposition = new ArrayList<>();
-                    hierarchy.getDecomposition().put(tmpn.tasksynonym, decomposition);
+                    hierarchy.getDecomposition().put(tmpn.taskSynonym, decomposition);
                     for (Node child : children) {
-                        decomposition.add(child.tasksynonym);
+                        decomposition.add(child.taskSynonym);
                     }
                 }
             }
         }
-
         return hierarchy;
-    }
-
-    /**
-     * Print the usage of the AbstractSTNPlanner.
-     */
-    protected static void printUsage() {
-        final StringBuilder strb = new StringBuilder();
-        strb.append("\nusage of the planner:\n")
-            .append("OPTIONS   DESCRIPTIONS\n")
-            .append("-o <str>    hddl domain file name\n")
-            .append("-f <str>    hddl problem file name\n")
-            .append("-v <num>    trace level\n")
-            .append("-t <num>    specifies the maximum CPU-time in seconds (preset: 600)\n");
-        System.out.println(strb.toString());
     }
 
     /**
@@ -307,17 +373,14 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
      * @throws FileNotFoundException if the domain or the problem file does not exist.
      */
     public Plan solve() throws FileNotFoundException {
-        if (!this.checkConfiguration()) {
+        if (!this.hasValidConfiguration()) {
             throw new RuntimeException("Invalid planner configuration");
         }
-
-        final PlannerConfiguration config = this.getConfiguration();
-        this.setTraceLevel(config.getTraceLevel());
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
         final PDDLParser parser = this.getParser();
-        final ParsedProblem parsedProblem = parser.parse(config.getDomain(), config.getProblem());
+        final ParsedProblem parsedProblem = parser.parse(this.getDomain(), this.getProblem());
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -338,10 +401,10 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
         } else if (LOGGER.isInfoEnabled()) {
             StringBuilder strb = new StringBuilder();
             strb.append("\nparsing domain file \"");
-            strb.append(config.getDomainFile().getName());
+            strb.append(this.getDomainFile().getName());
             strb.append("\" done successfully");
             strb.append("\nparsing problem file \"");
-            strb.append(config.getProblemFile().getName());
+            strb.append(this.getProblemFile().getName());
             strb.append("\" done successfully");
             strb.append("\n");
             LOGGER.info(strb);
@@ -368,7 +431,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             strb.append(pb.getActions().size() + " actions, ");
             strb.append(pb.getMethods().size() + " methods, ");
             strb.append(pb.getFluents().size() + " fluents, ");
-            strb.append(pb.getTasks().size() + " tasks)\n");
+            strb.append(pb.getTasks().size() + " tasks)\n\n");
             if (!pb.isTotallyOrederd()) {
                 strb.append("Unable to solve a problem that isn't totally ordered.\n");
             }
@@ -380,7 +443,7 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
             Plan plan = null;
             double searchTime = 0.0;
             try {
-                System.out.println("Searching a solution plan....\n");
+                LOGGER.info("Searching a solution plan....\n\n");
                 begin = System.currentTimeMillis();
                 plan = this.solve(pb);
                 end = System.currentTimeMillis();
@@ -431,8 +494,8 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
      * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
      */
     @Override
-    public boolean checkConfiguration() {
-        return this.getConfiguration().getTimeout() > 0;
+    public boolean hasValidConfiguration() {
+        return super.hasValidConfiguration();
     }
 
     /**
@@ -449,12 +512,23 @@ public abstract class AbstractSTNPlanner extends AbstractPlanner<HTNProblem> {
     }
 
     /**
+     * Wait until a key on keyboard is pressed.
+     */
+    protected static void waitPressAnyKey() {
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Node of the task decomposition. This inner class is use to produce the output of the plan in the hierarchical
      * plan validator.
      */
     private class Node {
         private Integer task;
-        private Integer tasksynonym;
+        private Integer taskSynonym;
         private Method method;
         private Node parent;
         private List<Node> children = new LinkedList<Node>();

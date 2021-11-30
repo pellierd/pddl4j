@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SearchStrategy;
-import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
 
 /**
@@ -27,21 +27,36 @@ import fr.uga.pddl4j.problem.ADLProblem;
  * @version 1.0 - 11.06.2018
  * @since 3.6
  */
-public interface StateSpaceStrategy extends SearchStrategy {
+public interface StateSpaceSearch extends SearchStrategy {
+
+    /**
+     * The default heuristic used (FAST_FORWARD).
+     */
+    static final GoalCostHeuristic.Name DEFAULT_HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
+
+    /**
+     * The default weight of the heuristic (1.0).
+     */
+    static final double DEFAULT_HEURISTIC_WEIGHT = 1.0;
+
+    /**
+     * The default time out (600s).
+     */
+    static final int DEFAULT_TIMEOUT = 600;
 
     /**
      * Returns the heuristic to use to solve the planning problem.
      *
      * @return the heuristic to use to solve the planning problem.
      */
-    Setting.Heuristic getHeuristic();
+    GoalCostHeuristic.Name getHeuristic();
 
     /**
      * Sets the heuristic to use to solved the problem.
      *
      * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
-    void setHeuristic(final Setting.Heuristic heuristic);
+    void setHeuristic(final GoalCostHeuristic.Name heuristic);
 
     /**
      * Returns the weight set to the heuristic.
@@ -174,4 +189,66 @@ public interface StateSpaceStrategy extends SearchStrategy {
      */
     Plan extractPlan(final Node solutionNode, final ADLProblem codedProblem);
 
+    /**
+     * Returns an instance of a specified search strategy with the default heuristic, weight and timeout.
+     *
+     * @param name the name of the search strategy.
+     * @return the search strategy.
+     */
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name) {
+        return StateSpaceSearch.getInstance(name, StateSpaceSearch.DEFAULT_HEURISTIC);
+    }
+
+    /**
+     * Returns an instance of a specified search strategy withe the default weight and timeout.
+     *
+     * @param name the name of the search strategy.
+     * @param heuristic the heuristic to used bt the search strategy.
+     * @return the search strategy.
+     */
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final GoalCostHeuristic.Name heuristic) {
+        return StateSpaceSearch.getInstance(name, heuristic, StateSpaceSearch.DEFAULT_HEURISTIC_WEIGHT);
+    }
+
+    /**
+     * Returns an instance of a specified search strategy with ethe default timeout.
+     *
+     * @param name the name of the search strategy.
+     * @param heuristic the heuristic to used bt the search strategy.
+     * @param weight the weight of the heuristic to used of the search strategy.
+     * @return the search strategy.
+     */
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final GoalCostHeuristic.Name heuristic,
+                                        final double weight) {
+        return StateSpaceSearch.getInstance(name, heuristic, weight, StateSpaceSearch.DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Returns an instance of a specified search strategy.
+     *
+     * @param name the name of the search strategy.
+     * @param heuristic the heuristic to used bt the search strategy.
+     * @param weight the weight of the heuristic to used of the search strategy.
+     * @param timeout the timeout of the search strategy.
+     * @return the search strategy.
+     */
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final GoalCostHeuristic.Name heuristic,
+                                        final double weight, final int timeout) {
+        switch (name) {
+            case ASTAR:
+                return new AStar(timeout, heuristic, weight);
+            case BREADTH_FIRST:
+                return new BreadthFirstSearch(timeout);
+            case DEPTH_FIRST:
+                return new DepthFirstSearch(timeout);
+            case ENFORCED_HILL_CLIMBING:
+                return new EnforcedHillClimbing(timeout, heuristic, weight);
+            case GREEDY_BEST_FIRST:
+                return new GreedyBestFirstSearch(timeout, heuristic, weight);
+            case HILL_CLIMBING:
+                return new HillClimbing(timeout, heuristic, weight);
+            default:
+                return null;
+        }
+    }
 }

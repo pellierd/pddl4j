@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.graph;
 
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;

@@ -246,7 +246,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic im
     }
 
     /**
-     * Set the goal of the the relaxed problem to solve in order to compute the heuristic.
+     * Set the goal of the relaxed problem to solve in order to compute the heuristic.
      *
      * @param goal the goal.
      * @throws NullPointerException if <code>goal == null</code>.

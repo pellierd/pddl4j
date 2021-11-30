@@ -53,7 +53,7 @@ public class TFDNode extends AbstractSTNNode {
      * to DEFAULT_OPERATOR and the task is set to DEFAULT_TASK.
      */
     public TFDNode() {
-        super(new State(), null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
+        super(new State(), null, DEFAULT_OPERATOR, DEFAULT_TASK);
         this.setTasks(new LinkedList<>());
     }
 
@@ -65,7 +65,7 @@ public class TFDNode extends AbstractSTNNode {
      * @param tasks the task network of the node.
      */
     public TFDNode(final State state, final List<Integer> tasks) {
-        super(state, null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
+        super(state, null, DEFAULT_OPERATOR, DEFAULT_TASK);
         this.setTasks(tasks);
     }
 

@@ -62,7 +62,7 @@ public final class PFDNode extends AbstractSTNNode {
      * @param taskNetwork the task network of the node.
      */
     public PFDNode(final State state, final TaskNetwork taskNetwork) {
-        super(state, null, AbstractSTNNode.DEFAULT_OPERATOR, AbstractSTNNode.DEFAULT_TASK);
+        super(state, null, DEFAULT_OPERATOR, DEFAULT_TASK);
         this.setTaskNetwork(taskNetwork);
     }
 

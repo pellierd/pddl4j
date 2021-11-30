@@ -15,9 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
-import fr.uga.pddl4j.planners.Setting;
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -50,7 +48,7 @@ public final class AStar extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public AStar(int timeout, Setting.Heuristic heuristic, double weight) {
+    public AStar(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -63,9 +61,7 @@ public final class AStar extends AbstractStateSpaceSearch {
     public Node search(final ADLProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
-        final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
-            getHeuristic(), codedProblem);
+        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), codedProblem);
         // Get the initial state from the planning problem
         final State init = new State(codedProblem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)
@@ -83,7 +79,7 @@ public final class AStar extends AbstractStateSpaceSearch {
 
         this.resetNodesStatistics();
         Node solution = null;
-        final int timeout = getTimeout();
+        final long timeout = this.getTimeout() * 1000;
         long time = 0;
         // Start of the search
         while (!open.isEmpty() && solution == null && time < timeout) {

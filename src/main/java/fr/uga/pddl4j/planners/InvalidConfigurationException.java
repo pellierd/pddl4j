@@ -30,7 +30,7 @@ package fr.uga.pddl4j.planners;
 public class InvalidConfigurationException extends RuntimeException {
 
     /**
-     * Creates a new invalid configurationn exception.
+     * Creates a new invalid configuration exception.
      *
      * @see Exception#Exception()
      */

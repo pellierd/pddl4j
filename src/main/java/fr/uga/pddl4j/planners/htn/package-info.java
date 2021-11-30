@@ -14,6 +14,6 @@
  */
 
 /**
- * This package contains the classes of the critical path heuristics implemented in the PDDL4J library.
+ * This package contains the common classes shared by all hierarchical planners.
  */
-package fr.uga.pddl4j.heuristics.criticalpath;
+package fr.uga.pddl4j.planners.htn;

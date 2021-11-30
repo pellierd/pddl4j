@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.heuristics;
 
+import fr.uga.pddl4j.heuristics.graph.FastForward;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -28,7 +29,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 19.10.2020
  */
-public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic  {
+public abstract class AbstractGoalCostHeuristic extends AbstractHeuristic implements GoalCostHeuristic  {
 
     /**
      * The goal to reached.
@@ -92,7 +93,7 @@ public abstract class AbstractGoalCostHeuristic implements GoalCostHeuristic  {
     }
 
     /**
-     * Set the goal of the the relaxed problem to solve in order to compute the heuristic.
+     * Set the goal of the relaxed problem to solve in order to compute the heuristic.
      *
      * @param goal the goal.
      */

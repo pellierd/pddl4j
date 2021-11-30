@@ -15,8 +15,9 @@
 
 package fr.uga.pddl4j.test.planners.htn;
 
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.htn.stn.PFDPlanner;
+import fr.uga.pddl4j.planners.htn.stn.TFD;
 import fr.uga.pddl4j.test.Tools;
 
 import org.apache.logging.log4j.Level;
@@ -26,14 +27,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
- * Implements the <tt>PFDPlannerTest</tt> of the PDD4L library. The class executes the junit tests with PFDPlanner on
+ * Implements the <tt>TFDPlannerTest</tt> of the PDD4L library. The class executes the junit tests with TFDPlanner on
  * planning domain of IPC. A bound of 60 seconds is allocated to the search. The plan returns for each test is tested
  * with the pandaPiParser.
  *
@@ -41,7 +38,7 @@ import java.nio.file.Paths;
  * @version 1.0 - 16.19.2020
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PFDPlannerTest {
+public class TFDTest {
 
     /**
      * Computation timeout.
@@ -51,7 +48,7 @@ public class PFDPlannerTest {
     /**
      * Default Trace level.
      */
-    private static final Level TRACE_LEVEL = Level.OFF;
+    private static final Level LOG_LEVEL = Level.OFF;
 
     /**
      * The planner configuration used to run the tests.
@@ -63,9 +60,9 @@ public class PFDPlannerTest {
      */
     @Before
     public void initTest() {
-        this.config = PFDPlanner.getDefaultConfiguration();
-        config.setTimeout(PFDPlannerTest.TIMEOUT);
-        config.setTraceLevel(PFDPlannerTest.TRACE_LEVEL);
+        this.config = TFD.getDefaultConfiguration();
+        this.config.setProperty(TFD.TIME_OUT_SETTING, TFDTest.TIMEOUT);
+        this.config.setProperty(TFD.LOG_LEVEL_SETTING, TFDTest.LOG_LEVEL);
         Tools.changeVALPerm();
     }
 
@@ -75,7 +72,7 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_PFDPlanner_IPC2020_HDDL_Feature_Test1() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Feature_Test1() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test1" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -88,7 +85,7 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_PFDPlanner_IPC2020_HDDL_Feature_Test2() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Feature_Test2() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -101,7 +98,7 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_PFDPlanner_IPC2020_HDDL_Feature_Test3() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Feature_Test3() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test3" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -114,7 +111,7 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_PFDPlanner_IPC2020_HDDL_Feature_Test4() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Feature_Test4() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test4" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -127,7 +124,7 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     /*@Test
-    public void test_PFDPlanner_IPC2020_HDDL_Feature_Test5() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Feature_Test5() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/feature-tests/test5" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
@@ -140,11 +137,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Barman() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Barman() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/barman" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -153,11 +150,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Childsnack() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Childsnack() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -166,11 +163,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Gripper() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Gripper() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/gripper" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -179,11 +176,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Miconic() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Miconic() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/miconic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -192,11 +189,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Rover() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Rover() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/rover" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -205,11 +202,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Satellite() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Satellite() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/satellite" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -218,11 +215,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Smartphone() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Smartphone() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/smartphone" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -231,11 +228,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Transport() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Transport() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/transport" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -244,11 +241,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_UMTranslog() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_UMTranslog() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/umtranslog" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -257,11 +254,11 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Woodworking() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Woodworking() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/woodworking" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 
     /**
@@ -270,10 +267,10 @@ public class PFDPlannerTest {
      * @throws Exception if something went wrong.
      */
     @Test
-    public void test_PFDPlanner_IPC2020_HDDL_Zenotravel() throws Exception {
+    public void test_TFDPlanner_IPC2020_HDDL_Zenotravel() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/zenotravel" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
-        Tools.solve(localTestPath, Tools.HDDL_EXT, this.config);
+        Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.TFD, this.config);
     }
 }

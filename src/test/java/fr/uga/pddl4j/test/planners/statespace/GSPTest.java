@@ -15,21 +15,11 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.Setting;
-import fr.uga.pddl4j.planners.statespace.GenericPlanner;
-import fr.uga.pddl4j.planners.statespace.HSP;
-import fr.uga.pddl4j.planners.statespace.search.AStar;
-import fr.uga.pddl4j.planners.statespace.search.BreadthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.DepthFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.GreedyBestFirstSearch;
-import fr.uga.pddl4j.planners.statespace.search.HillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.planners.SearchStrategy;
+import fr.uga.pddl4j.planners.statespace.GSP;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -38,11 +28,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * Implements the <tt>GenericPlannerTest</tt> of the PDD4L library. The planner accepts only PDDL3.0 language.
@@ -54,11 +40,11 @@ import java.nio.file.Paths;
  * It suppose benchmark directory is a the root of your project.
  * If no test files are provided all test will pass the validation.</p>
  *
- * @author Emmanuel Hermellin
+ * @author Emmanuel Hermellin, Damien Pellier
  * @version 0.1 - 22.11.18
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GenericPlannerTest {
+public class GSPTest {
 
     /**
      * Computation timeout.
@@ -81,10 +67,9 @@ public class GenericPlannerTest {
      */
     @Before
     public void initTest() {
-        this.config = GenericPlanner.getDefaultConfiguration();
-        this.config.setPlanner(Setting.Planner.GENERIC);
-        this.config.setTimeout(GenericPlannerTest.TIMEOUT);
-        this.config.setHeuristicWeight(GenericPlannerTest.HEURISTIC_WEIGHT);
+        this.config = GSP.getDefaultConfiguration();
+        this.config.setProperty(GSP.TIME_OUT_SETTING, GSPTest.TIMEOUT);
+        this.config.setProperty(GSP.WEIGHT_HEURISTIC_SETTING, GSPTest.HEURISTIC_WEIGHT);
         Tools.changeVALPerm();
     }
 
@@ -94,23 +79,21 @@ public class GenericPlannerTest {
      * @param path the path of the problems.
      */
     public void solve(String path) {
-        for (Setting.SearchStrategy strategy : Setting.SearchStrategy.values()) {
+        for (SearchStrategy.Name strategy : SearchStrategy.Name.values()) {
             switch (strategy) {
                 case BREADTH_FIRST:
                 case DEPTH_FIRST:
-                    this.config.setSearchStrategy(strategy);
-                    Tools.solve(path, Tools.PDDL_EXT, this.config);
+                    this.config.setProperty(GSP.SEARCH_STRATEGIES_SETTING, strategy);
+                    Tools.solve(path, Tools.PDDL_EXT, Planner.Name.GSP, this.config);
                     break;
                 case GREEDY_BEST_FIRST:
-                case ENFORCE_HILL_CLIMBING:
+                case ENFORCED_HILL_CLIMBING:
                 case ASTAR:
                 case HILL_CLIMBING:
-                    this.config.setSearchStrategy(strategy);
-                    for (Setting.Heuristic heuristic : Setting.Heuristic.values()) {
-                        if (!heuristic.equals(Setting.Heuristic.NONE)) {
-                            this.config.setHeuristic(heuristic);
-                            Tools.solve(path, Tools.PDDL_EXT, this.config);
-                        }
+                    this.config.setProperty(GSP.SEARCH_STRATEGIES_SETTING, strategy);
+                    for (GoalCostHeuristic.Name heuristic : GoalCostHeuristic.Name.values()) {
+                        this.config.setProperty(GSP.HEURISTIC_SETTING, heuristic);
+                        Tools.solve(path, Tools.PDDL_EXT, Planner.Name.GSP, this.config);
                     }
                     break;
                 default:

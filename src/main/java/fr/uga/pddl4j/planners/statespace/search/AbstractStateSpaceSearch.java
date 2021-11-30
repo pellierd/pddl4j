@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 
@@ -30,12 +30,12 @@ import java.util.Objects;
  * @version 1.0 - 11.06.2018
  * @since 3.6
  */
-public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
+public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
 
     /**
      * The heuristic of the planner.
      */
-    private Setting.Heuristic heuristic;
+    private GoalCostHeuristic.Name heuristic;
 
     /**
      * The heuristic weight.
@@ -78,7 +78,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @return the heuristic to use to solve the planning problem.
      */
     @Override
-    public final Setting.Heuristic getHeuristic() {
+    public final GoalCostHeuristic.Name getHeuristic() {
         return this.heuristic;
     }
 
@@ -88,7 +88,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
     @Override
-    public final void setHeuristic(final Setting.Heuristic heuristic) {
+    public final void setHeuristic(final GoalCostHeuristic.Name heuristic) {
         Objects.requireNonNull(heuristic);
         this.heuristic = heuristic;
     }
@@ -114,9 +114,9 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
     }
 
     /**
-     * Sets the time out of the planner.
+     * Sets the time out of the planner in second.
      *
-     * @param timeout the time allocated to the search in second. Timeout mus be positive.
+     * @param timeout the time allocated to the search in second. Timeout must be positive.
      */
     @Override
     public final void setTimeOut(final int timeout) {
@@ -124,7 +124,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
     }
 
     /**
-     * Returns the time out of the planner.
+     * Returns the time out of the planner in second.
      *
      * @return the time out of the planner, i.e., the time allocated to the search in second.
      */
@@ -237,13 +237,8 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * Create a new search strategy.
      */
     public AbstractStateSpaceSearch() {
-        super();
-        this.heuristic = Setting.Heuristic.FAST_FORWARD;
-        this.weight = Setting.DEFAULT_HEURISTIC_WEIGHT;
-        this.timeout = Setting.DEFAULT_TIMEOUT * 1000;
-        this.searchingTime = 0;
-        this.memoryUsed = 0;
-        resetNodesStatistics();
+        this(StateSpaceSearch.DEFAULT_TIMEOUT, StateSpaceSearch.DEFAULT_HEURISTIC,
+            StateSpaceSearch.DEFAULT_HEURISTIC_WEIGHT);
     }
 
     /**
@@ -252,25 +247,19 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceStrategy {
      * @param timeout   the time out of the planner in seconds.
      */
     public AbstractStateSpaceSearch(int timeout) {
-        super();
-        this.heuristic = Setting.Heuristic.FAST_FORWARD;
-        this.weight = Setting.DEFAULT_HEURISTIC_WEIGHT;
-        this.timeout = timeout * 1000;
-        this.searchingTime = 0;
-        this.memoryUsed = 0;
-        resetNodesStatistics();
+        this(timeout, StateSpaceSearch.DEFAULT_HEURISTIC, StateSpaceSearch.DEFAULT_HEURISTIC_WEIGHT);
     }
 
     /**
      * Create a new search strategy.
      *
+     * @param timeout   the time out of the planner in seconds.
      * @param heuristic the heuristicType to use to solve the planning problem.
-     * @param timeout   the time out of the planner in seconds
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceSearch(int timeout, Setting.Heuristic heuristic, double weight) {
+    public AbstractStateSpaceSearch(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
         super();
-        this.timeout = timeout * 1000;
+        this.timeout = timeout;
         this.heuristic = heuristic;
         this.weight = weight;
         this.searchingTime = 0;

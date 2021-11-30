@@ -16,46 +16,58 @@
 package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import picocli.CommandLine;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
 /**
- * This class implements the code of the total ordered simple task network planner. The search method is an
+ * This class implements the code of a Total-order Forward Decomposition Planner. The search method is an
  * implementation of the total order STN procedure describes in the book of Automated Planning of Ghallab and al.
  * page 239.
  *
- * <p>The command line to launcg the planner is as follow:</p>
+ * <p>The command line to launch the planner is as follow:</p>
  *
  * <pre>
- * Usage of TFDPlanner:
+ * {@code
+ * TFDPlanner [-hiV] [-l=<logLevel>] [-t=<timeout>] <domain> <problem>
  *
- * OPTIONS   DESCRIPTIONS
+ * Description:
  *
- * -o <i>str</i>   the path to the domain
- * -f <i>str</i>   the path to the problem
- * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
- * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+ * Solves a specified planning problem using a Total-order Forward Decomposition
+ * strategy.
+ *
+ * Parameters:
+ *       <domain>              The domain file.
+ *       <problem>             The problem file.
+ *
+ * Options:
+ *   -t, --timeout=<timeout>   Set the time out of the planner in seconds (preset
+ *                               600s).
+ *   -l, --log=<logLevel>      Set the level of trace of the planner: ALL, DEBUG,
+ *                               INFO, ERROR, FATAL, OFF, TRACE (preset INFO).
+ *   -i, --interactive         Set the planner in interactive mode for debug
+ *   -h, --help                Show this help message and exit.
+ *   -V, --version             Print version information and exit.
+ * }
  * </pre>
  *
  * <p>Commande line example:</p>
  * <pre>
- *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner
- *          -o src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl
- *          -f src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl
+ * {@code
+ *     java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner
+ *          src/test/resources/benchmarks/hddl/ipc2020/barman/domain.hddl
+ *          src/test/resources/benchmarks/hddl/ipc2020/barman/p01.hddl
+ *          -t 600
+ * }
  * </pre>
  *
  * @author D. Pellier
@@ -64,19 +76,36 @@ import java.util.PriorityQueue;
  *
  * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-public final class TFDPlanner extends AbstractSTNPlanner {
+@CommandLine.Command(name = "TFDPlanner",
+    version = "TFDPlanner 2.0",
+    description = "Solves a specified planning problem using a Total-order Forward Decomposition strategy.",
+    sortOptions = false,
+    mixinStandardHelpOptions = true,
+    headerHeading = "Usage:%n",
+    synopsisHeading = "%n",
+    descriptionHeading = "%nDescription:%n%n",
+    parameterListHeading = "%nParameters:%n",
+    optionListHeading = "%nOptions:%n")
+public final class TFD extends AbstractSTNPlanner {
 
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(TFDPlanner.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(TFD.class.getName());
+
+    /**
+     * Creates a new planner with a default configuration.
+     */
+    public TFD() {
+        super();
+    }
 
     /**
      * Creates a new abstract STN planner with the default configuration.
      *
      * @param configuration the configuration of the planner.
      */
-    public TFDPlanner(final PlannerConfiguration configuration) {
+    public TFD(final PlannerConfiguration configuration) {
         super(configuration);
     }
 
@@ -98,8 +127,6 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         // Create the root node of the search space
         final State init = new State(problem.getInitialState());
         final TFDNode root = new TFDNode(init, problem.getInitialTaskNetwork().getTasks());
-        //root.getState().getNegative().set(0, problem.getFluents().size());
-        //root.getState().getNegative().andNot(root.getState().getPositive());
 
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
@@ -108,26 +135,23 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         Plan plan = null;
 
         // Get the timeout for searching
-        final int timeout = this.getConfiguration().getTimeout();
+        final int timeout = this.getTimeout() * 1000;
         final long start = System.currentTimeMillis();
         long elapsedTime = 0;
-
-        boolean debug = false;
 
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
-            //final TFDNode currentNode = open.poll();
             final TFDNode currentNode = open.poll();
 
-            if (debug) {
-                System.out.println("=========> Pop a new node <=========\n");
-                System.out.println("=> Current state:");
-                System.out.println(problem.toString(currentNode.getState()));
-                System.out.println("\n=> Tasks to be excuted:");
-                System.out.println(currentNode.getTasks());
+            if (this.isInteractive()) {
+                LOGGER.info("=========> Pop a new node <=========\n");
+                LOGGER.info("=> Current state:");
+                LOGGER.info(problem.toString(currentNode.getState()));
+                LOGGER.info("\n=> Tasks to be excuted:");
+                LOGGER.info(currentNode.getTasks());
                 for (int i = 0; i < currentNode.getTasks().size(); i++) {
-                    System.out.println(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
+                    LOGGER.info(problem.toString(problem.getTasks().get(currentNode.getTasks().get(i))));
                 }
             }
             // If the task network is empty we've got a solution
@@ -137,14 +161,13 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 }  else {
                     if (LOGGER.isDebugEnabled()) {
                         Plan p = super.extractPlan(currentNode, problem);
-                        System.out.println("\nFound plan as follows:\n" + problem.toString(p));
-                        System.out.println(" But plan does does not reach the goal:\n");
-                        System.out.println(problem.toString(problem.getGoal()) + "\n");
+                        LOGGER.debug("\nFound plan as follows:\n" + problem.toString(p));
+                        LOGGER.debug(" But plan does does not reach the goal:\n");
+                        LOGGER.debug(problem.toString(problem.getGoal()) + "\n");
                     }
                 }
             } else {
                 // Get and remove the fist task of the task network
-                //System.out.println(currentNode);
                 int task = currentNode.popTask();
                 // Get the current state of the search
                 final State state = currentNode.getState();
@@ -154,8 +177,8 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                 if (problem.getTasks().get(task).isPrimtive()) {
                     for (Integer operator : relevantOperators) {
                         final Action action = problem.getActions().get(operator);
-                        if (debug) {
-                            System.out.println("\n======> Try to decompose primitive tasks "
+                        if (this.isInteractive()) {
+                            LOGGER.info("\n======> Try to decompose primitive tasks "
                                 + problem.toString(problem.getTasks().get(task)) + " with \n\n"
                                 + problem.toString(action));
                         }
@@ -166,31 +189,27 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             childNode.getState().apply(action.getConditionalEffects());
                             childNode.setTask(task);
                             open.add(childNode);
-                            if (debug) {
-                                System.out.println("=====> Decomposition succeeded push node:");
-                                System.out.println(problem.toString(childNode.getState()));
+                            if (this.isInteractive()) {
+                                LOGGER.info("=====> Decomposition succeeded push node:");
+                                LOGGER.info(problem.toString(childNode.getState()));
                                 for (int t : childNode.getTasks()) {
-                                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                                    LOGGER.info(problem.toString(problem.getTasks().get(t)));
                                 }
                             }
                         } else {
-                            if (debug) {
-                                System.out.println("=====> Decomposition failed");
+                            if (this.isInteractive()) {
+                                LOGGER.info("=====> Decomposition failed");
                             }
                         }
-                        if (debug) {
-                            try {
-                                System.in.read();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                        if (this.isInteractive()) {
+                            AbstractSTNPlanner.waitPressAnyKey();
                         }
                     }
                 } else { // Case of the compound task
                     for (Integer operator : relevantOperators) {
                         final Method method = problem.getMethods().get(operator);
-                        if (debug) {
-                            System.out.println("\n======> Try to decompose compound tasks "
+                        if (this.isInteractive()) {
+                            LOGGER.info("\n======> Try to decompose compound tasks "
                                 + problem.toString(problem.getTasks().get(task)) + " with\n\n"
                                 + problem.toString(method));
                         }
@@ -201,25 +220,21 @@ public final class TFDPlanner extends AbstractSTNPlanner {
                             childNode.pushAllTasks(method.getSubTasks());
                             childNode.setTask(task);
                             open.add(childNode);
-                            if (debug) {
-                                System.out.println("=====> Decomposition succeeded push node:");
-                                System.out.println("=====>\n" + problem.toString(childNode.getState()));
-                                System.out.println("=====>\n");
+                            if (this.isInteractive()) {
+                                LOGGER.info("=====> Decomposition succeeded push node:");
+                                LOGGER.info("=====>\n" + problem.toString(childNode.getState()));
+                                LOGGER.info("=====>\n");
                                 for (int t : childNode.getTasks()) {
-                                    System.out.println(problem.toString(problem.getTasks().get(t)));
+                                    LOGGER.info(problem.toString(problem.getTasks().get(t)));
                                 }
                             }
                         } else {
-                            if (debug) {
-                                System.out.println("=====> Decomposition failed");
+                            if (this.isInteractive()) {
+                                LOGGER.info("=====> Decomposition failed");
                             }
                         }
-                        if (debug) {
-                            try {
-                                System.in.read();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                        if (this.isInteractive()) {
+                            AbstractSTNPlanner.waitPressAnyKey();
                         }
                     }
                 }
@@ -229,59 +244,19 @@ public final class TFDPlanner extends AbstractSTNPlanner {
         return plan;
     }
 
-
     /**
-     * Returns the configuration by default of the planner.
-     *
-     * @return the configuration by default of the planner.
-     */
-    public static PlannerConfiguration getDefaultConfiguration() {
-        PlannerConfiguration config = new PlannerConfiguration();
-        config.setPlanner(Setting.Planner.TFD);
-        config.setDomain(Setting.DEFAULT_DOMAIN);
-        config.setProblem(Setting.DEFAULT_PROBLEM);
-        config.setTimeout(Setting.DEFAULT_TIMEOUT);
-        config.setHeuristic(Setting.Heuristic.NONE);
-        config.setHeuristicWeight(Setting.DEFAULT_HEURISTIC_WEIGHT);
-        config.setSearchStrategy(Setting.SearchStrategy.DEPTH_FIRST);
-        config.setTraceLevel(Level.INFO);
-        return config;
-    }
-
-    /**
-     * The main method of the <code>TFDPlanner</code> example. The command line syntax is as
-     * follow:
-     *
-     * <pre>
-     * Usage of TFDPlanner:
-     *
-     * OPTIONS   DESCRIPTIONS
-     *
-     * -o <i>str</i>   the path to the domain
-     * -f <i>str</i>   the path to the problem
-     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
-     * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
-     * </pre>
-     *
-     * <p>Commande line example:</p>
-     * <pre>
-     *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.TFDPlanner
-     *          -o src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl
-     *          -f src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl
-     * </pre>
+     * The main method of the <code>TFDPlanner</code> example.
      *
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
         try {
-            final PlannerConfiguration config = new PlannerConfiguration(args, TFDPlanner.getDefaultConfiguration());
-            final Planner planner = new TFDPlanner(config);
-            planner.solve();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }  catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            final TFD planner = new TFD();
+            final CommandLine cmd = new CommandLine(planner);
+            int exitCode = (int) cmd.execute(args);
+            System.exit(exitCode);
+        } catch (Throwable e) {
+            LOGGER.fatal(e.getMessage());
         }
-
     }
 }

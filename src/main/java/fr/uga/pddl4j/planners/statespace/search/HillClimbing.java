@@ -15,9 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
-import fr.uga.pddl4j.planners.Setting;
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -50,7 +48,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public HillClimbing(int timeout, Setting.Heuristic heuristic, double weight) {
+    public HillClimbing(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -63,9 +61,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
     public Node search(final ADLProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
-        final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
-            getHeuristic(), codedProblem);
+        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), codedProblem);
 
         State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
@@ -75,7 +71,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
         boolean deadEndFree = true;
 
         this.resetNodesStatistics();
-        final int timeout = getTimeout();
+        final long timeout = this.getTimeout() * 1000;
         final long begin = System.currentTimeMillis();
         long searchingTime = 0;
         while (!openList.isEmpty() && solution == null
@@ -116,7 +112,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @return the list of successors from the parent node.
      */
     private LinkedList<Node> getSuccessors(final Node parent, final ADLProblem problem,
-                                           final PlanningGraphHeuristic heuristic) {
+                                           final GoalCostHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

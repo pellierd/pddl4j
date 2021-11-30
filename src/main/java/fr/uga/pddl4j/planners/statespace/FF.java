@@ -20,23 +20,15 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.Setting;
-import fr.uga.pddl4j.planners.statespace.search.AStar;
-import fr.uga.pddl4j.planners.statespace.search.EnforcedHillClimbing;
-import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.planners.statespace.search.StateSpaceStrategy;
+import fr.uga.pddl4j.planners.SearchStrategy;
 
 import fr.uga.pddl4j.problem.ADLProblem;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import picocli.CommandLine;
 
-import java.io.FileNotFoundException;
-import java.util.Objects;
+import java.util.Arrays;
 
 /**
  * This class implements Fast Forward planner based on Enforced Hill Climbing algorithm and AStar search.
@@ -45,22 +37,38 @@ import java.util.Objects;
  * <p>The command line syntax to launch the planner is as follow:</p>
  *
  * <pre>
- * usage of FF:
+ * {@code
+ * FF [-hV] [-l=<logLevel>] [-t=<timeout>] [-w=<weight>] <domain>
+ *             <problem>
  *
- * OPTIONS   DESCRIPTIONS
+ * Description:
  *
- * -o <i>str</i>   the path to the domain
- * -f <i>str</i>   the path to the problem
- * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
- * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+ * Solves a specified planning problem combining enforced hill climbing and A*
+ * search strategies using the the delete relaxation heuristic.
  *
+ * Parameters:
+ *       <domain>              The domain file.
+ *       <problem>             The problem file.
+ *
+ * Options:
+ *   -l, --log=<logLevel>      Set the level of trace: ALL, DEBUG, INFO, ERROR,
+ *                               FATAL, OFF, TRACE (preset INFO).
+ *   -t, --timeout=<timeout>   Set the time out of the planner in seconds (
+ *                               preset 600s).
+ *   -w, --weight=<weight>     Set the weight of the heuristic (preset 1.0).
+ *   -h, --help                Show this help message and exit.
+ *   -V, --version             Print version information and exit.
+ *  }
  * </pre>
  *
  * <p>Commande line example:</p>
  * <pre>
- *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.statespace.FF
- *        -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
- *        -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed//pb01.pddl
+ * {@code
+ *     java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FastForward
+ *          pddl/depots/domain.pddl
+ *          pddl/depots/p01.pddl
+ *          -t 1000
+ * }
  * </pre>
  *
  * @author Samuel Aaron Boyd
@@ -68,36 +76,32 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 2.0 - 24.01.2018
  *
- * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
+@CommandLine.Command(name = "FF",
+    version = "FF 2.0",
+    description = "Solves a specified planning problem combining enforced hill climbing and A* search "
+        + "strategies using the the delete relaxation heuristic.",
+    sortOptions = false,
+    mixinStandardHelpOptions = true,
+    headerHeading = "Usage:%n",
+    synopsisHeading = "%n",
+    descriptionHeading = "%nDescription:%n%n",
+    parameterListHeading = "%nParameters:%n",
+    optionListHeading = "%nOptions:%n")
+public final class FF extends AbstractStateSpacePlanner<ADLProblem>  {
 
     /**
-     * The logger of the class.
+     * The class logger.
      */
     private static final Logger LOGGER = LogManager.getLogger(FF.class.getName());
-
-    /**
-     * The Enforced Hill Climbing strategy.
-     */
-    private final StateSpaceStrategy enforcedHillClimbing;
-
-    /**
-     * The Greedy Best First Search strategy.
-     */
-    private final StateSpaceStrategy astar;
 
     /**
      * Creates a new planner with default parameters.
      */
     public FF() {
         super();
-        this.enforcedHillClimbing = new EnforcedHillClimbing();
-        this.astar = new AStar();
-        this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
-        this.getStateSpaceStrategies().add(this.astar);
+        this.setSearchStrategies(Arrays.asList(SearchStrategy.Name.ENFORCED_HILL_CLIMBING, SearchStrategy.Name.ASTAR));
     }
-
 
     /**
      * Creates a new planner.
@@ -106,77 +110,18 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
      */
     public FF(PlannerConfiguration configuration) {
         super(configuration);
-        final int timeout = this.getConfiguration().getTimeout();
-        final Setting.Heuristic heuristic = this.getConfiguration().getHeuristic();
-        final double weight = this.getConfiguration().getHeuristicWeight();
-        this.enforcedHillClimbing = new EnforcedHillClimbing(timeout, heuristic, weight);
-        this.astar = new AStar(timeout, heuristic, weight);
-        this.getStateSpaceStrategies().add(this.enforcedHillClimbing);
-        this.getStateSpaceStrategies().add(this.astar);
     }
 
     /**
-     * Search a solution plan to a specified domain and problem.
+     * Sets the weight of the heuristic.
      *
-     * @param pb the problem to solve.
+     * @param weight the weight of the heuristic. The weight must be greater than 0.
+     * @throws IllegalArgumentException if the weight is strictly less than 0.
      */
-    @Override
-    public Plan solve(final ADLProblem pb) {
-        Objects.requireNonNull(pb);
-
-        LOGGER.info("* starting enforced hill climbing\n");
-        Node solutionNode = this.enforcedHillClimbing.searchSolutionNode(pb);
-
-        if (solutionNode != null) {
-            LOGGER.info("* enforced hill climbing succeeded\n");
-            this.getStatistics().setTimeToSearch(this.enforcedHillClimbing.getSearchingTime());
-            this.getStatistics().setMemoryUsedToSearch(this.enforcedHillClimbing.getMemoryUsed());
-            return (SequentialPlan) this.enforcedHillClimbing.extractPlan(solutionNode, pb);
-        } else {
-            LOGGER.info("* enforced hill climbing failed\n");
-            LOGGER.info("* starting A* search\n");
-            solutionNode = astar.searchSolutionNode(pb);
-            this.getStatistics().setTimeToSearch(this.astar.getSearchingTime());
-            this.getStatistics().setMemoryUsedToSearch(this.astar.getMemoryUsed());
-            if (solutionNode == null) {
-                LOGGER.info("* A* search failed\n");
-                return null;
-            } else {
-                LOGGER.info("* A* search succeeded\n");
-                return (SequentialPlan) this.astar.extractPlan(solutionNode, pb);
-            }
-        }
-    }
-
-    /**
-     * Returns if the planner configuration is valid or not. A configuration is valid is the timeout is greater than 0
-     * and the heuristic weight is greater than 0.0.
-     *
-     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
-     */
-    @Override
-    public boolean checkConfiguration() {
-        return this.getConfiguration().getTimeout() > 0
-            && this.getConfiguration().getHeuristicWeight() > 0.0;
-    }
-
-
-    /**
-     * Returns the configuration by default of the planner.
-     *
-     * @return the configuration by default of the planner.
-     */
-    public static PlannerConfiguration getDefaultConfiguration() {
-        PlannerConfiguration config = new PlannerConfiguration();
-        config.setPlanner(Setting.Planner.FF);
-        config.setDomain(Setting.DEFAULT_DOMAIN);
-        config.setProblem(Setting.DEFAULT_PROBLEM);
-        config.setTimeout(Setting.DEFAULT_TIMEOUT);
-        config.setHeuristic(Setting.Heuristic.FAST_FORWARD);
-        config.setHeuristicWeight(Setting.DEFAULT_HEURISTIC_WEIGHT);
-        config.setSearchStrategy(Setting.SearchStrategy.NONE);
-        config.setTraceLevel(Level.INFO);
-        return config;
+    @CommandLine.Option(names = { "-w", "--weight" }, defaultValue = "1.0", paramLabel = "<weight>",
+        description = "Set the weight of the heuristic (preset 1.0).")
+    public void setHeuristicWeight(final double weight) {
+        super.setHeuristicWeight(weight);
     }
 
     /**
@@ -193,38 +138,34 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * The main method of the <code>FF</code> planner. The command line syntax is as follow:
+     * Checks the planner configuration and returns if the configuration is valid. A configuration is valid if (1) the
+     * domain and the problem files exist and can be read, (2) the timeout is greater than 0, (3) the weight of the
+     * heuristic is greater than 0, (4) the heuristic is a not null and (5) the list of search strategies to use is
+     * ENFORCE_HILL_CLIMBING and ASTAR.
      *
-     * <pre>
-     * usage of FF:
-     *
-     * OPTIONS   DESCRIPTIONS
-     *
-     * -o <i>str</i>   the path to the domain
-     * -f <i>str</i>   the path to the problem
-     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
-     * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
-     *
-     * </pre>
-     *
-     * <p>Commande line example:</p>
-     * <pre>
-     *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.statespace.FF
-     *        -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl
-     *        -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed//pb01.pddl
-     * </pre>
+     * @return <code>true</code> if the configuration is valid <code>false</code> otherwise.
+     */
+    public boolean hasValidConfiguration() {
+        return super.hasValidConfiguration()
+            && this.getSearchStrategies().size() == 2
+            && this.getSearchStrategies().get(0).equals(SearchStrategy.Name.ENFORCED_HILL_CLIMBING)
+            && this.getSearchStrategies().get(1).equals(SearchStrategy.Name.ASTAR);
+
+    }
+
+    /**
+     * The main method of the <code>FastForward</code> planner.
      *
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
         try {
-            final PlannerConfiguration config = new PlannerConfiguration(args, FF.getDefaultConfiguration());
-            Planner planner = new FF(config);
-            planner.solve();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }  catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            final FF planner = new FF();
+            CommandLine cmd = new CommandLine(planner);
+            int exitCode = (int) cmd.execute(args);
+            System.exit(exitCode);
+        } catch (Throwable e) {
+            LOGGER.fatal(e.getMessage());
         }
     }
 }

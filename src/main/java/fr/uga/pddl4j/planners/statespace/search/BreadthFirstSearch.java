@@ -60,7 +60,7 @@ public final class BreadthFirstSearch extends AbstractStateSpaceSearch {
 
         final HashSet<Node> closeSet = new HashSet<>();
         final LinkedList<Node> openSet = new LinkedList<>();
-        final int timeout = getTimeout();
+        final int timeout = this.getTimeout() * 1000;
 
         State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, 0);

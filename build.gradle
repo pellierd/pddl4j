@@ -36,9 +36,12 @@ dependencies {
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
-    testImplementation group: 'junit', name: 'junit', version: '4.13'
     implementation group: 'org.openjdk.jol', name: 'jol-core', version: '0.9'
-//    implementation group: 'com.github.jbellis', name: 'jamm', version: '0.3.0'
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
+
+    //implementation group: 'com.github.jbellis', name: 'jamm', version: '0.3.0'
+    implementation 'info.picocli:picocli:4.6.1'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
 
 //    testImplementation 'junit:junit:4.13'
 }
@@ -62,6 +65,7 @@ jjdoc {
 // Remove warning about log4j ProcessPlugin raised with --warning-mode=all
 compileJava {
     options.compilerArgs += '-proc:none'
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 //    options.compilerArgs += '-Xlint:none'
 }
 
@@ -172,18 +176,19 @@ test {
     }
 
     // The set of Junit tests
-    scanForTestClasses = false
-    //includes = ['**/PDDLParserTest.class']
-    //includes = ['**/HDDLParserTest.class']
-    //includes = ['**/ADLProblemInstantiationTest.class']
-    //includes = ['**/HTNProblemInstantiationTest.class']
-    //includes = ['**/TemporalProblemInstantiationTest.class']
-    //includes = ['**/HSPTest.class']
-    //includes = ['**/FFTest.class']
-    //includes = ['**/GenericPlannerTest.class']
-    //includes = ['**/TFDPlannerTest.class']
-    includes = ['**/PFDPlannerTest.class']
-
+    scanForTestClasses = true
+    includes = [
+            //'**/PDDLParserTest.class',
+            //'**/HDDLParserTest.class',
+            //'**/ADLProblemInstantiationTest.class',
+            //'**/HTNProblemInstantiationTest.class',
+            //'**/TemporalProblemInstantiationTest.class',
+            '**/HSPTest.class',
+            //'**/FFTest.class',
+            //'**/GSPTest.class',
+            //'**/TFDTest.class',
+            //'**/PFDTest.class'
+    ]
 
 }
 

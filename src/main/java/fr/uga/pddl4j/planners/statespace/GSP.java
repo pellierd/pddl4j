@@ -29,20 +29,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
+import java.util.List;
+
 /**
- * This class implements a simple state space planner based on A* algorithm. It is possible to choose the heuristic
- * function used and its weight.
+ * This class implements a simple generic planner. It is possible to choose the search strategy and the heuristic to
+ * solve a planning.
  *
  * <p>The command line syntax to launch the planner is as follow:</p>
  *
  * <pre>
  * {@code
- * HeuristicStateSpacePlanner [-hV] [-e=<heuristic>] [-l=<logLevel>]
- *                            [-t=<timeout>] [-w=<weight>] <domain> <problem>
+ * GSP [-hV] [-e="<heuristic>] [-l=<logLevel>]
+ *                                [-t=<timeout>] [-w=<weight>] [-s
+ *                                [=<strategies>...]]... <domain> <problem>
  *
  * Description:
  *
- * Solves a specified planning problem using A* search strategy.
+ * Solves a specified planning problem using a specified search strategy and
+ * heuristic.
  *
  * Parameters:
  *       <domain>              The domain file.
@@ -53,32 +57,44 @@ import picocli.CommandLine;
  *                               FATAL, OFF, TRACE (preset INFO).
  *   -t, --timeout=<timeout>   Set the time out of the planner in seconds (
  *                               preset 600s).
- *   -w, --weight=<weight>     the weight of the heuristic (preset 1.0).
+ *   -w, --weight=<weight>     Set the weight of the heuristic (preset 1.0).
  *   -e, --heuristic=<heuristic>
- *                             Set the heuristic : AJUSTED_SUM, AJUSTED_SUM2,
+ *                             Set the heuristics: AJUSTED_SUM, AJUSTED_SUM2,
  *                               AJUSTED_SUM2M, COMBO, MAX, FAST_FORWARD,
  *                               SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)
+ *   -s, --search-strategies[=<strategies>...]
+ *                             Set the search strategies: ASTAR,
+ *                               ENFORCED_HILL_CLIMBING, BREADTH_FIRST,
+ *                               GREEDY_BEST_FIRST, DEPTH_FIRST, HILL_CLIMBING
+ *                               (preset: ASTAR)
  *   -h, --help                Show this help message and exit.
  *   -V, --version             Print version information and exit.
- *  }
- * </pre>
- *
- * <p>Commande line example:</p>
- * <pre>
- * {@code
- *     java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.HeuristicStateSpacePlanner
- *          pddl/depots/domain.pddl
- *          pddl/depots/p01.pddl -e SUM
  * }
  * </pre>
  *
+ * <p>Command line example:</p>
+ * <pre>
+ * {@code
+ * java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.GenericStateSpaceSearchPlanner
+ *      pddl/depots/domain.pddl
+ *      pddl/depots/p01.pddl
+ *      -t 1000
+ *      -w 1.0
+ *      -e FAST_FORWARD
+ *      -s ENFORCED_HILL_CLIMBING ASTAR
+ * }
+ * </pre>
+ *
+ *
+ * @author E. Hermellin
  * @author D. Pellier
- * @version 1.0 - 14.06.2010
+ * @version 3.0 - 28.09.2018
+ *
  * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-@CommandLine.Command(name = "HSP",
-    version = "HSP 2.0",
-    description = "Solves a specified planning problem using A* search strategy.",
+@CommandLine.Command(name = "GSP",
+    version = "GSP 2.0",
+    description = "Solves a specified planning problem using a specified search strategy and heuristic.",
     sortOptions = false,
     mixinStandardHelpOptions = true,
     headerHeading = "Usage:%n",
@@ -86,65 +102,66 @@ import picocli.CommandLine;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class HSP extends AbstractStateSpacePlanner<ADLProblem>  {
+public final class GSP extends AbstractStateSpacePlanner<ADLProblem> {
 
     /**
-     * The class logger.
+     * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(HSP.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(GSP.class.getName());
 
     /**
      * Creates a new planner with default parameters.
      */
-    public HSP() {
+    public GSP() {
         super();
     }
 
     /**
-     * Creates a new planner with a default configuration.
+     * Creates a new planner from a planner configuration.
      *
      * @param configuration the configuration of the planner.
      */
-    public HSP(PlannerConfiguration configuration) {
+    public GSP(final PlannerConfiguration configuration) {
         super(configuration);
     }
 
     /**
-     * Sets the weight of the heuristic.
+     * Sets the weight of the heuristic. This method is overrided to add the command line option of the planner.
      *
      * @param weight the weight of the heuristic. The weight must be greater than 0.
      * @throws IllegalArgumentException if the weight is strictly less than 0.
      */
     @CommandLine.Option(names = { "-w", "--weight" }, defaultValue = "1.0", paramLabel = "<weight>",
         description = "Set the weight of the heuristic (preset 1.0).")
+    @Override
     public final void setHeuristicWeight(final double weight) {
         super.setHeuristicWeight(weight);
     }
 
     /**
-     * Set the name of heuristic used by the planner to the solve a planning problem.
+     * Set the name of heuristic used by the planner to solve a planning problem. This method is overrided to add the
+     * command line options of the planner.
      *
      * @param heuristic the name of the heuristic.
      */
     @CommandLine.Option(names = { "-e", "--heuristic" }, defaultValue = "FAST_FORWARD",
-        description = "Set the heuristic : AJUSTED_SUM, AJUSTED_SUM2, AJUSTED_SUM2M, COMBO, MAX, FAST_FORWARD, "
-            + "SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)")
+        description = "Set the heuristics: AJUSTED_SUM, AJUSTED_SUM2, AJUSTED_SUM2M, COMBO, MAX, FAST_FORWARD, "
+            +  "SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)")
+    @Override
     public final void setHeuristic(GoalCostHeuristic.Name heuristic)  {
         super.setHeuristic(heuristic);
     }
 
     /**
-     * Checks the planner configuration and returns if the configuration is valid. A configuration is valid if (1) the
-     * domain and the problem files exist and can be read, (2) the timeout is greater than 0, (3) the weight of the
-     * heuristic is greater than 0, (4) the heuristic is a not null and (5) the list of search strategies to use
-     * constains one search strategy : ASTAR.
+     * Set the list of search strategies used by the planner to solve a planning problem.
      *
-     * @return <code>true</code> if the configuration is valid <code>false</code> otherwise.
+     * @param strategies the list of serach strategies to used.
      */
-    public boolean hasValidConfiguration() {
-        return super.hasValidConfiguration()
-            && this.getSearchStrategies().size() == 1
-            && this.getSearchStrategies().get(0).equals(SearchStrategy.Name.ASTAR);
+    @CommandLine.Option(names = { "-s", "--search-strategies" }, paramLabel = "<strategies>", arity = "0..*",
+        defaultValue = "ASTAR", description = "Set the search strategies: ASTAR, ENFORCED_HILL_CLIMBING, "
+        + "BREADTH_FIRST, GREEDY_BEST_FIRST, DEPTH_FIRST, HILL_CLIMBING (preset: ASTAR)")
+    public final void setSearchStrategies(List<SearchStrategy.Name> strategies)  {
+        super.setSearchStrategies(strategies);
     }
 
     /**
@@ -154,31 +171,23 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem>  {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public ADLProblem instantiate(ParsedProblem problem) {
+    public ADLProblem instantiate(final ParsedProblem problem) {
         ADLProblem pb = new ADLProblem(problem);
         pb.instantiate();
         return pb;
     }
 
     /**
-     * The main method of the <code>HeuristicStateSpacePlanner</code> planner. The command line syntax is as follow:
+     * The main method of the <code>GenericStateSpacePlanner</code>.
      *
      * @param args the arguments of the command line.
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         try {
-            final HSP planner = new HSP();
-            CommandLine cmd = new CommandLine(planner);
-            int exitCode = (int) cmd.execute(args);
+            final GSP planner = new GSP();
+            int exitCode = (int) new CommandLine(planner).execute(args);
             System.exit(exitCode);
-
-            //System.setOut(new PrintStream("/dev/null"));
-            //final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
-            //System.out.println("qhjgdjqshdg");
-            //HSP planner = new HSP(config);
-            //planner.solve();
-            //System.out.println("111111"+GraphLayout.parseInstance(planner).totalSize());
-        } catch (IllegalArgumentException e) {
+        } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());
         }
     }

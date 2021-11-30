@@ -24,5 +24,4 @@ import java.io.Serializable;
  * @version 1.0 - 28.06.2021
  */
 public interface Heuristic extends Serializable {
-
 }

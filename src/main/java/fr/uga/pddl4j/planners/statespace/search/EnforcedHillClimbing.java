@@ -19,9 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristic;
-import fr.uga.pddl4j.heuristics.graph.PlanningGraphHeuristicFactory;
-import fr.uga.pddl4j.planners.Setting;
+import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -53,7 +51,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public EnforcedHillClimbing(int timeout, Setting.Heuristic heuristic, double weight) {
+    public EnforcedHillClimbing(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -67,11 +65,9 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final PlanningGraphHeuristicFactory factory = new PlanningGraphHeuristicFactory();
-        final PlanningGraphHeuristic heuristic = factory.createRelaxtionHeuristic(
-            getHeuristic(), codedProblem);
+        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final int timeout = getTimeout();
+        final long timeout = this.getTimeout() * 1000;
 
         State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
@@ -123,7 +119,7 @@ public final class EnforcedHillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(Node parent, ADLProblem problem, PlanningGraphHeuristic heuristic) {
+    private LinkedList<Node> getSuccessors(Node parent, ADLProblem problem, GoalCostHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

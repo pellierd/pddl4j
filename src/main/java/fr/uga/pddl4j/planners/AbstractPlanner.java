@@ -21,12 +21,15 @@ import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -45,9 +48,19 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     private static final Logger LOGGER = LogManager.getLogger(AbstractPlanner.class.getName());
 
     /**
-     * The configuration of the planner.
+     * The path to the domain of the planner.
      */
-    private PlannerConfiguration configuration;
+    private String domain;
+
+    /**
+     * The path to the problem of the planner.
+     */
+    private String problem;
+
+    /**
+     * The timeout of the planner in milliseconds.
+     */
+    private int timeout;
 
     /**
      * The parser of the planner.
@@ -71,13 +84,12 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
     /**
      * Creates a new planner.
-     *
      */
     public AbstractPlanner() {
         super();
+        this.setConfiguration(Planner.getDefaultConfiguration());
         this.parser = new PDDLParser();
         this.statistics = new Statistics();
-        this.setConfiguration(Planner.getDefaultConfiguration());
         this.parsedProblem = null;
         this.instantiateProblem = null;
     }
@@ -90,6 +102,117 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     public AbstractPlanner(PlannerConfiguration configuration) {
         this();
         this.setConfiguration(configuration);
+    }
+
+    /**
+     * Sets the domain of the planner.
+     *
+     * @param domain the path to the PDDL domain file.
+     */
+    @Parameters(index = "0", description = "The domain file.")
+    public final void setDomain(final String domain) {
+        this.domain = domain;
+    }
+
+    /**
+     * Returns the path to the PDDL domain file.
+     *
+     * @return the path to the PDDL domain file of the configuration or null if the domain is not initialized.
+     */
+    public final String getDomain() {
+        return this.domain;
+    }
+
+    /**
+     * Returns the domain file containing the PDDL domain description.
+     *
+     * @return the domain file containing the PDDL domain description or null if the domain is not initialized.
+     */
+    public final File getDomainFile() {
+        return this.getDomain() == null ? null : new File(this.getDomain());
+    }
+
+    /**
+     * Sets the path to the PDDL problem description.
+     *
+     * @param problem the path to the PDDL problem description.
+     */
+    @Parameters(index = "1", description = "The problem file.")
+    public final void setProblem(final String problem) {
+        this.problem = problem;
+    }
+
+    /**
+     * Returns the path to the PDDL problem description.
+     *
+     * @return the path to the PDDL problem description or null if the problem is not initialized.
+     */
+    public final String getProblem() {
+        return this.problem;
+    }
+
+    /**
+     * Returns the problem file containing the PDDL problem description.
+     *
+     * @return the problem file containing the PDDL problem description or null if the problem is not initialized.
+     */
+    public final File getProblemFile() {
+        return this.getProblem() == null ? null : new File(this.getProblem());
+    }
+
+    /**
+     * Sets the log level of the planner.
+     *
+     * @param log the log of the planner.
+     * @see java.util.logging.Level
+     */
+    @Option(names = { "-l", "--log" }, defaultValue = "INFO", converter = LogLevel.class,
+        description = "Set the level of trace of the planner: ALL, DEBUG, INFO, ERROR, FATAL, OFF, TRACE "
+            + "(preset INFO).")
+    public final void setLogLevel(final LogLevel log) {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getRootLogger();
+        loggerConfig.setLevel(log.getLevel());
+        context.updateLoggers();
+
+    }
+
+    /**
+     * Returns the log of the planner.
+     *
+     * @return the trace level declared of the planner.
+     * @see java.util.logging.Level
+     */
+    public final LogLevel getLogLevel() {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getRootLogger();
+        return new LogLevel(loggerConfig.getLevel());
+    }
+
+    /**
+     * Sets the timeout of the planner.
+     *
+     * @param timeout to use by the planner in second. The timeout must greater than 0.
+     * @throws IllegalArgumentException if the timeout is strictly less than 0.
+     */
+    @Option(names = { "-t", "--timeout" }, defaultValue = "600", description = "Set the time out of the planner in "
+         + "seconds" + " (preset 600s).")
+    public final void setTimeout(int timeout) {
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("time out must be greater than 0");
+        }
+        this.timeout = timeout;
+    }
+
+    /**
+     * Returns the timeout of the planner.
+     *
+     * @return the timeout of the planner
+     */
+    public final int getTimeout() {
+        return this.timeout;
     }
 
     /**
@@ -114,7 +237,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * @throws IOException if an error occur during parsing.
      */
     public ParsedProblem parse() throws IOException {
-        this.parsedProblem = this.parser.parse(this.configuration.getDomain(), this.configuration.getProblem());
+        this.parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
         return this.parsedProblem;
     }
 
@@ -128,21 +251,58 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     }
 
     /**
+     * Checks the planner configuration and returns if the configuration is valid. A configuration is valid if (1) the
+     * domain and the problem files exist and can be read and (2) the timeout is greater than 0.
+     *
+     * @return <code>true</code> if the configuration is valid <code>false</code> otherwise.
+     */
+    public boolean hasValidConfiguration() {
+        return this.getDomainFile().exists() && this.getDomainFile().canRead()
+            && this.getProblemFile().exists() && this.getProblemFile().canRead()
+            && this.getTimeout() > 0;
+    }
+
+    /**
      * Returns the configuration of the planner.
      *
      * @return the configuration of the planner.
      */
     public PlannerConfiguration getConfiguration() {
-        return this.configuration;
+        final PlannerConfiguration config =  new PlannerConfiguration();
+        config.setProperty(Planner.DOMAIN_SETTING, this.getDomain());
+        config.setProperty(Planner.PROBLEM_SETTING, this.getProblem());
+        config.setProperty(Planner.TIME_OUT_SETTING, Integer.toString(this.getTimeout()));
+        config.setProperty(Planner.LOG_LEVEL_SETTING, this.getLogLevel().toString());
+        return config;
     }
 
     /**
-     * Sets the configuration of the planner.
+     * Sets the configuration of the planner. If a planner setting is not defined in the specified configuration, the
+     * setting is initialized with its default value.
      *
      * @param configuration the configuration to set.
      */
-    public void setConfiguration(PlannerConfiguration configuration) {
-        this.configuration = configuration;
+    public void setConfiguration(final PlannerConfiguration configuration) {
+        if (configuration.getProperty(Planner.DOMAIN_SETTING) == null) {
+            this.setDomain(Planner.DEFAULT_DOMAIN);
+        } else {
+            this.setDomain(configuration.getProperty(Planner.DOMAIN_SETTING));
+        }
+        if (configuration.getProperty(Planner.PROBLEM_SETTING) == null) {
+            this.setProblem(Planner.DEFAULT_PROBLEM);
+        } else {
+            this.setProblem(configuration.getProperty(Planner.PROBLEM_SETTING));
+        }
+        if (configuration.getProperty(Planner.TIME_OUT_SETTING) == null) {
+            this.setTimeout(Planner.DEFAULT_TIME_OUT);
+        } else {
+            this.setTimeout(Integer.parseInt(configuration.getProperty(Planner.TIME_OUT_SETTING)));
+        }
+        if (configuration.getProperty(Planner.LOG_LEVEL_SETTING) == null) {
+            this.setLogLevel(Planner.DEFAULT_LOG_LEVEL);
+        } else {
+            this.setLogLevel(new LogLevel(configuration.getProperty(Planner.LOG_LEVEL_SETTING)));
+        }
     }
 
     /**
@@ -152,19 +312,6 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      */
     protected PDDLParser getParser() {
         return this.parser;
-    }
-
-    /**
-     * Sets the trace level of the planner.
-     *
-     * @param level the trace level of the planner.
-     */
-    protected void setTraceLevel(final Level level) {
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
-        LoggerConfig loggerConfig = config.getRootLogger();
-        loggerConfig.setLevel(level);
-        context.updateLoggers();
     }
 
     /**
@@ -179,29 +326,19 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     }
 
     /**
-     * Checks the planner configuration and returns if the configuration is valid.
-     *
-     * @return <code>true</code> if the configuration is valide <code>false</code> otherwise.
-     */
-    public abstract boolean checkConfiguration();
-
-    /**
      * Solves the problem as defined by the planner configuration.
      *
      * @return the solution plan found or null is no solution was found.
      * @throws FileNotFoundException domain of problem files does not exist.
      */
     public Plan solve() throws FileNotFoundException {
-        if (!this.checkConfiguration()) {
+        if (!this.hasValidConfiguration()) {
             throw new RuntimeException("Invalid planner configuration");
         }
 
-        final PlannerConfiguration config = this.getConfiguration();
-        this.setTraceLevel(config.getTraceLevel());
-
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        final ParsedProblem parsedProblem = this.parser.parse(config.getDomain(), config.getProblem());
+        final ParsedProblem parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
         ErrorManager errorManager = this.parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -222,10 +359,10 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
         } else if (LOGGER.isInfoEnabled()) {
             StringBuilder strb = new StringBuilder();
             strb.append("\nparsing domain file \"");
-            strb.append(config.getDomainFile().getName());
+            strb.append(this.getDomainFile().getName());
             strb.append("\" done successfully");
             strb.append("\nparsing problem file \"");
-            strb.append(config.getProblemFile().getName());
+            strb.append(this.getProblemFile().getName());
             strb.append("\" done successfully");
             strb.append("\n");
             LOGGER.info(strb);
@@ -297,5 +434,18 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
         } else {
             return null;
         }
+    }
+
+    /**
+     * This method contains the code called by the main method of the planner when planner are launched from
+     * command line.
+     *
+     * @return the exit return value of the planner.
+     * @throws Exception if an exception occurred during planning process.
+     */
+    @Override
+    public Integer call() throws Exception {
+        this.solve();
+        return 0;
     }
 }

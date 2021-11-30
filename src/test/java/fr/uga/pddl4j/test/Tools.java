@@ -185,20 +185,21 @@ public abstract class Tools {
     /**
      * Solves all the problems in the specified directory with a specified planner configuration.
      *
-     * @param currentTestPath the current sub dir to test
+     * @param path the current sub dir to test
      * @param extension the file extension .pddl ou .hddl
+     * @param name the name of the planner to used.
      * @param config the planner configuration to use to solve problems.
      */
-    public static void solve(String currentTestPath, String extension, PlannerConfiguration config) {
-        Tools.cleanValPlan(currentTestPath);
-        String currentDomain = currentTestPath + "domain" + extension;
+    public static void solve(String path, String extension, Planner.Name name, PlannerConfiguration config) {
+        Tools.cleanValPlan(path);
+        String currentDomain = path + "domain" + extension;
         boolean oneDomainPerProblem = false;
         String problemFile;
         String currentProblem;
 
         // Counting the number of problem files
-        File[] pbFileList = new File(currentTestPath)
-            .listFiles((dir, name) -> name.startsWith("p") && name.endsWith(extension) && !name.contains("dom"));
+        File[] pbFileList = new File(path)
+            .listFiles((dir, pb) -> pb.startsWith("p") && pb.endsWith(extension) && !pb.contains("dom"));
 
         int nbTest = 0;
         if (pbFileList != null) {
@@ -210,20 +211,23 @@ public abstract class Tools {
             oneDomainPerProblem = true;
         }
 
-        System.out.println("Test " + config.getPlanner() + " planner (" + config.getSearchStrategy() + ", "
-            + config.getHeuristic() + ") on " + currentTestPath);
+        System.out.println("Test " + name + " planner on " + path);
         // Loop around problems in one category
         int fillLength = Math.max(Integer.toString(nbTest).length(), 2);
         for (int i = 1; i < nbTest + 1; i++) {
             problemFile = String.format("p%0" + fillLength + "d" + extension, i);
-            currentProblem = currentTestPath + problemFile;
+            currentProblem = path + problemFile;
 
             if (oneDomainPerProblem) {
-                currentDomain = currentTestPath + problemFile.split(".p")[0] + "-" + "domain" + extension;
+                currentDomain = path + problemFile.split(".p")[0] + "-" + "domain" + extension;
             }
             // Parses the PDDL domain and problem description
             try {
-                Planner planner = config.buildPlanner();
+
+                config.setProperty(Planner.DOMAIN_SETTING, currentDomain);
+                config.setProperty(Planner.PROBLEM_SETTING, currentProblem);
+                Planner planner = Planner.getInstance(name, config);
+
 
                 ParsedProblem parsedProblem = planner.parse(currentDomain, currentProblem);
                 ErrorManager errorManager = planner.getParserErrorManager();
@@ -240,15 +244,15 @@ public abstract class Tools {
                     Problem pb = planner.instantiate(parsedProblem);
                     if (pb.isSolvable()) {
                         // Searches for a solution plan
-                        System.out.println("* Trying to solve [" + currentProblem + "]" + " in " + config.getTimeout()
-                            + " seconds");
+                        System.out.println("* Trying to solve [" + currentProblem + "]" + " in "
+                            + config.getProperty(Planner.TIME_OUT_SETTING) + " seconds");
                         plan = planner.solve(pb);
                     } else {
                         System.err.println("* Problem [" + currentProblem + "]" + " not solvable.");
                     }
                     if (plan == null) { // no solution in TIMEOUT computation time
-                        System.out.println("* No solution found in " + config.getTimeout() + " seconds for "
-                            + currentProblem);
+                        System.out.println("* No solution found in " + config.getProperty(Planner.TIME_OUT_SETTING)
+                            + " seconds for " + currentProblem);
                         break;
                     } else if (plan.isEmpty()) { // Empty solution
                         System.out.println("* Empty solution for " + currentProblem);
@@ -273,7 +277,7 @@ public abstract class Tools {
             System.out.println();
         }
         try {
-            Tools.checkPlanValidity(currentTestPath, extension);
+            Tools.checkPlanValidity(path, extension);
         } catch (Exception e) {
             e.printStackTrace();
         }

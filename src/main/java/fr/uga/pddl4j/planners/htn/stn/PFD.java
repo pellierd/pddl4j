@@ -16,19 +16,15 @@
 package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.planners.Setting;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import picocli.CommandLine;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -39,22 +35,36 @@ import java.util.PriorityQueue;
  * Ghallab and al. page 243.
  *
  * <pre>
- * Usage of PFDPlanner:
+ * {@code
+ * PFDPlanner [-hiV] [-l=<logLevel>] [-t=<timeout>] <domain> <problem>
  *
- * OPTIONS   DESCRIPTIONS
+ * Description:
  *
- * -o <i>str</i>   the path to the domain
- * -f <i>str</i>   the path to the problem
- * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
- * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
+ * Solves a specified planning problem using a Partial-order Forward Decomposition
+ * strategy.
  *
+ * Parameters:
+ *       <domain>              The domain file.
+ *       <problem>             The problem file.
+ *
+ * Options:
+ *   -t, --timeout=<timeout>   Set the time out of the planner in seconds (preset
+ *                               600s).
+ *   -l, --log=<logLevel>      Set the level of trace of the planner: ALL, DEBUG,
+ *                               INFO, ERROR, FATAL, OFF, TRACE (preset INFO).
+ *   -i, --interactive         Set the planner in interactive mode for debug
+ *   -h, --help                Show this help message and exit.
+ *   -V, --version             Print version information and exit.
+ * }
  * </pre>
  *
  * <p>Commande line example:</p>
  * <pre>
- *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.PFDPlanner
- *          -o src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl
- *          -f src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl
+ * {@code
+ *     java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.htn.stn.PFDPlanner
+ *          src/test/resources/benchmarks/hddl/ipc2020/barman/domain.hddl
+ *          src/test/resources/benchmarks/hddl/ipc2020/barman/p01.hddl
+ * }
  * </pre>
  *
  * @author D. Pellier
@@ -63,20 +73,37 @@ import java.util.PriorityQueue;
  *
  * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-public final class PFDPlanner extends AbstractSTNPlanner {
+@CommandLine.Command(name = "PFDPlanner",
+    version = "TFDPlanner 2.0",
+    description = "Solves a specified planning problem using a Partial-order Forward Decomposition strategy.",
+    sortOptions = false,
+    mixinStandardHelpOptions = true,
+    headerHeading = "Usage:%n",
+    synopsisHeading = "%n",
+    descriptionHeading = "%nDescription:%n%n",
+    parameterListHeading = "%nParameters:%n",
+    optionListHeading = "%nOptions:%n")
+public final class PFD extends AbstractSTNPlanner {
 
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(PFDPlanner.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(PFD.class.getName());
 
     /**
-     * Creates a new partial order STN planner with the default parameters.
-     *
-     * @param config the configuration of the planner.
+     * Creates a new planner with a default configuration.
      */
-    public PFDPlanner(final PlannerConfiguration config) {
-        super(config);
+    public PFD() {
+        super();
+    }
+
+    /**
+     * Creates a new abstract STN planner with the default configuration.
+     *
+     * @param configuration the configuration of the planner.
+     */
+    public PFD(final PlannerConfiguration configuration) {
+        super(configuration);
     }
 
     /**
@@ -98,10 +125,6 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         final State init = new State(problem.getInitialState());
         final PFDNode root = new PFDNode(init, problem.getInitialTaskNetwork());
 
-        // Create the root node of the search space
-        //root.getState().getNegative().set(0, problem.getFluents().size());
-        //root.getState().getNegative().andNot(root.getState().getPositive());
-
         // Add the root node to the list of the pending nodes to explore.
         open.add(root);
 
@@ -109,25 +132,22 @@ public final class PFDPlanner extends AbstractSTNPlanner {
         Plan plan = null;
 
         // Get the timeout for searching
-        final int timeout = this.getConfiguration().getTimeout();
+        final int timeout = this.getTimeout() * 1000;
         final long start = System.currentTimeMillis();
         long elapsedTime = 0;
-
-        boolean debug = false;
 
         // Start exploring the search space
         while (!open.isEmpty() && plan == null && elapsedTime < timeout) {
             // Get and remove the first node of the pending list of nodes.
             final PFDNode currentNode = open.poll();
 
-            if (debug) {
-                System.out.println("=========> Pop a new node <=========\n");
-                System.out.println("=> Current state:");
-                System.out.println(problem.toString(currentNode.getState()));
-                System.out.println("\n=> Tasks to be executed:");
-                System.out.println(problem.toString(currentNode.getTaskNetwork()));
-
-                System.out.println(currentNode.getTaskNetwork().getOrderingConstraints().toBitString());
+            if (this.isInteractive()) {
+                LOGGER.info("=========> Pop a new node <=========\n");
+                LOGGER.info("=> Current state:");
+                LOGGER.info(problem.toString(currentNode.getState()));
+                LOGGER.info("\n=> Tasks to be executed:");
+                LOGGER.info(problem.toString(currentNode.getTaskNetwork()));
+                LOGGER.info(currentNode.getTaskNetwork().getOrderingConstraints().toBitString());
             }
 
             // If the task network has no more task, a solution is found
@@ -137,9 +157,9 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                 }  else {
                     if (LOGGER.isDebugEnabled()) {
                         Plan p = super.extractPlan(currentNode, problem);
-                        System.out.println("\nFound plan as follows:\n" + problem.toString(p));
-                        System.out.println(" But plan does does not reach the goal:\n");
-                        System.out.println(problem.toString(problem.getGoal()) + "\n");
+                        LOGGER.debug("\nFound plan as follows:\n" + problem.toString(p));
+                        LOGGER.debug(" But plan does does not reach the goal:\n");
+                        LOGGER.debug(problem.toString(problem.getGoal()) + "\n");
                     }
                 }
             } else {
@@ -157,13 +177,13 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                     if (problem.getTasks().get(taskIndex).isPrimtive()) {
                         for (Integer operator : relevantOperators) {
                             final Action action = problem.getActions().get(operator);
-                            if (debug) {
-                                System.out.println("\n======> Try to decompose primitive tasks "
+                            if (this.isInteractive()) {
+                                LOGGER.info("\n======> Try to decompose primitive tasks "
                                     + problem.toString(problem.getTasks().get(taskIndex)) + " with \n\n"
                                     + problem.toString(action));
 
-                                System.out.println("=> Current state:");
-                                System.out.println(problem.toString(currentNode.getState()));
+                                LOGGER.info("=> Current state:");
+                                LOGGER.info(problem.toString(currentNode.getState()));
                             }
                             if (state.satisfy(action.getPrecondition())) {
                                 final PFDNode childNode = new PFDNode(currentNode);
@@ -173,34 +193,30 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 childNode.getTaskNetwork().removeTask(task);
                                 childNode.setTask(taskIndex);
                                 open.add(childNode);
-                                if (debug) {
-                                    System.out.println("=====> Decomposition succeeded push node:");
-                                    System.out.println(problem.toString(childNode.getState()));
-                                    System.out.println(problem.toString(problem.getTasks().get(childNode.getTask())));
+                                if (this.isInteractive()) {
+                                    LOGGER.info("=====> Decomposition succeeded push node:");
+                                    LOGGER.info(problem.toString(childNode.getState()));
+                                    LOGGER.info(problem.toString(problem.getTasks().get(childNode.getTask())));
                                     for (int t : childNode.getTaskNetwork().getTasks()) {
-                                        System.out.println(problem.toString(problem.getTasks().get(t)));
+                                        LOGGER.info(problem.toString(problem.getTasks().get(t)));
                                     }
-                                    System.out.println("=> New state:");
-                                    System.out.println(problem.toString(childNode.getState()));
+                                    LOGGER.info("=> New state:");
+                                    LOGGER.info(problem.toString(childNode.getState()));
                                 }
                             } else {
-                                if (debug) {
-                                    System.out.println("=====> Decomposition failed");
+                                if (this.isInteractive()) {
+                                    LOGGER.info("=====> Decomposition failed");
                                 }
                             }
-                            if (debug) {
-                                try {
-                                    System.in.read();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                            if (this.isInteractive()) {
+                                AbstractSTNPlanner.waitPressAnyKey();
                             }
                         }
                     } else { // Case of compund tasks
                         for (Integer operator : relevantOperators) {
                             final Method method = problem.getMethods().get(operator);
-                            if (debug) {
-                                System.out.println("\n======> Try to decompose compound tasks "
+                            if (this.isInteractive()) {
+                                LOGGER.info("\n======> Try to decompose compound tasks "
                                     + problem.toString(problem.getTasks().get(taskIndex)) + " with\n\n"
                                     + problem.toString(method));
                             }
@@ -211,22 +227,18 @@ public final class PFDPlanner extends AbstractSTNPlanner {
                                 childNode.getTaskNetwork().decompose(task, method);
                                 childNode.setTask(taskIndex);
                                 open.add(childNode);
-                                if (debug) {
-                                    System.out.println("=====> Decomposition succeeded push node:");
-                                    System.out.println(problem.toString(childNode.getTaskNetwork()));
-                                    System.out.println(problem.toString(problem.getTasks().get(childNode.getTask())));
+                                if (this.isInteractive()) {
+                                    LOGGER.info("=====> Decomposition succeeded push node:");
+                                    LOGGER.info(problem.toString(childNode.getTaskNetwork()));
+                                    LOGGER.info(problem.toString(problem.getTasks().get(childNode.getTask())));
                                 }
                             } else {
-                                if (debug) {
-                                    System.out.println("=====> Decomposition failed");
+                                if (this.isInteractive()) {
+                                    LOGGER.info("=====> Decomposition failed");
                                 }
                             }
-                            if (debug) {
-                                try {
-                                    System.in.read();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                            if (this.isInteractive()) {
+                                AbstractSTNPlanner.waitPressAnyKey();
                             }
                         }
                     }
@@ -238,57 +250,18 @@ public final class PFDPlanner extends AbstractSTNPlanner {
     }
 
     /**
-     * Returns the configuration by default of the planner.
-     *
-     * @return the configuration by default of the planner.
-     */
-    public static PlannerConfiguration getDefaultConfiguration() {
-        PlannerConfiguration config = new PlannerConfiguration();
-        config.setPlanner(Setting.Planner.PFD);
-        config.setDomain(Setting.DEFAULT_DOMAIN);
-        config.setProblem(Setting.DEFAULT_PROBLEM);
-        config.setTimeout(Setting.DEFAULT_TIMEOUT);
-        config.setHeuristic(Setting.Heuristic.NONE);
-        config.setHeuristicWeight(Setting.DEFAULT_HEURISTIC_WEIGHT);
-        config.setSearchStrategy(Setting.SearchStrategy.DEPTH_FIRST);
-        config.setTraceLevel(Level.INFO);
-        return config;
-    }
-
-    /**
-     * The main method of the <code>PFDPlanner</code> example. The command line syntax is as
-     * follow:
-     *
-     * <pre>
-     * usage of PFDPlanner:
-     *
-     * OPTIONS   DESCRIPTIONS
-     *
-     * -o <i>str</i>   the path to the domain
-     * -f <i>str</i>   the path to the problem
-     * -t <i>num</i>   specifies the maximum CPU-time in seconds (preset: 600)
-     * -v <i>level</i> the trace level: ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF (preset: INFO)
-     * </pre>
-     *
-     * <p>Commande line example:</p>
-     * <pre>
-     *     java -cp build/libs/pddl4j-x.x.x.jar fr.uga.pddl4j.planners.htn.stn.PFDPlanner
-     *          -o src/test/resources/benchmarks/hddl/ipc2020/rover/domain.hddl
-     *          -f src/test/resources/benchmarks/hddl/ipc2020/rover/pb01.hddl
-     * </pre>
+     * The main method of the <code>PFDPlanner</code> example.
      *
      * @param args the arguments of the command line.
      */
     public static void main(final String[] args) {
         try {
-            final PlannerConfiguration config = new PlannerConfiguration(args, PFDPlanner.getDefaultConfiguration());
-            final PFDPlanner planner = new PFDPlanner(config);
-            planner.solve();
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }  catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            final PFD planner = new PFD();
+            final CommandLine cmd = new CommandLine(planner);
+            int exitCode = (int) cmd.execute(args);
+            System.exit(exitCode);
+        } catch (Throwable e) {
+            LOGGER.fatal(e.getMessage());
         }
-
     }
 }

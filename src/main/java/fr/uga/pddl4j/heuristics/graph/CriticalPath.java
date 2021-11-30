@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.criticalpath;
+package fr.uga.pddl4j.heuristics.graph;
 
 import fr.uga.pddl4j.heuristics.graph.RelaxedGraphHeuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;

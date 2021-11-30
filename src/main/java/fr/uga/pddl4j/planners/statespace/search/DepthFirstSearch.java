@@ -59,7 +59,7 @@ public final class DepthFirstSearch extends AbstractStateSpaceSearch {
 
         final LinkedList<Node> closeSet = new LinkedList<>();
         final LinkedList<Node> openSet = new LinkedList<>();
-        final int timeout = getTimeout();
+        final long timeout = this.getTimeout() * 1000;
 
         State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, 0);

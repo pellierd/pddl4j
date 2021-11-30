@@ -26,4 +26,35 @@ import java.io.Serializable;
  */
 public interface SearchStrategy extends Serializable {
 
+    /**
+     * The name of the search strategy.
+     *
+     */
+    enum Name {
+        /**
+         * The A* search strategy.
+         */
+        ASTAR,
+        /**
+         * The enforced hill climbing search strategy.
+         */
+        ENFORCED_HILL_CLIMBING,
+        /**
+         * The breadth first search strategy.
+         */
+        BREADTH_FIRST,
+        /**
+         * The greedy first search strategy.
+         */
+        GREEDY_BEST_FIRST,
+        /**
+         * The depth first search strategy.
+         */
+        DEPTH_FIRST,
+        /**
+         * The hill climbing first search strategy.
+         */
+        HILL_CLIMBING,
+    }
+
 }
