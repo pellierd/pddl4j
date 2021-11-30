@@ -75,13 +75,12 @@ import java.util.List;
  * <p>Command line example:</p>
  * <pre>
  * {@code
- * java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.GenericStateSpaceSearchPlanner
- *      pddl/depots/domain.pddl
- *      pddl/depots/p01.pddl
- *      -t 1000
- *      -w 1.0
- *      -e FAST_FORWARD
- *      -s ENFORCED_HILL_CLIMBING ASTAR
+ *  java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.GSP
+ *         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
+ *         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
+ *         -s ENFORCED_HILL_CLIMBING ASTAR
+ *         -e FAST_FORWARD
+ *         -t 1000
  * }
  * </pre>
  *

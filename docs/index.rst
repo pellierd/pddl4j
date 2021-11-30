@@ -55,6 +55,6 @@ The library contains:
    automated_planning_in_a_nutshell
    getting_started
    building_the_library
-   planners
+   running_planners
    pddl_tutorial
    how_to_contribute

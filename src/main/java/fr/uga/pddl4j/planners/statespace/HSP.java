@@ -37,7 +37,7 @@ import picocli.CommandLine;
  *
  * <pre>
  * {@code
- * HeuristicStateSpacePlanner [-hV] [-e=<heuristic>] [-l=<logLevel>]
+ * HSP [-hV] [-e=<heuristic>] [-l=<logLevel>]
  *                            [-t=<timeout>] [-w=<weight>] <domain> <problem>
  *
  * Description:
@@ -63,12 +63,15 @@ import picocli.CommandLine;
  *  }
  * </pre>
  *
- * <p>Commande line example:</p>
+ * <p>Command line example:</p>
  * <pre>
  * {@code
- *     java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.HeuristicStateSpacePlanner
- *          pddl/depots/domain.pddl
- *          pddl/depots/p01.pddl -e SUM
+ *    java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.HSP
+ *         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pdd
+ *            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
+ *         -e MAX
+ *         -w 1.2
+ *         -t 600
  * }
  * </pre>
  *

@@ -61,13 +61,13 @@ import java.util.Arrays;
  *  }
  * </pre>
  *
- * <p>Commande line example:</p>
+ * <p>Command line example:</p>
  * <pre>
  * {@code
- *     java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FastForward
- *          pddl/depots/domain.pddl
- *          pddl/depots/p01.pddl
- *          -t 1000
+ *    java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FF
+ *            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pdd
+ *            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
+ *            -t 1000
  * }
  * </pre>
  *

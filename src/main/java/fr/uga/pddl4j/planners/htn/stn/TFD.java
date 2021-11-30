@@ -38,7 +38,7 @@ import java.util.PriorityQueue;
  *
  * <pre>
  * {@code
- * TFDPlanner [-hiV] [-l=<logLevel>] [-t=<timeout>] <domain> <problem>
+ * TFD [-hiV] [-l=<logLevel>] [-t=<timeout>] <domain> <problem>
  *
  * Description:
  *

@@ -52,10 +52,9 @@ To create a jar of the PDDL4J library *with the dependency libraries* just use t
 
   ./gradlew shadowJar
 
-The jar generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.X is the version of PDDL4J. The
-libraries include in the jar are :
- - `Log4j <https://logging.apache.org/log4j/>`_ used for logging;
- - `JUnit <https://junit.org/junit5/>`_ used for unit tests.
+The jar generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.X is the version of PDDL4J. The libraries include in the jar are :
+  - `Log4j <https://logging.apache.org/log4j/>`_ used for logging;
+  - `JUnit <https://junit.org/junit5/>`_ used for unit tests.
 
 .. note :: Both jar are executable. The main class run by default is ``PlannerConfiguration``.
 

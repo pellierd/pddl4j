@@ -45,14 +45,14 @@ generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.
 Example: Running Fast Forward planner
 ------------------------------------
 
-Several planners are implemented in PDDL4J (see xxx) to have the full list of planners implemented in the library and have the command lines to run them.
+Several planners are implemented in PDDL4J (see section :ref:`running_planner_chapter`.) to have the full list of planners implemented in the library and have the command lines to run them.
 As sample, find below the command line to launch Fast Forward planner implemented in the library.
 
 .. code-block:: bash
 
   $ java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FF \
-     -o src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \
-     -f src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
+     src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \
+     src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
 
 This command run the planner FF on the domain logics and the problem 1.
 
