@@ -15,8 +15,6 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
@@ -34,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This interface describes the interface of all ADL planning problem.
+ * This interface describes the interface of all planning problem.
  *
  * @author D. Pellier
  * @version 4.0 - 26.11.2020
@@ -218,30 +216,5 @@ public interface Problem extends Serializable {
      * @return a string representation of the specified operator.
      */
     String toShortString(final AbstractGroundOperator operator);
-
-
-    /**
-     * Returns the LOGGER of the Planner class.
-     *
-     * @return the Planner class.
-     */
-    //Logger getLogger();
-
-    //void setLogger(Logger logger);
-
-
-    /**
-     * Sets the trace level of the planner.
-     *
-     * @param level the trace level of the planner.
-     */
-    //void setTraceLevel(final Level level);
-
-    /**
-     * Returns the trace level of the planner.
-     *
-     * @return the trace level of the planner.
-     */
-    //Level getTraceLevel();
 
 }

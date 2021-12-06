@@ -154,7 +154,7 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem>  {
     }
 
     /**
-     * The main method of the <code>FastForward</code> planner.
+     * The main method of the <code>FF</code> planner.
      *
      * @param args the arguments of the command line.
      */

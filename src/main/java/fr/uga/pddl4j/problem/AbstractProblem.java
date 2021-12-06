@@ -431,7 +431,6 @@ public abstract class AbstractProblem implements Problem {
      * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
      */
     public final void instantiate() {
-        //instantiate(AbstractProblem.DEFAULT_LOG_LEVEL);
         this.initialization();
         this.preinstantiation();
         this.instantiation();

@@ -29,7 +29,8 @@ generally adopted standard benchmark domains. The emergence of a language  stand
 field, influencing what is seen as central and what peripheral in the development of planning systems.
 
 The library contains:
-  - A PDDL 3.1 parser and all the classes need to manipulate its concepts. The parser can be configured to accept only specified requirements of PDDL language.
+  - A PDDL 3.1 parser and all the classes need to manipulate its concepts. The parser can be configured to accept only
+    specified requirements of PDDL language.
   - A set of useful pre-processing mechanisms in order to instantiate and simply operators into ground actions.
   - A set of already implemented classical heuristics, e.g., relaxed planning graph, critical path, etc.
   - Several examples of planners using PDDL4J.
@@ -53,8 +54,9 @@ The library contains:
    :hidden:
 
    automated_planning_in_a_nutshell
+   pddl_tutorial
    getting_started
    building_the_library
    running_planners
-   pddl_tutorial
+   writing_your_own_planner
    how_to_contribute

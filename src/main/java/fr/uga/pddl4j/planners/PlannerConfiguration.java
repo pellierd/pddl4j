@@ -26,11 +26,33 @@ import java.util.Properties;
  * <p>To create a planner with a specific configuration use the following example code:</p>
  * <pre>
  * {@code
- *      PlannerConfiguration config = new PlannerConfiguration();
- *      config.setProperty(StateSpacePlanner.HEURISTIC_SETTING, GoalCostHeuristic.Name.FAST_FORWARD);
- *      config.setProperty(StateSpacePlanner.WEIGHT_HEURISTIC_SETTING, "1.0");
- *      Planner planner = Planner.getInstance(Planner.Name.HSP, config);
- *      planner.solve();
+ *         // The path to the benchmarks directory
+ *         final String benchmarks = "src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/";
+ *
+ *         // Gets the default configuration from the planner
+ *         PlannerConfiguration config = HSP.getDefaultConfiguration();
+ *         // Sets the domain of the problem to solve
+ *         config.setProperty(HSP.DOMAIN_SETTING, benchmarks + "domain.pddl");
+ *         // Sets the problem to solve
+ *         config.setProperty(HSP.PROBLEM_SETTING, benchmarks + "p01.pddl");
+ *         // Sets the timeout allocated to the search.
+ *         config.setProperty(HSP.TIME_OUT_SETTING, 1000);
+ *         // Sets the log level
+ *         config.setProperty(HSP.LOG_LEVEL_SETTING, LogLevel.INFO);
+ *         // Sets the heuristic used to search
+ *         config.setProperty(HSP.HEURISTIC_SETTING, GoalCostHeuristic.Name.MAX);
+ *         // Sets the weight of the heuristic
+ *         config.setProperty(HSP.WEIGHT_HEURISTIC_SETTING, 1.2);
+ *
+ *         // Creates an instance of the HSP planner with the specified configuration
+ *         Planner planner = Planner.getInstance(Planner.Name.HSP, config);
+ *
+ *         // Runs the planner and print the solution
+ *         try {
+ *             planner.solve();
+ *         } catch (FileNotFoundException e) {
+ *             e.printStackTrace();
+ *         }
  *  }
  * </pre>
  *

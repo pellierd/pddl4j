@@ -45,7 +45,7 @@ generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.
 Example: Running Fast Forward planner
 ------------------------------------
 
-Several planners are implemented in PDDL4J (see section :ref:`running_planner_chapter`.) to have the full list of planners implemented in the library and have the command lines to run them.
+Several planners are implemented in PDDL4J (see section :ref:`running_planners_chapter`.) to have the full list of planners implemented in the library and have the command lines to run them.
 As sample, find below the command line to launch Fast Forward planner implemented in the library.
 
 .. code-block:: bash

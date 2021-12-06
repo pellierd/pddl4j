@@ -125,7 +125,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem>  {
     }
 
     /**
-     * Set the name of heuristic used by the planner to the solve a planning problem.
+     * Set the name of heuristic used by the planner to solve a planning problem.
      *
      * @param heuristic the name of the heuristic.
      */
@@ -164,7 +164,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem>  {
     }
 
     /**
-     * The main method of the <code>HeuristicStateSpacePlanner</code> planner. The command line syntax is as follow:
+     * The main method of the <code>HSP</code> planner.
      *
      * @param args the arguments of the command line.
      */

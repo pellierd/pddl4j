@@ -387,7 +387,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
                 strb.append(this.getStatistics().getNumberOfActions());
                 strb.append(" actions, ");
                 strb.append(this.getStatistics().getNumberOfRelevantFluents());
-                strb.append(" fluents)\n");
+                strb.append(" fluents)\n\n");
                 LOGGER.info(strb);
             }
             if (LOGGER.isInfoEnabled() && !pb.isSolvable()) {
@@ -440,12 +440,16 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * This method contains the code called by the main method of the planner when planner are launched from
      * command line.
      *
-     * @return the exit return value of the planner.
-     * @throws Exception if an exception occurred during planning process.
+     * @return the exit return value of the planner: O if every thing is ok; 1 otherwise.
      */
     @Override
-    public Integer call() throws Exception {
-        this.solve();
+    public Integer call() {
+        try {
+            this.solve();
+        } catch (FileNotFoundException e) {
+            LOGGER.fatal(e.getMessage());
+            return 1;
+        }
         return 0;
     }
 }

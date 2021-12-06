@@ -36,7 +36,7 @@ import java.util.PriorityQueue;
  *
  * <pre>
  * {@code
- * PFDPlanner [-hiV] [-l=<logLevel>] [-t=<timeout>] <domain> <problem>
+ * PFD [-hiV] [-l=<logLevel>] [-t=<timeout>] <domain> <problem>
  *
  * Description:
  *
@@ -73,8 +73,8 @@ import java.util.PriorityQueue;
  *
  * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-@CommandLine.Command(name = "PFDPlanner",
-    version = "TFDPlanner 2.0",
+@CommandLine.Command(name = "PFD",
+    version = "PFD 2.0",
     description = "Solves a specified planning problem using a Partial-order Forward Decomposition strategy.",
     sortOptions = false,
     mixinStandardHelpOptions = true,
@@ -250,7 +250,7 @@ public final class PFD extends AbstractSTNPlanner {
     }
 
     /**
-     * The main method of the <code>PFDPlanner</code> example.
+     * The main method of the <code>PFD</code> planner.
      *
      * @param args the arguments of the command line.
      */

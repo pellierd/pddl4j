@@ -76,8 +76,8 @@ import java.util.PriorityQueue;
  *
  * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-@CommandLine.Command(name = "TFDPlanner",
-    version = "TFDPlanner 2.0",
+@CommandLine.Command(name = "TFD",
+    version = "TFD 2.0",
     description = "Solves a specified planning problem using a Total-order Forward Decomposition strategy.",
     sortOptions = false,
     mixinStandardHelpOptions = true,
@@ -245,7 +245,7 @@ public final class TFD extends AbstractSTNPlanner {
     }
 
     /**
-     * The main method of the <code>TFDPlanner</code> example.
+     * The main method of the <code>TFD</code> planner.
      *
      * @param args the arguments of the command line.
      */

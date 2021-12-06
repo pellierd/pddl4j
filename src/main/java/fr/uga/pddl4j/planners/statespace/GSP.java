@@ -177,7 +177,7 @@ public final class GSP extends AbstractStateSpacePlanner<ADLProblem> {
     }
 
     /**
-     * The main method of the <code>GenericStateSpacePlanner</code>.
+     * The main method of the <code>GSP</code>.
      *
      * @param args the arguments of the command line.
      */
