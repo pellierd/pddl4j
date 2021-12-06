@@ -1,4 +1,4 @@
-.. _running_planners_chapter:
+.. _running_planners_from_command_line_chapter:
 
 Running Planners from Command line
 ==================================
@@ -9,27 +9,6 @@ The planners currently implemented in the library are:
   #. **GSP** (*Generic Search Planner*). This planner is a generic state space planner. It is possible to choose the search strategy and the goal cost heuristic function.
   #. **TFD** (*Total-order Forward Decomposition*). It is based on dept first search search strategy and can only deal with total-order task decomposition.
   #. **PFD** (*Partial-order Forward Decomposition*). It is based on dept first search search strategy and can deal with partial-order task decomposition.
-
-There are two ways to run a planner either from the command line or by programming.
-
-By Programming
-*****************
-
-To run a planner by programming just used the following code:
-
-.. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/PlannerConfigurationExample1.java
-    :language: java
-    :lines: 16-
-
-The configuration of the planner can be also done using the class ``PlannerConfiguration`` as follow:
-
-.. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/PlannerConfigurationExample2.java
-    :language: java
-    :lines: 16-
-
-
-From Command Line
-*****************
 
 FF (FastForward)
 ----------------

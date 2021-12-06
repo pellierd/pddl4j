@@ -57,6 +57,7 @@ The library contains:
    pddl_tutorial
    getting_started
    building_the_library
-   running_planners
+   running_planners_from_command_line
+   configuring_planners_by_programming
    writing_your_own_planner
    how_to_contribute
