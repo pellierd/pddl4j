@@ -13,8 +13,6 @@ and PDDL4J generates possible solutions. **No programming language and/or backgr
 application fields like can be use in many industrial fields as smart homes/data/cities, autonomous systems and
 robotics, logistics, business processes etc.
 
-
-
 .. note::
 
   If you are not familiar with Automated Planning, start reading the chapter
@@ -40,7 +38,7 @@ The library contains:
 .. note::
 
   To get PDDL4J and start running a planner start reading the chapter :ref:`getting_started_chapter` or exploring
-  the PDDL4J API documentation :ref:`pddl4j_api_documentation_chapter`.
+  the PDDL4J API documentation :ref:`api_documentation_chapter`.
 
 .. important::
 
@@ -62,6 +60,6 @@ The library contains:
    writing_your_own_planner
    using_the_pddl_parser
    instantiating_planning_problems
-   pddl4j_api_documentation
+   api_documentation
    download
    how_to_contribute

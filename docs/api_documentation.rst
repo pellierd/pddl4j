@@ -1,6 +1,6 @@
-.. _pddl4j_api_documentation_chapter:
+.. _api_documentation_chapter:
 
-PDDL4J API Documentation
+API Documentation
 ========================
 
 The current version of the PDDL4J API Documentation is 4.0.0. Current and past API documentations of the library are

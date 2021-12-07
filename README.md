@@ -1,12 +1,11 @@
-## PDDL4J library
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.45971.svg)](http://dx.doi.org/10.5281/zenodo.45971)
+# PDDL4J library
 
-### 1. Contact
+## 1. Contact
 
 - Damien Pellier (damien.pellier@imag.fr)
 - https://lig-membres.imag.fr/pellier/
 
-### 2. Description
+## 2. Description
 
 PDDL4J is an open source library under LGPL license.
 
@@ -31,204 +30,28 @@ standard will have an impact on the entire field, influencing what is seen as
 central and what peripheral in the development of planning systems.
 
 The library contains:
-  * A PDDL 3.1 parser and all the classes need to manipulate its
+  * A PDDL 3.1 parser and HDDL 1.0 parser and all the classes need to manipulate its
 concepts. The parser can be configured to accept only specified requirements of
-PDDL language.
+PDDL od HDDL language.
   * A set of useful pre-processing mechanisms in order to instantiate and
 simply actions into ground actions based on inertia properties.
-  * A set of already implemented classical heuristics, e.g., h_ff, h_max, etc.
-  * Several examples of planners using PDDL4J.
+  * A set of already implemented classical heuristics.
+  * Several examples of planners using PDDL4J such as FastForward.
 
-### 3. How to use the PDDL4J library?
+## 3. Dependencies
 
-The pddl4j library is package with "gradle". If ant is not installed on your computer,
-go to https://gradle.org/ and install it.
+  * [Java JDK](https://adoptopenjdk.net/>) version 8 or higher.
+  * [Gradle](https://gradle.org/>) to build the library.
 
-#### Dependency
+## 4. How to use the PDDL4J library?
 
-Java JDK 8 must be installed on the computer that will run PDDL4J:
+A complete documentation of the library is [available online](http://pddl4j.imag.fr/). For those in a hurry to get
+PDDL4J and start running a planner start reading the [Getting Started section](http://pddl4j.imag.fr/getting_started.html).
+Note that [PDDL4J API documentation](http://pddl4j.imag.fr/api_documentation.html) is also available online.
 
-**On Windows**
+## 5. How to cite
 
-Go to Oracle website and download the JDk corresponding to your computer architecture (x64 or x86): [Java](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+The library is open source. If you use it, please cite us:
 
-After the installation, you have to add java to your Windows *PATH*.
-
-**On Linux (Debian / Ubuntu)**
-
-    sudo apt-get install openjdk-8-jdk
-
-#### 3.1 How to build PDDL4J?
-
-Type at the root of the PDDL4J distribution:
-> ./gradlew build
-
-if you want to build the project with findbug:
-> ./gradlew build -Pfindbug
-
-The jar "pddl4j-VERSION.jar" is available in the build/libs directory.
-
-#### 3.3 How to use binary distribution?
-
-The pddl4j library can be used as a jar file called "pddl4j-VERSION.jar" in the "libs"
-directory of the release. Therefore, include the jar in our classpath and enjoy
-it.
-
-#### 3.4 How to access the documentation?
-
-All the documentations are contained in the doc directory.
-
-To generate the javadoc just type:
-> ./gradlew javadoc
-
-
-#### 3.5 How to run existing planner?
-
-Planners are available in the "planners" package of the distribution. For
-instance, this archive contains a simple planner based on A* search strategy
-called HSP. To launch this planner use the following command line:
-
-> java -javaagent:build/libs/pddl4j-3.8.3.jar -server -Xms2048m -Xmx2048m fr.uga.pddl4j.planners.statespace.StateSpacePlannerFactory -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
-
-> java -jar build/libs/pddl4j-3.8.3.jar -o pddl/blocksworld/domain.pddl -f pddl/blocksworld/p15.pddl
-
-Or use the gradle run command:
-> gradle run -PArgs=-o,pddl/blocksworld/domain.pddl,-f,pddl/blocksworld/p15.pddl
-
-Note: A set of planning problems is available in the web site of the international
-planning competition: http://ipc.icaps-conference.org.
-
-### 4. How to cite
-
-PDDL4J: a planning domain description library for java
+> D. Pellier & H. Fiorino (2017) PDDL4J: a planning domain description library for java, Journal of Experimental & Theoretical Artificial Intelligence, 30:1, 143-176
 https://doi.org/10.1080/0952813X.2017.1409278
-
-> D. Pellier & H. Fiorino (2017) PDDL4J: a planning domain description library for java, Journal of Experimental & Theoretical Artificial Intelligence, 30:1, 143-176, DOI: 10.1080/0952813X.2017.1409278
-
-### 5. Changelog
-
-**PDDL4J v3.8.2**
-
-*Search strategy*
-* Improve structure: add StateSpaceStrategyAnytime interface
-
-*Planner*
-* Improve structure: add StateSpacePlannerAnytime interface
-
-**PDDL4J v3.8.2**
-
-*Search strategy*
-* Fix issue with anytime solution
-* Fix issue with SolutionListener
-
-*JUnit*
-* Fix issue on Windows
-
-**PDDL4J v3.8.1**
-
-*Parser*
-* Add HTN features in Lexer
-
-*Search strategy*
-* Fix AStar
-
-**PDDL4J v3.8**
-
-*Global*
-* Add ACTION-COST support in PDDL4J (parser, encoder, solver)
-
-*Planner*
-* Add FF Anytime planner
-* Add Hill Climbing Anytime planner
-* Add Generic Anytime planner
-
-*Heuristic*
-* Add MIN_COST heuristic
-
-*Search Strategy*
-* Add Anytime Search Strategies
-
-*Others*
-* Bug fix
-* Add JUnit tests
-
-**PDDL4J v3.7.3**
-
-*Global*
-* Add SolutionEvent and SolutionListener (for StateSpaceStrategy)
-
-*Parser*
-* Fix End Of File bug in Lexer
-
-*Planner*
-* Fix bugs for GenericPlanner
-
-**PDDL4J v3.7.2**
-
-*State space strategy*
-* Add Generic planner structure
-
-*Parser*
-* Fix parser bug
-
-*Global*
-* Add BNF
-
-**PDDL4J v3.7.1**
-
-*State space strategy*
-* Add Breadth First Search and Depth First Search
-* Add associated JUnit tests
-
-*Global*
-* Add CLI script to launch PDDL4J
-* Patch PDDL4J for Java 10
-
-**PDDL4J v3.7.0**
-
-*Update project tools*
-* log4j 2.11
-* Checkstyle 8.9
-* SonarQube 2.6.1
-* Javacc 2.4
-* Gradle wrapper 4.8
-* Add Jenkinsfile script for CI
-
-*Planner*
-* New package: Statespace with HSP and FF planners
-* Add StateSpacePlanner and StateSpacePlannerFactory interfaces
-* Use StateSpacePlannerFactory to create state space planners
-
-*State space strategy*
-* Search strategies are now independant from planners: Add StateSpaceStrategy interface
-* A*, Greedy Best First Search, Enforced Hill Climbing and Hill Climbing are available
-* Add JUnit tests
-
-*Global*
-* Add tests
-* Fix bugs and javadoc
-* Memory Agent: PDDL4J could work even if JVM command line is not given
-* Big work on JUnit tests and VAL
-
-**PDDL4J v3.6.0**
-
-*Planner*
-* Adding Fast Forward planner
-* Adding Enforced Hill Climbing planner
-* Adding depth attibute in Node class
-* Converting cost and heuristic in double
-* Fix bugs
-
-*Parser*
-* Adding parseFromString method (it's is now possible to parse a string containing a pddl domain and/or problem)
-* Refactor Parser class and fix bugs
-
-*JUnit tests*
-* Adding tests for all the planners, CodedProblem, Encoder, Parser, Plan, etc.
-* Refactor and fix bugs
-
-*Global*
-* Change AdaptatorJavaJson to JsonAdapter
-* Fix logger and standard outputs
-* Throws uncatched exceptions
-* Fix bugs
