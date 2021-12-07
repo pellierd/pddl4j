@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -25,36 +25,42 @@ import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
- * This class implement the adjusted sum 2 heuristic. This heuristic improves the adjusted sum
- * heuristic by replacing the computation of the <code>cost(S)</code> by the used the relaxed plan
+ * This class implement the combo heuristic. This heuristic improves the adjusted sum
+ * heuristic by replacing the computation of the interaction degree of the adjusted sum
  * heuristic. Now, we have the following heuristic:
  * <pre>
- * hadjsum2(S) := cost(S) + delta(S)
+ * combo(S) := hsum(S) + hlvel(S)
  * </pre>
  * where
  * <ul>
- * <li> <code>cost(S) := 1 +  cost(S + prec(a) - add(a))</code>
- * <li> <code>delta(S) := lev(S) - max(lev(p))</code> for all <code>p</code> in <code>S</code>
+ * <li> <code>hsum(S)</code> is the sum heuristic value and</li>
+ * <li> <code>hlev(S)</code> the set-level heuristic value.</li>
  * </ul>
- * <b>Warning:</b> The adjusted sum heuristic is not admissible.
+ * <b>Warning:</b> The combo heuristic is not admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 10.06.2010
+ * @version 1.0 - 01.09.2010
  * @see AdjustedSum
- * @see Max
- * @see FastForward
  * @see Sum
+ * @see SetLevel
  */
-public final class AdjustedSum2 extends RelaxedGraphHeuristic {
+public final class Combo extends RelaxedGraphHeuristic {
 
     /**
-     * Creates a new <code>AdjustedSum2</code> heuristic for a specified planning problem.
+     * The set level heuristic used to compute the delta function, i.e., the interaction degree
+     * among propositions of the goal.
+     */
+    private SetLevel delta;
+
+    /**
+     * Creates a new <code>COMBO</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public AdjustedSum2(ADLProblem problem) {
+    public Combo(ADLProblem problem) {
         super(problem);
+        this.delta = new SetLevel(problem);
         super.setAdmissible(false);
     }
 
@@ -70,9 +76,11 @@ public final class AdjustedSum2 extends RelaxedGraphHeuristic {
     @Override
     public int estimate(final State state, final Condition goal) {
         super.setGoal(goal);
-        final int level = super.expandRelaxedPlanningGraph(state);
-        return super.isGoalReachable() ? super.getRelaxedPlanValue() + (level - super.getMaxValue())
-            : Integer.MAX_VALUE;
+        // First, we expand the relaxed planing graph to compute the sum heuristic
+        super.expandRelaxedPlanningGraph(state);
+        // Second, we expand the relaxed planning graph with mutex to compute the set level heuristic
+        this.delta.expandPlanningGraph(state);
+        return super.isGoalReachable() ? this.getSumValue() + this.delta.estimate(state, goal) : Integer.MAX_VALUE;
     }
 
     /**

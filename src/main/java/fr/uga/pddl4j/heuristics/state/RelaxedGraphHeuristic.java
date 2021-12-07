@@ -17,9 +17,8 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
-import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -42,7 +41,7 @@ import java.util.List;
  * @author Damien Pellier
  * @version 1.0 20.08.2010
  */
-public abstract class RelaxedGraphHeuristic extends AbstractGoalCostHeuristic implements PlanningGraphHeuristic {
+public abstract class RelaxedGraphHeuristic extends AbstractStateHeuristic implements PlanningGraphHeuristic {
 
     /**
      * The array of unconditional operators of the problem.

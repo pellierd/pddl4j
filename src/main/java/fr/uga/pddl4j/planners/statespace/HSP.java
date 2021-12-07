@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
@@ -132,7 +132,7 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem>  {
     @CommandLine.Option(names = { "-e", "--heuristic" }, defaultValue = "FAST_FORWARD",
         description = "Set the heuristic : AJUSTED_SUM, AJUSTED_SUM2, AJUSTED_SUM2M, COMBO, MAX, FAST_FORWARD, "
             + "SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)")
-    public final void setHeuristic(GoalCostHeuristic.Name heuristic)  {
+    public final void setHeuristic(StateHeuristic.Name heuristic)  {
         super.setHeuristic(heuristic);
     }
 
@@ -174,13 +174,6 @@ public final class HSP extends AbstractStateSpacePlanner<ADLProblem>  {
             CommandLine cmd = new CommandLine(planner);
             int exitCode = (int) cmd.execute(args);
             System.exit(exitCode);
-
-            //System.setOut(new PrintStream("/dev/null"));
-            //final PlannerConfiguration config = new PlannerConfiguration(args, HSP.getDefaultConfiguration());
-            //System.out.println("qhjgdjqshdg");
-            //HSP planner = new HSP(config);
-            //planner.solve();
-            //System.out.println("111111"+GraphLayout.parseInstance(planner).totalSize());
         } catch (IllegalArgumentException e) {
             LOGGER.fatal(e.getMessage());
         }

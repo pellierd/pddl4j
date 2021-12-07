@@ -745,7 +745,8 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @return a string representation of this domain.
      */
     public String toString() {
-        return this.problemName == null ? this.toPDDLDomainString() : this.toPDDLProblemString();
+        return this.problemName == null ? this.toPDDLDomainString() :
+            this.toPDDLDomainString() + " \n\n" + this.toPDDLProblemString();
     }
 
     /**

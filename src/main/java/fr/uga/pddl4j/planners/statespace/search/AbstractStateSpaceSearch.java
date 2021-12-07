@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -35,7 +35,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
     /**
      * The heuristic of the planner.
      */
-    private GoalCostHeuristic.Name heuristic;
+    private StateHeuristic.Name heuristic;
 
     /**
      * The heuristic weight.
@@ -78,7 +78,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
      * @return the heuristic to use to solve the planning problem.
      */
     @Override
-    public final GoalCostHeuristic.Name getHeuristic() {
+    public final StateHeuristic.Name getHeuristic() {
         return this.heuristic;
     }
 
@@ -88,7 +88,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
      * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
     @Override
-    public final void setHeuristic(final GoalCostHeuristic.Name heuristic) {
+    public final void setHeuristic(final StateHeuristic.Name heuristic) {
         Objects.requireNonNull(heuristic);
         this.heuristic = heuristic;
     }
@@ -257,7 +257,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
      * @param heuristic the heuristicType to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public AbstractStateSpaceSearch(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
+    public AbstractStateSpaceSearch(int timeout, StateHeuristic.Name heuristic, double weight) {
         super();
         this.timeout = timeout;
         this.heuristic = heuristic;

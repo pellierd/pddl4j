@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.examples.asp;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
@@ -70,7 +70,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
     /**
      * The default value of the HEURISTIC property used for planner configuration.
      */
-    public static final GoalCostHeuristic.Name DEFAULT_HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
+    public static final StateHeuristic.Name DEFAULT_HEURISTIC = StateHeuristic.Name.FAST_FORWARD;
 
     /**
      * The WEIGHT_HEURISTIC property used for planner configuration.
@@ -90,7 +90,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
     /**
      * The name of the heuristic used by the planner.
      */
-    private GoalCostHeuristic.Name heuristic;
+    private StateHeuristic.Name heuristic;
 
     /**
      * Creates a new A* search planner with the default configuration.
@@ -132,7 +132,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
     @CommandLine.Option(names = { "-e", "--heuristic" }, defaultValue = "FAST_FORWARD",
         description = "Set the heuristic : AJUSTED_SUM, AJUSTED_SUM2, AJUSTED_SUM2M, COMBO, "
             + "MAX, FAST_FORWARD SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)")
-    public void setHeuristic(GoalCostHeuristic.Name heuristic)  {
+    public void setHeuristic(StateHeuristic.Name heuristic)  {
         this.heuristic = heuristic;
     }
 
@@ -141,7 +141,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      *
      * @return the name of the heuristic used by the planner to solve a planning problem.
      */
-    public final GoalCostHeuristic.Name getHeuristic() {
+    public final StateHeuristic.Name getHeuristic() {
         return this.heuristic;
     }
 
@@ -252,7 +252,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
         if (configuration.getProperty(ASP.HEURISTIC_SETTING) == null) {
             this.setHeuristic(ASP.DEFAULT_HEURISTIC);
         } else {
-            this.setHeuristic(GoalCostHeuristic.Name.valueOf(configuration.getProperty(
+            this.setHeuristic(StateHeuristic.Name.valueOf(configuration.getProperty(
                 ASP.HEURISTIC_SETTING)));
         }
     }
@@ -281,7 +281,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
     public Plan astar(ADLProblem problem) {
 
         // First we create an instance of the heuristic to use to guide the search
-        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), problem);
+        final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), problem);
 
         // We get the initial state from the planning problem
         final State init = new State(problem.getInitialState());

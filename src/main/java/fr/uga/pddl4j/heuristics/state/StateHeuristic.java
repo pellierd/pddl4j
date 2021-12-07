@@ -13,17 +13,9 @@
 * see <http://www.gnu.org/licenses/>
 */
 
-package fr.uga.pddl4j.heuristics;
+package fr.uga.pddl4j.heuristics.state;
 
-import fr.uga.pddl4j.heuristics.graph.AdjustedSum;
-import fr.uga.pddl4j.heuristics.graph.AdjustedSum2;
-import fr.uga.pddl4j.heuristics.graph.AjustedSum2M;
-import fr.uga.pddl4j.heuristics.graph.Combo;
-import fr.uga.pddl4j.heuristics.graph.FastForward;
-import fr.uga.pddl4j.heuristics.graph.Max;
-import fr.uga.pddl4j.heuristics.graph.SetLevel;
-import fr.uga.pddl4j.heuristics.graph.Sum;
-import fr.uga.pddl4j.heuristics.graph.SumMutex;
+import fr.uga.pddl4j.heuristics.Heuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
@@ -41,7 +33,7 @@ import fr.uga.pddl4j.problem.operator.Condition;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public interface GoalCostHeuristic extends Heuristic {
+public interface StateHeuristic extends Heuristic {
 
     /**
      * The name of heuristics.
@@ -121,7 +113,7 @@ public interface GoalCostHeuristic extends Heuristic {
      * @param problem the problem for which the heuristic is created.
      * @return the heuristic created.
      */
-    public static GoalCostHeuristic getInstance(final GoalCostHeuristic.Name name, final ADLProblem problem) {
+    public static StateHeuristic getInstance(final StateHeuristic.Name name, final ADLProblem problem) {
         switch (name) {
             case FAST_FORWARD:
                 return new FastForward(problem);

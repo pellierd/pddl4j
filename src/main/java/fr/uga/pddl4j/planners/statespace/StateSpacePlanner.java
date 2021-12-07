@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 
 import fr.uga.pddl4j.planners.SearchStrategy;
@@ -51,7 +51,7 @@ public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
     /**
      * The default value of the HEURISTIC property used for planner configuration.
      */
-    static final GoalCostHeuristic.Name DEFAULT_HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
+    static final StateHeuristic.Name DEFAULT_HEURISTIC = StateHeuristic.Name.FAST_FORWARD;
 
     /**
      * The WEIGHT_HEURISTIC property used for planner configuration.

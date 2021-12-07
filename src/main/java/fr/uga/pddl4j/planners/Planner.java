@@ -15,16 +15,6 @@
 
 package fr.uga.pddl4j.planners;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
-import fr.uga.pddl4j.heuristics.graph.AdjustedSum;
-import fr.uga.pddl4j.heuristics.graph.AdjustedSum2;
-import fr.uga.pddl4j.heuristics.graph.AjustedSum2M;
-import fr.uga.pddl4j.heuristics.graph.Combo;
-import fr.uga.pddl4j.heuristics.graph.FastForward;
-import fr.uga.pddl4j.heuristics.graph.Max;
-import fr.uga.pddl4j.heuristics.graph.SetLevel;
-import fr.uga.pddl4j.heuristics.graph.Sum;
-import fr.uga.pddl4j.heuristics.graph.SumMutex;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
@@ -34,7 +24,6 @@ import fr.uga.pddl4j.planners.htn.stn.TFD;
 import fr.uga.pddl4j.planners.statespace.FF;
 import fr.uga.pddl4j.planners.statespace.GSP;
 import fr.uga.pddl4j.planners.statespace.HSP;
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.Level;
 

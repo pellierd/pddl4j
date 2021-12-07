@@ -16,5 +16,5 @@
 /**
  * This package contains the critical path and delete relaxation heuristics implemented in the PDDL4J library.
  */
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 

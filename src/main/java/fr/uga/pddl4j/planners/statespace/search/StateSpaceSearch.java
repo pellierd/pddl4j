@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -32,7 +32,7 @@ public interface StateSpaceSearch extends SearchStrategy {
     /**
      * The default heuristic used (FAST_FORWARD).
      */
-    static final GoalCostHeuristic.Name DEFAULT_HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
+    static final StateHeuristic.Name DEFAULT_HEURISTIC = StateHeuristic.Name.FAST_FORWARD;
 
     /**
      * The default weight of the heuristic (1.0).
@@ -49,14 +49,14 @@ public interface StateSpaceSearch extends SearchStrategy {
      *
      * @return the heuristic to use to solve the planning problem.
      */
-    GoalCostHeuristic.Name getHeuristic();
+    StateHeuristic.Name getHeuristic();
 
     /**
      * Sets the heuristic to use to solved the problem.
      *
      * @param heuristic the heuristic to use to solved the problem. The heuristic cannot be null.
      */
-    void setHeuristic(final GoalCostHeuristic.Name heuristic);
+    void setHeuristic(final StateHeuristic.Name heuristic);
 
     /**
      * Returns the weight set to the heuristic.
@@ -206,7 +206,7 @@ public interface StateSpaceSearch extends SearchStrategy {
      * @param heuristic the heuristic to used bt the search strategy.
      * @return the search strategy.
      */
-    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final GoalCostHeuristic.Name heuristic) {
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final StateHeuristic.Name heuristic) {
         return StateSpaceSearch.getInstance(name, heuristic, StateSpaceSearch.DEFAULT_HEURISTIC_WEIGHT);
     }
 
@@ -218,7 +218,7 @@ public interface StateSpaceSearch extends SearchStrategy {
      * @param weight the weight of the heuristic to used of the search strategy.
      * @return the search strategy.
      */
-    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final GoalCostHeuristic.Name heuristic,
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final StateHeuristic.Name heuristic,
                                         final double weight) {
         return StateSpaceSearch.getInstance(name, heuristic, weight, StateSpaceSearch.DEFAULT_TIMEOUT);
     }
@@ -232,7 +232,7 @@ public interface StateSpaceSearch extends SearchStrategy {
      * @param timeout the timeout of the search strategy.
      * @return the search strategy.
      */
-    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final GoalCostHeuristic.Name heuristic,
+    static StateSpaceSearch getInstance(final SearchStrategy.Name name, final StateHeuristic.Name heuristic,
                                         final double weight, final int timeout) {
         switch (name) {
             case ASTAR:

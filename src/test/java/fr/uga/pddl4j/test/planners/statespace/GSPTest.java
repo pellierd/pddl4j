@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
@@ -91,7 +91,7 @@ public class GSPTest {
                 case ASTAR:
                 case HILL_CLIMBING:
                     this.config.setProperty(GSP.SEARCH_STRATEGIES_SETTING, strategy);
-                    for (GoalCostHeuristic.Name heuristic : GoalCostHeuristic.Name.values()) {
+                    for (StateHeuristic.Name heuristic : StateHeuristic.Name.values()) {
                         this.config.setProperty(GSP.HEURISTIC_SETTING, heuristic);
                         Tools.solve(path, Tools.PDDL_EXT, Planner.Name.GSP, this.config);
                     }

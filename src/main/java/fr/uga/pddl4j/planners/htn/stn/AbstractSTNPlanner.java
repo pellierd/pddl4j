@@ -15,7 +15,6 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
@@ -23,12 +22,9 @@ import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.htn.AbstractHTNPlanner;
-import fr.uga.pddl4j.planners.statespace.AbstractStateSpacePlanner;
-import fr.uga.pddl4j.planners.statespace.StateSpacePlanner;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
@@ -46,7 +42,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.concurrent.Callable;
 
 /**
  * This abstract class implements the common methods of all Simple Task Network planners.

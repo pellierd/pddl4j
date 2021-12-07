@@ -15,10 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
+import org.openjdk.jol.info.GraphLayout;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -48,7 +49,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public HillClimbing(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
+    public HillClimbing(int timeout, StateHeuristic.Name heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -61,7 +62,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
     public Node search(final ADLProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
-        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), codedProblem);
+        final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), codedProblem);
 
         State init = new State(codedProblem.getInitialState());
         Node root = new Node(init, null, 0, 0, heuristic.estimate(init, codedProblem.getGoal()));
@@ -97,7 +98,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
             searchingTime = end - begin;
         }
 
-        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(openList) + MemoryAgent.getDeepSizeOf(heuristic));
+        this.setMemoryUsed(GraphLayout.parseInstance(openList).totalSize());
         this.setSearchingTime(searchingTime);
 
         return solution;
@@ -112,7 +113,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @return the list of successors from the parent node.
      */
     private LinkedList<Node> getSuccessors(final Node parent, final ADLProblem problem,
-                                           final GoalCostHeuristic heuristic) {
+                                           final StateHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 
         int index = 0;

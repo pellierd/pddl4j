@@ -17,11 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
-
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
-
-import java.io.Serializable;
+package fr.uga.pddl4j.heuristics.state;
 
 /**
  * This interface defines the methods accessible from all heuristics. An heuristic is a function
@@ -35,7 +31,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public interface PlanningGraphHeuristic extends GoalCostHeuristic {
-    
+public interface PlanningGraphHeuristic extends StateHeuristic {
+
 
 }

@@ -15,10 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
+import org.openjdk.jol.info.GraphLayout;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public GreedyBestFirstSearch(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
+    public GreedyBestFirstSearch(int timeout, StateHeuristic.Name heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -64,7 +65,7 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
 
-        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), codedProblem);
+        final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), codedProblem);
         final Set<Node> closeSet = new HashSet<>();
         final Set<Node> openSet = new HashSet<>();
         final long timeout = this.getTimeout() * 1000;
@@ -113,8 +114,8 @@ public final class GreedyBestFirstSearch extends AbstractStateSpaceSearch {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet)
-        //    + MemoryAgent.getDeepSizeOf(heuristic));
+        this.setMemoryUsed(GraphLayout.parseInstance(closeSet).totalSize()
+            + GraphLayout.parseInstance(openSet).totalSize());
         this.setSearchingTime(searchingTime);
 
         return solution;

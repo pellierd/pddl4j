@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
+import org.openjdk.jol.info.GraphLayout;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -375,7 +376,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
         T pb = this.instantiate(parsedProblem);
         this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
-        //this.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
+        this.getStatistics().setMemoryUsedForProblemRepresentation(GraphLayout.parseInstance(pb).totalSize());
 
         if (pb != null) {
 

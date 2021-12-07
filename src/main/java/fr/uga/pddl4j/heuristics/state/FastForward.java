@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -25,42 +25,44 @@ import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
- * This class implement the combo heuristic. This heuristic improves the adjusted sum
- * heuristic by replacing the computation of the interaction degree of the adjusted sum
- * heuristic. Now, we have the following heuristic:
+ * This class implements the heuristics of the fast forward planner. For more about this
+ * heuristic see J. Hoffmann, A Heuristic for DOMAIN Independent Planning and its Use in an Enforced
+ * Hill-climbing Algorithm, in: Proceedings of the 12th International Symposium on Methodologies for
+ * Intelligent Systems, Charlotte, North Carolina, USA, October 2000.
+ * <p>
+ * The computation of the value returned by the heuristics is based on the extraction of a relaxed
+ * plan to the planning graph ignoring negative effects according to the difficulty heuristic. The
+ * heuristic value is the number of actions of the relaxed plan extracted. To select an effect
+ * according to the unconditional operators difficulty heuristic, the question is, which achiever
+ * should be choose when no NOOP is available ? It is certainly a good idea to select an achiever
+ * whose preconditions seems to be "easy". From the graph building_the_library.rst phase, we can obtain a simple
+ * measure for the operators_difficulty of an action's preconditions as follows:
+ * </p>
  * <pre>
- * combo(S) := hsum(S) + hlvel(S)
+ * difficulty(o) := SUM_ID(min { i | p is member of the fact layer at time i }) with p in pre(o)
  * </pre>
- * where
- * <ul>
- * <li> <code>hsum(S)</code> is the sum heuristic value and</li>
- * <li> <code>hlev(S)</code> the set-level heuristic value.</li>
- * </ul>
- * <b>Warning:</b> The combo heuristic is not admissible.
+ * <p>
+ * The operators_difficulty of each action can be set when it is first inserted into the graph.
+ * During plan extraction, facing a fact for which no NOOP is available, we then simply selected an
+ * achieving action with minimal operators_difficulty. This heuristic works well in situation where
+ * there are severals ways to achieve one fact. but some ways need less effort than others.
+ * </p>
+ * <b>Warning:</b> The relaxed plan heuristic is not admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 01.09.2010
- * @see AdjustedSum
- * @see Sum
- * @see SetLevel
+ * @version 1.0 - 20.08.2010
+ * @see RelaxedGraphHeuristic
  */
-public final class Combo extends RelaxedGraphHeuristic {
+public final class FastForward extends RelaxedGraphHeuristic {
 
     /**
-     * The set level heuristic used to compute the delta function, i.e., the interaction degree
-     * among propositions of the goal.
-     */
-    private SetLevel delta;
-
-    /**
-     * Creates a new <code>COMBO</code> heuristic for a specified planning problem.
+     * Creates a new <code>FF</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public Combo(ADLProblem problem) {
+    public FastForward(ADLProblem problem) {
         super(problem);
-        this.delta = new SetLevel(problem);
         super.setAdmissible(false);
     }
 
@@ -72,15 +74,13 @@ public final class Combo extends RelaxedGraphHeuristic {
      * @param state the state from which the distance to the goal must be estimated.
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state.
+     * @throws NullPointerException if <code>state == null &#38;&#38; goal == null</code>.
      */
     @Override
     public int estimate(final State state, final Condition goal) {
         super.setGoal(goal);
-        // First, we expand the relaxed planing graph to compute the sum heuristic
         super.expandRelaxedPlanningGraph(state);
-        // Second, we expand the relaxed planning graph with mutex to compute the set level heuristic
-        this.delta.expandPlanningGraph(state);
-        return super.isGoalReachable() ? this.getSumValue() + this.delta.estimate(state, goal) : Integer.MAX_VALUE;
+        return super.isGoalReachable() ? super.getRelaxedPlanValue() : Integer.MAX_VALUE;
     }
 
     /**

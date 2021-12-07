@@ -5,13 +5,15 @@ Welcome to PDDL4J's documentation!
 PDDL4J is a software library under `LGPL license <https://www.gnu.org/licenses/lgpl-3.0.en.html>`_ embedding Artificial
 Intelligence algorithms to find solutions for planning problems, that is to say time organized actions to achieve a
 goal. Solutions to planning problems are "todo lists" named **plan** representing operational features of actions like
-**who, how, where, when and what to do**.
+**who, how, where, when and what to do**. The code of the library is available on `GitHub <https://github.com/pellierd/pddl4j>`_.
 
 PDDL4J is a suite of solvers useful for decision problems that can be solved by a sequence of actions (plan). It is
 based on a declarative approach: the user **states** a decision problem in PDDL (Planning Domain Description language
 and PDDL4J generates possible solutions. **No programming language and/or background** is required. PDDL4J has lot of
 application fields like can be use in many industrial fields as smart homes/data/cities, autonomous systems and
 robotics, logistics, business processes etc.
+
+
 
 .. note::
 
@@ -37,10 +39,8 @@ The library contains:
 
 .. note::
 
-  To get PDDL4J and start running a planner start reading the chapter
-  :ref:`getting_started_chapter`.
-
-
+  To get PDDL4J and start running a planner start reading the chapter :ref:`getting_started_chapter` or exploring
+  the PDDL4J API documentation :ref:`pddl4j_api_documentation_chapter`.
 
 .. important::
 
@@ -60,4 +60,8 @@ The library contains:
    running_planners_from_command_line
    configuring_planners_by_programming
    writing_your_own_planner
+   using_the_pddl_parser
+   instantiating_planning_problems
+   pddl4j_api_documentation
+   download
    how_to_contribute

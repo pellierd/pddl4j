@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -25,28 +25,27 @@ import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
- * This heuristic returns the level of the planning graph where all the propositions of the goal are
- * reached without any mutex free. For more information on this heuristic see: X. Nguyen and S.
- * Kambhampati. "Extracting effective and admissible state space heuristics from the planning
- * graph". In proceedings of the National Conference on Innovative Applications of Artificial
- * Intelligence, 2000.
- * <b>Warning:</b> The set-level heuristic is admissible.
+ * This class implements the SUM_ID mutex heuristic is an adaptation of the sum heuristic where mutual
+ * exclusion are computed. For more details on the sum heuristic see Blai Bonet and Hector Geffner,
+ * Planning as Heuristic Search, Artificial Intelligence 129, 2001, Elsevier.
+ * <b>Warning:</b> The sum heuristic is not admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 10.06.2010
- * @see RelaxedGraphHeuristic
+ * @version 1.0 - 11.06.2010
+ * @see GraphHeuristic
+ * @see Sum
  */
-public final class SetLevel extends GraphHeuristic {
+public final class SumMutex extends GraphHeuristic {
 
     /**
-     * Creates a new <code>SET_LEVEL</code> heuristic for a specified planning problem.
+     * Creates a new <code>SUM_MUTEX</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public SetLevel(ADLProblem problem) {
+    public SumMutex(ADLProblem problem) {
         super(problem);
-        super.setAdmissible(true);
+        super.setAdmissible(false);
     }
 
     /**
@@ -64,7 +63,8 @@ public final class SetLevel extends GraphHeuristic {
     @Override
     public int estimate(final State state, final Condition goal) {
         super.setGoal(goal);
-        return this.expandPlanningGraph(state);
+        super.expandPlanningGraph(state);
+        return super.isGoalReachable() ? this.getSumValue() : Integer.MAX_VALUE;
     }
 
     /**
@@ -80,5 +80,4 @@ public final class SetLevel extends GraphHeuristic {
     public double estimate(final Node node, final Condition goal) {
         return estimate((State) node, goal);
     }
-
 }

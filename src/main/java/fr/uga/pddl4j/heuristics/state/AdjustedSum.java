@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;

@@ -17,9 +17,8 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
-import fr.uga.pddl4j.heuristics.AbstractGoalCostHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.State;
@@ -47,7 +46,7 @@ import java.util.List;
  * @author Damien Pellier
  * @version 1.0 20.08.2010
  */
-public abstract class GraphHeuristic extends AbstractGoalCostHeuristic implements PlanningGraphHeuristic {
+public abstract class GraphHeuristic extends AbstractStateHeuristic implements PlanningGraphHeuristic {
 
     /**
      * The array used to store the apparition level of the propositions.

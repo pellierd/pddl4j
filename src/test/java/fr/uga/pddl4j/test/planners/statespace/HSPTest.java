@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.test.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.statespace.HSP;
@@ -49,7 +49,7 @@ public class HSPTest {
     /**
      * Default Heuristic Type.
      */
-    private static final GoalCostHeuristic.Name HEURISTIC = GoalCostHeuristic.Name.FAST_FORWARD;
+    private static final StateHeuristic.Name HEURISTIC = StateHeuristic.Name.FAST_FORWARD;
 
     /**
      * Default Heuristic Weight.

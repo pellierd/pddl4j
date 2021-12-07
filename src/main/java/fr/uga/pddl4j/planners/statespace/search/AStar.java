@@ -15,10 +15,11 @@
 
 package fr.uga.pddl4j.planners.statespace.search;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
+import org.openjdk.jol.info.GraphLayout;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ public final class AStar extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic to use to solve the planning problem.
      * @param weight    the weight set to the heuristic.
      */
-    public AStar(int timeout, GoalCostHeuristic.Name heuristic, double weight) {
+    public AStar(int timeout, StateHeuristic.Name heuristic, double weight) {
         super(timeout, heuristic, weight);
     }
 
@@ -61,7 +62,7 @@ public final class AStar extends AbstractStateSpaceSearch {
     public Node search(final ADLProblem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final long begin = System.currentTimeMillis();
-        final GoalCostHeuristic heuristic = GoalCostHeuristic.getInstance(this.getHeuristic(), codedProblem);
+        final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), codedProblem);
         // Get the initial state from the planning problem
         final State init = new State(codedProblem.getInitialState());
         // Initialize the closed list of nodes (store the nodes explored)
@@ -145,7 +146,8 @@ public final class AStar extends AbstractStateSpaceSearch {
 
         this.setExploredNodes(closeSet.size());
         this.setPendingNodes(openSet.size());
-        //this.setMemoryUsed(MemoryAgent.getDeepSizeOf(closeSet) + MemoryAgent.getDeepSizeOf(openSet));
+        this.setMemoryUsed(GraphLayout.parseInstance(closeSet).totalSize()
+            + GraphLayout.parseInstance(openSet).totalSize());
         this.setSearchingTime(time);
 
         // return the search computed or null if no search was found

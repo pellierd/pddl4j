@@ -17,7 +17,7 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics.graph;
+package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.problem.ADLProblem;
@@ -25,47 +25,28 @@ import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
 /**
- * This class implements the SUM_ID heuristic. (for more details on this heuristic see Blai Bonet and
- * Hector Geffner, Planning as Heuristic Search, Artificial Intelligence 129, 2001, Elsevier)
- * <p>
- * The principle of this heuristics function <i>h</i> is to resolved a relaxed the planning problem
- * <i>P'</i> in which all delete list are ignored. The cost of achieving an atom <i>p</i> form the
- * state <i>s</i> is noted <i>gs(p)</i>. These estimates can be defined recursively as:
- * </p>
- * <ul>
- * <li> <i>gs(p)</i> = 0, if <i>p</i> is in <i>s</i>,
- * <li> <i>gs(p)</i> = min[1 + <i>gs(Prec(op))]</i> for each <i>op</i> in <i>O(p)</i>, otherwise
- * </ul>
- * <p>where <i>O(p)</i> stands for the actions <i>op</i> that add <i>p</i>, i.e., with <i>p</i> in
- * <i>Add(op)</i>, and <i>gs(Prec(op))</i>, to be defined below, stands for the estimated cost of
- * achieving the preconditions of action <i>op</i> from <i>s</i>. The cost <i>gs(C)</i> of a sets
- * of atoms is defined as the weighted sum of the costs of individual atoms:
- * </p>
- * <ul>
- * <li> <i>hsum(C)</i> = sum <i>gs(r)</i> for all <i>r</i> in <i>C</i> (additive costs)
- * </ul>
- * <p>The heuristic assumes that subgoals are independent. This is not true in general as the
- * achievement of some subgoals can make the achievement of the other subgoals more or less
- * difficult. For this reason, the additive heuristic is not admissible (i.e., it may overestimate
- * the true costs).
- * </p>
- * <b>Warning:</b> The sum heuristic is admissible.
+ * This heuristic returns the level of the planning graph where all the propositions of the goal are
+ * reached without any mutex free. For more information on this heuristic see: X. Nguyen and S.
+ * Kambhampati. "Extracting effective and admissible state space heuristics from the planning
+ * graph". In proceedings of the National Conference on Innovative Applications of Artificial
+ * Intelligence, 2000.
+ * <b>Warning:</b> The set-level heuristic is admissible.
  *
  * @author D. Pellier
- * @version 1.0 - 11.06.2010
+ * @version 1.0 - 10.06.2010
  * @see RelaxedGraphHeuristic
  */
-public final class Sum extends RelaxedGraphHeuristic {
+public final class SetLevel extends GraphHeuristic {
 
     /**
-     * Creates a new <code>SUM_ID</code> heuristic for a specified planning problem.
+     * Creates a new <code>SET_LEVEL</code> heuristic for a specified planning problem.
      *
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public Sum(final ADLProblem problem) {
+    public SetLevel(ADLProblem problem) {
         super(problem);
-        super.setAdmissible(false);
+        super.setAdmissible(true);
     }
 
     /**
@@ -79,13 +60,11 @@ public final class Sum extends RelaxedGraphHeuristic {
      * @param goal  the goal expression.
      * @return the distance to the goal state from the specified state or
      * <code>Integer.MAX_VALUE</code> if the goal is unreachable from the specified state.
-     * @throws NullPointerException if <code>state == null</code>.
      */
     @Override
     public int estimate(final State state, final Condition goal) {
         super.setGoal(goal);
-        this.expandRelaxedPlanningGraph(state);
-        return super.isGoalReachable() ? super.getSumValue() : Integer.MAX_VALUE;
+        return this.expandPlanningGraph(state);
     }
 
     /**

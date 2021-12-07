@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
@@ -147,7 +147,7 @@ public final class GSP extends AbstractStateSpacePlanner<ADLProblem> {
         description = "Set the heuristics: AJUSTED_SUM, AJUSTED_SUM2, AJUSTED_SUM2M, COMBO, MAX, FAST_FORWARD, "
             +  "SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)")
     @Override
-    public final void setHeuristic(GoalCostHeuristic.Name heuristic)  {
+    public final void setHeuristic(StateHeuristic.Name heuristic)  {
         super.setHeuristic(heuristic);
     }
 

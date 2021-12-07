@@ -15,22 +15,19 @@
 
 package fr.uga.pddl4j.examples;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.planners.LogLevel;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.statespace.HSP;
 
 import java.io.FileNotFoundException;
 
 /**
- * The class is an example. It shows how to create a HSP planner by programming and running it using the class
- * {@code PlannerConfiguration}.
+ * The class is an example. It shows how to create a planner by programming and running it.
  *
  * @author D. Pellier
  * @version 4.0 - 30.11.2021
  */
-public class PlannerConfigurationExample2 {
+public class DirectPlannerConfigurationExample {
 
     /**
      * The main method of the class.
@@ -42,25 +39,22 @@ public class PlannerConfigurationExample2 {
         // The path to the benchmarks directory
         final String benchmarks = "src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/";
 
-        // Gets the default configuration from the planner
-        PlannerConfiguration config = HSP.getDefaultConfiguration();
+        // Creates the planner
+        HSP planner = new HSP();
         // Sets the domain of the problem to solve
-        config.setProperty(HSP.DOMAIN_SETTING, benchmarks + "domain.pddl");
+        planner.setDomain(benchmarks + "domain.pddl");
         // Sets the problem to solve
-        config.setProperty(HSP.PROBLEM_SETTING, benchmarks + "p01.pddl");
-        // Sets the timeout allocated to the search.
-        config.setProperty(HSP.TIME_OUT_SETTING, 1000);
-        // Sets the log level
-        config.setProperty(HSP.LOG_LEVEL_SETTING, LogLevel.INFO);
-        // Sets the heuristic used to search
-        config.setProperty(HSP.HEURISTIC_SETTING, GoalCostHeuristic.Name.MAX);
+        planner.setProblem(benchmarks + "p01.pddl");
+        // Sets the timeout of the search in seconds
+        planner.setTimeout(1000);
+        // Sets log level
+        planner.setLogLevel(LogLevel.INFO);
+        // Selects the heuristic to use
+        planner.setHeuristic(StateHeuristic.Name.MAX);
         // Sets the weight of the heuristic
-        config.setProperty(HSP.WEIGHT_HEURISTIC_SETTING, 1.2);
+        planner.setHeuristicWeight(1.2);
 
-        // Creates an instance of the HSP planner with the specified configuration
-        Planner planner = Planner.getInstance(Planner.Name.HSP, config);
-
-        // Runs the planner and print the solution
+        // Solve and print the result
         try {
             planner.solve();
         } catch (FileNotFoundException e) {

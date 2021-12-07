@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.heuristics.GoalCostHeuristic;
+import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
@@ -62,7 +62,7 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
     /**
      * The name of the heuristic used by the planner.
      */
-    private GoalCostHeuristic.Name heuristic;
+    private StateHeuristic.Name heuristic;
 
     /**
      * Creates a new planner.
@@ -128,7 +128,7 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
      *
      * @param heuristic the name of the heuristic.
      */
-    public void setHeuristic(GoalCostHeuristic.Name heuristic)  {
+    public void setHeuristic(StateHeuristic.Name heuristic)  {
         this.heuristic = heuristic;
     }
 
@@ -137,7 +137,7 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
      *
      * @return the name of the heuristic used by the planner to solve a planning problem.
      */
-    public final GoalCostHeuristic.Name getHeuristic() {
+    public final StateHeuristic.Name getHeuristic() {
         return this.heuristic;
     }
 
@@ -219,7 +219,7 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
         if (configuration.getProperty(StateSpacePlanner.HEURISTIC_SETTING) == null) {
             this.setHeuristic(StateSpacePlanner.DEFAULT_HEURISTIC);
         } else {
-            this.setHeuristic(GoalCostHeuristic.Name.valueOf(configuration.getProperty(
+            this.setHeuristic(StateHeuristic.Name.valueOf(configuration.getProperty(
                 StateSpacePlanner.HEURISTIC_SETTING)));
         }
     }
@@ -270,6 +270,7 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
                 LOGGER.info("* " + strategy.name() + " search failed\n");
             }
             final long end = System.currentTimeMillis();
+            this.getStatistics().setMemoryUsedToSearch(search.getMemoryUsed());
             timeout -= ((end - begin) / 1000);
         }
         return plan;

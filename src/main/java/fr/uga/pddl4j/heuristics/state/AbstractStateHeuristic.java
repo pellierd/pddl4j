@@ -13,9 +13,9 @@
  * see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.heuristics;
+package fr.uga.pddl4j.heuristics.state;
 
-import fr.uga.pddl4j.heuristics.graph.FastForward;
+import fr.uga.pddl4j.heuristics.AbstractHeuristic;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Fluent;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -29,7 +29,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 19.10.2020
  */
-public abstract class AbstractGoalCostHeuristic extends AbstractHeuristic implements GoalCostHeuristic  {
+public abstract class AbstractStateHeuristic extends AbstractHeuristic implements StateHeuristic {
 
     /**
      * The goal to reached.
@@ -57,7 +57,7 @@ public abstract class AbstractGoalCostHeuristic extends AbstractHeuristic implem
      *
      * @param problem the problem to solve.
      */
-    protected AbstractGoalCostHeuristic(final ADLProblem problem) {
+    protected AbstractStateHeuristic(final ADLProblem problem) {
         this.facts = problem.getFluents();
         this.goal = problem.getGoal();
         this.actions = problem.getActions();
