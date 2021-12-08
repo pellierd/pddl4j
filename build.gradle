@@ -112,18 +112,6 @@ shadowJar {
     }
 }
 
-task run (type: JavaExec, dependsOn: build){
-    if (project.hasProperty("Args")) {
-        println("arguments list : " + Args)
-        args(Args.split(','))
-    }
-
-    jvmArgs = ["-javaagent:"+project.buildDir.name+"/libs/"+project.name+"-"+project.version+".jar", "-server", "-Xms2048m", "-Xmx2048m"]
-
-    main = "fr.uga.pddl4j.planners.PlannerConfiguration"
-    classpath = sourceSets.main.runtimeClasspath
-}
-
 clean{
     delete 'build', 'out', fileTree(dir: "src/main/java/fr/uga/pddl4j/parser/lexer", exclude:"Lexer.jj")
 }
