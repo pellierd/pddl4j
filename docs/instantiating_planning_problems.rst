@@ -39,8 +39,8 @@ Finally, get the last binary of PDDL4J and save it in the ``lib`` directory
 
 .. code-block:: bash
 
-    wget http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0-all.jar
-    mv pddl4j-4.0.0-all.jar lib/pddl4j-4.0.0-all.jar
+    wget http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0.jar
+    mv pddl4j-4.0.0.jar lib/pddl4j-4.0.0.jar
 
 Step 2. Create the main class of our example
 --------------------------------------------
@@ -69,13 +69,13 @@ To test the above code use the following command line to compile the example:
 
 .. code-block:: bash
 
-    javac -d classes -cp classes:lib/pddl4j-4.0.0-all.jar src/fr/uga/pddl4j/examples/ProblemInstantiationExample.java
+    javac -d classes -cp classes:lib/pddl4j-4.0.0.jar src/fr/uga/pddl4j/examples/ProblemInstantiationExample.java
 
 and then the following command line to run the example:
 
 .. code-block:: bash
 
-    java -cp classes:lib/pddl4j-4.0.0-all.jar fr.uga.pddl4j.examples.ProblemInstantiationExample \\
+    java -cp classes:lib/pddl4j-4.0.0.jar fr.uga.pddl4j.examples.ProblemInstantiationExample \\
         src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \\
         src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
 

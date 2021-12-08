@@ -9,7 +9,7 @@ make available for download binary versions as well as the main releases. The la
 Binaries
 --------
 
-  - `pddl4j.4.0.0-all.jar <http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0-all.jar>`_
+  - `pddl4j.4.0.0.jar <http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0.jar>`_
   - `pddl4j.3.8.3.jar <http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-3.8.3.jar>`_
   - `pddl4j.3.8.2.jar <http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-3.8.2.jar>`_
   - `pddl4j.3.8.1.jar <http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-3.8.1.jar>`_

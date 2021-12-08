@@ -390,7 +390,7 @@ The procedure to run the logistic domain and problem with HSP planner of the lib
 
     .. code-block:: bash
 
-        $ java -jar pddl4j-X.X-all.jar -server -Xms2048m -Xmx2048m -p HSP -o logistics.pddl -f problem.pddl
+        $ java -jar pddl4j-X.X.jar -server -Xms2048m -Xmx2048m -p HSP -o logistics.pddl -f problem.pddl
 
     * The JVM (Java Virtual Machine) arguments:
         * ``-jar`` specified the executable jar of the library.

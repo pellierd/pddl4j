@@ -36,10 +36,10 @@ To build PDDL4J and creating the executable jar use the following command line:
 
 .. code-block:: bash
 
-  ./gradlew shadowJar
+  ./gradlew jar
 
 This command build a single jar of the PDDL4J library containing all the dependency libraries used by PDDL4J. The jar
-generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.X is the version of PDDL4J.
+generated is located in the directory ``build/libs/pddl4j-X.X.jar`` where X.X is the version of PDDL4J.
 
 
 Example: Running Fast Forward planner
@@ -50,7 +50,7 @@ As sample, find below the command line to launch Fast Forward planner implemente
 
 .. code-block:: bash
 
-  $ java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FF \
+  $ java -cp build/libs/pddl4j-4.0.jar fr.uga.pddl4j.planners.statespace.FF \
      src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \
      src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
 

@@ -44,8 +44,8 @@ Finally, get the last binary of PDDL4J and save it in the ``lib`` directory
 
 .. code-block:: bash
 
-    wget http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0-all.jar
-    mv pddl4j-4.0.0-all.jar lib/pddl4j-4.0.0-all.jar
+    wget http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0.jar
+    mv pddl4j-4.0.0.jar lib/pddl4j-4.0.0.jar
 
 You are now ready to write your own A* planner.
 
@@ -127,13 +127,13 @@ To test, first compile your planner:
 
 .. code-block:: bash
 
-    javac -d classes -cp lib/pddl4j-4.0.0-all.jar src/fr/uga/pddl4j/examples/asp/ASP.java
+    javac -d classes -cp lib/pddl4j-4.0.0.jar src/fr/uga/pddl4j/examples/asp/ASP.java
 
 and run it with the command line:
 
 .. code-block:: bash
 
-    java -cp classes:lib/pddl4j-4.0.0-all.jar fr.uga.pddl4j.examples.asp.ASP --help
+    java -cp classes:lib/pddl4j-4.0.0.jar fr.uga.pddl4j.examples.asp.ASP --help
 
 You will obtain the following message:
 
@@ -180,13 +180,13 @@ To test, your complete command line compile once again your planner:
 
 .. code-block:: bash
 
-    javac -d classes -cp lib/pddl4j-4.0.0-all.jar src/fr/uga/pddl4j/examples/asp/ASP.java
+    javac -d classes -cp lib/pddl4j-4.0.0.jar src/fr/uga/pddl4j/examples/asp/ASP.java
 
 and run it with for instance the command line:
 
 .. code-block:: bash
 
-    java -cp classes:lib/pddl4j-4.0.0-all.jar fr.uga.pddl4j.examples.ASP
+    java -cp classes:lib/pddl4j-4.0.0.jar fr.uga.pddl4j.examples.ASP
          src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
          src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
          -e FAST_FORWARD
@@ -256,7 +256,7 @@ a test:
 
 .. code-block:: bash
 
-    java -cp classes:lib/pddl4j-4.0.0-all.jar fr.uga.pddl4j.examples.ASP
+    java -cp classes:lib/pddl4j-4.0.0.jar fr.uga.pddl4j.examples.ASP
          src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
          src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
          -e FAST_FORWARD

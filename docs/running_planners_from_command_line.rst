@@ -41,7 +41,7 @@ Command line example:
 
 .. code-block:: bash
 
-    java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.FF
+    java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.FF
            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pdd
            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
            -t 1000
@@ -82,7 +82,7 @@ Command line example:
 
 .. code-block:: bash
 
-   java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.HSP
+   java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.HSP
         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pdd
            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
         -e MAX
@@ -132,7 +132,7 @@ Command line example:
 
 .. code-block:: bash
 
-  java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.statespace.GSP
+  java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.GSP
         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
         -s ENFORCED_HILL_CLIMBING ASTAR
@@ -172,7 +172,7 @@ Command line example:
 
 .. code-block:: bash
 
-  java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.htn.stn.TFD
+  java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.htn.stn.TFD
            src/test/resources/benchmarks/hddl/ipc2020/barman/domain.hddl
            src/test/resources/benchmarks/hddl/ipc2020/barman/p01.hddl
            -t 600
@@ -212,7 +212,7 @@ Command line example:
 
 .. code-block:: bash
 
-  java -cp build/libs/pddl4j-4.0-all.jar fr.uga.pddl4j.planners.htn.stn.PFD
+  java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.htn.stn.PFD
            src/test/resources/benchmarks/hddl/ipc2020/barman/domain.hddl
            src/test/resources/benchmarks/hddl/ipc2020/barman/p01.hddl
            -t 600

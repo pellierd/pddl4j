@@ -37,26 +37,18 @@ The different build stages are the following:
 Creating a jar of the library
 -----------------------------
 
-To create a jar of the PDDL4J library *without dependency libraries* just use the command line:
+To create a jar of the PDDL4J library with all dependency libraries just use the command line:
 
 .. code-block:: bash
 
   ./gradlew jar
 
 The jar generated is located in the directory ``./build/libs/pddl4j-X.X.jar`` where X.X is the version of PDDL4J. If the
-library is not build, the library is built before.
-
-To create a jar of the PDDL4J library *with the dependency libraries* just use the command line:
-
-.. code-block:: bash
-
-  ./gradlew shadowJar
-
-The jar generated is located in the directory ``build/libs/pddl4j-X.X-all.jar`` where X.X is the version of PDDL4J. The libraries include in the jar are :
+library is not build, the library is built before. The libraries include in the jar are :
   - `Log4j <https://logging.apache.org/log4j/>`_ used for logging;
-  - `JUnit <https://junit.org/junit5/>`_ used for unit tests.
-
-.. note :: Both jar are executable. The main class run by default is ``PlannerConfiguration``.
+  - `JUnit <https://junit.org/junit5/>`_ used for unit tests;
+  - `Picocli <https://picocli.info/>`_ to deal with planners command line.
+  - `JOL <https://openjdk.java.net/projects/code-tools/jol/>`_  to analyze object layout schemes in JVMs.
 
 Generating the Java documentation
 ---------------------------------
