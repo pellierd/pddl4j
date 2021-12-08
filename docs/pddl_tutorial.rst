@@ -360,45 +360,33 @@ Running the logistics example
 
 The procedure to run the logistic domain and problem with HSP planner of the library is given below:
 
-    #. Open a terminal
+    1. Open a terminal
 
-    #. Create a directory called PDDL4J:
+    2. Create a directory called PDDL4J:
 
     .. code-block:: bash
 
         $ mkdir pddl4j
 
-    #. Go to the directory:
+    3. Go to the directory:
 
     .. code-block:: bash
 
         $ cd pddl4j
 
-    #. Download the binary of last release (X.X.X is the number of release - see `releases page <https://github.com/pellierd/pddl4j/releases>`_)
+    4. Download the binary of last release (X.X.X is the number of release - see :ref:`download_chapter`.
 
     .. code-block:: bash
 
-        $ wget https://github.com/pellierd/pddl4j/releases/download/vX.X.X/PDDL4J-vX.X.X.zip
+        $ wget http://pddl4j.imag.fr/repository/pddl4j/binaries/pddl4j-4.0.0.jar
 
-    #. Unzip zip the last release:
+    5. Move the domain file :download:`logistics.pddl <resources/logistics.pddl>` previously created or download it in
+    the ``pdd4j`` directory.
 
-    .. code-block:: bash
+    6. Move the domain file :download:`problem.pddl <resources/problem.pddl>` previously created or download it in
+    the ``pdd4j`` directory.
 
-        $ unzip PDDL4J-vX.X.X.zip
-
-    #. Download the domain file:
-
-    .. code-block:: bash
-
-        $ wget http://pddl4j.imag.fr/repository/wiki/logistics.pddl
-
-    #. Download the problem file:
-
-    .. code-block:: bash
-
-        $ wget http://pddl4j.imag.fr/repository/wiki/problem.pddl
-
-    #. Test the example:
+    7. Test the example:
 
     .. code-block:: bash
 

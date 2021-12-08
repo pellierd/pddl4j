@@ -62,4 +62,5 @@ The library contains:
    instantiating_planning_problems
    api_documentation
    download
+   Issues <https://github.com/pellierd/pddl4j/issues?q=>
    how_to_contribute
