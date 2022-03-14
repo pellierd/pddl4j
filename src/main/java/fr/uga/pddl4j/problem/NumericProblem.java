@@ -103,7 +103,7 @@ public class NumericProblem extends AbstractNumericProblem {
     }
 
     /**
-     * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
+     * This method carries out all the necessary treatments to preinstantiate the problem. In particular, it calculates
      * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
      * be triggered and infer of the domain that are not typing.
      */
@@ -126,7 +126,7 @@ public class NumericProblem extends AbstractNumericProblem {
     }
 
     /**
-     * This method carries out all the necessary treatment to postinstantiate the problem. In particular, it simplifies
+     * This method carries out all the necessary treatments to postinstantiate the problem. In particular, it simplifies
      * the actions instantiated based on static properties based on the initial state information of the problem in
      * order to prune the actions that can never be triggered.
      */
