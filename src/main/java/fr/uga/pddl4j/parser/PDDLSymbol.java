@@ -143,6 +143,11 @@ public class PDDLSymbol implements Serializable {
     private int endColumn;
 
     /**
+     * The time specifier of the symbol.
+     */
+    private PDDLTimeSpecifier timeSpecifier;
+
+    /**
      * Creates a symbol from a specified symbol.
      *
      * @param symbol the symbol.
@@ -154,6 +159,7 @@ public class PDDLSymbol implements Serializable {
         this.beginColumn = symbol.getBeginColumn();
         this.endLine = symbol.getEndLine();
         this.endColumn = symbol.getEndColumn();
+        this.timeSpecifier = symbol.getTimeSpecifier();
     }
 
     /**
@@ -169,6 +175,7 @@ public class PDDLSymbol implements Serializable {
         this.beginColumn = token.beginColumn;
         this.endLine = token.endLine;
         this.endColumn = token.endColumn;
+        this.timeSpecifier = null;
     }
 
     /**
@@ -189,6 +196,7 @@ public class PDDLSymbol implements Serializable {
         this.beginColumn = beginColumn;
         this.endLine = endLine;
         this.endColumn = endColumn;
+        this.timeSpecifier = null;
     }
 
     /**
@@ -215,7 +223,6 @@ public class PDDLSymbol implements Serializable {
      * Sets the kind of this symbol.
      *
      * @param kind the kind of the symbol.
-     * @throws NullPointerException of the specified kind is null.
      */
     public final void setKind(final Kind kind) {
         this.kind = kind;
@@ -281,6 +288,24 @@ public class PDDLSymbol implements Serializable {
      */
     public final int getEndColumn() {
         return this.endColumn;
+    }
+
+    /**
+     * Returns the time specifier of the symbol.
+     *
+     * @return the time specifier of the symbol.
+     */
+    public final PDDLTimeSpecifier getTimeSpecifier() {
+        return this.timeSpecifier;
+    }
+
+    /**
+     * Sets the time specifier of the symbol.
+     *
+     * @param  timeSpecifier the time specifier to set.
+     */
+    public final void setTimeSpecifier(final PDDLTimeSpecifier timeSpecifier) {
+        this.timeSpecifier = timeSpecifier;
     }
 
     /**
@@ -406,7 +431,23 @@ public class PDDLSymbol implements Serializable {
      */
     @Override
     public String toString() {
-        return this.image;
+        StringBuilder str = new StringBuilder();
+        switch (this.kind) {
+            case TASK:
+                if (this.getTimeSpecifier() != null) {
+                    str.append("( ");
+                    str.append(this.getTimeSpecifier());
+                    str.append(" ");
+                    str.append(this.getImage());
+                    str.append(")");
+                } else {
+                    str.append(this.getImage());
+                }
+                break;
+            default:
+                str.append(this.getImage());
+        }
+        return str.toString();
     }
 
 }

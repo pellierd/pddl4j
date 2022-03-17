@@ -55,7 +55,28 @@ public class PDDLMethod extends PDDLAbstractOperator {
     }
 
     /**
-     * Creates method with a specified name, parameter, task performed, precondition and tasknetwork.
+     * Creates method with a specified name, parameter, task performed, precondition and task network.
+     *
+     * @param name The name of the method.
+     * @param parameters The list of the method parameters.
+     * @param task The task performed by the method.
+     * @param duration The duration constraints of the method.
+     * @param preconditions The preconditions of the task. This parameter can be null.
+     * @param tasks The subtasks of the method.
+     * @param ordering The ordering constraints between the subtasks of the method.
+     * @param constraints The constraint on the subtasks of the method.
+     * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
+     */
+    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+                      final PDDLExpression duration, final PDDLExpression preconditions, final PDDLExpression tasks,
+                      final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
+        super(name, parameters, preconditions, duration);
+        this.task = task;
+        this.taskNetwork = new PDDLTaskNetwork(tasks, ordering, constraints, ordered);
+    }
+
+    /**
+     * Creates method with a specified name, parameter, task performed, precondition and task network.
      *
      * @param name The name of the method.
      * @param parameters The list of the method parameters.
@@ -63,32 +84,45 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param tasks The subtasks of the method.
      * @param ordering The ordering constraints between the subtasks of the method.
-     * @param logical The constraint on the subtasks of the method.
+     * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
-     * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
     public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
-                      final PDDLExpression preconditions, final PDDLExpression tasks, final PDDLExpression ordering,
-                      final PDDLExpression logical, final boolean ordered) {
-        super(name, parameters, preconditions);
-        this.task = task;
-        this.taskNetwork = new PDDLTaskNetwork(tasks, ordering, logical, ordered);
+                      final PDDLExpression preconditions, final PDDLExpression tasks,
+                      final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
+        this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered);
     }
 
     /**
-     * Creates method with a specified name, parameter, task performed, precondition and tasknetwork.
+     * Creates method with a specified name, parameter, task performed, precondition and task network.
+     *
+     * @param name The name of the method.
+     * @param parameters The list of the method parameters.
+     * @param task The task performed by the method.
+     * @param duration The duration constraints of the method.
+     * @param preconditions The preconditions of the task. This parameter can be null.
+     * @param network the task network of the method.
+     */
+    public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+                      final PDDLExpression duration, final PDDLExpression preconditions,
+                      final PDDLTaskNetwork network) {
+        this(name, parameters, task, duration, preconditions, network.getTasks(), network.getOrdering(),
+            network.getConstraints(), network.isTotallyOrdered());
+    }
+
+    /**
+     * Creates method with a specified name, parameter, task performed, precondition and task network.
      *
      * @param name The name of the method.
      * @param parameters The list of the method parameters.
      * @param task The task performed by the method.
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
-     * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
     public PDDLMethod(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
                       final PDDLExpression preconditions, final PDDLTaskNetwork network) {
-        this(name, parameters, task, preconditions, network.getTasks(), network.getOrderingConstraints(),
-            network.getLogicalConstraints(), network.isTotallyOrdered());
+        this(name, parameters, task, preconditions, network.getTasks(), network.getOrdering(),
+            network.getConstraints(), network.isTotallyOrdered());
     }
 
     /**
@@ -132,8 +166,8 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @return the ordering constraints of the task network.
      */
-    public final PDDLExpression getOrderingConstraints() {
-        return this.taskNetwork.getOrderingConstraints();
+    public final PDDLExpression getOrdering() {
+        return this.taskNetwork.getOrdering();
     }
 
     /**
@@ -141,7 +175,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setOrderingConstraints(final PDDLExpression constraints) {
+    public final void setOrdering(final PDDLExpression constraints) {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 
@@ -150,8 +184,8 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @return the logical constraints of the task network.
      */
-    public final PDDLExpression getLogicalConstraints() {
-        return this.taskNetwork.getLogicalConstraints();
+    public final PDDLExpression getConstraints() {
+        return this.taskNetwork.getConstraints();
     }
 
     /**
@@ -202,20 +236,20 @@ public class PDDLMethod extends PDDLAbstractOperator {
         final Map<String, String> taskIDCtx = new LinkedHashMap<>();
         this.getSubTasks().renameTaskIDs(taskIDCtx);
         // Rename the tag ID used in the ordering constraints of the method
-        this.getOrderingConstraints().renameTaskIDs(taskIDCtx);
+        this.getOrdering().renameTaskIDs(taskIDCtx);
         // In this case enumerate the orderings contraints in the cas of totally ordered
         if (this.isTotallyOrdered()) {
-            this.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
+            this.setOrdering(new PDDLExpression(PDDLConnective.AND));
             for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {
                 PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 c.setAtom(new LinkedList<PDDLSymbol>());
                 c.getAtom().add(this.getSubTasks().getChildren().get(j - 1).getTaskID());
                 c.getAtom().add(this.getSubTasks().getChildren().get(j).getTaskID());
-                this.getOrderingConstraints().addChild(c);
+                this.getOrdering().addChild(c);
             }
         }
         // Rename the logical constraits
-        this.getLogicalConstraints().renameVariables(varCtx);
+        this.getConstraints().renameVariables(varCtx);
         PDDLExpression preconditions = null;
         if (!this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
             preconditions = this.getPreconditions();
@@ -223,7 +257,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
             preconditions = new PDDLExpression(PDDLConnective.AND);
             preconditions.addChild(this.getPreconditions());
         }
-        Iterator<PDDLExpression> i = this.getLogicalConstraints().getChildren().iterator();
+        Iterator<PDDLExpression> i = this.getConstraints().getChildren().iterator();
         while (i.hasNext()) {
             final PDDLExpression constraint = i.next();
             switch (constraint.getConnective()) {
@@ -253,7 +287,11 @@ public class PDDLMethod extends PDDLAbstractOperator {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        str.append("(:method ");
+        if (!super.isDurative()) {
+            str.append("(:method ");
+        } else {
+            str.append("(:durative-method ");
+        }
         str.append(this.getName().toString()).append("\n");
         str.append("  :parameters (");
         if (!super.getParameters().isEmpty()) {
@@ -264,8 +302,18 @@ public class PDDLMethod extends PDDLAbstractOperator {
         }
         str.append(")\n");
         str.append("  :task ").append(this.getTask().toString("  ")).append("\n");
-        if (!this.getPreconditions().getChildren().isEmpty()) {
-            str.append("  :precondition\n  " + this.getPreconditions().toString("  ") + "\n");
+
+        if (super.isDurative()) {
+            str.append("\n  :duration ");
+            str.append("\n  ");
+            str.append(this.getDuration().toString("  "));
+            if (!this.getPreconditions().getChildren().isEmpty()) {
+                str.append("  :condition\n  " + this.getPreconditions().toString("  ") + "\n");
+            }
+        } else {
+            if (!this.getPreconditions().getChildren().isEmpty()) {
+                str.append("  :precondition\n  " + this.getPreconditions().toString("  ") + "\n");
+            }
         }
         if (this.isTotallyOrdered()) {
             str.append("  :ordered-subtasks\n  ");
@@ -277,13 +325,13 @@ public class PDDLMethod extends PDDLAbstractOperator {
         } else {
             str.append("()\n");
         }
-        if (!this.getOrderingConstraints().getChildren().isEmpty()) {
+        if (!this.getOrdering().getChildren().isEmpty()) {
             str.append("  :ordering\n  ");
-            str.append(this.getOrderingConstraints().toString("  ") + "\n");
+            str.append(this.getOrdering().toString("  ") + "\n");
         }
-        if (!this.getLogicalConstraints().getChildren().isEmpty()) {
+        if (!this.getConstraints().getChildren().isEmpty()) {
             str.append("  :constraints\n  ");
-            str.append(this.getLogicalConstraints().toString("  ") + "\n");
+            str.append(this.getConstraints().toString("  ") + "\n");
         }
         str.append(")");
         return str.toString();

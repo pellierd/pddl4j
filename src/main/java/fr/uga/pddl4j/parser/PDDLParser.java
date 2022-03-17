@@ -23,8 +23,14 @@ import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
 import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 
+import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.LogLevel;
+import fr.uga.pddl4j.planners.statespace.HSP;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import picocli.CommandLine;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,6 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
@@ -95,12 +102,22 @@ import java.util.stream.Collectors;
  * @author D Pellier
  * @version 2.0 - 28.01.10
  */
-public final class PDDLParser {
+@CommandLine.Command(name = "PDDLParser",
+    version = "PDDLParser 1.0",
+    description = "Parse PDDL domain and problem.",
+    sortOptions = false,
+    mixinStandardHelpOptions = true,
+    headerHeading = "Usage:%n",
+    synopsisHeading = "%n",
+    descriptionHeading = "%nDescription:%n%n",
+    parameterListHeading = "%nParameters:%n",
+    optionListHeading = "%nOptions:%n")
+public final class PDDLParser implements Callable<Integer> {
 
     /**
-     * Logger of the class.
+     * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(PDDLParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(AbstractPlanner.class.getName());
 
     /**
      * The specific symbol object.
@@ -148,11 +165,90 @@ public final class PDDLParser {
     private PDDLProblem problem;
 
     /**
+     * The domain file.
+     */
+    private File domainFile;
+
+    /**
+     * The problem file.
+     */
+    private File problemFile;
+
+    /**
      * Create a new <code>PDDLParser</code>.
      */
     public PDDLParser() {
         super();
         this.mgr = new ErrorManager();
+    }
+
+    /**
+     * Sets the domain file to parse.
+     *
+     * @param domain the domain file to parse.
+     */
+    @CommandLine.Parameters(index = "0", description = "The domain file.")
+    public final void setDomainFile(final File domain) {
+        this.domainFile = domain;
+    }
+
+    /**
+     * Returns the domain file to parse.
+     *
+     * @return the domain file to parse.
+     */
+    public final File getDomainFile() {
+        return this.domainFile;
+    }
+
+    /**
+     * Sets the problem file to parse.
+     *
+     * @param problem the problem file to parse.
+     */
+    @CommandLine.Parameters(index = "1", description = "The problem file.")
+    public final void setProblemFile(final File problem) {
+        this.problemFile = problem;
+    }
+
+    /**
+     * Returns the problem file to parse.
+     *
+     * @return the problem file to parse.
+     */
+    public final File getProblemFile() {
+        return this.problemFile;
+    }
+
+    /**
+     * Sets the log level of the planner.
+     *
+     * @param log the log of the planner.
+     * @see java.util.logging.Level
+     */
+    @CommandLine.Option(names = { "-l", "--log" }, defaultValue = "INFO", converter = LogLevel.class,
+        description = "Set the level of trace of the planner: ALL, DEBUG, INFO, ERROR, FATAL, OFF, TRACE "
+            + "(preset INFO).")
+    public final void setLogLevel(final LogLevel log) {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getRootLogger();
+        loggerConfig.setLevel(log.getLevel());
+        context.updateLoggers();
+
+    }
+
+    /**
+     * Returns the log of the planner.
+     *
+     * @return the trace level declared of the planner.
+     * @see java.util.logging.Level
+     */
+    public final LogLevel getLogLevel() {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getRootLogger();
+        return new LogLevel(loggerConfig.getLevel());
     }
 
     /**
@@ -163,6 +259,7 @@ public final class PDDLParser {
      * @throws FileNotFoundException if the specified domain does not exist.
      */
     public PDDLDomain parseDomain(String domain) throws FileNotFoundException {
+        this.domainFile = new File(domain);
         return this.parseDomain(new File(domain));
     }
 
@@ -174,19 +271,30 @@ public final class PDDLParser {
      * @throws FileNotFoundException if the specified domain file does not exist.
      */
     public PDDLDomain parseDomain(File domain) throws FileNotFoundException {
-        if (!domain.exists()) {
-            throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.");
+        this.domainFile = domain;
+        return this.parseDomain();
+    }
+
+    /**
+     * Parses a planning domain from a specific file.
+     *
+     * @return the pddl domain parsed or null if a lexical error or parser error occurred.
+     * @throws FileNotFoundException if the specified domain file does not exist.
+     */
+    public PDDLDomain parseDomain() throws FileNotFoundException {
+        if (!this.getDomainFile().exists()) {
+            throw new FileNotFoundException("File  \"" + this.getDomainFile().getName() + "\" does not exist.\n");
         }
         try {
             // Parse and check the domain
-            FileInputStream inputStream = new FileInputStream(domain);
+            FileInputStream inputStream = new FileInputStream(this.getDomainFile());
             if (this.lexer == null) {
                 this.lexer = new Lexer(inputStream);
             } else {
                 this.lexer.ReInit(inputStream);
             }
             lexer.setErrorManager(this.mgr);
-            lexer.setFile(domain);
+            lexer.setFile(this.getDomainFile());
             this.domain = this.lexer.domain();
             this.checkRequirements();
             this.checkTypesDeclaration();
@@ -203,7 +311,7 @@ public final class PDDLParser {
             return null;
         }
         return (this.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
-                && this.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()) ? this.domain : null;
+            && this.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()) ? this.domain : null;
     }
 
     /**
@@ -214,7 +322,8 @@ public final class PDDLParser {
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
     public PDDLProblem parseProblem(String problem) throws FileNotFoundException {
-        return this.parseProblem(new File(problem));
+        this.problemFile = new File(problem);
+        return this.parseProblem();
     }
 
     /**
@@ -225,18 +334,29 @@ public final class PDDLParser {
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
     public PDDLProblem parseProblem(File problem) throws FileNotFoundException {
-        if (!problem.exists()) {
-            throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.");
+       this.problemFile = problem;
+       return this.parseProblem();
+    }
+
+    /**
+     * Parses a planning problem from a specific file.
+     *
+     * @return the pddl problem parsed or null if a lexical error or parser error occurred.
+     * @throws FileNotFoundException if the specified problem file does not exist.
+     */
+    public PDDLProblem parseProblem() throws FileNotFoundException {
+        if (!this.getProblemFile().exists()) {
+            throw new FileNotFoundException("File  \"" + this.getProblemFile().getName() + "\" does not exist.\n");
         }
         try {
             // Parse and check the problem
-            FileInputStream inputStream = new FileInputStream(problem);
+            FileInputStream inputStream = new FileInputStream(this.getProblemFile());
             if (this.lexer == null) {
                 this.lexer = new Lexer(inputStream);
             } else {
                 this.lexer.ReInit(inputStream);
             }
-            this.lexer.setFile(problem);
+            this.lexer.setFile(this.getProblemFile());
             this.problem = this.lexer.problem();
             this.checkDomainName();
             this.checkRequirements();
@@ -273,7 +393,7 @@ public final class PDDLParser {
      */
     public ParsedProblem parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
         if (!domainAndProblem.exists()) {
-            throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.");
+            throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.\n");
         }
         try {
             this.lexer = new Lexer(new FileInputStream(domainAndProblem));
@@ -434,10 +554,10 @@ public final class PDDLParser {
      */
     public ParsedProblem parse(File domain, File problem) throws FileNotFoundException {
         if (!domain.exists()) {
-            throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.");
+            throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.\n");
         }
         if (!problem.exists()) {
-            throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.");
+            throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.\n");
         }
         try {
             // Parse and check the domain
@@ -1068,11 +1188,11 @@ public final class PDDLParser {
                     checked &= false;
                 }
                 checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
-                checked &= this.checkParserNode(meth.getLogicalConstraints(), meth.getParameters());
+                checked &= this.checkParserNode(meth.getConstraints(), meth.getParameters());
             }
             if (this.checkTaskIDsUniqueness(meth)) {
                 final Set<PDDLSymbol> taskIds = this.getTaskIDs(meth.getSubTasks());
-                final Set<PDDLSymbol> consIds = this.getTaskIDs(meth.getOrderingConstraints());
+                final Set<PDDLSymbol> consIds = this.getTaskIDs(meth.getOrdering());
                 for (PDDLSymbol id : consIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" in method "
@@ -1081,7 +1201,7 @@ public final class PDDLParser {
                         checked = false;
                     }
                 }
-                checked = this.checkOrderingConstraintAcyclicness(meth.getOrderingConstraints());
+                checked = this.checkOrderingConstraintAcyclicness(meth.getOrdering());
             } else {
                 checked = false;
             }
@@ -1153,7 +1273,7 @@ public final class PDDLParser {
             checked = this.checkParserNode(tn.getTasks(), tn.getParameters());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<PDDLSymbol>())) {
                 final Set<PDDLSymbol> taskIds = this.getTaskIDs(tn.getTasks());
-                final Set<PDDLSymbol> consIds = this.getTaskIDs(tn.getOrderingConstraints());
+                final Set<PDDLSymbol> consIds = this.getTaskIDs(tn.getOrdering());
                 for (PDDLSymbol id : consIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" initial task network"
@@ -1727,7 +1847,7 @@ public final class PDDLParser {
      *
      * @param args the arguments of the command line.
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         final StringBuilder strb = new StringBuilder();
 
@@ -1759,14 +1879,81 @@ public final class PDDLParser {
             } else {
                 strb.append("not ok");
                 parser.mgr.printAll();
+                for (Message m: parser.getErrorManager().getMessages()) {
+                    System.out.println(m);
+                }
             }
         } else {
+
             strb.append("\nusage of parser:\n").append("OPTIONS   DESCRIPTIONS\n")
                 .append("-p <str>    path for operator and fact file\n")
                 .append("-o <str>    operator file name\n")
                 .append("-f <str>    fact file name\n");
         }
 
+
         LOGGER.trace(strb);
+    }*/
+
+
+
+    /**
+     * The main method of the <code>PDDLParser</code> planner.
+     *
+     * @param args the arguments of the command line.
+     */
+    public static void main(String[] args) {
+        try {
+            final PDDLParser parser = new PDDLParser();
+            CommandLine cmd = new CommandLine(parser);
+            int exitCode = (int) cmd.execute(args);
+            System.exit(exitCode);
+        } catch (IllegalArgumentException e) {
+            LOGGER.fatal(e.getMessage());
+        }
+    }
+
+    /**
+     * This method contains the code called by the main method of the planner when planner are launched from
+     * command line.
+     *
+     * @return the exit return value of the planner: O if every thing is ok; 1 otherwise.
+     */
+    @Override
+    public Integer call() {
+        try {
+            this.parse(this.getDomainFile(), this.getProblemFile());
+            final ErrorManager errorManager = this.getErrorManager();
+            if (!errorManager.isEmpty()) {
+                for (Message m : errorManager.getMessages()) {
+                    if (LOGGER.isFatalEnabled()
+                        && (m.getType().equals(Message.Type.LEXICAL_ERROR)
+                        || m.getType().equals(Message.Type.PARSER_ERROR))) {
+                        LOGGER.fatal(m.toString());
+                    } else if (LOGGER.isWarnEnabled()
+                        && m.getType().equals(Message.Type.PARSER_WARNING)) {
+                        LOGGER.warn(m.toString());
+                    }
+                }
+                if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
+                    || !errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
+                    return null;
+                }
+            } else if (LOGGER.isInfoEnabled()) {
+                StringBuilder strb = new StringBuilder();
+                strb.append("\nparsing domain file \"");
+                strb.append(this.getDomainFile().getName());
+                strb.append("\" done successfully");
+                strb.append("\nparsing problem file \"");
+                strb.append(this.getProblemFile().getName());
+                strb.append("\" done successfully");
+                strb.append("\n");
+                LOGGER.info(strb);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.fatal(e.getMessage());
+            return 1;
+        }
+        return 0;
     }
 }

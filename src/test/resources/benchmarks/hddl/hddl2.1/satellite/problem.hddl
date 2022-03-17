@@ -1,0 +1,73 @@
+(define
+	(problem p4obs_1sat_3mod)
+	(:domain  satellite2)
+	(:objects
+		instrument0 - instrument
+		instrument1 - instrument
+		satellite0 - satellite
+		infrared0 - mode
+		spectrograph1 - mode
+		infrared2 - mode
+		star0 - calib_direction
+		groundstation1 - calib_direction
+		site1 - image_direction
+		site2 - image_direction
+		site3 - image_direction
+		site4 - image_direction
+		site5 - image_direction
+	)
+	(:htn
+		:parameters ()
+		:subtasks (and
+		 (task0 (do_observation site2 infrared2))
+		 (task1 (do_observation site3 infrared2))
+		 (task2 (do_observation site4 infrared0))
+		 (task3 (do_observation site5 infrared2))
+		)
+	)
+	(:init
+		(supports instrument0 infrared2)
+		(supports instrument0 spectrograph1)
+		(supports instrument0 infrared0)
+		(calibration_target instrument0 star0)
+		(supports instrument1 infrared2)
+		(supports instrument1 spectrograph1)
+		(calibration_target instrument1 groundstation1)
+		(on_board instrument0 satellite0)
+		(on_board instrument1 satellite0)
+		(power_avail satellite0)
+		(pointing satellite0 star0)
+		(= (calibration-time instrument0) 20)
+		(= (calibration-time instrument1) 5)
+		(= (turn-time site1 site2) 149.2)
+		(= (turn-time site1 site3) 513.3)
+		(= (turn-time site1 site4) 704.9)
+		(= (turn-time site1 site5) 681.1)
+		(= (turn-time site2 site1) 149.2)
+		(= (turn-time site2 site3) 370.9)
+		(= (turn-time site2 site4) 621.3)
+		(= (turn-time site2 site5) 558.7)
+		(= (turn-time site3 site1) 513.3)
+		(= (turn-time site3 site2) 370.9)
+		(= (turn-time site3 site4) 678.1)
+		(= (turn-time site3 site5) 490.2)
+		(= (turn-time site4 site1) 704.9)
+		(= (turn-time site4 site2) 621.3)
+		(= (turn-time site4 site3) 678.1)
+		(= (turn-time site4 site5) 237.2)
+		(= (turn-time site5 site1) 681.1)
+		(= (turn-time site5 site2) 558.7)
+		(= (turn-time site5 site3) 490.2)
+		(= (turn-time site5 site4) 237.2))
+		(at 500 (observable site1))
+		(at 1000 (not (observable site1)))
+		(at 5 (observable site2))
+		(at 500 (not (observable site2)))
+		(at 450 (observable site3))
+		(at 1050 (not (observable site3)))
+		(at 500 (observable site4))
+		(at 2500 (not (observable site4)))
+		(at 1050 (observable site5))
+		(at 2500 (not (observable site5)))
+	)
+)

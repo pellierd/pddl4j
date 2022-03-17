@@ -724,7 +724,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
             final Map<String, String> taskIDCtx = new LinkedHashMap<>();
             tn.getTasks().renameTaskIDs(taskIDCtx);
             // Rename the tag ID used in the ordering constraints of the method
-            tn.getOrderingConstraints().renameTaskIDs(taskIDCtx);
+            tn.getOrdering().renameTaskIDs(taskIDCtx);
             // In this case enumerate the orderings contraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
                 tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
@@ -733,7 +733,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
                     c.setAtom(new LinkedList<PDDLSymbol>());
                     c.getAtom().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
                     c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
-                    tn.getOrderingConstraints().addChild(c);
+                    tn.getOrdering().addChild(c);
                 }
             }
         }

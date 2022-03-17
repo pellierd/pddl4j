@@ -123,7 +123,12 @@ public enum PDDLRequireKey {
     /**
      * The PDDL :method-preconditions requirement for HDDL langage.
      */
-    METHOD_PRECONDITIONS(":method-preconditions");
+    METHOD_PRECONDITIONS(":method-preconditions"),
+
+    /**
+     * The PDDL :method-constraints requirement for HDDL langage.
+     */
+    METHOD_CONSTRAINTS(":method-constraints");
 
     /**
      * The image associate to the require key in the PDDL language.

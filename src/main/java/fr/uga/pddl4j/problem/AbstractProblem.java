@@ -1002,7 +1002,7 @@ public abstract class AbstractProblem implements Problem {
         } else {
             final int size = subtasks.getChildren().size();
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = this.initOrderingConstraints(method.getOrderingConstraints());
+            orderingConstraints = this.initOrderingConstraints(method.getOrdering());
             for (IntExpression c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
             }
@@ -1071,7 +1071,7 @@ public abstract class AbstractProblem implements Problem {
         } else {
             final int size = subtasks.getChildren().size();
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = this.initOrderingConstraints(taskNetwork.getOrderingConstraints());
+            orderingConstraints = this.initOrderingConstraints(taskNetwork.getOrdering());
             for (IntExpression c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
             }

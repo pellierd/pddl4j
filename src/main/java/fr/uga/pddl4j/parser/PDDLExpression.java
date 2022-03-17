@@ -87,7 +87,12 @@ public class PDDLExpression implements Serializable {
     private PDDLSymbol taskID;
 
     /**
-     * Creates a new expression from a other one.
+     * The task interval used to specified method constraints.
+     */
+    private PDDLTaskInterval taskInterval;
+
+    /**
+     * Creates a new PDDL expression from a other one.
      *
      * @param other the other expression.
      * @throws NullPointerException if other is null.
@@ -116,11 +121,14 @@ public class PDDLExpression implements Serializable {
         if (other.getTaskID() != null) {
             this.taskID = new PDDLSymbol(other.getTaskID());
         }
+        if (other.getTaskInterval() != null) {
+            this.taskInterval = new PDDLTaskInterval(other.getTaskInterval());
+        }
         this.value = other.getValue();
     }
 
     /**
-     * Creates a new planning node.
+     * Creates a new PDDL expression.
      */
     private PDDLExpression() {
         super();
@@ -131,10 +139,11 @@ public class PDDLExpression implements Serializable {
         this.variables = null;
         this.value = null;
         this.taskID = null;
+        this.taskInterval = null;
     }
 
     /**
-     * Creates a new planning node with a specified connective.
+     * Creates a new PDDL expression with a specified connective.
      *
      * @param connective the connective.
      * @throws RuntimeException if the specified connective is null.
@@ -309,6 +318,26 @@ public class PDDLExpression implements Serializable {
     }
 
     /**
+     * Set the task interval of this expression. The task interval is only use in HTN planning to define method
+     * constraint.
+     *
+     * @param interval the task interval to set.
+     */
+    public final void setTaskInterval(PDDLTaskInterval interval) {
+        this.taskInterval = interval;
+    }
+
+    /**
+     * Returns the ask interval of this expression. The task interval is only use in HTN planning to define method
+     * constraint.
+     *
+     * @return the task interval of the expression.
+     */
+    public final PDDLTaskInterval getTaskInterval() {
+        return this.taskInterval;
+    }
+
+    /**
      * Returns if this parser node is a preference.
      *
      * @return <code>true</code> if this parser node is a preference; <code>false</code> otherwise.
@@ -339,6 +368,11 @@ public class PDDLExpression implements Serializable {
         }
         switch (this.getConnective()) {
             case AND:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case EQUAL:
                 for (int i = 0; i < this.getChildren().size(); i++) {
                     this.getChildren().get(i).renameTaskIDs(context);
                 }
@@ -357,6 +391,10 @@ public class PDDLExpression implements Serializable {
                 }
                 break;
             case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
                 this.atom.get(0).rename(context);
                 this.atom.get(1).rename(context);
                 break;
@@ -610,7 +648,7 @@ public class PDDLExpression implements Serializable {
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
      *          not null and is an instance of <tt>PDDLExpression</tt> and it has the same connective, children,
-     *          atom, value, preference name, variable, value and taskID; otherwise return <tt>false</tt>.
+     *          atom, value, preference name, variable, value, taskID and task interval; otherwise return <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -627,7 +665,8 @@ public class PDDLExpression implements Serializable {
                 && Objects.equals(this.getValue(), other.getValue())
                 && Objects.equals(this.getPrefName(), other.getPrefName())
                 && Objects.equals(this.getVariable(), other.getVariable())
-                && Objects.equals(this.getTaskID(), other.getTaskID());
+                && Objects.equals(this.getTaskID(), other.getTaskID())
+                && Objects.equals(this.getTaskInterval(), other.getTaskInterval());
         }
         return false;
     }
@@ -641,7 +680,7 @@ public class PDDLExpression implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(this.getConnective(), this.getVariables(), this.getAtom(), this.getChildren(),
-            this.getValue(), this.getPrefName(), this.getVariable(), this.getTaskID());
+            this.getValue(), this.getPrefName(), this.getVariable(), this.getTaskID(), this.getTaskInterval());
     }
 
     /**
@@ -814,6 +853,10 @@ public class PDDLExpression implements Serializable {
                     .append(")");
                 break;
             case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.atom.get(0).toString()).append(" ")
@@ -876,7 +919,7 @@ public class PDDLExpression implements Serializable {
     }
 
     /**
-     * Return if this expression is malformed. An expression is considered as well in the following cases:
+     * Returns if this expression is malformed. An expression is considered as well in the following cases:
      * <ul>
      * <li>Empty OR and AND expressions, i.e., without any children, are considered as well formed.</li>
      * <li>Quantified expressions (EXISTS, FORALL) is well formed if it has at least one quantified variable and one

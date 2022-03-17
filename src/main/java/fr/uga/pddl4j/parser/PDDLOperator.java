@@ -98,6 +98,29 @@ public interface PDDLOperator extends Serializable {
     int getArity();
 
     /**
+     * Returns the duration constraints of the operator. If the return value is null, it means that that the operator is
+     * not durative.
+     *
+     * @return the duration constraints of the operator.
+     */
+    PDDLExpression getDuration();
+
+    /**
+     * Sets new duration constraints to the operator.
+     *
+     * @param duration the duration constraint to set
+     */
+    void setDuration(final PDDLExpression duration);
+
+    /**
+     * Returns if this action is durative operator. If the method return <code>false</code>, the accessor
+     * <code>getDuration()</code> returns <code>false</code>.
+     *
+     * @return <code>true</code> if this operator is a durative, <code>false</code> otherwise.
+     */
+    boolean isDurative();
+
+    /**
      * Normalizes the operators.
      *
      * @see PDDLExpression#renameVariables()

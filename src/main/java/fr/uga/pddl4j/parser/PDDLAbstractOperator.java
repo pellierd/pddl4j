@@ -49,8 +49,12 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
     private PDDLExpression preconditions;
 
     /**
+     * The duration constraints of the operator.
+     */
+    private PDDLExpression duration;
+
+    /**
      * Create a new operator from another.
-     *
      */
     private PDDLAbstractOperator() {
         super();
@@ -69,10 +73,13 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
         this.preconditions = new PDDLExpression(other.getPreconditions());
+        if (this.duration != null) {
+            this.duration = new PDDLExpression(other.getDuration());
+        }
     }
 
     /**
-     * Creates operator with a specified name, list of parameters, preconditions and effects.
+     * Creates operator with a specified name, list of parameters, preconditions.
      *
      * @param name The name of the operator.
      * @param parameters The list of parameters of the operator.
@@ -80,9 +87,23 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
      */
     protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters,
                                    final PDDLExpression preconditions) {
+        this(name, parameters, preconditions, null);
+    }
+
+    /**
+     * Creates operator with a specified name, list of parameters, preconditions and duration constraints.
+     *
+     * @param name The name of the operator.
+     * @param parameters The list of parameters of the operator.
+     * @param preconditions The goal description that represents the preconditions of the operator.
+     * @param duration the duration constraint of the operator.
+     */
+    protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters,
+                                   final PDDLExpression preconditions, final PDDLExpression duration) {
         this.name = name;
         this.parameters = parameters;
         this.preconditions = preconditions;
+        this.duration = duration;
     }
 
     /**
@@ -184,6 +205,34 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
     public final int getArity() {
         return this.parameters.size();
     }
+
+    /**
+     * Returns the duration constraints of the operator.
+     *
+     * @return the duration constraints of the operator.
+     */
+    public final PDDLExpression getDuration() {
+        return this.duration;
+    }
+
+    /**
+     * Sets new duration constraints to the operator.
+     *
+     * @param duration the duration constraint to set
+     */
+    public final void setDuration(final PDDLExpression duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * Returns if this action is durative operator.
+     *
+     * @return <code>true</code> if this operator is a durative, <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.getDuration() != null;
+    }
+
 
     /**
      * Normalizes the operators.

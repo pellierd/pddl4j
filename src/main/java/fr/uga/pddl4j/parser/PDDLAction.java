@@ -43,11 +43,6 @@ public class PDDLAction extends PDDLAbstractOperator {
     private PDDLExpression effects;
 
     /**
-     * The goal description that represents the constraints duration of temporal operator.
-     */
-    private PDDLExpression duration;
-
-    /**
      * Create a new operator from another.
      *
      * @param other the other operator.
@@ -55,9 +50,6 @@ public class PDDLAction extends PDDLAbstractOperator {
     public PDDLAction(final PDDLAction other) {
         super(other);
         this.effects = new PDDLExpression(other.getEffects());
-        if (this.duration != null) {
-            this.duration = new PDDLExpression(other.getDuration());
-        }
     }
 
     /**
@@ -80,15 +72,14 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      * @param effects The goal description that represents the effects of the operator.
-     * @param duration The goal description that represents the duration constraints of the
+     * @param duration The description that represents the duration constraints of the
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
     public PDDLAction(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters, final PDDLExpression preconditions,
                       final PDDLExpression effects, final PDDLExpression duration) {
-        super(name, parameters, preconditions);
+        super(name, parameters, preconditions, duration);
         this.effects = effects;
-        this.duration = duration;
     }
 
 
@@ -108,35 +99,7 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @throws NullPointerException if the specified effects is null.
      */
     public final void setEffects(final PDDLExpression effects) {
-
         this.effects = effects;
-    }
-
-    /**
-     * Returns the goal description that represents the duration constraints of the operator.
-     *
-     * @return the goal description that represents the duration constraints of the operator.
-     */
-    public final PDDLExpression getDuration() {
-        return this.duration;
-    }
-
-    /**
-     * Sets new duration constraints to the operator.
-     *
-     * @param duration the duration constraint to set
-     */
-    public final void setDuration(final PDDLExpression duration) {
-        this.duration = duration;
-    }
-
-    /**
-     * Returns if this action is durative action.
-     *
-     * @return <code>true</code> if this action is a durative action, <code>false</code> otherwise.
-     */
-    public final boolean isDurative() {
-        return this.getDuration() != null;
     }
 
     /**
@@ -173,7 +136,7 @@ public class PDDLAction extends PDDLAbstractOperator {
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();
-        if (this.duration == null) {
+        if (!super.isDurative()) {
             str.append("(:action ");
         } else {
             str.append("(:durative-action ");
@@ -186,13 +149,20 @@ public class PDDLAction extends PDDLAbstractOperator {
             str.append(this.getParameters().get(this.getParameters().size() - 1).toString());
         }
         str.append(")");
-        if (this.duration != null) {
-            str.append("\n  :duration ").append("\n  ").append(this.duration.toString("  ")).append("\n  :condition ");
+        if (super.isDurative()) {
+            str.append("\n  :duration ");
+            str.append("\n  ");
+            str.append(this.getDuration().toString("  "));
+            str.append("\n  :condition ");
         } else {
             str.append("\n  :precondition ");
         }
-        str.append("\n  ").append(this.getPreconditions().toString("  ")).append("\n  :effect ").append("\n  ")
-            .append(this.effects.toString("  ")).append("\n)");
+        str.append("\n  ");
+        str.append(this.getPreconditions().toString("  "));
+        str.append("\n  :effect ");
+        str.append("\n  ");
+        str.append(this.effects.toString("  "));
+        str.append("\n)");
         return str.toString();
     }
 }

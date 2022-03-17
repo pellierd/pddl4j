@@ -80,8 +80,8 @@ public class PDDLTaskNetwork implements Serializable {
             this.parameters.add(new PDDLTypedSymbol(param));
         }
         this.tasks = new PDDLExpression(other.getTasks());
-        this.orderingConstraints = new PDDLExpression(other.getOrderingConstraints());
-        this.logicalConstraints = new PDDLExpression(other.getLogicalConstraints());
+        this.orderingConstraints = new PDDLExpression(other.getOrdering());
+        this.logicalConstraints = new PDDLExpression(other.getConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered();
     }
 
@@ -166,7 +166,7 @@ public class PDDLTaskNetwork implements Serializable {
      *
      * @return the ordering constraints of the task network.
      */
-    public final PDDLExpression getOrderingConstraints() {
+    public final PDDLExpression getOrdering() {
         return this.orderingConstraints;
     }
 
@@ -184,7 +184,7 @@ public class PDDLTaskNetwork implements Serializable {
      *
      * @return the logical constraints of the task network.
      */
-    public final PDDLExpression getLogicalConstraints() {
+    public final PDDLExpression getConstraints() {
         return this.logicalConstraints;
     }
 
@@ -239,8 +239,8 @@ public class PDDLTaskNetwork implements Serializable {
         if (object != null && object.getClass().equals(this.getClass())) {
             final PDDLTaskNetwork other = (PDDLTaskNetwork) object;
             return this.getTasks().equals(other.getTasks())
-                && this.getOrderingConstraints().equals(other.getOrderingConstraints())
-                && this.getLogicalConstraints().equals(other.getLogicalConstraints())
+                && this.getOrdering().equals(other.getOrdering())
+                && this.getConstraints().equals(other.getConstraints())
                 && this.isTotallyOrdered() == other.isTotallyOrdered();
         }
         return false;
@@ -272,13 +272,13 @@ public class PDDLTaskNetwork implements Serializable {
         } else {
             str.append("()\n");
         }
-        if (!this.getOrderingConstraints().getChildren().isEmpty()) {
+        if (!this.getOrdering().getChildren().isEmpty()) {
             str.append("\n  :ordering\n  ");
-            str.append(this.getOrderingConstraints().toString("  "));
+            str.append(this.getOrdering().toString("  "));
         }
-        if (!this.getLogicalConstraints().getChildren().isEmpty()) {
+        if (!this.getConstraints().getChildren().isEmpty()) {
             str.append("\n  :constraints\n  ");
-            str.append(this.getLogicalConstraints().toString("  "));
+            str.append(this.getConstraints().toString("  "));
         }
         return str.toString();
     }
