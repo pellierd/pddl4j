@@ -1873,7 +1873,7 @@ PDDLMethod durative_method_def() : // ADD HDDL2.1
 	    left_bracket() <DURATIVE_METHOD> name=method_name()
 	        <PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
-			<DURATION> duration=method_duration_constraint()
+			[<DURATION> duration=method_duration_constraint()]
 			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
 			    <CONDITION> condition=da_gd()
 			]
