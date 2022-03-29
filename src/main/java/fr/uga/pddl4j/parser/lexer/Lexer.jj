@@ -2273,7 +2273,7 @@ PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_BEFORE> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <HOLD_BEFORE> id = task_id() gd = gd() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.addChild(gd);
         return exp;
@@ -2287,7 +2287,7 @@ PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
     PDDLExpression effect = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_AFTER> id = task_id() effect = effect() {
+    <LEFT_BRACKET> <HOLD_AFTER> id = task_id() effect = effect() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.addChild(effect);
         return exp;
@@ -2302,7 +2302,7 @@ PDDLExpression hold_between_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() {
+    <LEFT_BRACKET> <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() <RIGHT_BRACKET> {
         exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
         exp.addChild(gd);
         return exp;
@@ -2317,7 +2317,7 @@ PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() {
+    <LEFT_BRACKET> <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() <RIGHT_BRACKET> {
          exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
          exp.addChild(gd);
          return exp;
@@ -2331,7 +2331,7 @@ PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
     PDDLExpression effect = null;
 }
 {
-    <LEFT_BRACKET> <AT> <END> id = task_id() effect = effect() {
+    <LEFT_BRACKET> <AT> <END> id = task_id() effect = effect() <RIGHT_BRACKET> {
          exp.setTaskID(id);
          exp.addChild(effect);
          return exp;
@@ -2345,7 +2345,7 @@ PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <AT> <START> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <AT> <START> id = task_id() gd = gd() <RIGHT_BRACKET> {
        exp.setTaskID(id);
        exp.addChild(gd);
        return exp;
@@ -2359,7 +2359,7 @@ PDDLExpression always_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <ALWAYS> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <ALWAYS> id = task_id() gd = gd() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.addChild(gd);
         return exp;
@@ -2373,7 +2373,7 @@ PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <AT_MOST_ONCE> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <AT_MOST_ONCE> id = task_id() gd = gd() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.addChild(gd);
         return exp;
@@ -2387,7 +2387,7 @@ PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
      PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <SOMETIME> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <SOMETIME> id = task_id() gd = gd() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.addChild(gd);
         return exp;
@@ -2401,7 +2401,7 @@ PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
      PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <SOMETIME_BEFORE> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <SOMETIME_BEFORE> id = task_id() gd = gd() <RIGHT_BRACKET> {
          exp.setTaskID(id);
          exp.addChild(gd);
          return exp;
@@ -2415,7 +2415,7 @@ PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
     PDDLExpression gd = null;
 }
 {
-    <LEFT_BRACKET> <SOMETIME_AFTER> id = task_id() gd = gd() {
+    <LEFT_BRACKET> <SOMETIME_AFTER> id = task_id() gd = gd() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.addChild(gd);
         return exp;
