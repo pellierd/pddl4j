@@ -3080,6 +3080,19 @@ PDDLExpression d_value() :
 	}
 }
 
+PDDLExpression td_value() :  // ADD HDDL2.1
+{
+	PDDLExpression node = null;
+}
+{
+	(	LOOKAHEAD(2) node = d_value()
+	| 	LOOKAHEAD(2) node = f_duration()
+	) {
+		return node;
+	}
+}
+
+
 PDDLExpression method_duration_constraint() : // ADD HDDL2.1
 {
     PDDLExpression node = null;
@@ -3139,7 +3152,7 @@ PDDLExpression equal_method_duration_constraint() : // ADD HDDL2.1
 {
   	left_bracket() <EQUAL>
   		op1=duration()
-  		op2=d_value()
+  		op2=td_value()
   	right_bracket() {
   		node.addChild(op1);
   		node.addChild(op2);
@@ -3156,7 +3169,7 @@ PDDLExpression great_method_duration_constraint() : // ADD HDDL2.1
 {
    	left_bracket() <GREAT>
    		op1=duration()
-   		op2=d_value()
+   		op2=td_value()
    	right_bracket() {
    		node.addChild(op1);
    		node.addChild(op2);
@@ -3173,7 +3186,7 @@ PDDLExpression great_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
    	left_bracket() <GEQUAL>
    		op1=duration()
-   		op2=d_value()
+   		op2=td_value()
    	right_bracket() {
    		node.addChild(op1);
    		node.addChild(op2);
@@ -3190,7 +3203,7 @@ PDDLExpression less_method_duration_constraint() : // ADD HDDL2.1
 {
    	left_bracket() <LESS>
    		op1=duration()
-   		op2=d_value()
+   		op2=td_value()
    	right_bracket() {
    		node.addChild(op1);
    		node.addChild(op2);
@@ -3207,7 +3220,7 @@ PDDLExpression less_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
    	left_bracket() <LEQUAL>
    		op1=duration()
-   		op2=d_value()
+   		op2=td_value()
    	right_bracket() {
    		node.addChild(op1);
    		node.addChild(op2);
