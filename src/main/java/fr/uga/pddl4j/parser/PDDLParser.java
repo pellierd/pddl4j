@@ -1213,7 +1213,10 @@ public final class PDDLParser implements Callable<Integer> {
                         }
                     }
                 }
-                checked = this.checkOrderingConstraintAcyclicness(meth.getOrdering());
+                // The verification is done only for non durative method
+                if (!meth.isDurative()) {
+                    checked = this.checkOrderingConstraintAcyclicness(meth.getOrdering());
+                }
             } else {
                 checked = false;
             }
@@ -1222,7 +1225,7 @@ public final class PDDLParser implements Callable<Integer> {
     }
 
     /**
-     * Checks that the orderings constraints are acyclic.
+     * Checks that the orderings constraints are acyclic. It wor
      *
      * @param constraints the ordering constraints expression. We make the assumption that the constraints are described
      *                    by an AND PDDLExpression.
