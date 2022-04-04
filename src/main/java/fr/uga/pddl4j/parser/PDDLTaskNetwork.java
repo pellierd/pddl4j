@@ -50,7 +50,7 @@ public class PDDLTaskNetwork implements Serializable {
     /**
      * The constraints of the task network.
      */
-    private PDDLExpression logicalConstraints;
+    private PDDLExpression constraints;
 
     /**
      * A boolean flag to indicate if the task network is totally ordered or not.
@@ -65,7 +65,7 @@ public class PDDLTaskNetwork implements Serializable {
         this.parameters = null;
         this.tasks = null;
         this.orderingConstraints = null;
-        this.logicalConstraints = null;
+        this.constraints = null;
         this.isTotallyOrdered = false;
     }
 
@@ -81,7 +81,7 @@ public class PDDLTaskNetwork implements Serializable {
         }
         this.tasks = new PDDLExpression(other.getTasks());
         this.orderingConstraints = new PDDLExpression(other.getOrdering());
-        this.logicalConstraints = new PDDLExpression(other.getConstraints());
+        this.constraints = new PDDLExpression(other.getConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered();
     }
 
@@ -90,17 +90,17 @@ public class PDDLTaskNetwork implements Serializable {
      *
      * @param tasks The tasks of the task network.
      * @param ordering The ordering constraints between the tasks of the task network.
-     * @param logical The logicial constraint between the tasks of the task network.
+     * @param constraints The logical constraint between the tasks of the task network.
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
     public PDDLTaskNetwork(final PDDLExpression tasks,
-                           final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
+                           final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
         super();
         this.setParameters(new ArrayList<>());
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);
-        this.setLogicalConstraints(logical);
+        this.setConstraints(constraints);
         this.setTotallyOrdered(ordered);
     }
 
@@ -110,17 +110,17 @@ public class PDDLTaskNetwork implements Serializable {
      * @param parameters the parameters of the task network.
      * @param tasks The tasks of the task network.
      * @param ordering The ordering constraints between the tasks of the task network.
-     * @param logical The logicial constraint between the tasks of the task network.
+     * @param constraints The logical constraint between the tasks of the task network.
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
     public PDDLTaskNetwork(final List<PDDLTypedSymbol> parameters, final PDDLExpression tasks,
-                           final PDDLExpression ordering, final PDDLExpression logical, final boolean ordered) {
+                           final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
         super();
         this.setParameters(parameters);
         this.setTasks(tasks);
         this.setOrderingConstraints(ordering);
-        this.setLogicalConstraints(logical);
+        this.setConstraints(constraints);
         this.setTotallyOrdered(ordered);
     }
 
@@ -185,7 +185,7 @@ public class PDDLTaskNetwork implements Serializable {
      * @return the logical constraints of the task network.
      */
     public final PDDLExpression getConstraints() {
-        return this.logicalConstraints;
+        return this.constraints;
     }
 
     /**
@@ -193,8 +193,8 @@ public class PDDLTaskNetwork implements Serializable {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setLogicalConstraints(final PDDLExpression constraints) {
-        this.logicalConstraints = constraints;
+    public final void setConstraints(final PDDLExpression constraints) {
+        this.constraints = constraints;
     }
 
     /**
@@ -223,7 +223,7 @@ public class PDDLTaskNetwork implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.tasks, this.orderingConstraints, this.logicalConstraints, this.isTotallyOrdered);
+        return Objects.hash(this.tasks, this.orderingConstraints, this.constraints, this.isTotallyOrdered);
     }
 
     /**

@@ -194,7 +194,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *  @param constraints The constraints to set.
      */
     public final void setLogicalConstraints(final PDDLExpression constraints) {
-        this.taskNetwork.setLogicalConstraints(constraints);
+        this.taskNetwork.setConstraints(constraints);
     }
 
     /**

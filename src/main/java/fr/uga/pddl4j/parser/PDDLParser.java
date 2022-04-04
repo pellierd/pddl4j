@@ -1193,24 +1193,33 @@ public final class PDDLParser implements Callable<Integer> {
             }
             if (this.checkTaskIDsUniqueness(meth)) {
                 final Set<PDDLSymbol> taskIds = this.getTaskIDs(meth.getSubTasks());
-                final Set<PDDLSymbol> consIds = this.getTaskIDs(meth.getOrdering());
-                for (PDDLSymbol id : consIds) {
+                if (meth.isDurative()) {
+                    final Set<PDDLSymbol> durativeIds = this.getTaskIDs(meth.getDuration());
+                    for (PDDLSymbol id : durativeIds) {
+                        if (!taskIds.contains(id)) {
+                            this.mgr.logParserError("task alias \"" + id + "\" in the durative constraints of the "
+                                + "method " + "\"" + meth.getName() + "\" is undefined", this.lexer
+                                .getFile(), id.getBeginLine(), id.getBeginColumn());
+                            checked = false;
+                        }
+                    }
+                }
+                final Set<PDDLSymbol> orderingIds = this.getTaskIDs(meth.getOrdering());
+                for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" in ordering constraints of the method "
-                            + "\"" + meth.getName() + "\" is undefined", this.lexer
+                        this.mgr.logParserError("task alias \"" + id + "\" in the ordering constraints of the" +
+                            " method \"" + meth.getName() + "\" is undefined", this.lexer
                             .getFile(), id.getBeginLine(), id.getBeginColumn());
                         checked = false;
                     }
                 }
-                if (meth.isDurative()) {
-                    final Set<PDDLSymbol> durativeIds = this.getTaskIDs(meth.getOrdering());
-                    for (PDDLSymbol id : durativeIds) {
-                        if (!taskIds.contains(id)) {
-                            this.mgr.logParserError("task alias \"" + id + "\" in durative constraints of the " +
-                                "method " + "\"" + meth.getName() + "\" is undefined", this.lexer
-                                .getFile(), id.getBeginLine(), id.getBeginColumn());
-                            checked = false;
-                        }
+                final Set<PDDLSymbol> constIds = this.getTaskIDs(meth.getConstraints());
+                for (PDDLSymbol id : constIds) {
+                    if (!taskIds.contains(id)) {
+                        this.mgr.logParserError("task alias \"" + id + "\" in the constraints of the " +
+                            "method " + "\"" + meth.getName() + "\" is undefined", this.lexer
+                            .getFile(), id.getBeginLine(), id.getBeginColumn());
+                        checked = false;
                     }
                 }
                 // The verification is done only for non durative method
@@ -1345,6 +1354,8 @@ public final class PDDLParser implements Callable<Integer> {
             case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
             case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_BETWEEN: // Add constraints HDDL2.1
+            case HOLD_DURING: // Add constraints HDDL2.1
                 taskIDs.add(exp.getAtom().get(0));
                 taskIDs.add(exp.getAtom().get(1));
                 break;
@@ -1361,6 +1372,12 @@ public final class PDDLParser implements Callable<Integer> {
                 if (op2.getConnective().equals(PDDLConnective.FN_HEAD)) {
                     taskIDs.add(op2.getAtom().get(1));
                 }
+                break;
+            case HOLD_BEFORE: // Add constraints HDDL2.1
+            case HOLD_AFTER: // Add constraints HDDL2.1
+            case SOMETIME_BEFORE: // Add constraints HDDL2.1
+            case SOMETIME_AFTER: // Add constraints HDDL2.1
+                taskIDs.add(exp.getAtom().get(0));
                 break;
             default:
                 for (PDDLExpression c : exp.getChildren()) {
