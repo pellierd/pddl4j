@@ -1297,14 +1297,27 @@ public final class PDDLParser implements Callable<Integer> {
             checked = this.checkParserNode(tn.getTasks(), tn.getParameters());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<PDDLSymbol>())) {
                 final Set<PDDLSymbol> taskIds = this.getTaskIDs(tn.getTasks());
-                final Set<PDDLSymbol> consIds = this.getTaskIDs(tn.getOrdering());
-                for (PDDLSymbol id : consIds) {
+                final Set<PDDLSymbol> orderingIds = this.getTaskIDs(tn.getOrdering());
+                for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" initial task network"
-                            + " is undefined", this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
+                        this.mgr.logParserError("task alias \"" + id + "\" in the ordering constrains of the " +
+                            "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
+                            id.getBeginColumn());
                         checked = false;
                     }
                 }
+                final Set<PDDLSymbol> constIds = this.getTaskIDs(tn.getConstraints());
+                for (PDDLSymbol id : constIds) {
+                    if (!taskIds.contains(id)) {
+                        this.mgr.logParserError("task alias \"" + id + "\" in the constrains of the " +
+                                "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
+                            id.getBeginColumn());
+                        checked = false;
+                    }
+                }
+                // The verification must be done but not implemented yet due to temporal aspects that make it more
+                // complicated
+                //checked = this.checkOrderingConstraintAcyclicness(tn.getOrdering());
             } else {
                 checked = false;
             }
