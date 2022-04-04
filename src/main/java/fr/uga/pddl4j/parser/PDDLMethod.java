@@ -180,7 +180,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
     }
 
     /**
-     * Returns the logicial constraints between the tasks of the task network.
+     * Returns the logical constraints between the tasks of the task network.
      *
      * @return the logical constraints of the task network.
      */
@@ -235,9 +235,13 @@ public class PDDLMethod extends PDDLAbstractOperator {
         // Rename task id the tasks contained the method.
         final Map<String, String> taskIDCtx = new LinkedHashMap<>();
         this.getSubTasks().renameTaskIDs(taskIDCtx);
+        // Rename the tag ID used in the durations constraints of the method
+        if (this.isDurative()) {
+            this.getDuration().renameTaskIDs(taskIDCtx);
+        }
         // Rename the tag ID used in the ordering constraints of the method
         this.getOrdering().renameTaskIDs(taskIDCtx);
-        // In this case enumerate the orderings contraints in the cas of totally ordered
+        // In this case enumerate the orderings constraints in the cas of totally ordered
         if (this.isTotallyOrdered()) {
             this.setOrdering(new PDDLExpression(PDDLConnective.AND));
             for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {

@@ -3227,7 +3227,7 @@ PDDLExpression duration() : // ADD HDDL2.1
 
 PDDLExpression f_duration() : // ADD HDDL2.1
 {
-    PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+    PDDLExpression node = new PDDLExpression(PDDLConnective.F_TASK_TIME);
     List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
     Token t = null;
     PDDLSymbol argument = null;

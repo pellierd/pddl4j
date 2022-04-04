@@ -68,6 +68,10 @@ public enum PDDLConnective {
      */
     TIME_VAR("?duration"),
     /**
+     * The connective for the temporal task time.
+     */
+    F_TASK_TIME("duration"),
+    /**
      * The connective for ground function expression used in initial fact expressions.
      */
     FN_ATOM("="),

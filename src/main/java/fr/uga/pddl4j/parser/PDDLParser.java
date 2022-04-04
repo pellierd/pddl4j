@@ -25,7 +25,6 @@ import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.LogLevel;
-import fr.uga.pddl4j.planners.statespace.HSP;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -1362,6 +1361,9 @@ public final class PDDLParser implements Callable<Integer> {
             case TASK:
                 taskIDs.add(exp.getTaskID());
                 break;
+            case F_TASK_TIME:
+                taskIDs.add(exp.getAtom().get(1)); // Add constraints HDDL2.1
+                break;
             case LESS_ORDERING_CONSTRAINT:
             case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
             case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
@@ -1371,20 +1373,6 @@ public final class PDDLParser implements Callable<Integer> {
             case HOLD_DURING: // Add constraints HDDL2.1
                 taskIDs.add(exp.getAtom().get(0));
                 taskIDs.add(exp.getAtom().get(1));
-                break;
-            case LESS: // Add durative constraints HDDL2.1
-            case LESS_OR_EQUAL: // Add durative constraints HDDL2.1
-            case GREATER: // Add durative constraints HDDL2.1
-            case GREATER_OR_EQUAL: // Add durative constraints HDDL2.1
-            case EQUAL: // Add durative constraints HDDL2.1
-                final PDDLExpression op1 = exp.getChildren().get(0);
-                final PDDLExpression op2 = exp.getChildren().get(1);
-                if (op1.getConnective().equals(PDDLConnective.FN_HEAD)) {
-                    taskIDs.add(op1.getAtom().get(1));
-                }
-                if (op2.getConnective().equals(PDDLConnective.FN_HEAD)) {
-                    taskIDs.add(op2.getAtom().get(1));
-                }
                 break;
             case HOLD_BEFORE: // Add constraints HDDL2.1
             case HOLD_AFTER: // Add constraints HDDL2.1

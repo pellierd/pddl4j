@@ -367,16 +367,6 @@ public class PDDLExpression implements Serializable {
             throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
         }
         switch (this.getConnective()) {
-            case AND:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case EQUAL:
-                for (int i = 0; i < this.getChildren().size(); i++) {
-                    this.getChildren().get(i).renameTaskIDs(context);
-                }
-                break;
             case TASK:
                 // Set a dummy taskID to task if no task taskID was specified
                 if (this.getTaskID() == null) {
@@ -390,16 +380,30 @@ public class PDDLExpression implements Serializable {
                     this.getTaskID().renameTaskID(context);
                 }
                 break;
+            case F_TASK_TIME:
+                this.atom.get(1).rename(context);
+                break;
             case LESS_ORDERING_CONSTRAINT:
-            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
-            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
-            case GREATER_ORDERING_CONSTRAINT:
-            case EQUAL_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_BETWEEN: // Add constraints HDDL2.1
+            case HOLD_DURING: // Add constraints HDDL2.1
                 this.atom.get(0).rename(context);
                 this.atom.get(1).rename(context);
                 break;
+            case HOLD_BEFORE: // Add constraints HDDL2.1
+            case HOLD_AFTER: // Add constraints HDDL2.1
+            case SOMETIME_BEFORE: // Add constraints HDDL2.1
+            case SOMETIME_AFTER: // Add constraints HDDL2.1
+                this.atom.get(0).rename(context);
+                break;
             default:
-                // Do nothing
+                for (int i = 0; i < this.getChildren().size(); i++) {
+                    this.getChildren().get(i).renameTaskIDs(context);
+                }
+                break;
         }
     }
 
