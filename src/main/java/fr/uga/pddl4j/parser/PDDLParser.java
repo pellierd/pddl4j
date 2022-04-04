@@ -1183,8 +1183,9 @@ public final class PDDLParser implements Callable<Integer> {
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
                 PDDLSymbol taskSymbol = meth.getTask().getAtom().get(0);
                 if (actionSet.contains(taskSymbol.getImage())) {
-                    this.mgr.logParserError("task symbol \"" + taskSymbol.getImage() + "\" already used as action name",
-                        this.lexer.getFile(), taskSymbol.getBeginLine(), taskSymbol.getBeginColumn());
+                    this.mgr.logParserError("task symbol \"" + taskSymbol.getImage()
+                            + "\" already used as action name",
+                            this.lexer.getFile(), taskSymbol.getBeginLine(), taskSymbol.getBeginColumn());
                     checked &= false;
                 }
                 checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
@@ -1195,10 +1196,21 @@ public final class PDDLParser implements Callable<Integer> {
                 final Set<PDDLSymbol> consIds = this.getTaskIDs(meth.getOrdering());
                 for (PDDLSymbol id : consIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" in method "
+                        this.mgr.logParserError("task alias \"" + id + "\" in ordering constraints of the method "
                             + "\"" + meth.getName() + "\" is undefined", this.lexer
                             .getFile(), id.getBeginLine(), id.getBeginColumn());
                         checked = false;
+                    }
+                }
+                if (meth.isDurative()) {
+                    final Set<PDDLSymbol> durativeIds = this.getTaskIDs(meth.getOrdering());
+                    for (PDDLSymbol id : durativeIds) {
+                        if (!taskIds.contains(id)) {
+                            this.mgr.logParserError("task alias \"" + id + "\" in durative constraints of the " +
+                                "method " + "\"" + meth.getName() + "\" is undefined", this.lexer
+                                .getFile(), id.getBeginLine(), id.getBeginColumn());
+                            checked = false;
+                        }
                     }
                 }
                 checked = this.checkOrderingConstraintAcyclicness(meth.getOrdering());
@@ -1326,8 +1338,26 @@ public final class PDDLParser implements Callable<Integer> {
                 taskIDs.add(exp.getTaskID());
                 break;
             case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
                 taskIDs.add(exp.getAtom().get(0));
                 taskIDs.add(exp.getAtom().get(1));
+                break;
+            case LESS: // Add durative constraints HDDL2.1
+            case LESS_OR_EQUAL: // Add durative constraints HDDL2.1
+            case GREATER: // Add durative constraints HDDL2.1
+            case GREATER_OR_EQUAL: // Add durative constraints HDDL2.1
+            case EQUAL: // Add durative constraints HDDL2.1
+                final PDDLExpression op1 = exp.getChildren().get(0);
+                final PDDLExpression op2 = exp.getChildren().get(1);
+                if (op1.getConnective().equals(PDDLConnective.FN_HEAD)) {
+                    taskIDs.add(op1.getAtom().get(1));
+                }
+                if (op2.getConnective().equals(PDDLConnective.FN_HEAD)) {
+                    taskIDs.add(op2.getAtom().get(1));
+                }
                 break;
             default:
                 for (PDDLExpression c : exp.getChildren()) {

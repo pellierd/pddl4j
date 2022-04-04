@@ -248,7 +248,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
                 this.getOrdering().addChild(c);
             }
         }
-        // Rename the logical constraits
+        // Rename the logical constraints
         this.getConstraints().renameVariables(varCtx);
         PDDLExpression preconditions = null;
         if (!this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
