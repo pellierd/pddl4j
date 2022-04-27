@@ -338,9 +338,6 @@ TOKEN :
 |	< MAXIMIZE : "maximize" >
 |	< MINIMIZE : "minimize" >
 |	< IS_VIOLATED : "is-violated" >
-|	< BEFORE : "before" >
-|	< AFTER : "after" >
-|	< BETWEEN : "between" >
 
 }
 
@@ -386,7 +383,7 @@ Token left_bracket() :
 
 PDDLDomain domain() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 	PDDLSymbol name = null;
 }
 {
@@ -420,7 +417,7 @@ PDDLDomain domain() :
 
 ParsedProblem domain_and_problem() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 	PDDLSymbol name = null;
 }
 {
@@ -722,7 +719,7 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 }
 {
     (   LOOKAHEAD(2)
-        <LEFT_BRACKET> <RIGHT_BRACKET>
+        left_bracket() right_bracket()
 	|   LOOKAHEAD(2, {kind == Lexer.PRIMITIVE_TYPE})
 			(t=primitive_type() {
 				tmp.add(t);
@@ -914,7 +911,7 @@ PDDLNamedTypedList atomic_formula_skeleton() :
 	List<PDDLTypedSymbol> typedList = null;
 }
 {
-	<LEFT_BRACKET>
+	left_bracket()
 		predicate=predicate()
 		typedList=typed_list(Lexer.VARIABLE)
 	right_bracket() {
@@ -975,7 +972,7 @@ PDDLNamedTypedList atomic_function_skeleton() :
 	left_bracket()
 		functor=functor()
 		typedList=typed_list(Lexer.VARIABLE)
-	<RIGHT_BRACKET>
+	right_bracket()
 	{
 		PDDLNamedTypedList l = new PDDLNamedTypedList(functor);
 		for (PDDLTypedSymbol s : typedList) {
@@ -1054,23 +1051,23 @@ List<PDDLSymbol> function_type() :
 
 PDDLExpression con_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=and_con_gd()
-	|	LOOKAHEAD(2) node=forall_con_gd()
-	|	LOOKAHEAD(2) node=at_end_con_gd()
-	|	LOOKAHEAD(2) node=always_con_gd()
-	|	LOOKAHEAD(2) node=sometime_con_gd()
-	|	LOOKAHEAD(2) node=within_con_gd()
-	|	LOOKAHEAD(2) node=at_most_once_con_gd()
-	|	LOOKAHEAD(2) node=sometime_after_con_gd()
-	|	LOOKAHEAD(2) node=sometime_before_con_gd()
-	|	LOOKAHEAD(2) node=always_within_con_gd()
-	|	LOOKAHEAD(2) node=hold_during_con_gd()
-	|	LOOKAHEAD(2) node=hold_after_con_gd()
+	(	LOOKAHEAD(2) exp=and_con_gd()
+	|	LOOKAHEAD(2) exp=forall_con_gd()
+	|	LOOKAHEAD(2) exp=at_end_con_gd()
+	|	LOOKAHEAD(2) exp=always_con_gd()
+	|	LOOKAHEAD(2) exp=sometime_con_gd()
+	|	LOOKAHEAD(2) exp=within_con_gd()
+	|	LOOKAHEAD(2) exp=at_most_once_con_gd()
+	|	LOOKAHEAD(2) exp=sometime_after_con_gd()
+	|	LOOKAHEAD(2) exp=sometime_before_con_gd()
+	|	LOOKAHEAD(2) exp=always_within_con_gd()
+	|	LOOKAHEAD(2) exp=hold_during_con_gd()
+	|	LOOKAHEAD(2) exp=hold_after_con_gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
@@ -1078,13 +1075,18 @@ PDDLExpression and_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression child = null;
+	Token begin = null;
+	Token end = null;
 }
 {
-	left_bracket() <AND>
+	begin=left_bracket() <AND>
 		(LOOKAHEAD(2) child=con_gd() {
 			conGD.addChild(child);
-		})* right_bracket()
+		})*
+	end=right_bracket()
 	{
+		conGD.setBegin(begin);
+		conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1094,17 +1096,21 @@ PDDLExpression forall_con_gd() :
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.FORALL);
 	PDDLExpression child = null;
 	List<PDDLTypedSymbol> typedList = null;
+	Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		child=con_gd()
-	right_bracket()
+	end=right_bracket()
 	{
 		conGD.setVariables(typedList);
 		conGD.addChild(child);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1112,14 +1118,18 @@ PDDLExpression forall_con_gd() :
 PDDLExpression at_end_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
+	Token begin = null;
+    Token end = null;
 }
 {
-		left_bracket() <AT> <END>
-			node=gd()
-		right_bracket()
+		begin=left_bracket() <AT> <END>
+			exp=gd()
+		end=right_bracket()
 	{
-		conGD.addChild(node);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1127,14 +1137,19 @@ PDDLExpression at_end_con_gd() :
 PDDLExpression always_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS);
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
+	Token begin = null;
+    Token end = null;
+
 }
 {
-	left_bracket() <ALWAYS>
-		node=gd()
-	right_bracket()
+	begin=left_bracket() <ALWAYS>
+		exp=gd()
+	end=right_bracket()
 	{
-		conGD.addChild(node);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1142,14 +1157,18 @@ PDDLExpression always_con_gd() :
 PDDLExpression sometime_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME);
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
+	Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <SOMETIME>
-		node=gd()
-	right_bracket()
+	begin=left_bracket() <SOMETIME>
+		exp=gd()
+	end=right_bracket()
 	{
-		conGD.addChild(node);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1157,19 +1176,19 @@ PDDLExpression sometime_con_gd() :
 PDDLExpression within_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.WITHIN);
-	Token token = null;
-	PDDLExpression node = null;
+	PDDLExpression num, exp;
+    Token begin, end;
 }
 {
-	left_bracket() <WITHIN>
-		token=<NUMBER>
-		node=gd()
-	right_bracket()
+	begin=left_bracket() <WITHIN>
+		num=number()
+		exp=gd()
+	end=right_bracket()
 	{
-		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
-		n1.setValue(Double.parseDouble(token.image));
-		conGD.addChild(n1);
-		conGD.addChild(node);
+		conGD.addChild(num);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1177,14 +1196,17 @@ PDDLExpression within_con_gd() :
 PDDLExpression at_most_once_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_MOST_ONCE);
-	PDDLExpression node = null;
+	PDDLExpression exp;
+    Token begin, end;
 }
 {
-	left_bracket() <AT_MOST_ONCE>
-		node=gd()
-	right_bracket()
+	begin=left_bracket() <AT_MOST_ONCE>
+		exp=gd()
+	end=right_bracket()
 	{
-		conGD.addChild(node);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1194,15 +1216,19 @@ PDDLExpression sometime_after_con_gd() :
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_AFTER);
 	PDDLExpression gd1 = null;
 	PDDLExpression gd2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <SOMETIME_AFTER>
+	begin=left_bracket() <SOMETIME_AFTER>
 		gd1=gd()
 		gd2=gd()
-	right_bracket()
+	end=right_bracket()
 	{
 		conGD.addChild(gd1);
 		conGD.addChild(gd2);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1212,15 +1238,19 @@ PDDLExpression sometime_before_con_gd() :
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE);
 	PDDLExpression gd1 = null;
 	PDDLExpression gd2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <SOMETIME_BEFORE>
+	begin=left_bracket() <SOMETIME_BEFORE>
 		gd1=gd()
 		gd2=gd()
-	right_bracket()
+	end=right_bracket()
 	{
 		conGD.addChild(gd1);
 		conGD.addChild(gd2);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1228,20 +1258,17 @@ PDDLExpression sometime_before_con_gd() :
 PDDLExpression always_within_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_WITHIN);
-	Token token = null;
-	PDDLExpression gd1 = null;
-	PDDLExpression gd2 = null;
+	PDDLExpression num, gd1, gd2;
+    Token begin, end;
 }
 {
-	left_bracket() <ALWAYS_WITHIN>
-		token=<NUMBER>
+	begin=left_bracket() <ALWAYS_WITHIN>
+		num=number()
 		gd1=gd()
 		gd2=gd()
-	right_bracket()
+	end=right_bracket()
 	{
-		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
-		n1.setValue(Double.parseDouble(token.image));
-		conGD.addChild(n1);
+		conGD.addChild(num);
 		conGD.addChild(gd1);
 		conGD.addChild(gd2);
 		return conGD;
@@ -1251,24 +1278,21 @@ PDDLExpression always_within_con_gd() :
 PDDLExpression hold_during_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_DURING);
-	Token token1 = null;
-	Token token2 = null;
-	PDDLExpression node = null;
+	PDDLExpression exp, num1, num2;
+    Token begin, end;
 }
 {
-	left_bracket() <HOLD_DURING>
-		token1=<NUMBER>
-		token2=<NUMBER>
-		node=gd()
-	right_bracket()
+	begin=left_bracket() <HOLD_DURING>
+		num1=number()
+		num2=number()
+		exp=gd()
+	end=right_bracket()
 	{
-		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
-		n1.setValue(Double.parseDouble(token1.image));
-		conGD.addChild(n1);
-		PDDLExpression n2 = new PDDLExpression(PDDLConnective.NUMBER);
-		n2.setValue(Double.parseDouble(token2.image));
-		conGD.addChild(n2);
-		conGD.addChild(node);
+		conGD.addChild(num1);
+		conGD.addChild(num2);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
@@ -1276,206 +1300,242 @@ PDDLExpression hold_during_con_gd() :
 PDDLExpression hold_after_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_AFTER);
-	Token token = null;
-	PDDLExpression node = null;
+	PDDLExpression exp, num;
+    Token begin, end;
 }
 {
-	left_bracket() <HOLD_AFTER>
-		token=<NUMBER>
-		node=gd()
-	right_bracket()
+	begin=left_bracket() <HOLD_AFTER>
+		num=number()
+		exp=gd()
+	end=right_bracket()
 	{
-		PDDLExpression n1 = new PDDLExpression(PDDLConnective.NUMBER);
-		n1.setValue(Double.parseDouble(token.image));
-		conGD.addChild(n1);
-		conGD.addChild(node);
+		conGD.addChild(num);
+		conGD.addChild(exp);
+		conGD.setBegin(begin);
+        conGD.setEnd(end);
 		return conGD;
 	}
 }
 
 PDDLExpression gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
 	(	LOOKAHEAD(2)
-			node=atomic_formula(Lexer.TERM)
+			exp=atomic_formula(Lexer.TERM)
 	|	LOOKAHEAD(2)
-			node=and_gd()
+			exp=and_gd()
 	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)})
-			node=or_gd()
+			exp=or_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.NEGATIVE_PRECONDITIONS)})
-			node=not_gd()
+			exp=not_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
 				&& this.isRequirement(PDDLRequireKey.NEGATIVE_PRECONDITIONS)})
-			node=imply_gd()
+			exp=imply_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)})
-			node=exists_gd()
+			exp=exists_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
-			node=forall_gd()
+			exp=forall_gd()
 	| 	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.EQUALITY)})
-			node=equal_gd()
+			exp=equal_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)})
-			node=f_comp()
+			exp=f_comp()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression equal_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
 	(LOOKAHEAD(2)
-		node=not_equal_atomic_formula()
+		exp=not_equal_atomic_formula()
 |	LOOKAHEAD(2)
-		node=equal_atomic_formula()
+		exp=equal_atomic_formula()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression not_equal_atomic_formula() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.NOT);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.NOT);
 	PDDLExpression c = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<NOT>
 		c=equal_gd()
-	right_bracket() {
-	 	node.addChild(c);
-		return node;
+	end=right_bracket() {
+	 	exp.addChild(c);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression equal_atomic_formula() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL_ATOM);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_ATOM);
 	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
 	PDDLSymbol t1 = null;
 	PDDLSymbol t2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <EQUAL>
+	begin=left_bracket() <EQUAL>
 		t1=term()
 		t2=term()
-	right_bracket() {
+	end=right_bracket() {
 	 	atom.add(t1);
 	 	atom.add(t2);
-	 	node.setAtom(atom);
-		return node;
+	 	exp.setAtom(atom);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression and_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <AND> (LOOKAHEAD(2) s=gd() {
-		node.addChild(s);
-	})* right_bracket()
+	begin=left_bracket() <AND> (LOOKAHEAD(2) s=gd() {
+		exp.addChild(s);
+	})*
+	end=right_bracket()
 	{
-		return node;
+        exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression or_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.OR);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.OR);
 	PDDLExpression s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <OR> (LOOKAHEAD(2) s=gd() {
-		node.addChild(s);
-	})* right_bracket()
+	begin=left_bracket() <OR> (LOOKAHEAD(2) s=gd() {
+		exp.addChild(s);
+	})*
+	end=right_bracket()
 	{
-		return node;
+        exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression not_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.NOT);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.NOT);
 	PDDLExpression s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <NOT> s=gd() right_bracket()
+	begin=left_bracket() <NOT> s=gd() end=right_bracket()
 	{
-		node.addChild(s);
-		return node;
+		exp.addChild(s);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression imply_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.OR);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.OR);
 	PDDLExpression p = null;
 	PDDLExpression q = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <IMPLY> p=gd() q=gd() right_bracket()
+	begin=left_bracket() <IMPLY> p=gd() q=gd() end=right_bracket()
 	{
 		PDDLExpression not_p = new PDDLExpression(PDDLConnective.NOT);
 		not_p.addChild(p);
-		node.addChild(not_p);
-		node.addChild(q);
-		return node;
+		exp.addChild(not_p);
+		exp.addChild(q);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression exists_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.EXISTS);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.EXISTS);
 	List<PDDLTypedSymbol> typedList = null;
 	PDDLExpression s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <EXISTS>
+	begin=left_bracket() <EXISTS>
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		s=gd()
-	right_bracket() {
-		node.setVariables(typedList);
-		node.addChild(s);
-		return node;
+	end=right_bracket() {
+		exp.setVariables(typedList);
+		exp.addChild(s);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression forall_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
 	List<PDDLTypedSymbol> typedList = null;
 	PDDLExpression s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		s=gd()
-	right_bracket() {
-		node.setVariables(typedList);
-		node.addChild(s);
-		return node;
+	end=right_bracket() {
+		exp.setVariables(typedList);
+		exp.addChild(s);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression atomic_formula(int type) :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.ATOM);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.ATOM);
 	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
 	PDDLSymbol t = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() t=predicate() {
+	begin=left_bracket() t=predicate() {
 		atom.add(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
@@ -1484,9 +1544,11 @@ PDDLExpression atomic_formula(int type) :
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
 			atom.add(t);
 		})*
-	) right_bracket() {
-		node.setAtom(atom);
-		return node;
+	) end=right_bracket() {
+		exp.setAtom(atom);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
@@ -1504,153 +1566,182 @@ PDDLSymbol term() :
 
 PDDLExpression literal(int type) :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=atomic_formula(type)
-	| 	LOOKAHEAD(2) node=not_atomic_formula(type)
+	(	LOOKAHEAD(2) exp=atomic_formula(type)
+	| 	LOOKAHEAD(2) exp=not_atomic_formula(type)
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression not_atomic_formula(int type) :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.NOT);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.NOT);
 	PDDLExpression s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <NOT>
+	begin=left_bracket() <NOT>
 		s=atomic_formula(type)
-	right_bracket() {
-		node.addChild(s);
-		return node;
+	end=right_bracket() {
+		exp.addChild(s);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression f_comp() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	node=binary_comp() {
-		return node;
+	exp=binary_comp() {
+		return exp;
 	}
 }
 
 PDDLExpression binary_comp() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=greater_comp()
-	|	LOOKAHEAD(2) node=less_comp()
-	|	LOOKAHEAD(2) node=greater_equal_comp()
-	|	LOOKAHEAD(2) node=less_equal_comp()
-	|	LOOKAHEAD(2) node=equal_comp()
+	(	LOOKAHEAD(2) exp=greater_comp()
+	|	LOOKAHEAD(2) exp=less_comp()
+	|	LOOKAHEAD(2) exp=greater_equal_comp()
+	|	LOOKAHEAD(2) exp=less_equal_comp()
+	|	LOOKAHEAD(2) exp=equal_comp()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression greater_comp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <GREAT>
+	begin=left_bracket() <GREAT>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression greater_equal_comp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <GEQUAL>
+	begin=left_bracket() <GEQUAL>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression less_equal_comp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <LEQUAL>
+	begin=left_bracket() <LEQUAL>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression less_comp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <LESS>
+	begin=left_bracket() <LESS>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+    	exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression equal_comp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <EQUAL>
+	begin=left_bracket() <EQUAL>
 		op1=f_exp()
 		op2=f_exp()
-
-	right_bracket() {
-	 	node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+	 	exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression f_exp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.F_EXP);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.F_EXP);
 	PDDLExpression child = null;
+    Token begin = null;
+    Token end = null;
 }
 {
 	(	child=number()
 	|	LOOKAHEAD(2) child=op()
 	|	LOOKAHEAD(2) child=f_head()
 	) {
-		node.addChild(child);
-		return node;
+		exp.addChild(child);
+		exp.setBeginLine(child.getBeginLine());
+		exp.setBeginColumn(child.getBeginColumn());
+		exp.setEndLine(child.getEndLine());
+        exp.setEndColumn(child.getEndColumn());
+		return exp;
 	}
 }
 
@@ -1661,136 +1752,171 @@ PDDLExpression number() :
 {
 	t=<NUMBER>
 	{
-		PDDLExpression node = new PDDLExpression(PDDLConnective.NUMBER);
-		node.setValue(Double.parseDouble(t.image));
-		return node;
+		PDDLExpression exp = new PDDLExpression(PDDLConnective.NUMBER);
+		exp.setValue(Double.parseDouble(t.image));
+		exp.setBegin(t);
+        exp.setEnd(t);
+		return exp;
 	}
 }
 
 PDDLExpression op() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=binary_operation()
-	|	LOOKAHEAD(2) node=unary_op()
+	(	LOOKAHEAD(2) exp=binary_operation()
+	|	LOOKAHEAD(2) exp=unary_op()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression binary_operation():
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=add_op()
-	|	LOOKAHEAD(2) node=substract_op()
-	|	LOOKAHEAD(2) node=multiply_op()
-	|	LOOKAHEAD(2) node=divide_op()
+	(	LOOKAHEAD(2) exp=add_op()
+	|	LOOKAHEAD(2) exp=substract_op()
+	|	LOOKAHEAD(2) exp=multiply_op()
+	|	LOOKAHEAD(2) exp=divide_op()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression add_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.PLUS);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.PLUS);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <ADD>
+	begin=left_bracket() <ADD>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression substract_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MINUS);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINUS);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <SUB>
+	begin=left_bracket() <SUB>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression multiply_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MUL);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <MUL>
+	begin=left_bracket() <MUL>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression divide_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIV);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <DIV>
+	begin=left_bracket() <DIV>
 		op1=f_exp()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression unary_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.UMINUS);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.UMINUS);
 	PDDLExpression op1 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <SUB>
+	begin=left_bracket() <SUB>
 		op1=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression f_head() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
 	List<PDDLSymbol> tokenList = new ArrayList<PDDLSymbol>();
 	PDDLSymbol s = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	(left_bracket() s=functor() {
-		tokenList.add(s);
-	} (LOOKAHEAD(2) s=term() {
-		tokenList.add(s);
-	})* right_bracket()
-| 	s=functor() { tokenList.add(s); }) {
-		node.setAtom(tokenList);
-		return node;
+	begin=left_bracket() s=functor() {
+	    	tokenList.add(s);
+	    } (LOOKAHEAD(2) s=term() {
+	        tokenList.add(s);
+	    })*
+	end=right_bracket() {
+	    exp.setAtom(tokenList);
+	    exp.setBegin(begin);
+	    exp.setEnd(end);
+        return exp;
+	}
+| 	s=functor() {
+        tokenList.add(s);
+		exp.setAtom(tokenList);
+        exp.setBeginLine(s.getBeginLine());
+        exp.setBeginColumn(s.getBeginColumn());
+        exp.setEndLine(s.getEndLine());
+        exp.setEndColumn(s.getEndColumn());
+		return exp;
 	}
 }
 
@@ -1927,18 +2053,27 @@ PDDLExpression subtask_def() : // ADD HDDL
 {
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
     PDDLExpression taskID = null;
+    Token begin;
+    Token end;
 }
 {
     (   LOOKAHEAD(2)
             taskID=subtask() {
                 exp = new PDDLExpression(PDDLConnective.AND);
                 exp.addChild(taskID);
+                exp.setBeginLine(taskID.getBeginLine());
+                exp.setBeginColumn(taskID.getBeginColumn());
+                exp.setEndLine(taskID.getEndLine());
+                exp.setEndColumn(taskID.getEndColumn());
             }
     |   LOOKAHEAD(2)
             exp=and_subtask()
     |   LOOKAHEAD(3)
-            <LEFT_BRACKET> <RIGHT_BRACKET>)
-    {
+            begin=left_bracket() end=right_bracket() {
+                exp.setBegin(begin);
+                exp.setEnd(end);
+            }
+    ) {
         return exp;
     }
 }
@@ -1948,11 +2083,16 @@ PDDLExpression and_subtask() : // ADD HDDL
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
     PDDLExpression task = null;
     int i = 0;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <AND> (LOOKAHEAD (2) task=subtask() {
+    begin=left_bracket() <AND> (LOOKAHEAD (2) task=subtask() {
         exp.addChild(task);
-    })* <RIGHT_BRACKET> {
+    })*
+    end=right_bracket() {
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
@@ -1961,14 +2101,18 @@ PDDLExpression subtask() :  // ADD HDDL
 {
     PDDLSymbol taskID;
     PDDLExpression task;
+    Token begin = null;
+    Token end = null;
 }
 {
     (   LOOKAHEAD(3)
-            <LEFT_BRACKET>
+            begin=left_bracket()
                 taskID=task_id()
                 task=task_formula(Lexer.TERM)
-            <RIGHT_BRACKET> {
+            end=right_bracket() {
                 task.setTaskID(taskID);
+                task.setBegin(begin);
+                task.setEnd(end);
             }
     |   LOOKAHEAD(2)
             task=task_formula(Lexer.TERM)
@@ -1978,12 +2122,14 @@ PDDLExpression subtask() :  // ADD HDDL
 }
 PDDLExpression task_formula(int type) : // ADD HDDL
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.TASK);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK);
 	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
 	PDDLSymbol t = null;
+	Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() t=task_symbol() {
+	begin=left_bracket() t=task_symbol() {
 		atom.add(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
@@ -1992,9 +2138,11 @@ PDDLExpression task_formula(int type) : // ADD HDDL
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
 			atom.add(t);
 		})*
-	) right_bracket() {
-		node.setAtom(atom);
-		return node;
+	) end=right_bracket() {
+		exp.setAtom(atom);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
@@ -2021,6 +2169,10 @@ PDDLExpression htn_ordering_constraints_def() : // ADD HDDL
             taskID=htn_ordering_constraint() {
                 exp = new PDDLExpression(PDDLConnective.AND);
                 exp.addChild(taskID);
+                exp.setBeginLine(taskID.getBeginLine());
+                exp.setBeginColumn(taskID.getBeginColumn());
+                exp.setEndLine(taskID.getEndLine());
+                exp.setEndColumn(taskID.getEndColumn());
             }
     |   LOOKAHEAD(2)
             exp = and_ordering_constraints()
@@ -2033,130 +2185,158 @@ PDDLExpression and_ordering_constraints() : // ADD HDDL
 {
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
     PDDLExpression ordering = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <AND> (ordering = htn_ordering_constraint() {
+    begin=left_bracket() <AND> (ordering = htn_ordering_constraint() {
         exp.addChild(ordering);
-    })+ <RIGHT_BRACKET> {
+    })+ end=right_bracket() {
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
 
 PDDLExpression htn_ordering_constraint() : // ADD HDDL
 {
-    PDDLExpression node = null;
+    PDDLExpression exp = null;
 }
 {
     (   LOOKAHEAD(3)
-            node = less_htn_ordering_constraint()
+            exp = less_htn_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
-            node = equal_htn_temporal_ordering_constraint()
+            exp = equal_htn_temporal_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
-            node = less_htn_temporal_ordering_constraint()
+            exp = less_htn_temporal_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
-            node = less_or_equal_htn_temporal_ordering_constraint()
+            exp = less_or_equal_htn_temporal_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
-            node = great_htn_temporal_ordering_constraint()
+            exp = great_htn_temporal_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
-            node = great_or_equal_htn_temporal_ordering_constraint()
+            exp = great_or_equal_htn_temporal_ordering_constraint()
     ) {
-        return node;
+        return exp;
     }
 }
 
 PDDLExpression less_htn_ordering_constraint() : // ADD HDDL
 {
-    PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
     List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
     PDDLSymbol id1 = null;
     PDDLSymbol id2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <LESS> id1=task_id() id2=task_id() <RIGHT_BRACKET> {
+    begin=left_bracket() <LESS> id1=task_id() id2=task_id() end=right_bracket() {
         tasks.add(id1);
         tasks.add(id2);
-        node.setAtom(tasks);
-        return node;
+        exp.setAtom(tasks);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
 PDDLExpression equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL_ORDERING_CONSTRAINT);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_ORDERING_CONSTRAINT);
     List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
     PDDLSymbol id1 = null;
     PDDLSymbol id2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <EQUAL> id1=time_task_id() id2=time_task_id() <RIGHT_BRACKET> {
+    begin=left_bracket() <EQUAL> id1=time_task_id() id2=time_task_id() end=right_bracket() {
         tasks.add(id1);
         tasks.add(id2);
-        node.setAtom(tasks);
-        return node;
+        exp.setAtom(tasks);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
 PDDLExpression less_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-        List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
-        PDDLSymbol id1 = null;
-        PDDLSymbol id2 = null;
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+    List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
+    PDDLSymbol id1 = null;
+    PDDLSymbol id2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <LESS> id1 = time_task_id() id2 = time_task_id() <RIGHT_BRACKET> {
+    begin=left_bracket() <LESS> id1 = time_task_id() id2 = time_task_id() end=right_bracket() {
          tasks.add(id1);
          tasks.add(id2);
-         node.setAtom(tasks);
-         return node;
+         exp.setAtom(tasks);
+         exp.setBegin(begin);
+         exp.setEnd(end);
+         return exp;
     }
 }
 
 PDDLExpression less_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_ORDERING_CONSTRAINT);
+     PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_ORDERING_CONSTRAINT);
      List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
      PDDLSymbol id1 = null;
      PDDLSymbol id2 = null;
+     Token begin = null;
+     Token end = null;
 }
 {
-    <LEFT_BRACKET> <LEQUAL> id1 = time_task_id() id2 = time_task_id() <RIGHT_BRACKET> {
+    begin=left_bracket() <LEQUAL> id1 = time_task_id() id2 = time_task_id() end=right_bracket() {
         tasks.add(id1);
         tasks.add(id2);
-        node.setAtom(tasks);
-        return node;
+        exp.setAtom(tasks);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
 PDDLExpression great_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_ORDERING_CONSTRAINT);
+     PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_ORDERING_CONSTRAINT);
      List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
      PDDLSymbol id1 = null;
      PDDLSymbol id2 = null;
+     Token begin = null;
+     Token end = null;
 }
 {
-    <LEFT_BRACKET> <GREAT> id1 = time_task_id() id2 = time_task_id() <RIGHT_BRACKET> {
+    begin=left_bracket() <GREAT> id1 = time_task_id() id2 = time_task_id() end=right_bracket() {
         tasks.add(id1);
         tasks.add(id2);
-        node.setAtom(tasks);
-        return node;
+        exp.setAtom(tasks);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
 PDDLExpression great_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_ORDERING_CONSTRAINT);
-         List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
-         PDDLSymbol id1 = null;
-         PDDLSymbol id2 = null;
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_ORDERING_CONSTRAINT);
+    List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
+    PDDLSymbol id1 = null;
+    PDDLSymbol id2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <GEQUAL> id1 = time_task_id() id2 = time_task_id() <RIGHT_BRACKET> {
+    begin=left_bracket() <GEQUAL> id1 = time_task_id() id2 = time_task_id() end=right_bracket() {
        tasks.add(id1);
        tasks.add(id2);
-       node.setAtom(tasks);
-       return node;
+       exp.setAtom(tasks);
+       exp.setBegin(begin);
+       exp.setEnd(end);
+       return exp;
     }
 }
 
@@ -2179,7 +2359,7 @@ PDDLSymbol start_task_id() : // ADD HDDL2.1
     PDDLSymbol symbol = null;
 }
 {
-    <LEFT_BRACKET> <START> symbol = task_id() <RIGHT_BRACKET> {
+    left_bracket() <START> symbol = task_id() right_bracket() {
         symbol.setTimeSpecifier(PDDLTimeSpecifier.START);
         return symbol;
     }
@@ -2190,7 +2370,7 @@ PDDLSymbol end_task_id() : // ADD HDDL2.1
     PDDLSymbol symbol = null;
 }
 {
-    <LEFT_BRACKET> <END> symbol = task_id() <RIGHT_BRACKET> {
+    left_bracket() <END> symbol = task_id() right_bracket() {
         symbol.setTimeSpecifier(PDDLTimeSpecifier.END);
         return symbol;
     }
@@ -2198,22 +2378,26 @@ PDDLSymbol end_task_id() : // ADD HDDL2.1
 
 PDDLExpression htn_constraints_def() : // ADD HDDL
 {
-    PDDLExpression node = null;
+    PDDLExpression exp = null;
     PDDLExpression c = null;
 }
 {
     (   LOOKAHEAD(2)
-            node = empty_and()
+            exp = empty_and()
     |   LOOKAHEAD(2)
             c = htn_constraint() {
-                node = new PDDLExpression(PDDLConnective.AND);
-                node.addChild(c);
+                exp = new PDDLExpression(PDDLConnective.AND);
+                exp.addChild(c);
+                exp.setBeginLine(c.getBeginLine());
+                exp.setBeginColumn(c.getBeginColumn());
+                exp.setEndLine(c.getEndLine());
+                exp.setEndColumn(c.getEndColumn());
             }
     |   LOOKAHEAD(2)
-            node = and_htn_constraints()
+            exp = and_htn_constraints()
     )
     {
-        return node;
+        return exp;
     }
 }
 
@@ -2221,48 +2405,52 @@ PDDLExpression and_htn_constraints() :  // ADD HDDL
 {
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
     PDDLExpression c = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <AND> (c = htn_constraint() {
+    begin=left_bracket() <AND> (c = htn_constraint() {
         exp.addChild(c);
-    })+ <RIGHT_BRACKET> {
+    })+ end=right_bracket() {
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
 
 PDDLExpression htn_constraint() : // ADD HDDL
 {
-    PDDLExpression node = null;
+    PDDLExpression exp = null;
 }
 {
     (   LOOKAHEAD(2)
-            node = equal_atomic_formula()
+            exp = equal_atomic_formula()
     |   LOOKAHEAD(2)
-            node = not_equal_atomic_formula()
+            exp = not_equal_atomic_formula()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = hold_before_htn_constraint()
+            exp = hold_before_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = hold_after_htn_constraint()
+            exp = hold_after_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = hold_between_htn_constraint()
+            exp = hold_between_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = hold_during_htn_constraint()
+            exp = hold_during_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = at_end_htn_constraint()
+            exp = at_end_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = at_start_htn_constraint()
+            exp = at_start_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = always_htn_constraint()
+            exp = always_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = at_most_one_htn_constraint()
+            exp = at_most_one_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = sometime_htn_constraint()
+            exp = sometime_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = sometime_before_htn_constraint()
+            exp = sometime_before_htn_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
-            node = sometime_after_htn_constraint()
+            exp = sometime_after_htn_constraint()
     ) {
-        return node;
+        return exp;
     }
 }
 
@@ -2271,11 +2459,15 @@ PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BEFORE);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_BEFORE> id = task_id() gd = gd() <RIGHT_BRACKET> {
+    begin=left_bracket() <HOLD_BEFORE> id = task_id() gd = gd() end=right_bracket() {
         exp.setTaskID(id);
         exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
@@ -2285,11 +2477,15 @@ PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_AFTER);
     PDDLSymbol id = null;
     PDDLExpression effect = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_AFTER> id = task_id() effect = effect() <RIGHT_BRACKET> {
+    begin=left_bracket() <HOLD_AFTER> id = task_id() effect = effect() end=right_bracket() {
         exp.setTaskID(id);
         exp.addChild(effect);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
@@ -2300,11 +2496,15 @@ PDDLExpression hold_between_htn_constraint() : // ADD HDDL2.1
     PDDLSymbol id1 = null;
     PDDLSymbol id2 = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() <RIGHT_BRACKET> {
+    begin=left_bracket() <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() end=right_bracket() {
         exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
         exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
@@ -2315,12 +2515,16 @@ PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
     PDDLSymbol id1 = null;
     PDDLSymbol id2 = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() <RIGHT_BRACKET> {
-         exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
-         exp.addChild(gd);
-         return exp;
+    begin=left_bracket() <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() end=right_bracket() {
+        exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
@@ -2329,12 +2533,16 @@ PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
     PDDLSymbol id = null;
     PDDLExpression effect = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <AT> <END> id = task_id() effect = effect() <RIGHT_BRACKET> {
-         exp.setTaskID(id);
-         exp.addChild(effect);
-         return exp;
+    begin=left_bracket() <AT> <END> id = task_id() effect = effect() end=right_bracket() {
+        exp.setTaskID(id);
+        exp.addChild(effect);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
@@ -2343,12 +2551,16 @@ PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <AT> <START> id = task_id() gd = gd() <RIGHT_BRACKET> {
-       exp.setTaskID(id);
-       exp.addChild(gd);
-       return exp;
+    begin=left_bracket() <AT> <START> id = task_id() gd = gd() end=right_bracket() {
+        exp.setTaskID(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
@@ -2357,11 +2569,15 @@ PDDLExpression always_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.ALWAYS);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <ALWAYS> id = task_id() gd = gd() <RIGHT_BRACKET> {
+    begin=left_bracket() <ALWAYS> id = task_id() gd = gd() end=right_bracket() {
         exp.setTaskID(id);
         exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
@@ -2371,40 +2587,52 @@ PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_MOST_ONCE);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <AT_MOST_ONCE> id = task_id() gd = gd() <RIGHT_BRACKET> {
+    begin=left_bracket() <AT_MOST_ONCE> id = task_id() gd = gd() end=right_bracket() {
         exp.setTaskID(id);
         exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
 
 PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME);
-     PDDLSymbol id = null;
-     PDDLExpression gd = null;
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME);
+    PDDLSymbol id = null;
+    PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <SOMETIME> id = task_id() gd = gd() <RIGHT_BRACKET> {
+    begin=left_bracket() <SOMETIME> id = task_id() gd = gd() end=right_bracket() {
         exp.setTaskID(id);
         exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
 
 PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE);
-     PDDLSymbol id = null;
-     PDDLExpression gd = null;
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE);
+    PDDLSymbol id = null;
+    PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <SOMETIME_BEFORE> id = task_id() gd = gd() <RIGHT_BRACKET> {
-         exp.setTaskID(id);
-         exp.addChild(gd);
-         return exp;
+    begin=left_bracket() <SOMETIME_BEFORE> id = task_id() gd = gd() end=right_bracket() {
+        exp.setTaskID(id);
+        exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
@@ -2413,11 +2641,15 @@ PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
     PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_AFTER);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-    <LEFT_BRACKET> <SOMETIME_AFTER> id = task_id() gd = gd() <RIGHT_BRACKET> {
+    begin=left_bracket() <SOMETIME_AFTER> id = task_id() gd = gd() end=right_bracket() {
         exp.setTaskID(id);
         exp.addChild(gd);
+        exp.setBegin(begin);
+        exp.setEnd(end);
         return exp;
     }
 }
@@ -2429,10 +2661,10 @@ PDDLDerivedPredicate derived_def() :
 }
 {
 	try {
-		<LEFT_BRACKET>  <DERIVED>
+		left_bracket() <DERIVED>
 			head=atomic_formula_skeleton()
 			body=gd()
-		<RIGHT_BRACKET>
+		right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
@@ -2446,7 +2678,7 @@ PDDLAction action_def() :
 	PDDLSymbol name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
 }
 {
 	try {
@@ -2468,7 +2700,7 @@ PDDLAction htn_action_def() :
 	PDDLSymbol name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);;
+	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
 }
 {
 	try {
@@ -2497,89 +2729,109 @@ PDDLSymbol action_name() :
 
 PDDLExpression pre_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.PREFERENCES)}) node=pref_gd()
-	|	LOOKAHEAD(2) node=and_pre_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)}) node=forall_pre_gd()
-	|	LOOKAHEAD(2) node=empty_or()
-	|	LOOKAHEAD(2) node=gd()
+	(	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.PREFERENCES)}) exp=pref_gd()
+	|	LOOKAHEAD(2) exp=and_pre_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)}) exp=forall_pre_gd()
+	|	LOOKAHEAD(2) exp=empty_or()
+	|	LOOKAHEAD(2) exp=gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression empty_or() :
 {
-	Token t = token;
+    Token begin = null;
+    Token end = null;
 }
 {
-	t=<LEFT_BRACKET> <RIGHT_BRACKET>
+	begin=left_bracket() end=right_bracket()
 	{
-		return new PDDLExpression(PDDLConnective.OR);
+		PDDLExpression or = new PDDLExpression(PDDLConnective.OR);
+		or.setBegin(begin);
+		or.setEnd(end);
+		return or;
 	}
 }
 
 PDDLExpression empty_and() :
 {
-	Token t = token;
+	Token begin = null;
+    Token end = null;
 }
 {
-	t=<LEFT_BRACKET> <RIGHT_BRACKET>
+	begin=left_bracket() end=right_bracket()
 	{
-		return new PDDLExpression(PDDLConnective.AND);
+		PDDLExpression and = new PDDLExpression(PDDLConnective.AND);
+		and.setBegin(begin);
+        and.setEnd(end);
+        return and;
 	}
 }
 
 PDDLExpression and_pre_gd() :
 {
-	Token t = token;
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression s;
+	Token begin = null;
+    Token end = null;
 }
 {
-	t=left_bracket() <AND>
+	begin=left_bracket() <AND>
 		(s=pre_gd() {
-			node.addChild(s);
-		})* right_bracket()
+			exp.addChild(s);
+		})*
+		end=right_bracket()
 	{
-		return node;
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression forall_pre_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
 	List<PDDLTypedSymbol> vars = null;
 	PDDLExpression s = null;
+	Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			vars=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		s=pre_gd()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.setVariables(vars);
-		node.addChild(s);
-		return node;
+		exp.setVariables(vars);
+		exp.addChild(s);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression pref_gd() :
 {
 	PDDLSymbol pref_name = null;
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
+	Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <PREFERENCE>
+	begin=left_bracket() <PREFERENCE>
 		[pref_name=pref_name()]
-		node=gd()
-	right_bracket() {
-		node.setPrefName(pref_name);
-		return node;
+		exp=gd()
+	end=right_bracket() {
+		exp.setPrefName(pref_name);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
@@ -2595,153 +2847,177 @@ PDDLSymbol pref_name() :
 
 PDDLExpression effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=empty_or()
-	|   LOOKAHEAD(2) node=and_c_effect()
-	|	LOOKAHEAD(2) node=c_effect()
+	(	LOOKAHEAD(2) exp=empty_or()
+	|   LOOKAHEAD(2) exp=and_c_effect()
+	|	LOOKAHEAD(2) exp=c_effect()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression and_c_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression s = null;
+	Token begin = null;
+	Token end = null;
 }
 {
-	left_bracket() <AND> (LOOKAHEAD(2) s=c_effect() {
-		node.addChild(s);
-	})* right_bracket()
+	begin=left_bracket() <AND> (LOOKAHEAD(2) s=c_effect() {
+		exp.addChild(s);
+	})*
+	end=right_bracket()
 	{
-		return node;
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression c_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) node=forall_effect()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) node=when_con_effect()
-	|	LOOKAHEAD(2) node=p_effect()
+	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) exp=forall_effect()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) exp=when_con_effect()
+	|	LOOKAHEAD(2) exp=p_effect()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression forall_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
 	List<PDDLTypedSymbol> vars = null;
 	PDDLExpression s = null;
+	Token begin = null;
+	Token end = null;
 }
 {
-	left_bracket() <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			vars=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		s=effect()
-	right_bracket() {
-		node.setVariables(vars);
-		node.addChild(s);
-		return node;
+	end=right_bracket() {
+		exp.setVariables(vars);
+		exp.addChild(s);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression when_con_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.WHEN);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.WHEN);
 	PDDLExpression condition = null;
 	PDDLExpression effects = null;
+	Token begin = null;
+	Token end = null;
 }
 {
-	left_bracket() <WHEN>
+	begin=left_bracket() <WHEN>
 		condition=gd()
 		effects=cond_effect()
-	right_bracket() {
-		node.addChild(condition);
-		node.addChild(effects);
-		return node;
+	end=right_bracket() {
+		exp.addChild(condition);
+		exp.addChild(effects);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression cond_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=and_p_effect()
-	|	LOOKAHEAD(2) node=p_effect()
+	(	LOOKAHEAD(2) exp=and_p_effect()
+	|	LOOKAHEAD(2) exp=p_effect()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression and_p_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression s = null;
+	Token begin = null;
+	Token end = null;
 }
 {
-	left_bracket() <AND> (LOOKAHEAD(2) s=p_effect() {
-		node.addChild(s);
-	})* right_bracket()
+	begin=left_bracket() <AND> (LOOKAHEAD(2) s=p_effect() {
+		exp.addChild(s);
+	})*
+	end=right_bracket()
 	{
-		return node;
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression p_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
  	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
     			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-    			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) node=assign_op()
-    	|   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.ACTION_COSTS) }) node=increase_total_cost()
-
-
-    	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
+    			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) exp=assign_op()
+    	|   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.ACTION_COSTS) }) exp=increase_total_cost()
+    	|	LOOKAHEAD(2) exp=literal(Lexer.TERM)
     	) {
-    		return node;
+    		return exp;
     	}
 
 }
 
 PDDLExpression increase_total_cost() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.INCREASE);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.INCREASE);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
+    Token begin = null;
+    Token end = null;
 }
 {
-	left_bracket() <INCREASE>
+	begin=left_bracket() <INCREASE>
 		op1=total_cost()
 		op2=numeric_term()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression total_cost() :
 {
 	Token t;
+    Token begin;
+    Token end;
 }
 {
-	<LEFT_BRACKET> t=<TOTAL_COST> <RIGHT_BRACKET> {
-		PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
+		PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
 		List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
 		function.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
-		node.setAtom(function);
-		return node;
+		exp.setAtom(function);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
@@ -2749,124 +3025,127 @@ PDDLExpression numeric_term() :
 {
 	List<PDDLSymbol> tokenList = new ArrayList<PDDLSymbol>();
 	PDDLSymbol s = null;
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(left_bracket() s=functor() {
-		tokenList.add(s);
-	} (LOOKAHEAD(2) s=term() {
-		tokenList.add(s);
-	})* right_bracket() {
-		node = new PDDLExpression(PDDLConnective.FN_HEAD);
-		node.setAtom(tokenList);
-		return node;
+	(   exp=f_head()
+    | 	exp=number()
+    ) {
+		return exp;
 	}
-    | 	node=number() {
-		return node;
-	})
 }
 
 PDDLExpression assign_op() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=assign()
-	|	LOOKAHEAD(2) node=scale_up()
-	|	LOOKAHEAD(2) node=scale_down()
-	|	LOOKAHEAD(2) node=increase()
-	|	LOOKAHEAD(2) node=decrease()
+	(	LOOKAHEAD(2) exp=assign()
+	|	LOOKAHEAD(2) exp=scale_up()
+	|	LOOKAHEAD(2) exp=scale_down()
+	|	LOOKAHEAD(2) exp=increase()
+	|	LOOKAHEAD(2) exp=decrease()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression assign() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <ASSIGN>
+	begin=left_bracket() <ASSIGN>
 		op1=f_head()
 		op2=f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression scale_up() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_UP);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_UP);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <SCALE_UP>
+	begin=left_bracket() <SCALE_UP>
 		op1=f_head()
 		op2=f_exp()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression scale_down() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_DOWN);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_DOWN);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <SCALE_DOWN>
+	begin=left_bracket() <SCALE_DOWN>
 		op1=f_head()
 		op2=f_exp()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression increase() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.INCREASE);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.INCREASE);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <INCREASE>
+	begin=left_bracket() <INCREASE>
 		op1=f_head()
 		op2=f_exp()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression decrease() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.DECREASE);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DECREASE);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <DECREASE>
+	begin=left_bracket() <DECREASE>
 		op1=f_head()
 		op2=f_exp()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
@@ -2909,315 +3188,343 @@ PDDLSymbol da_symbol() :
 
 PDDLExpression duration_constraint() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(2) node=empty_or()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) node=and_simple_duration_constraint()
-	|	LOOKAHEAD(2) node=simple_duration_constraint()
+	(	LOOKAHEAD(2) exp=empty_or()
+	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) exp=and_simple_duration_constraint()
+	|	LOOKAHEAD(2) exp=simple_duration_constraint()
 	) {
-		return node;
+		return exp;
 	}
 }
 PDDLExpression and_simple_duration_constraint() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AND>
+	begin=left_bracket() <AND>
 		(LOOKAHEAD(2) child=simple_duration_constraint(){
-			node.addChild(child);
+			exp.addChild(child);
 		})+
-	right_bracket() {
-		return node;
+	end=right_bracket() {
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression simple_duration_constraint() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=d_op()
-	|	LOOKAHEAD(2) node=at_simple_duration_constraint()
+	(	LOOKAHEAD(2) exp=d_op()
+	|	LOOKAHEAD(2) exp=at_simple_duration_constraint()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_simple_duration_constraint() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 }
 {
-	(	LOOKAHEAD(3) node=at_start_simple_duration_constraint()
-	| 	LOOKAHEAD(3) node=at_end_simple_duration_constraint()
+	(	LOOKAHEAD(3) exp=at_start_simple_duration_constraint()
+	| 	LOOKAHEAD(3) exp=at_end_simple_duration_constraint()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_start_simple_duration_constraint() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <START>
+	begin=left_bracket() <AT> <START>
 		child=simple_duration_constraint()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression at_end_simple_duration_constraint() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	<LEFT_BRACKET> <AT> <END>
+	begin=left_bracket() <AT> <END>
 		child=simple_duration_constraint()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression d_op() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(	LOOKAHEAD(2)
-			node=equal_d_op()
+			exp=equal_d_op()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
-			node=gequal_d_op()
+			exp=gequal_d_op()
 	| 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
-			node=lequal_d_op()
+			exp=lequal_d_op()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression equal_d_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <EQUAL>
+	begin=left_bracket() <EQUAL>
 		op1=var_duration()
 		op2=d_value()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression gequal_d_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	<LEFT_BRACKET> <GEQUAL>
+	begin=left_bracket() <GEQUAL>
 		op1=var_duration()
 		op2=d_value()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression lequal_d_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <LEQUAL>
+	begin=left_bracket() <LEQUAL>
 		op1=var_duration()
 		op2=d_value()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression var_duration() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.TIME_VAR);
-	Token t = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.TIME_VAR);
+	Token t;
 }
 {
 	t=<VAR_DURATION>
 	{
-		node.setVariable(new PDDLSymbol(PDDLSymbol.Kind.DURATION_VARIABLE, t));
-		return node;
+		exp.setVariable(new PDDLSymbol(PDDLSymbol.Kind.DURATION_VARIABLE, t));
+		return exp;
 	}
 }
 
 PDDLExpression d_value() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=number()
+	(	LOOKAHEAD(2) exp=number()
 	| 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) node=f_exp()
+			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) exp=f_exp()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression method_duration_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression node = null;
+    PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=empty_or()
-	|	LOOKAHEAD(2) node=simple_method_duration_constraint() // ADD HDDL2.1
+	(	LOOKAHEAD(2) exp=empty_or()
+	|	LOOKAHEAD(2) exp=simple_method_duration_constraint() // ADD HDDL2.1
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) // ADD HDDL2.1
-            node=and_simple_method_duration_constraint()
+            exp=and_simple_method_duration_constraint()
 	) {
-	    return node;
+	    return exp;
 	}
 }
 
 PDDLExpression and_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AND>
+	begin=left_bracket() <AND>
 		(LOOKAHEAD(2) child=simple_method_duration_constraint(){
-			node.addChild(child);
+			exp.addChild(child);
 		})+
-	right_bracket() {
-		return node;
+	end=right_bracket() {
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(	LOOKAHEAD(2)
-            node=equal_method_duration_constraint()
+            exp=equal_method_duration_constraint()
     |	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
-             node=great_method_duration_constraint()
+             exp=great_method_duration_constraint()
     | 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
-            node=great_or_equal_method_duration_constraint()
+            exp=great_or_equal_method_duration_constraint()
     |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
-            node=less_method_duration_constraint()
+            exp=less_method_duration_constraint()
     | 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
-            node=less_or_equal_method_duration_constraint()
-	|	LOOKAHEAD(2) node=at_simple_duration_constraint()
+            exp=less_or_equal_method_duration_constraint()
+	|	LOOKAHEAD(2) exp=at_simple_duration_constraint()
 	) {
-		return node;
+		return exp;
     }
 }
 
 PDDLExpression equal_method_duration_constraint() : // ADD HDDL2.1
 {
-  	PDDLExpression node = new PDDLExpression(PDDLConnective.EQUAL);
-  	PDDLExpression op1 = null;
-  	PDDLExpression op2 = null;
+  	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL);
+  	PDDLExpression op1, op2;
+  	Token begin, end;
 }
 {
-  	left_bracket() <EQUAL>
+  	begin=left_bracket() <EQUAL>
   		op1=duration()
   		op2=d_value()
-  	right_bracket() {
-  		node.addChild(op1);
-  		node.addChild(op2);
-  		return node;
+  	end=right_bracket() {
+  		exp.addChild(op1);
+  		exp.addChild(op2);
+  		exp.setBegin(begin);
+  		exp.setEnd(begin);
+  		return exp;
   	}
 }
 
 PDDLExpression great_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER);
-   	PDDLExpression op1 = null;
-   	PDDLExpression op2 = null;
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER);
+   	PDDLExpression op1, op2;
+   	Token begin, end;
 }
 {
-   	left_bracket() <GREAT>
+   	begin=left_bracket() <GREAT>
    		op1=duration()
    		op2=d_value()
-   	right_bracket() {
-   		node.addChild(op1);
-   		node.addChild(op2);
-   		return node;
+   	end=right_bracket() {
+   		exp.addChild(op1);
+   		exp.addChild(op2);
+   		exp.setBegin(begin);
+   		exp.setEnd(end);
+   		return exp;
    	}
 }
 
 PDDLExpression great_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression node = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
-   	PDDLExpression op1 = null;
-   	PDDLExpression op2 = null;
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+   	PDDLExpression op1, op2;
+   	Token begin, end;
 }
 {
-   	left_bracket() <GEQUAL>
+   	begin=left_bracket() <GEQUAL>
    		op1=duration()
    		op2=d_value()
-   	right_bracket() {
-   		node.addChild(op1);
-   		node.addChild(op2);
-   		return node;
+   	end=right_bracket() {
+   		exp.addChild(op1);
+   		exp.addChild(op2);
+   		exp.setBegin(begin);
+   		exp.setEnd(end);
+   		return exp;
    	}
 }
 
 PDDLExpression less_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS);
-   	PDDLExpression op1 = null;
-   	PDDLExpression op2 = null;
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS);
+   	PDDLExpression op1, op2;
+   	Token begin, end;
 }
 {
-   	left_bracket() <LESS>
+   	begin=left_bracket() <LESS>
    		op1=duration()
    		op2=d_value()
-   	right_bracket() {
-   		node.addChild(op1);
-   		node.addChild(op2);
-   		return node;
+   	end=right_bracket() {
+   		exp.addChild(op1);
+   		exp.addChild(op2);
+   		exp.setBegin(begin);
+   		exp.setEnd(end);
+   		return exp;
    	}
 }
 
 PDDLExpression less_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression node = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
-   	PDDLExpression op1 = null;
-   	PDDLExpression op2 = null;
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+   	PDDLExpression op1, op2;
+   	Token begin, end;
 }
 {
-   	left_bracket() <LEQUAL>
+   	begin=left_bracket() <LEQUAL>
    		op1=duration()
    		op2=d_value()
-   	right_bracket() {
-   		node.addChild(op1);
-   		node.addChild(op2);
-   		return node;
+   	end=right_bracket() {
+   		exp.addChild(op1);
+   		exp.addChild(op2);
+   		exp.setBegin(begin);
+   		exp.setEnd(end);
+   		return exp;
    	}
 }
 
 PDDLExpression duration() : // ADD HDDL2.1
 {
-    PDDLExpression duration = null;
+    PDDLExpression duration;
 }
 {
     (duration = var_duration() | duration = f_duration()) {
@@ -3227,566 +3534,639 @@ PDDLExpression duration() : // ADD HDDL2.1
 
 PDDLExpression f_duration() : // ADD HDDL2.1
 {
-    PDDLExpression node = new PDDLExpression(PDDLConnective.F_TASK_TIME);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.F_TASK_TIME);
     List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
-    Token t = null;
-    PDDLSymbol argument = null;
+    Token f, begin, end;
+    PDDLSymbol argument;
 }
 {
-    left_bracket() t = <F_DURATION> argument = task_id() right_bracket() {
-        function.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
+    begin=left_bracket() f=<F_DURATION> argument = task_id() end=right_bracket() {
+        function.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
         function.add(argument);
-        node.setAtom(function);
-        return node;
+        exp.setAtom(function);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
     }
 }
 
 PDDLExpression temporal_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(3) node=at_start_simple_method_duration_constraint()
-	| 	LOOKAHEAD(3) node=at_end_simple_method_duration_constraint()
+	(	LOOKAHEAD(3) exp=at_start_simple_method_duration_constraint()
+	| 	LOOKAHEAD(3) exp=at_end_simple_method_duration_constraint()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_start_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <START>
+	begin=left_bracket() <AT> <START>
 		child=simple_duration_constraint()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression at_end_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <END>
+	begin=left_bracket() <AT> <END>
 		child=simple_duration_constraint()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_gd():
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=pref_timed_gd()
-	|	LOOKAHEAD(2) node=and_da_gd()
+	(	LOOKAHEAD(2) exp=pref_timed_gd()
+	|	LOOKAHEAD(2) exp=and_da_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
-			node=forall_da_gd()
+			exp=forall_da_gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression forall_da_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
-	PDDLExpression child = null;
-	List<PDDLTypedSymbol> typedList = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	PDDLExpression child;
+	List<PDDLTypedSymbol> typedList;
+	Token begin, end;
 }
 {
-	<LEFT_BRACKET> <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		child=da_gd()
-	right_bracket()
+	end=right_bracket()
 	{
-		node.setVariables(typedList);
-		node.addChild(child);
-		return node;
+		exp.setVariables(typedList);
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression and_da_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	<LEFT_BRACKET> <AND>
+	begin=left_bracket() <AND>
 		(LOOKAHEAD(2) child=da_gd() {
-			node.addChild(child);
+			exp.addChild(child);
 		})*
-	right_bracket() {
-		return node;
+	end=right_bracket() {
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression pref_timed_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(	LOOKAHEAD(2)
-			node=timed_gd()
+			exp=timed_gd()
 	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.PREFERENCES)})
-			node=named_pref_timed_gd()
+			exp=named_pref_timed_gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression named_pref_timed_gd() :
 {
 	PDDLSymbol pref_name = null;
-	PDDLExpression node = null;
+	PDDLExpression exp;
+	Token begin, end;
 }
 {
-	left_bracket() <PREFERENCE>
+	begin=left_bracket() <PREFERENCE>
 		[pref_name=pref_name()]
-		node=timed_gd()
-	right_bracket() {
-		node.setPrefName(pref_name);
-		return node;
+		exp=timed_gd()
+	end=right_bracket() {
+		exp.setPrefName(pref_name);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression timed_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=at_timed_gd()
-	|	LOOKAHEAD(2) node=over_timed_gd()
+	(	LOOKAHEAD(2) exp=at_timed_gd()
+	|	LOOKAHEAD(2) exp=over_timed_gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression over_timed_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.OVER_ALL);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.OVER_ALL);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <OVER> <ALL>
+	begin=left_bracket() <OVER> <ALL>
 		child=gd()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression at_timed_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(3) node=at_start_timed_gd()
-	|	LOOKAHEAD(2) node=at_end_timed_gd()
+	(	LOOKAHEAD(3) exp=at_start_timed_gd()
+	|	LOOKAHEAD(2) exp=at_end_timed_gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_start_timed_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <START>
+	begin=left_bracket() <AT> <START>
 		child=gd()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression at_end_timed_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <END>
+	begin=left_bracket() <AT> <END>
 		child=gd()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(
 		LOOKAHEAD(2)
-			node=and_da_effect()
+			exp=and_da_effect()
 	| 	LOOKAHEAD(2)
-			node=timed_effect()
+			exp=timed_effect()
 	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)})
-			node=forall_da_effect()
+			exp=forall_da_effect()
 	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)})
-			node=when_da_effect()
+			exp=when_da_effect()
 	| 	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)})
-			node=da_assign_op()
+			exp=da_assign_op()
 
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression da_assign_op() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=da_assign()
-	|	LOOKAHEAD(2) node=da_scale_up()
-	|	LOOKAHEAD(2) node=da_scale_down()
-	|	LOOKAHEAD(2) node=da_increase()
-	|	LOOKAHEAD(2) node=da_decrease()
+	(	LOOKAHEAD(2) exp=da_assign()
+	|	LOOKAHEAD(2) exp=da_scale_up()
+	|	LOOKAHEAD(2) exp=da_scale_down()
+	|	LOOKAHEAD(2) exp=da_increase()
+	|	LOOKAHEAD(2) exp=da_decrease()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression da_assign() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <ASSIGN>
+	begin=left_bracket() <ASSIGN>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_scale_up() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_UP);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_UP);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <SCALE_UP>
+	begin=left_bracket() <SCALE_UP>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_scale_down() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.SCALE_DOWN);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_DOWN);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <SCALE_DOWN>
+	begin=left_bracket() <SCALE_DOWN>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_increase() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.INCREASE);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.INCREASE);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <INCREASE>
+	begin=left_bracket() <INCREASE>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_decrease() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.DECREASE);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DECREASE);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <DECREASE>
+	begin=left_bracket() <DECREASE>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression when_da_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.WHEN);
-	PDDLExpression condition = null;
-	PDDLExpression effect = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.WHEN);
+	PDDLExpression condition, effect;
+	Token begin, end;
 }
 {
-	left_bracket() <WHEN>
+	begin=left_bracket() <WHEN>
 		condition=da_gd()
 		effect=da_effect()
-	right_bracket() {
-		node.addChild(condition);
-		node.addChild(effect);
-		return node;
+	end=right_bracket() {
+		exp.addChild(condition);
+		exp.addChild(effect);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
-
 PDDLExpression forall_da_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> typedList = null;
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> typedList;
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		child=da_effect()
-	right_bracket() {
-		node.setVariables(typedList);
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.setVariables(typedList);
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression and_da_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AND>
+	begin=left_bracket() <AND>
 		(LOOKAHEAD(2) child=da_effect() {
-			node.addChild(child);
+			exp.addChild(child);
 		})*
-	right_bracket() {
-		return node;
+	end=right_bracket() {
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression timed_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(	LOOKAHEAD(2)
-			node=at_a_effect()
+			exp=at_a_effect()
 	|	LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.CONTINOUS_EFFECTS)})
-			node=assign_op_t()
+			exp=assign_op_t()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_f_assign_da() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(3) node=at_start_f_assign_da()
-	|	LOOKAHEAD(3) node=at_end_f_assign_da()
+	(	LOOKAHEAD(3) exp=at_start_f_assign_da()
+	|	LOOKAHEAD(3) exp=at_end_f_assign_da()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_start_f_assign_da() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <START>
+	begin=left_bracket() <AT> <START>
 		child=f_assign_da()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 
 PDDLExpression at_end_f_assign_da() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <END>
+	begin=left_bracket() <AT> <END>
 		child=f_assign_da()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression at_a_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(4) node=at_start_a_effect()
-	|	LOOKAHEAD(4) node=at_end_a_effect()
+	(	LOOKAHEAD(4) exp=at_start_a_effect()
+	|	LOOKAHEAD(4) exp=at_end_a_effect()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 
 PDDLExpression a_effect() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
- 	(	LOOKAHEAD(2) node=f_assign_da()
-	|	LOOKAHEAD(2) node=literal(Lexer.TERM)
-	|	LOOKAHEAD(2) node=when_con_effect()
-	|	LOOKAHEAD(2) node=forall_effect()
+ 	(	LOOKAHEAD(2) exp=f_assign_da()
+	|	LOOKAHEAD(2) exp=literal(Lexer.TERM)
+	|	LOOKAHEAD(2) exp=when_con_effect()
+	|	LOOKAHEAD(2) exp=forall_effect()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression at_start_a_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <START>
+	begin=left_bracket() <AT> <START>
 		child=a_effect()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
-
 PDDLExpression at_end_a_effect() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AT> <END>
+	begin=left_bracket() <AT> <END>
 		child=a_effect()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression assign_op_t() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=increase_assign_op_t()
-	|	LOOKAHEAD(2) node=decrease_assign_op_t()
+	(	LOOKAHEAD(2) exp=increase_assign_op_t()
+	|	LOOKAHEAD(2) exp=decrease_assign_op_t()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression increase_assign_op_t() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <INCREASE>
+	begin=left_bracket() <INCREASE>
 		op1=f_head()
 		op2=f_exp_t()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression decrease_assign_op_t() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <DECREASE>
+	begin=left_bracket() <DECREASE>
 		op1=f_head()
 		op2=f_exp_t()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression f_exp_t() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.F_EXP_T);
-	PDDLSymbol continuous_variable_name = null;
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.F_EXP_T);
+	PDDLSymbol continuous_variable_name;
+	PDDLExpression child;
+	Token begin, end;
 }
 {
 	(	LOOKAHEAD(2)
-			left_bracket() <MUL>
+			begin=left_bracket() <MUL>
 				continuous_variable_name=continuous_variable()
 				child=f_exp()
-			right_bracket()
+			end=right_bracket() {
+			    exp.setBegin(begin);
+			    exp.setEnd(end);
+			    exp.addChild(child);
+			    exp.setVariable(continuous_variable_name);
+			}
 	| 	LOOKAHEAD(2)
-			left_bracket() <MUL>
+			begin=left_bracket() <MUL>
 				child=f_exp()
 				continuous_variable_name=continuous_variable()
-			right_bracket()
+			end=right_bracket()  {
+                exp.setBegin(begin);
+                exp.setEnd(end);
+                exp.addChild(child);
+                exp.setVariable(continuous_variable_name);
+            }
 	| 	LOOKAHEAD(2)
-		continuous_variable_name=continuous_variable()
+		    continuous_variable_name=continuous_variable() {
+		        exp.setBeginLine(continuous_variable_name.getBeginLine());
+                exp.setBeginColumn(continuous_variable_name.getBeginColumn());
+                exp.setEndLine(continuous_variable_name.getEndLine());
+                exp.setEndColumn(continuous_variable_name.getEndColumn());
+                exp.setVariable(continuous_variable_name);
+		    }
 	) {
-		node.setVariable(continuous_variable_name);
-		if (child != null) node.addChild(child);
-		return node;
+		return exp;
 	}
 }
 
 PDDLSymbol continuous_variable() :
 {
-	Token t = null;
+	Token t;
 }
 {
 	t=<CONTINUOUS_VARIABLE>  {
@@ -3796,112 +4176,120 @@ PDDLSymbol continuous_variable() :
 
 PDDLExpression f_assign_da() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=da_assign()
-	|	LOOKAHEAD(2) node=da_scale_up()
-	|	LOOKAHEAD(2) node=da_scale_down()
-	|	LOOKAHEAD(2) node=da_increase()
-	|	LOOKAHEAD(2) node=da_decrease()
+	(	LOOKAHEAD(2) exp=da_assign()
+	|	LOOKAHEAD(2) exp=da_scale_up()
+	|	LOOKAHEAD(2) exp=da_scale_down()
+	|	LOOKAHEAD(2) exp=da_increase()
+	|	LOOKAHEAD(2) exp=da_decrease()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression f_exp_da() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=da_op()
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) node=var_duration()
-	|	LOOKAHEAD(2) node=f_exp()
+	(	LOOKAHEAD(2) exp=da_op()
+	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) exp=var_duration()
+	|	LOOKAHEAD(2) exp=f_exp()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 
 PDDLExpression da_op() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=da_add_op()
-	|	LOOKAHEAD(2) node=da_substract_op()
-	|	LOOKAHEAD(2) node=da_multiply_op()
-	|	LOOKAHEAD(2) node=da_divide_op()
+	(	LOOKAHEAD(2) exp=da_add_op()
+	|	LOOKAHEAD(2) exp=da_substract_op()
+	|	LOOKAHEAD(2) exp=da_multiply_op()
+	|	LOOKAHEAD(2) exp=da_divide_op()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression da_add_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.PLUS);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.PLUS);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <ADD>
+	begin=left_bracket() <ADD>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_substract_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MINUS);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINUS);
+	PDDLExpression op1, op2 = null;
+	Token begin, end;
 }
 {
-	left_bracket() <SUB>
+	begin=left_bracket() <SUB>
 		(	LOOKAHEAD(3) (op1=f_head() [op2=f_exp_da()])
-	| 	LOOKAHEAD(3) ([LOOKAHEAD(2) op2=f_exp_da()] op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		if (op2 != null) node.addChild(op2);
-		return node;
+	    | 	LOOKAHEAD(3) ([LOOKAHEAD(2) op2=f_exp_da()] op1=f_head()))
+	end=right_bracket() {
+		exp.addChild(op1);
+		if (op2 != null) exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_multiply_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MUL);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <MUL>
-	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
-	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	begin=left_bracket() <MUL>
+	    (	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	    | 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression da_divide_op() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.DIV);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <DIV>
-	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
-	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	begin=left_bracket() <DIV>
+	    (	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
+	    | 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
@@ -3919,8 +4307,8 @@ PDDLProblem problem() :
 
 PDDLProblem pddl_problem() :
 {
-	PDDLSymbol name = null;
-	PDDLSymbol domain = null;
+	PDDLSymbol name;
+	PDDLSymbol domain;
 }
 {
 	try {
@@ -3952,9 +4340,9 @@ PDDLProblem pddl_problem() :
 
 PDDLProblem htn_problem() : // ADD HDDL
 {
-	PDDLSymbol name = null;
-	PDDLSymbol domain = null;
-	PDDLTaskNetwork taskNetwork = null;
+	PDDLSymbol name;
+	PDDLSymbol domain;
+	PDDLTaskNetwork taskNetwork;
 	List<PDDLTypedSymbol> parameters = new ArrayList<PDDLTypedSymbol>();
 }
 {
@@ -3972,7 +4360,7 @@ PDDLProblem htn_problem() : // ADD HDDL
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
         left_bracket() <HTN>
-            [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
+            [LOOKAHEAD(2) <PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()]
             taskNetwork = task_network() {
                 taskNetwork.setParameters(parameters);
                 this.problem.setInitialTaskNetwork(taskNetwork);
@@ -4030,13 +4418,13 @@ void object_declaration() :
 
 void init() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	try {
 		left_bracket() <INIT>
-			(LOOKAHEAD(2) node=init_el() {
-				this.problem.addInitialFact(node);
+			(LOOKAHEAD(2) exp=init_el() {
+				this.problem.addInitialFact(exp);
 			})*
 		right_bracket()
 	} catch(Throwable e) {
@@ -4047,59 +4435,62 @@ void init() :
 
 PDDLExpression init_el() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(
-		LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.TIMED_INITIAL_LITERALS)}) node=timed_literal()
-	|	LOOKAHEAD(2) node=literal(Lexer.CONSTANT)
+		LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.TIMED_INITIAL_LITERALS)}) exp=timed_literal()
+	|	LOOKAHEAD(2) exp=literal(Lexer.CONSTANT)
 	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)}) node=equal_init_el()
+			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)}) exp=equal_init_el()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression equal_init_el() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_ATOM);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_ATOM);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <EQUAL>
+	begin=left_bracket() <EQUAL>
 		op1=constant_f_head()
 		op2=number()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression timed_literal() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.DURATION_ATOM);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DURATION_ATOM);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket() <AT>
+	begin=left_bracket() <AT>
 		op1=number()
 		op2=literal(Lexer.CONSTANT)
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 
 void goal() :
 {
-
 }
 {
     left_bracket() <GOAL>
@@ -4109,7 +4500,7 @@ void goal() :
 
 void pddl_goal() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp = null;
 	Boolean goal_utilities = false;
 	if (this.isRequirement(PDDLRequireKey.GOAL_UTILITIES)
 			&& !this.isRequirement(PDDLRequireKey.PREFERENCES)) {
@@ -4120,8 +4511,8 @@ void pddl_goal() :
 }
 {
 	try {
-		node=pre_gd() {
-			this.problem.setGoal(node);
+		exp=pre_gd() {
+			this.problem.setGoal(exp);
 			if (goal_utilities) {
 				this.getRequirements().remove(PDDLRequireKey.PREFERENCES);
 			}
@@ -4133,11 +4524,11 @@ void pddl_goal() :
 
 void pddl_const(int type) :
 {
-	PDDLExpression conGD = null;
+	PDDLExpression conGD;
 }
 {
 	try {
-		<LEFT_BRACKET> <CONSTRAINTS>
+		left_bracket() <CONSTRAINTS>
 			conGD=pref_con_gd()
 		right_bracket() {
 			if (type == Lexer.PARSER_DOMAIN) {
@@ -4154,267 +4545,304 @@ void pddl_const(int type) :
 
 PDDLExpression pref_con_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	(	LOOKAHEAD(2)
-			node=and_pref_con_gd()
+			exp=and_pref_con_gd()
 	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
-			node=forall_pref_con_gd()
+			exp=forall_pref_con_gd()
 	| 	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.PREFERENCES)})
-			node=named_pref_con_gd()
+			exp=named_pref_con_gd()
 	|	LOOKAHEAD(2)
-			node=con_gd()
+			exp=con_gd()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression and_pref_con_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.AND);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <AND>
+	begin=left_bracket() <AND>
 		(LOOKAHEAD(2) child=pref_con_gd() {
-			node.addChild(child);
-		})* right_bracket()
-	{
-		return node;
+			exp.addChild(child);
+		})*
+	end=right_bracket() {
+        exp.setBegin(begin);
+        exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression named_pref_con_gd() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 	PDDLSymbol pref_name = null;
+	Token begin, end;
 }
 {
-	left_bracket() <PREFERENCE>
+	begin=left_bracket() <PREFERENCE>
 		[pref_name=pref_name()]
-		node=con_gd()
-	right_bracket() {
-		node.setPrefName(pref_name);
-		return node;
+		exp=con_gd()
+	end=right_bracket() {
+		exp.setPrefName(pref_name);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression forall_pref_con_gd() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> typedList = null;
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	List<PDDLTypedSymbol> typedList;
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket() <FORALL>
+	begin=left_bracket() <FORALL>
 		left_bracket()
 			typedList=typed_list(Lexer.VARIABLE)
 		right_bracket()
 		child=pref_con_gd()
-	right_bracket() {
-		node.setVariables(typedList);
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.setVariables(typedList);
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 void metric_spec() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
 	try {
-		(	LOOKAHEAD(3) node=maximize()
-		| 	LOOKAHEAD(3) node=minimize()
-		)
+		(	LOOKAHEAD(3) exp=maximize()
+		| 	LOOKAHEAD(3) exp=minimize()
+		) {
+          	this.problem.setMetric(exp);
+        }
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
-	{
-		this.problem.setMetric(node);
-	}
+
 }
 
 PDDLExpression maximize() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MAXIMIZE);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MAXIMIZE);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<METRIC>
 		<MAXIMIZE>
 		child=metric_f_exp()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression minimize() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MINIMIZE);
-	PDDLExpression child = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINIMIZE);
+	PDDLExpression child;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<METRIC>
 		<MINIMIZE>
 		child=metric_f_exp()
-	right_bracket() {
-		node.addChild(child);
-		return node;
+	end=right_bracket() {
+		exp.addChild(child);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression metric_f_exp() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=op_metric_f_exp()
-	|	LOOKAHEAD(2) node=number()
-	|	LOOKAHEAD(2) node=constant_f_head()
-	|	LOOKAHEAD(2) node=total_time()
-	|	LOOKAHEAD(2) node=violated_pref_exp()
+	(	LOOKAHEAD(2) exp=op_metric_f_exp()
+	|	LOOKAHEAD(2) exp=number()
+	|	LOOKAHEAD(2) exp=constant_f_head()
+	|	LOOKAHEAD(2) exp=total_time()
+	|	LOOKAHEAD(2) exp=violated_pref_exp()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression violated_pref_exp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.IS_VIOLATED);
-	PDDLSymbol pref_name = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.IS_VIOLATED);
+	PDDLSymbol pref_name;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<IS_VIOLATED>
 		pref_name=pref_name()
-	right_bracket() {
-		node.setPrefName(pref_name);
-		return node;
+	end=right_bracket() {
+		exp.setPrefName(pref_name);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression constant_f_head() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
 	List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
-	PDDLSymbol functor = null;
-	PDDLSymbol argument = null;
+	PDDLSymbol functor, argument;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		functor=functor() { function.add(functor); }
 		(LOOKAHEAD(2) argument=constant(){
 			function.add(argument);
 		})*
-	right_bracket() {
-		node.setAtom(function);
-		return node;
+	end=right_bracket() {
+		exp.setAtom(function);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression total_time() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.FN_HEAD);
-	Token t;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
+	Token f, begin, end;
 }
 {
 	(LOOKAHEAD(3)
-		left_bracket() t=<TOTAL_TIME> right_bracket()
+		begin=left_bracket() f=<TOTAL_TIME> end=right_bracket() {
+		    exp.setBegin(begin);
+		    exp.setEnd(end);
+		}
 | 	LOOKAHEAD(2)
-		t=<TOTAL_TIME>) {
+		f=<TOTAL_TIME>) {
 			List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
-			atom.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
-			node.setAtom(atom);
-			return node;
+			atom.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
+			exp.setAtom(atom);
+			exp.setBeginLine(f.beginLine);
+            exp.setBeginColumn(f.beginColumn);
+            exp.setEndLine(f.endLine);
+            exp.setEndColumn(f.endColumn);
+			return exp;
 		}
 }
 
 PDDLExpression op_metric_f_exp() :
 {
-	PDDLExpression node = null;
+	PDDLExpression exp;
 }
 {
-	(	LOOKAHEAD(2) node=add_op_metric_f_exp()
-	|	LOOKAHEAD(2) node=substract_op_metric_f_exp()
-	| 	LOOKAHEAD(2) node=multi_op_metric_f_exp()
-	| 	LOOKAHEAD(2) node=div_op_metric_f_exp()
+	(	LOOKAHEAD(2) exp=add_op_metric_f_exp()
+	|	LOOKAHEAD(2) exp=substract_op_metric_f_exp()
+	| 	LOOKAHEAD(2) exp=multi_op_metric_f_exp()
+	| 	LOOKAHEAD(2) exp=div_op_metric_f_exp()
 	) {
-		return node;
+		return exp;
 	}
 }
 
 PDDLExpression add_op_metric_f_exp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.PLUS);
-	PDDLExpression op = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.PLUS);
+	PDDLExpression op;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<ADD>
-		op=metric_f_exp() { node.addChild(op); }
+		op=metric_f_exp() { exp.addChild(op); }
 		(LOOKAHEAD(2) op=metric_f_exp() {
-			node.addChild(op);
+			exp.addChild(op);
 		})+
-	right_bracket() {
-		return node;
+	end=right_bracket() {
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression substract_op_metric_f_exp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MINUS);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINUS);
+	PDDLExpression op1, op2 = null;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<SUB>
 		op1=metric_f_exp()
 		[op2=metric_f_exp()]
-	right_bracket() {
-		node.addChild(op1);
-		if (op2 != null) node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		if (op2 != null) exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 PDDLExpression div_op_metric_f_exp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.DIV);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression op1, op2;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<DIV>
 		op1=metric_f_exp()
 		op2=metric_f_exp()
-	right_bracket() {
-		node.addChild(op1);
-		node.addChild(op2);
-		return node;
+	end=right_bracket() {
+		exp.addChild(op1);
+		exp.addChild(op2);
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }
 
 
 PDDLExpression multi_op_metric_f_exp() :
 {
-	PDDLExpression node = new PDDLExpression(PDDLConnective.MUL);
-	PDDLExpression op = null;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression op;
+	Token begin, end;
 }
 {
-	left_bracket()
+	begin=left_bracket()
 		<MUL>
-		op=metric_f_exp() { node.addChild(op); }
+		op=metric_f_exp() { exp.addChild(op); }
 		(LOOKAHEAD(2) op=metric_f_exp() {
-			node.addChild(op);
+			exp.addChild(op);
 		})+
-	right_bracket() {
-		return node;
+	end=right_bracket() {
+		exp.setBegin(begin);
+		exp.setEnd(end);
+		return exp;
 	}
 }

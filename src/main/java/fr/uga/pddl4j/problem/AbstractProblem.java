@@ -943,10 +943,12 @@ public abstract class AbstractProblem implements Problem {
         }
         // Encode the preconditions of the operator
         final IntExpression preconditions = this.initExpression(action.getPreconditions(), variables);
+        preconditions.moveNegationInward();
         intAction.setPreconditions(preconditions);
         // Encode the effects of the operator
         final IntExpression effects = this.initExpression(action.getEffects(), variables);
         intAction.setEffects(effects);
+        effects.moveNegationInward();
         return intAction;
     }
 

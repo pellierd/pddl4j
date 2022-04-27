@@ -21,7 +21,6 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Token;
 
-import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +33,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLSymbol implements Serializable {
+public class PDDLSymbol extends AbstractParserObject {
 
     /**
      * The name of rename variable.
@@ -123,26 +122,6 @@ public class PDDLSymbol implements Serializable {
     private String image;
 
     /**
-     * The begin line of the symbol.
-     */
-    private int beginLine;
-
-    /**
-     * The begin column of the symbol.
-     */
-    private int beginColumn;
-
-    /**
-     * The end line of the symbol.
-     */
-    private int endLine;
-
-    /**
-     * The end column of the symbol.
-     */
-    private int endColumn;
-
-    /**
      * The time specifier of the symbol.
      */
     private PDDLTimeSpecifier timeSpecifier;
@@ -153,12 +132,9 @@ public class PDDLSymbol implements Serializable {
      * @param symbol the symbol.
      */
     public PDDLSymbol(final PDDLSymbol symbol) {
+        super(symbol);
         this.kind = symbol.getKind();
         this.image = symbol.getImage();
-        this.beginLine = symbol.getBeginLine();
-        this.beginColumn = symbol.getBeginColumn();
-        this.endLine = symbol.getEndLine();
-        this.endColumn = symbol.getEndColumn();
         this.timeSpecifier = symbol.getTimeSpecifier();
     }
 
@@ -169,12 +145,9 @@ public class PDDLSymbol implements Serializable {
      * @param token the token.
      */
     public PDDLSymbol(final Kind kind, final Token token) {
+        super(token.beginLine, token.beginColumn, token.endLine, token.endColumn);
         this.kind = kind;
         this.image = token.image.toLowerCase(Locale.ENGLISH);
-        this.beginLine = token.beginLine;
-        this.beginColumn = token.beginColumn;
-        this.endLine = token.endLine;
-        this.endColumn = token.endColumn;
         this.timeSpecifier = null;
     }
 
@@ -190,24 +163,22 @@ public class PDDLSymbol implements Serializable {
      */
     public PDDLSymbol(final Kind kind, final String image, final int beginLine, final int beginColumn,
                       final int endLine, final int endColumn) {
+        super(beginLine, beginColumn, endLine, endColumn);
         this.kind = kind;
         this.image = image.toLowerCase(Locale.ENGLISH);
-        this.beginLine = beginLine;
-        this.beginColumn = beginColumn;
-        this.endLine = endLine;
-        this.endColumn = endColumn;
         this.timeSpecifier = null;
     }
 
     /**
-     * Creates a new symbol with a specified image. The line and the column are initialize to
+     * Creates a new symbol with a specified image. The line and the column are initialized to
      * <code>-1</code>.
      *
      * @param kind  the kind of the symbol.
      * @param image the string image of the symbol.
      */
     public PDDLSymbol(final Kind kind, final String image) {
-        this(kind, image, -1, -1, -1, -1);
+        this(kind, image, ParserObject.DEFAULT_BEGIN_LINE, ParserObject.DEFAULT_BEGING_COLUMN,
+            ParserObject.DEFAULT_END_LINE,  ParserObject.DEFAULT_END_COLUMN);
     }
 
     /**
@@ -244,50 +215,6 @@ public class PDDLSymbol implements Serializable {
      */
     public final void setImage(String image) {
         this.image = image;
-    }
-
-    /**
-     * Return the begin line of the file where this symbol appear. The return value <code>-1</code>
-     * indicates that the attribute was not initialized.
-     *
-     * @return the begin line of the file where this symbol appear or <code>-1</code> if it was
-     *          not initialized.
-     */
-    public final int getBeginLine() {
-        return this.beginLine;
-    }
-
-    /**
-     * Return the begin column of the file where this symbol appear. The return value <code>-1</code>
-     * indicates that the attribute was not initialized.
-     *
-     * @return the begin column of the file where this symbol appear or <code>-1</code> if it was
-     *          not initialized.
-     */
-    public final int getBeginColumn() {
-        return this.beginColumn;
-    }
-
-    /**
-     * Return the end line of the file where this symbol appear. The return value <code>-1</code>
-     * indicates that the attribute was not initialized.
-     *
-     * @return the end line of the file where this symbol appear or <code>-1</code> if it was
-     *          not initialized.
-     */
-    public final int getEndLine() {
-        return this.endLine;
-    }
-
-    /**
-     * Return the end column of the file where this symbol appear. The return value <code>-1</code>
-     * indicates that the attribute was not initialized.
-     *
-     * @return the end column of the file where this symbol appear or <code>-1</code> if it was
-     *          not initialized.
-     */
-    public final int getEndColumn() {
-        return this.endColumn;
     }
 
     /**

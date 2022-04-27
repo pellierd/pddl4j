@@ -19,6 +19,9 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.parser.lexer.Token;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +44,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLExpression implements Serializable {
+public class PDDLExpression extends AbstractParserObject {
 
     /**
      * The type of the node.
@@ -98,6 +101,7 @@ public class PDDLExpression implements Serializable {
      * @throws NullPointerException if other is null.
      */
     public PDDLExpression(final PDDLExpression other) {
+        super(other);
         if (other == null) {
             throw new NullPointerException("other == null");
         }
@@ -128,7 +132,7 @@ public class PDDLExpression implements Serializable {
     }
 
     /**
-     * Creates a new PDDL expression.
+     * Creates a new empty AND expression.
      */
     private PDDLExpression() {
         super();
@@ -154,7 +158,7 @@ public class PDDLExpression implements Serializable {
     }
 
     /**
-     * Attach a new son to this node.
+     * Attach a new child to this node.
      *
      * @param exp the son to add
      * @return <code>true</code> if the node was added; <code>false</code> otherwise
@@ -354,6 +358,26 @@ public class PDDLExpression implements Serializable {
     }
 
     /**
+     * Sets the begin line and column of the expression from a specified token.
+     *
+     * @param begin the first token of the expression.
+     */
+    public void setBegin(final Token begin) {
+        this.setBeginLine(begin.beginLine);
+        this.setBeginColumn(begin.beginColumn);
+    }
+
+    /**
+     * Sets the end line and column of the expression from a specified token.
+     *
+     * @param end the last token of the expression.
+     */
+    public void setEnd(final Token end) {
+        this.setEndLine(end.endLine);
+        this.setEndColumn(end.endColumn);
+    }
+
+    /**
      * Renames the ID of the task contained in the expression with a specified symbol, i.e., the tag tasks
      * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are alowed as
      * tasks expression for the moment in method description.
@@ -437,6 +461,38 @@ public class PDDLExpression implements Serializable {
                 break;
             case AND:
             case OR:
+            case NOT:
+            case F_EXP_T:
+            case EQUAL:
+            case FN_ATOM:
+            case WHEN:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case MUL:
+            case DIV:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case ALWAYS:
+            case SOMETIME:
+            case AT_MOST_ONCE:
+            case HOLD_AFTER:
+            case WITHIN:
+            case ALWAYS_WITHIN:
+            case F_EXP:
+            case HOLD_DURING:
                 for (int i = 0; i < this.getChildren().size(); i++) {
                     this.getChildren().get(i).renameVariables(context);
                 }
@@ -451,104 +507,63 @@ public class PDDLExpression implements Serializable {
                 }
                 this.getChildren().get(0).renameVariables(newContext);
                 break;
-            case F_EXP_T:
-                if (!this.getChildren().isEmpty()) {
-                    this.getChildren().get(0).renameVariables(context);
-                }
-                break;
-            case EQUAL:
-            case FN_ATOM:
-            case WHEN:
-            case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case MUL:
-            case DIV:
-            case MINUS:
-            case PLUS:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-                this.getChildren().get(0).renameVariables(context);
-                this.getChildren().get(1).renameVariables(context);
-                break;
-            case AT_START:
-            case AT_END:
-            case MINIMIZE:
-            case MAXIMIZE:
-            case UMINUS:
-            case NOT:
-            case ALWAYS:
-            case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case F_EXP:
-                this.getChildren().get(0).renameVariables(context);
-                break;
-            case HOLD_AFTER:
-            case WITHIN:
-                this.getChildren().get(1).renameVariables(context);
-                break;
-            case ALWAYS_WITHIN:
-                this.getChildren().get(1).renameVariables(context);
-                this.getChildren().get(2).renameVariables(context);
-                break;
-            case HOLD_DURING:
-                this.getChildren().get(2).renameVariables(context);
-                break;
             case IS_VIOLATED:
             case NUMBER:
             case TIME_VAR:
-            default:
+            case DURATION_ATOM:
                 // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 
     /**
-     * Moves the negation inward the expression.
+     * Sets the expression into negative normal form.
      *
      * @throws MalformedExpressionException if this expression is malformed.
      */
-    public void moveNegationInward() throws MalformedExpressionException {
+    //public void toNNF() throws MalformedExpressionException {
+    //    this.simplify();
+    //    this.toNNF();
+
+    //}
+    /**
+     * Sets the expression into negative normal form.
+     *
+     * @throws MalformedExpressionException if this expression is malformed.
+     */
+    public void toNNF() throws MalformedExpressionException {
         if (this.isMalformedExpression()) {
-            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
+            throw new MalformedExpressionException(this.toString());
         }
         switch (this.connective) {
+            case NOT:
+                this.moveNegationInward();
+                break;
             case AND:
             case OR:
-                this.children.forEach(PDDLExpression::moveNegationInward);
-                break;
             case FORALL:
             case EXISTS:
-            case AT_START:
-            case AT_END:
-            case OVER_ALL:
             case ALWAYS:
             case SOMETIME:
             case AT_MOST_ONCE:
-                this.getChildren().get(0).moveNegationInward();
-                break;
             case WHEN:
             case SOMETIME_AFTER:
             case SOMETIME_BEFORE:
             case HOLD_AFTER:
             case WITHIN:
-                this.getChildren().get(0).moveNegationInward();
-                this.getChildren().get(1).moveNegationInward();
-                break;
-            case NOT:
-                this.negate();
-                break;
             case ALWAYS_WITHIN:
-                this.getChildren().get(1).moveNegationInward();
-                this.getChildren().get(2).moveNegationInward();
-                break;
             case HOLD_DURING:
-                this.getChildren().get(2).moveNegationInward();
+                //this.getChildren().forEach(PDDLExpression::toNNF);
+                for (PDDLExpression c : this.getChildren()) {
+                    c.toNNF();
+                }
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.moveTimeSpecifierInward();
                 break;
             case ATOM:
             case FN_HEAD:
@@ -580,69 +595,262 @@ public class PDDLExpression implements Serializable {
                 // Do nothing
                 break;
             default:
-                // Do nothing
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 
     /**
-     * Negates the expression.
+     * Moves the negation inward the expression.
      *
-     * @throws MalformedExpressionException if the expression is malformed.
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
-    private void negate() throws MalformedExpressionException {
-        if (this.isMalformedExpression()) {
-            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
-        }
-        PDDLExpression exp = this.getChildren().get(0);
-        switch (exp.getConnective()) {
+    private void moveNegationInward() {
+        assert this.getConnective().equals(PDDLConnective.NOT);
+
+        final PDDLExpression child = this.getChildren().get(0);
+        switch (child.getConnective()) {
             case FORALL:
                 this.setConnective(PDDLConnective.EXISTS);
                 PDDLExpression negation = new PDDLExpression(PDDLConnective.NOT);
-                negation.addChild(exp.getChildren().get(0));
-                negation.moveNegationInward();
+                negation.addChild(child.getChildren().get(0));
+                negation.toNNF();
                 this.children.set(0, negation);
                 break;
             case EXISTS:
                 this.setConnective(PDDLConnective.FORALL);
-                this.setVariables(exp.getVariables());
+                this.setVariables(child.getVariables());
                 negation = new PDDLExpression(PDDLConnective.NOT);
-                negation.addChild(exp.getChildren().get(0));
-                negation.moveNegationInward();
+                negation.addChild(child.getChildren().get(0));
+                negation.toNNF();
                 this.children.set(0, negation);
                 break;
             case AND:
                 this.setConnective(PDDLConnective.OR);
                 this.children.clear();
-                for (int i = 0; i < exp.getChildren().size(); i++) {
+                for (int i = 0; i < child.getChildren().size(); i++) {
                     negation = new PDDLExpression(PDDLConnective.NOT);
-                    negation.addChild(exp.getChildren().get(i));
-                    negation.moveNegationInward();
+                    negation.addChild(child.getChildren().get(i));
+                    negation.toNNF();
                     this.children.add(negation);
                 }
                 break;
             case OR:
                 this.setConnective(PDDLConnective.AND);
                 this.children.clear();
-                for (int i = 0; i < exp.getChildren().size(); i++) {
+                for (int i = 0; i < child.getChildren().size(); i++) {
                     negation = new PDDLExpression(PDDLConnective.NOT);
-                    negation.addChild(exp.children.get(i));
-                    negation.moveNegationInward();
+                    negation.addChild(child.children.get(i));
+                    negation.toNNF();
                     this.children.add(negation);
                 }
                 break;
             case NOT:
-                final PDDLExpression neg = exp.getChildren().get(0);
-                this.atom = neg.getAtom();
-                this.children = neg.getChildren();
-                this.connective = neg.getConnective();
-                this.prefName = neg.getPrefName();
-                this.value = neg.getValue();
-                this.variable = neg.getVariable();
-                this.variables = neg.getVariables();
-                this.moveNegationInward();
+                this.affect(child.getChildren().get(0));
+                this.toNNF();
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.setConnective(child.getConnective());
+                child.setConnective(PDDLConnective.NOT);
+                break;
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case ATOM:
+            case EQUAL_ATOM:
+                // Do nothing
                 break;
             default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+    /**
+     * Simplify the expression. This method removes the double negation and removes the extra inner conjunctions and
+     * disjunctions.
+     *
+     * @return <code>true</code> if the expression was simplified; <code>false</code> otherwise.
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     */
+    private void simplify() {
+        switch (this.getConnective()) {
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                PDDLExpression child = this.getChildren().get(0);
+                child.simplify();
+                if (child.getConnective().equals(PDDLConnective.TRUE)
+                    || child.getConnective().equals(PDDLConnective.FALSE)) {
+                    this.setConnective(child.getConnective());
+                }
+                break;
+            case AND:
+                if (this.getChildren().isEmpty()) {
+                    this.setConnective(PDDLConnective.TRUE);
+                } else if (this.getChildren().size() == 1) {
+                    this.affect(this.getChildren().get(0));
+                    this.simplify();
+                } else {
+                    int i = 0;
+                    while (i < this.getChildren().size()
+                        && !this.getConnective().equals(PDDLConnective.TRUE)
+                        && !this.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = this.getChildren().get(i);
+                        child.simplify();
+                        if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            this.setConnective(PDDLConnective.FALSE);
+                        } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            this.getChildren().remove(i);
+                        } else if (child.getConnective().equals(PDDLConnective.AND)) {
+                            this.getChildren().remove(i);
+                            this.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case OR:
+                if (this.getChildren().isEmpty()) {
+                    this.setConnective(PDDLConnective.TRUE);
+                } else if (this.getChildren().size() == 1) {
+                    this.affect(this.getChildren().get(0));
+                    this.simplify();
+                } else {
+                    int i = 0;
+                    while (i < this.getChildren().size()
+                        && !this.getConnective().equals(PDDLConnective.TRUE)
+                        && !this.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = this.getChildren().get(i);
+                        child.simplify();
+                        if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            this.setConnective(PDDLConnective.TRUE);
+                        } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            this.getChildren().remove(i);
+                        } else if (child.getConnective().equals(PDDLConnective.OR)) {
+                            this.getChildren().remove(i);
+                            this.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case NOT:
+                child = this.getChildren().get(0);
+                child.simplify();
+                if (child.getConnective().equals(PDDLConnective.NOT)) {
+                    this.affect(child.getChildren().get(0));
+                } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                    this.setConnective(PDDLConnective.FALSE);
+                } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                    this.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case WHEN:
+                PDDLExpression condition = this.getChildren().get(0);
+                condition.simplify();
+                PDDLExpression effect = this.getChildren().get(1);
+                effect.simplify();
+                if (condition.getConnective().equals(PDDLConnective.TRUE)) {
+                    this.affect(effect);
+                } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
+                    this.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case EQUAL_ATOM:
+                if (this.getAtom().get(0).equals(this.getAtom().get(1))) {
+                    this.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case ATOM:
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+    /**
+     * Make a s
+     */
+    public void affect(final PDDLExpression exp) {
+        this.atom = exp.getAtom();
+        this.children = exp.getChildren();
+        this.connective = exp.getConnective();
+        this.prefName = exp.getPrefName();
+        this.value = exp.getValue();
+        this.variable = exp.getVariable();
+        this.variables = exp.getVariables();
+        this.setBeginLine(exp.getBeginLine());
+        this.setBeginColumn(exp.getBeginColumn());
+        this.setEndLine(exp.getEndLine());
+        this.setEndColumn(exp.getEndColumn());
+    }
+
+    /**
+     * Move the time specifier inward the expression.
+     *
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     */
+    private void moveTimeSpecifierInward() {
+        assert this.getConnective().equals(PDDLConnective.AT_START)
+            || this.getConnective().equals(PDDLConnective.AT_END)
+            || this.getConnective().equals(PDDLConnective.OVER_ALL);
+
+        final PDDLExpression child = this.getChildren().get(0);
+        switch (child.getConnective()) {
+            case FORALL:
+            case EXISTS:
+                PDDLExpression timeExp = new PDDLExpression(this.getConnective());
+                timeExp.addChild(child.getChildren().get(0));
+                timeExp.moveTimeSpecifierInward();
+                this.children.set(0, timeExp);
+                this.setConnective(child.getConnective());
+                this.setVariables(child.getVariables());
+                break;
+            case AND:
+            case OR:
+                this.children.clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    timeExp = new PDDLExpression(this.getConnective());
+                    timeExp.addChild(child.getChildren().get(i));
+                    timeExp.moveTimeSpecifierInward();
+                    this.children.add(timeExp);
+                }
+                this.setConnective(child.getConnective());
+                break;
+            case NOT:
+                child.toNNF();
+                if (!child.getConnective().equals(PDDLConnective.NOT)) {
+                    this.moveTimeSpecifierInward();
+                }
+                break;
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case ATOM:
+            case EQUAL_ATOM:
                 // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 

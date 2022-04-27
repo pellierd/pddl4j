@@ -238,7 +238,7 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
      * Normalizes the operators.
      *
      * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#moveNegationInward()
+     * @see PDDLExpression#toNNF() ()
      */
     public final void normalize() {
         this.normalize(0);
@@ -250,7 +250,7 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
      * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#moveNegationInward()
+     * @see PDDLExpression#toNNF() ()
      */
     protected Map<String, String> normalize(int index) {
         int i = index;
@@ -270,7 +270,7 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
         }
         // Rename the preconditions
         this.getPreconditions().renameVariables(context);
-        this.getPreconditions().moveNegationInward();
+        this.getPreconditions().toNNF();
         return context;
     }
 

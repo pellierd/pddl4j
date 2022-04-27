@@ -220,7 +220,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#moveNegationInward()
+     * @see PDDLExpression#toNNF()
      */
     protected Map<String, String> normalize(int index) {
         // Rename the parameters
@@ -279,7 +279,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
             }
         }
         this.setPreconditions(preconditions);
-        this.getPreconditions().moveNegationInward();
+        this.getPreconditions().toNNF();
         return varCtx;
     }
 

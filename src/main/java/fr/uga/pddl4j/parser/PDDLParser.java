@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -1133,7 +1134,7 @@ public final class PDDLParser implements Callable<Integer> {
     }
 
     /**
-     * Checks if the declared actions are well formed.
+     * Checks if the declared actions are well-formed.
      * <ul>
      * <li> actions must have a unique name.</li>
      * <li> The type of the variables or constants used in their precondition, condition and effects
@@ -1142,14 +1143,16 @@ public final class PDDLParser implements Callable<Integer> {
      * parameters of the actions.</li>
      * </ul>
      *
-     * @return <code>true</code> if the function declaration are well formed; <code>false</code> otherwise.
+     * @return <code>true</code> if the function declaration are well-formed; <code>false</code> otherwise.
      */
     private boolean checkActionDeclaration() {
         boolean checked = this.checkActionsUniqueness();
         for (PDDLAction action : this.domain.getActions()) {
             if (this.checkActionParameters(action)) {
                 checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
+                this.checkExpressionSemantic(new PDDLExpression(action.getPreconditions()));
                 checked &= this.checkParserNode(action.getEffects(), action.getParameters());
+                this.checkExpressionSemantic(new PDDLExpression(action.getEffects()));
                 if (action.getDuration() != null) {
                     checked &= this.checkParserNode(action.getDuration(), action.getParameters());
                 }
@@ -1159,7 +1162,7 @@ public final class PDDLParser implements Callable<Integer> {
     }
 
     /**
-     * Checks if the declared methods are well formed.
+     * Checks if the declared methods are well-formed.
      * <ul>
      * <li> Methods must have a unique name.</li>
      * <li> The type of the variables or constants used in their precondition, task and subtasks previously declared.
@@ -1179,6 +1182,7 @@ public final class PDDLParser implements Callable<Integer> {
         for (PDDLMethod meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
+                this.checkExpressionSemantic(new PDDLExpression(meth.getPreconditions()));
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
                 PDDLSymbol taskSymbol = meth.getTask().getAtom().get(0);
                 if (actionSet.contains(taskSymbol.getImage())) {
@@ -1424,13 +1428,13 @@ public final class PDDLParser implements Callable<Integer> {
 
     /**
      * Checks if a PDDL expression such as the preconditions, the effects and the duration of an
-     * action is well formed. More precisely, check if all variables are well typed and are valid
+     * action is well-formed. More precisely, check if all variables are well typed and are valid
      * parameters of the action or quantified variable and finally, if all atoms match a predicate
      * previously declared.
      *
      * @param exp     The PDDL expression.
      * @param context The symbolEncoding.
-     * @return <code>true</code> if the expression is well formed; <code>false</code> otherwise.
+     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
     private boolean checkParserNode(PDDLExpression exp, List<PDDLTypedSymbol> context) {
         boolean checked = true;
@@ -1480,7 +1484,7 @@ public final class PDDLParser implements Callable<Integer> {
                 stackGD.add(0, gd.getChildren().get(i));
             }
         }
-        this.checkPDDLExpressionConsistency(exp);
+        //this.checkPDDLExpressionConsistency(exp);
         return checked;
     }
 
@@ -1492,7 +1496,7 @@ public final class PDDLParser implements Callable<Integer> {
      * @return <code>true</code> if the expression is consistent; <code>false</code> otherwise.
      */
     private boolean checkPDDLExpressionConsistency(final PDDLExpression exp) {
-        exp.moveNegationInward();
+        exp.toNNF();
         return this.checkPDDLExpressionConsistency(exp, new HashSet<>(), new HashSet<>());
     }
 
@@ -1885,70 +1889,6 @@ public final class PDDLParser implements Callable<Integer> {
     }
 
     /**
-     * The main method of the parser example. The command line syntax is as follow:
-     * <pre>
-     * usage of parser:
-     *
-     * OPTIONS   DESCRIPTIONS
-     *
-     * -p   path for operator and fact file
-     * -o   operator file name
-     * -f   fact file name
-     * </pre>
-     *
-     * @param args the arguments of the command line.
-     */
-    /*public static void main(String[] args) {
-
-        final StringBuilder strb = new StringBuilder();
-
-        if (args.length == 2 && "-p".equals(args[0])) {
-            strb.append("parse problem ").append("\"").append(args[1]).append("\": ");
-            PDDLParser parser = new PDDLParser();
-            try {
-                parser.parse(args[1]);
-            } catch (FileNotFoundException fnfException) {
-                LOGGER.error("parsing problem error", fnfException);
-            }
-            if (parser.mgr.isEmpty()) {
-                strb.append("ok");
-            } else {
-                strb.append(System.lineSeparator());
-                parser.mgr.printAll();
-            }
-        } else if (args.length == 4 && "-o".equals(args[0]) && "-f".equals(args[2])) {
-            strb.append("Parsed files ").append("\"").append(args[1]).append("\" and ").append("\"").append(args[3])
-                .append("\": ");
-            PDDLParser parser = new PDDLParser();
-            try {
-                parser.parse(args[1], args[3]);
-            } catch (FileNotFoundException fnfException) {
-                LOGGER.error("domain or problem missing", fnfException);
-            }
-            if (parser.mgr.isEmpty()) {
-                strb.append("ok");
-            } else {
-                strb.append("not ok");
-                parser.mgr.printAll();
-                for (Message m: parser.getErrorManager().getMessages()) {
-                    System.out.println(m);
-                }
-            }
-        } else {
-
-            strb.append("\nusage of parser:\n").append("OPTIONS   DESCRIPTIONS\n")
-                .append("-p <str>    path for operator and fact file\n")
-                .append("-o <str>    operator file name\n")
-                .append("-f <str>    fact file name\n");
-        }
-
-
-        LOGGER.trace(strb);
-    }*/
-
-
-
-    /**
      * The main method of the <code>PDDLParser</code> planner.
      *
      * @param args the arguments of the command line.
@@ -2007,4 +1947,162 @@ public final class PDDLParser implements Callable<Integer> {
         }
         return 0;
     }
+
+
+    /**
+     * Check the semantic of an PDDL expression. This method checks:
+     * <ul>
+     *     <li>double negation;</li>
+     *     <li>unnecessary inner conjunctions or disjunctions</li>
+     *     <li>equality always true</li>
+     *     <li>unnecessary precondition</li>
+     *     <li>unnecessary conditional effect</li>
+     * </ul>
+     *
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN.
+     */
+    private void checkExpressionSemantic(final PDDLExpression exp) {
+        int line = exp.getBeginLine();
+        int column = exp.getBeginColumn();
+        switch (exp.getConnective()) {
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                PDDLExpression child = exp.getChildren().get(0);
+                this.checkExpressionSemantic(child);
+                if (child.getConnective().equals(PDDLConnective.TRUE)
+                        || child.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(child.getConnective());
+                    this.mgr.logParserWarning(exp.getConnective().getImage().toUpperCase(Locale.ROOT)
+                        + " expression is always " + exp.getConnective().getImage().toUpperCase(Locale.ROOT),
+                        this.lexer.getFile(), line, column);
+                }
+                break;
+            case AND:
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("AND expression is empty", this.lexer.getFile(), line, column);
+                } else if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
+                    this.checkExpressionSemantic(exp);
+                } else {
+                    int i = 0;
+                    while (i < exp.getChildren().size()
+                        && !exp.getConnective().equals(PDDLConnective.TRUE)
+                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = exp.getChildren().get(i);
+                        int childLine = child.getBeginLine();
+                        int childColumn = child.getBeginColumn();
+                        this.checkExpressionSemantic(child);
+                        if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            exp.setConnective(PDDLConnective.FALSE);
+                            this.mgr.logParserWarning("AND expression contains a sub-expression (line "
+                                + childLine + ", column " + childColumn + ") always FALSE ",
+                                this.lexer.getFile(), line, column);
+                        } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            exp.getChildren().remove(i);
+                            this.mgr.logParserWarning("AND expression contains a sub-expression (line "
+                                + childLine + ", column " + childColumn + ") always TRUE ",
+                                this.lexer.getFile(), line, column);
+                        } else if (child.getConnective().equals(PDDLConnective.AND)) {
+                            exp.getChildren().remove(i);
+                            exp.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                            this.mgr.logParserWarning("AND expression contains an inner conjunction that "
+                                + "can be removed", this.lexer.getFile(), line, column);
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case OR:
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("OR expression is empty",  this.lexer.getFile(), line, column);
+                } else if (exp.getChildren().size() == 1) {
+                    exp.affect(exp.getChildren().get(0));
+                    this.checkExpressionSemantic(exp);
+                } else {
+                    int i = 0;
+                    while (i < exp.getChildren().size()
+                        && !exp.getConnective().equals(PDDLConnective.TRUE)
+                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = exp.getChildren().get(i);
+                        int childLine = child.getBeginLine();
+                        int childColumn = child.getBeginColumn();
+                        this.checkExpressionSemantic(child);
+                        if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            exp.setConnective(PDDLConnective.TRUE);
+                            this.mgr.logParserWarning("OR expression contains a sub-expression (line "
+                                    + childLine + ", column " + childColumn + ") always TRUE ",
+                                this.lexer.getFile(), line, column);
+                        } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            exp.getChildren().remove(i);
+                            this.mgr.logParserWarning("OR expression contains a sub-expression (line "
+                                    + childLine + ", column " + childColumn + ") always FALSE ",
+                                this.lexer.getFile(), line, column);
+                        } else if (child.getConnective().equals(PDDLConnective.OR)) {
+                            exp.getChildren().remove(i);
+                            exp.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                            this.mgr.logParserWarning("OR expression contains an inner disjunction that "
+                                + "can be removed", this.lexer.getFile(), line, column);
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case NOT:
+                child = exp.getChildren().get(0);
+                this.checkExpressionSemantic(child);
+                if (child.getConnective().equals(PDDLConnective.NOT)) {
+                    exp.affect(child.getChildren().get(0));
+                    this.mgr.logParserWarning("NOT expression contains a double negation that "
+                        + "can be removed", this.lexer.getFile(), line, column);
+                } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case WHEN:
+                PDDLExpression condition = exp.getChildren().get(0);
+                this.checkExpressionSemantic(condition);
+                PDDLExpression effect = exp.getChildren().get(1);
+                this.checkExpressionSemantic(effect);
+                if (condition.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.affect(effect);
+                    this.mgr.logParserWarning("WHEN expression with condition always TRUE. " +
+                        "Effect can be considered as unconditional", this.lexer.getFile(), line, column);
+                } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("WHEN expression with condition always FALSE. " +
+                        "The whole conditional effect can be removed", this.lexer.getFile(), line, column);
+                }
+                break;
+            case EQUAL_ATOM:
+                if (exp.getAtom().get(0).equals(exp.getAtom().get(1))) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("EQUAL expression always TRUE. " +
+                            "The expression  can be removed", this.lexer.getFile(), line, column);
+                }
+                break;
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case ATOM:
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+
 }

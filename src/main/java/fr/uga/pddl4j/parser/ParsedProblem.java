@@ -694,7 +694,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         // Rename all the variables from the constraints declaration of the domain
         if (this.getConstraints() != null) {
             this.getConstraints().renameVariables();
-            this.getConstraints().moveNegationInward();
+            this.getConstraints().toNNF();
         }
         // Rename all the variables from the derived predicates
         for (int i = 0; i < this.getDerivesPredicates().size(); i++) {
@@ -712,7 +712,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         // Rename the goal of the problem
         if (this.getGoal() != null) {
             this.getGoal().renameVariables();
-            this.getGoal().moveNegationInward();
+            this.getGoal().toNNF();
         }
         // Standardize the initial task network
         if (this.getInitialTaskNetwork() != null) {
