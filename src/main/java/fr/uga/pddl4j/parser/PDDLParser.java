@@ -21,7 +21,6 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Lexer;
 import fr.uga.pddl4j.parser.lexer.ParseException;
-import fr.uga.pddl4j.parser.lexer.TokenMgrError;
 
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.LogLevel;
@@ -138,11 +137,6 @@ public final class PDDLParser implements Callable<Integer> {
      * The specific symbol total-costs.
      */
     public static final PDDLSymbol TOTAL_TIME = new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, "total-time");
-
-    /**
-     * Message for unhandled error.
-     */
-    private static final String UNEXP_ERROR_MESSAGE = "\nunexpected error";
 
     /**
      * The error manager of the parser.
@@ -285,31 +279,31 @@ public final class PDDLParser implements Callable<Integer> {
         if (!this.getDomainFile().exists()) {
             throw new FileNotFoundException("File  \"" + this.getDomainFile().getName() + "\" does not exist.\n");
         }
-        try {
-            // Parse and check the domain
-            FileInputStream inputStream = new FileInputStream(this.getDomainFile());
-            if (this.lexer == null) {
-                this.lexer = new Lexer(inputStream);
-            } else {
-                this.lexer.ReInit(inputStream);
-            }
-            lexer.setErrorManager(this.mgr);
-            lexer.setFile(this.getDomainFile());
-            this.domain = this.lexer.domain();
-            this.checkRequirements();
-            this.checkTypesDeclaration();
-            this.checkConstantsDeclaration();
-            this.checkPredicatesDeclaration();
-            this.checkFunctionsDeclaration();
-            this.checkDomainConstraints();
-            this.checkTaskDeclaration();
-            this.checkActionDeclaration();
-            this.checkMethodDeclaration();
-            this.checkDerivedPredicateDeclaration();
-        } catch (Throwable t) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, t.getMessage());
-            return null;
+
+        // Parse and check the domain
+        FileInputStream inputStream = new FileInputStream(this.getDomainFile());
+        if (this.lexer == null) {
+            this.lexer = new Lexer(inputStream);
+        } else {
+            this.lexer.ReInit(inputStream);
         }
+        lexer.setErrorManager(this.mgr);
+        lexer.setFile(this.getDomainFile());
+        try {
+            this.domain = this.lexer.domain();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        this.checkRequirements();
+        this.checkTypesDeclaration();
+        this.checkConstantsDeclaration();
+        this.checkPredicatesDeclaration();
+        this.checkFunctionsDeclaration();
+        this.checkDomainConstraints();
+        this.checkTaskDeclaration();
+        this.checkActionDeclaration();
+        this.checkMethodDeclaration();
+        this.checkDerivedPredicateDeclaration();
         return (this.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
             && this.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()) ? this.domain : null;
     }
@@ -348,27 +342,28 @@ public final class PDDLParser implements Callable<Integer> {
         if (!this.getProblemFile().exists()) {
             throw new FileNotFoundException("File  \"" + this.getProblemFile().getName() + "\" does not exist.\n");
         }
-        try {
-            // Parse and check the problem
-            FileInputStream inputStream = new FileInputStream(this.getProblemFile());
-            if (this.lexer == null) {
-                this.lexer = new Lexer(inputStream);
-            } else {
-                this.lexer.ReInit(inputStream);
-            }
-            this.lexer.setFile(this.getProblemFile());
-            this.problem = this.lexer.problem();
-            this.checkDomainName();
-            this.checkRequirements();
-            this.checkObjectsDeclaration();
-            this.checkInitialTaskNetwork();
-            this.checkInitialFacts();
-            this.checkGoal();
-            this.checkProblemConstraints();
-            this.checkMetric();
-        } catch (Throwable t) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, t.getMessage());
+
+        // Parse and check the problem
+        FileInputStream inputStream = new FileInputStream(this.getProblemFile());
+        if (this.lexer == null) {
+            this.lexer = new Lexer(inputStream);
+        } else {
+            this.lexer.ReInit(inputStream);
         }
+        this.lexer.setFile(this.getProblemFile());
+        try {
+            this.problem = this.lexer.problem();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        this.checkDomainName();
+        this.checkRequirements();
+        this.checkObjectsDeclaration();
+        this.checkInitialTaskNetwork();
+        this.checkInitialFacts();
+        this.checkGoal();
+        this.checkProblemConstraints();
+        this.checkMetric();
         return (this.getErrorManager().getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
             && this.getErrorManager().getMessages(Message.Type.PARSER_ERROR).isEmpty()) ? this.problem : null;
     }
@@ -395,33 +390,32 @@ public final class PDDLParser implements Callable<Integer> {
         if (!domainAndProblem.exists()) {
             throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.\n");
         }
+        this.lexer = new Lexer(new FileInputStream(domainAndProblem));
+        lexer.setErrorManager(this.mgr);
+        lexer.setFile(domainAndProblem);
         try {
-            this.lexer = new Lexer(new FileInputStream(domainAndProblem));
-            lexer.setErrorManager(this.mgr);
-            lexer.setFile(domainAndProblem);
             this.lexer.domain_and_problem();
-            this.domain = this.lexer.getDomain();
-            this.problem = this.lexer.getProblem();
-            this.checkRequirements();
-            this.checkTypesDeclaration();
-            this.checkConstantsDeclaration();
-            this.checkPredicatesDeclaration();
-            this.checkFunctionsDeclaration();
-            this.checkTaskDeclaration();
-            this.checkActionDeclaration();
-            this.checkMethodDeclaration();
-            this.checkDerivedPredicateDeclaration();
-            this.checkDomainName();
-            this.checkObjectsDeclaration();
-            this.checkInitialTaskNetwork();
-            this.checkInitialFacts();
-            this.checkGoal();
-            this.checkProblemConstraints();
-            this.checkMetric();
-        } catch (TokenMgrError | ParseException | RuntimeException exception) {
-            exception.printStackTrace();
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+        this.domain = this.lexer.getDomain();
+        this.problem = this.lexer.getProblem();
+        this.checkRequirements();
+        this.checkTypesDeclaration();
+        this.checkConstantsDeclaration();
+        this.checkPredicatesDeclaration();
+        this.checkFunctionsDeclaration();
+        this.checkTaskDeclaration();
+        this.checkActionDeclaration();
+        this.checkMethodDeclaration();
+        this.checkDerivedPredicateDeclaration();
+        this.checkDomainName();
+        this.checkObjectsDeclaration();
+        this.checkInitialTaskNetwork();
+        this.checkInitialFacts();
+        this.checkGoal();
+        this.checkProblemConstraints();
+        this.checkMetric();
         return new ParsedProblem(this.getDomain(), this.getProblem());
     }
 
@@ -431,30 +425,26 @@ public final class PDDLParser implements Callable<Integer> {
      * @param domainString  the string that contains the planning domains.
      * @param problemString the string that contains the planning problem.
      */
-    public void parseFromString(String domainString, String problemString) {
-        try {
-            // Create temp files for domain and problem
-            File domainTempFile = File.createTempFile("domain", ".pddl");
-            File problemTempFile = File.createTempFile("problem", ".pddl");
+    public void parseFromString(String domainString, String problemString) throws IOException {
+        // Create temp files for domain and problem
+        File domainTempFile = File.createTempFile("domain", ".pddl");
+        File problemTempFile = File.createTempFile("problem", ".pddl");
 
-            // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(domainTempFile), "UTF-8"))) {
-                writer.write(domainString);
-            }
-
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(problemTempFile), "UTF-8"))) {
-                writer.write(problemString);
-            }
-
-            // Parse and check the domain
-            parseDomain(domainTempFile);
-            // Parse and check the problem
-            parseProblem(problemTempFile);
-        } catch (RuntimeException | IOException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        // Fill files with string content
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+            new FileOutputStream(domainTempFile), "UTF-8"))) {
+            writer.write(domainString);
         }
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+            new FileOutputStream(problemTempFile), "UTF-8"))) {
+            writer.write(problemString);
+        }
+
+        // Parse and check the domain
+        parseDomain(domainTempFile);
+        // Parse and check the problem
+        parseProblem(problemTempFile);
     }
 
     /**
@@ -462,22 +452,18 @@ public final class PDDLParser implements Callable<Integer> {
      *
      * @param domainAndProblemString the string that contains the domain and planning problem.
      */
-    public void parseFromString(String domainAndProblemString) {
-        try {
-            // Create temp files for domain and problem
-            File domainAndProblemTempFile = File.createTempFile("domainAndProblemString", ".pddl");
+    public void parseFromString(String domainAndProblemString) throws IOException {
+        // Create temp files for domain and problem
+        File domainAndProblemTempFile = File.createTempFile("domainAndProblemString", ".pddl");
 
-            // Fill files with string content
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(domainAndProblemTempFile), "UTF-8"))) {
-                writer.write(domainAndProblemString);
-            }
-
-            // Parse and check the domain and problem
-            parse(domainAndProblemTempFile);
-        } catch (RuntimeException | IOException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
+        // Fill files with string content
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+            new FileOutputStream(domainAndProblemTempFile), "UTF-8"))) {
+            writer.write(domainAndProblemString);
         }
+
+        // Parse and check the domain and problem
+        parse(domainAndProblemTempFile);
     }
 
     /**
@@ -485,13 +471,9 @@ public final class PDDLParser implements Callable<Integer> {
      *
      * @param inputDomainAndProblem the stream that contains the domain and planning problem.
      */
-    public void parseFromStream(InputStream inputDomainAndProblem) {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(inputDomainAndProblem, "UTF-8"))) {
-            parseFromString(buffer.lines().collect(Collectors.joining("\n")));
-        } catch (RuntimeException | IOException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-        }
+    public void parseFromStream(InputStream inputDomainAndProblem) throws IOException {
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(inputDomainAndProblem, "UTF-8"));
+        parseFromString(buffer.lines().collect(Collectors.joining("\n")));
     }
 
     /**
@@ -501,15 +483,11 @@ public final class PDDLParser implements Callable<Integer> {
      * @param inputProblem the stream that contains the planning problem.
 
      */
-    public void parseFromStream(InputStream inputDomain, InputStream inputProblem) {
-        try {
-            BufferedReader bufferDomain = new BufferedReader(new InputStreamReader(inputDomain, "UTF-8"));
-            BufferedReader bufferProblem = new BufferedReader(new InputStreamReader(inputProblem, "UTF-8"));
-            parseFromString(bufferDomain.lines().collect(Collectors.joining("\n")),
-                bufferProblem.lines().collect(Collectors.joining("\n")));
-        } catch (RuntimeException | IOException exception) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, exception);
-        }
+    public void parseFromStream(InputStream inputDomain, InputStream inputProblem) throws IOException {
+        BufferedReader bufferDomain = new BufferedReader(new InputStreamReader(inputDomain, "UTF-8"));
+        BufferedReader bufferProblem = new BufferedReader(new InputStreamReader(inputProblem, "UTF-8"));
+        parseFromString(bufferDomain.lines().collect(Collectors.joining("\n")),
+            bufferProblem.lines().collect(Collectors.joining("\n")));
     }
 
     /**
@@ -559,16 +537,11 @@ public final class PDDLParser implements Callable<Integer> {
         if (!problem.exists()) {
             throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.\n");
         }
-        try {
-            // Parse and check the domain
-            PDDLDomain pddlDomain = this.parseDomain(domain);
-            // Parse and check the problem
-            PDDLProblem pddlProblem = this.parseProblem(problem);
-            return (pddlDomain != null && pddlProblem != null) ? new ParsedProblem(pddlDomain, pddlProblem) : null;
-        } catch (Throwable t) {
-            LOGGER.error(UNEXP_ERROR_MESSAGE, t);
-        }
-        return null;
+        // Parse and check the domain
+        PDDLDomain pddlDomain = this.parseDomain(domain);
+        // Parse and check the problem
+        PDDLProblem pddlProblem = this.parseProblem(problem);
+        return (pddlDomain != null && pddlProblem != null) ? new ParsedProblem(pddlDomain, pddlProblem) : null;
     }
 
     /**
@@ -1484,77 +1457,8 @@ public final class PDDLParser implements Callable<Integer> {
                 stackGD.add(0, gd.getChildren().get(i));
             }
         }
-        //this.checkPDDLExpressionConsistency(exp);
         return checked;
     }
-
-    /**
-     * Checks if a PDDL expression is consistent or not, i.e., contains the atomic formula and it negatation.
-     * This method only produces warnings.
-     *
-     * @param exp  The PDDL expression.
-     * @return <code>true</code> if the expression is consistent; <code>false</code> otherwise.
-     */
-    private boolean checkPDDLExpressionConsistency(final PDDLExpression exp) {
-        exp.toNNF();
-        return this.checkPDDLExpressionConsistency(exp, new HashSet<>(), new HashSet<>());
-    }
-
-    /**
-     * Checks if a PDDL expression is consistent or not, i.e., contains the atomic formula and it negatation.
-     *
-     * @param exp     The PDDL expression.
-     * @param positive the set of positive atoms previously encoutered.
-     * @param negative the set of negative atoms previously encoutered.
-     * @return <code>true</code> if the expression is consistent; <code>false</code> otherwise.
-     */
-    private boolean checkPDDLExpressionConsistency(final PDDLExpression exp, Set<PDDLExpression> positive,
-                                                   Set<PDDLExpression> negative) {
-        boolean checked = true;
-        switch (exp.getConnective()) {
-            case ATOM:
-                PDDLSymbol predicate = exp.getAtom().get(0);
-                if (!positive.add(exp)) {
-                    this.mgr.logParserWarning("atomic formula " + exp
-                        + " is used twice in the same expression",
-                        this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
-                    checked = false;
-                }
-                if (negative.contains(exp)) {
-                    this.mgr.logParserWarning("atomic formula " + exp
-                        + " and its negation is used in the same expression",
-                        this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
-                    checked = false;
-                }
-                break;
-            case NOT:
-                if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.ATOM)) {
-                    final PDDLExpression notExp = exp.getChildren().get(0);
-                    predicate = notExp.getAtom().get(0);
-                    if (!negative.add(notExp)) {
-                        this.mgr.logParserWarning("atomic formula " + notExp
-                                + " is used twice in the same expression",
-                                this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
-                        checked = false;
-                    }
-                    if (positive.contains(notExp)) {
-                        this.mgr.logParserWarning("atomic formula " + notExp
-                                + "  and its negation is used in the same expression",
-                                this.lexer.getFile(), predicate.getBeginLine(), predicate.getBeginColumn());
-                        checked = false;
-                    }
-                } else {
-                    checked = this.checkPDDLExpressionConsistency(exp.getChildren().get(0), positive, negative);
-                }
-                break;
-            default:
-                for (int i = 0; i < exp.getChildren().size(); i++) {
-                    checked &= this.checkPDDLExpressionConsistency(exp.getChildren().get(i), positive, negative);
-                }
-        }
-        return checked;
-    }
-
 
     /**
      * Check if an atom used is well typed and if it was previously declared in the predicates of
@@ -1899,7 +1803,7 @@ public final class PDDLParser implements Callable<Integer> {
             CommandLine cmd = new CommandLine(parser);
             int exitCode = (int) cmd.execute(args);
             System.exit(exitCode);
-        } catch (IllegalArgumentException e) {
+        } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());
         }
     }
@@ -1965,6 +1869,10 @@ public final class PDDLParser implements Callable<Integer> {
     private void checkExpressionSemantic(final PDDLExpression exp) {
         int line = exp.getBeginLine();
         int column = exp.getBeginColumn();
+
+        // Expression can be evaluated
+        if (line == ParserObject.DEFAULT_BEGIN_LINE && column == ParserObject.DEFAULT_BEGING_COLUMN) return;
+
         switch (exp.getConnective()) {
             case FORALL:
             case EXISTS:
@@ -1977,14 +1885,16 @@ public final class PDDLParser implements Callable<Integer> {
                         || child.getConnective().equals(PDDLConnective.FALSE)) {
                     exp.setConnective(child.getConnective());
                     this.mgr.logParserWarning(exp.getConnective().getImage().toUpperCase(Locale.ROOT)
-                        + " expression is always " + exp.getConnective().getImage().toUpperCase(Locale.ROOT),
+                        + " expression is always " + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + ".",
                         this.lexer.getFile(), line, column);
                 }
                 break;
             case AND:
+                this.checkDuplicateChild(exp);
+                this.checkTautology(exp);
                 if (exp.getChildren().isEmpty()) {
                     exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("AND expression is empty", this.lexer.getFile(), line, column);
+                    this.mgr.logParserWarning("AND expression is empty.", this.lexer.getFile(), line, column);
                 } else if (exp.getChildren().size() == 1) {
                     exp.affect(exp.getChildren().get(0));
                     this.checkExpressionSemantic(exp);
@@ -2000,19 +1910,19 @@ public final class PDDLParser implements Callable<Integer> {
                         if (child.getConnective().equals(PDDLConnective.FALSE)) {
                             exp.setConnective(PDDLConnective.FALSE);
                             this.mgr.logParserWarning("AND expression contains a sub-expression (line "
-                                + childLine + ", column " + childColumn + ") always FALSE ",
+                                + childLine + ", column " + childColumn + ") always FALSE.",
                                 this.lexer.getFile(), line, column);
                         } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
                             exp.getChildren().remove(i);
                             this.mgr.logParserWarning("AND expression contains a sub-expression (line "
-                                + childLine + ", column " + childColumn + ") always TRUE ",
+                                + childLine + ", column " + childColumn + ") always TRUE.",
                                 this.lexer.getFile(), line, column);
                         } else if (child.getConnective().equals(PDDLConnective.AND)) {
                             exp.getChildren().remove(i);
                             exp.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
                             this.mgr.logParserWarning("AND expression contains an inner conjunction that "
-                                + "can be removed", this.lexer.getFile(), line, column);
+                                + "can be removed.", this.lexer.getFile(), line, column);
                         } else {
                             i++;
                         }
@@ -2020,9 +1930,11 @@ public final class PDDLParser implements Callable<Integer> {
                 }
                 break;
             case OR:
+                this.checkDuplicateChild(exp);
+                this.checkTautology(exp);
                 if (exp.getChildren().isEmpty()) {
                     exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("OR expression is empty",  this.lexer.getFile(), line, column);
+                    this.mgr.logParserWarning("OR expression is empty.",  this.lexer.getFile(), line, column);
                 } else if (exp.getChildren().size() == 1) {
                     exp.affect(exp.getChildren().get(0));
                     this.checkExpressionSemantic(exp);
@@ -2038,19 +1950,19 @@ public final class PDDLParser implements Callable<Integer> {
                         if (child.getConnective().equals(PDDLConnective.TRUE)) {
                             exp.setConnective(PDDLConnective.TRUE);
                             this.mgr.logParserWarning("OR expression contains a sub-expression (line "
-                                    + childLine + ", column " + childColumn + ") always TRUE ",
+                                    + childLine + ", column " + childColumn + ") always TRUE.",
                                 this.lexer.getFile(), line, column);
                         } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
                             exp.getChildren().remove(i);
                             this.mgr.logParserWarning("OR expression contains a sub-expression (line "
-                                    + childLine + ", column " + childColumn + ") always FALSE ",
+                                    + childLine + ", column " + childColumn + ") always FALSE. ",
                                 this.lexer.getFile(), line, column);
                         } else if (child.getConnective().equals(PDDLConnective.OR)) {
                             exp.getChildren().remove(i);
                             exp.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
                             this.mgr.logParserWarning("OR expression contains an inner disjunction that "
-                                + "can be removed", this.lexer.getFile(), line, column);
+                                + "can be removed.", this.lexer.getFile(), line, column);
                         } else {
                             i++;
                         }
@@ -2063,7 +1975,7 @@ public final class PDDLParser implements Callable<Integer> {
                 if (child.getConnective().equals(PDDLConnective.NOT)) {
                     exp.affect(child.getChildren().get(0));
                     this.mgr.logParserWarning("NOT expression contains a double negation that "
-                        + "can be removed", this.lexer.getFile(), line, column);
+                        + "can be removed.", this.lexer.getFile(), line, column);
                 } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.setConnective(PDDLConnective.FALSE);
                 } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
@@ -2078,18 +1990,18 @@ public final class PDDLParser implements Callable<Integer> {
                 if (condition.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.affect(effect);
                     this.mgr.logParserWarning("WHEN expression with condition always TRUE. " +
-                        "Effect can be considered as unconditional", this.lexer.getFile(), line, column);
+                        "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
                 } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
                     exp.setConnective(PDDLConnective.TRUE);
                     this.mgr.logParserWarning("WHEN expression with condition always FALSE. " +
-                        "The whole conditional effect can be removed", this.lexer.getFile(), line, column);
+                        "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
                 }
                 break;
             case EQUAL_ATOM:
                 if (exp.getAtom().get(0).equals(exp.getAtom().get(1))) {
                     exp.setConnective(PDDLConnective.TRUE);
                     this.mgr.logParserWarning("EQUAL expression always TRUE. " +
-                            "The expression  can be removed", this.lexer.getFile(), line, column);
+                            "The expression can be removed.", this.lexer.getFile(), line, column);
                 }
                 break;
             case EQUAL:
@@ -2098,11 +2010,74 @@ public final class PDDLParser implements Callable<Integer> {
             case LESS:
             case LESS_OR_EQUAL:
             case ATOM:
+            case TRUE:
+            case FALSE:
                 break;
             default:
-                throw new UnexpectedExpressionException(this.toString());
+                System.out.println(exp.toString());
+                System.out.println(exp.getConnective());
+                throw new UnexpectedExpressionException(exp.toString());
         }
     }
 
+    /**
+     * Check and removed duplicated child in conjunction and disjunction expressions. The expression in parameter is
+     * modified. If a duplicated subexpression is found, the duplicated expression is removed.
+     *
+     * @param exp the expression to test.
+     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
+     */
+    private boolean checkDuplicateChild(PDDLExpression exp) {
+        assert exp.getConnective().equals(PDDLConnective.AND)
+            || exp.getConnective().equals(PDDLConnective.OR);
+        boolean check = true;
+        for (int i = 0; i < exp.getChildren().size(); i++) {
+            final PDDLExpression ei = exp.getChildren().get(i);
+            for (int j = i + 1; j < exp.getChildren().size(); j++) {
+                final PDDLExpression ej = exp.getChildren().get(j);
+                if (ei.equals(ej)) {
+                    exp.getChildren().remove(j);
+                    j--;
+                    this.mgr.logParserWarning("Duplicated " + ei.getConnective() + " sub-expression in "
+                        + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. " +
+                        "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
+                        ej.getBeginColumn());
+                    check = false;
+                }
+            }
+        }
+        return check;
+    }
 
+    /**
+     * Check and remove tautologies of the form (a and not a) in conjunctive and disjunctive expressions. The expression
+     * in parameter is modified. If a tautology is detected, the subexpression of the tautology are removed and replaced
+     * by a TRUE expression.
+     *
+     * @param exp the expression to test.
+     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
+     */
+    private boolean checkTautology(PDDLExpression exp) {
+        assert exp.getConnective().equals(PDDLConnective.AND)
+            || exp.getConnective().equals(PDDLConnective.OR);
+        boolean check = true;
+        for (int i = 0; i < exp.getChildren().size(); i++) {
+            PDDLExpression ei = exp.getChildren().get(i);
+            PDDLExpression neg = new PDDLExpression(PDDLConnective.NOT);
+            neg.addChild(ei);
+            for (int j = i + 1; j < exp.getChildren().size(); j++) {
+                PDDLExpression ej = exp.getChildren().get(j);
+                if (ej.equals(neg)) {
+                    ei.setConnective(PDDLConnective.TRUE);
+                    exp.getChildren().remove(j);
+                    j--;
+                    this.mgr.logParserWarning("Tautology detected between sub-expressions in "
+                        + exp.getConnective() + " expression.",
+                        this.lexer.getFile(), exp.getBeginLine(), exp.getBeginColumn());
+                    check = false;
+                }
+            }
+        }
+        return check;
+    }
 }

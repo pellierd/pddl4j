@@ -66,8 +66,8 @@ public class PDDLParserExample {
                 System.out.println(parsedProblem.toString());
             }
             // This exception could happen if the domain or the problem does not exist
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 }
