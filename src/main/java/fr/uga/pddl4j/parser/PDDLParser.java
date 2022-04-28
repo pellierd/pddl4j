@@ -2014,8 +2014,6 @@ public final class PDDLParser implements Callable<Integer> {
             case FALSE:
                 break;
             default:
-                System.out.println(exp.toString());
-                System.out.println(exp.getConnective());
                 throw new UnexpectedExpressionException(exp.toString());
         }
     }
