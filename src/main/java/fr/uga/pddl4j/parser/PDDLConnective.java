@@ -48,6 +48,10 @@ public enum PDDLConnective {
      */
     OR("or"),
     /**
+     * The connective for the imply expressions.
+     */
+    IMPLY("imply"),
+    /**
      * The connective for the universal expressions.
      */
     FORALL("forall"),

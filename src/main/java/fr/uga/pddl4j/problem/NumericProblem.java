@@ -50,7 +50,7 @@ public class NumericProblem extends AbstractNumericProblem {
     @Override
     protected void initialization() {
         // Standardize the variables symbol contained in the domain
-        this.getParsedProblem().standardize();
+        this.getParsedProblem().normalize();
         // Initialize the requirements of the problem
         this.initRequirements();
         // Collect the information on the type declared in the domain

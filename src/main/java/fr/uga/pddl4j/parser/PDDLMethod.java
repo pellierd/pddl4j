@@ -216,10 +216,14 @@ public class PDDLMethod extends PDDLAbstractOperator {
     }
 
     /**
-     * Normalizes the method.
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, and its
+     * durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence. More over the
+     * method rename the task ID.
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF()
      */
     protected Map<String, String> normalize(int index) {
@@ -279,6 +283,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
             }
         }
         this.setPreconditions(preconditions);
+        this.getPreconditions().simplify();
         this.getPreconditions().toNNF();
         return varCtx;
     }

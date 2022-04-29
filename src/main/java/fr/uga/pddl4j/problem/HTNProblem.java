@@ -53,7 +53,7 @@ public class HTNProblem extends AbstractHTNProblem {
     @Override
     protected void initialization() {
         // Standardize the variables symbol contained in the domain
-        this.getParsedProblem().standardize();
+        this.getParsedProblem().normalize();
 
         // Collect the information on the type declared in the domain
         this.initTypes();

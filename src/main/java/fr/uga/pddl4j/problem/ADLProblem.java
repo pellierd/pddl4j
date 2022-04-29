@@ -20,7 +20,6 @@ import fr.uga.pddl4j.parser.ParsedProblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,7 +75,7 @@ public class ADLProblem extends FinalizedProblem {
     protected void initialization() {
 
         // Standardize the variables symbol contained in the domain
-        this.getParsedProblem().standardize();
+        this.getParsedProblem().normalize();
 
         // Collect the requirements of the problem.
         this.initRequirements();

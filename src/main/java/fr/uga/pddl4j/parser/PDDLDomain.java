@@ -20,10 +20,6 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -251,7 +247,7 @@ public interface PDDLDomain extends Serializable {
      * @see PDDLAction#normalize()
      * @see PDDLDerivedPredicate#normalize()
      */
-    void standardize();
+    void normalize();
 
     /**
      * Returns a string representation of this domain.

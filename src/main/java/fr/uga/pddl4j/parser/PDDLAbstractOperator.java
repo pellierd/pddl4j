@@ -233,11 +233,13 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
         return this.getDuration() != null;
     }
 
-
     /**
-     * Normalizes the operators.
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
      * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF() ()
      */
     public final void normalize() {
@@ -245,11 +247,14 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
     }
 
     /**
-     * Normalizes the operators.
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
      * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF() ()
      */
     protected Map<String, String> normalize(int index) {
@@ -262,14 +267,9 @@ public abstract class PDDLAbstractOperator implements PDDLOperator {
             context.put(image, params.getImage());
             i++;
         }
-        // A hack to remove single atom in precondition
-        if (this.preconditions.isLiteral()) {
-            PDDLExpression atom = this.preconditions;
-            this.preconditions = new PDDLExpression(PDDLConnective.AND);
-            this.preconditions.addChild(atom);
-        }
         // Rename the preconditions
         this.getPreconditions().renameVariables(context);
+        this.getPreconditions().simplify();
         this.getPreconditions().toNNF();
         return context;
     }

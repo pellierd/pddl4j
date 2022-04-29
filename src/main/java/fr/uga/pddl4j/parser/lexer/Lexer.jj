@@ -1461,7 +1461,7 @@ PDDLExpression not_gd() :
 
 PDDLExpression imply_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.OR);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.IMPLY);
 	PDDLExpression p = null;
 	PDDLExpression q = null;
     Token begin = null;
@@ -1470,9 +1470,9 @@ PDDLExpression imply_gd() :
 {
 	begin=left_bracket() <IMPLY> p=gd() q=gd() end=right_bracket()
 	{
-		PDDLExpression not_p = new PDDLExpression(PDDLConnective.NOT);
-		not_p.addChild(p);
-		exp.addChild(not_p);
+/*		PDDLExpression not_p = new PDDLExpression(PDDLConnective.NOT);
+		not_p.addChild(p);*/
+		exp.addChild(p);
 		exp.addChild(q);
         exp.setBegin(begin);
         exp.setEnd(end);

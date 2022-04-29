@@ -1123,13 +1123,13 @@ public final class PDDLParser implements Callable<Integer> {
         for (PDDLAction action : this.domain.getActions()) {
             if (this.checkActionParameters(action)) {
                 checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
-                this.checkExpressionSemantic(new PDDLExpression(action.getPreconditions()));
                 checked &= this.checkParserNode(action.getEffects(), action.getParameters());
-                this.checkExpressionSemantic(new PDDLExpression(action.getEffects()));
+                final PDDLExpression effects = new PDDLExpression(action.getEffects());
                 if (action.getDuration() != null) {
                     checked &= this.checkParserNode(action.getDuration(), action.getParameters());
                 }
             }
+            this.checkActionSemantic(new PDDLAction(action));
         }
         return checked;
     }
@@ -1155,7 +1155,6 @@ public final class PDDLParser implements Callable<Integer> {
         for (PDDLMethod meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
-                this.checkExpressionSemantic(new PDDLExpression(meth.getPreconditions()));
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
                 PDDLSymbol taskSymbol = meth.getTask().getAtom().get(0);
                 if (actionSet.contains(taskSymbol.getImage())) {
@@ -1205,6 +1204,7 @@ public final class PDDLParser implements Callable<Integer> {
             } else {
                 checked = false;
             }
+            this.checkMethodSemantic(new PDDLMethod(meth));
         }
         return checked;
     }
@@ -1744,7 +1744,6 @@ public final class PDDLParser implements Callable<Integer> {
         return checked;
     }
 
-
     /**
      * Checks the uniqueness of the name of the action declared.
      *
@@ -1781,6 +1780,390 @@ public final class PDDLParser implements Callable<Integer> {
             }
         }
         return checked;
+    }
+
+    /**
+     * Check the semantic of an action. The action in parameter is modified during the method call.
+     *
+     * @param action the action to check.
+     * @return <code>true</code> if the action succeeds the test; <code>false</code> otherwise.
+     */
+    private boolean checkActionSemantic(PDDLAction action) {
+        boolean check = true;
+        int i = 0;
+        // Rename the parameters
+        final Map<String, String> context = new LinkedHashMap<>();
+        final List<PDDLTypedSymbol> parameters = action.getParameters();
+        for (final PDDLTypedSymbol params : parameters) {
+            final String image = params.renameVariables(i);
+            context.put(image, params.getImage());
+            i++;
+        }
+        // Check preconditions
+        final PDDLExpression preconditions = action.getPreconditions();
+        preconditions.renameVariables(context);
+        check &= this.checkExpressionSemantic(preconditions);
+        if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
+            this.mgr.logParserWarning("Action " + action.getName() + " is always applicable: "
+                    + "action preconditions can be simplified to TRUE.", this.lexer.getFile(),
+                action.getName().getBeginLine(), action.getName().getBeginColumn());
+            check = false;
+        } else if (preconditions.getConnective().equals(PDDLConnective.FALSE)) {
+            this.mgr.logParserWarning("Action " + action.getName() + " is never applicable: "
+                    + "action preconditions can be simplified to FALSE.", this.lexer.getFile(),
+                action.getName().getBeginLine(), action.getName().getBeginColumn());
+            check = false;
+        }
+        // Check effects
+        final PDDLExpression effects = action.getPreconditions();
+        effects.renameVariables(context);
+        check &= this.checkExpressionSemantic(effects);
+        if (effects.getConnective().equals(PDDLConnective.TRUE)) {
+            this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
+                    + "action effects can be simplified to TRUE.", this.lexer.getFile(),
+                action.getName().getBeginLine(), action.getName().getBeginColumn());
+            check = false;
+        } else if (effects.getConnective().equals(PDDLConnective.FALSE)) {
+            this.mgr.logParserWarning("Action " + action.getName() + " is produced invalid effects: "
+                    + "action effects can be simplified to FALSE.", this.lexer.getFile(),
+                action.getName().getBeginLine(), action.getName().getBeginColumn());
+            check = false;
+        }
+        return check;
+    }
+
+    /**
+     * Check the semantic of a method. The method in parameter is modified during the method call.
+     *
+     * @param method the method to check.
+     * @return <code>true</code> if the method succeeds the test; <code>false</code> otherwise.
+     */
+    private boolean checkMethodSemantic(PDDLMethod method) {
+        boolean check = true;
+        int i = 0;
+        // Rename the parameters
+        final Map<String, String> context = new LinkedHashMap<>();
+        final List<PDDLTypedSymbol> parameters = method.getParameters();
+        for (final PDDLTypedSymbol params : parameters) {
+            final String image = params.renameVariables(i);
+            context.put(image, params.getImage());
+            i++;
+        }
+        // Check the method preconditions
+        final PDDLExpression preconditions = method.getPreconditions();
+        preconditions.renameVariables(context);
+        check &= this.checkExpressionSemantic(preconditions);
+        if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
+            this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
+                    + "method preconditions can be simplified to TRUE.", this.lexer.getFile(),
+                method.getName().getBeginLine(), method.getName().getBeginColumn());
+            check = false;
+        } else if (preconditions.getConnective().equals(PDDLConnective.FALSE)) {
+            this.mgr.logParserWarning("Method " + method.getName() + " is never applicable: "
+                    + "method preconditions can be simplified to FALSE.", this.lexer.getFile(),
+                method.getName().getBeginLine(), method.getName().getBeginColumn());
+            check = false;
+        }
+        return check;
+    }
+
+    /**
+     * Check the semantic of an PDDL expression. This method checks:
+     * <ul>
+     *     <li>double negation</li>
+     *     <li>unnecessary inner conjunctions or disjunctions</li>
+     *     <li>equality always true</li>
+     *     <li>disjunction or conjunction containing a and not a </li>
+     *     <li>unnecessary conditional effect</li>
+     *     <li>duplicated expression</li>
+     * </ul>
+     *
+     * @return <code>true</code> if the expression succeeds the test; <code>false</code> otherwise.
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     * EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN,
+     * TRUE and FALSE.
+     */
+    private boolean checkExpressionSemantic(final PDDLExpression exp) {
+
+        int line = exp.getBeginLine();
+        int column = exp.getBeginColumn();
+
+        // Expression cannot be evaluated due to lexical failure
+        if (line == ParserObject.DEFAULT_BEGIN_LINE && column == ParserObject.DEFAULT_BEGING_COLUMN) {
+            return false;
+        }
+
+        boolean check = true;
+        switch (exp.getConnective()) {
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                PDDLExpression child = exp.getChildren().get(0);
+                check &= this.checkExpressionSemantic(child);
+                if (child.getConnective().equals(PDDLConnective.TRUE)
+                    || child.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(child.getConnective());
+                    this.mgr.logParserWarning(exp.getConnective() + " expression is always " + exp.getConnective()
+                            + ".", this.lexer.getFile(), line, column);
+                    check = false;
+                }
+                break;
+            case IMPLY:
+                final PDDLExpression cause = exp.getChildren().get(0);
+                final PDDLExpression consequence = exp.getChildren().get(1);
+                check &= this.checkExpressionSemantic(cause);
+                if (cause.getConnective().equals(PDDLConnective.TRUE)) {
+                    check &= this.checkExpressionSemantic(consequence);
+                    exp.assign(consequence);
+                    this.mgr.logParserWarning("IMPLY expression cause always TRUE.", this.lexer.getFile(),
+                        line, column);
+                    check = false;
+                } else if (cause.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("IMPLY expression cause always FALSE.", this.lexer.getFile(),
+                        line, column);
+                    check = false;
+                } else {
+                    check &= this.checkExpressionSemantic(consequence);
+                    if (consequence.getConnective().equals(PDDLConnective.TRUE)) {
+                        exp.setConnective(PDDLConnective.TRUE);
+                        this.mgr.logParserWarning("IMPLY expression consequence always TRUE.",
+                            this.lexer.getFile(), line, column);
+                        check = false;
+                    } else if (consequence.getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(PDDLConnective.NOT);
+                        exp.getChildren().remove(1);
+                        this.mgr.logParserWarning("IMPLY expression consequence always FALSE.",
+                            this.lexer.getFile(), line, column);
+                        check = false;
+                    }
+                }
+                break;
+            case AND:
+                check &= this.checkDuplicateChild(exp);
+                check &= this.checkTautology(exp);
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("AND expression is empty.", this.lexer.getFile(), line, column);
+                    check = false;
+                } else if (exp.getChildren().size() == 1) {
+                    exp.assign(exp.getChildren().get(0));
+                    check &= this.checkExpressionSemantic(exp);
+                } else {
+                    int i = 0;
+                    while (i < exp.getChildren().size()
+                        && !exp.getConnective().equals(PDDLConnective.TRUE)
+                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = exp.getChildren().get(i);
+                        int childLine = child.getBeginLine();
+                        int childColumn = child.getBeginColumn();
+                        check &= this.checkExpressionSemantic(child);
+                        if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            exp.setConnective(PDDLConnective.FALSE);
+                            this.mgr.logParserWarning("AND expression contains a sub-expression (line "
+                                    + childLine + ", column " + childColumn + ") always FALSE.",
+                                this.lexer.getFile(), line, column);
+                            check = false;
+                        } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            exp.getChildren().remove(i);
+                            this.mgr.logParserWarning("AND expression contains a sub-expression (line "
+                                    + childLine + ", column " + childColumn + ") always TRUE.",
+                                this.lexer.getFile(), line, column);
+                            check = false;
+                        } else if (child.getConnective().equals(PDDLConnective.AND)) {
+                            exp.getChildren().remove(i);
+                            exp.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                            this.mgr.logParserWarning("AND expression contains an inner conjunction that "
+                                + "can be removed.", this.lexer.getFile(), line, column);
+                            check = false;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case OR:
+                check &= this.checkDuplicateChild(exp);
+                check &= this.checkTautology(exp);
+                if (exp.getChildren().isEmpty()) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("OR expression is empty.",  this.lexer.getFile(), line, column);
+                    check = false;
+                } else if (exp.getChildren().size() == 1) {
+                    exp.assign(exp.getChildren().get(0));
+                    check &= this.checkExpressionSemantic(exp);
+                } else {
+                    int i = 0;
+                    while (i < exp.getChildren().size()
+                        && !exp.getConnective().equals(PDDLConnective.TRUE)
+                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = exp.getChildren().get(i);
+                        int childLine = child.getBeginLine();
+                        int childColumn = child.getBeginColumn();
+                        check &= this.checkExpressionSemantic(child);
+                        if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            exp.setConnective(PDDLConnective.TRUE);
+                            this.mgr.logParserWarning("OR expression contains a sub-expression (line "
+                                    + childLine + ", column " + childColumn + ") always TRUE.",
+                                this.lexer.getFile(), line, column);
+                            check = false;
+                        } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            exp.getChildren().remove(i);
+                            this.mgr.logParserWarning("OR expression contains a sub-expression (line "
+                                    + childLine + ", column " + childColumn + ") always FALSE. ",
+                                this.lexer.getFile(), line, column);
+                            check = false;
+                        } else if (child.getConnective().equals(PDDLConnective.OR)) {
+                            exp.getChildren().remove(i);
+                            exp.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                            this.mgr.logParserWarning("OR expression contains an inner disjunction that "
+                                + "can be removed.", this.lexer.getFile(), line, column);
+                            check = false;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case NOT:
+                child = exp.getChildren().get(0);
+                check &= this.checkExpressionSemantic(child);
+                if (child.getConnective().equals(PDDLConnective.NOT)) {
+                    exp.assign(child.getChildren().get(0));
+                    this.mgr.logParserWarning("NOT expression contains a double negation that "
+                        + "can be removed.", this.lexer.getFile(), line, column);
+                } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                }
+                break;
+            case WHEN:
+                PDDLExpression condition = exp.getChildren().get(0);
+                check &= this.checkExpressionSemantic(condition);
+                PDDLExpression effect = exp.getChildren().get(1);
+                check &= this.checkExpressionSemantic(effect);
+                if (condition.getConnective().equals(PDDLConnective.TRUE)) {
+                    exp.assign(effect);
+                    this.mgr.logParserWarning("WHEN expression with condition always TRUE. " +
+                        "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
+                    check = false;
+                } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("WHEN expression with condition always FALSE. " +
+                        "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
+                    check = false;
+                }
+                break;
+            case EQUAL_ATOM:
+                if (exp.getAtom().get(0).equals(exp.getAtom().get(1))) {
+                    exp.setConnective(PDDLConnective.TRUE);
+                    this.mgr.logParserWarning("EQUAL expression always TRUE. " +
+                        "The expression can be removed.", this.lexer.getFile(), line, column);
+                    check = false;
+                }
+                break;
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+                for (PDDLExpression c : exp.getChildren()) {
+                    check &= this.checkExpressionSemantic(c);
+                }
+                break;
+            case ALWAYS:
+            case AT_MOST_ONCE:
+                check &= this.checkExpressionSemantic(exp.getChildren().get(0));
+                break;
+            case WITHIN:
+            case HOLD_AFTER:
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
+                break;
+            case ALWAYS_WITHIN:
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(2));
+                break;
+            case HOLD_DURING:
+                check &= this.checkExpressionSemantic(exp.getChildren().get(2));
+                break;
+            case EQUAL:
+            case GREATER:
+            case GREATER_OR_EQUAL:
+            case LESS:
+            case LESS_OR_EQUAL:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.toString());
+        }
+        return check;
+    }
+
+    /**
+     * Check and removed duplicated child in conjunction and disjunction expressions. The expression in parameter is
+     * modified. If a duplicated subexpression is found, the duplicated expression is removed.
+     *
+     * @param exp the expression to test. The expression must be a conjunction of a disjunction.
+     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
+     */
+    private boolean checkDuplicateChild(PDDLExpression exp) {
+        assert exp.getConnective().equals(PDDLConnective.AND)
+            || exp.getConnective().equals(PDDLConnective.OR);
+        boolean check = true;
+        for (int i = 0; i < exp.getChildren().size(); i++) {
+            final PDDLExpression ei = exp.getChildren().get(i);
+            for (int j = i + 1; j < exp.getChildren().size(); j++) {
+                final PDDLExpression ej = exp.getChildren().get(j);
+                if (ei.equals(ej)) {
+                    exp.getChildren().remove(j);
+                    j--;
+                    this.mgr.logParserWarning("Duplicated " + ei.getConnective() + " sub-expression in "
+                            + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. " +
+                            "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
+                        ej.getBeginColumn());
+                    System.out.println("ei = " + ei.toString());
+                    System.out.println("ej = " + ej.toString());
+                    check = false;
+                }
+            }
+        }
+        return check;
+    }
+
+    /**
+     * Check and remove tautologies of the form (a and not a) in conjunctive and disjunctive expressions. The expression
+     * in parameter is modified. If a tautology is detected, the subexpression of the tautology are removed and replaced
+     * by a TRUE expression.
+     *
+     * @param exp the expression to test. The expression must be a conjunction of a disjunction.
+     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
+     */
+    private boolean checkTautology(PDDLExpression exp) {
+        assert exp.getConnective().equals(PDDLConnective.AND)
+            || exp.getConnective().equals(PDDLConnective.OR);
+        boolean check = true;
+        for (int i = 0; i < exp.getChildren().size(); i++) {
+            PDDLExpression ei = exp.getChildren().get(i);
+            PDDLExpression neg = new PDDLExpression(PDDLConnective.NOT);
+            neg.addChild(ei);
+            for (int j = i + 1; j < exp.getChildren().size(); j++) {
+                PDDLExpression ej = exp.getChildren().get(j);
+                if (ej.equals(neg)) {
+                    ei.setConnective(PDDLConnective.TRUE);
+                    exp.getChildren().remove(j);
+                    j--;
+                    this.mgr.logParserWarning("Tautology detected between sub-expressions in "
+                            + exp.getConnective() + " expression.",
+                        this.lexer.getFile(), exp.getBeginLine(), exp.getBeginColumn());
+                    check = false;
+                }
+            }
+        }
+        return check;
     }
 
     /**
@@ -1850,232 +2233,5 @@ public final class PDDLParser implements Callable<Integer> {
             return 1;
         }
         return 0;
-    }
-
-
-    /**
-     * Check the semantic of an PDDL expression. This method checks:
-     * <ul>
-     *     <li>double negation;</li>
-     *     <li>unnecessary inner conjunctions or disjunctions</li>
-     *     <li>equality always true</li>
-     *     <li>unnecessary precondition</li>
-     *     <li>unnecessary conditional effect</li>
-     * </ul>
-     *
-     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN.
-     */
-    private void checkExpressionSemantic(final PDDLExpression exp) {
-        int line = exp.getBeginLine();
-        int column = exp.getBeginColumn();
-
-        // Expression can be evaluated
-        if (line == ParserObject.DEFAULT_BEGIN_LINE && column == ParserObject.DEFAULT_BEGING_COLUMN) return;
-
-        switch (exp.getConnective()) {
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-            case OVER_ALL:
-                PDDLExpression child = exp.getChildren().get(0);
-                this.checkExpressionSemantic(child);
-                if (child.getConnective().equals(PDDLConnective.TRUE)
-                        || child.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(child.getConnective());
-                    this.mgr.logParserWarning(exp.getConnective().getImage().toUpperCase(Locale.ROOT)
-                        + " expression is always " + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + ".",
-                        this.lexer.getFile(), line, column);
-                }
-                break;
-            case AND:
-                this.checkDuplicateChild(exp);
-                this.checkTautology(exp);
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("AND expression is empty.", this.lexer.getFile(), line, column);
-                } else if (exp.getChildren().size() == 1) {
-                    exp.affect(exp.getChildren().get(0));
-                    this.checkExpressionSemantic(exp);
-                } else {
-                    int i = 0;
-                    while (i < exp.getChildren().size()
-                        && !exp.getConnective().equals(PDDLConnective.TRUE)
-                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
-                        child = exp.getChildren().get(i);
-                        int childLine = child.getBeginLine();
-                        int childColumn = child.getBeginColumn();
-                        this.checkExpressionSemantic(child);
-                        if (child.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.setConnective(PDDLConnective.FALSE);
-                            this.mgr.logParserWarning("AND expression contains a sub-expression (line "
-                                + childLine + ", column " + childColumn + ") always FALSE.",
-                                this.lexer.getFile(), line, column);
-                        } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
-                            exp.getChildren().remove(i);
-                            this.mgr.logParserWarning("AND expression contains a sub-expression (line "
-                                + childLine + ", column " + childColumn + ") always TRUE.",
-                                this.lexer.getFile(), line, column);
-                        } else if (child.getConnective().equals(PDDLConnective.AND)) {
-                            exp.getChildren().remove(i);
-                            exp.getChildren().addAll(i, child.getChildren());
-                            i += child.getChildren().size();
-                            this.mgr.logParserWarning("AND expression contains an inner conjunction that "
-                                + "can be removed.", this.lexer.getFile(), line, column);
-                        } else {
-                            i++;
-                        }
-                    }
-                }
-                break;
-            case OR:
-                this.checkDuplicateChild(exp);
-                this.checkTautology(exp);
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("OR expression is empty.",  this.lexer.getFile(), line, column);
-                } else if (exp.getChildren().size() == 1) {
-                    exp.affect(exp.getChildren().get(0));
-                    this.checkExpressionSemantic(exp);
-                } else {
-                    int i = 0;
-                    while (i < exp.getChildren().size()
-                        && !exp.getConnective().equals(PDDLConnective.TRUE)
-                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
-                        child = exp.getChildren().get(i);
-                        int childLine = child.getBeginLine();
-                        int childColumn = child.getBeginColumn();
-                        this.checkExpressionSemantic(child);
-                        if (child.getConnective().equals(PDDLConnective.TRUE)) {
-                            exp.setConnective(PDDLConnective.TRUE);
-                            this.mgr.logParserWarning("OR expression contains a sub-expression (line "
-                                    + childLine + ", column " + childColumn + ") always TRUE.",
-                                this.lexer.getFile(), line, column);
-                        } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.getChildren().remove(i);
-                            this.mgr.logParserWarning("OR expression contains a sub-expression (line "
-                                    + childLine + ", column " + childColumn + ") always FALSE. ",
-                                this.lexer.getFile(), line, column);
-                        } else if (child.getConnective().equals(PDDLConnective.OR)) {
-                            exp.getChildren().remove(i);
-                            exp.getChildren().addAll(i, child.getChildren());
-                            i += child.getChildren().size();
-                            this.mgr.logParserWarning("OR expression contains an inner disjunction that "
-                                + "can be removed.", this.lexer.getFile(), line, column);
-                        } else {
-                            i++;
-                        }
-                    }
-                }
-                break;
-            case NOT:
-                child = exp.getChildren().get(0);
-                this.checkExpressionSemantic(child);
-                if (child.getConnective().equals(PDDLConnective.NOT)) {
-                    exp.affect(child.getChildren().get(0));
-                    this.mgr.logParserWarning("NOT expression contains a double negation that "
-                        + "can be removed.", this.lexer.getFile(), line, column);
-                } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                }
-                break;
-            case WHEN:
-                PDDLExpression condition = exp.getChildren().get(0);
-                this.checkExpressionSemantic(condition);
-                PDDLExpression effect = exp.getChildren().get(1);
-                this.checkExpressionSemantic(effect);
-                if (condition.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.affect(effect);
-                    this.mgr.logParserWarning("WHEN expression with condition always TRUE. " +
-                        "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
-                } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("WHEN expression with condition always FALSE. " +
-                        "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
-                }
-                break;
-            case EQUAL_ATOM:
-                if (exp.getAtom().get(0).equals(exp.getAtom().get(1))) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("EQUAL expression always TRUE. " +
-                            "The expression can be removed.", this.lexer.getFile(), line, column);
-                }
-                break;
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case ATOM:
-            case TRUE:
-            case FALSE:
-                break;
-            default:
-                throw new UnexpectedExpressionException(exp.toString());
-        }
-    }
-
-    /**
-     * Check and removed duplicated child in conjunction and disjunction expressions. The expression in parameter is
-     * modified. If a duplicated subexpression is found, the duplicated expression is removed.
-     *
-     * @param exp the expression to test.
-     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
-     */
-    private boolean checkDuplicateChild(PDDLExpression exp) {
-        assert exp.getConnective().equals(PDDLConnective.AND)
-            || exp.getConnective().equals(PDDLConnective.OR);
-        boolean check = true;
-        for (int i = 0; i < exp.getChildren().size(); i++) {
-            final PDDLExpression ei = exp.getChildren().get(i);
-            for (int j = i + 1; j < exp.getChildren().size(); j++) {
-                final PDDLExpression ej = exp.getChildren().get(j);
-                if (ei.equals(ej)) {
-                    exp.getChildren().remove(j);
-                    j--;
-                    this.mgr.logParserWarning("Duplicated " + ei.getConnective() + " sub-expression in "
-                        + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. " +
-                        "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
-                        ej.getBeginColumn());
-                    check = false;
-                }
-            }
-        }
-        return check;
-    }
-
-    /**
-     * Check and remove tautologies of the form (a and not a) in conjunctive and disjunctive expressions. The expression
-     * in parameter is modified. If a tautology is detected, the subexpression of the tautology are removed and replaced
-     * by a TRUE expression.
-     *
-     * @param exp the expression to test.
-     * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
-     */
-    private boolean checkTautology(PDDLExpression exp) {
-        assert exp.getConnective().equals(PDDLConnective.AND)
-            || exp.getConnective().equals(PDDLConnective.OR);
-        boolean check = true;
-        for (int i = 0; i < exp.getChildren().size(); i++) {
-            PDDLExpression ei = exp.getChildren().get(i);
-            PDDLExpression neg = new PDDLExpression(PDDLConnective.NOT);
-            neg.addChild(ei);
-            for (int j = i + 1; j < exp.getChildren().size(); j++) {
-                PDDLExpression ej = exp.getChildren().get(j);
-                if (ej.equals(neg)) {
-                    ei.setConnective(PDDLConnective.TRUE);
-                    exp.getChildren().remove(j);
-                    j--;
-                    this.mgr.logParserWarning("Tautology detected between sub-expressions in "
-                        + exp.getConnective() + " expression.",
-                        this.lexer.getFile(), exp.getBeginLine(), exp.getBeginColumn());
-                    check = false;
-                }
-            }
-        }
-        return check;
     }
 }

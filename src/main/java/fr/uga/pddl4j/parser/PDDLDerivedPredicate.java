@@ -108,11 +108,12 @@ public class PDDLDerivedPredicate implements Serializable {
     }
 
     /**
-     * Normalizes the derived predicates, i.e, renames the variables contained in the derived
-     * predicate and move the negation inward.
+     * This method renames the variable of the derived predicated and simplifies its body before converting it into
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
      * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#moveNegationInward()
+     * @see PDDLExpression#simplify()
+     * @see PDDLExpression#toNNF()
      */
     public void normalize() {
         // Rename the head of the derived predicate
@@ -125,6 +126,9 @@ public class PDDLDerivedPredicate implements Serializable {
         }
         // Rename the body of the derived predicate
         this.getBody().renameVariables(context);
+        this.getBody().simplify();
+        this.getBody().toNNF();
+
     }
 
     /**

@@ -21,12 +21,11 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Token;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -493,43 +492,40 @@ public class PDDLExpression extends AbstractParserObject {
             case ALWAYS_WITHIN:
             case F_EXP:
             case HOLD_DURING:
+            case IMPLY:
                 for (int i = 0; i < this.getChildren().size(); i++) {
                     this.getChildren().get(i).renameVariables(context);
                 }
                 break;
             case FORALL:
             case EXISTS:
-                final Map<String, String> newContext = new LinkedHashMap<>(context);
                 for (int i = 0; i < this.getVariables().size(); i++) {
                     final PDDLTypedSymbol var = this.getVariables().get(i);
-                    final String image = var.renameVariables(newContext.size() + i);
-                    newContext.put(image, var.getImage());
+                    final String image = var.renameVariables(context.size() + 1);
+                    context.put(image, var.getImage());
                 }
-                this.getChildren().get(0).renameVariables(newContext);
+                this.getChildren().get(0).renameVariables(context);
                 break;
             case IS_VIOLATED:
             case NUMBER:
             case TIME_VAR:
             case DURATION_ATOM:
+            case TRUE:
+            case FALSE:
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(this.toString());
+                throw new UnexpectedExpressionException(this.getConnective().toString());
         }
     }
 
     /**
-     * Sets the expression into negative normal form.
-     *
-     * @throws MalformedExpressionException if this expression is malformed.
-     */
-    //public void toNNF() throws MalformedExpressionException {
-    //    this.simplify();
-    //    this.toNNF();
-
-    //}
-    /**
-     * Sets the expression into negative normal form.
+     * Sets the expression into negative normal form. After the method call, negation can occurs only before atomic
+     * formula and time specifier (at start, at end, overall) can only occur before literal. The method is applicable on
+     * expressions containing a goal description, i.e., NOT, AND, OR, WHEN, IMPLY, SOMETIME_AFTER, SOMETIME_BEFORE,
+     * FORALL, EXISTS, ALWAYS, AT_MOST_ONCE, WITHIN, HOLD_AFTER, ALWAYS_WITHIN, HOLD_DURING, AT_START, AT_END, OVERALL,
+     * ATOM, EQUAL_ATOM, EQUAL, LESS, LESS_OR_EQUAL, GREATER, GREATER_OR_EQUAL, ASSIGN, INCREASE, DECREASE, SCALE_UP,
+     * SCALE_DOWN, TRUE and FALSE.
      *
      * @throws MalformedExpressionException if this expression is malformed.
      */
@@ -543,22 +539,28 @@ public class PDDLExpression extends AbstractParserObject {
                 break;
             case AND:
             case OR:
+            case WHEN:
+            case IMPLY:
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+                this.getChildren().forEach(PDDLExpression::toNNF);
+                break;
             case FORALL:
             case EXISTS:
             case ALWAYS:
-            case SOMETIME:
             case AT_MOST_ONCE:
-            case WHEN:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case HOLD_AFTER:
+                this.getChildren().get(0).toNNF();
+                break;
             case WITHIN:
+            case HOLD_AFTER:
+                this.getChildren().get(1).toNNF();
+                break;
             case ALWAYS_WITHIN:
+                this.getChildren().get(1).toNNF();
+                this.getChildren().get(2).toNNF();
+                break;
             case HOLD_DURING:
-                //this.getChildren().forEach(PDDLExpression::toNNF);
-                for (PDDLExpression c : this.getChildren()) {
-                    c.toNNF();
-                }
+                this.getChildren().get(2).toNNF();
                 break;
             case AT_START:
             case AT_END:
@@ -566,14 +568,7 @@ public class PDDLExpression extends AbstractParserObject {
                 this.moveTimeSpecifierInward();
                 break;
             case ATOM:
-            case FN_HEAD:
             case EQUAL_ATOM:
-            case F_EXP:
-            case NUMBER:
-            case F_EXP_T:
-            case TIME_VAR:
-            case FN_ATOM:
-            case DURATION_ATOM:
             case LESS:
             case LESS_OR_EQUAL:
             case EQUAL:
@@ -584,14 +579,8 @@ public class PDDLExpression extends AbstractParserObject {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
-            case MINUS:
-            case PLUS:
-            case UMINUS:
-            case MINIMIZE:
-            case MAXIMIZE:
-            case IS_VIOLATED:
+            case TRUE:
+            case FALSE:
                 // Do nothing
                 break;
             default:
@@ -646,14 +635,32 @@ public class PDDLExpression extends AbstractParserObject {
                 }
                 break;
             case NOT:
-                this.affect(child.getChildren().get(0));
+                this.assign(child.getChildren().get(0));
                 this.toNNF();
+                break;
+            case IMPLY: // (not (imply p q)) -> (imply (not p) (not q))
+                this.setConnective(PDDLConnective.IMPLY);
+                final PDDLExpression notp = new PDDLExpression(PDDLConnective.NOT);
+                notp.addChild(child.getChildren().get(0));
+                notp.toNNF();
+                final PDDLExpression notq = new PDDLExpression(PDDLConnective.NOT);
+                notq.addChild(child.getChildren().get(1));
+                notq.toNNF();
+                this.getChildren().clear();
+                this.getChildren().add(notp);
+                this.getChildren().add(notq);
                 break;
             case AT_START:
             case AT_END:
             case OVER_ALL:
                 this.setConnective(child.getConnective());
                 child.setConnective(PDDLConnective.NOT);
+                break;
+            case TRUE:
+                this.setConnective(PDDLConnective.FALSE);
+                break;
+            case FALSE:
+                this.setConnective(PDDLConnective.TRUE);
                 break;
             case EQUAL:
             case GREATER:
@@ -664,20 +671,29 @@ public class PDDLExpression extends AbstractParserObject {
             case EQUAL_ATOM:
                 // Do nothing
                 break;
+
             default:
                 throw new UnexpectedExpressionException(this.toString());
         }
     }
 
     /**
-     * Simplify the expression. This method removes the double negation and removes the extra inner conjunctions and
-     * disjunctions.
+     * Simplify the expression. This method removes:
+     * <ul>
+     *   <li>double negation</li>
+     *   <li>unnecessary inner conjunctions or disjunctions</li>
+     *   <li>equality always true</li>
+     *   <li>disjunction or conjunction containing a and not a </li>
+     *   <li>unnecessary conditional effect</li>
+     *   <li>duplicated expression</li>
+     *   </ul>
      *
      * @return <code>true</code> if the expression was simplified; <code>false</code> otherwise.
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN, TRUE or
+     * FALSE;
      */
-    private void simplify() {
+    public void simplify() {
         switch (this.getConnective()) {
             case FORALL:
             case EXISTS:
@@ -691,11 +707,21 @@ public class PDDLExpression extends AbstractParserObject {
                     this.setConnective(child.getConnective());
                 }
                 break;
+            case IMPLY:
+                // replace imply expression (imply p q) by its equivalent disjunction (or (not p) q)
+                this.setConnective(PDDLConnective.OR);
+                final PDDLExpression notp = new PDDLExpression(PDDLConnective.NOT);
+                notp.addChild(this.getChildren().get(0));
+                this.getChildren().set(0, notp);
+                this.simplify();
+                break;
             case AND:
+                this.removeDuplicateChild(this);
+                this.removedTautology(this);
                 if (this.getChildren().isEmpty()) {
                     this.setConnective(PDDLConnective.TRUE);
                 } else if (this.getChildren().size() == 1) {
-                    this.affect(this.getChildren().get(0));
+                    this.assign(this.getChildren().get(0));
                     this.simplify();
                 } else {
                     int i = 0;
@@ -719,10 +745,12 @@ public class PDDLExpression extends AbstractParserObject {
                 }
                 break;
             case OR:
+                this.removeDuplicateChild(this);
+                this.removedTautology(this);
                 if (this.getChildren().isEmpty()) {
                     this.setConnective(PDDLConnective.TRUE);
                 } else if (this.getChildren().size() == 1) {
-                    this.affect(this.getChildren().get(0));
+                    this.assign(this.getChildren().get(0));
                     this.simplify();
                 } else {
                     int i = 0;
@@ -749,7 +777,7 @@ public class PDDLExpression extends AbstractParserObject {
                 child = this.getChildren().get(0);
                 child.simplify();
                 if (child.getConnective().equals(PDDLConnective.NOT)) {
-                    this.affect(child.getChildren().get(0));
+                    this.assign(child.getChildren().get(0));
                 } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
                     this.setConnective(PDDLConnective.FALSE);
                 } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
@@ -762,7 +790,7 @@ public class PDDLExpression extends AbstractParserObject {
                 PDDLExpression effect = this.getChildren().get(1);
                 effect.simplify();
                 if (condition.getConnective().equals(PDDLConnective.TRUE)) {
-                    this.affect(effect);
+                    this.assign(effect);
                 } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
                     this.setConnective(PDDLConnective.TRUE);
                 }
@@ -772,12 +800,33 @@ public class PDDLExpression extends AbstractParserObject {
                     this.setConnective(PDDLConnective.TRUE);
                 }
                 break;
+            case SOMETIME_AFTER:
+            case SOMETIME_BEFORE:
+                this.getChildren().forEach(PDDLExpression::toNNF);
+                break;
+            case ALWAYS:
+            case AT_MOST_ONCE:
+                this.getChildren().get(0).toNNF();
+                break;
+            case WITHIN:
+            case HOLD_AFTER:
+                this.getChildren().get(1).toNNF();
+                break;
+            case ALWAYS_WITHIN:
+                this.getChildren().get(1).toNNF();
+                this.getChildren().get(2).toNNF();
+                break;
+            case HOLD_DURING:
+                this.getChildren().get(2).toNNF();
+                break;
             case EQUAL:
             case GREATER:
             case GREATER_OR_EQUAL:
             case LESS:
             case LESS_OR_EQUAL:
             case ATOM:
+            case TRUE:
+            case FALSE:
                 break;
             default:
                 throw new UnexpectedExpressionException(this.toString());
@@ -785,9 +834,67 @@ public class PDDLExpression extends AbstractParserObject {
     }
 
     /**
-     * Make a s
+     * Removed duplicated child in conjunction and disjunction expressions. The expression in parameter is
+     * modified. If a duplicated subexpression is found, the duplicated expression is removed.
+     *
+     * @param exp the expression to test. The expression must be a conjunction of a disjunction.
+     * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
      */
-    public void affect(final PDDLExpression exp) {
+    private boolean removeDuplicateChild(PDDLExpression exp) {
+        assert exp.getConnective().equals(PDDLConnective.AND)
+            || exp.getConnective().equals(PDDLConnective.OR);
+        boolean modified = false;
+        for (int i = 0; i < exp.getChildren().size(); i++) {
+            final PDDLExpression ei = exp.getChildren().get(i);
+            for (int j = i + 1; j < exp.getChildren().size(); j++) {
+                final PDDLExpression ej = exp.getChildren().get(j);
+                if (ei.equals(ej)) {
+                    exp.getChildren().remove(j);
+                    j--;
+                    modified = true;
+                }
+            }
+        }
+        return modified;
+    }
+
+    /**
+     * Removes tautologies of the form (a and not a) in conjunctive and disjunctive expressions. The expression
+     * in parameter is modified. If a tautology is detected, the subexpression of the tautology are removed and replaced
+     * by a TRUE expression.
+     *
+     * @param exp the expression to test. The expression must be a conjunction of a disjunction.
+     * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
+     */
+    private boolean removedTautology(PDDLExpression exp) {
+        assert exp.getConnective().equals(PDDLConnective.AND)
+            || exp.getConnective().equals(PDDLConnective.OR);
+        boolean modified = false;
+        for (int i = 0; i < exp.getChildren().size(); i++) {
+            final PDDLExpression ei = exp.getChildren().get(i);
+            final PDDLExpression neg = new PDDLExpression(PDDLConnective.NOT);
+            neg.addChild(ei);
+            for (int j = i + 1; j < exp.getChildren().size(); j++) {
+                final PDDLExpression ej = exp.getChildren().get(j);
+                if (ej.equals(neg)) {
+                    ei.setConnective(PDDLConnective.TRUE);
+                    exp.getChildren().remove(j);
+                    j--;
+                    modified = true;
+                }
+            }
+        }
+        return modified;
+    }
+
+    /**
+     * Assigns a specified expression to this expression. After the method call the expression is equals to the
+     * expression in parameter. The assignment is swallow, i.e., the assignment does not make a deep copy of the content
+     * of the expression in parameter.
+     *
+     * @param exp the expression to assigned to this expression.
+     */
+    public void assign(final PDDLExpression exp) {
         this.atom = exp.getAtom();
         this.children = exp.getChildren();
         this.connective = exp.getConnective();
@@ -1008,6 +1115,15 @@ public class PDDLExpression extends AbstractParserObject {
                     str.append("()");
                 }
                 break;
+            case IMPLY:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
             case FORALL:
             case EXISTS:
                 String off = baseOffset + baseOffset + "  ";
@@ -1124,7 +1240,7 @@ public class PDDLExpression extends AbstractParserObject {
                     .append(")");
                 break;
             default:
-                // Do nothing
+                throw new UnexpectedExpressionException(this.getConnective().toString());
 
         }
         return str.toString();

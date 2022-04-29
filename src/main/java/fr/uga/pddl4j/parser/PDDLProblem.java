@@ -175,7 +175,7 @@ public interface PDDLProblem extends Serializable {
      * @see PDDLAction#normalize()
      * @see PDDLDerivedPredicate#normalize()
      */
-    void standardize();
+    void normalize();
 
     /**
      * Returns a string representation of this problem.

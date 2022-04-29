@@ -22,6 +22,7 @@ package fr.uga.pddl4j.parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -115,5 +116,4 @@ public final class PDDLTypedSymbol extends PDDLSymbol {
         }
         return str.toString();
     }
-
 }

@@ -102,7 +102,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
     @Override
     protected void initialization() {
         // Standardize the variables symbol contained in the domain
-        this.getParsedProblem().standardize();
+        this.getParsedProblem().normalize();
         this.initRequirements();
         // Collect the information on the type declared in the domain
         this.initTypes();

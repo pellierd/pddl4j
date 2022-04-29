@@ -685,6 +685,8 @@ public abstract class AbstractProblem implements Problem {
             case F_EXP:
             case MINIMIZE:
             case MAXIMIZE:
+            case TRUE:
+            case FALSE:
                 // Do nothing
                 break;
             default:
