@@ -16,8 +16,6 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
@@ -197,11 +195,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FN_HEAD:
             case FN_ATOM:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -497,11 +495,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FN_HEAD:
             case FN_ATOM:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -575,11 +573,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FN_HEAD:
             case FN_ATOM:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -869,11 +867,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FN_HEAD:
             case FN_ATOM:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -1051,11 +1049,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case WHEN:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -1332,11 +1330,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case WHEN:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -1494,11 +1492,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case ATOM:
             case NOT:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
             case EQUAL_ATOM:
             case INCREASE:
             case DECREASE:

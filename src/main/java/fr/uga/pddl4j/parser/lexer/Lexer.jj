@@ -39,13 +39,11 @@ import fr.uga.pddl4j.parser.PDDLAction;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.PDDLSymbol;
-import fr.uga.pddl4j.parser.PDDLTaskInterval;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
+import fr.uga.pddl4j.parser.PDDLTimeInterval;
 import fr.uga.pddl4j.parser.PDDLTimeSpecifier;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
 
-import java.io.FileInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -174,6 +172,7 @@ public class Lexer {
     }
 
 }
+
 PARSER_END(Lexer)
 
 
@@ -1470,8 +1469,6 @@ PDDLExpression imply_gd() :
 {
 	begin=left_bracket() <IMPLY> p=gd() q=gd() end=right_bracket()
 	{
-/*		PDDLExpression not_p = new PDDLExpression(PDDLConnective.NOT);
-		not_p.addChild(p);*/
 		exp.addChild(p);
 		exp.addChild(q);
         exp.setBegin(begin);
@@ -1621,7 +1618,7 @@ PDDLExpression binary_comp() :
 
 PDDLExpression greater_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_COMPARISON);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -1642,7 +1639,7 @@ PDDLExpression greater_comp() :
 
 PDDLExpression greater_equal_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -1663,7 +1660,7 @@ PDDLExpression greater_equal_comp() :
 
 PDDLExpression less_equal_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -1684,7 +1681,7 @@ PDDLExpression less_equal_comp() :
 
 PDDLExpression less_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_COMPARISON);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -1705,7 +1702,7 @@ PDDLExpression less_comp() :
 
 PDDLExpression equal_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_COMPARISON);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -2456,7 +2453,7 @@ PDDLExpression htn_constraint() : // ADD HDDL
 
 PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BEFORE);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BEFORE_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2464,7 +2461,7 @@ PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <HOLD_BEFORE> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2474,7 +2471,7 @@ PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_AFTER);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_AFTER_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression effect = null;
     Token begin = null;
@@ -2482,7 +2479,7 @@ PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <HOLD_AFTER> id = task_id() effect = effect() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(effect);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2492,7 +2489,7 @@ PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression hold_between_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BETWEEN);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BETWEEN_METHOD_CONSTRAINT);
     PDDLSymbol id1 = null;
     PDDLSymbol id2 = null;
     PDDLExpression gd = null;
@@ -2501,17 +2498,17 @@ PDDLExpression hold_between_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
-        exp.addChild(gd);
-        exp.setBegin(begin);
-        exp.setEnd(end);
-        return exp;
-    }
+    exp.setTimeInterval(new PDDLTimeInterval(id1, id2));
+    exp.addChild(gd);
+    exp.setBegin(begin);
+    exp.setEnd(end);
+    return exp;
+}
 }
 
 PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_DURING);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_DURING_METHOD_CONSTRAINT);
     PDDLSymbol id1 = null;
     PDDLSymbol id2 = null;
     PDDLExpression gd = null;
@@ -2520,7 +2517,7 @@ PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskInterval(new PDDLTaskInterval(id1, id2));
+        exp.setTimeInterval(new PDDLTimeInterval(id1, id2));
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2530,7 +2527,7 @@ PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression effect = null;
     Token begin = null;
@@ -2538,7 +2535,7 @@ PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <AT> <END> id = task_id() effect = effect() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(effect);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2548,7 +2545,7 @@ PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2556,7 +2553,7 @@ PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <AT> <START> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2566,7 +2563,7 @@ PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression always_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.ALWAYS);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.ALWAYS_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2574,7 +2571,7 @@ PDDLExpression always_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <ALWAYS> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2584,7 +2581,7 @@ PDDLExpression always_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_MOST_ONCE);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_MOST_ONCE_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2592,7 +2589,7 @@ PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <AT_MOST_ONCE> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2602,7 +2599,7 @@ PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2610,7 +2607,7 @@ PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <SOMETIME> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2620,7 +2617,7 @@ PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2628,7 +2625,7 @@ PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <SOMETIME_BEFORE> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2638,7 +2635,7 @@ PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
 
 PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_AFTER);
+    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_AFTER_METHOD_CONSTRAINT);
     PDDLSymbol id = null;
     PDDLExpression gd = null;
     Token begin = null;
@@ -2646,7 +2643,7 @@ PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() <SOMETIME_AFTER> id = task_id() gd = gd() end=right_bracket() {
-        exp.setTaskID(id);
+        exp.setTime(id);
         exp.addChild(gd);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -3292,7 +3289,7 @@ PDDLExpression d_op() :
 
 PDDLExpression equal_d_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_COMPARISON);
 	PDDLExpression op1, op2;
 	Token begin, end;
 }
@@ -3311,7 +3308,7 @@ PDDLExpression equal_d_op() :
 
 PDDLExpression gequal_d_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
 	PDDLExpression op1, op2;
 	Token begin, end;
 }
@@ -3330,7 +3327,7 @@ PDDLExpression gequal_d_op() :
 
 PDDLExpression lequal_d_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
 	PDDLExpression op1, op2;
 	Token begin, end;
 }
@@ -3429,7 +3426,7 @@ PDDLExpression simple_method_duration_constraint() : // ADD HDDL2.1
 
 PDDLExpression equal_method_duration_constraint() : // ADD HDDL2.1
 {
-  	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL);
+  	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_COMPARISON);
   	PDDLExpression op1, op2;
   	Token begin, end;
 }
@@ -3448,7 +3445,7 @@ PDDLExpression equal_method_duration_constraint() : // ADD HDDL2.1
 
 PDDLExpression great_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER);
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_COMPARISON);
    	PDDLExpression op1, op2;
    	Token begin, end;
 }
@@ -3467,7 +3464,7 @@ PDDLExpression great_method_duration_constraint() : // ADD HDDL2.1
 
 PDDLExpression great_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL);
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
    	PDDLExpression op1, op2;
    	Token begin, end;
 }
@@ -3486,7 +3483,7 @@ PDDLExpression great_or_equal_method_duration_constraint() : // ADD HDDL2.1
 
 PDDLExpression less_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS);
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_COMPARISON);
    	PDDLExpression op1, op2;
    	Token begin, end;
 }
@@ -3505,7 +3502,7 @@ PDDLExpression less_method_duration_constraint() : // ADD HDDL2.1
 
 PDDLExpression less_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL);
+   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
    	PDDLExpression op1, op2;
    	Token begin, end;
 }

@@ -90,23 +90,23 @@ public enum PDDLConnective {
     /**
      * The connective for the binary comparison expressions less.
      */
-    LESS("<"),
+    LESS_COMPARISON("<"),
     /**
      * The connective for the binary comparison expressions less or equal.
      */
-    LESS_OR_EQUAL("<="),
+    LESS_OR_EQUAL_COMPARISON("<="),
     /**
      * The connective for the binary comparison expressions equal.
      */
-    EQUAL("="),
+    EQUAL_COMPARISON("="),
     /**
      * The connective for the binary comparison expressions greater.
      */
-    GREATER(">"),
+    GREATER_COMPARISON(">"),
     /**
      * The connective for the binary comparison expressions greater or equal.
      */
-    GREATER_OR_EQUAL(">="),
+    GREATER_OR_EQUAL_COMPARISON(">="),
     /**
      * The connective for the binary operation expressions multiplication.
      */
@@ -266,7 +266,51 @@ public enum PDDLConnective {
     /**
      * PDDLConnective for ordering constraints used in HDDL fragment.
      */
-    EQUAL_ORDERING_CONSTRAINT("=");
+    EQUAL_ORDERING_CONSTRAINT("="),
+    /**
+     * PDDLConnective for hold before method constraints in HDDL fragment.
+     */
+    HOLD_BEFORE_METHOD_CONSTRAINT("hold-before"),
+    /**
+     * PDDLConnective for hold after method constraints in HDDL fragment.
+     */
+    HOLD_AFTER_METHOD_CONSTRAINT("hold-after"),
+    /**
+     * PDDLConnective for hold between method constraints in HDDL fragment.
+     */
+    HOLD_BETWEEN_METHOD_CONSTRAINT("hold-between"),
+    /**
+     * PDDLConnective for hold during method constraints in HDDL fragment.
+     */
+    HOLD_DURING_METHOD_CONSTRAINT("hold-during"),
+    /**
+     * PDDLConnective for at end method constraints in HDDL fragment.
+     */
+    AT_END_METHOD_CONSTRAINT("at-end"),
+    /**
+     * PDDLConnective for at start between method constraints in HDDL fragment.
+     */
+    AT_START_METHOD_CONSTRAINT("at-start"),
+    /**
+     * PDDLConnective for always method constraints in HDDL fragment.
+     */
+    ALWAYS_METHOD_CONSTRAINT("always"),
+    /**
+     * PDDLConnective for at most once method constraints in HDDL fragment.
+     */
+    AT_MOST_ONCE_METHOD_CONSTRAINT("at-most-once"),
+    /**
+     * PDDLConnective for sometime method constraints in HDDL fragment.
+     */
+    SOMETIME_METHOD_CONSTRAINT("sometime"),
+    /**
+     * PDDLConnective for sometime before method constraints in HDDL fragment.
+     */
+    SOMETIME_BEFORE_METHOD_CONSTRAINT("sometimes-before"),
+    /**
+     * PDDLConnective for sometime after method constraints in HDDL fragment.
+     */
+     SOMETIME_AFTER_METHOD_CONSTRAINT("sometimes-after");
 
     /**
      * The image associate to the connective in the PDDL language.

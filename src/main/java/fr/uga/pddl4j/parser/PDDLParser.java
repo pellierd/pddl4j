@@ -2088,11 +2088,11 @@ public final class PDDLParser implements Callable<Integer> {
             case HOLD_DURING:
                 check &= this.checkExpressionSemantic(exp.getChildren().get(2));
                 break;
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case LESS:
-            case LESS_OR_EQUAL:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
             case ATOM:
             case TRUE:
             case FALSE:

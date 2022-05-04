@@ -16,8 +16,6 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.Constants;
@@ -154,11 +152,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case FN_HEAD:
             case FN_ATOM:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -414,11 +412,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case EQUAL_ATOM:
                 break;
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -572,11 +570,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                     exp.getChildren().clear();
                 }
                 break;
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
                 op1 = exp.getChildren().get(0);
                 op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
@@ -588,35 +586,35 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
                     && op2.getConnective().equals(PDDLConnective.NUMBER)) {
                     switch (exp.getConnective()) {
-                        case LESS:
+                        case LESS_COMPARISON:
                             if (op1.getValue() < op2.getValue()) {
                                 exp.setConnective(PDDLConnective.TRUE);
                             } else {
                                 exp.setConnective(PDDLConnective.FALSE);
                             }
                             break;
-                        case LESS_OR_EQUAL:
+                        case LESS_OR_EQUAL_COMPARISON:
                             if (op1.getValue() <= op2.getValue()) {
                                 exp.setConnective(PDDLConnective.TRUE);
                             } else {
                                 exp.setConnective(PDDLConnective.FALSE);
                             }
                             break;
-                        case GREATER:
+                        case GREATER_COMPARISON:
                             if (op1.getValue() > op2.getValue()) {
                                 exp.setConnective(PDDLConnective.TRUE);
                             } else {
                                 exp.setConnective(PDDLConnective.FALSE);
                             }
                             break;
-                        case GREATER_OR_EQUAL:
+                        case GREATER_OR_EQUAL_COMPARISON:
                             if (op1.getValue() >= op2.getValue()) {
                                 exp.setConnective(PDDLConnective.TRUE);
                             } else {
                                 exp.setConnective(PDDLConnective.FALSE);
                             }
                             break;
-                        case EQUAL:
+                        case EQUAL_COMPARISON:
                             if (op1.getValue() == op2.getValue()) {
                                 exp.setConnective(PDDLConnective.TRUE);
                             } else {

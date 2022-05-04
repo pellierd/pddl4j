@@ -108,7 +108,11 @@ public class PDDLSymbol extends AbstractParserObject {
         /**
          * the task id symbol.
          */
-        TASK_ID;
+        TASK_ID,
+        /**
+         * The number symbol.
+         */
+        NUMBER;
     }
 
     /**
@@ -215,6 +219,24 @@ public class PDDLSymbol extends AbstractParserObject {
      */
     public final void setImage(String image) {
         this.image = image;
+    }
+
+    /**
+     * Return the value of this symbol. This method is used to get the value of symbol of type number.
+     *
+     * @return the value of the this symbol.
+     */
+    public final Double getValue() {
+        return Double.valueOf(this.image);
+    }
+
+    /**
+     * Sets a value to this symbol.
+     *
+     * @param value the new value to set.
+     */
+    public final void setValue(double value) {
+        this.image = Double.toString(value);
     }
 
     /**

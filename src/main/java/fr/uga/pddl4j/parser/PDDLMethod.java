@@ -269,12 +269,12 @@ public class PDDLMethod extends PDDLAbstractOperator {
         while (i.hasNext()) {
             final PDDLExpression constraint = i.next();
             switch (constraint.getConnective()) {
-                case EQUAL:
+                case EQUAL_COMPARISON:
                     preconditions.addChild(constraint);
                     i.remove();
                     break;
                 case NOT:
-                    if (constraint.getChildren().get(0).equals(PDDLConnective.EQUAL)) {
+                    if (constraint.getChildren().get(0).equals(PDDLConnective.EQUAL_COMPARISON)) {
                         preconditions.addChild(constraint);
                         i.remove();
                     }

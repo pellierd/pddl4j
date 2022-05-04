@@ -664,13 +664,13 @@ public abstract class AbstractProblem implements Problem {
             case ATOM:
             case FN_HEAD:
             case TIME_VAR:
-            case EQUAL:
+            case EQUAL_COMPARISON:
             case EQUAL_ATOM:
             case FN_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case MUL:
             case DIV:
             case MINUS:
@@ -1230,11 +1230,11 @@ public abstract class AbstractProblem implements Problem {
             case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -1574,11 +1574,11 @@ public abstract class AbstractProblem implements Problem {
             case FN_ATOM:
             case WHEN:
             case DURATION_ATOM:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:

@@ -347,11 +347,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 extractRelevantFluents(exp.getChildren().get(0), facts);
                 break;
             case WHEN:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case ASSIGN:
             case INCREASE:
             case DECREASE:
@@ -442,11 +442,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
                 break;
             case WHEN:
-            case LESS:
-            case LESS_OR_EQUAL:
-            case EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
             case MUL:
             case DIV:
             case MINUS:
@@ -835,11 +835,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     condition.getNumericConstraints().addAll(ce.getNumericConstraints());
                 }
                 break;
-            case LESS:
-            case LESS_OR_EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
                 condition.getNumericConstraints().add(this.encodeNumericConstraint(exp));
                 break;
             case TRUE:
@@ -868,11 +868,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     constraints.addAll(this.finalizeNumericConstraints(e));
                 }
                 break;
-            case LESS:
-            case LESS_OR_EQUAL:
-            case GREATER:
-            case GREATER_OR_EQUAL:
-            case EQUAL:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
                 constraints.add(this.encodeNumericConstraint(exp));
                 break;
             case TRUE:
@@ -895,19 +895,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         ArithmeticExpression right = this.finalizeArithmeticExpression(exp.getChildren().get(1));
         NumericConstraint constraint;
         switch (exp.getConnective()) {
-            case EQUAL:
+            case EQUAL_COMPARISON:
                 constraint = new NumericConstraint(NumericConstraint.Comparator.EQUAL, left, right);
                 break;
-            case LESS:
+            case LESS_COMPARISON:
                 constraint = new NumericConstraint(NumericConstraint.Comparator.LESS, left, right);
                 break;
-            case LESS_OR_EQUAL:
+            case LESS_OR_EQUAL_COMPARISON:
                 constraint = new NumericConstraint(NumericConstraint.Comparator.LESS_OR_EQUAL, left, right);
                 break;
-            case GREATER:
+            case GREATER_COMPARISON:
                 constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER, left, right);
                 break;
-            case GREATER_OR_EQUAL:
+            case GREATER_OR_EQUAL_COMPARISON:
                 constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER_OR_EQUAL, left, right);
                 break;
             default:

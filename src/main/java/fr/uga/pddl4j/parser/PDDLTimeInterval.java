@@ -19,81 +19,81 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * This class defines the methods to manipulate a task interval used in PDDL expressions.
+ * This class defines the methods to manipulate a interval used in PDDL expressions.
  *
  * @author D. Pellier
  * @version 1.0 - 15.03.2022
  */
-public class PDDLTaskInterval implements Serializable {
+public class PDDLTimeInterval implements Serializable {
 
     /**
-     * The lower bound task.
+     * The lower bound.
      */
     private PDDLSymbol lower;
 
     /**
-     * The upper bound task.
+     * The upper bound.
      */
     private PDDLSymbol upper;
 
     /**
-     * Creates new task interval. The constructor is private to prevent use of default constructor.
+     * Creates new interval. The constructor is private to prevent use of default constructor.
      */
-    private PDDLTaskInterval() {
+    private PDDLTimeInterval() {
         super();
     }
 
     /**
-     * Creates new task interval.
+     * Creates new interval.
      *
-     * @param lower the lower bound task.
-     * @param upper the upper bound task.
+     * @param lower the lower bound.
+     * @param upper the upper bound.
      */
-    public PDDLTaskInterval(final PDDLSymbol lower, final PDDLSymbol upper) {
+    public PDDLTimeInterval(final PDDLSymbol lower, final PDDLSymbol upper) {
         this.lower = lower;
         this.upper = upper;
     }
 
     /**
-     * Creates new task interval from another, i.e., creates a deep copy.
+     * Creates new interval from another, i.e., creates a deep copy.
      *
      * @param other the other interval.
      */
-    public PDDLTaskInterval(final PDDLTaskInterval other) {
+    public PDDLTimeInterval(final PDDLTimeInterval other) {
         this(new PDDLSymbol(other.getLowerBound()), new PDDLSymbol(other.getUpperBound()));
     }
 
     /**
-     * Returns the lower bound task of the interval.
+     * Returns the lower bound of the interval.
      *
-     * @return the lower bound task of the interval.
+     * @return the lower bound of the interval.
      */
     public final PDDLSymbol getLowerBound() {
         return this.lower;
     }
 
     /**
-     * Sets the lower bound task of the interval.
+     * Sets the lower bound of the interval.
      *
-     * @param bound the lower bound task of the interval.
+     * @param bound the lower bound of the interval.
      */
     public void setLowerBound(PDDLSymbol bound) {
         this.lower = bound;
     }
 
     /**
-     * Returns the upper bound task of the interval.
+     * Returns the upper bound of the interval.
      *
-     * @return the upper bound task of the interval.
+     * @return the upper bound of the interval.
      */
     public final PDDLSymbol getUpperBound() {
         return this.upper;
     }
 
     /**
-     * Sets the upper bound task of the interval.
+     * Sets the upper bound of the interval.
      *
-     * @param bound the upper bound task of the interval.
+     * @param bound the upper bound of the interval.
      */
     public void setUpperBound(PDDLSymbol bound) {
         this.upper = bound;
@@ -112,7 +112,7 @@ public class PDDLTaskInterval implements Serializable {
 
     /**
      * Returns if an object is equal to this interval. An object is equals to this interval, if the object is an
-     * instance <code>PDDLTaskInterval</code> and has the same lower and upper bounds.
+     * instance <code>PDDLInterval</code> and has the same lower and upper bounds.
      *
      * @param object the object to be compared.
      * @returns <code>true</code> if the object in parameter is equal to this interval of <code>false</code> otherwise.
@@ -120,8 +120,8 @@ public class PDDLTaskInterval implements Serializable {
      */
     @Override
     public boolean equals(final Object object) {
-        if (object instanceof PDDLTaskInterval) {
-            final PDDLTaskInterval other = (PDDLTaskInterval) object;
+        if (object instanceof PDDLTimeInterval) {
+            final PDDLTimeInterval other = (PDDLTimeInterval) object;
             return other.getLowerBound().equals(this.getLowerBound())
                 && other.getUpperBound().equals(this.getUpperBound());
         }
