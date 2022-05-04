@@ -643,20 +643,20 @@ public abstract class AbstractProblem implements Problem {
             case AT_START:
             case AT_END:
             case OVER_ALL:
-            case ALWAYS:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(0));
                 break;
-            case HOLD_AFTER:
-            case WITHIN:
+            case HOLD_AFTER_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(1));
                 break;
-            case ALWAYS_WITHIN:
+            case ALWAYS_WITHIN_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(1));
                 this.initEitherTypes(exp.getChildren().get(2));
                 break;
-            case HOLD_DURING:
+            case HOLD_DURING_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(2));
                 break;
             case IS_VIOLATED:
@@ -1244,10 +1244,10 @@ public abstract class AbstractProblem implements Problem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 intExp.getChildren().add(this.initExpression(exp.getChildren().get(0), variables));
                 intExp.getChildren().add(this.initExpression(exp.getChildren().get(1), variables));
                 break;
@@ -1257,10 +1257,10 @@ public abstract class AbstractProblem implements Problem {
             case MAXIMIZE:
             case UMINUS:
             case NOT:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case F_EXP:
             case F_EXP_T:
                 intExp.getChildren().add(this.initExpression(exp.getChildren().get(0), variables));
@@ -1268,8 +1268,8 @@ public abstract class AbstractProblem implements Problem {
             case NUMBER:
                 intExp.setValue(exp.getValue());
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 intExp.getChildren().add(this.initExpression(exp.getChildren().get(0), variables));
                 intExp.getChildren().add(this.initExpression(exp.getChildren().get(1), variables));
                 intExp.getChildren().add(this.initExpression(exp.getChildren().get(2), variables));
@@ -1588,8 +1588,8 @@ public abstract class AbstractProblem implements Problem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
                 str.append("(");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
@@ -1605,7 +1605,7 @@ public abstract class AbstractProblem implements Problem {
             case MAXIMIZE:
             case UMINUS:
             case NOT:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
                 str.append("(");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");

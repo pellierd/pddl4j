@@ -1167,9 +1167,9 @@ public final class PDDLParser implements Callable<Integer> {
                 checked &= this.checkParserNode(meth.getConstraints(), meth.getParameters());
             }
             if (this.checkTaskIDsUniqueness(meth)) {
-                final Set<PDDLSymbol> taskIds = this.getTaskIDs(meth.getSubTasks());
+                final Set<PDDLSymbol> taskIds = meth.getSubTasks().getTaskIDs();
                 if (meth.isDurative()) {
-                    final Set<PDDLSymbol> durativeIds = this.getTaskIDs(meth.getDuration());
+                    final Set<PDDLSymbol> durativeIds = meth.getDuration().getTaskIDs();
                     for (PDDLSymbol id : durativeIds) {
                         if (!taskIds.contains(id)) {
                             this.mgr.logParserError("task alias \"" + id + "\" in the durative constraints of the "
@@ -1179,7 +1179,7 @@ public final class PDDLParser implements Callable<Integer> {
                         }
                     }
                 }
-                final Set<PDDLSymbol> orderingIds = this.getTaskIDs(meth.getOrdering());
+                final Set<PDDLSymbol> orderingIds = meth.getOrdering().getTaskIDs();
                 for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" in the ordering constraints of the" +
@@ -1188,7 +1188,7 @@ public final class PDDLParser implements Callable<Integer> {
                         checked = false;
                     }
                 }
-                final Set<PDDLSymbol> constIds = this.getTaskIDs(meth.getConstraints());
+                final Set<PDDLSymbol> constIds = meth.getConstraints().getTaskIDs();
                 for (PDDLSymbol id : constIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" in the constraints of the " +
@@ -1272,8 +1272,8 @@ public final class PDDLParser implements Callable<Integer> {
             final PDDLTaskNetwork tn = this.problem.getInitialTaskNetwork();
             checked = this.checkParserNode(tn.getTasks(), tn.getParameters());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<PDDLSymbol>())) {
-                final Set<PDDLSymbol> taskIds = this.getTaskIDs(tn.getTasks());
-                final Set<PDDLSymbol> orderingIds = this.getTaskIDs(tn.getOrdering());
+                final Set<PDDLSymbol> taskIds = tn.getTasks().getTaskIDs();
+                final Set<PDDLSymbol> orderingIds = tn.getOrdering().getTaskIDs();
                 for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" in the ordering constrains of the " +
@@ -1282,7 +1282,7 @@ public final class PDDLParser implements Callable<Integer> {
                         checked = false;
                     }
                 }
-                final Set<PDDLSymbol> constIds = this.getTaskIDs(tn.getConstraints());
+                final Set<PDDLSymbol> constIds = tn.getConstraints().getTaskIDs();
                 for (PDDLSymbol id : constIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task alias \"" + id + "\" in the constrains of the " +
@@ -1324,45 +1324,6 @@ public final class PDDLParser implements Callable<Integer> {
             }
         }
         return unique;
-    }
-
-    /**
-     * Returns the set of task IDs contains in an expression.
-     *
-     * @param exp the expression.
-     * @return the set of task IDs contains in exp.
-     */
-    private Set<PDDLSymbol> getTaskIDs(PDDLExpression exp) {
-        Set<PDDLSymbol> taskIDs  = new HashSet<PDDLSymbol>();
-        switch (exp.getConnective()) {
-            case TASK:
-                taskIDs.add(exp.getTaskID());
-                break;
-            case F_TASK_TIME:
-                taskIDs.add(exp.getAtom().get(1)); // Add constraints HDDL2.1
-                break;
-            case LESS_ORDERING_CONSTRAINT:
-            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
-            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
-            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
-            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
-            case HOLD_BETWEEN: // Add constraints HDDL2.1
-            case HOLD_DURING: // Add constraints HDDL2.1
-                taskIDs.add(exp.getAtom().get(0));
-                taskIDs.add(exp.getAtom().get(1));
-                break;
-            case HOLD_BEFORE: // Add constraints HDDL2.1
-            case HOLD_AFTER: // Add constraints HDDL2.1
-            case SOMETIME_BEFORE: // Add constraints HDDL2.1
-            case SOMETIME_AFTER: // Add constraints HDDL2.1
-                taskIDs.add(exp.getAtom().get(0));
-                break;
-            default:
-                for (PDDLExpression c : exp.getChildren()) {
-                    taskIDs.addAll(this.getTaskIDs(c));
-                }
-        }
-        return taskIDs;
     }
 
     /**
@@ -2067,25 +2028,25 @@ public final class PDDLParser implements Callable<Integer> {
                     check = false;
                 }
                 break;
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
                 for (PDDLExpression c : exp.getChildren()) {
                     check &= this.checkExpressionSemantic(c);
                 }
                 break;
-            case ALWAYS:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
                 check &= this.checkExpressionSemantic(exp.getChildren().get(0));
                 break;
-            case WITHIN:
-            case HOLD_AFTER:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 check &= this.checkExpressionSemantic(exp.getChildren().get(1));
                 break;
-            case ALWAYS_WITHIN:
+            case ALWAYS_WITHIN_CONSTRAINT:
                 check &= this.checkExpressionSemantic(exp.getChildren().get(1));
                 check &= this.checkExpressionSemantic(exp.getChildren().get(2));
                 break;
-            case HOLD_DURING:
+            case HOLD_DURING_CONSTRAINT:
                 check &= this.checkExpressionSemantic(exp.getChildren().get(2));
                 break;
             case EQUAL_COMPARISON:

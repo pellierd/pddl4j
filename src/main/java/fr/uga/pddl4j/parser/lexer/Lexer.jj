@@ -1135,7 +1135,7 @@ PDDLExpression at_end_con_gd() :
 
 PDDLExpression always_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_CONSTRAINT);
 	PDDLExpression exp = null;
 	Token begin = null;
     Token end = null;
@@ -1155,7 +1155,7 @@ PDDLExpression always_con_gd() :
 
 PDDLExpression sometime_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_CONSTRAINT);
 	PDDLExpression exp = null;
 	Token begin = null;
     Token end = null;
@@ -1174,7 +1174,7 @@ PDDLExpression sometime_con_gd() :
 
 PDDLExpression within_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.WITHIN);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.WITHIN_CONSTRAINT);
 	PDDLExpression num, exp;
     Token begin, end;
 }
@@ -1194,7 +1194,7 @@ PDDLExpression within_con_gd() :
 
 PDDLExpression at_most_once_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_MOST_ONCE);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_MOST_ONCE_CONSTRAINT);
 	PDDLExpression exp;
     Token begin, end;
 }
@@ -1212,7 +1212,7 @@ PDDLExpression at_most_once_con_gd() :
 
 PDDLExpression sometime_after_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_AFTER);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_AFTER_CONSTRAINT);
 	PDDLExpression gd1 = null;
 	PDDLExpression gd2 = null;
     Token begin = null;
@@ -1234,7 +1234,7 @@ PDDLExpression sometime_after_con_gd() :
 
 PDDLExpression sometime_before_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE_CONSTRAINT);
 	PDDLExpression gd1 = null;
 	PDDLExpression gd2 = null;
     Token begin = null;
@@ -1256,7 +1256,7 @@ PDDLExpression sometime_before_con_gd() :
 
 PDDLExpression always_within_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_WITHIN);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_WITHIN_CONSTRAINT);
 	PDDLExpression num, gd1, gd2;
     Token begin, end;
 }
@@ -1276,7 +1276,7 @@ PDDLExpression always_within_con_gd() :
 
 PDDLExpression hold_during_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_DURING);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_DURING_CONSTRAINT);
 	PDDLExpression exp, num1, num2;
     Token begin, end;
 }
@@ -1298,7 +1298,7 @@ PDDLExpression hold_during_con_gd() :
 
 PDDLExpression hold_after_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_AFTER);
+	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_AFTER_CONSTRAINT);
 	PDDLExpression exp, num;
     Token begin, end;
 }

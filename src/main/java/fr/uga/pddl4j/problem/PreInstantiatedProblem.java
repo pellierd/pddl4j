@@ -209,21 +209,21 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
             case TIME_VAR:
             case IS_VIOLATED:
             case NUMBER:
             case MINIMIZE:
             case MAXIMIZE:
             case UMINUS:
-            case ALWAYS:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case F_EXP:
                 // do nothing
                 break;
@@ -474,19 +474,19 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case AT_START:
             case AT_END:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case WHEN:
                 this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
                 this.replace(exp.getChildren().get(1), inertia, connective, ti, ts);
                 this.replace(exp.getChildren().get(3), inertia, connective, ti, ts);
@@ -552,19 +552,19 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case AT_START:
             case AT_END:
             case NOT:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case WHEN:
                 unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(0)));
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(0)));
                 unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(1)));
                 unaryInertia.addAll(this.collectUnaryInertia(exp.getChildren().get(3)));
@@ -840,22 +840,22 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case AT_START:
             case AT_END:
             case NOT:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
                 this.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
                 break;
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case WHEN:
                 this.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
                 this.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 this.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
                 this.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
                 this.expandQuantifiedExpression(exp.getChildren().get(3), simplify);
@@ -1063,10 +1063,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 this.substitute(exp.getChildren().get(0), var, cons, simplify);
                 this.substitute(exp.getChildren().get(1), var, cons, simplify);
                 break;
@@ -1075,10 +1075,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case AT_START:
             case AT_END:
             case UMINUS:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case F_EXP:
                 this.substitute(exp.getChildren().get(0), var, cons, simplify);
                 break;
@@ -1087,8 +1087,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     this.substitute(exp.getChildren().get(0), var, cons, simplify);
                 }
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 this.substitute(exp.getChildren().get(0), var, cons, simplify);
                 this.substitute(exp.getChildren().get(1), var, cons, simplify);
                 this.substitute(exp.getChildren().get(3), var, cons, simplify);
@@ -1314,10 +1314,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case AT_START:
             case AT_END:
             case UMINUS:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
                 this.simplify(exp.getChildren().get(0));
                 break;
             case NOT:
@@ -1344,10 +1344,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 this.simplify(exp.getChildren().get(0));
                 this.simplify(exp.getChildren().get(1));
                 break;
@@ -1355,8 +1355,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case F_EXP:
                 this.simplify(exp.getChildren().get(0));
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 this.simplify(exp.getChildren().get(0));
                 this.simplify(exp.getChildren().get(1));
                 this.simplify(exp.getChildren().get(3));

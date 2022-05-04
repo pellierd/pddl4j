@@ -339,10 +339,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case AT_START:
             case AT_END:
             case UMINUS:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case NOT:
                 extractRelevantFluents(exp.getChildren().get(0), facts);
                 break;
@@ -362,10 +362,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case MINUS:
             case PLUS:
 
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 extractRelevantFluents(exp.getChildren().get(0), facts);
                 extractRelevantFluents(exp.getChildren().get(1), facts);
                 break;
@@ -375,8 +375,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     extractRelevantFluents(exp.getChildren().get(0), facts);
                 }
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 extractRelevantFluents(exp.getChildren().get(0), facts);
                 extractRelevantFluents(exp.getChildren().get(1), facts);
                 extractRelevantFluents(exp.getChildren().get(3), facts);

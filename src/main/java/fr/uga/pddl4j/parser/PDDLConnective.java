@@ -182,43 +182,39 @@ public enum PDDLConnective {
     /**
      * The connective for the always expressions.
      */
-    ALWAYS("always"),
+    ALWAYS_CONSTRAINT("always"),
     /**
      * The connective for the sometime expressions.
      */
-    SOMETIME("sometimes"),
+    SOMETIME_CONSTRAINT("sometimes"),
     /**
      * The connective for the within expressions.
      */
-    WITHIN("within"),
+    WITHIN_CONSTRAINT("within"),
     /**
      * The connective for the at most once expressions.
      */
-    AT_MOST_ONCE("at-most-once"),
+    AT_MOST_ONCE_CONSTRAINT("at-most-once"),
     /**
      * The connective for the sometime after expressions.
      */
-    SOMETIME_AFTER("sometime-after"),
+    SOMETIME_AFTER_CONSTRAINT("sometime-after"),
     /**
      * The connective for the sometime before expressions.
      */
-    SOMETIME_BEFORE("sometime-before"),
+    SOMETIME_BEFORE_CONSTRAINT("sometime-before"),
     /**
      * The connective for the always within expressions.
      */
-    ALWAYS_WITHIN("always-within"),
+    ALWAYS_WITHIN_CONSTRAINT("always-within"),
     /**
      * The connective for the holding during expressions.
      */
-    HOLD_DURING("hold-during"),
+    HOLD_DURING_CONSTRAINT("hold-during"),
     /**
      * The connective for the holding after expressions.
      */
-    HOLD_AFTER("hold-after"),
-    /**
-     * The connective for the after expressions.
-     */
-    AFTER("after"),
+    HOLD_AFTER_CONSTRAINT("hold-after"),
     /**
      * The connective for the function term.
      */
@@ -231,18 +227,6 @@ public enum PDDLConnective {
      * The connective for expression of type FALSE.
      */
     FALSE("false"),
-    /**
-     * The connective for the hold-before expression.
-     */
-    HOLD_BEFORE("hold-before"),
-    /**
-     * The connective for the before expression.
-     */
-    BEFORE("before"),
-    /**
-     * The connective for the between expression.
-     */
-    HOLD_BETWEEN("hold-between"),
     /**
      * PDDLConnective for task used in HDDL fragment.
      */

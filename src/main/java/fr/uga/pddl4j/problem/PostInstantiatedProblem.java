@@ -166,22 +166,22 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
             case TIME_VAR:
             case IS_VIOLATED:
             case NUMBER:
             case MINIMIZE:
             case MAXIMIZE:
             case UMINUS:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case F_EXP:
                 break;
             default:
@@ -389,10 +389,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case AT_START:
             case AT_END:
             case UMINUS:
-            case ALWAYS:
+            case ALWAYS_CONSTRAINT:
             case OVER_ALL:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
                 this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 break;
             case NOT:
@@ -426,10 +426,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case WITHIN:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 this.simplifyWithGroundInertia(exp.getChildren().get(1), effect);
                 break;
@@ -437,8 +437,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case F_EXP:
                 this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 this.simplifyWithGroundInertia(exp.getChildren().get(1), effect);
                 this.simplifyWithGroundInertia(exp.getChildren().get(3), effect);

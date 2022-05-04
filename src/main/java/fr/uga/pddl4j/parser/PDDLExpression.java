@@ -22,11 +22,13 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.parser.lexer.Token;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -521,13 +523,13 @@ public class PDDLExpression extends AbstractParserObject {
             case MAXIMIZE:
             case UMINUS:
             case F_EXP:
-            case ALWAYS:
-            case SOMETIME:
-            case AT_MOST_ONCE:
-            case HOLD_AFTER:
-            case WITHIN:
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
@@ -587,14 +589,14 @@ public class PDDLExpression extends AbstractParserObject {
             case OR:
             case WHEN:
             case IMPLY:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
                 this.getChildren().forEach(PDDLExpression::toNNF);
                 break;
             case FORALL:
             case EXISTS:
-            case ALWAYS:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case AT_END_METHOD_CONSTRAINT:
@@ -608,15 +610,15 @@ public class PDDLExpression extends AbstractParserObject {
             case HOLD_DURING_METHOD_CONSTRAINT:
                 this.getChildren().get(0).toNNF();
                 break;
-            case WITHIN:
-            case HOLD_AFTER:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 this.getChildren().get(1).toNNF();
                 break;
-            case ALWAYS_WITHIN:
+            case ALWAYS_WITHIN_CONSTRAINT:
                 this.getChildren().get(1).toNNF();
                 this.getChildren().get(2).toNNF();
                 break;
-            case HOLD_DURING:
+            case HOLD_DURING_CONSTRAINT:
                 this.getChildren().get(2).toNNF();
                 break;
             case AT_START:
@@ -760,8 +762,8 @@ public class PDDLExpression extends AbstractParserObject {
             case AT_START:
             case AT_END:
             case OVER_ALL:
-            case ALWAYS:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case AT_END_METHOD_CONSTRAINT:
@@ -873,19 +875,19 @@ public class PDDLExpression extends AbstractParserObject {
                     this.setConnective(PDDLConnective.TRUE);
                 }
                 break;
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
                 this.getChildren().forEach(PDDLExpression::simplify);
                 break;
-            case WITHIN:
-            case HOLD_AFTER:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
                 this.getChildren().get(1).simplify();
                 break;
-            case ALWAYS_WITHIN:
+            case ALWAYS_WITHIN_CONSTRAINT:
                 this.getChildren().get(1).simplify();
                 this.getChildren().get(2).simplify();
                 break;
-            case HOLD_DURING:
+            case HOLD_DURING_CONSTRAINT:
                 this.getChildren().get(2).simplify();
                 break;
             case EQUAL_COMPARISON:
@@ -1118,6 +1120,68 @@ public class PDDLExpression extends AbstractParserObject {
     }
 
     /**
+     * Returns the set of task IDs contains in this expression.
+     *
+     * @return the set of task IDs contains in exp.
+     * @throws <code>UnexpectedExpressionException</code> if the expression is not a TASK, F_TASK_TIME,
+     * LESS_ORDERING_CONSTRAINT, LESS_OR_EQUAL_ORDERING_CONSTRAINT, GREATER_ORDERING_CONSTRAINT,
+     * GREATER_OR_EQUAL_ORDERING_CONSTRAINT, EQUAL_ORDERING_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
+     * HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
+     * HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
+     */
+    public Set<PDDLSymbol> getTaskIDs() {
+        Set<PDDLSymbol> taskIDs  = new HashSet<PDDLSymbol>();
+        switch (this.getConnective()) {
+            case TASK:
+                taskIDs.add(this.getTaskID());
+                break;
+            case F_TASK_TIME:
+                taskIDs.add(this.getAtom().get(1)); // Add constraints HDDL2.1
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+                taskIDs.add(this.getAtom().get(0));
+                taskIDs.add(this.getAtom().get(1));
+                break;
+            case HOLD_BEFORE_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_AFTER_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case SOMETIME_AFTER_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+                taskIDs.add(this.getTime());
+                break;
+            case HOLD_BETWEEN_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_DURING_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+                taskIDs.add(this.getTimeInterval().getLowerBound());
+                taskIDs.add(this.getTimeInterval().getUpperBound());
+                break;
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case EQUAL_ATOM:
+                // Do nothing
+                break;
+            case NOT:
+                if (!this.getChildren().get(0).getConnective().equals(PDDLConnective.EQUAL_ATOM)) {
+                    throw new UnexpectedExpressionException(this.getConnective().toString());
+                }
+                break;
+            case AND:
+                for (PDDLExpression c : this.getChildren()) {
+                    taskIDs.addAll(c.getTaskIDs());
+                }
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().toString());
+        }
+        return taskIDs;
+    }
+
+    /**
      * Returns a string representation of this node.
      *
      * @return a string representation of this node.
@@ -1246,8 +1310,8 @@ public class PDDLExpression extends AbstractParserObject {
             case DIV:
             case MINUS:
             case PLUS:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.children.get(0).toString(baseOffset)).append(" ")
@@ -1270,9 +1334,9 @@ public class PDDLExpression extends AbstractParserObject {
             case AT_START:
             case AT_END:
             case OVER_ALL:
-            case ALWAYS:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.getChildren().get(0).toString(baseOffset))
@@ -1287,8 +1351,8 @@ public class PDDLExpression extends AbstractParserObject {
             case IS_VIOLATED:
                 str.append("(").append(this.getConnective().getImage()).append(")");
                 break;
-            case HOLD_AFTER:
-            case WITHIN:
+            case HOLD_AFTER_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
                 str.append("(")
                     .append(this.getConnective().getImage())
                     .append(" ")
@@ -1297,7 +1361,7 @@ public class PDDLExpression extends AbstractParserObject {
                     .append(this.getChildren().get(1).toString(baseOffset))
                     .append(")");
                 break;
-            case ALWAYS_WITHIN:
+            case ALWAYS_WITHIN_CONSTRAINT:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.getChildren().get(0).getValue()).append(" ")
@@ -1305,7 +1369,7 @@ public class PDDLExpression extends AbstractParserObject {
                     .append(this.getChildren().get(2).toString(baseOffset))
                     .append(")");
                 break;
-            case HOLD_DURING:
+            case HOLD_DURING_CONSTRAINT:
                 str.append("(")
                     .append(this.getConnective().getImage()).append(" ")
                     .append(this.getChildren().get(0).getValue()).append(" ")
@@ -1379,19 +1443,19 @@ public class PDDLExpression extends AbstractParserObject {
                 malformed = this.variables.isEmpty() || this.children.isEmpty()
                     && this.children.get(0).isMalformedExpression();
                 break;
-            case ALWAYS_WITHIN:
-            case HOLD_DURING:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
                 malformed = this.children.size() != 3
                     && this.children.get(0).isMalformedExpression()
                     && this.children.get(1).isMalformedExpression()
                     && this.children.get(2).isMalformedExpression();
                 break;
             case DURATION_ATOM:
-            case SOMETIME_AFTER:
-            case SOMETIME_BEFORE:
-            case HOLD_AFTER:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case LESS_ORDERING_CONSTRAINT:
-            case WITHIN:
+            case WITHIN_CONSTRAINT:
                 malformed = this.atom.size() != 2;
                 break;
             case WHEN:
@@ -1418,9 +1482,9 @@ public class PDDLExpression extends AbstractParserObject {
             case AT_START:
             case AT_END:
             case OVER_ALL:
-            case ALWAYS:
-            case SOMETIME:
-            case AT_MOST_ONCE:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
             case MINIMIZE:
             case MAXIMIZE:
             case F_EXP_T:
