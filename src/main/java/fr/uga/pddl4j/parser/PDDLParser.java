@@ -328,8 +328,8 @@ public final class PDDLParser implements Callable<Integer> {
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
     public PDDLProblem parseProblem(File problem) throws FileNotFoundException {
-       this.problemFile = problem;
-       return this.parseProblem();
+        this.problemFile = problem;
+        return this.parseProblem();
     }
 
     /**
@@ -424,6 +424,7 @@ public final class PDDLParser implements Callable<Integer> {
      *
      * @param domainString  the string that contains the planning domains.
      * @param problemString the string that contains the planning problem.
+     * @throws IOException if an error occurs while parsing.
      */
     public void parseFromString(String domainString, String problemString) throws IOException {
         // Create temp files for domain and problem
@@ -451,6 +452,7 @@ public final class PDDLParser implements Callable<Integer> {
      * Parses a planning domain and a planning problem from their respective string description.
      *
      * @param domainAndProblemString the string that contains the domain and planning problem.
+     * @throws IOException if an error occurs while parsing.
      */
     public void parseFromString(String domainAndProblemString) throws IOException {
         // Create temp files for domain and problem
@@ -470,6 +472,7 @@ public final class PDDLParser implements Callable<Integer> {
      * Parses a planning domain and a planning problem from an input stream.
      *
      * @param inputDomainAndProblem the stream that contains the domain and planning problem.
+     * @throws IOException if an error occurs while parsing.
      */
     public void parseFromStream(InputStream inputDomainAndProblem) throws IOException {
         BufferedReader buffer = new BufferedReader(new InputStreamReader(inputDomainAndProblem, "UTF-8"));
@@ -481,7 +484,7 @@ public final class PDDLParser implements Callable<Integer> {
      *
      * @param inputDomain  the stream that contains the domain.
      * @param inputProblem the stream that contains the planning problem.
-
+     * @throws IOException if an error occurs while parsing.
      */
     public void parseFromStream(InputStream inputDomain, InputStream inputProblem) throws IOException {
         BufferedReader bufferDomain = new BufferedReader(new InputStreamReader(inputDomain, "UTF-8"));
@@ -795,7 +798,7 @@ public final class PDDLParser implements Callable<Integer> {
                         checked = false;
                     }
                     break;
-                case DURATION_ATOM:
+                case TIMED_LITERAL:
                     stackGD.add(gd.getChildren().get(1));
                     break;
                 case NOT:
@@ -1173,8 +1176,8 @@ public final class PDDLParser implements Callable<Integer> {
                     for (PDDLSymbol id : durativeIds) {
                         if (!taskIds.contains(id)) {
                             this.mgr.logParserError("task alias \"" + id + "\" in the durative constraints of the "
-                                + "method " + "\"" + meth.getName() + "\" is undefined", this.lexer
-                                .getFile(), id.getBeginLine(), id.getBeginColumn());
+                                + "method " + "\"" + meth.getName() + "\" is undefined",
+                                this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
                             checked = false;
                         }
                     }
@@ -1182,18 +1185,18 @@ public final class PDDLParser implements Callable<Integer> {
                 final Set<PDDLSymbol> orderingIds = meth.getOrdering().getTaskIDs();
                 for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" in the ordering constraints of the" +
-                            " method \"" + meth.getName() + "\" is undefined", this.lexer
-                            .getFile(), id.getBeginLine(), id.getBeginColumn());
+                        this.mgr.logParserError("task alias \"" + id + "\" in the ordering constraints of the"
+                            + " method \"" + meth.getName() + "\" is undefined",
+                            this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
                         checked = false;
                     }
                 }
                 final Set<PDDLSymbol> constIds = meth.getConstraints().getTaskIDs();
                 for (PDDLSymbol id : constIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" in the constraints of the " +
-                            "method " + "\"" + meth.getName() + "\" is undefined", this.lexer
-                            .getFile(), id.getBeginLine(), id.getBeginColumn());
+                        this.mgr.logParserError("task alias \"" + id + "\" in the constraints of the "
+                            + "method " + "\"" + meth.getName() + "\" is undefined",
+                            this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1276,17 +1279,17 @@ public final class PDDLParser implements Callable<Integer> {
                 final Set<PDDLSymbol> orderingIds = tn.getOrdering().getTaskIDs();
                 for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" in the ordering constrains of the " +
-                            "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
-                            id.getBeginColumn());
+                        this.mgr.logParserError("task alias \"" + id + "\" in the ordering constrains of the "
+                                + "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
+                                id.getBeginColumn());
                         checked = false;
                     }
                 }
                 final Set<PDDLSymbol> constIds = tn.getConstraints().getTaskIDs();
                 for (PDDLSymbol id : constIds) {
                     if (!taskIds.contains(id)) {
-                        this.mgr.logParserError("task alias \"" + id + "\" in the constrains of the " +
-                                "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
+                        this.mgr.logParserError("task alias \"" + id + "\" in the constrains of the "
+                            +  "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
                             id.getBeginColumn());
                         checked = false;
                     }
@@ -1841,8 +1844,8 @@ public final class PDDLParser implements Callable<Integer> {
      *
      * @return <code>true</code> if the expression succeeds the test; <code>false</code> otherwise.
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     * EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN,
-     * TRUE and FALSE.
+     *      EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM,
+     *      WHEN, TRUE and FALSE.
      */
     private boolean checkExpressionSemantic(final PDDLExpression exp) {
 
@@ -1861,6 +1864,22 @@ public final class PDDLParser implements Callable<Integer> {
             case AT_START:
             case AT_END:
             case OVER_ALL:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
                 PDDLExpression child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
                 if (child.getConnective().equals(PDDLConnective.TRUE)
@@ -2010,44 +2029,51 @@ public final class PDDLParser implements Callable<Integer> {
                 check &= this.checkExpressionSemantic(effect);
                 if (condition.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.assign(effect);
-                    this.mgr.logParserWarning("WHEN expression with condition always TRUE. " +
-                        "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
+                    this.mgr.logParserWarning("WHEN expression with condition always TRUE. "
+                        + "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
                     check = false;
                 } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
                     exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("WHEN expression with condition always FALSE. " +
-                        "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
+                    this.mgr.logParserWarning("WHEN expression with condition always FALSE. "
+                        + "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
                     check = false;
                 }
                 break;
             case EQUAL_ATOM:
                 if (exp.getAtom().get(0).equals(exp.getAtom().get(1))) {
                     exp.setConnective(PDDLConnective.TRUE);
-                    this.mgr.logParserWarning("EQUAL expression always TRUE. " +
-                        "The expression can be removed.", this.lexer.getFile(), line, column);
+                    this.mgr.logParserWarning("EQUAL expression always TRUE. "
+                        + "The expression can be removed.", this.lexer.getFile(), line, column);
+                    check = false;
+                }
+                break;
+            case TIMED_LITERAL:
+                if (exp.getTime().getValue() < 0.0) {
+                    this.mgr.logParserError("TIMED_LITERAL expression cannot use a time < 0.0. ",
+                        this.lexer.getFile(), line, column);
                     check = false;
                 }
                 break;
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
-                for (PDDLExpression c : exp.getChildren()) {
-                    check &= this.checkExpressionSemantic(c);
-                }
-                break;
-            case ALWAYS_CONSTRAINT:
-            case AT_MOST_ONCE_CONSTRAINT:
-                check &= this.checkExpressionSemantic(exp.getChildren().get(0));
-                break;
-            case WITHIN_CONSTRAINT:
-            case HOLD_AFTER_CONSTRAINT:
-                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
-                break;
             case ALWAYS_WITHIN_CONSTRAINT:
+                check &= this.checkExpressionSemantic(exp.getChildren().get(0));
                 check &= this.checkExpressionSemantic(exp.getChildren().get(1));
-                check &= this.checkExpressionSemantic(exp.getChildren().get(2));
                 break;
             case HOLD_DURING_CONSTRAINT:
-                check &= this.checkExpressionSemantic(exp.getChildren().get(2));
+                if (!exp.getTimeInterval().isValid()) {
+                    exp.setConnective(PDDLConnective.FALSE);
+                    this.mgr.logParserError("HOLD_DURING_CONSTRAINT expression with invalid interval ",
+                        this.lexer.getFile(), line, column);
+                    check = false;
+                } else {
+                    check &= this.checkExpressionSemantic(exp.getChildren().get(0));
+                    if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.TRUE)
+                        || exp.getChildren().get(0).getConnective().equals(PDDLConnective.FALSE)) {
+                        exp.setConnective(exp.getChildren().get(0).getConnective());
+                        check = false;
+                    }
+                }
                 break;
             case EQUAL_COMPARISON:
             case GREATER_COMPARISON:
@@ -2083,9 +2109,9 @@ public final class PDDLParser implements Callable<Integer> {
                     exp.getChildren().remove(j);
                     j--;
                     this.mgr.logParserWarning("Duplicated " + ei.getConnective() + " sub-expression in "
-                            + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. " +
-                            "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
-                        ej.getBeginColumn());
+                            + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. "
+                            + "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
+                            ej.getBeginColumn());
                     System.out.println("ei = " + ei.toString());
                     System.out.println("ej = " + ej.toString());
                     check = false;

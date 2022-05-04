@@ -214,11 +214,11 @@ public class PDDLExpression extends AbstractParserObject {
      * Set the connective of this node.
      *
      * @param connective the connective.
-     * @throws NullPointerException if the specified connective is null.
+     * @throws IllegalArgumentException if the specified connective is null.
      */
-    public void setConnective(final PDDLConnective connective) throws NullPointerException {
+    public void setConnective(final PDDLConnective connective) throws IllegalArgumentException {
         if (connective == null) {
-            throw new NullPointerException("PDDLConnective can not be null in setConnective call");
+            throw new IllegalArgumentException("PDDLConnective can not be null in setConnective call");
         }
         this.connective = connective;
     }
@@ -384,26 +384,6 @@ public class PDDLExpression extends AbstractParserObject {
     }
 
     /**
-     * Sets the begin line and column of the expression from a specified token.
-     *
-     * @param begin the first token of the expression.
-     */
-    public void setBegin(final Token begin) {
-        this.setBeginLine(begin.beginLine);
-        this.setBeginColumn(begin.beginColumn);
-    }
-
-    /**
-     * Sets the end line and column of the expression from a specified token.
-     *
-     * @param end the last token of the expression.
-     */
-    public void setEnd(final Token end) {
-        this.setEndLine(end.endLine);
-        this.setEndColumn(end.endColumn);
-    }
-
-    /**
      * Renames the ID of the task contained in the expression with a specified symbol, i.e., the tag tasks
      * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are alowed as
      * tasks expression for the moment in method description.
@@ -507,8 +487,8 @@ public class PDDLExpression extends AbstractParserObject {
             case LESS_OR_EQUAL_COMPARISON:
             case GREATER_COMPARISON:
             case GREATER_OR_EQUAL_COMPARISON:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case ASSIGN:
@@ -557,7 +537,7 @@ public class PDDLExpression extends AbstractParserObject {
             case IS_VIOLATED:
             case NUMBER:
             case TIME_VAR:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case TRUE:
             case FALSE:
                 // Do nothing
@@ -651,7 +631,7 @@ public class PDDLExpression extends AbstractParserObject {
      * Moves the negation inward the expression.
      *
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
     private void moveNegationInward() {
         assert this.getConnective().equals(PDDLConnective.NOT);
@@ -749,13 +729,14 @@ public class PDDLExpression extends AbstractParserObject {
      *
      * @return <code>true</code> if the expression was simplified; <code>false</code> otherwise.
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN, TRUE,
-     * FALSE, HOLD_AFTER_METHOD_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT, AT_END_METHOD_CONSTRAINT,
-     * AT_START_METHOD_CONSTRAINT, ALWAYS_METHOD_CONSTRAINT, AT_MOST_ONCE_METHOD_CONSTRAINT, SOMETIME_METHOD_CONSTRAINT,
-     * SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT, HOLD_BETWEEN_METHOD_CONSTRAINT,
-     * HOLD_DURING_METHOD_CONSTRAINT.
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN, TRUE,
+     *      FALSE, HOLD_AFTER_METHOD_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT, AT_END_METHOD_CONSTRAINT,
+     *      AT_START_METHOD_CONSTRAINT, ALWAYS_METHOD_CONSTRAINT, AT_MOST_ONCE_METHOD_CONSTRAINT,
+     *      SOMETIME_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
+     *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT.
      */
-    public void simplify() {
+    public boolean simplify() throws UnexpectedExpressionException {
+        boolean simplified = false;
         switch (this.getConnective()) {
             case FORALL:
             case EXISTS:
@@ -764,6 +745,9 @@ public class PDDLExpression extends AbstractParserObject {
             case OVER_ALL:
             case ALWAYS_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case AT_END_METHOD_CONSTRAINT:
@@ -780,6 +764,7 @@ public class PDDLExpression extends AbstractParserObject {
                 if (child.getConnective().equals(PDDLConnective.TRUE)
                     || child.getConnective().equals(PDDLConnective.FALSE)) {
                     this.setConnective(child.getConnective());
+                    simplified = true;
                 }
                 break;
             case IMPLY:
@@ -788,31 +773,36 @@ public class PDDLExpression extends AbstractParserObject {
                 final PDDLExpression notp = new PDDLExpression(PDDLConnective.NOT);
                 notp.addChild(this.getChildren().get(0));
                 this.getChildren().set(0, notp);
-                this.simplify();
+                simplified = this.simplify();
                 break;
             case AND:
-                this.removeDuplicateChild(this);
-                this.removedTautology(this);
+                simplified &= this.removeDuplicateChild(this);
+                simplified &= this.removedTautology(this);
                 if (this.getChildren().isEmpty()) {
                     this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
                 } else if (this.getChildren().size() == 1) {
                     this.assign(this.getChildren().get(0));
                     this.simplify();
+                    simplified = true;
                 } else {
                     int i = 0;
                     while (i < this.getChildren().size()
                         && !this.getConnective().equals(PDDLConnective.TRUE)
                         && !this.getConnective().equals(PDDLConnective.FALSE)) {
                         child = this.getChildren().get(i);
-                        child.simplify();
+                        simplified &= child.simplify();
                         if (child.getConnective().equals(PDDLConnective.FALSE)) {
                             this.setConnective(PDDLConnective.FALSE);
+                            simplified = true;
                         } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
                             this.getChildren().remove(i);
+                            simplified = true;
                         } else if (child.getConnective().equals(PDDLConnective.AND)) {
                             this.getChildren().remove(i);
                             this.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
+                            simplified = true;
                         } else {
                             i++;
                         }
@@ -820,28 +810,33 @@ public class PDDLExpression extends AbstractParserObject {
                 }
                 break;
             case OR:
-                this.removeDuplicateChild(this);
-                this.removedTautology(this);
+                simplified &= this.removeDuplicateChild(this);
+                simplified &= this.removedTautology(this);
                 if (this.getChildren().isEmpty()) {
                     this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
                 } else if (this.getChildren().size() == 1) {
                     this.assign(this.getChildren().get(0));
                     this.simplify();
+                    simplified = true;
                 } else {
                     int i = 0;
                     while (i < this.getChildren().size()
                         && !this.getConnective().equals(PDDLConnective.TRUE)
                         && !this.getConnective().equals(PDDLConnective.FALSE)) {
                         child = this.getChildren().get(i);
-                        child.simplify();
+                        simplified &= child.simplify();
                         if (child.getConnective().equals(PDDLConnective.TRUE)) {
                             this.setConnective(PDDLConnective.TRUE);
+                            simplified = true;
                         } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
                             this.getChildren().remove(i);
+                            simplified = true;
                         } else if (child.getConnective().equals(PDDLConnective.OR)) {
                             this.getChildren().remove(i);
                             this.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
+                            simplified = true;
                         } else {
                             i++;
                         }
@@ -850,45 +845,56 @@ public class PDDLExpression extends AbstractParserObject {
                 break;
             case NOT:
                 child = this.getChildren().get(0);
-                child.simplify();
+                simplified &= child.simplify();
                 if (child.getConnective().equals(PDDLConnective.NOT)) {
                     this.assign(child.getChildren().get(0));
+                    simplified = true;
                 } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
                     this.setConnective(PDDLConnective.FALSE);
+                    simplified = true;
                 } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
                     this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
                 }
                 break;
             case WHEN:
                 PDDLExpression condition = this.getChildren().get(0);
-                condition.simplify();
+                simplified &= condition.simplify();
                 PDDLExpression effect = this.getChildren().get(1);
-                effect.simplify();
+                simplified &= effect.simplify();
                 if (condition.getConnective().equals(PDDLConnective.TRUE)) {
                     this.assign(effect);
+                    simplified = true;
                 } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
                     this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
                 }
                 break;
             case EQUAL_ATOM:
                 if (this.getAtom().get(0).equals(this.getAtom().get(1))) {
                     this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
                 }
                 break;
-            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_AFTER_CONSTRAINT: // Simplification must be checked with the constraints semantic
             case SOMETIME_BEFORE_CONSTRAINT:
-                this.getChildren().forEach(PDDLExpression::simplify);
-                break;
-            case WITHIN_CONSTRAINT:
-            case HOLD_AFTER_CONSTRAINT:
-                this.getChildren().get(1).simplify();
-                break;
             case ALWAYS_WITHIN_CONSTRAINT:
-                this.getChildren().get(1).simplify();
-                this.getChildren().get(2).simplify();
+                simplified &= this.getChildren().get(0).simplify();
+                simplified &= this.getChildren().get(1).simplify();
                 break;
             case HOLD_DURING_CONSTRAINT:
-                this.getChildren().get(2).simplify();
+                if (!this.getTimeInterval().isValid()) {
+                    this.setConnective(PDDLConnective.FALSE);
+                    simplified = true;
+                } else {
+                    child = this.getChildren().get(0);
+                    simplified &= child.simplify();
+                    if (child.getConnective().equals(PDDLConnective.TRUE)
+                        || child.getConnective().equals(PDDLConnective.FALSE)) {
+                        this.setConnective(child.getConnective());
+                        simplified = true;
+                    }
+                }
                 break;
             case EQUAL_COMPARISON:
             case GREATER_COMPARISON:
@@ -902,6 +908,7 @@ public class PDDLExpression extends AbstractParserObject {
             default:
                 throw new UnexpectedExpressionException(this.toString());
         }
+        return simplified;
     }
 
     /**
@@ -986,7 +993,7 @@ public class PDDLExpression extends AbstractParserObject {
      * Move the time specifier inward the expression.
      *
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     * EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
     private void moveTimeSpecifierInward() {
         assert this.getConnective().equals(PDDLConnective.AT_START)
@@ -1041,7 +1048,8 @@ public class PDDLExpression extends AbstractParserObject {
      * @param object the other object.
      * @return <tt>true</tt> if this expression is equal to <tt>object</tt>, i.e., <tt>other</tt> is
      *          not null and is an instance of <tt>PDDLExpression</tt> and it has the same connective, children,
-     *          atom, value, preference name, variable, value, taskID and task interval; otherwise return <tt>false</tt>.
+     *          atom, value, preference name, variable, value, taskID and task interval; otherwise return
+     *          <tt>false</tt>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -1123,13 +1131,13 @@ public class PDDLExpression extends AbstractParserObject {
      * Returns the set of task IDs contains in this expression.
      *
      * @return the set of task IDs contains in exp.
-     * @throws <code>UnexpectedExpressionException</code> if the expression is not a TASK, F_TASK_TIME,
-     * LESS_ORDERING_CONSTRAINT, LESS_OR_EQUAL_ORDERING_CONSTRAINT, GREATER_ORDERING_CONSTRAINT,
-     * GREATER_OR_EQUAL_ORDERING_CONSTRAINT, EQUAL_ORDERING_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
-     * HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
-     * HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
+     * @throws UnexpectedExpressionException if the expression is not a TASK, F_TASK_TIME,
+     *      LESS_ORDERING_CONSTRAINT, LESS_OR_EQUAL_ORDERING_CONSTRAINT, GREATER_ORDERING_CONSTRAINT,
+     *      GREATER_OR_EQUAL_ORDERING_CONSTRAINT, EQUAL_ORDERING_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
+     *      HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
+     *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
      */
-    public Set<PDDLSymbol> getTaskIDs() {
+    public Set<PDDLSymbol> getTaskIDs() throws UnexpectedExpressionException {
         Set<PDDLSymbol> taskIDs  = new HashSet<PDDLSymbol>();
         switch (this.getConnective()) {
             case TASK:
@@ -1295,7 +1303,6 @@ public class PDDLExpression extends AbstractParserObject {
                 break;
             case FN_ATOM:
             case WHEN:
-            case DURATION_ATOM:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -1306,17 +1313,17 @@ public class PDDLExpression extends AbstractParserObject {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
-                str.append("(")
-                    .append(this.getConnective().getImage()).append(" ")
-                    .append(this.children.get(0).toString(baseOffset)).append(" ")
-                    .append(this.children.get(1).toString(baseOffset))
-                    .append(")");
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.children.get(0).toString(baseOffset)).append(" ");
+                str.append(this.children.get(1).toString(baseOffset));
+                str.append(")");
                 break;
             case LESS_ORDERING_CONSTRAINT:
             case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
@@ -1337,46 +1344,6 @@ public class PDDLExpression extends AbstractParserObject {
             case ALWAYS_CONSTRAINT:
             case SOMETIME_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
-                str.append("(")
-                    .append(this.getConnective().getImage()).append(" ")
-                    .append(this.getChildren().get(0).toString(baseOffset))
-                    .append(")");
-                break;
-            case MINIMIZE:
-            case MAXIMIZE:
-                str.append(this.getConnective().getImage()).append(" ")
-                    .append(this.getChildren().get(0).getValue())
-                    .append(")");
-                break;
-            case IS_VIOLATED:
-                str.append("(").append(this.getConnective().getImage()).append(")");
-                break;
-            case HOLD_AFTER_CONSTRAINT:
-            case WITHIN_CONSTRAINT:
-                str.append("(")
-                    .append(this.getConnective().getImage())
-                    .append(" ")
-                    .append(this.getChildren().get(0).getValue())
-                    .append(" ")
-                    .append(this.getChildren().get(1).toString(baseOffset))
-                    .append(")");
-                break;
-            case ALWAYS_WITHIN_CONSTRAINT:
-                str.append("(")
-                    .append(this.getConnective().getImage()).append(" ")
-                    .append(this.getChildren().get(0).getValue()).append(" ")
-                    .append(this.getChildren().get(1).toString(baseOffset)).append(" ")
-                    .append(this.getChildren().get(2).toString(baseOffset))
-                    .append(")");
-                break;
-            case HOLD_DURING_CONSTRAINT:
-                str.append("(")
-                    .append(this.getConnective().getImage()).append(" ")
-                    .append(this.getChildren().get(0).getValue()).append(" ")
-                    .append(this.getChildren().get(1).getValue()).append(" ")
-                    .append(this.getChildren().get(2).toString(baseOffset))
-                    .append(")");
-                break;
             case AT_END_METHOD_CONSTRAINT:
             case AT_START_METHOD_CONSTRAINT:
             case ALWAYS_METHOD_CONSTRAINT:
@@ -1387,6 +1354,18 @@ public class PDDLExpression extends AbstractParserObject {
                 str.append(this.getChildren().get(0).toString(baseOffset));
                 str.append(")");
                 break;
+            case MINIMIZE:
+            case MAXIMIZE:
+                str.append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue())
+                    .append(")");
+                break;
+            case IS_VIOLATED:
+                str.append("(").append(this.getConnective().getImage()).append(")");
+                break;
+            case TIMED_LITERAL:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case SOMETIME_BEFORE_METHOD_CONSTRAINT:
@@ -1397,6 +1376,7 @@ public class PDDLExpression extends AbstractParserObject {
                 str.append(this.getChildren().get(0).toString(baseOffset));
                 str.append(")");
                 break;
+            case HOLD_DURING_CONSTRAINT:
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
                 str.append("(");
@@ -1404,6 +1384,15 @@ public class PDDLExpression extends AbstractParserObject {
                 str.append(this.getTimeInterval().getLowerBound()).append(" ");
                 str.append(this.getTimeInterval().getUpperBound()).append(" ");
                 str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(")");
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getTimeInterval().getLowerBound()).append(" ");
+                str.append(this.getTimeInterval().getUpperBound()).append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(this.getChildren().get(1).toString(baseOffset));
                 str.append(")");
                 break;
             default:
@@ -1416,18 +1405,28 @@ public class PDDLExpression extends AbstractParserObject {
     /**
      * Returns if this expression is malformed. An expression is considered as well in the following cases:
      * <ul>
-     * <li>Empty OR and AND expressions, i.e., without any children, are considered as well formed.</li>
+     * <li>OR and AND expressions have to have all their child well-formed.</li>
+     * <li>EQUAL_ATOM expressions are well-formed if the expression contains an atom of at least two symbols.</li>
      * <li>Quantified expressions (EXISTS, FORALL) is well formed if it has at least one quantified variable and one
      * child expression.</li>
+     * <li>IMPLY, WHEN, EQUAL_COMPARISON, LESS_COMPARISON, LESS_OR_EQUAL_COMPARISON, GREATER_COMPARISON,
+     * GREATER_OR_EQUAL_COMPARISON, ASSIGN, INCREASE, DECREASE, SCALE_UP, SCALE_DOWN, MULTIPLICATION, DIVISION, MINUS,
+     * PLUS, SOMETIME_AFTER_CONSTRAINT, SOMETIME_BEFORE_CONSTRAINT expressions are well-formed if they have to child and
+     * both child are well-formed.</li>
+     * <li> NOT, UMINUS, AT_START, AT_END, OVER_ALL, MINIMIZE, MAXIMIZE, F_EXP_T, F_EXP, AT_END_METHOD_CONSTRAINT,
+     * AT_START_METHOD_CONSTRAINT, ALWAYS_METHOD_CONSTRAINT, AT_MOST_ONCE_METHOD_CONSTRAINT, SOMETIME_METHOD_CONSTRAINT
+     * expression are well-formed if they have on child and if it is well-formed.</li>
      * <li>ATOM, TASKS, and F_HEAD expressions without any symbols as arguments are considered as well formed.</li>
-     * <li>EQUAL_ATOM expression with two symbols as arguments is considered as well formed.</li>
-     * <li>NOT, UMINUS, AT_START, AT_END, OVER_ALL, ALWAYS, SOMETIME, AT_MOST_ONCE, MINIMIZE, MAXIMIZE and F_EXP_T
-     * expressions must have at least one child expression to be considered as well formed.</li>
-     * <li>FN_ATOM, WHEN, DURATION_ATOM, LESS, LESS_OR_EQUAL, EQUAL, GREATER, GREATER_OR_EQUAL, ASSIGN, INCREASE,
-     * DECREASE, SCALE_UP, SCALE_DOWN, MUL, DIV, MINUS, PLUS, SOMETIME_AFTER, SOMETIME_BEFORE, HOLD_AFTER and WITHIN
-     * must have at least two children expressions to be considered as well formed.</li>
-     * <li>ALWAYS_WITHIN and HOLD_DURING must have at least three children expressions to be considered as well formed.
-     * </li>
+     * <li>TIMED_LITERAL, WITHIN_CONSTRAINT, HOLD_AFTER_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
+     * HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT,
+     * SOMETIME_AFTER_METHOD_CONSTRAINT expressions are considered as well-formed if they have well-formed child and a
+     * time value.</li>
+     * <li>HOLD_DURING_CONSTRAINT, HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT expressions are
+     * well-formed if they have two child well-formed and an time interval value.</li>
+     * <li>ALWAYS_WITHIN expression must have at least two children to be considered as well formed and time interval
+     * value.</li>.
+     * <li>NUMBER expressions are considered is they have a value.</li>
+     * <li>TIME_VAR, IS_VIOLATED exprssions are always considered as well-formed</li>
      * </ul>
      *
      * @return <code>true</code> if the expression is malformed; <code>false</code> otherwise.
@@ -1435,29 +1434,23 @@ public class PDDLExpression extends AbstractParserObject {
     public boolean isMalformedExpression() {
         boolean malformed = false;
         switch (this.connective) {
+            case AND:
+            case OR:
+                Iterator<PDDLExpression> i = this.getChildren().iterator();
+                while (!malformed && i.hasNext()) {
+                    malformed |= i.next().isMalformedExpression();
+                }
+                break;
             case EQUAL_ATOM:
                 malformed = this.atom.size() != 2;
                 break;
             case FORALL:
             case EXISTS:
-                malformed = this.variables.isEmpty() || this.children.isEmpty()
-                    && this.children.get(0).isMalformedExpression();
+                malformed = this.variables.isEmpty()
+                    || this.children.isEmpty()
+                    || this.children.get(0).isMalformedExpression();
                 break;
-            case ALWAYS_WITHIN_CONSTRAINT:
-            case HOLD_DURING_CONSTRAINT:
-                malformed = this.children.size() != 3
-                    && this.children.get(0).isMalformedExpression()
-                    && this.children.get(1).isMalformedExpression()
-                    && this.children.get(2).isMalformedExpression();
-                break;
-            case DURATION_ATOM:
-            case SOMETIME_AFTER_CONSTRAINT:
-            case SOMETIME_BEFORE_CONSTRAINT:
-            case HOLD_AFTER_CONSTRAINT:
-            case LESS_ORDERING_CONSTRAINT:
-            case WITHIN_CONSTRAINT:
-                malformed = this.atom.size() != 2;
-                break;
+            case IMPLY:
             case WHEN:
             case EQUAL_COMPARISON:
             case LESS_COMPARISON:
@@ -1469,59 +1462,70 @@ public class PDDLExpression extends AbstractParserObject {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
                 malformed = this.children.size() != 2
-                    && this.children.get(0).isMalformedExpression()
-                    && this.children.get(1).isMalformedExpression();
+                    || this.children.get(0).isMalformedExpression()
+                    || this.children.get(1).isMalformedExpression();
                 break;
             case NOT:
             case UMINUS:
             case AT_START:
             case AT_END:
             case OVER_ALL:
-            case ALWAYS_CONSTRAINT:
-            case SOMETIME_CONSTRAINT:
-            case AT_MOST_ONCE_CONSTRAINT:
             case MINIMIZE:
             case MAXIMIZE:
             case F_EXP_T:
             case F_EXP:
-                malformed = this.children.size() != 1
-                    && this.children.get(0).isMalformedExpression();
-                break;
-            case ATOM:
-            case TASK:
-            case FN_HEAD:
-                malformed = this.getAtom().size() == 0;
-                break;
-            case TIME_VAR:
-            case NUMBER:
-            case IS_VIOLATED:
-            case AND:
-            case OR:
-                break;
             case AT_END_METHOD_CONSTRAINT:
             case AT_START_METHOD_CONSTRAINT:
             case ALWAYS_METHOD_CONSTRAINT:
             case AT_MOST_ONCE_METHOD_CONSTRAINT:
             case SOMETIME_METHOD_CONSTRAINT:
-                malformed = this.getChildren().size() != 1;
+                malformed = this.children.size() != 1
+                    || this.children.get(0).isMalformedExpression();
                 break;
+            case ATOM:
+            case TASK:
+            case FN_HEAD:
+                malformed = this.getAtom().isEmpty();
+                break;
+            case TIMED_LITERAL:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case SOMETIME_BEFORE_METHOD_CONSTRAINT:
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
-                malformed = this.getChildren().size() != 1 && this.getTime() == null;
+                malformed = this.getChildren().size() != 1
+                    || this.getTime() == null
+                    || this.getChildren().get(0).isMalformedExpression();
                 break;
+            case HOLD_DURING_CONSTRAINT:
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
-                malformed = this.getChildren().size() != 1 && this.getTimeInterval() == null;
+                malformed = this.getChildren().size() != 1
+                    || this.getTimeInterval() == null
+                    || this.getChildren().get(0).isMalformedExpression();
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                malformed = this.getChildren().size() != 1
+                    || this.getTime() == null
+                    || this.getChildren().get(0).isMalformedExpression()
+                    || this.getChildren().get(1).isMalformedExpression();
+                break;
+            case NUMBER:
+                malformed = this.getValue() == null;
+                break;
+            case TIME_VAR:
+            case IS_VIOLATED:
                 break;
             default:
-                // Do nothing
+                throw new UnexpectedExpressionException(this.getConnective().toString());
 
         }
         return malformed;

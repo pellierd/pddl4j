@@ -1175,16 +1175,17 @@ PDDLExpression sometime_con_gd() :
 PDDLExpression within_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.WITHIN_CONSTRAINT);
-	PDDLExpression num, exp;
+	PDDLExpression exp;
+	PDDLSymbol time;
     Token begin, end;
 }
 {
 	begin=left_bracket() <WITHIN>
-		num=number()
+		time=number_symbol()
 		exp=gd()
 	end=right_bracket()
 	{
-		conGD.addChild(num);
+		conGD.setTime(time);
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
         conGD.setEnd(end);
@@ -1257,17 +1258,18 @@ PDDLExpression sometime_before_con_gd() :
 PDDLExpression always_within_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_WITHIN_CONSTRAINT);
-	PDDLExpression num, gd1, gd2;
+	PDDLExpression gd1, gd2;
+	PDDLSymbol time;
     Token begin, end;
 }
 {
 	begin=left_bracket() <ALWAYS_WITHIN>
-		num=number()
+		time=number_symbol()
 		gd1=gd()
 		gd2=gd()
 	end=right_bracket()
 	{
-		conGD.addChild(num);
+		conGD.setTime(time);
 		conGD.addChild(gd1);
 		conGD.addChild(gd2);
 		return conGD;
@@ -1277,18 +1279,18 @@ PDDLExpression always_within_con_gd() :
 PDDLExpression hold_during_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_DURING_CONSTRAINT);
-	PDDLExpression exp, num1, num2;
+	PDDLExpression exp;
+	PDDLSymbol lower, upper;
     Token begin, end;
 }
 {
 	begin=left_bracket() <HOLD_DURING>
-		num1=number()
-		num2=number()
+		lower=number_symbol()
+		upper=number_symbol()
 		exp=gd()
 	end=right_bracket()
 	{
-		conGD.addChild(num1);
-		conGD.addChild(num2);
+		conGD.setTimeInterval(new PDDLTimeInterval(lower, upper));
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
         conGD.setEnd(end);
@@ -1299,16 +1301,17 @@ PDDLExpression hold_during_con_gd() :
 PDDLExpression hold_after_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_AFTER_CONSTRAINT);
-	PDDLExpression exp, num;
+	PDDLExpression exp;
+	PDDLSymbol time;
     Token begin, end;
 }
 {
 	begin=left_bracket() <HOLD_AFTER>
-		num=number()
+		time=number_symbol()
 		exp=gd()
 	end=right_bracket()
 	{
-		conGD.addChild(num);
+		conGD.setTime(time);
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
         conGD.setEnd(end);
@@ -1742,6 +1745,16 @@ PDDLExpression f_exp() :
 	}
 }
 
+PDDLSymbol number_symbol() :
+{
+	Token t = null;
+}
+{
+	t=<NUMBER> {
+        return new PDDLSymbol(PDDLSymbol.Kind.NUMBER, t);
+	}
+}
+
 PDDLExpression number() :
 {
 	Token t = null;
@@ -1828,7 +1841,7 @@ PDDLExpression substract_op() :
 
 PDDLExpression multiply_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MULTIPLICATION);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -1849,7 +1862,7 @@ PDDLExpression multiply_op() :
 
 PDDLExpression divide_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIVISION);
 	PDDLExpression op1 = null;
 	PDDLExpression op2 = null;
     Token begin = null;
@@ -1963,22 +1976,28 @@ PDDLMethod method_def() : // ADD HDDL
 	PDDLExpression taskID = null;
 	PDDLExpression precondition = new PDDLExpression(PDDLConnective.AND);
 	PDDLTaskNetwork tn = null;
+	Token begin = null;
+    Token end = null;
+
 }
 {
 	try {
-		left_bracket() <METHOD> name=method_name()
+		begin=left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
 			    <PRECONDITION> precondition=pre_gd()
 			]
             tn = task_network()
-			right_bracket()
+		end=right_bracket()
 	} catch(Throwable e) {
 	    this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLMethod(name, parameters, taskID, precondition, tn);
+		PDDLMethod m = new PDDLMethod(name, parameters, taskID, precondition, tn);
+		m.setBegin(begin);
+        m.setEnd(end);
+        return m;
 	}
 }
 
@@ -1990,10 +2009,13 @@ PDDLMethod durative_method_def() : // ADD HDDL2.1
 	PDDLExpression duration = null;
 	PDDLExpression condition = new PDDLExpression(PDDLConnective.AND);
 	PDDLTaskNetwork tn = null;
+	Token begin = null;
+    Token end = null;
+
 }
 {
 	try {
-	    left_bracket() <DURATIVE_METHOD> name=method_name()
+	    begin=left_bracket() <DURATIVE_METHOD> name=method_name()
 	        <PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[<DURATION> duration=method_duration_constraint()]
@@ -2001,12 +2023,15 @@ PDDLMethod durative_method_def() : // ADD HDDL2.1
 			    <CONDITION> condition=da_gd()
 			]
             tn = task_network()
-		right_bracket()
+		end=right_bracket()
 	} catch(Throwable e) {
         this.error(e, token.beginLine, token.beginColumn);
     }
     {
-    	return new PDDLMethod(name, parameters, taskID, duration, condition, tn);
+    	PDDLMethod m = new PDDLMethod(name, parameters, taskID, duration, condition, tn);
+    	m.setBegin(begin);
+        m.setEnd(end);
+        return m;
     }
 }
 
@@ -2655,6 +2680,8 @@ PDDLDerivedPredicate derived_def() :
 {
 	PDDLNamedTypedList head = null;
 	PDDLExpression body = null;
+	Token begin = null;
+	Token end = null;
 }
 {
 	try {
@@ -2666,7 +2693,10 @@ PDDLDerivedPredicate derived_def() :
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLDerivedPredicate(head, body);
+		PDDLDerivedPredicate axiom = new PDDLDerivedPredicate(head, body);
+		axiom.setBegin(begin);
+		axiom.setEnd(end);
+		return axiom;
 	}
 }
 
@@ -2676,19 +2706,24 @@ PDDLAction action_def() :
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
+	Token begin = null;
+	Token end = null;
 }
 {
 	try {
-		left_bracket() <ACTION> name=action_name()
+		begin=left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 		    <PRECONDITION> preconds=pre_gd()
 		    <EFFECT> effects=effect()
-			right_bracket()
+		end=right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLAction(name, parameters, preconds, effects);
+		PDDLAction a = new PDDLAction(name, parameters, preconds, effects);
+		a.setBegin(begin);
+		a.setEnd(end);
+		return a;
 	}
 }
 
@@ -2698,19 +2733,25 @@ PDDLAction htn_action_def() :
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
+    Token begin = null;
+    Token end = null;
+
 }
 {
 	try {
-		left_bracket() <ACTION> name=action_name()
+		begin=left_bracket() <ACTION> name=action_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 		    [LOOKAHEAD(2) <PRECONDITION> preconds=pre_gd()]
 			[LOOKAHEAD(2) <EFFECT> effects=effect()]
-			right_bracket()
+		end=right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLAction(name, parameters, preconds, effects);
+		PDDLAction a =  new PDDLAction(name, parameters, preconds, effects);
+		a.setBegin(begin);
+        a.setEnd(end);
+        return a;
 	}
 }
 
@@ -3153,10 +3194,13 @@ PDDLAction durative_action_def() :
 	PDDLExpression duration = null;
 	PDDLExpression condition = null;
 	PDDLExpression effect = null;
+	Token begin = null;
+    Token end = null;
+
 }
 {
 	try {
-		left_bracket() <DURATIVE_ACTION> name=da_symbol()
+		begin=left_bracket() <DURATIVE_ACTION> name=da_symbol()
 			<PARAMETERS>
 				left_bracket()
 					parameters=typed_list(Lexer.VARIABLE)
@@ -3164,12 +3208,15 @@ PDDLAction durative_action_def() :
 			<DURATION> duration=duration_constraint()
 			<CONDITION> condition=da_gd()
 			<EFFECT> effect=da_effect()
-			right_bracket()
+		end=right_bracket()
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
 	}
 	{
-		return new PDDLAction(name, parameters, condition, effect, duration);
+		PDDLAction a = new PDDLAction(name, parameters, condition, effect, duration);
+		a.setBegin(begin);
+		a.setEnd(end);
+		return a;
 	}
 }
 
@@ -4254,7 +4301,7 @@ PDDLExpression da_substract_op() :
 
 PDDLExpression da_multiply_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MULTIPLICATION);
 	PDDLExpression op1, op2;
 	Token begin, end;
 }
@@ -4273,7 +4320,7 @@ PDDLExpression da_multiply_op() :
 
 PDDLExpression da_divide_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIVISION);
 	PDDLExpression op1, op2;
 	Token begin, end;
 }
@@ -4468,17 +4515,18 @@ PDDLExpression equal_init_el() :
 
 PDDLExpression timed_literal() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DURATION_ATOM);
-	PDDLExpression op1, op2;
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.TIMED_LITERAL);
+	PDDLExpression literal;
+	PDDLSymbol time;
 	Token begin, end;
 }
 {
 	begin=left_bracket() <AT>
-		op1=number()
-		op2=literal(Lexer.CONSTANT)
+		time=number_symbol()
+		literal=literal(Lexer.CONSTANT)
 	end=right_bracket() {
-		exp.addChild(op1);
-		exp.addChild(op2);
+		exp.setTime(time);
+		exp.addChild(literal);
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -4805,7 +4853,7 @@ PDDLExpression substract_op_metric_f_exp() :
 
 PDDLExpression div_op_metric_f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIV);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIVISION);
 	PDDLExpression op1, op2;
 	Token begin, end;
 }
@@ -4826,7 +4874,7 @@ PDDLExpression div_op_metric_f_exp() :
 
 PDDLExpression multi_op_metric_f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MUL);
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.MULTIPLICATION);
 	PDDLExpression op;
 	Token begin, end;
 }

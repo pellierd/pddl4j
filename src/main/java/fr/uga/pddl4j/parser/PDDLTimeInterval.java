@@ -129,6 +129,20 @@ public class PDDLTimeInterval implements Serializable {
     }
 
     /**
+     * Returns if this interval is valid. An interval is valid if it is an internal defined over task id or if it is
+     * defined on number the lower bound is less or equal to the upper bound.
+     *
+     * @return <code>true</code> if the interval is valid; <code>false</code> otherwise.
+     */
+    public final boolean isValid() {
+        return (this.getUpperBound().getKind().equals(PDDLSymbol.Kind.TASK_ID)
+            && this.getLowerBound().getKind().equals(PDDLSymbol.Kind.TASK_ID))
+            || (this.getUpperBound().getKind().equals(PDDLSymbol.Kind.NUMBER)
+            && this.getLowerBound().getKind().equals(PDDLSymbol.Kind.NUMBER)
+            && this.getLowerBound().getValue() <= this.getUpperBound().getValue());
+    }
+
+    /**
      * Returns a string representation of this interval.
      *
      * @return a string representation of this interval.

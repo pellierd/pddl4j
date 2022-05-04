@@ -151,7 +151,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case EQUAL_ATOM:
             case FN_HEAD:
             case FN_ATOM:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -162,8 +162,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
@@ -422,8 +422,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
@@ -445,7 +445,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case FN_ATOM:
             case NUMBER:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case TIME_VAR:
             case IS_VIOLATED:
             case MINIMIZE:
@@ -527,8 +527,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case PLUS:
             case MINUS:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
                 IntExpression op1 = exp.getChildren().get(0);
                 IntExpression op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
@@ -546,10 +546,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                         case MINUS:
                             exp.setValue(op1.getValue() - op2.getValue());
                             break;
-                        case MUL:
+                        case MULTIPLICATION:
                             exp.setValue(op1.getValue() * op2.getValue());
                             break;
-                        case DIV:
+                        case DIVISION:
                             exp.setValue(op1.getValue() / op2.getValue());
                             break;
                         default:

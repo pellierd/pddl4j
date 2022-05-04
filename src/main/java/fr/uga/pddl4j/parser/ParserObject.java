@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.parser.lexer.Token;
+
 import java.io.Serializable;
 
 /**
@@ -112,5 +114,19 @@ public interface ParserObject extends Serializable {
      * @param endColumn the end column of the file where this object appears.
      */
     void setEndColumn(final int endColumn);
+
+    /**
+     * Sets the begin line and column of the expression from a specified token.
+     *
+     * @param begin the first token of the expression.
+     */
+    void setBegin(final Token begin);
+
+    /**
+     * Sets the end line and column of the expression from a specified token.
+     *
+     * @param end the last token of the expression.
+     */
+    void setEnd(final Token end);
 
 }

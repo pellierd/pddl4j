@@ -194,7 +194,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EQUAL_ATOM:
             case FN_HEAD:
             case FN_ATOM:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -205,8 +205,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
@@ -494,7 +494,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EQUAL_ATOM:
             case FN_HEAD:
             case FN_ATOM:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -505,8 +505,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case F_EXP_T:
@@ -572,7 +572,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EQUAL_ATOM:
             case FN_HEAD:
             case FN_ATOM:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -583,8 +583,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case F_EXP_T:
@@ -866,7 +866,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EQUAL_ATOM:
             case FN_HEAD:
             case FN_ATOM:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -877,8 +877,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case F_EXP_T:
@@ -1059,8 +1059,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
@@ -1095,7 +1095,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case FN_ATOM:
             case NUMBER:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case TIME_VAR:
             case IS_VIOLATED:
             case MINIMIZE:
@@ -1340,8 +1340,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
@@ -1363,7 +1363,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case FN_ATOM:
             case NUMBER:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case TIME_VAR:
             case IS_VIOLATED:
             case MINIMIZE:

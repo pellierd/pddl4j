@@ -357,8 +357,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
 
@@ -383,7 +383,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 break;
             case FN_ATOM:
             case NUMBER:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case TIME_VAR:
             case IS_VIOLATED:
             case MINIMIZE:
@@ -447,8 +447,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case EQUAL_COMPARISON:
             case GREATER_COMPARISON:
             case GREATER_OR_EQUAL_COMPARISON:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case ASSIGN:
@@ -940,12 +940,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 left = this.finalizeArithmeticExpression(exp.getChildren().get(0));
                 arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.UMINUS, left, null);
                 break;
-            case DIV:
+            case DIVISION:
                 left = this.finalizeArithmeticExpression(exp.getChildren().get(0));
                 right = this.finalizeArithmeticExpression(exp.getChildren().get(1));
                 arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.DIV, left, right);
                 break;
-            case MUL:
+            case MULTIPLICATION:
                 left = this.finalizeArithmeticExpression(exp.getChildren().get(0));
                 right = this.finalizeArithmeticExpression(exp.getChildren().get(1));
                 arithmeticExpression = new ArithmeticExpression(ArithmeticOperator.MUL, left, right);

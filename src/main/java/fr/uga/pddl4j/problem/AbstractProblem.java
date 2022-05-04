@@ -671,8 +671,8 @@ public abstract class AbstractProblem implements Problem {
             case LESS_OR_EQUAL_COMPARISON:
             case GREATER_COMPARISON:
             case GREATER_OR_EQUAL_COMPARISON:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case ASSIGN:
@@ -1229,7 +1229,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FN_ATOM:
             case WHEN:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -1240,8 +1240,8 @@ public abstract class AbstractProblem implements Problem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:
@@ -1573,7 +1573,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FN_ATOM:
             case WHEN:
-            case DURATION_ATOM:
+            case TIMED_LITERAL:
             case LESS_COMPARISON:
             case LESS_OR_EQUAL_COMPARISON:
             case EQUAL_COMPARISON:
@@ -1584,8 +1584,8 @@ public abstract class AbstractProblem implements Problem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-            case MUL:
-            case DIV:
+            case MULTIPLICATION:
+            case DIVISION:
             case MINUS:
             case PLUS:
             case SOMETIME_AFTER_CONSTRAINT:

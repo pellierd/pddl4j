@@ -30,7 +30,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLDerivedPredicate implements Serializable {
+public class PDDLDerivedPredicate extends AbstractParserObject {
 
     /**
      * The head of the derived predicate.

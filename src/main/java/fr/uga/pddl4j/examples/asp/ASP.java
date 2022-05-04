@@ -115,7 +115,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      * @param weight the weight of the heuristic. The weight must be greater than 0.
      * @throws IllegalArgumentException if the weight is strictly less than 0.
      */
-    @CommandLine.Option(names = { "-w", "--weight" }, defaultValue = "1.0",
+    @CommandLine.Option(names = {"-w", "--weight"}, defaultValue = "1.0",
         paramLabel = "<weight>", description = "Set the weight of the heuristic (preset 1.0).")
     public void setHeuristicWeight(final double weight) {
         if (weight <= 0) {
@@ -129,10 +129,10 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      *
      * @param heuristic the name of the heuristic.
      */
-    @CommandLine.Option(names = { "-e", "--heuristic" }, defaultValue = "FAST_FORWARD",
+    @CommandLine.Option(names = {"-e", "--heuristic"}, defaultValue = "FAST_FORWARD",
         description = "Set the heuristic : AJUSTED_SUM, AJUSTED_SUM2, AJUSTED_SUM2M, COMBO, "
             + "MAX, FAST_FORWARD SET_LEVEL, SUM, SUM_MUTEX (preset: FAST_FORWARD)")
-    public void setHeuristic(StateHeuristic.Name heuristic)  {
+    public void setHeuristic(StateHeuristic.Name heuristic) {
         this.heuristic = heuristic;
     }
 
@@ -228,7 +228,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      */
     @Override
     public PlannerConfiguration getConfiguration() {
-        final PlannerConfiguration config =  super.getConfiguration();
+        final PlannerConfiguration config = super.getConfiguration();
         config.setProperty(ASP.HEURISTIC_SETTING, this.getHeuristic().toString());
         config.setProperty(ASP.WEIGHT_HEURISTIC_SETTING, Double.toString(this.getHeuristicWeight()));
         return config;
@@ -293,7 +293,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
         final double weight = this.getHeuristicWeight();
         final PriorityQueue<Node> open = new PriorityQueue<>(100, new Comparator<Node>() {
             public int compare(Node n1, Node n2) {
-                double f1 =  weight * n1.getHeuristic() + n1.getCost();
+                double f1 = weight * n1.getHeuristic() + n1.getCost();
                 double f2 = weight * n2.getHeuristic() + n2.getCost();
                 return Double.compare(f1, f2);
             }
@@ -320,10 +320,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
             // If the goal is satisfied in the current node then extract the search and return it
             if (current.satisfy(problem.getGoal())) {
                 return this.extractPlan(current, problem);
-            }
-
-            // Else we try to apply the actions of the problem to the current node
-            else {
+            } else { // Else we try to apply the actions of the problem to the current node
                 for (int i = 0; i < problem.getActions().size(); i++) {
                     // We get the actions of the problem
                     Action a = problem.getActions().get(i);
@@ -358,7 +355,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
     /**
      * Extracts a search from a specified node.
      *
-     * @param node the node.
+     * @param node    the node.
      * @param problem the problem.
      * @return the search extracted from the specified node.
      */

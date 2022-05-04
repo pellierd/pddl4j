@@ -84,9 +84,9 @@ public enum PDDLConnective {
      */
     FN_HEAD(""),
     /**
-     * The connective for the duration atomic expressions.
+     * The connective for the duration literal expressions.
      */
-    DURATION_ATOM("at"),
+    TIMED_LITERAL("at"),
     /**
      * The connective for the binary comparison expressions less.
      */
@@ -110,11 +110,11 @@ public enum PDDLConnective {
     /**
      * The connective for the binary operation expressions multiplication.
      */
-    MUL("*"),
+    MULTIPLICATION("*"),
     /**
      * The connective for the binary operation expressions division.
      */
-    DIV("/"),
+    DIVISION("/"),
     /**
      * The connective for the binary operation expressions minus.
      */
@@ -294,7 +294,7 @@ public enum PDDLConnective {
     /**
      * PDDLConnective for sometime after method constraints in HDDL fragment.
      */
-     SOMETIME_AFTER_METHOD_CONSTRAINT("sometimes-after");
+    SOMETIME_AFTER_METHOD_CONSTRAINT("sometimes-after");
 
     /**
      * The image associate to the connective in the PDDL language.

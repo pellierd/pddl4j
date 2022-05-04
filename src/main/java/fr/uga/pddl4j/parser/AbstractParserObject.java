@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.parser;
 
+import fr.uga.pddl4j.parser.lexer.Token;
+
 /**
  * This abstract class implements the common methods of all object produced by the parser.
  *
@@ -90,7 +92,7 @@ public class AbstractParserObject implements ParserObject {
      * <code>DEFAULT_BEGIN_LIN</code> indicates that the attribute was not initialized.
      *
      * @return the begin line of the file where this object appears or <code>DEFAULT_BEGIN_LINE</code> if it
-     * was not initialized.
+     *      was not initialized.
      */
     public final int getBeginLine() {
         return this.beginLine;
@@ -110,7 +112,7 @@ public class AbstractParserObject implements ParserObject {
      * <code>DEFAULT_BEGIN_COLUMN</code> indicates that the attribute was not initialized.
      *
      * @return the begin column of the file where this object appears or <code>DEFAULT_BEGIN_COLUMN</code> if
-     * it was not initialized.
+     *      it was not initialized.
      */
     public final int getBeginColumn() {
         return this.beginColumn;
@@ -130,7 +132,7 @@ public class AbstractParserObject implements ParserObject {
      * indicates that the attribute was not initialized.
      *
      * @return the end line of the file where this object appears or <code>DEFAULT_EN_LINE</code> if it was
-     * not initialized.
+     *      not initialized.
      */
     public final int getEndLine() {
         return this.endLine;
@@ -150,7 +152,7 @@ public class AbstractParserObject implements ParserObject {
      * indicates that the attribute was not initialized.
      *
      * @return the end column of the file where this object appears or <code>DEFAULT_END_COLUMN</code> if it
-     * was not initialized.
+     *      was not initialized.
      */
     public final int getEndColumn() {
         return this.endColumn;
@@ -161,7 +163,27 @@ public class AbstractParserObject implements ParserObject {
      *
      * @param endColumn the end column of the file where this object appears.
      */
-    public void setEndColumn(final int endColumn) {
+    public final void setEndColumn(final int endColumn) {
         this.endColumn = endColumn;
+    }
+
+    /**
+     * Sets the begin line and column of the expression from a specified token.
+     *
+     * @param begin the first token of the expression.
+     */
+    public final void setBegin(final Token begin) {
+        this.setBeginLine(begin.beginLine);
+        this.setBeginColumn(begin.beginColumn);
+    }
+
+    /**
+     * Sets the end line and column of the expression from a specified token.
+     *
+     * @param end the last token of the expression.
+     */
+    public final void setEnd(final Token end) {
+        this.setEndLine(end.endLine);
+        this.setEndColumn(end.endColumn);
     }
 }
