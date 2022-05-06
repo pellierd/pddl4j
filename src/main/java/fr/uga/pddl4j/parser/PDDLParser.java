@@ -1864,6 +1864,7 @@ public final class PDDLParser implements Callable<Integer> {
             case AT_START:
             case AT_END:
             case OVER_ALL:
+            case AT_END_CONSTRAINT:
             case ALWAYS_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
             case SOMETIME_CONSTRAINT:
