@@ -296,7 +296,6 @@ public abstract class AbstractProblem implements Problem {
         super();
     }
 
-
     /**
      * Creates a new problem from a domain and problem.
      *
@@ -304,7 +303,6 @@ public abstract class AbstractProblem implements Problem {
      */
     public AbstractProblem(final ParsedProblem problem) {
         this();
-        //this.domain = domain;
         this.problem = problem;
     }
 
@@ -425,27 +423,11 @@ public abstract class AbstractProblem implements Problem {
         return this.compoundTaskSymbols;
     }
 
-
     /**
      * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
      * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
      */
     public final void instantiate() {
-        this.initialization();
-        this.preinstantiation();
-        this.instantiation();
-        this.postinstantiation();
-        this.finalization();
-    }
-
-    /**
-     * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
-     * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
-     *
-     * @param level the log level.
-     */
-    public final void instantiate(final Level level) {
-        //this.setTraceLevel(level);
         this.initialization();
         this.preinstantiation();
         this.instantiation();

@@ -138,13 +138,6 @@ public interface Problem extends Serializable {
     void instantiate();
 
     /**
-     * Instantiate the problem.
-     *
-     * @param level the log level.
-     */
-    void instantiate(final Level level);
-
-    /**
      * Returns a string representation of a specified operator.
      *
      * @param action     the action.
