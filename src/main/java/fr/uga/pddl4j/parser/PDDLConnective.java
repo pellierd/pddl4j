@@ -180,6 +180,10 @@ public enum PDDLConnective {
      */
     WHEN("when"),
     /**
+     * The connective for the at end constraint expressions.
+     */
+    AT_END_CONSTRAINT("at end"),
+    /**
      * The connective for the always expressions.
      */
     ALWAYS_CONSTRAINT("always"),

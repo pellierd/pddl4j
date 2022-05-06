@@ -542,10 +542,6 @@ public abstract class AbstractProblem implements Problem {
         for (PDDLNamedTypedList function : this.problem.getFunctions()) {
             this.initEitherTypes(function.getArguments());
         }
-        // Collect the types from the constraints declaration of the domain
-        if (this.problem.getConstraints() != null) {
-            this.initEitherTypes(this.problem.getConstraints());
-        }
         // Collect the types from the derived predicates
         for (PDDLDerivedPredicate axiom : this.problem.getDerivesPredicates()) {
             this.initEitherTypes(axiom.getHead().getArguments());
@@ -625,6 +621,7 @@ public abstract class AbstractProblem implements Problem {
             case AT_START:
             case AT_END:
             case OVER_ALL:
+            case AT_END_CONSTRAINT:
             case ALWAYS_CONSTRAINT:
             case SOMETIME_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
