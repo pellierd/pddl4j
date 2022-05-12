@@ -25,14 +25,14 @@ package fr.uga.pddl4j.parser;
  * @author Cedric Gerard
  * @version 1.0 - 03/03/2016
  */
-public class UnexpectedExpressionException extends RuntimeException {
+public class UnexpectedPDDLExpressionException extends RuntimeException {
 
     /**
      * Default constructor with only string message.
      *
      * @param message the error description
      */
-    public UnexpectedExpressionException(String message) {
+    public UnexpectedPDDLExpressionException(String message) {
         super(message);
     }
 
@@ -42,7 +42,7 @@ public class UnexpectedExpressionException extends RuntimeException {
      * @param message the error description
      * @param cause   the cause this trigger the exception
      */
-    public UnexpectedExpressionException(String message, Throwable cause) {
+    public UnexpectedPDDLExpressionException(String message, Throwable cause) {
         super(message, cause);
     }
 }

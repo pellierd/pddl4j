@@ -314,6 +314,8 @@ public class IntExpression implements Serializable {
         this.isPrimtive = flag;
     }
 
+
+
     /**
      * Affects this expression to an other. After affectation this expression and the other are
      * equal. No copy of the content of the other expression is done.

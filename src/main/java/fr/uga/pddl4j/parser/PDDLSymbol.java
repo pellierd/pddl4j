@@ -72,7 +72,7 @@ public class PDDLSymbol extends AbstractParserObject {
         /**
          * The alias symbol.
          */
-        ALIAS,
+        //ALIAS,
         /**
          * The preference symbol.
          */
@@ -109,10 +109,6 @@ public class PDDLSymbol extends AbstractParserObject {
          * the task id symbol.
          */
         TASK_ID,
-        /**
-         * The number symbol.
-         */
-        NUMBER;
     }
 
     /**
@@ -382,7 +378,7 @@ public class PDDLSymbol extends AbstractParserObject {
     public String toString() {
         StringBuilder str = new StringBuilder();
         switch (this.kind) {
-            case TASK:
+            case TASK_ID:
                 if (this.getTimeSpecifier() != null) {
                     str.append("( ");
                     str.append(this.getTimeSpecifier());

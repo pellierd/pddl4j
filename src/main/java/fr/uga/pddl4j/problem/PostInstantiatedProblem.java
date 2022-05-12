@@ -17,7 +17,7 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.parser.UnexpectedPDDLExpressionException;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
@@ -240,7 +240,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().getImage());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().getImage());
         }
     }
 
@@ -553,7 +553,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                             exp.setValue(op1.getValue() / op2.getValue());
                             break;
                         default:
-                            throw new UnexpectedExpressionException(this.toString(exp));
+                            throw new UnexpectedPDDLExpressionException(this.toString(exp));
                     }
                     exp.setConnective(PDDLConnective.NUMBER);
 
@@ -622,7 +622,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                             }
                             break;
                         default:
-                            throw new UnexpectedExpressionException(this.toString(exp));
+                            throw new UnexpectedPDDLExpressionException(this.toString(exp));
                     }
                 }
                 break;
@@ -659,7 +659,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
     }
 

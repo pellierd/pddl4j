@@ -18,7 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.parser.UnexpectedPDDLExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.numeric.ArithmeticExpression;
@@ -470,7 +470,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
 
         }
     }
@@ -505,7 +505,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      */
     protected void finalizeActions()
-        throws UnexpectedExpressionException {
+        throws UnexpectedPDDLExpressionException {
         this.actions = new ArrayList<>(this.getIntActions().size());
         final List<Action> addedActions = new ArrayList<>();
         int actionIndex = 0;
@@ -530,7 +530,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the expression in bit set representation.
      */
-    private Effect finalizeEffect(final IntExpression exp) throws UnexpectedExpressionException {
+    private Effect finalizeEffect(final IntExpression exp) throws UnexpectedPDDLExpressionException {
         final Effect effect = new Effect();
         switch (exp.getConnective()) {
             case ATOM:
@@ -575,7 +575,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                             effect.addNumericAssignment(assignment);
                             break;
                         default:
-                            throw new UnexpectedExpressionException(ei.getConnective().toString());
+                            throw new UnexpectedPDDLExpressionException(ei.getConnective().toString());
                     }
                 }
                 break;
@@ -591,7 +591,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return effect;
     }
@@ -661,7 +661,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_DOWN, fluent, arithmeticExpression);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return assignment;
     }
@@ -747,7 +747,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     effects.addAll(ei.getChildren());
                     break;
                 default:
-                    throw new UnexpectedExpressionException(this.toString(ei));
+                    throw new UnexpectedPDDLExpressionException(this.toString(ei));
             }
         }
         if (hasUnConditionalEffects) {
@@ -818,7 +818,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param exp the <code>IntExpression</code>.
      * @return the condition encoded.
      */
-    protected Condition finalizeCondition(final IntExpression exp) throws UnexpectedExpressionException {
+    protected Condition finalizeCondition(final IntExpression exp) throws UnexpectedPDDLExpressionException {
         final Condition condition = new Condition();
         switch (exp.getConnective()) {
             case ATOM:
@@ -846,7 +846,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return condition;
     }
@@ -859,7 +859,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return the expression in bit set representation.
      */
     private List<NumericConstraint> finalizeNumericConstraints(final IntExpression exp)
-        throws UnexpectedExpressionException {
+        throws UnexpectedPDDLExpressionException {
 
         final List<NumericConstraint> constraints = new ArrayList<>();
         switch (exp.getConnective()) {
@@ -879,7 +879,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return constraints;
     }
@@ -911,7 +911,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER_OR_EQUAL, left, right);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return constraint;
     }
@@ -963,7 +963,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 arithmeticExpression = new NumericVariable(NumericVariable.DURATION);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return arithmeticExpression;
     }
@@ -989,7 +989,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     }
                     break;
                 default:
-                    throw new UnexpectedExpressionException(this.toString(fact));
+                    throw new UnexpectedPDDLExpressionException(this.toString(fact));
             }
         }
     }
@@ -1573,7 +1573,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Encode a list of specified methods into the final compact representation. The specified
      * maps are used to speed-up the search by mapping the an expression to this index.
      */
-    protected void finalizeMethods() throws UnexpectedExpressionException {
+    protected void finalizeMethods() throws UnexpectedPDDLExpressionException {
         this.methods = new ArrayList<>(this.getIntMethods().size());
         final List<Method> addedMethods = new ArrayList<>();
         int methodIndex = this.getRelevantActions().size();
@@ -1602,7 +1602,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return the list of methods encoded into final compact representation.
      */
     private Method finalizeMethod(final IntMethod method, final Map<IntExpression, Integer> factMap,
-                                    final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
+                                    final Map<IntExpression, Integer> taskMap) throws UnexpectedPDDLExpressionException {
 
         final int arity = method.arity();
         final Method encoded = new Method(method.getName(), arity);
@@ -1648,7 +1648,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param method the list of methods to normalized.
      */
-    private List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
+    private List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedPDDLExpressionException {
         final List<IntMethod> normalisedMethods = new ArrayList<>();
         final IntExpression precond = new IntExpression(method.getPreconditions());
         this.toDNF(precond);

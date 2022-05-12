@@ -1223,13 +1223,13 @@ public final class PDDLParser implements Callable<Integer> {
     private boolean checkOrderingConstraintAcyclicness(final PDDLExpression constraints) {
         Map<PDDLSymbol, Set<PDDLSymbol>> ordering = new LinkedHashMap<PDDLSymbol, Set<PDDLSymbol>>();
         for (PDDLExpression constraint : constraints.getChildren()) {
-            PDDLSymbol keyTask = constraint.getAtom().get(0);
+            PDDLSymbol keyTask = constraint.getChildren().get(0).getTaskID();
             Set<PDDLSymbol> tasks = ordering.get(keyTask);
             if (tasks == null) {
                 tasks = new HashSet<PDDLSymbol>();
                 ordering.put(keyTask, tasks);
             }
-            tasks.add(constraint.getAtom().get(1));
+            tasks.add(constraint.getChildren().get(1).getTaskID());
         }
         Boolean closure = false;
         while (!closure) {
@@ -1843,7 +1843,7 @@ public final class PDDLParser implements Callable<Integer> {
      * </ul>
      *
      * @return <code>true</code> if the expression succeeds the test; <code>false</code> otherwise.
-     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     * @throws UnexpectedPDDLExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM,
      *      WHEN, TRUE and FALSE.
      */
@@ -1868,8 +1868,6 @@ public final class PDDLParser implements Callable<Integer> {
             case ALWAYS_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
             case SOMETIME_CONSTRAINT:
-            case WITHIN_CONSTRAINT:
-            case HOLD_AFTER_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case AT_END_METHOD_CONSTRAINT:
@@ -2049,22 +2047,39 @@ public final class PDDLParser implements Callable<Integer> {
                 }
                 break;
             case TIMED_LITERAL:
-                if (exp.getTime().getValue() < 0.0) {
+                if (exp.getChildren().get(0).getValue() < 0.0) {
                     this.mgr.logParserError("TIMED_LITERAL expression cannot use a time < 0.0. ",
                         this.lexer.getFile(), line, column);
                     check = false;
                 }
                 break;
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+                if (exp.getChildren().get(0).getValue() < 0.0) {
+                    this.mgr.logParserError(exp.getConnective().toString()
+                            + " expression cannot use a time < 0.0. ",  this.lexer.getFile(), line, column);
+                    check = false;
+                }
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
+                break;
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
-            case ALWAYS_WITHIN_CONSTRAINT:
                 check &= this.checkExpressionSemantic(exp.getChildren().get(0));
                 check &= this.checkExpressionSemantic(exp.getChildren().get(1));
                 break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                if (exp.getChildren().get(0).getValue() < 0.0) {
+                    this.mgr.logParserError(exp.getConnective().toString()
+                        + " expression cannot use a time < 0.0. ",  this.lexer.getFile(), line, column);
+                    check = false;
+                }
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(2));
+                break;
             case HOLD_DURING_CONSTRAINT:
-                if (!exp.getTimeInterval().isValid()) {
+                if (exp.getChildren().get(0).getValue() > exp.getChildren().get(1).getValue()) {
                     exp.setConnective(PDDLConnective.FALSE);
-                    this.mgr.logParserError("HOLD_DURING_CONSTRAINT expression with invalid interval ",
+                    this.mgr.logParserError("HOLD_DURING_CONSTRAINT expression with invalid interval",
                         this.lexer.getFile(), line, column);
                     check = false;
                 } else {
@@ -2086,7 +2101,7 @@ public final class PDDLParser implements Callable<Integer> {
             case FALSE:
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.toString());
+                throw new UnexpectedPDDLExpressionException(exp.toString());
         }
         return check;
     }

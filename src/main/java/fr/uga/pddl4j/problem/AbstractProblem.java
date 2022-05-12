@@ -26,7 +26,7 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.parser.UnexpectedExpressionException;
+import fr.uga.pddl4j.parser.UnexpectedPDDLExpressionException;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
@@ -35,7 +35,6 @@ import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,11 +60,6 @@ public abstract class AbstractProblem implements Problem {
      * The logger of the class.
      */
     private static final Logger LOGGER = LogManager.getLogger(AbstractProblem.class.getName());
-
-    /**
-     * The PDDL domain.
-     */
-    //private PDDLDomain domain;
 
     /**
      * The PDDL problem.
@@ -669,7 +663,7 @@ public abstract class AbstractProblem implements Problem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
     }
 
@@ -876,7 +870,7 @@ public abstract class AbstractProblem implements Problem {
                     this.intInitialState.add(exp);
                     break;
                 default:
-                    throw new UnexpectedExpressionException(exp.getConnective().toString());
+                    throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
 
             }
         }
@@ -1091,7 +1085,7 @@ public abstract class AbstractProblem implements Problem {
      * expression returned is the index of the task in the AND expression of the tasks list of a method.
      *
      * @param exp the constraints to encode. The constraints must be an AND expression.
-     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
+     * @throws UnexpectedPDDLExpressionException if the exp in parameter is unexpected. Only AND and
      *      LESS_ORDERING_CONSTRAINTS are expected.
      */
     private IntExpression initOrderingConstraints(final PDDLExpression exp) {
@@ -1103,15 +1097,19 @@ public abstract class AbstractProblem implements Problem {
                 }
                 break;
             case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
                 IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(Integer.valueOf(exp.getAtom().get(0).getImage().substring(1)));
+                t1.setTaskID(Integer.valueOf(exp.getChildren().get(0).getTaskID().getImage().substring(1)));
                 intExp.addChild(t1);
                 IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(Integer.valueOf(exp.getAtom().get(1).getImage().substring(1)));
+                t2.setTaskID(Integer.valueOf(exp.getChildren().get(1).getTaskID().getImage().substring(1)));
                 intExp.addChild(t2);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.toString());
+                throw new UnexpectedPDDLExpressionException(exp.toString());
         }
         return intExp;
     }
@@ -1608,7 +1606,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(")");
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
         }
         return str.toString();
     }
