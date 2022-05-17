@@ -1843,7 +1843,7 @@ public final class PDDLParser implements Callable<Integer> {
      * </ul>
      *
      * @return <code>true</code> if the expression succeeds the test; <code>false</code> otherwise.
-     * @throws UnexpectedPDDLExpressionException if the expression is not composed of expressions that are not FORALL,
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM,
      *      WHEN, TRUE and FALSE.
      */
@@ -1853,7 +1853,7 @@ public final class PDDLParser implements Callable<Integer> {
         int column = exp.getBeginColumn();
 
         // Expression cannot be evaluated due to lexical failure
-        if (line == ParserObject.DEFAULT_BEGIN_LINE && column == ParserObject.DEFAULT_BEGING_COLUMN) {
+        if (line == ParsedObject.DEFAULT_BEGIN_LINE && column == ParsedObject.DEFAULT_BEGING_COLUMN) {
             return false;
         }
 
@@ -2101,7 +2101,7 @@ public final class PDDLParser implements Callable<Integer> {
             case FALSE:
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.toString());
+                throw new UnexpectedExpressionException(exp.toString());
         }
         return check;
     }

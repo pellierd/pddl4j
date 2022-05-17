@@ -27,7 +27,7 @@ import fr.uga.pddl4j.parser.lexer.Token;
  * @author D. Pellier
  * @version 1.0 - 28.04.2022
  */
-public class AbstractParserObject implements ParserObject {
+public class AbstractParsedObject implements ParsedObject {
 
     /**
      * The begin line of the symbol.
@@ -57,7 +57,7 @@ public class AbstractParserObject implements ParserObject {
      * @param endLine the end line.
      * @param endColumn the end column.
      */
-    public AbstractParserObject(final int beginLine, final int beginColumn, final int endLine, final int endColumn) {
+    public AbstractParsedObject(final int beginLine, final int beginColumn, final int endLine, final int endColumn) {
         super();
         this.setBeginLine(beginLine);
         this.setBeginColumn(beginColumn);
@@ -68,14 +68,14 @@ public class AbstractParserObject implements ParserObject {
     /**
      * Creates a default object.
      *
-     * @see ParserObject#DEFAULT_BEGIN_LINE
-     * @see ParserObject#DEFAULT_BEGING_COLUMN
-     * @see ParserObject#DEFAULT_END_LINE
-     * @see ParserObject#DEFAULT_END_COLUMN
+     * @see ParsedObject#DEFAULT_BEGIN_LINE
+     * @see ParsedObject#DEFAULT_BEGING_COLUMN
+     * @see ParsedObject#DEFAULT_END_LINE
+     * @see ParsedObject#DEFAULT_END_COLUMN
      */
-    public AbstractParserObject() {
-        this(ParserObject.DEFAULT_BEGIN_LINE, ParserObject.DEFAULT_BEGING_COLUMN,
-            ParserObject.DEFAULT_END_LINE, ParserObject.DEFAULT_END_COLUMN);
+    public AbstractParsedObject() {
+        this(ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
+            ParsedObject.DEFAULT_END_LINE, ParsedObject.DEFAULT_END_COLUMN);
     }
 
     /**
@@ -83,7 +83,7 @@ public class AbstractParserObject implements ParserObject {
      *
      * @param other the other object to be copied.
      */
-    public AbstractParserObject(final AbstractParserObject other) {
+    public AbstractParsedObject(final AbstractParsedObject other) {
         this(other.getBeginLine(), other.getBeginColumn(), other.getEndLine(), other.getEndColumn());
     }
 

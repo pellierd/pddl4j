@@ -17,7 +17,7 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.parser.UnexpectedPDDLExpressionException;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.util.IntMatrix;
@@ -281,7 +281,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
 
@@ -1220,7 +1220,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 if (exp.getChildren().isEmpty()) {
                     exp.setConnective(PDDLConnective.TRUE);
                 } else if (exp.getChildren().size() == 1) {
-                    exp.affect(exp.getChildren().get(0));
+                    exp.assign(exp.getChildren().get(0));
                 }
                 break;
             case OR:
@@ -1296,7 +1296,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 if (exp.getChildren().isEmpty()) {
                     exp.setConnective(PDDLConnective.TRUE);
                 } else if (exp.getChildren().size() == 1) {
-                    exp.affect(exp.getChildren().get(0));
+                    exp.assign(exp.getChildren().get(0));
                 } else {
                     final Iterator<IntExpression> it = exp.getChildren().iterator();
                     while (it.hasNext()) {
@@ -1379,7 +1379,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the expression to transform in CNF.
      */
-    protected void toCNF(final IntExpression exp) throws UnexpectedPDDLExpressionException {
+    protected void toCNF(final IntExpression exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case WHEN:
                 final IntExpression antecedent = exp.getChildren().get(0);
@@ -1424,7 +1424,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 exp.getChildren().add(copy);
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
 
@@ -1433,7 +1433,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the expression to transform in DNF.
      */
-    protected void toDNF(final IntExpression exp) throws UnexpectedPDDLExpressionException {
+    protected void toDNF(final IntExpression exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case OR:
                 List<IntExpression> children = exp.getChildren();
@@ -1488,7 +1488,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     }
                     dnf = newOr;
                 }
-                exp.affect(dnf);
+                exp.assign(dnf);
                 break;
             case ATOM:
             case NOT:
@@ -1514,7 +1514,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 exp.getChildren().add(and);
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
 

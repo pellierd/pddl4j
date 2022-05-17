@@ -16,13 +16,9 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,8 +54,8 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             //System.out.println(Encoder.toString(a));
 
             this.expandQuantifiedExpression(a.getPreconditions(), false);
-            a.getPreconditions().moveTimeSpecifierInward();
-            a.getPreconditions().moveNegationInward();
+            // REMOVED FOR TEST a.getPreconditions().moveTimeSpecifierInward();
+            // REMOVED FOR TESTa.getPreconditions().moveNegationInward();
 
             //System.out.println("*** Precondition ***");
             //System.out.println(Encoder.toString(a.getPreconditions()));
@@ -97,8 +93,8 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
 
             // Expands the quantified expression on the effect of the action
             this.expandQuantifiedExpression(a.getEffects(), false);
-            a.getEffects().moveTimeSpecifierInward();
-            a.getEffects().moveNegationInward();
+            // REMOVED FOR TESTa.getEffects().moveTimeSpecifierInward();
+            // REMOVED FOR TESTa.getEffects().moveNegationInward();
             this.toCNF(a.getEffects());
             //this.simplify(a.getEffects());
 
@@ -202,7 +198,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                             and.addChild(mpi);
                             final IntExpression notPi = new IntExpression(PDDLConnective.NOT);
                             notPi.addChild(pi);
-                            notPi.moveNegationInward();
+                            // REMOVED FOR TESTnotPi.moveNegationInward();
                             and.addChild(notPi);
                             when.addChild(and);
                             final IntExpression notMpi = new IntExpression(PDDLConnective.NOT);
@@ -380,7 +376,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                     exp.setConnective(PDDLConnective.AND);
                     exp.getChildren().clear();
                 } else {
-                    exp.affect(exp.getChildren().get(0));
+                    exp.assign(exp.getChildren().get(0));
                 }
                 break;
             default:

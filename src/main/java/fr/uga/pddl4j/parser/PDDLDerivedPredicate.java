@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLDerivedPredicate extends AbstractParserObject {
+public class PDDLDerivedPredicate extends AbstractParsedObject {
 
     /**
      * The head of the derived predicate.

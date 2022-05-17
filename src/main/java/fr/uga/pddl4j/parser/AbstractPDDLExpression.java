@@ -21,35 +21,54 @@ package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Token;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
- * This interface implements the common methods of all object produced by the parser.
+ * This class defines the method an PDDL expression.
  *
  * @author D. Pellier
- * @version 1.0 - 28.04.2022
+ * @version 1.0 - 13.05.2022
  */
-public interface ParserObject extends Serializable {
+public abstract class AbstractPDDLExpression extends AbstractExpression implements ParsedObject {
 
     /**
-     * The default begin line value.
+     * The parsed objet to deal with multiple inheritance with <code>Expression</code> and <code>ParseObject</code>.
      */
-    static final int DEFAULT_BEGIN_LINE = -1;
+    private AbstractParsedObject parsedObject;
 
     /**
-     * The default end line value.
+     * Creates a new expression from another one. This constructor creates a deep copy.
+     *
+     * @param other the other expression.
+     * @throws NullPointerException if other is null.
      */
-    static final int DEFAULT_END_LINE = -1;
+    public AbstractPDDLExpression(final AbstractPDDLExpression other) {
+        super(other);
+        this.parsedObject = new AbstractParsedObject();
+        this.setBeginLine(other.getBeginLine());
+        this.setBeginColumn(other.getBeginColumn());
+        this.setEndLine(other.getEndLine());
+        this.setEndColumn(other.getEndColumn());
+    }
 
     /**
-     * The default begin column value.
+     * Creates a new PDDL expression with a specified connective.
+     *
+     * @param connective the connective.
+     * @throws RuntimeException if the specified connective is null.
      */
-    static final int DEFAULT_BEGING_COLUMN = -1;
+    public AbstractPDDLExpression(final PDDLConnective connective) {
+        super(connective);
+        this.parsedObject = new AbstractParsedObject();
+    }
 
     /**
-     * The default begin column value.
+     * Creates a new empty AND expression.
      */
-    static final int DEFAULT_END_COLUMN = -1;
+    public AbstractPDDLExpression() {
+        this(PDDLConnective.AND);
+    }
 
     /**
      * Returns the begin line of the file where this object appear. The return value <code>DEFAULT_BEGIN_LINE</code>
@@ -58,14 +77,18 @@ public interface ParserObject extends Serializable {
      * @return the begin line of the file where this object appear or <code>DEFAULT_BEGIN_LINE</code> if it was
      *          not initialized.
      */
-    int getBeginLine();
+    public final int getBeginLine() {
+        return this.parsedObject.getBeginLine();
+    }
 
     /**
      * Sets the begin line of the file where this object appear.
      *
      * @param beginLine the begin line of the object in the file.
      */
-    void setBeginLine(final int beginLine);
+    public final void setBeginLine(final int beginLine) {
+        this.parsedObject.setBeginLine(beginLine);
+    }
 
     /**
      * Returns the begin column of the file where this object appears. The return value <code>DEFAULT_END_LINE</code>
@@ -74,14 +97,18 @@ public interface ParserObject extends Serializable {
      * @return the begin column of the file where this object appears or <code>DEFAULT_END_LINE</code> if it was
      *          not initialized.
      */
-    int getBeginColumn();
+    public final int getBeginColumn() {
+        return this.parsedObject.getBeginColumn();
+    }
 
     /**
      * Sets the begin column of the file where this object appears.
      *
      * @param beginColumn the begin column of the file where this object appear.
      */
-    void setBeginColumn(final int beginColumn);
+    public final void setBeginColumn(final int beginColumn) {
+        this.parsedObject.setEndColumn(getBeginColumn());
+    }
 
     /**
      * Returns the end line of the file where this object appears. The return value <code>DEFAULT_BEGING_COLUMN</code>
@@ -90,14 +117,18 @@ public interface ParserObject extends Serializable {
      * @return the end line of the file where this object appears or <code>DEFAULT_BEGING_COLUM</code> if it was
      *          not initialized.
      */
-    int getEndLine();
+    public final int getEndLine() {
+        return this.parsedObject.getEndLine();
+    }
 
     /**
      * Sets the end line of the file where this object appears.
      *
      * @param endLine the end line of the file where this object appears.
      */
-    void setEndLine(final int endLine);
+    public final void setEndLine(final int endLine) {
+        this.parsedObject.setEndLine(endLine);
+    }
 
     /**
      * Returns the end column of the file where this object appears. The return value <code>DEFAULT_END_COLUMN</code>
@@ -106,27 +137,35 @@ public interface ParserObject extends Serializable {
      * @return the end column of the file where this object appears or <code>DEFAULT_END_COLUMN</code> if it was
      *          not initialized.
      */
-    int getEndColumn();
+    public final int getEndColumn() {
+        return this.parsedObject.getEndColumn();
+    }
 
     /**
      * Sets the end column of the file where this object appears.
      *
      * @param endColumn the end column of the file where this object appears.
      */
-    void setEndColumn(final int endColumn);
+    public final void setEndColumn(final int endColumn) {
+        this.parsedObject.setEndColumn(endColumn);
+    }
 
     /**
      * Sets the begin line and column of the expression from a specified token.
      *
      * @param begin the first token of the expression.
      */
-    void setBegin(final Token begin);
+    public final void setBegin(final Token begin) {
+        this.parsedObject.setBegin(begin);
+    }
 
     /**
      * Sets the end line and column of the expression from a specified token.
      *
      * @param end the last token of the expression.
      */
-    void setEnd(final Token end);
+    public final void setEnd(final Token end) {
+        this.parsedObject.setEnd(end);
+    }
 
 }

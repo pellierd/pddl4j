@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLExpression extends AbstractParserObject {
+public class PDDLExpression extends AbstractParsedObject {
 
     /**
      * The type of the node.
@@ -494,7 +494,7 @@ public class PDDLExpression extends AbstractParserObject {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnective().toString());
         }
     }
 
@@ -568,14 +568,14 @@ public class PDDLExpression extends AbstractParserObject {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.toString());
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 
     /**
      * Moves the negation inward the expression.
      *
-     * @throws UnexpectedPDDLExpressionException if the expression is not composed of expressions that are not FORALL,
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
     private void moveNegationInward() {
@@ -657,7 +657,7 @@ public class PDDLExpression extends AbstractParserObject {
                 break;
 
             default:
-                throw new UnexpectedPDDLExpressionException(this.toString());
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 
@@ -673,14 +673,14 @@ public class PDDLExpression extends AbstractParserObject {
      *   </ul>
      *
      * @return <code>true</code> if the expression was simplified; <code>false</code> otherwise.
-     * @throws UnexpectedPDDLExpressionException if the expression is not composed of expressions that are not FORALL,
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN, TRUE,
      *      FALSE, HOLD_AFTER_METHOD_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT, AT_END_METHOD_CONSTRAINT,
      *      AT_START_METHOD_CONSTRAINT, ALWAYS_METHOD_CONSTRAINT, AT_MOST_ONCE_METHOD_CONSTRAINT,
      *      SOMETIME_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
      *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT.
      */
-    public boolean simplify() throws UnexpectedPDDLExpressionException {
+    public boolean simplify() throws UnexpectedExpressionException {
         boolean simplified = false;
         switch (this.getConnective()) {
             case FORALL:
@@ -858,7 +858,7 @@ public class PDDLExpression extends AbstractParserObject {
             case FALSE:
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.toString());
+                throw new UnexpectedExpressionException(this.toString());
         }
         return simplified;
     }
@@ -942,7 +942,7 @@ public class PDDLExpression extends AbstractParserObject {
     /**
      * Move the time specifier inward the expression.
      *
-     * @throws UnexpectedPDDLExpressionException if the expression is not composed of expressions that are not FORALL,
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
     private void moveTimeSpecifierInward() {
@@ -988,7 +988,7 @@ public class PDDLExpression extends AbstractParserObject {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.toString());
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 
@@ -1078,13 +1078,13 @@ public class PDDLExpression extends AbstractParserObject {
      * Returns the set of task IDs contains in this expression.
      *
      * @return the set of task IDs contains in exp.
-     * @throws UnexpectedPDDLExpressionException if the expression is not a TASK, F_TASK_TIME,
+     * @throws UnexpectedExpressionException if the expression is not a TASK, F_TASK_TIME,
      *      LESS_ORDERING_CONSTRAINT, LESS_OR_EQUAL_ORDERING_CONSTRAINT, GREATER_ORDERING_CONSTRAINT,
      *      GREATER_OR_EQUAL_ORDERING_CONSTRAINT, EQUAL_ORDERING_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
      *      HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
      *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
      */
-    public Set<PDDLSymbol> getTaskIDs() throws UnexpectedPDDLExpressionException {
+    public Set<PDDLSymbol> getTaskIDs() throws UnexpectedExpressionException {
         Set<PDDLSymbol> taskIDs  = new HashSet<PDDLSymbol>();
         switch (this.getConnective()) {
             case TASK:
@@ -1100,7 +1100,7 @@ public class PDDLExpression extends AbstractParserObject {
                 break;
             case NOT:
                 if (!this.getChildren().get(0).getConnective().equals(PDDLConnective.EQUAL_ATOM)) {
-                    throw new UnexpectedPDDLExpressionException(this.getConnective().toString());
+                    throw new UnexpectedExpressionException(this.getConnective().toString());
                 }
                 break;
             case AND:
@@ -1128,7 +1128,7 @@ public class PDDLExpression extends AbstractParserObject {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnective().toString());
         }
         return taskIDs;
     }
@@ -1344,7 +1344,7 @@ public class PDDLExpression extends AbstractParserObject {
                 str.append(this.getTaskID().toString());
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnective().toString());
 
         }
         return str.toString();
@@ -1504,7 +1504,7 @@ public class PDDLExpression extends AbstractParserObject {
                     && this.getChildren().get(1).isMalformedExpression();
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnective().toString());
 
         }
         return malformed;

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 25.03.2020
  */
-public abstract class PDDLAbstractOperator extends AbstractParserObject implements PDDLOperator {
+public abstract class PDDLAbstractOperator extends AbstractParsedObject implements PDDLOperator {
 
     /**
      * The name of the operator.

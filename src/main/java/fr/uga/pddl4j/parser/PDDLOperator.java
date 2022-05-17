@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ import java.util.List;
  * @version 1.0 - 25.03.2020
  */
 
-public interface PDDLOperator extends ParserObject {
+public interface PDDLOperator extends ParsedObject {
 
     /**
      * Returns the name of the operator.

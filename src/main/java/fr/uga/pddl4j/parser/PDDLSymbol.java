@@ -33,7 +33,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLSymbol extends AbstractParserObject {
+public class PDDLSymbol extends AbstractParsedObject {
 
     /**
      * The name of rename variable.
@@ -177,8 +177,8 @@ public class PDDLSymbol extends AbstractParserObject {
      * @param image the string image of the symbol.
      */
     public PDDLSymbol(final Kind kind, final String image) {
-        this(kind, image, ParserObject.DEFAULT_BEGIN_LINE, ParserObject.DEFAULT_BEGING_COLUMN,
-            ParserObject.DEFAULT_END_LINE,  ParserObject.DEFAULT_END_COLUMN);
+        this(kind, image, ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
+            ParsedObject.DEFAULT_END_LINE,  ParsedObject.DEFAULT_END_COLUMN);
     }
 
     /**

@@ -19,7 +19,9 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.MalformedExpressionException;
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -314,15 +316,13 @@ public class IntExpression implements Serializable {
         this.isPrimtive = flag;
     }
 
-
-
     /**
      * Affects this expression to an other. After affectation this expression and the other are
      * equal. No copy of the content of the other expression is done.
      *
      * @param other expression.
      */
-    public final void affect(final IntExpression other) {
+    public final void assign(final IntExpression other) {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
         this.taskID = other.getTaskID();
@@ -382,7 +382,7 @@ public class IntExpression implements Serializable {
     /**
      * Move negation inward the expression.
      */
-    public void moveNegationInward() {
+    /*public void moveNegationInward() {
         switch (this.getConnective()) {
             case NOT:
                 IntExpression p = this.getChildren().get(0);
@@ -412,7 +412,7 @@ public class IntExpression implements Serializable {
                                 this.addChild(q);
                             }
                         } else {
-                            this.affect(this.getChildren().get(0));
+                            this.assign(this.getChildren().get(0));
                             this.moveNegationInward();
                         }
                         break;
@@ -427,7 +427,7 @@ public class IntExpression implements Serializable {
                                 this.addChild(q);
                             }
                         } else {
-                            this.affect(this.getChildren().get(0));
+                            this.assign(this.getChildren().get(0));
                             this.moveNegationInward();
                         }
                         break;
@@ -435,9 +435,9 @@ public class IntExpression implements Serializable {
                         p.expandImply();
                         this.moveNegationInward();
                         break;*/
-                    case NOT:
+                    /*case NOT:
                         IntExpression neg = p.getChildren().get(0);
-                        this.affect(neg);
+                        this.assign(neg);
                         this.moveNegationInward();
                         break;
                     case AT_START:
@@ -459,7 +459,7 @@ public class IntExpression implements Serializable {
                 this.getChildren().get(1).moveNegationInward();
                 this.getChildren().set(0, notP);
                 break;*/
-            default:
+            /*default:
                 this.children.forEach(IntExpression::moveNegationInward);
                 break;
                 // do nothing
@@ -469,7 +469,7 @@ public class IntExpression implements Serializable {
     /**
      * Move time specifier inward the expression.
      */
-    public void moveTimeSpecifierInward() {
+    /* void moveTimeSpecifierInward() {
         switch (this.getConnective()) {
             case AND:
             case OR:
@@ -508,7 +508,7 @@ public class IntExpression implements Serializable {
                 this.getChildren().get(1).moveTimeSpecifierInward();
                 this.getChildren().set(0, notP);
                 break;*/
-            case AT_START:
+            /*case AT_START:
             case AT_END:
             case OVER_ALL:
                 IntExpression p = this.getChildren().get(0);
@@ -551,7 +551,7 @@ public class IntExpression implements Serializable {
                         p.expandImply();
                         this.moveTimeSpecifierInward();
                         break;*/
-                    case NOT:
+                    /*case NOT:
                         p.setConnective(this.getConnective());
                         this.setConnective(PDDLConnective.NOT);
                         break;
@@ -573,6 +573,438 @@ public class IntExpression implements Serializable {
                 break;
             default:
                 // do nothing
+        }
+    }
+
+    /**
+     * Returns a string representation of this node.
+     *
+     * @return a string representation of this node.
+     * @see java.lang.Object#toString
+     */
+    @Override
+    public String toString() {
+        return this.toString("");
+    }
+
+    /**
+     * Returns a string representation of this parser node.
+     *
+     * @param baseOffset the offset white space from the left used for indentation.
+     * @return a string representation of this parser node.
+     * @throws MalformedExpressionException if the expression is malformed.
+     */
+    public String toString(String baseOffset) throws MalformedExpressionException {
+        StringBuilder str = new StringBuilder();
+        switch (this.connective) {
+            case ATOM:
+            case FN_HEAD:
+                str.append("(");
+                str.append(this.getPredicate());
+                if (this.getArguments().length != 0) {
+                    str.append(" ");
+                    for (int i = 0; i < this.getArguments().length - 1; i++) {
+                        str.append(this.getArguments()[i]).append(" ");
+                    }
+                    str.append(this.getArguments()[(this.getArguments().length - 1)]);
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                if (this.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                    str.append(this.getTaskID());
+                    str.append(" ");
+                }
+                if (this.getArguments().length != 0) {
+                    str.append(this.getPredicate());
+                    str.append(" ");
+                    for (int i = 0; i < this.getArguments().length - 1; i++) {
+                        str.append(this.getArguments()[i]).append(" ");
+                    }
+                    str.append(this.getArguments()[(this.getArguments().length - 1)]);
+                }
+                str.append(")");
+                break;
+            case EQUAL_ATOM:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                for (int i = 0; i < this.getArguments().length - 1; i++) {
+                    str.append(this.getArguments()[i]);
+                    str.append(" ");
+                }
+                str.append(this.getArguments()[this.getArguments().length - 1]).append(")");
+                break;
+            case AND:
+            case OR:
+                if (!this.children.isEmpty()) {
+                    String offset = baseOffset + "  ";
+                    str.append("(").append(this.getConnective().getImage());
+                    str.append(" ");
+                    for (int i = 0; i < this.children.size() - 1; i++) {
+                        str.append(this.children.get(i).toString(offset)).append("\n").append(offset);
+                    }
+                    str.append(this.children.get(this.children.size() - 1).toString(offset));
+                    str.append(")");
+                } else {
+                    str.append("()");
+                }
+                break;
+            case IMPLY:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case FORALL:
+            case EXISTS:
+                String off = baseOffset + baseOffset + "  ";
+                str.append(" (");
+                str.append(this.getConnective().getImage());
+                str.append(" (");
+                str.append(this.variable);
+                str.append(" ");
+                str.append(this.children.get(0).toString(off));
+                str.append(")");
+                break;
+            case NUMBER:
+                str.append(this.value);
+                break;
+            case F_EXP:
+                str.append(this.children.get(0).toString(baseOffset));
+                break;
+            case F_EXP_T:
+                if (this.children.isEmpty()) {
+                    str.append(this.getVariable());
+                } else {
+                    str.append("(").append(this.getConnective().getImage()).append(" ")
+                        .append(this.getVariable()).append(" ")
+                        .append(this.children.get(0).toString(baseOffset));
+                }
+                break;
+            case TIME_VAR:
+                str.append(this.getVariable());
+                break;
+            case FN_ATOM:
+            case WHEN:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.children.get(0).toString(baseOffset)).append(" ");
+                str.append(this.children.get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString());
+                str.append(")");
+                break;
+            case NOT:
+            case UMINUS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(")");
+                break;
+            case MINIMIZE:
+            case MAXIMIZE:
+                str.append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue())
+                    .append(")");
+                break;
+            case IS_VIOLATED:
+                str.append("(").append(this.getConnective().getImage()).append(")");
+                break;
+            case TIMED_LITERAL:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case HOLD_DURING_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString()).append(" ");
+                str.append(this.getChildren().get(2).toString(baseOffset));
+                str.append(")");
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString()).append(" ");
+                str.append(this.getChildren().get(2).toString(baseOffset));
+                str.append(this.getChildren().get(3).toString(baseOffset));
+                str.append(")");
+                break;
+            case TASK_ID:
+                str.append(this.getTaskID());
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().toString());
+
+        }
+        return str.toString();
+    }
+
+    /**
+     * Sets the expression into negative normal form. After the method call, negation can occurs only before atomic
+     * formula and time specifier (at start, at end, overall) can only occur before literal. The method is applicable on
+     * expressions containing a goal description, i.e., NOT, AND, OR, WHEN, IMPLY, SOMETIME_AFTER, SOMETIME_BEFORE,
+     * FORALL, EXISTS, ALWAYS, AT_MOST_ONCE, WITHIN, HOLD_AFTER, ALWAYS_WITHIN, HOLD_DURING, AT_START, AT_END, OVERALL,
+     * ATOM, EQUAL_ATOM, EQUAL, LESS, LESS_OR_EQUAL, GREATER, GREATER_OR_EQUAL, ASSIGN, INCREASE, DECREASE, SCALE_UP,
+     * SCALE_DOWN, TRUE and FALSE.
+     *
+     * @throws MalformedExpressionException if this expression is malformed.
+     */
+    public void toNNF() throws MalformedExpressionException {
+
+        switch (this.connective) {
+            case NOT:
+                this.moveNegationInward();
+                break;
+            case AND:
+            case OR:
+            case WHEN:
+            case IMPLY:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case FORALL:
+            case EXISTS:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
+                this.getChildren().forEach(IntExpression::toNNF);
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.moveTimeSpecifierInward();
+                break;
+            case ATOM:
+            case EQUAL_ATOM:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case TASK_ID:
+            case NUMBER:
+            case TRUE:
+            case FALSE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+    /**
+     * Moves the negation inward the expression.
+     *
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     */
+    private void moveNegationInward() {
+        assert this.getConnective().equals(PDDLConnective.NOT);
+
+        final IntExpression child = this.getChildren().get(0);
+        switch (child.getConnective()) {
+            case FORALL:
+                this.setConnective(PDDLConnective.EXISTS);
+                IntExpression negation = new IntExpression(PDDLConnective.NOT);
+                negation.addChild(child.getChildren().get(0));
+                negation.toNNF();
+                this.children.set(0, negation);
+                break;
+            case EXISTS:
+                this.setConnective(PDDLConnective.FORALL);
+                this.setVariable(child.getVariable());
+                negation = new IntExpression(PDDLConnective.NOT);
+                negation.addChild(child.getChildren().get(0));
+                negation.toNNF();
+                this.children.set(0, negation);
+                break;
+            case AND:
+                this.setConnective(PDDLConnective.OR);
+                this.children.clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    negation = new IntExpression(PDDLConnective.NOT);
+                    negation.addChild(child.getChildren().get(i));
+                    negation.toNNF();
+                    this.children.add(negation);
+                }
+                break;
+            case OR:
+                this.setConnective(PDDLConnective.AND);
+                this.children.clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    negation = new IntExpression(PDDLConnective.NOT);
+                    negation.addChild(child.children.get(i));
+                    negation.toNNF();
+                    this.children.add(negation);
+                }
+                break;
+            case NOT:
+                this.assign(child.getChildren().get(0));
+                this.toNNF();
+                break;
+            case IMPLY: // (not (imply p q)) -> (imply (not p) (not q))
+                this.setConnective(PDDLConnective.IMPLY);
+                final IntExpression notp = new IntExpression(PDDLConnective.NOT);
+                notp.addChild(child.getChildren().get(0));
+                notp.toNNF();
+                final IntExpression notq = new IntExpression(PDDLConnective.NOT);
+                notq.addChild(child.getChildren().get(1));
+                notq.toNNF();
+                this.getChildren().clear();
+                this.getChildren().add(notp);
+                this.getChildren().add(notq);
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.setConnective(child.getConnective());
+                child.setConnective(PDDLConnective.NOT);
+                break;
+            case TRUE:
+                this.setConnective(PDDLConnective.FALSE);
+                break;
+            case FALSE:
+                this.setConnective(PDDLConnective.TRUE);
+                break;
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case ATOM:
+            case EQUAL_ATOM:
+                // Do nothing
+                break;
+
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+    /**
+     * Move the time specifier inward the expression.
+     *
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     */
+    private void moveTimeSpecifierInward() {
+        assert this.getConnective().equals(PDDLConnective.AT_START)
+            || this.getConnective().equals(PDDLConnective.AT_END)
+            || this.getConnective().equals(PDDLConnective.OVER_ALL);
+
+        final IntExpression child = this.getChildren().get(0);
+        switch (child.getConnective()) {
+            case FORALL:
+            case EXISTS:
+                IntExpression timeExp = new IntExpression(this.getConnective());
+                timeExp.addChild(child.getChildren().get(0));
+                timeExp.moveTimeSpecifierInward();
+                this.children.set(0, timeExp);
+                this.setConnective(child.getConnective());
+                this.setVariable(child.getVariable());
+                break;
+            case AND:
+            case OR:
+                this.children.clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    timeExp = new IntExpression(this.getConnective());
+                    timeExp.addChild(child.getChildren().get(i));
+                    timeExp.moveTimeSpecifierInward();
+                    this.children.add(timeExp);
+                }
+                this.setConnective(child.getConnective());
+                break;
+            case NOT:
+                child.toNNF();
+                if (!child.getConnective().equals(PDDLConnective.NOT)) {
+                    this.moveTimeSpecifierInward();
+                }
+                break;
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case ATOM:
+            case EQUAL_ATOM:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
         }
     }
 }

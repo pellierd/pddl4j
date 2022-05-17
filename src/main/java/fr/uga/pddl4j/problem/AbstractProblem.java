@@ -26,7 +26,7 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.parser.UnexpectedPDDLExpressionException;
+import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
@@ -663,7 +663,7 @@ public abstract class AbstractProblem implements Problem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
     }
 
@@ -870,7 +870,7 @@ public abstract class AbstractProblem implements Problem {
                     this.intInitialState.add(exp);
                     break;
                 default:
-                    throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
+                    throw new UnexpectedExpressionException(exp.getConnective().toString());
 
             }
         }
@@ -918,12 +918,14 @@ public abstract class AbstractProblem implements Problem {
         }
         // Encode the preconditions of the operator
         final IntExpression preconditions = this.initExpression(action.getPreconditions(), variables);
-        preconditions.moveNegationInward();
+        //preconditions.moveNegationInward();
+        preconditions.toNNF();
         intAction.setPreconditions(preconditions);
         // Encode the effects of the operator
         final IntExpression effects = this.initExpression(action.getEffects(), variables);
         intAction.setEffects(effects);
-        effects.moveNegationInward();
+        //effects.moveNegationInward();
+        effects.toNNF();
         return intAction;
     }
 
@@ -1085,7 +1087,7 @@ public abstract class AbstractProblem implements Problem {
      * expression returned is the index of the task in the AND expression of the tasks list of a method.
      *
      * @param exp the constraints to encode. The constraints must be an AND expression.
-     * @throws UnexpectedPDDLExpressionException if the exp in parameter is unexpected. Only AND and
+     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
      *      LESS_ORDERING_CONSTRAINTS are expected.
      */
     private IntExpression initOrderingConstraints(final PDDLExpression exp) {
@@ -1109,7 +1111,7 @@ public abstract class AbstractProblem implements Problem {
                 intExp.addChild(t2);
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.toString());
+                throw new UnexpectedExpressionException(exp.toString());
         }
         return intExp;
     }
@@ -1606,7 +1608,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(")");
                 break;
             default:
-                throw new UnexpectedPDDLExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
         return str.toString();
     }
