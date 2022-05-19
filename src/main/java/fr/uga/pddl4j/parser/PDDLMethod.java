@@ -250,9 +250,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
             this.setOrdering(new PDDLExpression(PDDLConnective.AND));
             for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {
                 PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                c.setAtom(new LinkedList<PDDLSymbol>());
-                c.getAtom().add(this.getSubTasks().getChildren().get(j - 1).getTaskID());
-                c.getAtom().add(this.getSubTasks().getChildren().get(j).getTaskID());
+                c.setArguments(new LinkedList<PDDLSymbol>());
+                c.getArguments().add(this.getSubTasks().getChildren().get(j - 1).getTaskID());
+                c.getArguments().add(this.getSubTasks().getChildren().get(j).getTaskID());
                 this.getOrdering().addChild(c);
             }
         }

@@ -299,7 +299,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                         fact = fact.getChildren().get(0);
                     }
                     if (fact.getPredicate() == i) {
-                        newTypeDomain.add(fact.getArguments()[0]);
+                        newTypeDomain.add(fact.getArguments().get(0));
                     }
                 }
                 this.inferredDomains.add(newTypeDomain);
@@ -338,7 +338,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             for (final IntAction o : actions) {
                 if (o.arity() > 0) {
 
-                    int index = -inertia.getArguments()[0] - 1;
+                    int index = -inertia.getArguments().get(0) - 1;
                     // Hack add for constant in predicate
                     //if (index < 0) {
                     //    break;
@@ -396,7 +396,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     }
 
     /**
-     * Replace all the occurrences of a specified unary inertia contained in the a specified
+     * Replace all the occurrences of a specified unary inertia contained in the specified
      * expression by <code>TRUE</code> or <code>FALSE</code>.
      *
      * @param exp        the expression.
@@ -445,7 +445,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case FORALL:
             case EXISTS:
-                if (inertia.getArguments()[0] == exp.getVariable()) {
+                if (inertia.getArguments().get(0) == exp.getVariable()) {
                     final IntExpression ei = new IntExpression(exp);
                     ei.setType(ti);
                     this.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
@@ -604,7 +604,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     }
 
     /**
-     * This method creates the predicates predicates tables used to simplify atomic expression.
+     * This method creates the predicate tables used to simplify atomic expression.
      */
     protected void createPredicatesTables() {
         final int tableSize = this.getConstantSymbols().size();
@@ -628,7 +628,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             final int arity = this.getPredicateSignatures().get(fact.getPredicate()).size();
             final List<IntMatrix> pTables = this.predicatesTables.get(fact.getPredicate());
             final int[] set = new int[arity];
-            final int[] args = fact.getArguments();
+            final List<Integer> args = fact.getArguments();
             for (final IntMatrix intMatrix : pTables) {
                 int indexSize = 0;
                 for (int aSet : set) {
@@ -640,7 +640,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 int j = 0;
                 for (int i = 0; i < set.length; i++) {
                     if (set[i] == 1) {
-                        index[j] = args[i];
+                        index[j] = args.get(i);
                         j++;
                     }
                 }
@@ -914,10 +914,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
         int indexSize = 0;
-        final int[] args = exp.getArguments();
-        final int[] mask = new int[args.length];
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] >= 0) {
+        final List<Integer> args = exp.getArguments();
+        final int[] mask = new int[args.size()];
+        for (int i = 0; i < args.size(); i++) {
+            if (args.get(i) >= 0) {
                 mask[i] = 1;
                 indexSize++;
             }
@@ -932,7 +932,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             if (mask[i] == 0) {
                 max *= this.getDomains().get(predArg.get(i)).size();
             } else {
-                index[j] = args[i];
+                index[j] = args.get(i);
                 j++;
             }
 
@@ -966,10 +966,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         boolean updated = false;
         switch (exp.getConnective()) {
             case ATOM:
-                int[] args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == var) {
-                        args[i] = cons;
+                List<Integer> args = exp.getArguments();
+                for (int i = 0; i < args.size(); i++) {
+                    if (args.get(i) == var) {
+                        args.set(i, cons);
                         updated = true;
                     }
                 }
@@ -979,17 +979,17 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case TASK:
                 args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == var) {
-                        args[i] = cons;
+                for (int i = 0; i < args.size(); i++) {
+                    if (args.get(i) == var) {
+                        args.set(i, cons);
                     }
                 }
                 break;
             case FN_HEAD:
                 args = exp.getArguments();
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == var) {
-                        args[i] = cons;
+                for (int i = 0; i < args.size(); i++) {
+                    if (args.get(i) == var) {
+                        args.set(i, cons);
                         updated = true;
                     }
                 }
@@ -1000,14 +1000,14 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EQUAL_ATOM:
                 args = exp.getArguments();
                 // Get and substitute the first argument
-                final int arg1 = args[0];
+                final int arg1 = args.get(0);
                 if (arg1 == var) {
-                    args[0] = cons;
+                    args.set(0, cons);
                 }
                 // Get and substitute the second argument
-                final int arg2 = args[1];
+                final int arg2 = args.get(1);
                 if (arg2 == var) {
-                    args[1] = cons;
+                    args.set(1, cons);
                 }
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1 == arg2) {
@@ -1132,11 +1132,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FN_HEAD:
                 break;
             case EQUAL_ATOM:
-                int[] args = exp.getArguments();
+                List<Integer> args = exp.getArguments();
                 // Get and substitute the first argument
-                final int arg1 = args[0];
+                final int arg1 = args.get(0);
                 // Get and substitute the second argument
-                final int arg2 = args[1];
+                final int arg2 = args.get(1);
                 if (arg1 == arg2) {
                     // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                     exp.setConnective(PDDLConnective.TRUE);

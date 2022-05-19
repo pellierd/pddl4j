@@ -644,10 +644,10 @@ public final class PDDLParser implements Callable<Integer> {
                 case FN_HEAD:
                 case EQUAL_ATOM:
                     boolean error = false;
-                    final List<PDDLSymbol> atom = gd.getAtom();
-                    final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(atom.get(0));
-                    for (int i = 1; i < atom.size(); i++) {
-                        PDDLSymbol symbol = atom.get(i);
+                    final List<PDDLSymbol> arguments = gd.getArguments();
+                    final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(gd.getSymbol());
+                    for (int i = 0; i < arguments.size(); i++) {
+                        PDDLSymbol symbol = arguments.get(i);
                         Iterator<PDDLTypedSymbol> j = ctx.iterator();
                         PDDLTypedSymbol qvar = null;
                         while (j.hasNext() && qvar == null) {
@@ -752,19 +752,19 @@ public final class PDDLParser implements Callable<Integer> {
                 case ATOM:
                 case FN_ATOM:
                     boolean error = false;
-                    List<PDDLSymbol> atom = gd.getAtom();
-                    if (atom == null) {
-                        atom = gd.getChildren().get(0).getAtom();
+                    List<PDDLSymbol> arguments = gd.getArguments();
+                    if (arguments == null) {
+                        arguments = gd.getChildren().get(0).getArguments();
                     }
-                    final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(atom.get(0));
-                    for (int i = 1; i < atom.size(); i++) {
-                        PDDLSymbol symbol = atom.get(i);
+                    final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(gd.getSymbol());
+                    for (int i = 0; i < arguments.size(); i++) {
+                        PDDLSymbol symbol = arguments.get(i);
                         PDDLTypedSymbol object = this.problem.getObject(symbol);
                         if (object == null) {
                             object = this.domain.getConstant(symbol);
                         }
                         if (object == null) {
-                            this.mgr.logParserError("object \"" + atom.get(i) + "\" is undefined",
+                            this.mgr.logParserError("object \"" + arguments.get(i) + "\" is undefined",
                                 this.lexer.getFile(), symbol.getBeginLine(), symbol
                                     .getBeginColumn());
                             error = true;
@@ -1159,7 +1159,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
-                PDDLSymbol taskSymbol = meth.getTask().getAtom().get(0);
+                PDDLSymbol taskSymbol = meth.getTask().getSymbol();
                 if (actionSet.contains(taskSymbol.getImage())) {
                     this.mgr.logParserError("task symbol \"" + taskSymbol.getImage()
                             + "\" already used as action name",
@@ -1409,7 +1409,7 @@ public final class PDDLParser implements Callable<Integer> {
                     }
                     break;
                 case EQUAL_ATOM:
-                    for (PDDLSymbol term : gd.getAtom()) {
+                    for (PDDLSymbol term : gd.getArguments()) {
                         checked = this.checkTerm(term, newCtx);
                     }
                     break;
@@ -1434,10 +1434,10 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkAtom(PDDLExpression gd, List<PDDLTypedSymbol> context) {
         boolean checked = true;
-        List<PDDLSymbol> atom = gd.getAtom();
-        final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(atom.get(0));
-        for (int i = 1; i < atom.size(); i++) {
-            final PDDLSymbol s = atom.get(i);
+        List<PDDLSymbol> arguments = gd.getArguments();
+        final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(gd.getSymbol());
+        for (int i = 0; i < arguments.size(); i++) {
+            final PDDLSymbol s = arguments.get(i);
             if (s.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
                 PDDLTypedSymbol param = null;
                 Iterator<PDDLTypedSymbol> itr = context.iterator();
@@ -2039,7 +2039,7 @@ public final class PDDLParser implements Callable<Integer> {
                 }
                 break;
             case EQUAL_ATOM:
-                if (exp.getAtom().get(0).equals(exp.getAtom().get(1))) {
+                if (exp.getArguments().get(0).equals(exp.getArguments().get(1))) {
                     exp.setConnective(PDDLConnective.TRUE);
                     this.mgr.logParserWarning("EQUAL expression always TRUE. "
                         + "The expression can be removed.", this.lexer.getFile(), line, column);

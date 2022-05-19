@@ -1382,20 +1382,22 @@ PDDLExpression not_equal_atomic_formula() :
 PDDLExpression equal_atomic_formula() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_ATOM);
-	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
-	PDDLSymbol t1 = null;
-	PDDLSymbol t2 = null;
+	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
+	Token t = null;
+	PDDLSymbol arg1 = null;
+	PDDLSymbol arg2 = null;
     Token begin = null;
     Token end = null;
 }
 {
-	begin=left_bracket() <EQUAL>
-		t1=term()
-		t2=term()
+	begin=left_bracket() t=<EQUAL>
+		arg1=term()
+		arg2=term()
 	end=right_bracket() {
-	 	atom.add(t1);
-	 	atom.add(t2);
-	 	exp.setAtom(atom);
+        exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
+	 	args.add(arg1);
+	 	args.add(arg2);
+	 	exp.setArguments(args);
 		exp.setBegin(begin);
         exp.setEnd(end);
 		return exp;
@@ -1525,23 +1527,23 @@ PDDLExpression forall_gd() :
 PDDLExpression atomic_formula(int type) :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.ATOM);
-	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
+	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
 	PDDLSymbol t = null;
     Token begin = null;
     Token end = null;
 }
 {
 	begin=left_bracket() t=predicate() {
-		atom.add(t);
+		exp.setSymbol(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
-			atom.add(t);
+			args.add(t);
 		})*
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
-			atom.add(t);
+			args.add(t);
 		})*
 	) end=right_bracket() {
-		exp.setAtom(atom);
+		exp.setArguments(args);
 		exp.setBegin(begin);
         exp.setEnd(end);
 		return exp;
@@ -1888,26 +1890,26 @@ PDDLExpression unary_op() :
 PDDLExpression f_head() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	List<PDDLSymbol> tokenList = new ArrayList<PDDLSymbol>();
+	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
 	PDDLSymbol s = null;
     Token begin = null;
     Token end = null;
 }
 {
 	begin=left_bracket() s=functor() {
-	    	tokenList.add(s);
+	    	exp.setSymbol(s);
 	    } (LOOKAHEAD(2) s=term() {
-	        tokenList.add(s);
+	        args.add(s);
 	    })*
 	end=right_bracket() {
-	    exp.setAtom(tokenList);
+	    exp.setArguments(args);
 	    exp.setBegin(begin);
 	    exp.setEnd(end);
         return exp;
 	}
 | 	s=functor() {
-        tokenList.add(s);
-		exp.setAtom(tokenList);
+        exp.setSymbol(s);
+		exp.setArguments(args);
         exp.setBeginLine(s.getBeginLine());
         exp.setBeginColumn(s.getBeginColumn());
         exp.setEndLine(s.getEndLine());
@@ -2131,23 +2133,23 @@ PDDLExpression subtask() :  // ADD HDDL
 PDDLExpression task_formula(int type) : // ADD HDDL
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK);
-	List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
+	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
 	PDDLSymbol t = null;
 	Token begin = null;
     Token end = null;
 }
 {
 	begin=left_bracket() t=task_symbol() {
-		atom.add(t);
+		exp.setSymbol(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
-			atom.add(t);
+			args.add(t);
 		})*
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
-			atom.add(t);
+			args.add(t);
 		})*
 	) end=right_bracket() {
-		exp.setAtom(atom);
+		exp.setArguments(args);
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -3050,9 +3052,8 @@ PDDLExpression total_cost() :
 {
 	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
 		PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-		List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
-		function.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
-		exp.setAtom(function);
+		exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
+		exp.setArguments(new ArrayList<PDDLSymbol>());
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -3579,15 +3580,13 @@ PDDLExpression duration() : // ADD HDDL2.1
 PDDLExpression f_duration() : // ADD HDDL2.1
 {
     PDDLExpression exp = new PDDLExpression(PDDLConnective.F_TASK_TIME);
-    List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
     Token f, begin, end;
     PDDLSymbol argument;
 }
 {
     begin=left_bracket() f=<F_DURATION> argument = task_id_symbol() end=right_bracket() {
-        function.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
-        function.add(argument);
-        exp.setAtom(function);
+        exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
+        exp.setArguments(new ArrayList<PDDLSymbol>());
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
@@ -4754,18 +4753,20 @@ PDDLExpression violated_pref_exp() :
 PDDLExpression constant_f_head() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	List<PDDLSymbol> function = new ArrayList<PDDLSymbol>();
+	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
 	PDDLSymbol functor, argument;
 	Token begin, end;
 }
 {
 	begin=left_bracket()
-		functor=functor() { function.add(functor); }
+		functor=functor() {
+		    exp.setSymbol(functor);
+		}
 		(LOOKAHEAD(2) argument=constant(){
-			function.add(argument);
+			args.add(argument);
 		})*
 	end=right_bracket() {
-		exp.setAtom(function);
+		exp.setArguments(args);
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -4785,9 +4786,8 @@ PDDLExpression total_time() :
 		}
 | 	LOOKAHEAD(2)
 		f=<TOTAL_TIME>) {
-			List<PDDLSymbol> atom = new ArrayList<PDDLSymbol>();
-			atom.add(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
-			exp.setAtom(atom);
+			exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
+			exp.setArguments(new ArrayList<PDDLSymbol>());
 			exp.setBeginLine(f.beginLine);
             exp.setBeginColumn(f.beginColumn);
             exp.setEndLine(f.endLine);

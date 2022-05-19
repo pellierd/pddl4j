@@ -297,7 +297,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         for (IntExpression exp : facts) {
             final IntExpression relevant = new IntExpression(exp);
             this.intExpFluents.add(relevant);
-            this.fluents.add(new Fluent(exp.getPredicate(), exp.getArguments()));
+            int[] arguments = new int[exp.getArguments().size()];
+            for (int i = 0; i < exp.getArguments().size(); i++) {
+                arguments[i] = exp.getArguments().get(i);
+            }
+            this.fluents.add(new Fluent(exp.getPredicate(), arguments));
         }
     }
 
@@ -411,7 +415,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         for (IntExpression exp : fluents) {
             final IntExpression relevant = new IntExpression(exp);
             this.intExpNumericFluents.add(relevant);
-            this.numericFluents.add(new NumericFluent(exp.getPredicate(), exp.getArguments()));
+            int[] arguments = new int[exp.getArguments().size()];
+            for (int i = 0; i < exp.getArguments().size(); i++) {
+                arguments[i] = exp.getArguments().get(i);
+            }
+            this.numericFluents.add(new NumericFluent(exp.getPredicate(), arguments));
         }
     }
 
@@ -788,7 +796,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 this.getPredicateSignatures().add(new ArrayList<>());
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
                 dummyGoal.setPredicate(dummyPredicateIndex);
-                dummyGoal.setArguments(new int[0]);
+                dummyGoal.setArguments(new ArrayList<>(0));
                 final int dummyGoalIndex = this.getIntExpFluents().size();
                 this.getIntExpFluents().add(dummyGoal);
                 this.mapOfNumericFluentIndex.put(dummyGoal, dummyGoalIndex);
@@ -1525,10 +1533,18 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void extractRelevantTasks() {
         this.tasks = new ArrayList<>();
         for (IntExpression task : this.getRelevantPrimitiveTasks()) {
-            this.tasks.add(new Task(task.getPredicate(), task.getArguments(), true));
+            int[] arguments = new int[task.getArguments().size()];
+            for (int i = 0; i < task.getArguments().size(); i++) {
+                arguments[i] = task.getArguments().get(i);
+            }
+            this.tasks.add(new Task(task.getPredicate(), arguments, true));
         }
         for (IntExpression task : this.getRelevantCompundTasks()) {
-            this.tasks.add(new Task(task.getPredicate(), task.getArguments(), false));
+            int[] arguments = new int[task.getArguments().size()];
+            for (int i = 0; i < task.getArguments().size(); i++) {
+                arguments[i] = task.getArguments().get(i);
+            }
+            this.tasks.add(new Task(task.getPredicate(), arguments, false));
         }
     }
 

@@ -21,12 +21,14 @@ package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.MalformedExpressionException;
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.PDDLExpression;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -86,7 +88,7 @@ public class IntExpression implements Serializable {
      * The list of arguments of the expression. This attribute is used to store the argument of the
      * atomic expression.
      */
-    private int[] arguments;
+    private List<Integer> arguments;
 
     /**
      * The children of the expression.
@@ -123,9 +125,11 @@ public class IntExpression implements Serializable {
         this.connective = other.getConnective();
         this.predicate = other.getPredicate();
         this.taskID = other.getTaskID();
-        this.arguments = other.getArguments();
-        if (this.arguments != null) {
-            this.arguments = Arrays.copyOf(other.getArguments(), other.getArguments().length);
+        this.arguments = new ArrayList<>();
+        if (other.getArguments() != null) {
+            for (Integer arg : other.getArguments()) {
+                this.arguments.add(arg);
+            }
         }
         final List<IntExpression> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
@@ -145,7 +149,7 @@ public class IntExpression implements Serializable {
         this.connective = connective;
         this.predicate = IntExpression.DEFAULT_PREDICATE;
         this.taskID = IntExpression.DEFAULT_TASK_ID;
-        this.arguments = new int[0];
+        this.arguments = new ArrayList<>(0);
         this.children = new ArrayList<>();
         this.variable = IntExpression.DEFAULT_VARIABLE;
         this.type = IntExpression.DEFAULT_TYPE;
@@ -231,7 +235,7 @@ public class IntExpression implements Serializable {
      *
      * @return the arguments the list of arguments of this expression.
      */
-    public final int[] getArguments() {
+    public final List<Integer> getArguments() {
         return this.arguments;
     }
 
@@ -240,7 +244,7 @@ public class IntExpression implements Serializable {
      *
      * @param args the arguments to set.
      */
-    public final void setArguments(final int[] args) {
+    public final void setArguments(final List<Integer> args) {
         this.arguments = args;
     }
 
@@ -343,16 +347,17 @@ public class IntExpression implements Serializable {
      */
     @Override
     public boolean equals(final Object object) {
+        if (this == object) return true;
         if (object != null && object instanceof IntExpression) {
             final IntExpression other = (IntExpression) object;
-            return this.connective.equals(other.connective)
-                && this.predicate == other.predicate
-                && Arrays.equals(this.arguments, other.arguments)
-                && Double.compare(this.value, other.value) == 0.0
-                && this.variable == other.variable
-                && this.type == other.type
-                && this.children.equals(other.children)
-                && this.isPrimtive() == other.isPrimtive();
+            return Objects.equals(this.getConnective(), other.getConnective())
+                && Objects.equals(this.getPredicate(), other.getPredicate())
+                && Objects.equals(this.getArguments(), other.getArguments())
+                && Objects.equals(this.getValue(), other.getValue())
+                && Objects.equals(this.getVariable(), other.getVariable())
+                && Objects.equals(this.getType(), other.getType())
+                && Objects.equals(this.getChildren(), other.getChildren())
+                && Objects.equals(this.isPrimtive(), other.isPrimtive());
         }
         return false;
     }
@@ -365,18 +370,8 @@ public class IntExpression implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + this.connective.hashCode();
-        result = prime * result + this.predicate;
-        result = prime * result + Arrays.hashCode(this.arguments);
-        long temp;
-        temp = Double.doubleToLongBits(this.value);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        result = prime * result + this.variable;
-        result = prime * result + this.type;
-        result = prime * result + this.children.hashCode();
-        return result;
+        return Objects.hash(this.getConnective(), this.getPredicate(), this.getArguments(), this.getValue(),
+            this.getVariable(), this.getType(), this.getChildren(), this.isPrimtive());
     }
 
     /**
@@ -601,12 +596,12 @@ public class IntExpression implements Serializable {
             case FN_HEAD:
                 str.append("(");
                 str.append(this.getPredicate());
-                if (this.getArguments().length != 0) {
+                if (this.getArguments().size() != 0) {
                     str.append(" ");
-                    for (int i = 0; i < this.getArguments().length - 1; i++) {
-                        str.append(this.getArguments()[i]).append(" ");
+                    for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                        str.append(this.getArguments().get(i)).append(" ");
                     }
-                    str.append(this.getArguments()[(this.getArguments().length - 1)]);
+                    str.append(this.getArguments().get(this.getArguments().size() - 1));
                 }
                 str.append(")");
                 break;
@@ -616,13 +611,13 @@ public class IntExpression implements Serializable {
                     str.append(this.getTaskID());
                     str.append(" ");
                 }
-                if (this.getArguments().length != 0) {
+                if (this.getArguments().size() != 0) {
                     str.append(this.getPredicate());
                     str.append(" ");
-                    for (int i = 0; i < this.getArguments().length - 1; i++) {
-                        str.append(this.getArguments()[i]).append(" ");
+                    for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                        str.append(this.getArguments().get(i)).append(" ");
                     }
-                    str.append(this.getArguments()[(this.getArguments().length - 1)]);
+                    str.append(this.getArguments().get(this.getArguments().size() - 1));
                 }
                 str.append(")");
                 break;
@@ -630,11 +625,11 @@ public class IntExpression implements Serializable {
                 str.append("(");
                 str.append(this.getConnective().getImage());
                 str.append(" ");
-                for (int i = 0; i < this.getArguments().length - 1; i++) {
-                    str.append(this.getArguments()[i]);
+                for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                    str.append(this.getArguments().get(i));
                     str.append(" ");
                 }
-                str.append(this.getArguments()[this.getArguments().length - 1]).append(")");
+                str.append(this.getArguments().get(this.getArguments().size() - 1)).append(")");
                 break;
             case AND:
             case OR:

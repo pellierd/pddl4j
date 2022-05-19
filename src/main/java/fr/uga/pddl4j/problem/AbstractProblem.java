@@ -768,7 +768,7 @@ public abstract class AbstractProblem implements Problem {
     protected void initCompoundTaskSymbols() {
         this.compoundTaskSymbols = new LinkedHashSet<>();
         for (PDDLMethod m : this.getParsedProblem().getMethods()) {
-            this.compoundTaskSymbols.add(m.getTask().getAtom().get(0).getImage());
+            this.compoundTaskSymbols.add(m.getTask().getSymbol().getImage());
         }
     }
 
@@ -1145,41 +1145,41 @@ public abstract class AbstractProblem implements Problem {
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
                 intExp.setPredicate(IntExpression.EQUAL_PREDICATE);
-                int[] args = new int[exp.getAtom().size()];
-                for (int i = 0; i < exp.getAtom().size(); i++) {
-                    final PDDLSymbol argument = exp.getAtom().get(i);
+                List<Integer> args = new ArrayList<>(exp.getArguments().size());
+                for (int i = 0; i < exp.getArguments().size(); i++) {
+                    final PDDLSymbol argument = exp.getArguments().get(i);
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
-                        args[i] = -variables.indexOf(argument.getImage()) - 1;
+                        args.add(-variables.indexOf(argument.getImage()) - 1);
                     } else {
-                        args[i] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args.add(this.getConstantSymbols().indexOf(argument.getImage()));
                     }
                 }
                 intExp.setArguments(args);
                 break;
             case FN_HEAD:
-                final String functor = exp.getAtom().get(0).getImage();
+                final String functor = exp.getSymbol().getImage();
                 intExp.setPredicate(this.getFunctions().indexOf(functor));
-                args = new int[exp.getAtom().size() - 1];
-                for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final PDDLSymbol argument = exp.getAtom().get(i);
+                args = new ArrayList<>(exp.getArguments().size());
+                for (int i = 0; i < exp.getArguments().size(); i++) {
+                    final PDDLSymbol argument = exp.getArguments().get(i);
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
-                        args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
+                        args.add(-variables.indexOf(argument.getImage()) - 1);
                     } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args.add(this.getConstantSymbols().indexOf(argument.getImage()));
                     }
                 }
                 intExp.setArguments(args);
                 break;
             case ATOM:
-                final String predicate = exp.getAtom().get(0).getImage();
+                final String predicate = exp.getSymbol().getImage();
                 intExp.setPredicate(this.getPredicateSymbols().indexOf(predicate));
-                args = new int[exp.getAtom().size() - 1];
-                for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final PDDLSymbol argument = exp.getAtom().get(i);
+                args = new ArrayList<>(exp.getArguments().size());
+                for (int i = 0; i < exp.getArguments().size(); i++) {
+                    final PDDLSymbol argument = exp.getArguments().get(i);
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
-                        args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
+                        args.add(-variables.indexOf(argument.getImage()) - 1);
                     } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args.add(this.getConstantSymbols().indexOf(argument.getImage()));
                     }
                 }
                 intExp.setArguments(args);
@@ -1258,16 +1258,16 @@ public abstract class AbstractProblem implements Problem {
                 // Do nothing
                 break;
             case TASK: // ADD TO DEAL WITH HTN
-                final String task = exp.getAtom().get(0).getImage();
+                final String task = exp.getSymbol().getImage();
                 intExp.setPredicate(this.getTaskSymbols().indexOf(task));
                 intExp.setPrimtive(this.getPrimitiveTaskSymbols().contains(task));
-                args = new int[exp.getAtom().size() - 1];
-                for (int i = 1; i < exp.getAtom().size(); i++) {
-                    final PDDLSymbol argument = exp.getAtom().get(i);
+                args = new ArrayList<Integer>(exp.getArguments().size());
+                for (int i = 0; i < exp.getArguments().size(); i++) {
+                    final PDDLSymbol argument = exp.getArguments().get(i);
                     if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
-                        args[i - 1] = -variables.indexOf(argument.getImage()) - 1;
+                        args.add(-variables.indexOf(argument.getImage()) - 1);
                     } else {
-                        args[i - 1] = this.getConstantSymbols().indexOf(argument.getImage());
+                        args.add(this.getConstantSymbols().indexOf(argument.getImage()));
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
@@ -1453,7 +1453,7 @@ public abstract class AbstractProblem implements Problem {
             case ATOM:
                 str.append("(");
                 str.append(this.getPredicateSymbols().get(exp.getPredicate()));
-                int[] args = exp.getArguments();
+                List<Integer> args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
                         str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-index - 1);

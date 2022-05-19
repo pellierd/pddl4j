@@ -732,9 +732,9 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
                 tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
                     PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    c.setAtom(new LinkedList<PDDLSymbol>());
-                    c.getAtom().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
-                    c.getAtom().add(tn.getTasks().getChildren().get(i).getTaskID());
+                    c.setArguments(new LinkedList<PDDLSymbol>());
+                    c.getArguments().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
+                    c.getArguments().add(tn.getTasks().getChildren().get(i).getTaskID());
                     tn.getOrdering().addChild(c);
                 }
             }

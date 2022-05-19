@@ -55,10 +55,14 @@ public class PDDLExpression extends AbstractParsedObject {
     private List<PDDLTypedSymbol> variables;
 
     /**
-     * AND, OR, NOT, WHEN &#61;&#62; NULL ALL, EX &#61;&#62; the quantified variable with its type ATOM &#61;&#62;
-     * the atom as predicate&#45;&#62;param1&#45;&#62;param2&#45;&#62;...
+     * The symbol used in the atomic formula. The symbol can be a function symbol a predicate symbol or a task symbol.
      */
-    private List<PDDLSymbol> atom;
+    private PDDLSymbol symbol;
+
+    /**
+     * The arguments of the atomic formula of this expression.
+     */
+    private List<PDDLSymbol> arguments;
 
     /**
      * (a) for AND, OR this is the list of sons(a AND b AND c...), (b) for the rest this is the son,
@@ -88,16 +92,6 @@ public class PDDLExpression extends AbstractParsedObject {
     private PDDLSymbol taskID;
 
     /**
-     * The time of this expression.
-     */
-    //private PDDLSymbol time;
-
-    /**
-     * The time interval of this expression.
-     */
-    //private PDDLTimeInterval timeInterval;
-
-    /**
      * Creates a new PDDL expression from a other one.
      *
      * @param other the other expression.
@@ -109,9 +103,12 @@ public class PDDLExpression extends AbstractParsedObject {
             throw new NullPointerException("other == null");
         }
         this.connective = other.getConnective();
-        if (other.getAtom() != null) {
-            this.atom = new ArrayList<>();
-            this.atom.addAll(other.getAtom().stream().map(PDDLSymbol::new).collect(Collectors.toList()));
+        if (other.getSymbol() != null) {
+            this.setSymbol(new PDDLSymbol(other.getSymbol()));
+        }
+        if (other.getArguments() != null) {
+            this.arguments = new ArrayList<>();
+            this.arguments.addAll(other.getArguments().stream().map(PDDLSymbol::new).collect(Collectors.toList()));
         }
         if (other.getChildren() != null) {
             this.children = new ArrayList<>();
@@ -134,7 +131,8 @@ public class PDDLExpression extends AbstractParsedObject {
     private PDDLExpression() {
         super();
         this.connective = PDDLConnective.AND;
-        this.atom = null;
+        this.symbol = null;
+        this.arguments = null;
         this.children = new ArrayList<>();
         this.prefName = null;
         this.variables = null;
@@ -192,12 +190,31 @@ public class PDDLExpression extends AbstractParsedObject {
     }
 
     /**
-     * Sets the atom of this node.
+     * Sets a new symbol to this expression. Expression with a symbol are predicate, function or task formula.
      *
-     * @param atom the atom of this node.
+     * @param symbol the new symbol of this expression.
      */
-    public final void setAtom(final List<PDDLSymbol> atom) {
-        this.atom = atom;
+    public void setSymbol(final PDDLSymbol symbol) {
+        this.symbol = symbol;
+    }
+
+    /**
+     * Returns the symbol to this expression. Expression with a symbol are predicate, function or task formula.
+     *
+     * @return the symbol the new symbol of this expression. If this expression is not ATOM, a FUNCTION or TASK the
+     * returned symbol is null.
+     */
+    public final PDDLSymbol getSymbol() {
+        return this.symbol;
+    }
+
+    /**
+     * Sets the argument of this expression
+     *
+     * @param arguments the arguments of this node.
+     */
+    public final void setArguments(final List<PDDLSymbol> arguments) {
+        this.arguments = arguments;
     }
 
     /**
@@ -286,8 +303,8 @@ public class PDDLExpression extends AbstractParsedObject {
      *
      * @return the atom
      */
-    public final List<PDDLSymbol> getAtom() {
-        return this.atom;
+    public final List<PDDLSymbol> getArguments() {
+        return this.arguments;
     }
 
     /**
@@ -351,7 +368,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 // Set a dummy taskID to task if no task taskID was specified
                 if (this.getTaskID() == null) {
                     String newTaskID = new String(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size());
-                    PDDLSymbol taskID = new PDDLSymbol(this.getAtom().get(0));
+                    PDDLSymbol taskID = new PDDLSymbol(this.getSymbol());
                     taskID.setKind(PDDLSymbol.Kind.TASK_ID);
                     taskID.setImage(newTaskID);
                     this.setTaskID(taskID);
@@ -361,7 +378,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 }
                 break;
             case F_TASK_TIME:
-                this.atom.get(1).rename(context);
+                this.arguments.get(0).rename(context);
                 break;
             case LESS_ORDERING_CONSTRAINT:
             case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
@@ -421,8 +438,8 @@ public class PDDLExpression extends AbstractParsedObject {
             case FN_HEAD:
             case EQUAL_ATOM:
             case TASK:
-                for (int i = 0; i < this.getAtom().size(); i++) {
-                    this.getAtom().get(i).renameVariables(context);
+                for (int i = 0; i < this.getArguments().size(); i++) {
+                    this.getArguments().get(i).renameVariables(context);
                 }
                 break;
             case AND:
@@ -817,7 +834,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 }
                 break;
             case EQUAL_ATOM:
-                if (this.getAtom().get(0).equals(this.getAtom().get(1))) {
+                if (this.getArguments().get(0).equals(this.getArguments().get(1))) {
                     this.setConnective(PDDLConnective.TRUE);
                     simplified = true;
                 }
@@ -925,7 +942,8 @@ public class PDDLExpression extends AbstractParsedObject {
      * @param exp the expression to assigned to this expression.
      */
     public void assign(final PDDLExpression exp) {
-        this.atom = exp.getAtom();
+        this.setSymbol(exp.getSymbol());
+        this.arguments = exp.getArguments();
         this.children = exp.getChildren();
         this.connective = exp.getConnective();
         this.prefName = exp.getPrefName();
@@ -1011,7 +1029,8 @@ public class PDDLExpression extends AbstractParsedObject {
             PDDLExpression other = (PDDLExpression) obj;
             return getConnective() == other.getConnective()
                 && Objects.equals(this.getVariables(), other.getVariables())
-                && Objects.equals(this.getAtom(), other.getAtom())
+                && Objects.equals(this.getSymbol(), other.getSymbol())
+                && Objects.equals(this.getArguments(), other.getArguments())
                 && Objects.equals(this.getChildren(), other.getChildren())
                 && Objects.equals(this.getValue(), other.getValue())
                 && Objects.equals(this.getPrefName(), other.getPrefName())
@@ -1029,8 +1048,9 @@ public class PDDLExpression extends AbstractParsedObject {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getConnective(), this.getVariables(), this.getAtom(), this.getChildren(),
-            this.getValue(), this.getPrefName(), this.getVariable(), this.getTaskID());
+        return Objects.hash(this.getConnective(), this.getVariables(), this.getSymbol(),
+            this.getArguments(), this.getChildren(), this.getValue(), this.getPrefName(),
+            this.getVariable(), this.getTaskID());
     }
 
     /**
@@ -1096,7 +1116,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 taskIDs.add(this.getTaskID());
                 break;
             case F_TASK_TIME:
-                taskIDs.add(this.getAtom().get(1)); // Add constraints HDDL2.1
+                taskIDs.add(this.getArguments().get(0)); // Add constraints HDDL2.1
                 break;
             case NOT:
                 if (!this.getChildren().get(0).getConnective().equals(PDDLConnective.EQUAL_ATOM)) {
@@ -1160,24 +1180,28 @@ public class PDDLExpression extends AbstractParsedObject {
             case ATOM:
             case FN_HEAD:
                 str.append("(");
-                if (!this.atom.isEmpty()) {
-                    for (int i = 0; i < this.atom.size() - 1; i++) {
-                        str.append(this.atom.get(i).toString()).append(" ");
+                str.append(this.getSymbol());
+                str.append(" ");
+                if (!this.arguments.isEmpty()) {
+                    for (int i = 0; i < this.arguments.size() - 1; i++) {
+                        str.append(this.arguments.get(i).toString()).append(" ");
                     }
-                    str.append(this.atom.get(this.atom.size() - 1).toString());
+                    str.append(this.arguments.get(this.arguments.size() - 1).toString());
                 }
                 str.append(")");
                 break;
             case TASK:
                 str.append("(");
-                if (!this.atom.isEmpty()) {
+                str.append(this.getSymbol());
+                str.append(" ");
+                if (!this.arguments.isEmpty()) {
                     if (this.getTaskID() != null) {
                         str.append(this.getTaskID()).append(" (");
                     }
-                    for (int i = 0; i < this.atom.size() - 1; i++) {
-                        str.append(this.atom.get(i).toString()).append(" ");
+                    for (int i = 0; i < this.arguments.size() - 1; i++) {
+                        str.append(this.arguments.get(i).toString()).append(" ");
                     }
-                    str.append(this.atom.get(this.atom.size() - 1).toString());
+                    str.append(this.arguments.get(this.arguments.size() - 1).toString());
                 }
                 str.append(")");
                 break;
@@ -1185,10 +1209,10 @@ public class PDDLExpression extends AbstractParsedObject {
                 str.append("(")
                     .append(this.getConnective().getImage())
                     .append(" ");
-                for (int i = 0; i < this.atom.size() - 1; i++) {
-                    str.append(this.atom.get(i).toString()).append(" ");
+                for (int i = 0; i < this.arguments.size() - 1; i++) {
+                    str.append(this.arguments.get(i).toString()).append(" ");
                 }
-                str.append(this.atom.get(this.atom.size() - 1).toString()).append(")");
+                str.append(this.arguments.get(this.arguments.size() - 1).toString()).append(")");
                 break;
             case AND:
             case OR:
@@ -1276,8 +1300,8 @@ public class PDDLExpression extends AbstractParsedObject {
             case EQUAL_ORDERING_CONSTRAINT:
                 str.append("(");
                 str.append(this.getConnective().getImage()).append(" ");
-                str.append(this.atom.get(0).toString()).append(" ");
-                str.append(this.atom.get(1).toString());
+                str.append(this.arguments.get(0).toString()).append(" ");
+                str.append(this.arguments.get(1).toString());
                 str.append(")");
                 break;
             case NOT:
@@ -1390,7 +1414,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 }
                 break;
             case EQUAL_ATOM:
-                malformed = this.atom.size() != 2;
+                malformed = this.arguments.size() != 2;
                 break;
             case FORALL:
             case EXISTS:
@@ -1444,7 +1468,7 @@ public class PDDLExpression extends AbstractParsedObject {
             case ATOM:
             case TASK:
             case FN_HEAD:
-                malformed = this.getAtom().isEmpty();
+                malformed = this.getSymbol() == null;
                 break;
             case TIMED_LITERAL:
             case WITHIN_CONSTRAINT:

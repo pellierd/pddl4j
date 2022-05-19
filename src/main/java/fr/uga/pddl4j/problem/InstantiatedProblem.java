@@ -27,6 +27,7 @@ import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -239,9 +240,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final IntMethod copy = new IntMethod(method);
         boolean instantiable = true;
         int i = 0;
-        while (i < t.getArguments().length && instantiable) {
-            final int var = t.getArguments()[i];
-            final int cons = task.getArguments()[i];
+        while (i < t.getArguments().size() && instantiable) {
+            final int var = t.getArguments().get(i);
+            final int cons = task.getArguments().get(i);
             final int type = copy.getTypeOfParameters((-var - 1));
             final Set<Integer> domain = this.getDomains().get(type);
             if (domain.contains(cons)) {
@@ -478,7 +479,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final List<Integer> relevantIndex = new ArrayList<>();
             for (IntMethod method : meths) {
                 if (method.getTask().getPredicate() == task.getPredicate()
-                    && method.getTask().getArguments().length == task.getArguments().length) {
+                    && method.getTask().getArguments().size() == task.getArguments().size()) {
                     final List<IntMethod> instantiated = new ArrayList<>(100);
                     this.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
                     for (IntMethod instance : instantiated) {
@@ -593,7 +594,11 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
             task.setPredicate(this.getTaskSymbols().indexOf(a.getName()));
-            task.setArguments(a.getInstantiations());
+            List<Integer> arguments = new ArrayList<>(a.getInstantiations().length);
+            for (Integer arg : a.getInstantiations()) {
+                arguments.add(arg);
+            }
+            task.setArguments(arguments);
             tasks.add(task);
         }
         return tasks;
