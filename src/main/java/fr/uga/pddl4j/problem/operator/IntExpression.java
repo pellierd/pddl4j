@@ -95,6 +95,8 @@ public class IntExpression implements Serializable {
      */
     private List<IntExpression> children;
 
+    private List<IntTypedVariable> quantifiedVariables;
+
     /**
      * The variable is used by quantified expression.
      */
@@ -321,6 +323,24 @@ public class IntExpression implements Serializable {
     }
 
     /**
+     * Returns the list of quantified variable of the expression.
+     *
+     * @return the list of quantified variable of the expression.
+     */
+    public final List<IntTypedVariable> getQuantifiedVariables() {
+        return this.quantifiedVariables;
+    }
+
+    /**
+     * Sets the list of quantified variable of the expression.
+     *
+     * @param  variables the list of quantified variable of the expression.
+     */
+    public final void setQuantifiedVariables(final List<IntTypedVariable> variables) {
+        this.quantifiedVariables = variables;
+    }
+
+     /**
      * Affects this expression to an other. After affectation this expression and the other are
      * equal. No copy of the content of the other expression is done.
      *
