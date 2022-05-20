@@ -397,7 +397,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
         this.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
         this.dummyPredicateCounter++;
         final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
-        atom.setPredicate(this.getPredicateSymbols().size() - 1);
+        atom.setSymbol(this.getPredicateSymbols().size() - 1);
         return atom;
 
     }

@@ -148,7 +148,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     private void extract(final IntExpression exp) {
         switch (exp.getConnective()) {
             case ATOM:
-                int predicate = exp.getPredicate();
+                int predicate = exp.getSymbol();
                 switch (this.inertia.get(predicate)) {
                     case INERTIA:
                         this.inertia.set(predicate, Inertia.NEGATIVE);
@@ -177,7 +177,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case NOT:
                 final IntExpression neg = exp.getChildren().get(0);
                 if (neg.getConnective().equals(PDDLConnective.ATOM)) {
-                    predicate = neg.getPredicate();
+                    predicate = neg.getSymbol();
                     switch (this.inertia.get(predicate)) {
                         case INERTIA:
                             this.inertia.set(predicate, Inertia.POSITIVE);
@@ -275,7 +275,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-                this.numericInertia.set(exp.getChildren().get(0).getPredicate(), Inertia.FLUENT);
+                this.numericInertia.set(exp.getChildren().get(0).getSymbol(), Inertia.FLUENT);
                 break;
             case ATOM:
                 // Do nothing
@@ -298,7 +298,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
-                    if (fact.getPredicate() == i) {
+                    if (fact.getSymbol() == i) {
                         newTypeDomain.add(fact.getArguments().get(0));
                     }
                 }
@@ -347,7 +347,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     final int dtIndex = action.getTypeOfParameters(index);
 
                     final String declaredType = this.getTypes().get(dtIndex);
-                    final int itIndex = inertia.getPredicate();
+                    final int itIndex = inertia.getSymbol();
                     final String inertiaType = this.getPredicateSymbols().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
@@ -445,12 +445,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case FORALL:
             case EXISTS:
-                if (inertia.getArguments().get(0) == exp.getVariable()) {
+                if (inertia.getArguments().get(0) == exp.getQuantifiedVariables().get(0).getVariable()) {
                     final IntExpression ei = new IntExpression(exp);
-                    ei.setType(ti);
+                    //ei.setType(ti);
+                    ei.getQuantifiedVariables().get(0).setType(ti);
                     this.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
                     final IntExpression es = new IntExpression(exp);
-                    es.setType(ts);
+                    es.getQuantifiedVariables().get(0).setType(ts);
                     this.replace(es, inertia, PDDLConnective.FALSE, ti, ts);
                     exp.getChildren().clear();
                     if (exp.getConnective().equals(PDDLConnective.FORALL)) {
@@ -534,7 +535,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         final List<IntExpression> unaryInertia = new ArrayList<>();
         switch (exp.getConnective()) {
             case ATOM:
-                if (this.getInferredDomains().get(exp.getPredicate()) != null) {
+                if (this.getInferredDomains().get(exp.getSymbol()) != null) {
                     unaryInertia.add(exp);
                 }
                 break;
@@ -625,8 +626,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
-            final int arity = this.getPredicateSignatures().get(fact.getPredicate()).size();
-            final List<IntMatrix> pTables = this.predicatesTables.get(fact.getPredicate());
+            final int arity = this.getPredicateSignatures().get(fact.getSymbol()).size();
+            final List<IntMatrix> pTables = this.predicatesTables.get(fact.getSymbol());
             final int[] set = new int[arity];
             final List<Integer> args = fact.getArguments();
             for (final IntMatrix intMatrix : pTables) {
@@ -769,7 +770,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && this.getDomains().get(ei.getType()).isEmpty()) {
+                        && this.getDomains().get(ei.getQuantifiedVariables().get(0).getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -787,7 +788,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && this.getDomains().get(ei.getType()).isEmpty()) {
+                        && this.getDomains().get(ei.getQuantifiedVariables().get(0).getType()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -799,9 +800,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case FORALL:
-                Set<Integer> constants = this.getDomains().get(exp.getType());
+                Set<Integer> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getType());
                 IntExpression qExp = exp.getChildren().get(0);
-                int var = exp.getVariable();
+                int var = exp.getQuantifiedVariables().get(0).getVariable();
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 Iterator<Integer> it = constants.iterator();
@@ -818,9 +819,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 this.expandQuantifiedExpression(exp, simplify);
                 break;
             case EXISTS:
-                constants = this.getDomains().get(exp.getType());
+                constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getType());
                 qExp = exp.getChildren().get(0);
-                var = exp.getVariable();
+                var = exp.getQuantifiedVariables().get(0).getVariable();
                 exp.setConnective(PDDLConnective.OR);
                 exp.getChildren().clear();
                 it = constants.iterator();
@@ -910,7 +911,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp the atomic expression to simplify.
      */
     private void simplyAtom(final IntExpression exp) {
-        final int predicate = exp.getPredicate();
+        final int predicate = exp.getSymbol();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
         int indexSize = 0;

@@ -33,6 +33,7 @@ import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
+import fr.uga.pddl4j.problem.operator.TypedVariable;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 
 import org.apache.logging.log4j.LogManager;
@@ -604,7 +605,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FORALL:
             case EXISTS:
-                this.initEitherTypes(exp.getVariables());
+                this.initEitherTypes(exp.getQuantifiedVariables());
                 this.initEitherTypes(exp.getChildren().get(0));
                 break;
             case WHEN:
@@ -1144,7 +1145,7 @@ public abstract class AbstractProblem implements Problem {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
-                intExp.setPredicate(IntExpression.EQUAL_PREDICATE);
+                intExp.setSymbol(IntExpression.EQUAL_PREDICATE);
                 List<Integer> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1158,7 +1159,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FN_HEAD:
                 final String functor = exp.getSymbol().getImage();
-                intExp.setPredicate(this.getFunctions().indexOf(functor));
+                intExp.setSymbol(this.getFunctions().indexOf(functor));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1172,7 +1173,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case ATOM:
                 final String predicate = exp.getSymbol().getImage();
-                intExp.setPredicate(this.getPredicateSymbols().indexOf(predicate));
+                intExp.setSymbol(this.getPredicateSymbols().indexOf(predicate));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1193,11 +1194,13 @@ public abstract class AbstractProblem implements Problem {
             case FORALL:
             case EXISTS:
                 final List<String> newVariables = new ArrayList<>(variables);
-                final List<PDDLTypedSymbol> qvar = exp.getVariables();
+                final List<PDDLTypedSymbol> qvar = exp.getQuantifiedVariables();
                 final String type = this.toStringType(qvar.get(0).getTypes());
                 int typeIndex = this.getTypes().indexOf(type);
-                intExp.setType(typeIndex);
-                intExp.setVariable(-variables.size() - 1);
+                final TypedVariable intQvar  = new TypedVariable(-variables.size() - 1, typeIndex);
+                //intExp.setType(typeIndex);
+                //intExp.setVariable(-variables.size() - 1);
+                intExp.getQuantifiedVariables().add(intQvar);
                 newVariables.add(qvar.get(0).getImage());
                 if (qvar.size() == 1) {
                     intExp.getChildren().add(this.initExpression(exp.getChildren().get(0), newVariables));
@@ -1259,7 +1262,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK: // ADD TO DEAL WITH HTN
                 final String task = exp.getSymbol().getImage();
-                intExp.setPredicate(this.getTaskSymbols().indexOf(task));
+                intExp.setSymbol(this.getTaskSymbols().indexOf(task));
                 intExp.setPrimtive(this.getPrimitiveTaskSymbols().contains(task));
                 args = new ArrayList<Integer>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
@@ -1452,7 +1455,7 @@ public abstract class AbstractProblem implements Problem {
         switch (exp.getConnective()) {
             case ATOM:
                 str.append("(");
-                str.append(this.getPredicateSymbols().get(exp.getPredicate()));
+                str.append(this.getPredicateSymbols().get(exp.getSymbol()));
                 List<Integer> args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -1464,7 +1467,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(")");
                 break;
             case FN_HEAD:
-                str.append("(").append(this.getFunctions().get(exp.getPredicate()));
+                str.append("(").append(this.getFunctions().get(exp.getSymbol()));
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -1482,7 +1485,7 @@ public abstract class AbstractProblem implements Problem {
                     str.append(exp.getTaskID());
                     str.append(" (");
                 }
-                str.append(this.getTaskSymbols().get(exp.getPredicate()));
+                str.append(this.getTaskSymbols().get(exp.getSymbol()));
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -1526,11 +1529,16 @@ public abstract class AbstractProblem implements Problem {
             case FORALL:
             case EXISTS:
                 str.append(" (").append(exp.getConnective().getImage());
-                str.append(" (").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(-exp.getVariable() - 1);
-                str.append(" - ");
+                str.append(" (");
+                for (TypedVariable var: exp.getQuantifiedVariables()) {
+                    str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                    str.append(-var.getVariable() - 1);
+                    str.append(" - ");
+                    str.append(this.getTypes().get(var.getType()));
+                }
+                str.append(")\n");
                 String offsetEx = baseOffset + baseOffset + "  ";
-                str.append(this.getTypes().get(exp.getType())).append(")\n").append(offsetEx);
+                str.append(offsetEx);
                 if (exp.getChildren().size() == 1) {
                     str.append(toString(exp.getChildren().get(0), offsetEx));
                 }

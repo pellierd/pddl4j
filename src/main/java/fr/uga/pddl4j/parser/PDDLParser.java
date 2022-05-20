@@ -710,7 +710,7 @@ public final class PDDLParser implements Callable<Integer> {
                     break;
                 case EXISTS:
                 case FORALL:
-                    for (PDDLTypedSymbol variable : gd.getVariables()) {
+                    for (PDDLTypedSymbol variable : gd.getQuantifiedVariables()) {
                         error = false;
                         for (PDDLSymbol type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {
@@ -1392,7 +1392,7 @@ public final class PDDLParser implements Callable<Integer> {
                     break;
                 case EXISTS:
                 case FORALL:
-                    for (PDDLTypedSymbol variable : gd.getVariables()) {
+                    for (PDDLTypedSymbol variable : gd.getQuantifiedVariables()) {
                         boolean error = false;
                         for (PDDLSymbol type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {

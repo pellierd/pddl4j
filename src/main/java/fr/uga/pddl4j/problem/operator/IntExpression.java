@@ -21,12 +21,10 @@ package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.MalformedExpressionException;
 import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLExpression;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -75,9 +73,9 @@ public class IntExpression implements Serializable {
     private PDDLConnective connective;
 
     /**
-     * The integer representation of the predicate.
+     * The integer representation of the symbol of the atomic formula represented by this expression.
      */
-    private int predicate;
+    private int symbol;
 
     /**
      * The integer representation of the task ID.
@@ -95,17 +93,15 @@ public class IntExpression implements Serializable {
      */
     private List<IntExpression> children;
 
-    private List<IntTypedVariable> quantifiedVariables;
+    /**
+     * The quantified variable of the expression.
+     */
+    private List<TypedVariable> quantifiedVariables;
 
     /**
      * The variable is used by quantified expression.
      */
     private int variable;
-
-    /**
-     * The type of the variable used by a quantified expression.
-     */
-    private int type;
 
     /**
      * The value of the expression. This attribute is used to store value of number expression.
@@ -125,7 +121,7 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final IntExpression other) {
         this.connective = other.getConnective();
-        this.predicate = other.getPredicate();
+        this.symbol = other.getSymbol();
         this.taskID = other.getTaskID();
         this.arguments = new ArrayList<>();
         if (other.getArguments() != null) {
@@ -136,8 +132,13 @@ public class IntExpression implements Serializable {
         final List<IntExpression> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
         this.children.addAll(otherChildren.stream().map(IntExpression::new).collect(Collectors.toList()));
+        this.quantifiedVariables = new ArrayList<>();
+        if (other.getQuantifiedVariables() != null) {
+            for (TypedVariable var : other.getQuantifiedVariables()) {
+                this.quantifiedVariables.add(new TypedVariable(var));
+            }
+        }
         this.variable = other.getVariable();
-        this.type = other.getType();
         this.value = other.getValue();
         this.isPrimtive = other.isPrimtive();
     }
@@ -149,12 +150,12 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
-        this.predicate = IntExpression.DEFAULT_PREDICATE;
+        this.symbol = IntExpression.DEFAULT_PREDICATE;
         this.taskID = IntExpression.DEFAULT_TASK_ID;
         this.arguments = new ArrayList<>(0);
         this.children = new ArrayList<>();
+        this.quantifiedVariables = new ArrayList<>();
         this.variable = IntExpression.DEFAULT_VARIABLE;
-        this.type = IntExpression.DEFAULT_TYPE;
         this.value = IntExpression.DEFAULT_VARIABLE_VALUE;
         this.isPrimtive = false;
     }
@@ -197,21 +198,21 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Returns the predicate of this expression.
+     * Returns the symbol of the atomic formula represented by this expression.
      *
-     * @return the predicate
+     * @return the symbol of the atomic formula represented by this expression.
      */
-    public final int getPredicate() {
-        return predicate;
+    public final int getSymbol() {
+        return symbol;
     }
 
     /**
-     * Sets a new predicate to this expression.
+     * Sets a new symbol of the atomic formula represented by this expression.
      *
-     * @param predicate the new predicate to set
+     * @param symbol the new symbol to set
      */
-    public final void setPredicate(int predicate) {
-        this.predicate = predicate;
+    public final void setSymbol(int symbol) {
+        this.symbol = symbol;
     }
 
     /**
@@ -269,24 +270,6 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Returns the type of the quantified variable of the expression.
-     *
-     * @return the type of the quantified variable of the expression.
-     */
-    public final int getType() {
-        return this.type;
-    }
-
-    /**
-     * Set a new type to the quantified variable of the expression.
-     *
-     * @param type the type to the quantified variable to set.
-     */
-    public final void setType(final int type) {
-        this.type = type;
-    }
-
-    /**
      * Returns the value of this expression.
      *
      * @return the value of this expression.
@@ -327,7 +310,7 @@ public class IntExpression implements Serializable {
      *
      * @return the list of quantified variable of the expression.
      */
-    public final List<IntTypedVariable> getQuantifiedVariables() {
+    public final List<TypedVariable> getQuantifiedVariables() {
         return this.quantifiedVariables;
     }
 
@@ -336,7 +319,7 @@ public class IntExpression implements Serializable {
      *
      * @param  variables the list of quantified variable of the expression.
      */
-    public final void setQuantifiedVariables(final List<IntTypedVariable> variables) {
+    public final void setQuantifiedVariables(final List<TypedVariable> variables) {
         this.quantifiedVariables = variables;
     }
 
@@ -348,12 +331,12 @@ public class IntExpression implements Serializable {
      */
     public final void assign(final IntExpression other) {
         this.connective = other.getConnective();
-        this.predicate = other.getPredicate();
+        this.symbol = other.getSymbol();
         this.taskID = other.getTaskID();
         this.arguments = other.getArguments();
         this.children = other.getChildren();
+        this.quantifiedVariables = other.getQuantifiedVariables();
         this.variable = other.getVariable();
-        this.type = other.getType();
         this.value = other.getValue();
         this.isPrimtive = other.isPrimtive();
     }
@@ -371,11 +354,11 @@ public class IntExpression implements Serializable {
         if (object != null && object instanceof IntExpression) {
             final IntExpression other = (IntExpression) object;
             return Objects.equals(this.getConnective(), other.getConnective())
-                && Objects.equals(this.getPredicate(), other.getPredicate())
+                && Objects.equals(this.getSymbol(), other.getSymbol())
                 && Objects.equals(this.getArguments(), other.getArguments())
                 && Objects.equals(this.getValue(), other.getValue())
+                && Objects.equals(this.getQuantifiedVariables(), other.getQuantifiedVariables())
                 && Objects.equals(this.getVariable(), other.getVariable())
-                && Objects.equals(this.getType(), other.getType())
                 && Objects.equals(this.getChildren(), other.getChildren())
                 && Objects.equals(this.isPrimtive(), other.isPrimtive());
         }
@@ -390,8 +373,8 @@ public class IntExpression implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getConnective(), this.getPredicate(), this.getArguments(), this.getValue(),
-            this.getVariable(), this.getType(), this.getChildren(), this.isPrimtive());
+        return Objects.hash(this.getConnective(), this.getSymbol(), this.getArguments(), this.getValue(),
+            this.getQuantifiedVariables(), this.getVariable(), this.getChildren(), this.isPrimtive());
     }
 
     /**
@@ -615,7 +598,7 @@ public class IntExpression implements Serializable {
             case ATOM:
             case FN_HEAD:
                 str.append("(");
-                str.append(this.getPredicate());
+                str.append(this.getSymbol());
                 if (this.getArguments().size() != 0) {
                     str.append(" ");
                     for (int i = 0; i < this.getArguments().size() - 1; i++) {
@@ -632,7 +615,7 @@ public class IntExpression implements Serializable {
                     str.append(" ");
                 }
                 if (this.getArguments().size() != 0) {
-                    str.append(this.getPredicate());
+                    str.append(this.getSymbol());
                     str.append(" ");
                     for (int i = 0; i < this.getArguments().size() - 1; i++) {
                         str.append(this.getArguments().get(i)).append(" ");
@@ -681,8 +664,14 @@ public class IntExpression implements Serializable {
                 str.append(" (");
                 str.append(this.getConnective().getImage());
                 str.append(" (");
-                str.append(this.variable);
-                str.append(" ");
+                if (!this.quantifiedVariables.isEmpty()) {
+                    for (int i = 0; i < this.quantifiedVariables.size() - 1; i++) {
+                        str.append(this.getQuantifiedVariables().get(i).toString());
+                        str.append(" ");
+                    }
+                    str.append(this.getQuantifiedVariables().get(this.quantifiedVariables.size() - 1).toString());
+                    str.append(")");
+                }
                 str.append(this.children.get(0).toString(off));
                 str.append(")");
                 break;
@@ -901,7 +890,7 @@ public class IntExpression implements Serializable {
                 break;
             case EXISTS:
                 this.setConnective(PDDLConnective.FORALL);
-                this.setVariable(child.getVariable());
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
                 negation = new IntExpression(PDDLConnective.NOT);
                 negation.addChild(child.getChildren().get(0));
                 negation.toNNF();
@@ -990,7 +979,7 @@ public class IntExpression implements Serializable {
                 timeExp.moveTimeSpecifierInward();
                 this.children.set(0, timeExp);
                 this.setConnective(child.getConnective());
-                this.setVariable(child.getVariable());
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
                 break;
             case AND:
             case OR:

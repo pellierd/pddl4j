@@ -52,7 +52,7 @@ public class PDDLExpression extends AbstractParsedObject {
     /**
      * only for parsing: the variable in quantifiers.
      */
-    private List<PDDLTypedSymbol> variables;
+    private List<PDDLTypedSymbol> quantifiedVariables;
 
     /**
      * The symbol used in the atomic formula. The symbol can be a function symbol a predicate symbol or a task symbol.
@@ -115,9 +115,9 @@ public class PDDLExpression extends AbstractParsedObject {
             this.children.addAll(other.getChildren().stream().map(PDDLExpression::new).collect(Collectors.toList()));
         }
         this.prefName = other.getPrefName();
-        if (other.getVariables() != null) {
-            this.variables = new ArrayList<>();
-            this.variables.addAll(other.getVariables().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
+        if (other.getQuantifiedVariables() != null) {
+            this.quantifiedVariables = new ArrayList<>();
+            this.quantifiedVariables.addAll(other.getQuantifiedVariables().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
         }
         if (other.getVariable() != null) {
             this.variable = new PDDLSymbol(other.getVariable());
@@ -135,7 +135,7 @@ public class PDDLExpression extends AbstractParsedObject {
         this.arguments = null;
         this.children = new ArrayList<>();
         this.prefName = null;
-        this.variables = null;
+        this.quantifiedVariables = null;
         this.value = null;
         this.taskID = null;
     }
@@ -163,18 +163,18 @@ public class PDDLExpression extends AbstractParsedObject {
     }
 
     /**
-     * Sets the parse variable of this node, i.e., the var args in quantifiers.
+     * Sets the quantified variables of this expression.
      *
-     * @param variables the parse variables.
+     * @param variables the quantified variables of this expression.
      */
-    public void setVariables(final List<PDDLTypedSymbol> variables) {
-        this.variables = variables;
+    public void setQuantifiedVariables(final List<PDDLTypedSymbol> variables) {
+        this.quantifiedVariables = variables;
     }
 
     /**
-     * Returns the variable of this parser node.
+     * Returns the variable of this expression
      *
-     * @return the variable of this parser node.
+     * @return the variable of this expression.
      */
     public final PDDLSymbol getVariable() {
         return this.variable;
@@ -276,13 +276,12 @@ public class PDDLExpression extends AbstractParsedObject {
     }
 
     /**
-     * Returns the list of variables of this parser node. This list of variable is used to store the
-     * quantified variable of the PDDL logical expression.
+     * Returns the list of quantified variables of this expression.
      *
-     * @return the list of variables of this parser node.
+     * @return the list of quantified variables of this expression.
      */
-    public final List<PDDLTypedSymbol> getVariables() {
-        return this.variables;
+    public final List<PDDLTypedSymbol> getQuantifiedVariables() {
+        return this.quantifiedVariables;
     }
 
     /**
@@ -494,8 +493,8 @@ public class PDDLExpression extends AbstractParsedObject {
                 break;
             case FORALL:
             case EXISTS:
-                for (int i = 0; i < this.getVariables().size(); i++) {
-                    final PDDLTypedSymbol var = this.getVariables().get(i);
+                for (int i = 0; i < this.getQuantifiedVariables().size(); i++) {
+                    final PDDLTypedSymbol var = this.getQuantifiedVariables().get(i);
                     final String image = var.renameVariables(context.size() + 1);
                     context.put(image, var.getImage());
                 }
@@ -609,7 +608,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 break;
             case EXISTS:
                 this.setConnective(PDDLConnective.FORALL);
-                this.setVariables(child.getVariables());
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
                 negation = new PDDLExpression(PDDLConnective.NOT);
                 negation.addChild(child.getChildren().get(0));
                 negation.toNNF();
@@ -949,7 +948,7 @@ public class PDDLExpression extends AbstractParsedObject {
         this.prefName = exp.getPrefName();
         this.value = exp.getValue();
         this.variable = exp.getVariable();
-        this.variables = exp.getVariables();
+        this.quantifiedVariables = exp.getQuantifiedVariables();
         this.taskID = exp.getTaskID();
         this.setBeginLine(exp.getBeginLine());
         this.setBeginColumn(exp.getBeginColumn());
@@ -977,7 +976,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 timeExp.moveTimeSpecifierInward();
                 this.children.set(0, timeExp);
                 this.setConnective(child.getConnective());
-                this.setVariables(child.getVariables());
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
                 break;
             case AND:
             case OR:
@@ -1028,7 +1027,7 @@ public class PDDLExpression extends AbstractParsedObject {
         if (obj != null && obj instanceof PDDLExpression) {
             PDDLExpression other = (PDDLExpression) obj;
             return getConnective() == other.getConnective()
-                && Objects.equals(this.getVariables(), other.getVariables())
+                && Objects.equals(this.getQuantifiedVariables(), other.getQuantifiedVariables())
                 && Objects.equals(this.getSymbol(), other.getSymbol())
                 && Objects.equals(this.getArguments(), other.getArguments())
                 && Objects.equals(this.getChildren(), other.getChildren())
@@ -1048,7 +1047,7 @@ public class PDDLExpression extends AbstractParsedObject {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getConnective(), this.getVariables(), this.getSymbol(),
+        return Objects.hash(this.getConnective(), this.getQuantifiedVariables(), this.getSymbol(),
             this.getArguments(), this.getChildren(), this.getValue(), this.getPrefName(),
             this.getVariable(), this.getTaskID());
     }
@@ -1242,10 +1241,10 @@ public class PDDLExpression extends AbstractParsedObject {
             case EXISTS:
                 String off = baseOffset + baseOffset + "  ";
                 str.append(" (").append(this.getConnective().getImage()).append(" (");
-                for (int i = 0; i < this.variables.size() - 1; i++) {
-                    str.append(this.variables.get(i).toString()).append(", ");
+                for (int i = 0; i < this.quantifiedVariables.size() - 1; i++) {
+                    str.append(this.quantifiedVariables.get(i).toString()).append(", ");
                 }
-                str.append(this.variables.get(this.variables.size() - 1).toString())
+                str.append(this.quantifiedVariables.get(this.quantifiedVariables.size() - 1).toString())
                     .append(")\n")
                     .append(off)
                     .append(this.children.get(0).toString(off))
@@ -1418,7 +1417,7 @@ public class PDDLExpression extends AbstractParsedObject {
                 break;
             case FORALL:
             case EXISTS:
-                malformed = this.variables.isEmpty()
+                malformed = this.quantifiedVariables.isEmpty()
                     || this.children.isEmpty()
                     || this.children.get(0).isMalformedExpression();
                 break;

@@ -1105,7 +1105,7 @@ PDDLExpression forall_con_gd() :
 		child=con_gd()
 	end=right_bracket()
 	{
-		conGD.setVariables(typedList);
+		conGD.setQuantifiedVariables(typedList);
 		conGD.addChild(child);
 		conGD.setBegin(begin);
         conGD.setEnd(end);
@@ -1493,7 +1493,7 @@ PDDLExpression exists_gd() :
 		right_bracket()
 		s=gd()
 	end=right_bracket() {
-		exp.setVariables(typedList);
+		exp.setQuantifiedVariables(typedList);
 		exp.addChild(s);
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -1516,7 +1516,7 @@ PDDLExpression forall_gd() :
 		right_bracket()
 		s=gd()
 	end=right_bracket() {
-		exp.setVariables(typedList);
+		exp.setQuantifiedVariables(typedList);
 		exp.addChild(s);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -2848,7 +2848,7 @@ PDDLExpression forall_pre_gd() :
 		s=pre_gd()
 	end=right_bracket()
 	{
-		exp.setVariables(vars);
+		exp.setQuantifiedVariables(vars);
 		exp.addChild(s);
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -2945,7 +2945,7 @@ PDDLExpression forall_effect() :
 		right_bracket()
 		s=effect()
 	end=right_bracket() {
-		exp.setVariables(vars);
+		exp.setQuantifiedVariables(vars);
 		exp.addChild(s);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3668,7 +3668,7 @@ PDDLExpression forall_da_gd() :
 		child=da_gd()
 	end=right_bracket()
 	{
-		exp.setVariables(typedList);
+		exp.setQuantifiedVariables(typedList);
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3968,7 +3968,7 @@ PDDLExpression forall_da_effect() :
 		right_bracket()
 		child=da_effect()
 	end=right_bracket() {
-		exp.setVariables(typedList);
+		exp.setQuantifiedVariables(typedList);
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4654,7 +4654,7 @@ PDDLExpression forall_pref_con_gd() :
 		right_bracket()
 		child=pref_con_gd()
 	end=right_bracket() {
-		exp.setVariables(typedList);
+		exp.setQuantifiedVariables(typedList);
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);

@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * This class implements an task network. This class is used to store compact representation of a task network
+ * This class implements a task network. This class is used to store compact representation of a task network
  * during the instantiation process.
  *
  * @author D. Pellier
