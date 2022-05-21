@@ -1,11 +1,11 @@
 package fr.uga.pddl4j.parser;
 
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public abstract class AbstractExpression implements Expression {
+public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymbol> implements Expression<T1, T2> {
 
     /**
      * The type of the node.
@@ -13,87 +13,80 @@ public abstract class AbstractExpression implements Expression {
     private PDDLConnective connective;
 
     /**
-     * The children expression of this expression.
+     * The symbol used in the atomic formula. The symbol can be a function symbol a predicate symbol or a task symbol.
      */
-    private List<Expression> children;
+    private T1 symbol;
 
     /**
-     * The value associate to this node.
+     * The arguments of the atomic formula of this expression.
+     */
+    private List<T1> arguments;
+
+    /**
+     * only for parsing: the variable in quantifiers.
+     */
+    private List<T2> quantifiedVariables;
+
+    /**
+     * The value associate to this expression.
      */
     private Double value;
 
     /**
-     * Creates a new expression from another one. This constructor creates a deep copy.
-     *
-     * @param other the other expression.
-     * @throws NullPointerException if other is null.
+     * The children expression of this expression.
      */
-    public AbstractExpression(final Expression other) {
-        super();
-        if (other == null) {
-            throw new NullPointerException("other == null");
-        }
-        this.setConnective(other.getConnective());
-        if (other.getChildren() != null) {
-            this.children = new ArrayList<>();
-            /*this.children.addAll(other.getChildren().stream()
-                .map(AbstractExpression::new).collect(Collectors.toList()));
-
-            for (Expression child : this.getChildren()) {
-                this.addChild(new E);
-            }*/
-        } else {
-            this.children = new ArrayList<>();
-        }
-        this.setValue(other.getValue());
-    }
+    private List<Expression<T1, T2>> children;
 
     /**
-     * Creates a new PDDL expression with a specified connective.
+     * The name of the preference.
+     */
+    private T1 prefName;
+
+    /**
+     * The variable.
+     */
+    private T1 variable;
+
+    /**
+     * The taskID. Use to the alias of a task atom.
+     */
+    private T1 taskID;
+
+    /**
+     * Creates a new expression with a specified connective.
      *
      * @param connective the connective.
-     * @throws RuntimeException if the specified connective is null.
      */
     public AbstractExpression(final PDDLConnective connective) {
         super();
-        this.connective = connective;
-        this.children = new ArrayList<>();
-        this.value = null;
+        this.setConnective(connective);
+        this.setSymbol(null);
+        this.setArguments(new ArrayList<T1>());
+        this.setQuantifiedVariables(new ArrayList<T2>());
+        this.setValue(null);
+        this.setVariable(null);
+        this.setChildren(new ArrayList<Expression<T1, T2>>());
+        this.setPrefName(null);
+        this.setTaskID(null);
     }
 
     /**
-     * Creates a new empty AND expression.
-     */
-    public AbstractExpression() {
-        this(PDDLConnective.AND);
-    }
-
-    /**
-     * Add a new child expression to this expression.
+     * Assigns a specified expression to this expression. After the method call the expression is equals to the
+     * expression in parameter. The assignment is swallow, i.e., the assignment does not make a deep copy of the content
+     * of the expression in parameter.
      *
-     * @param exp the child to add
-     * @return <code>true</code> if the expression was added; <code>false</code> otherwise
+     * @param exp the expression to assigned to this expression.
      */
-    public final boolean addChild(final Expression exp) {
-        return this.children.add(exp);
-    }
-
-    /**
-     * Returns the list of children of this expression.
-     *
-     * @return the list of children of this expression.
-     */
-    public List<Expression> getChildren() {
-        return this.children;
-    }
-
-    /**
-     * Set the connective of this expression.
-     *
-     * @param connective the connective.
-     */
-    public final void setConnective(final PDDLConnective connective) {
-        this.connective = connective;
+    public void assign(Expression<T1, T2> exp) {
+        this.setConnective(exp.getConnective());
+        this.setSymbol(exp.getSymbol());
+        this.setArguments(exp.getArguments());
+        this.setQuantifiedVariables(exp.getQuantifiedVariables());
+        this.setValue(exp.getValue());
+        this.setVariable(exp.getVariable());
+        this.setChildren(exp.getChildren());
+        this.setPrefName(exp.getPrefName());
+        this.setTaskID(exp.getTaskID());
     }
 
     /**
@@ -106,21 +99,194 @@ public abstract class AbstractExpression implements Expression {
     }
 
     /**
-     * Set the value of this expression.
+     * Set the connective of this expression.
      *
-     * @param value the value of this expression.
+     * @param connective the connective.
+     */
+    public final void setConnective(final PDDLConnective connective) {
+        this.connective = connective;
+    }
+
+    /**
+     * Returns the symbol to this expression. Expression with a symbol are predicate, function or task formula.
+     *
+     * @return the symbol the new symbol of this expression. If this expression is not ATOM, a FUNCTION or TASK the
+     * returned symbol is null.
+     */
+    public final T1 getSymbol() {
+        return this.symbol;
+    }
+
+    /**
+     * Sets a new symbol to this expression. Expression with a symbol are predicate, function or task formula.
+     *
+     * @param symbol the new symbol of this expression.
+     */
+    public final void setSymbol(final T1 symbol) {
+        this.symbol = symbol;
+    }
+
+    /**
+     * Returns the arguments of the atomic formula represented by this expression.
+     *
+     * @return the arguments of the atomic formula represented by this expression.
+     */
+    public final List<T1> getArguments() {
+        return this.arguments;
+    }
+
+    /**
+     * Sets the argument of the atomic formula represented by this expression.
+     *
+     * @param arguments the arguments of the atomic formula represented by this expression.
+     */
+    public final void setArguments(final List<T1> arguments) {
+        this.arguments = arguments;
+    }
+
+    /**
+     * Adds an argument to this expression.
+     *
+     * @param argument the argument to add.
+     */
+    public final boolean addArgument(final T1 argument) {
+        return this.arguments.add(argument);
+    }
+
+
+    /**
+     * Returns the list of quantified variables of this expression.
+     *
+     * @return the list of quantified variables of this expression.
+     */
+    public final List<T2> getQuantifiedVariables() {
+        return this.quantifiedVariables;
+    }
+
+    /**
+     * Sets the quantified variables of this expression.
+     *
+     * @param variables the quantified variables of this expression.
+     */
+    public final void setQuantifiedVariables(final List<T2> variables) {
+        this.quantifiedVariables = variables;
+    }
+
+    /**
+     * Adds a quantified variable to this expression.
+     *
+     * @param variable the quantified variable to add.
+     */
+    public final boolean addQuantifiedVariable(final T2 variable) {
+        return this.quantifiedVariables.add(variable);
+    }
+
+    /**
+     * Returns the numeric value of this parser node.
+     *
+     * @return the numeric value of this parser node.
+     */
+    public final Double getValue() {
+        return this.value;
+    }
+
+    /**
+     * Set the numeric value of this expression.
+     *
+     * @param value the numeric value of this expression.
      */
     public final void setValue(final Double value) {
         this.value = value;
     }
 
     /**
-     * Returns the value of this expression.
+     * Returns the variable of this expression
      *
-     * @return the value of this expression.
+     * @return the variable of this expression.
      */
-    public final Double getValue() {
-        return this.value;
+    public final T1 getVariable() {
+        return this.symbol;
+    }
+
+    /**
+     * Sets a new variable to this parser node.
+     *
+     * @param variable the new variable to set.
+     */
+    public final void setVariable(final T1 variable) {
+        this.variable = variable;
+    }
+
+    /**
+     * Returns the name of the preference associated to this expression.
+     *
+     * @return the name of the preference or <code>null</code> if the preference name was not initialized.
+     */
+    public final T1 getPrefName() {
+        return this.prefName;
+    }
+
+    /**
+     * Sets a name to the preference associated to this expression.
+     *
+     * @param name the name of the preference to set.
+     */
+    public final void setPrefName(final T1 name) {
+        this.prefName = name;
+    }
+
+    /**
+     * Returns the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
+     *
+     * @return the taskID associated to this expression.
+     */
+    public final T1 getTaskID() {
+        return this.taskID;
+    }
+
+    /**
+     * Set the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
+     *
+     * @param taskID the taskID to set.
+     */
+    public final void setTaskID(T1 taskID) {
+        this.taskID = taskID;
+    }
+
+    /**
+     * Add a new child expression to this expression.
+     *
+     * @param exp the child to add
+     * @return <code>true</code> if the expression was added; <code>false</code> otherwise
+     * @throws RuntimeException if the specified node is null
+     */
+    public final boolean addChild(final Expression<T1, T2> exp) {
+        return this.children.add(exp);
+    }
+
+    /**
+     * Sets the list of children expressions of this expression.
+     *
+     * @param children the children expression to set.
+     */
+    public final void setChildren(final List<Expression<T1, T2>> children) {
+        this.children = children;
+    }
+
+    /**
+     * Returns the list of children of this expression.
+     *
+     * @return the list of children of this expression.
+     */
+    public List<Expression<T1, T2>> getChildren() {
+        return this.children;
+    }
+
+    /**
+     * Creates a new empty AND expression.
+     */
+    public AbstractExpression() {
+        this(PDDLConnective.AND);
     }
 
     /**
@@ -214,23 +380,25 @@ public abstract class AbstractExpression implements Expression {
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
-    /*public void moveNegationInward() {
+    public void moveNegationInward() {
         assert this.getConnective().equals(PDDLConnective.NOT);
 
-        final Expression child = this.getChildren().get(0);
+        final Expression<T1, T2> child = this.getChildren().get(0);
         switch (child.getConnective()) {
             case FORALL:
                 this.setConnective(PDDLConnective.EXISTS);
-                //this.assignVariables(child);
-                Expression negation = new AbstractExpression(PDDLConnective.NOT);
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                child.getQuantifiedVariables().clear();
+                Expression<T1, T2> negation = this.getInstance(PDDLConnective.NOT);
                 negation.addChild(child.getChildren().get(0));
                 negation.toNNF();
                 this.getChildren().set(0, negation);
                 break;
             case EXISTS:
                 this.setConnective(PDDLConnective.FORALL);
-                //this.assignVariables(child);
-                negation = new AbstractExpression(PDDLConnective.NOT);
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                child.getQuantifiedVariables().clear();
+                negation = this.getInstance(PDDLConnective.NOT);
                 negation.addChild(child.getChildren().get(0));
                 negation.toNNF();
                 this.getChildren().set(0, negation);
@@ -239,7 +407,7 @@ public abstract class AbstractExpression implements Expression {
                 this.setConnective(PDDLConnective.OR);
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
-                    negation = new AbstractExpression(PDDLConnective.NOT);
+                    negation = this.getInstance(PDDLConnective.NOT);
                     negation.addChild(child.getChildren().get(i));
                     negation.toNNF();
                     this.getChildren().add(negation);
@@ -249,7 +417,7 @@ public abstract class AbstractExpression implements Expression {
                 this.setConnective(PDDLConnective.AND);
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
-                    negation = new AbstractExpression(PDDLConnective.NOT);
+                    negation = this.getInstance(PDDLConnective.NOT);
                     negation.addChild(child.getChildren().get(i));
                     negation.toNNF();
                     this.getChildren().add(negation);
@@ -261,10 +429,10 @@ public abstract class AbstractExpression implements Expression {
                 break;
             case IMPLY: // (not (imply p q)) -> (imply (not p) (not q))
                 this.setConnective(PDDLConnective.IMPLY);
-                final Expression notp = new AbstractExpression(PDDLConnective.NOT);
+                final Expression notp = this.getInstance(PDDLConnective.NOT);
                 notp.addChild(child.getChildren().get(0));
                 notp.toNNF();
-                final Expression notq = new AbstractExpression(PDDLConnective.NOT);
+                final Expression notq = this.getInstance(PDDLConnective.NOT);
                 notq.addChild(child.getChildren().get(1));
                 notq.toNNF();
                 this.getChildren().clear();
@@ -304,27 +472,28 @@ public abstract class AbstractExpression implements Expression {
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
-    /*public void moveTimeSpecifierInward() {
+    public void moveTimeSpecifierInward() {
         assert this.getConnective().equals(PDDLConnective.AT_START)
             || this.getConnective().equals(PDDLConnective.AT_END)
             || this.getConnective().equals(PDDLConnective.OVER_ALL);
 
-        final Expression child = this.getChildren().get(0);
+        final Expression<T1, T2> child = this.getChildren().get(0);
         switch (child.getConnective()) {
             case FORALL:
             case EXISTS:
-                Expression timeExp = new AbstractExpression(this.getConnective());
+                Expression timeExp = this.getInstance(this.getConnective());
                 timeExp.addChild(child.getChildren().get(0));
                 timeExp.moveTimeSpecifierInward();
                 this.getChildren().set(0, timeExp);
                 this.setConnective(child.getConnective());
-                //this.assignVariables(child);
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                child.getQuantifiedVariables().clear();
                 break;
             case AND:
             case OR:
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
-                    timeExp = new AbstractExpression(this.getConnective());
+                    timeExp = this.getInstance(this.getConnective());
                     timeExp.addChild(child.getChildren().get(i));
                     timeExp.moveTimeSpecifierInward();
                     this.getChildren().add(timeExp);
@@ -370,7 +539,7 @@ public abstract class AbstractExpression implements Expression {
      *      SOMETIME_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
      *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT.
      */
-    /*public boolean simplify() throws UnexpectedExpressionException {
+    public boolean simplify() throws UnexpectedExpressionException {
         boolean simplified = false;
         switch (this.getConnective()) {
             case FORALL:
@@ -395,7 +564,7 @@ public abstract class AbstractExpression implements Expression {
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
-                Expression child = this.getChildren().get(0);
+                Expression<T1, T2> child = this.getChildren().get(0);
                 child.simplify();
                 if (child.getConnective().equals(PDDLConnective.TRUE)
                     || child.getConnective().equals(PDDLConnective.FALSE)) {
@@ -406,14 +575,14 @@ public abstract class AbstractExpression implements Expression {
             case IMPLY:
                 // replace imply expression (imply p q) by its equivalent disjunction (or (not p) q)
                 this.setConnective(PDDLConnective.OR);
-                final Expression notp = new AbstractExpression(PDDLConnective.NOT);
+                final Expression notp = this.getInstance(PDDLConnective.NOT);
                 notp.addChild(this.getChildren().get(0));
                 this.getChildren().set(0, notp);
                 simplified = this.simplify();
                 break;
             case AND:
-                simplified &= this.removeDuplicateChild(this);
-                simplified &= this.removedTautology(this);
+                simplified &= this.removeDuplicateChild();
+                simplified &= this.removedTautology();
                 if (this.getChildren().isEmpty()) {
                     this.setConnective(PDDLConnective.TRUE);
                     simplified = true;
@@ -446,8 +615,8 @@ public abstract class AbstractExpression implements Expression {
                 }
                 break;
             case OR:
-                simplified &= this.removeDuplicateChild(this);
-                simplified &= this.removedTautology(this);
+                simplified &= this.removeDuplicateChild();
+                simplified &= this.removedTautology();
                 if (this.getChildren().isEmpty()) {
                     this.setConnective(PDDLConnective.TRUE);
                     simplified = true;
@@ -507,11 +676,11 @@ public abstract class AbstractExpression implements Expression {
                 }
                 break;
             case EQUAL_ATOM:
-                /*if (this.getAtom().get(0).equals(this.getAtom().get(1))) {
+                if (this.getArguments().get(0).equals(this.getArguments().get(1))) {
                     this.setConnective(PDDLConnective.TRUE);
                     simplified = true;
-                }*/
-                /*break;
+                }
+                break;
             case SOMETIME_AFTER_CONSTRAINT: // Simplification must be checked with the constraints semantic
             case SOMETIME_BEFORE_CONSTRAINT:
                 simplified &= this.getChildren().get(0).simplify();
@@ -558,19 +727,18 @@ public abstract class AbstractExpression implements Expression {
      * Removed duplicated child in conjunction and disjunction expressions. The expression in parameter is
      * modified. If a duplicated subexpression is found, the duplicated expression is removed.
      *
-     * @param exp the expression to test. The expression must be a conjunction of a disjunction.
      * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
      */
-    private boolean removeDuplicateChild(Expression exp) {
-        assert exp.getConnective().equals(PDDLConnective.AND)
-            || exp.getConnective().equals(PDDLConnective.OR);
+    private boolean removeDuplicateChild() {
+        assert this.getConnective().equals(PDDLConnective.AND)
+            || this.getConnective().equals(PDDLConnective.OR);
         boolean modified = false;
-        for (int i = 0; i < exp.getChildren().size(); i++) {
-            final Expression ei = exp.getChildren().get(i);
-            for (int j = i + 1; j < exp.getChildren().size(); j++) {
-                final Expression ej = exp.getChildren().get(j);
+        for (int i = 0; i < this.getChildren().size(); i++) {
+            final Expression ei =  this.getChildren().get(i);
+            for (int j = i + 1; j < this.getChildren().size(); j++) {
+                final Expression ej = this.getChildren().get(j);
                 if (ei.equals(ej)) {
-                    exp.getChildren().remove(j);
+                    this.getChildren().remove(j);
                     j--;
                     modified = true;
                 }
@@ -584,29 +752,28 @@ public abstract class AbstractExpression implements Expression {
      * in parameter is modified. If a tautology is detected, the subexpression of the tautology are removed and replaced
      * by a TRUE expression.
      *
-     * @param exp the expression to test. The expression must be a conjunction of a disjunction.
      * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
      */
-    /*private boolean removedTautology(Expression exp) {
-        assert exp.getConnective().equals(PDDLConnective.AND)
-            || exp.getConnective().equals(PDDLConnective.OR);
+    private boolean removedTautology() {
+        assert this.getConnective().equals(PDDLConnective.AND)
+            || this.getConnective().equals(PDDLConnective.OR);
         boolean modified = false;
-        for (int i = 0; i < exp.getChildren().size(); i++) {
-            final Expression ei = exp.getChildren().get(i);
-            final Expression neg = new PDDLExpression(PDDLConnective.NOT);
+        for (int i = 0; i < this.getChildren().size(); i++) {
+            final Expression ei = this.getChildren().get(i);
+            final Expression neg = this.getInstance(PDDLConnective.NOT);
             neg.addChild(ei);
-            for (int j = i + 1; j < exp.getChildren().size(); j++) {
-                final Expression ej = exp.getChildren().get(j);
+            for (int j = i + 1; j < this.getChildren().size(); j++) {
+                final Expression ej = this.getChildren().get(j);
                 if (ej.equals(neg)) {
                     ei.setConnective(PDDLConnective.TRUE);
-                    exp.getChildren().remove(j);
+                    this.getChildren().remove(j);
                     j--;
                     modified = true;
                 }
             }
         }
         return modified;
-    }*/
+    }
 
     /**
      * Returns if a specified expression is contains, i.e., is a sub-expression of this expression. More
@@ -617,7 +784,7 @@ public abstract class AbstractExpression implements Expression {
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
      *          this expression; <code>false</code> otherwise.
      */
-    public final boolean contains(final Expression exp) {
+    public final boolean contains(final Expression<T1, T2> exp) {
         for (Expression s : this.getChildren()) {
             if (s.equals(exp) || s.contains(exp)) {
                 return true;
@@ -634,9 +801,9 @@ public abstract class AbstractExpression implements Expression {
      * @return <code>true</code> if the specified expression <code>exp</code> was removed;
      *          <code>false</code> otherwise.
      */
-    public final boolean remove(final Expression exp) {
+    public final boolean remove(final Expression<T1, T2> exp) {
         boolean removed = false;
-        Iterator<Expression> it = this.getChildren().iterator();
+        Iterator<Expression<T1, T2>> it = this.getChildren().iterator();
         while (it.hasNext()) {
             Expression s = it.next();
             if (s.equals(exp)) {
@@ -648,6 +815,8 @@ public abstract class AbstractExpression implements Expression {
         }
         return removed;
     }
+
+
 
     /**
      * Returns if this expression is malformed. An expression is considered as well in the following cases:
@@ -683,19 +852,19 @@ public abstract class AbstractExpression implements Expression {
         switch (this.getConnective()) {
             case AND:
             case OR:
-                Iterator<Expression> i = this.getChildren().iterator();
+                Iterator<Expression<T1, T2>> i = this.getChildren().iterator();
                 while (!malformed && i.hasNext()) {
                     malformed |= i.next().isMalformedExpression();
                 }
                 break;
             case EQUAL_ATOM:
-                //malformed = this.atom.size() != 2;
+                malformed = this.getArguments().size() != 2;
                 break;
             case FORALL:
             case EXISTS:
-                /*malformed = this.variables.isEmpty()
+                malformed = this.quantifiedVariables.isEmpty()
                     || this.getChildren().isEmpty()
-                    || this.getChildren().get(0).isMalformedExpression();*/
+                    || this.getChildren().get(0).isMalformedExpression();
                 break;
             case IMPLY:
             case WHEN:
@@ -743,7 +912,7 @@ public abstract class AbstractExpression implements Expression {
             case ATOM:
             case TASK:
             case FN_HEAD:
-                //malformed = this.getAtom().isEmpty();
+                malformed = this.getSymbol() == null;
                 break;
             case TIMED_LITERAL:
             case WITHIN_CONSTRAINT:
@@ -784,7 +953,7 @@ public abstract class AbstractExpression implements Expression {
                 malformed = this.getValue() == null;
                 break;
             case TASK_ID:
-                //malformed = this.getTaskID() == null;
+                malformed = this.getTaskID() == null;
                 break;
             case TIME_VAR:
             case IS_VIOLATED:
@@ -808,4 +977,226 @@ public abstract class AbstractExpression implements Expression {
         }
         return malformed;
     }
+
+    /**
+     * Returns a string representation of this node.
+     *
+     * @return a string representation of this node.
+     * @see java.lang.Object#toString
+     */
+    @Override
+    public String toString() {
+        return this.toString("");
+    }
+
+    /**
+     * Returns a string representation of this parser node.
+     *
+     * @param baseOffset the offset white space from the left used for indentation.
+     * @return a string representation of this parser node.
+     * @throws MalformedExpressionException if the expression is malformed.
+     */
+    public String toString(String baseOffset) throws MalformedExpressionException {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
+        }
+        StringBuilder str = new StringBuilder();
+        switch (this.getConnective()) {
+            case ATOM:
+            case FN_HEAD:
+                str.append("(");
+                str.append(this.getSymbol());
+                str.append(" ");
+                if (!this.getArguments().isEmpty()) {
+                    for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                        str.append(this.getArguments().get(i).toString()).append(" ");
+                    }
+                    str.append(this.getArguments().get(this.getArguments().size() - 1).toString());
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                str.append(this.getSymbol());
+                str.append(" ");
+                if (!this.getArguments().isEmpty()) {
+                    if (this.getTaskID() != null) {
+                        str.append(this.getTaskID()).append(" (");
+                    }
+                    for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                        str.append(this.getArguments().get(i).toString()).append(" ");
+                    }
+                    str.append(this.getArguments().get(this.getArguments().size() - 1).toString());
+                }
+                str.append(")");
+                break;
+            case EQUAL_ATOM:
+                str.append("(")
+                    .append(this.getConnective().getImage())
+                    .append(" ");
+                for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                    str.append(this.getArguments().get(i).toString()).append(" ");
+                }
+                str.append(this.getArguments().get(this.getArguments().size() - 1).toString()).append(")");
+                break;
+            case AND:
+            case OR:
+                if (!this.getChildren().isEmpty()) {
+                    String offset = baseOffset + "  ";
+                    str.append("(").append(this.getConnective().getImage());
+                    str.append(" ");
+                    for (int i = 0; i < this.getChildren().size() - 1; i++) {
+                        str.append(this.getChildren().get(i).toString(offset)).append("\n").append(offset);
+                    }
+                    str.append(this.getChildren().get(this.getChildren().size() - 1).toString(offset));
+                    str.append(")");
+                } else {
+                    str.append("()");
+                }
+                break;
+            case IMPLY:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case FORALL:
+            case EXISTS:
+                String off = baseOffset + baseOffset + "  ";
+                str.append(" (").append(this.getConnective().getImage()).append(" (");
+                for (int i = 0; i < this.quantifiedVariables.size() - 1; i++) {
+                    str.append(this.quantifiedVariables.get(i).toString()).append(", ");
+                }
+                str.append(this.quantifiedVariables.get(this.quantifiedVariables.size() - 1).toString())
+                    .append(")\n")
+                    .append(off)
+                    .append(this.children.get(0).toString(off))
+                    .append(")");
+                break;
+            case NUMBER:
+                str.append(this.value);
+                break;
+            case F_EXP:
+                str.append(this.children.get(0).toString(baseOffset));
+                break;
+            case F_EXP_T:
+                if (this.children.isEmpty()) {
+                    str.append(this.getVariable());
+                } else {
+                    str.append("(").append(this.getConnective().getImage()).append(" ")
+                        .append(this.getVariable()).append(" ")
+                        .append(this.children.get(0).toString(baseOffset));
+                }
+                break;
+            case TIME_VAR:
+                str.append(this.getVariable());
+                break;
+            case FN_ATOM:
+            case WHEN:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.children.get(0).toString(baseOffset)).append(" ");
+                str.append(this.children.get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.arguments.get(0).toString()).append(" ");
+                str.append(this.arguments.get(1).toString());
+                str.append(")");
+                break;
+            case NOT:
+            case UMINUS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(")");
+                break;
+            case MINIMIZE:
+            case MAXIMIZE:
+                str.append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue())
+                    .append(")");
+                break;
+            case IS_VIOLATED:
+                str.append("(").append(this.getConnective().getImage()).append(")");
+                break;
+            case TIMED_LITERAL:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case HOLD_DURING_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString()).append(" ");
+                str.append(this.getChildren().get(2).toString(baseOffset));
+                str.append(")");
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString()).append(" ");
+                str.append(this.getChildren().get(2).toString(baseOffset));
+                str.append(this.getChildren().get(3).toString(baseOffset));
+                str.append(")");
+                break;
+            case TASK_ID:
+                str.append(this.getTaskID().toString());
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().toString());
+
+        }
+        return str.toString();
+    }
+
 }

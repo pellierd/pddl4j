@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.TypedSymbol;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -29,7 +31,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 20.05.2022
  */
-public class TypedVariable implements Serializable  {
+public class TypedVariable implements TypedSymbol {
 
     /**
      * The int representation of the variable. The value must be negative.
@@ -142,5 +144,10 @@ public class TypedVariable implements Serializable  {
      */
     public String toString() {
         return "[" + this.getVariable() + ", " + this.getType() + "]";
+    }
+
+    @Override
+    public TypedVariable clone() {
+        return new TypedVariable(this.getVariable(), this.getType());
     }
 }

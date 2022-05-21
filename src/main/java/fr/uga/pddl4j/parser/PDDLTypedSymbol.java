@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public final class PDDLTypedSymbol extends PDDLSymbol {
+public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
 
     /**
      * The list of the types of this symbol.
@@ -115,5 +115,9 @@ public final class PDDLTypedSymbol extends PDDLSymbol {
             }
         }
         return str.toString();
+    }
+
+    public PDDLTypedSymbol clone() {
+        return new PDDLTypedSymbol(this);
     }
 }

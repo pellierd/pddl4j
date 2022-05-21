@@ -19,25 +19,24 @@
 
 package fr.uga.pddl4j.parser;
 
+import java.lang.Cloneable;
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * This interface defined the commun methods to manipulate expressions while parsing and grounding process.
+ * This interface defined the common methods to manipulate expressions while parsing and grounding process.
  *
  * @author D. Pellier
  * @version 1.0 - 13.05.2022
  */
-public interface Expression extends Serializable {
+public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends Serializable {
 
     /**
-     * Add a new child expression to this expression.
+     * Returns the connective of this expression.
      *
-     * @param exp the child to add
-     * @return <code>true</code> if the expression was added; <code>false</code> otherwise
-     * @throws RuntimeException if the specified node is null
+     * @return the connective of this expression.
      */
-    boolean addChild(final Expression exp);
+    PDDLConnective getConnective();
 
     /**
      * Set the connective of this expression.
@@ -47,25 +46,147 @@ public interface Expression extends Serializable {
     void setConnective(final PDDLConnective connective);
 
     /**
-     * Set the value of this expression.
+     * Returns the symbol to this expression. Expression with a symbol are predicate, function or task formula.
      *
-     * @param value the value of this expression.
+     * @return the symbol the new symbol of this expression. If this expression is not ATOM, a FUNCTION or TASK the
+     * returned symbol is null.
+     */
+    T1 getSymbol();
+
+    /**
+     * Sets a new symbol to this expression. Expression with a symbol are predicate, function or task formula.
+     *
+     * @param symbol the new symbol of this expression.
+     */
+    void setSymbol(final T1 symbol);
+
+    /**
+     * Returns the arguments of the atomic formula represented by this expression.
+     *
+     * @return the arguments of the atomic formula represented by this expression.
+     */
+    List<T1> getArguments();
+
+    /**
+     * Sets the argument of the atomic formula represented by this expression.
+     *
+     * @param arguments the arguments of the atomic formula represented by this expression.
+     */
+    void setArguments(final List<T1> arguments);
+
+    /**
+     * Adds an argument to this expression.
+     *
+     * @param argument the argument to add.
+     */
+    boolean addArgument(final T1 argument);
+
+    /**
+     * Returns the list of quantified variables of this expression.
+     *
+     * @return the list of quantified variables of this expression.
+     */
+    List<T2> getQuantifiedVariables();
+
+    /**
+     * Sets the quantified variables of this expression.
+     *
+     * @param variables the quantified variables of this expression.
+     */
+    void setQuantifiedVariables(final List<T2> variables);
+
+    /**
+     * Adds a quantified variable to this expression.
+     *
+     * @param variable the quantified variable to add.
+     */
+    boolean addQuantifiedVariable(final T2 variable);
+
+    /**
+     * Returns the numeric value of this parser node.
+     *
+     * @return the numeric value of this parser node.
+     */
+    Double getValue();
+
+    /**
+     * Set the numeric value of this expression.
+     *
+     * @param value the numeric value of this expression.
      */
     void setValue(final Double value);
+
+    /**
+     * Returns the variable of this expression
+     *
+     * @return the variable of this expression.
+     */
+    T1 getVariable();
+
+    /**
+     * Sets a new variable to this parser node.
+     *
+     * @param variable the new variable to set.
+     */
+    void setVariable(final T1 variable);
+
+    /**
+     * Returns the name of the preference associated to this expression.
+     *
+     * @return the name of the preference or <code>null</code> if the preference name was not initialized.
+     */
+    T1 getPrefName();
+
+    /**
+     * Sets a name to the preference associated to this expression.
+     *
+     * @param name the name of the preference to set.
+     */
+    void setPrefName(final T1 name);
+
+    /**
+     * Returns the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
+     *
+     * @return the taskID associated to this expression.
+     */
+    T1 getTaskID();
+
+    /**
+     * Set the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
+     *
+     * @param taskID the taskID to set.
+     */
+    void setTaskID(T1 taskID);
+
+    /**
+     * Add a new child expression to this expression.
+     *
+     * @param exp the child to add
+     * @return <code>true</code> if the expression was added; <code>false</code> otherwise
+     * @throws RuntimeException if the specified node is null
+     */
+    boolean addChild(final Expression<T1, T2> exp);
+
+    /**
+     * Sets the list of children expressions of this expression.
+     *
+     * @param children the children expression to set.
+     */
+    void setChildren(final List<Expression<T1, T2>> children);
 
     /**
      * Returns the list of children of this expression.
      *
      * @return the list of children of this expression.
      */
-    List<Expression> getChildren();
+    List<Expression<T1, T2>> getChildren();
 
     /**
-     * Returns the connective of this expression.
+     * Returns a deep copy of this expression.
      *
-     * @return the connective of this expression.
+     * @return a deep copy of this expression.
      */
-    PDDLConnective getConnective();
+    //Expression<T1, T2> clone();
 
     /**
      * Returns if this expression is a literal. A literal is an atomic formula or a negated atomic
@@ -76,14 +197,7 @@ public interface Expression extends Serializable {
     boolean isLiteral();
 
     /**
-     * Returns the value of this expression.
-     *
-     * @return the value of this expression.
-     */
-    Double getValue();
-
-    /**
-     * toNNF()
+     * Transforms this expression into it negative normal form.
      */
     void toNNF();
 
@@ -112,7 +226,7 @@ public interface Expression extends Serializable {
      * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
      *          this expression; <code>false</code> otherwise.
      */
-    boolean contains(final Expression exp);
+    boolean contains(final Expression<T1, T2> exp);
 
     /**
      * Removes all the occurrences of a specified expression contained in this expression and
@@ -122,7 +236,7 @@ public interface Expression extends Serializable {
      * @return <code>true</code> if the specified expression <code>exp</code> was removed;
      *          <code>false</code> otherwise.
      */
-    boolean remove(final Expression exp);
+    boolean remove(final Expression<T1, T2> exp);
 
     /**
      * Assigns a specified expression to this expression. After the method call the expression is equals to the
@@ -131,7 +245,7 @@ public interface Expression extends Serializable {
      *
      * @param exp the expression to assigned to this expression.
      */
-    //void assign(final Expression exp);
+    void assign(final Expression<T1, T2> exp);
 
     /**
      * Simplify the expression. This method removes:
@@ -206,4 +320,6 @@ public interface Expression extends Serializable {
      *
      */
     //void assignVariables(Expression exp);
+
+    Expression<T1, T2> getInstance(PDDLConnective connective);
 }

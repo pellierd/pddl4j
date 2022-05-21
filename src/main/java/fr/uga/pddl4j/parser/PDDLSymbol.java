@@ -33,7 +33,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLSymbol extends AbstractParsedObject {
+public class PDDLSymbol extends AbstractParsedObject implements Symbol {
 
     /**
      * The name of rename variable.
@@ -218,24 +218,6 @@ public class PDDLSymbol extends AbstractParsedObject {
     }
 
     /**
-     * Return the value of this symbol. This method is used to get the value of symbol of type number.
-     *
-     * @return the value of the this symbol.
-     */
-    public final Double getValue() {
-        return Double.valueOf(this.image);
-    }
-
-    /**
-     * Sets a value to this symbol.
-     *
-     * @param value the new value to set.
-     */
-    public final void setValue(double value) {
-        this.image = Double.toString(value);
-    }
-
-    /**
      * Returns the time specifier of the symbol.
      *
      * @return the time specifier of the symbol.
@@ -283,9 +265,6 @@ public class PDDLSymbol extends AbstractParsedObject {
      * @throws NullPointerException if context == null.
      */
     public final String renameVariables(final Map<String, String> context) {
-        if (context == null) {
-            throw new NullPointerException("context == null");
-        }
         String img = null;
         if (this.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
             img = this.getImage();
@@ -395,4 +374,7 @@ public class PDDLSymbol extends AbstractParsedObject {
         return str.toString();
     }
 
+    public PDDLSymbol clone() {
+        return new PDDLSymbol(this);
+    }
 }
