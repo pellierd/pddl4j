@@ -1,6 +1,7 @@
 package fr.uga.pddl4j.parser;
 
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -61,11 +62,11 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
         super();
         this.setConnective(connective);
         this.setSymbol(null);
-        this.setArguments(new ArrayList<T1>());
-        this.setQuantifiedVariables(new ArrayList<T2>());
+        this.setArguments(null);
+        this.setQuantifiedVariables(null);
         this.setValue(null);
         this.setVariable(null);
-        this.setChildren(new ArrayList<Expression<T1, T2>>());
+        this.setChildren(new ArrayList<>());
         this.setPrefName(null);
         this.setTaskID(null);
     }
@@ -388,7 +389,6 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
             case FORALL:
                 this.setConnective(PDDLConnective.EXISTS);
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
-                child.getQuantifiedVariables().clear();
                 Expression<T1, T2> negation = this.getInstance(PDDLConnective.NOT);
                 negation.addChild(child.getChildren().get(0));
                 negation.toNNF();
@@ -397,7 +397,6 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
             case EXISTS:
                 this.setConnective(PDDLConnective.FORALL);
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
-                child.getQuantifiedVariables().clear();
                 negation = this.getInstance(PDDLConnective.NOT);
                 negation.addChild(child.getChildren().get(0));
                 negation.toNNF();
@@ -487,7 +486,6 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
                 this.getChildren().set(0, timeExp);
                 this.setConnective(child.getConnective());
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
-                child.getQuantifiedVariables().clear();
                 break;
             case AND:
             case OR:
@@ -862,7 +860,7 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
                 break;
             case FORALL:
             case EXISTS:
-                malformed = this.quantifiedVariables.isEmpty()
+                malformed = this.getQuantifiedVariables().isEmpty()
                     || this.getChildren().isEmpty()
                     || this.getChildren().get(0).isMalformedExpression();
                 break;
@@ -1066,15 +1064,20 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
             case FORALL:
             case EXISTS:
                 String off = baseOffset + baseOffset + "  ";
-                str.append(" (").append(this.getConnective().getImage()).append(" (");
-                for (int i = 0; i < this.quantifiedVariables.size() - 1; i++) {
-                    str.append(this.quantifiedVariables.get(i).toString()).append(", ");
+                str.append(" (");
+                str.append(this.getConnective().getImage());
+                str.append(" (");
+                if (!this.getQuantifiedVariables().isEmpty()) {
+                    for (int i = 0; i < this.getQuantifiedVariables().size() - 1; i++) {
+                        str.append(this.getQuantifiedVariables().get(i).toString());
+                        str.append(", ");
+                    }
+                    str.append(this.getQuantifiedVariables().get(this.getQuantifiedVariables().size() - 1).toString());
                 }
-                str.append(this.quantifiedVariables.get(this.quantifiedVariables.size() - 1).toString())
-                    .append(")\n")
-                    .append(off)
-                    .append(this.children.get(0).toString(off))
-                    .append(")");
+                str.append(")\n");
+                str.append(off);
+                str.append(this.children.get(0).toString(off));
+                str.append(")");
                 break;
             case NUMBER:
                 str.append(this.value);

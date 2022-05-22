@@ -15,10 +15,10 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLAction;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
-import fr.uga.pddl4j.parser.PDDLExpression;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLNamedTypedList;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This class contains all the methods needed to encode the a planning problem into int representation before
+ * This class contains all the methods needed to encode a planning problem into int representation before
  * instantiation.
  *
  * @author D. Pellier
@@ -597,7 +597,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @param exp the expression.
      */
-    private void initEitherTypes(final PDDLExpression exp) {
+    private void initEitherTypes(final Expression<PDDLSymbol, PDDLTypedSymbol> exp) {
         switch (exp.getConnective()) {
             case AND:
             case OR:
@@ -1091,7 +1091,7 @@ public abstract class AbstractProblem implements Problem {
      * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
      *      LESS_ORDERING_CONSTRAINTS are expected.
      */
-    private IntExpression initOrderingConstraints(final PDDLExpression exp) {
+    private IntExpression initOrderingConstraints(final Expression<PDDLSymbol, PDDLTypedSymbol> exp) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case AND:
@@ -1123,7 +1123,7 @@ public abstract class AbstractProblem implements Problem {
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
-    private IntExpression initExpression(final PDDLExpression exp) {
+    private IntExpression initExpression(final Expression<PDDLSymbol, PDDLTypedSymbol> exp) {
         return this.initExpression(exp, new ArrayList<>());
     }
 
@@ -1140,7 +1140,7 @@ public abstract class AbstractProblem implements Problem {
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
      */
-    protected IntExpression initExpression(final PDDLExpression exp,
+    protected IntExpression initExpression(final Expression<PDDLSymbol, PDDLTypedSymbol> exp,
                                            final List<String> variables) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
@@ -1198,8 +1198,6 @@ public abstract class AbstractProblem implements Problem {
                 final String type = this.toStringType(qvar.get(0).getTypes());
                 int typeIndex = this.getTypes().indexOf(type);
                 final TypedVariable intQvar  = new TypedVariable(-variables.size() - 1, typeIndex);
-                //intExp.setType(typeIndex);
-                //intExp.setVariable(-variables.size() - 1);
                 intExp.getQuantifiedVariables().add(intQvar);
                 newVariables.add(qvar.get(0).getImage());
                 if (qvar.size() == 1) {

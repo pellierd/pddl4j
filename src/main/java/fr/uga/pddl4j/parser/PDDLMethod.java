@@ -265,9 +265,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
             preconditions = new PDDLExpression(PDDLConnective.AND);
             preconditions.addChild(this.getPreconditions());
         }
-        Iterator<PDDLExpression> i = this.getConstraints().getChildren().iterator();
+        Iterator<Expression<PDDLSymbol, PDDLTypedSymbol>> i = this.getConstraints().getChildren().iterator();
         while (i.hasNext()) {
-            final PDDLExpression constraint = i.next();
+            final Expression<PDDLSymbol, PDDLTypedSymbol> constraint = i.next();
             switch (constraint.getConnective()) {
                 case EQUAL_COMPARISON:
                     preconditions.addChild(constraint);
