@@ -33,7 +33,7 @@ import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
-import fr.uga.pddl4j.problem.operator.TypedVariable;
+import fr.uga.pddl4j.problem.operator.IntTypedSymbol;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 
 import org.apache.logging.log4j.LogManager;
@@ -1197,7 +1197,7 @@ public abstract class AbstractProblem implements Problem {
                 final List<PDDLTypedSymbol> qvar = exp.getQuantifiedVariables();
                 final String type = this.toStringType(qvar.get(0).getTypes());
                 int typeIndex = this.getTypes().indexOf(type);
-                final TypedVariable intQvar  = new TypedVariable(-variables.size() - 1, typeIndex);
+                final IntTypedSymbol intQvar  = new IntTypedSymbol(-variables.size() - 1, typeIndex);
                 intExp.getQuantifiedVariables().add(intQvar);
                 newVariables.add(qvar.get(0).getImage());
                 if (qvar.size() == 1) {
@@ -1528,7 +1528,7 @@ public abstract class AbstractProblem implements Problem {
             case EXISTS:
                 str.append(" (").append(exp.getConnective().getImage());
                 str.append(" (");
-                for (TypedVariable var: exp.getQuantifiedVariables()) {
+                for (IntTypedSymbol var: exp.getQuantifiedVariables()) {
                     str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
                     str.append(-var.getVariable() - 1);
                     str.append(" - ");

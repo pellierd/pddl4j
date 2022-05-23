@@ -96,7 +96,7 @@ public class IntExpression implements Serializable {
     /**
      * The quantified variable of the expression.
      */
-    private List<TypedVariable> quantifiedVariables;
+    private List<IntTypedSymbol> quantifiedVariables;
 
     /**
      * The variable is used by quantified expression.
@@ -134,8 +134,8 @@ public class IntExpression implements Serializable {
         this.children.addAll(otherChildren.stream().map(IntExpression::new).collect(Collectors.toList()));
         this.quantifiedVariables = new ArrayList<>();
         if (other.getQuantifiedVariables() != null) {
-            for (TypedVariable var : other.getQuantifiedVariables()) {
-                this.quantifiedVariables.add(new TypedVariable(var));
+            for (IntTypedSymbol var : other.getQuantifiedVariables()) {
+                this.quantifiedVariables.add(new IntTypedSymbol(var));
             }
         }
         this.variable = other.getVariable();
@@ -310,7 +310,7 @@ public class IntExpression implements Serializable {
      *
      * @return the list of quantified variable of the expression.
      */
-    public final List<TypedVariable> getQuantifiedVariables() {
+    public final List<IntTypedSymbol> getQuantifiedVariables() {
         return this.quantifiedVariables;
     }
 
@@ -319,7 +319,7 @@ public class IntExpression implements Serializable {
      *
      * @param  variables the list of quantified variable of the expression.
      */
-    public final void setQuantifiedVariables(final List<TypedVariable> variables) {
+    public final void setQuantifiedVariables(final List<IntTypedSymbol> variables) {
         this.quantifiedVariables = variables;
     }
 

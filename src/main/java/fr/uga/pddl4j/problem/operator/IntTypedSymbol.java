@@ -21,17 +21,16 @@ package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.TypedSymbol;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * This class implements a typed variable. This class is used to store the quantified variables of the class
+ * This class implements a typed symbol. This class is used to store the quantified variables of the class
  * <code>IntExpression</code>.
  *
  * @author D. Pellier
  * @version 1.0 - 20.05.2022
  */
-public class TypedVariable implements TypedSymbol {
+public class IntTypedSymbol implements TypedSymbol {
 
     /**
      * The int representation of the variable. The value must be negative.
@@ -47,7 +46,7 @@ public class TypedVariable implements TypedSymbol {
      * The empty constructor. The constructor is private to prevent the inheritance of the empty constraint of the
      * object class.
      */
-    private TypedVariable(){ }
+    private IntTypedSymbol(){ }
 
     /**
      *  Creates a new typed variable.
@@ -55,7 +54,7 @@ public class TypedVariable implements TypedSymbol {
      * @param variable the variable. The variable must be less than 0.
      * @param type the type of the variable. The type must be greater or equal to 0.
      */
-    public TypedVariable(final int variable, final int type) {
+    public IntTypedSymbol(final int variable, final int type) {
         super();
         this.setVariable(variable);
         this.setType(type);
@@ -66,7 +65,7 @@ public class TypedVariable implements TypedSymbol {
      *
      * @param other the other typed variable.
      */
-    public TypedVariable(final TypedVariable other) {
+    public IntTypedSymbol(final IntTypedSymbol other) {
         this(other.getVariable(), other.getType());
     }
 
@@ -121,7 +120,7 @@ public class TypedVariable implements TypedSymbol {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object != null && this.getClass().equals(object.getClass())) {
-            final TypedVariable other = (TypedVariable) object;
+            final IntTypedSymbol other = (IntTypedSymbol) object;
             return Objects.equals(this.getVariable(), this.getType());
         }
         return false;
@@ -138,6 +137,16 @@ public class TypedVariable implements TypedSymbol {
     }
 
     /**
+     * Returns a deep copy of this typed symbol.
+     *
+     * @return a deep copy of this typed symbol.
+     */
+    @Override
+    public IntTypedSymbol clone() {
+        return new IntTypedSymbol(this);
+    }
+
+    /**
      * Returns a string representation of this typed variable.
      *
      * @return a string representation of this typed variable.
@@ -146,8 +155,4 @@ public class TypedVariable implements TypedSymbol {
         return "[" + this.getVariable() + ", " + this.getType() + "]";
     }
 
-    @Override
-    public TypedVariable clone() {
-        return new TypedVariable(this.getVariable(), this.getType());
-    }
 }

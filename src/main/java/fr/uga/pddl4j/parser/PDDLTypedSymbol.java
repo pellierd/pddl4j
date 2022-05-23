@@ -117,6 +117,11 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
         return str.toString();
     }
 
+    /**
+     * Returns a deep copy of this typed symbol.
+     *
+     * @return a deep copy of this typed symbol.
+     */
     public PDDLTypedSymbol clone() {
         return new PDDLTypedSymbol(this);
     }

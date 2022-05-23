@@ -70,10 +70,6 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
          */
         TASK,
         /**
-         * The alias symbol.
-         */
-        //ALIAS,
-        /**
          * The preference symbol.
          */
         PREFERENCE,
