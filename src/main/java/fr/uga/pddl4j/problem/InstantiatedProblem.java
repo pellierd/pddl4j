@@ -238,8 +238,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         boolean instantiable = true;
         int i = 0;
         while (i < t.getArguments().size() && instantiable) {
-            final int var = t.getArguments().get(i);
-            final int cons = task.getArguments().get(i);
+            final int var = t.getArguments().get(i).getValue();
+            final int cons = task.getArguments().get(i).getValue();
             final int type = copy.getTypeOfParameters((-var - 1));
             final Set<IntSymbol> domain = this.getDomains().get(type);
             if (domain.contains(new IntSymbol(cons))) {
@@ -591,9 +591,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
             task.setSymbol(new IntSymbol(this.getTaskSymbols().indexOf(a.getName())));
-            List<Integer> arguments = new ArrayList<>(a.getInstantiations().length);
+            List<IntSymbol> arguments = new ArrayList<>(a.getInstantiations().length);
             for (Integer arg : a.getInstantiations()) {
-                arguments.add(arg);
+                arguments.add(new IntSymbol(arg));
             }
             task.setArguments(arguments);
             tasks.add(task);

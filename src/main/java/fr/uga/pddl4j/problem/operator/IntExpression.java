@@ -86,7 +86,7 @@ public class IntExpression implements Serializable {
      * The list of arguments of the expression. This attribute is used to store the argument of the
      * atomic expression.
      */
-    private List<Integer> arguments;
+    private List<IntSymbol> arguments;
 
     /**
      * The children of the expression.
@@ -125,7 +125,7 @@ public class IntExpression implements Serializable {
         this.taskID = new IntSymbol(other.getTaskID());
         this.arguments = new ArrayList<>();
         if (other.getArguments() != null) {
-            for (Integer arg : other.getArguments()) {
+            for (IntSymbol arg : other.getArguments()) {
                 this.arguments.add(arg);
             }
         }
@@ -237,7 +237,7 @@ public class IntExpression implements Serializable {
      *
      * @return the arguments the list of arguments of this expression.
      */
-    public final List<Integer> getArguments() {
+    public final List<IntSymbol> getArguments() {
         return this.arguments;
     }
 
@@ -246,7 +246,7 @@ public class IntExpression implements Serializable {
      *
      * @param args the arguments to set.
      */
-    public final void setArguments(final List<Integer> args) {
+    public final void setArguments(final List<IntSymbol> args) {
         this.arguments = args;
     }
 

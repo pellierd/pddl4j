@@ -300,7 +300,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             this.intExpFluents.add(relevant);
             int[] arguments = new int[exp.getArguments().size()];
             for (int i = 0; i < exp.getArguments().size(); i++) {
-                arguments[i] = exp.getArguments().get(i);
+                arguments[i] = exp.getArguments().get(i).getValue();
             }
             this.fluents.add(new Fluent(exp.getSymbol().getValue(), arguments));
         }
@@ -418,7 +418,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             this.intExpNumericFluents.add(relevant);
             int[] arguments = new int[exp.getArguments().size()];
             for (int i = 0; i < exp.getArguments().size(); i++) {
-                arguments[i] = exp.getArguments().get(i);
+                arguments[i] = exp.getArguments().get(i).getValue();
             }
             this.numericFluents.add(new NumericFluent(exp.getSymbol().getValue(), arguments));
         }
@@ -1536,14 +1536,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         for (IntExpression task : this.getRelevantPrimitiveTasks()) {
             int[] arguments = new int[task.getArguments().size()];
             for (int i = 0; i < task.getArguments().size(); i++) {
-                arguments[i] = task.getArguments().get(i);
+                arguments[i] = task.getArguments().get(i).getValue();
             }
             this.tasks.add(new Task(task.getSymbol().getValue(), arguments, true));
         }
         for (IntExpression task : this.getRelevantCompundTasks()) {
             int[] arguments = new int[task.getArguments().size()];
             for (int i = 0; i < task.getArguments().size(); i++) {
-                arguments[i] = task.getArguments().get(i);
+                arguments[i] = task.getArguments().get(i).getValue();
             }
             this.tasks.add(new Task(task.getSymbol().getValue(), arguments, false));
         }

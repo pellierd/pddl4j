@@ -148,7 +148,7 @@ test {
     scanForTestClasses = true
     includes = [
             //'**/PDDLParserTest.class',
-            //'**/HDDLParserTest.class',
+            //'**/HDDLParserTest.cla&ss',
             //'**/ADLProblemInstantiationTest.class',
             //'**/HTNProblemInstantiationTest.class',
             //'**/TemporalProblemInstantiationTest.class',
