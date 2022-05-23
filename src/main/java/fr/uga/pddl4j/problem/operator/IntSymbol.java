@@ -28,6 +28,15 @@ public class IntSymbol implements Symbol, Comparable<IntSymbol> {
     }
 
     /**
+     * Creates a new IntSymbol with a specified image.
+     *
+     * @param image the image of the symbol.
+     */
+    public IntSymbol(final String image) {
+        this.value = Integer.valueOf(image);
+    }
+
+    /**
      * Creates from a other IntSymbol. This constructor creates a deep copy of the object in paramater.
      *
      * @param other the other object.

@@ -973,10 +973,10 @@ public abstract class AbstractProblem implements Problem {
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                 final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(i);
+                t1.setTaskID(new IntSymbol(i));
                 constraint.addChild(t1);
                 final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(i + 1);
+                t2.setTaskID(new IntSymbol(i + 1));
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
             }
@@ -985,7 +985,8 @@ public abstract class AbstractProblem implements Problem {
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
             orderingConstraints = this.initOrderingConstraints(method.getOrdering());
             for (IntExpression c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
+                constraints.set(c.getChildren().get(0).getTaskID().getValue(),
+                    c.getChildren().get(1).getTaskID().getValue());
             }
             if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
                 IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
@@ -995,7 +996,7 @@ public abstract class AbstractProblem implements Problem {
                     constraints.removeColumn(subtaskIndex);
                     IntExpression st = subtasks.getChildren().get(subtaskIndex);
                     subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(i);
+                    st.setTaskID(new IntSymbol(i));
                     orderedSubtasks.addChild(st);
                 }
                 intMeth.setSubTasks(orderedSubtasks);
@@ -1003,10 +1004,10 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
                     final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(i);
+                    t1.setTaskID(new IntSymbol(i));
                     constraint.addChild(t1);
                     final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(i + 1);
+                    t2.setTaskID(new IntSymbol(i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }
@@ -1042,10 +1043,10 @@ public abstract class AbstractProblem implements Problem {
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                 final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(i);
+                t1.setTaskID(new IntSymbol(i));
                 constraint.addChild(t1);
                 final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(i + 1);
+                t2.setTaskID(new IntSymbol(i + 1));
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
             }
@@ -1054,7 +1055,8 @@ public abstract class AbstractProblem implements Problem {
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
             orderingConstraints = this.initOrderingConstraints(taskNetwork.getOrdering());
             for (IntExpression c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID(), c.getChildren().get(1).getTaskID());
+                constraints.set(c.getChildren().get(0).getTaskID().getValue(),
+                    c.getChildren().get(1).getTaskID().getValue());
             }
             if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
                 IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
@@ -1064,7 +1066,7 @@ public abstract class AbstractProblem implements Problem {
                     constraints.removeColumn(subtaskIndex);
                     IntExpression st = subtasks.getChildren().get(subtaskIndex);
                     subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(i);
+                    st.setTaskID(new IntSymbol(i));
                     orderedSubtasks.addChild(st);
                 }
                 this.intInitialTaskNetwork.setTasks(orderedSubtasks);
@@ -1072,10 +1074,10 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
                     final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(i);
+                    t1.setTaskID(new IntSymbol(i));
                     constraint.addChild(t1);
                     final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(i + 1);
+                    t2.setTaskID(new IntSymbol(i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }
@@ -1106,10 +1108,10 @@ public abstract class AbstractProblem implements Problem {
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
             case EQUAL_ORDERING_CONSTRAINT:
                 IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(Integer.valueOf(exp.getChildren().get(0).getTaskID().getImage().substring(1)));
+                t1.setTaskID(new IntSymbol(exp.getChildren().get(0).getTaskID().getImage().substring(1)));
                 intExp.addChild(t1);
                 IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(Integer.valueOf(exp.getChildren().get(1).getTaskID().getImage().substring(1)));
+                t2.setTaskID(new IntSymbol(exp.getChildren().get(1).getTaskID().getImage().substring(1)));
                 intExp.addChild(t2);
                 break;
             default:
@@ -1273,7 +1275,7 @@ public abstract class AbstractProblem implements Problem {
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
-                    intExp.setTaskID(Integer.valueOf(exp.getTaskID().getImage().substring(1)));
+                    intExp.setTaskID(new IntSymbol(exp.getTaskID().getImage().substring(1)));
                 }
                 intExp.setArguments(args);
                 break;
@@ -1479,7 +1481,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK:
                 str.append("(");
-                if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                if (exp.getTaskID().equals(IntExpression.DEFAULT_TASK_ID)) {
                     str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
                     str.append(exp.getTaskID());
                     str.append(" (");
@@ -1493,7 +1495,7 @@ public abstract class AbstractProblem implements Problem {
                         str.append(" ").append(this.getConstantSymbols().get(index));
                     }
                 }
-                if (exp.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
+                if (exp.getTaskID().equals(IntExpression.DEFAULT_TASK_ID)) {
                     str.append(")");
                 }
                 str.append(")");

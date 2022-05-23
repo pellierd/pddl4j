@@ -40,7 +40,7 @@ public class IntExpression implements Serializable {
     /**
      * The constant used to encode the default taskID id.
      */
-    public static final int DEFAULT_TASK_ID = -1;
+    public static final IntSymbol DEFAULT_TASK_ID = new IntSymbol(-1);
 
     /**
      * The constant used to encode the default variable.
@@ -65,7 +65,7 @@ public class IntExpression implements Serializable {
     /**
      * The constant used to encode the default predicate value.
      */
-    public static final int DEFAULT_SYMBOL_VALUE = -2;
+    public static final IntSymbol DEFAULT_SYMBOL = new IntSymbol(-2);
 
     /**
      * The connective of the expression.
@@ -80,7 +80,7 @@ public class IntExpression implements Serializable {
     /**
      * The integer representation of the task ID.
      */
-    private int taskID;
+    private IntSymbol taskID;
 
     /**
      * The list of arguments of the expression. This attribute is used to store the argument of the
@@ -122,7 +122,7 @@ public class IntExpression implements Serializable {
     public IntExpression(final IntExpression other) {
         this.connective = other.getConnective();
         this.symbol = new IntSymbol(other.getSymbol());
-        this.taskID = other.getTaskID();
+        this.taskID = new IntSymbol(other.getTaskID());
         this.arguments = new ArrayList<>();
         if (other.getArguments() != null) {
             for (Integer arg : other.getArguments()) {
@@ -150,7 +150,7 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
-        this.symbol = new IntSymbol(IntExpression.DEFAULT_SYMBOL_VALUE);
+        this.symbol = IntExpression.DEFAULT_SYMBOL;
         this.taskID = IntExpression.DEFAULT_TASK_ID;
         this.arguments = new ArrayList<>(0);
         this.children = new ArrayList<>();
@@ -215,11 +215,11 @@ public class IntExpression implements Serializable {
     }
 
     /**
-     * Returns the tasks of this expression.
+     * Returns the task id of this expression.
      *
      * @return the taskID.
      */
-    public final int getTaskID() {
+    public final IntSymbol getTaskID() {
         return this.taskID;
     }
 
@@ -228,7 +228,7 @@ public class IntExpression implements Serializable {
      *
      * @param taskID the new predicate to set.
      */
-    public final void setTaskID(int taskID) {
+    public final void setTaskID(final IntSymbol taskID) {
         this.taskID = taskID;
     }
 
@@ -330,8 +330,8 @@ public class IntExpression implements Serializable {
      */
     public final void assign(final IntExpression other) {
         this.connective = other.getConnective();
-        this.setSymbol(other.symbol);
-        this.taskID = other.getTaskID();
+        this.setSymbol(other.getSymbol());
+        this.setTaskID(other.getTaskID());
         this.arguments = other.getArguments();
         this.children = other.getChildren();
         this.quantifiedVariables = other.getQuantifiedVariables();
@@ -609,8 +609,8 @@ public class IntExpression implements Serializable {
                 break;
             case TASK:
                 str.append("(");
-                if (this.getTaskID() != IntExpression.DEFAULT_TASK_ID) {
-                    str.append(this.getTaskID());
+                if (this.getTaskID().getValue().equals(IntExpression.DEFAULT_TASK_ID)) {
+                    str.append(this.getTaskID().getValue());
                     str.append(" ");
                 }
                 if (this.getArguments().size() != 0) {
@@ -788,7 +788,7 @@ public class IntExpression implements Serializable {
                 str.append(")");
                 break;
             case TASK_ID:
-                str.append(this.getTaskID());
+                str.append(this.getTaskID().getValue());
                 break;
             default:
                 throw new UnexpectedExpressionException(this.getConnective().toString());
