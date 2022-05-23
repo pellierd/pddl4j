@@ -119,7 +119,7 @@ public class IntTypedSymbol implements TypedSymbol {
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
-        if (object != null && this.getClass().equals(object.getClass())) {
+        if (object != null && object instanceof IntTypedSymbol) {
             final IntTypedSymbol other = (IntTypedSymbol) object;
             return Objects.equals(this.getVariable(), this.getType());
         }

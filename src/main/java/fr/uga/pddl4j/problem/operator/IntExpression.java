@@ -60,12 +60,12 @@ public class IntExpression implements Serializable {
     /**
      * The constant used to encode the specific predicate equal.
      */
-    public static final int EQUAL_PREDICATE = -1;
+    public static final int EQUAL_SYMBOL = -1;
 
     /**
      * The constant used to encode the default predicate value.
      */
-    public static final int DEFAULT_PREDICATE = -2;
+    public static final int DEFAULT_SYMBOL_VALUE = -2;
 
     /**
      * The connective of the expression.
@@ -75,7 +75,7 @@ public class IntExpression implements Serializable {
     /**
      * The integer representation of the symbol of the atomic formula represented by this expression.
      */
-    private int symbol;
+    private IntSymbol symbol;
 
     /**
      * The integer representation of the task ID.
@@ -121,7 +121,7 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final IntExpression other) {
         this.connective = other.getConnective();
-        this.symbol = other.getSymbol();
+        this.symbol = new IntSymbol(other.getSymbol());
         this.taskID = other.getTaskID();
         this.arguments = new ArrayList<>();
         if (other.getArguments() != null) {
@@ -150,7 +150,7 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
-        this.symbol = IntExpression.DEFAULT_PREDICATE;
+        this.symbol = new IntSymbol(IntExpression.DEFAULT_SYMBOL_VALUE);
         this.taskID = IntExpression.DEFAULT_TASK_ID;
         this.arguments = new ArrayList<>(0);
         this.children = new ArrayList<>();
@@ -202,16 +202,15 @@ public class IntExpression implements Serializable {
      *
      * @return the symbol of the atomic formula represented by this expression.
      */
-    public final int getSymbol() {
-        return symbol;
+    public final IntSymbol getSymbol() {
+        return this.symbol;
     }
-
     /**
      * Sets a new symbol of the atomic formula represented by this expression.
      *
      * @param symbol the new symbol to set
      */
-    public final void setSymbol(int symbol) {
+    public final void setSymbol(IntSymbol symbol) {
         this.symbol = symbol;
     }
 
@@ -331,7 +330,7 @@ public class IntExpression implements Serializable {
      */
     public final void assign(final IntExpression other) {
         this.connective = other.getConnective();
-        this.symbol = other.getSymbol();
+        this.setSymbol(other.symbol);
         this.taskID = other.getTaskID();
         this.arguments = other.getArguments();
         this.children = other.getChildren();
@@ -598,7 +597,7 @@ public class IntExpression implements Serializable {
             case ATOM:
             case FN_HEAD:
                 str.append("(");
-                str.append(this.getSymbol());
+                str.append(this.getSymbol().getValue());
                 if (this.getArguments().size() != 0) {
                     str.append(" ");
                     for (int i = 0; i < this.getArguments().size() - 1; i++) {
@@ -615,7 +614,7 @@ public class IntExpression implements Serializable {
                     str.append(" ");
                 }
                 if (this.getArguments().size() != 0) {
-                    str.append(this.getSymbol());
+                    str.append(this.getSymbol().getValue());
                     str.append(" ");
                     for (int i = 0; i < this.getArguments().size() - 1; i++) {
                         str.append(this.getArguments().get(i)).append(" ");

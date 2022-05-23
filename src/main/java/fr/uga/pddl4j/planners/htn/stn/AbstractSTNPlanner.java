@@ -384,13 +384,15 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
                     && (m.getType().equals(Message.Type.LEXICAL_ERROR)
                     || m.getType().equals(Message.Type.PARSER_ERROR))) {
                     LOGGER.fatal(m.toString());
+                    System.out.println("1");
                 } else if (LOGGER.isWarnEnabled()
                     && m.getType().equals(Message.Type.PARSER_WARNING)) {
                     LOGGER.warn(m.toString());
+                    System.out.println("1");
                 }
             }
             if (!errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()
-                || errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
+                || !errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()) {
                 return null;
             }
         } else if (LOGGER.isInfoEnabled()) {

@@ -82,7 +82,7 @@ public class IntSymbol implements Symbol, Comparable<IntSymbol> {
     @Override
     public boolean equals(final Object object) {
         if (this == object) return true;
-        if (object != null & getClass().equals(object.getClass())) {
+        if (object != null && object instanceof IntSymbol) {
             IntSymbol other = (IntSymbol) object;
             return Objects.equals(this.getValue(), other.getValue());
         }

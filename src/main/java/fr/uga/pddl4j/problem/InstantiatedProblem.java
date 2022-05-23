@@ -386,7 +386,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
         if (taskNetworks.size() > 1) {
             IntExpression root = new IntExpression(PDDLConnective.TASK);
-            root.setSymbol(this.getTaskSymbols().size());
+            root.setSymbol(new IntSymbol(this.getTaskSymbols().size()));
             this.getTaskSymbols().add("__top");
             this.getCompoundTaskSymbols().add("__top");
             root.setPrimtive(false);
@@ -475,7 +475,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final List<IntMethod> relevant = new ArrayList<>();
             final List<Integer> relevantIndex = new ArrayList<>();
             for (IntMethod method : meths) {
-                if (method.getTask().getSymbol() == task.getSymbol()
+                if (method.getTask().getSymbol().equals(task.getSymbol())
                     && method.getTask().getArguments().size() == task.getArguments().size()) {
                     final List<IntMethod> instantiated = new ArrayList<>(100);
                     this.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
@@ -590,7 +590,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         for (IntAction a : actions) {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
-            task.setSymbol(this.getTaskSymbols().indexOf(a.getName()));
+            task.setSymbol(new IntSymbol(this.getTaskSymbols().indexOf(a.getName())));
             List<Integer> arguments = new ArrayList<>(a.getInstantiations().length);
             for (Integer arg : a.getInstantiations()) {
                 arguments.add(arg);

@@ -19,6 +19,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.problem.operator.IntSymbol;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -397,7 +398,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
         this.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
         this.dummyPredicateCounter++;
         final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
-        atom.setSymbol(this.getPredicateSymbols().size() - 1);
+        atom.setSymbol(new IntSymbol(this.getPredicateSymbols().size() - 1));
         return atom;
 
     }

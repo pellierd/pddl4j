@@ -1146,7 +1146,7 @@ public abstract class AbstractProblem implements Problem {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
-                intExp.setSymbol(IntExpression.EQUAL_PREDICATE);
+                intExp.setSymbol(new IntSymbol(IntExpression.EQUAL_SYMBOL));
                 List<Integer> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1160,7 +1160,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FN_HEAD:
                 final String functor = exp.getSymbol().getImage();
-                intExp.setSymbol(this.getFunctions().indexOf(functor));
+                intExp.setSymbol(new IntSymbol(this.getFunctions().indexOf(functor)));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1174,7 +1174,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case ATOM:
                 final String predicate = exp.getSymbol().getImage();
-                intExp.setSymbol(this.getPredicateSymbols().indexOf(predicate));
+                intExp.setSymbol(new IntSymbol(this.getPredicateSymbols().indexOf(predicate)));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1261,7 +1261,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK: // ADD TO DEAL WITH HTN
                 final String task = exp.getSymbol().getImage();
-                intExp.setSymbol(this.getTaskSymbols().indexOf(task));
+                intExp.setSymbol(new IntSymbol(this.getTaskSymbols().indexOf(task)));
                 intExp.setPrimtive(this.getPrimitiveTaskSymbols().contains(task));
                 args = new ArrayList<Integer>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
@@ -1454,7 +1454,7 @@ public abstract class AbstractProblem implements Problem {
         switch (exp.getConnective()) {
             case ATOM:
                 str.append("(");
-                str.append(this.getPredicateSymbols().get(exp.getSymbol()));
+                str.append(this.getPredicateSymbols().get(exp.getSymbol().getValue()));
                 List<Integer> args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -1466,7 +1466,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(")");
                 break;
             case FN_HEAD:
-                str.append("(").append(this.getFunctions().get(exp.getSymbol()));
+                str.append("(").append(this.getFunctions().get(exp.getSymbol().getValue()));
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {
@@ -1484,7 +1484,7 @@ public abstract class AbstractProblem implements Problem {
                     str.append(exp.getTaskID());
                     str.append(" (");
                 }
-                str.append(this.getTaskSymbols().get(exp.getSymbol()));
+                str.append(this.getTaskSymbols().get(exp.getSymbol().getValue()));
                 args = exp.getArguments();
                 for (int index : args) {
                     if (index < 0) {

@@ -149,7 +149,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     private void extract(final IntExpression exp) {
         switch (exp.getConnective()) {
             case ATOM:
-                int predicate = exp.getSymbol();
+                int predicate = exp.getSymbol().getValue();
                 switch (this.inertia.get(predicate)) {
                     case INERTIA:
                         this.inertia.set(predicate, Inertia.NEGATIVE);
@@ -178,7 +178,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case NOT:
                 final IntExpression neg = exp.getChildren().get(0);
                 if (neg.getConnective().equals(PDDLConnective.ATOM)) {
-                    predicate = neg.getSymbol();
+                    predicate = neg.getSymbol().getValue();
                     switch (this.inertia.get(predicate)) {
                         case INERTIA:
                             this.inertia.set(predicate, Inertia.POSITIVE);
@@ -276,7 +276,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-                this.numericInertia.set(exp.getChildren().get(0).getSymbol(), Inertia.FLUENT);
+                this.numericInertia.set(exp.getChildren().get(0).getSymbol().getValue(), Inertia.FLUENT);
                 break;
             case ATOM:
                 // Do nothing
@@ -299,7 +299,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
-                    if (fact.getSymbol() == i) {
+                    if (fact.getSymbol().getValue() == i) {
                         newTypeDomain.add(new IntSymbol(fact.getArguments().get(0)));
                     }
                 }
@@ -348,7 +348,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     final int dtIndex = action.getTypeOfParameters(index);
 
                     final String declaredType = this.getTypes().get(dtIndex);
-                    final int itIndex = inertia.getSymbol();
+                    final int itIndex = inertia.getSymbol().getValue();
                     final String inertiaType = this.getPredicateSymbols().get(itIndex);
 
                     final String sti = declaredType + "^" + inertiaType;
@@ -536,7 +536,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         final List<IntExpression> unaryInertia = new ArrayList<>();
         switch (exp.getConnective()) {
             case ATOM:
-                if (this.getInferredDomains().get(exp.getSymbol()) != null) {
+                if (this.getInferredDomains().get(exp.getSymbol().getValue()) != null) {
                     unaryInertia.add(exp);
                 }
                 break;
@@ -627,8 +627,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
-            final int arity = this.getPredicateSignatures().get(fact.getSymbol()).size();
-            final List<IntMatrix> pTables = this.predicatesTables.get(fact.getSymbol());
+            final int arity = this.getPredicateSignatures().get(fact.getSymbol().getValue()).size();
+            final List<IntMatrix> pTables = this.predicatesTables.get(fact.getSymbol().getValue());
             final int[] set = new int[arity];
             final List<Integer> args = fact.getArguments();
             for (final IntMatrix intMatrix : pTables) {
@@ -912,7 +912,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp the atomic expression to simplify.
      */
     private void simplyAtom(final IntExpression exp) {
-        final int predicate = exp.getSymbol();
+        final int predicate = exp.getSymbol().getValue();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
         int indexSize = 0;

@@ -36,6 +36,7 @@ import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
+import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
@@ -301,7 +302,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             for (int i = 0; i < exp.getArguments().size(); i++) {
                 arguments[i] = exp.getArguments().get(i);
             }
-            this.fluents.add(new Fluent(exp.getSymbol(), arguments));
+            this.fluents.add(new Fluent(exp.getSymbol().getValue(), arguments));
         }
     }
 
@@ -419,7 +420,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             for (int i = 0; i < exp.getArguments().size(); i++) {
                 arguments[i] = exp.getArguments().get(i);
             }
-            this.numericFluents.add(new NumericFluent(exp.getSymbol(), arguments));
+            this.numericFluents.add(new NumericFluent(exp.getSymbol().getValue(), arguments));
         }
     }
 
@@ -795,7 +796,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 this.getPredicateSymbols().add(Constants.DUMMY_GOAL);
                 this.getPredicateSignatures().add(new ArrayList<>());
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
-                dummyGoal.setSymbol(dummyPredicateIndex);
+                dummyGoal.setSymbol(new IntSymbol(dummyPredicateIndex));
                 dummyGoal.setArguments(new ArrayList<>(0));
                 final int dummyGoalIndex = this.getIntExpFluents().size();
                 this.getIntExpFluents().add(dummyGoal);
@@ -1537,14 +1538,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             for (int i = 0; i < task.getArguments().size(); i++) {
                 arguments[i] = task.getArguments().get(i);
             }
-            this.tasks.add(new Task(task.getSymbol(), arguments, true));
+            this.tasks.add(new Task(task.getSymbol().getValue(), arguments, true));
         }
         for (IntExpression task : this.getRelevantCompundTasks()) {
             int[] arguments = new int[task.getArguments().size()];
             for (int i = 0; i < task.getArguments().size(); i++) {
                 arguments[i] = task.getArguments().get(i);
             }
-            this.tasks.add(new Task(task.getSymbol(), arguments, false));
+            this.tasks.add(new Task(task.getSymbol().getValue(), arguments, false));
         }
     }
 
