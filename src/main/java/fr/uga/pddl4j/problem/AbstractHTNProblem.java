@@ -15,10 +15,9 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
@@ -81,7 +80,7 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
      *
      * @return the signatures of the task defined in the problem.
      */
-    public List<List<Integer>> getTaskSignatures() {
+    public List<List<IntSymbol>> getTaskSignatures() {
         return super.getTaskSignatures();
     }
 

@@ -116,7 +116,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The typed signature of the tasks.
      */
-    private List<List<Integer>> taskSignatures;
+    private List<List<IntSymbol>> taskSignatures;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
@@ -379,7 +379,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the signatures of the task defined in the problem.
      */
-    protected List<List<Integer>> getTaskSignatures() {
+    protected List<List<IntSymbol>> getTaskSignatures() {
         return this.taskSignatures;
     }
 
@@ -736,7 +736,7 @@ public abstract class AbstractProblem implements Problem {
         for (PDDLNamedTypedList task : tasks) {
             this.taskSymbols.add(task.getName().getImage());
             final List<PDDLTypedSymbol> arguments = task.getArguments();
-            final List<Integer> argType = new ArrayList<>(arguments.size());
+            final List<IntSymbol> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol arg : arguments) {
                 final List<PDDLSymbol> types = arg.getTypes();
                 if (types.size() > 1) {
@@ -745,9 +745,9 @@ public abstract class AbstractProblem implements Problem {
                         image.append("~");
                         image.append(type.getImage());
                     }
-                    argType.add(this.typeSymbols.indexOf(image.toString()));
+                    argType.add(new IntSymbol(this.typeSymbols.indexOf(image.toString())));
                 } else {
-                    argType.add(this.typeSymbols.indexOf(types.get(0).getImage()));
+                    argType.add(new IntSymbol(this.typeSymbols.indexOf(types.get(0).getImage())));
                 }
             }
             this.taskSignatures.add(argType);
@@ -1735,7 +1735,7 @@ public abstract class AbstractProblem implements Problem {
                     str.append(":");
                     for (int j = 0; j < this.getTaskSignatures().get(i).size(); j++) {
                         str.append(" ");
-                        str.append(this.getTypes().get(this.getTaskSignatures().get(i).get(j)));
+                        str.append(this.getTypes().get(this.getTaskSignatures().get(i).get(j).getValue()));
                     }
                     str.append(System.lineSeparator());
                 }
