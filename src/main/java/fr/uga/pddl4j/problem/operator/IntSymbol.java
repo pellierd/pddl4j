@@ -7,6 +7,26 @@ import java.util.Objects;
 public class IntSymbol implements Symbol, Comparable<IntSymbol> {
 
     /**
+     * The constant used to encode the default taskID id.
+     */
+    public static final IntSymbol DEFAULT_TASK_ID = new IntSymbol(-1);
+
+    /**
+     * The constant used to encode the default variable.
+     */
+    public static final IntSymbol DEFAULT_VARIABLE = new IntSymbol(-1);
+
+    /**
+     * The constant used to encode the specific predicate equal.
+     */
+    public static final IntSymbol EQUAL_SYMBOL = new IntSymbol(-1);
+
+    /**
+     * The constant used to encode the default predicate value.
+     */
+    public static final IntSymbol DEFAULT_SYMBOL = new IntSymbol(-2);
+
+    /**
      * The integer used to represent teh symbol.
      */
     private Integer value;

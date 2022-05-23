@@ -1148,7 +1148,7 @@ public abstract class AbstractProblem implements Problem {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
-                intExp.setSymbol(new IntSymbol(IntExpression.EQUAL_SYMBOL));
+                intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
                 List<IntSymbol> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
@@ -1481,7 +1481,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK:
                 str.append("(");
-                if (exp.getTaskID().equals(IntExpression.DEFAULT_TASK_ID)) {
+                if (exp.getTaskID().equals(IntSymbol.DEFAULT_TASK_ID)) {
                     str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
                     str.append(exp.getTaskID());
                     str.append(" (");
@@ -1495,7 +1495,7 @@ public abstract class AbstractProblem implements Problem {
                         str.append(" ").append(this.getConstantSymbols().get(arg.getValue()));
                     }
                 }
-                if (exp.getTaskID().equals(IntExpression.DEFAULT_TASK_ID)) {
+                if (exp.getTaskID().equals(IntSymbol.DEFAULT_TASK_ID)) {
                     str.append(")");
                 }
                 str.append(")");

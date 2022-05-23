@@ -38,34 +38,9 @@ import java.util.stream.Collectors;
 public class IntExpression implements Serializable {
 
     /**
-     * The constant used to encode the default taskID id.
-     */
-    public static final IntSymbol DEFAULT_TASK_ID = new IntSymbol(-1);
-
-    /**
-     * The constant used to encode the default variable.
-     */
-    public static final IntSymbol DEFAULT_VARIABLE = new IntSymbol(-1);
-
-    /**
-     * The constant used to encode the default type.
-     */
-    public static final int DEFAULT_TYPE = -1;
-
-    /**
      * The constant used to encode the default variable value.
      */
     public static final Double DEFAULT_VALUE = Double.NaN;
-
-    /**
-     * The constant used to encode the specific predicate equal.
-     */
-    public static final int EQUAL_SYMBOL = -1;
-
-    /**
-     * The constant used to encode the default predicate value.
-     */
-    public static final IntSymbol DEFAULT_SYMBOL = new IntSymbol(-2);
 
     /**
      * The connective of the expression.
@@ -150,12 +125,12 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
-        this.symbol = IntExpression.DEFAULT_SYMBOL;
-        this.taskID = IntExpression.DEFAULT_TASK_ID;
+        this.symbol = IntSymbol.DEFAULT_SYMBOL;
+        this.taskID = IntSymbol.DEFAULT_TASK_ID;
         this.arguments = new ArrayList<>(0);
         this.children = new ArrayList<>();
         this.quantifiedVariables = new ArrayList<>();
-        this.variable = IntExpression.DEFAULT_VARIABLE;
+        this.variable = IntSymbol.DEFAULT_VARIABLE;
         this.value = IntExpression.DEFAULT_VALUE;
         this.isPrimtive = false;
     }
@@ -329,15 +304,15 @@ public class IntExpression implements Serializable {
      * @param other expression.
      */
     public final void assign(final IntExpression other) {
-        this.connective = other.getConnective();
+        this.setConnective(other.getConnective());
         this.setSymbol(other.getSymbol());
         this.setTaskID(other.getTaskID());
-        this.arguments = other.getArguments();
+        this.setArguments(other.getArguments());
         this.children = other.getChildren();
-        this.quantifiedVariables = other.getQuantifiedVariables();
+        this.setQuantifiedVariables(other.getQuantifiedVariables());
         this.setVariable(other.getVariable());
         this.setValue(other.getValue());
-        this.isPrimtive = other.isPrimtive();
+        this.setPrimtive(other.isPrimtive());
     }
 
     /**
@@ -609,7 +584,7 @@ public class IntExpression implements Serializable {
                 break;
             case TASK:
                 str.append("(");
-                if (this.getTaskID().getValue().equals(IntExpression.DEFAULT_TASK_ID)) {
+                if (this.getTaskID().getValue().equals(IntSymbol.DEFAULT_TASK_ID)) {
                     str.append(this.getTaskID().getValue());
                     str.append(" ");
                 }
