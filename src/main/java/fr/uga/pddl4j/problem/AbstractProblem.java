@@ -106,7 +106,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The typed signature of the functions.
      */
-    private List<List<Integer>> functionSignatures;
+    private List<List<IntSymbol>> functionSignatures;
 
     /**
      * The task symbols.
@@ -397,7 +397,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the signatures of the functions defined in the problem.
      */
-    protected List<List<Integer>> getFunctionSignatures() {
+    protected List<List<IntSymbol>> getFunctionSignatures() {
         return this.functionSignatures;
     }
 
@@ -708,7 +708,7 @@ public abstract class AbstractProblem implements Problem {
         for (PDDLNamedTypedList function : functions) {
             this.functionSymbols.add(function.getName().getImage());
             List<PDDLTypedSymbol> arguments = function.getArguments();
-            List<Integer> argType = new ArrayList<>(arguments.size());
+            List<IntSymbol> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol argument : arguments) {
                 List<PDDLSymbol> types = argument.getTypes();
                 if (types.size() > 1) {
@@ -716,9 +716,9 @@ public abstract class AbstractProblem implements Problem {
                     for (PDDLSymbol type1 : types) {
                         type.append("~").append(type1.getImage());
                     }
-                    argType.add(this.typeSymbols.indexOf(type.toString()));
+                    argType.add(new IntSymbol(this.typeSymbols.indexOf(type.toString())));
                 } else {
-                    argType.add(this.typeSymbols.indexOf(types.get(0).getImage()));
+                    argType.add(new IntSymbol(this.typeSymbols.indexOf(types.get(0).getImage())));
                 }
             }
             this.functionSignatures.add(argType);
@@ -1721,7 +1721,7 @@ public abstract class AbstractProblem implements Problem {
                     str.append(":");
                     for (int j = 0; j < this.getFunctionSignatures().get(i).size(); j++) {
                         str.append(" ");
-                        str.append(this.getTypes().get(this.getFunctionSignatures().get(i).get(j)));
+                        str.append(this.getTypes().get(this.getFunctionSignatures().get(i).get(j).getValue()));
                     }
                     str.append(System.lineSeparator());
                 }

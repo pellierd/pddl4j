@@ -15,6 +15,8 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.problem.operator.IntSymbol;
+
 import java.util.List;
 
 /**
@@ -37,5 +39,5 @@ public interface Numeric extends Problem {
      *
      * @return the signatures of the functions defined in the problem.
      */
-    List<List<Integer>> getFunctionSignatures();
+    List<List<IntSymbol>> getFunctionSignatures();
 }
