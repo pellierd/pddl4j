@@ -52,7 +52,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     /**
      * The table of inferred domains based on unary inertia encoding.
      */
-    private List<Set<Integer>> inferredDomains;
+    private List<Set<IntSymbol>> inferredDomains;
 
     /**
      * The list of predicates tables used to count the occurrence of a specified predicate in the
@@ -92,7 +92,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @return the list of domains inferred from unary predicate.
      */
-    private List<Set<Integer>> getInferredDomains() {
+    private List<Set<IntSymbol>> getInferredDomains() {
         return this.inferredDomains;
     }
 
@@ -294,13 +294,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
             if (this.getPredicateSignatures().get(i).size() == 1
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
-                final Set<Integer> newTypeDomain = new LinkedHashSet<>();
+                final Set<IntSymbol> newTypeDomain = new LinkedHashSet<>();
                 for (IntExpression fact : this.getIntInitialState()) {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
                     if (fact.getSymbol() == i) {
-                        newTypeDomain.add(fact.getArguments().get(0));
+                        newTypeDomain.add(new IntSymbol(fact.getArguments().get(0)));
                     }
                 }
                 this.inferredDomains.add(newTypeDomain);
