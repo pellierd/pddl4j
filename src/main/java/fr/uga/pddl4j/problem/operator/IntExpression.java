@@ -45,7 +45,7 @@ public class IntExpression implements Serializable {
     /**
      * The constant used to encode the default variable.
      */
-    public static final int DEFAULT_VARIABLE = -1;
+    public static final IntSymbol DEFAULT_VARIABLE = new IntSymbol(-1);
 
     /**
      * The constant used to encode the default type.
@@ -55,7 +55,7 @@ public class IntExpression implements Serializable {
     /**
      * The constant used to encode the default variable value.
      */
-    public static final Double DEFAULT_VARIABLE_VALUE = Double.NaN;
+    public static final Double DEFAULT_VALUE = Double.NaN;
 
     /**
      * The constant used to encode the specific predicate equal.
@@ -101,7 +101,7 @@ public class IntExpression implements Serializable {
     /**
      * The variable, e.g, ?duration, etc.
      */
-    private int variable;
+    private IntSymbol variable;
 
     /**
      * The value of the expression. This attribute is used to store value of number expression.
@@ -138,7 +138,7 @@ public class IntExpression implements Serializable {
                 this.quantifiedVariables.add(new IntTypedSymbol(var));
             }
         }
-        this.variable = other.getVariable();
+        this.variable = new IntSymbol(other.getVariable());
         this.value = other.getValue();
         this.isPrimtive = other.isPrimtive();
     }
@@ -156,7 +156,7 @@ public class IntExpression implements Serializable {
         this.children = new ArrayList<>();
         this.quantifiedVariables = new ArrayList<>();
         this.variable = IntExpression.DEFAULT_VARIABLE;
-        this.value = IntExpression.DEFAULT_VARIABLE_VALUE;
+        this.value = IntExpression.DEFAULT_VALUE;
         this.isPrimtive = false;
     }
 
@@ -255,16 +255,16 @@ public class IntExpression implements Serializable {
      *
      * @return the variable of the expression.
      */
-    public final int getVariable() {
+    public final IntSymbol getVariable() {
         return this.variable;
     }
 
     /**
-     * Sets a new quantified variable to the expression.
+     * Sets the variable of this expression.
      *
-     * @param variable the new quantified variable to set
+     * @param variable the variable of the expression.
      */
-    public final void setVariable(final int variable) {
+    public final void setVariable(final IntSymbol variable) {
         this.variable = variable;
     }
 
@@ -335,8 +335,8 @@ public class IntExpression implements Serializable {
         this.arguments = other.getArguments();
         this.children = other.getChildren();
         this.quantifiedVariables = other.getQuantifiedVariables();
-        this.variable = other.getVariable();
-        this.value = other.getValue();
+        this.setVariable(other.getVariable());
+        this.setValue(other.getValue());
         this.isPrimtive = other.isPrimtive();
     }
 
