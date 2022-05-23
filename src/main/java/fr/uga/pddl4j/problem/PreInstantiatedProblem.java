@@ -20,6 +20,7 @@ import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
+import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.util.IntMatrix;
 
 import java.util.ArrayList;
@@ -355,7 +356,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     if (ti == -1) {
                         ti = this.getTypes().size();
                         this.getTypes().add(sti);
-                        final Set<Integer> dt1 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
+                        final Set<IntSymbol> dt1 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
                         dt1.retainAll(this.getInferredDomains().get(itIndex));
                         this.getDomains().add(dt1);
                     }
@@ -365,7 +366,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     if (ts == -1) {
                         ts = this.getTypes().size();
                         this.getTypes().add(sts);
-                        final Set<Integer> dt2 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
+                        final Set<IntSymbol> dt2 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
                         dt2.removeAll(this.getInferredDomains().get(itIndex));
                         this.getDomains().add(dt2);
                     }
@@ -800,14 +801,14 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case FORALL:
-                Set<Integer> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getType());
+                Set<IntSymbol> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getType());
                 IntExpression qExp = exp.getChildren().get(0);
                 int var = exp.getQuantifiedVariables().get(0).getVariable();
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
-                Iterator<Integer> it = constants.iterator();
+                Iterator<IntSymbol> it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    int cons = it.next();
+                    int cons = it.next().getValue();
                     IntExpression copy = new IntExpression(qExp);
                     this.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
@@ -826,7 +827,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 exp.getChildren().clear();
                 it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    int cons = it.next();
+                    int cons = it.next().getValue();
                     IntExpression copy = new IntExpression(qExp);
                     this.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);

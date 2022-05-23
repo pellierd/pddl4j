@@ -32,6 +32,7 @@ import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
+import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.IntTypedSymbol;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
@@ -80,7 +81,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The values domain of associated to the type.
      */
-    private List<Set<Integer>> domains;
+    private List<Set<IntSymbol>> domains;
 
     /**
      * The constant symbols.
@@ -333,7 +334,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the domains for each type of the problem.
      */
-    public final List<Set<Integer>> getDomains() {
+    public final List<Set<IntSymbol>> getDomains() {
         return this.domains;
     }
 
@@ -518,7 +519,7 @@ public abstract class AbstractProblem implements Problem {
                 PDDLSymbol type = types.poll();
                 final int it = this.typeSymbols.indexOf(type.getImage());
                 types.addAll(this.problem.getType(type).getTypes());
-                this.domains.get(it).add(ic);
+                this.domains.get(it).add(new IntSymbol(ic));
             }
         }
     }
@@ -571,7 +572,7 @@ public abstract class AbstractProblem implements Problem {
             final List<PDDLSymbol> types = elt.getTypes();
             if (types.size() > 1) {
                 String newType;
-                Set<Integer> newTypeDomain = new LinkedHashSet<>();
+                Set<IntSymbol> newTypeDomain = new LinkedHashSet<>();
                 StringBuilder buf = new StringBuilder();
                 buf.append("either");
                 for (PDDLSymbol type : types) {
@@ -579,7 +580,7 @@ public abstract class AbstractProblem implements Problem {
                     buf.append("~");
                     buf.append(image);
                     int typeIndex = this.typeSymbols.indexOf(image);
-                    final Set<Integer> typeDomain = this.domains.get(typeIndex);
+                    final Set<IntSymbol> typeDomain = this.domains.get(typeIndex);
                     newTypeDomain.addAll(typeDomain);
                 }
                 newType = buf.toString();
@@ -1634,8 +1635,8 @@ public abstract class AbstractProblem implements Problem {
                     str.append(": ");
                     str.append(this.getTypes().get(i));
                     str.append(":");
-                    Set<Integer> domain = this.getDomains().get(i);
-                    for (Integer constant : domain) {
+                    Set<IntSymbol> domain = this.getDomains().get(i);
+                    for (IntSymbol constant : domain) {
                         str.append(" ");
                         str.append(constant);
                     }

@@ -24,8 +24,7 @@ import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Effect;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
+import fr.uga.pddl4j.problem.operator.IntSymbol;
 
 import java.io.Serializable;
 import java.util.List;
@@ -72,7 +71,7 @@ public interface Problem extends Serializable {
      *
      * @return the domains for each type of the problem.
      */
-    List<Set<Integer>> getDomains();
+    List<Set<IntSymbol>> getDomains();
 
     /**
      * Returns the list of constant symbols of the problem.
