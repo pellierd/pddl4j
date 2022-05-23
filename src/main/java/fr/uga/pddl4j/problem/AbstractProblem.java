@@ -96,7 +96,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The typed signature of the predicates.
      */
-    private List<List<Integer>> predicateSignatures;
+    private List<List<IntSymbol>> predicateSignatures;
 
     /**
      * The function symbols.
@@ -361,7 +361,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the signatures of the predicates defined in the problem.
      */
-    public final List<List<Integer>> getPredicateSignatures() {
+    public final List<List<IntSymbol>> getPredicateSignatures() {
         return this.predicateSignatures;
     }
 
@@ -680,7 +680,7 @@ public abstract class AbstractProblem implements Problem {
         for (PDDLNamedTypedList predicate : predicates) {
             this.predicateSymbols.add(predicate.getName().getImage());
             final List<PDDLTypedSymbol> arguments = predicate.getArguments();
-            final List<Integer> argType = new ArrayList<>(arguments.size());
+            final List<IntSymbol> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol arg : arguments) {
                 final List<PDDLSymbol> types = arg.getTypes();
                 if (types.size() > 1) {
@@ -689,9 +689,9 @@ public abstract class AbstractProblem implements Problem {
                         image.append("~");
                         image.append(type.getImage());
                     }
-                    argType.add(this.typeSymbols.indexOf(image.toString()));
+                    argType.add(new IntSymbol(this.typeSymbols.indexOf(image.toString())));
                 } else {
-                    argType.add(this.typeSymbols.indexOf(types.get(0).getImage()));
+                    argType.add(new IntSymbol(this.typeSymbols.indexOf(types.get(0).getImage())));
                 }
             }
             this.predicateSignatures.add(argType);
@@ -1707,7 +1707,7 @@ public abstract class AbstractProblem implements Problem {
                     str.append(":");
                     for (int j = 0; j < this.getPredicateSignatures().get(i).size(); j++) {
                         str.append(" ");
-                        str.append(this.getTypes().get(this.getPredicateSignatures().get(i).get(j)));
+                        str.append(this.getTypes().get(this.getPredicateSignatures().get(i).get(j).getValue()));
                     }
                     str.append(System.lineSeparator());
                 }

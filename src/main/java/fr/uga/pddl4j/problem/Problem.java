@@ -92,7 +92,7 @@ public interface Problem extends Serializable {
      *
      * @return the signatures of the predicates defined in the problem.
      */
-    List<List<Integer>> getPredicateSignatures();
+    List<List<IntSymbol>> getPredicateSignatures();
 
     /**
      * Returns the list of relevant fluents used the problem.
