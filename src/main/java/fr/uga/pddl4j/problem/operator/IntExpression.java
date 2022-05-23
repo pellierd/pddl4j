@@ -55,7 +55,7 @@ public class IntExpression implements Serializable {
     /**
      * The constant used to encode the default variable value.
      */
-    public static final int DEFAULT_VARIABLE_VALUE = -1;
+    public static final Double DEFAULT_VARIABLE_VALUE = Double.NaN;
 
     /**
      * The constant used to encode the specific predicate equal.
@@ -99,14 +99,14 @@ public class IntExpression implements Serializable {
     private List<IntTypedSymbol> quantifiedVariables;
 
     /**
-     * The variable is used by quantified expression.
+     * The variable, e.g, ?duration, etc.
      */
     private int variable;
 
     /**
      * The value of the expression. This attribute is used to store value of number expression.
      */
-    private double value;
+    private Double value;
 
     /**
      * A flag to indicate if this expression represente a primitive task.
@@ -273,7 +273,7 @@ public class IntExpression implements Serializable {
      *
      * @return the value of this expression.
      */
-    public final double getValue() {
+    public final Double getValue() {
         return this.value;
     }
 
@@ -282,7 +282,7 @@ public class IntExpression implements Serializable {
      *
      * @param value the new value to set
      */
-    public final void setValue(double value) {
+    public final void setValue(Double value) {
         this.value = value;
     }
 

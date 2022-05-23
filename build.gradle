@@ -152,10 +152,10 @@ test {
             //'**/ADLProblemInstantiationTest.class',
             //'**/HTNProblemInstantiationTest.class',
             //'**/TemporalProblemInstantiationTest.class',
-            '**/HSPTest.class',
+            //'**/HSPTest.class',
             //'**/FFTest.class',
             //'**/GSPTest.class',
-            //'**/TFDTest.class',
+            '**/TFDTest.class',
             //'**/PFDTest.class'
     ]
 
