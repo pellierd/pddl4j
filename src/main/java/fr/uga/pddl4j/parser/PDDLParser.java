@@ -121,22 +121,22 @@ public final class PDDLParser implements Callable<Integer> {
     /**
      * The specific symbol object.
      */
-    public static final PDDLSymbol OBJECT = new PDDLSymbol(PDDLSymbol.Kind.TYPE, "object");
+    public static final PDDLSymbol OBJECT = new PDDLSymbol(SymbolType.TYPE, "object");
 
     /**
      * The specific symbol number.
      */
-    public static final PDDLSymbol NUMBER = new PDDLSymbol(PDDLSymbol.Kind.TYPE, "number");
+    public static final PDDLSymbol NUMBER = new PDDLSymbol(SymbolType.TYPE, "number");
 
     /**
      * The specific symbol total-costs.
      */
-    public static final PDDLSymbol TOTAL_COST = new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, "total-cost");
+    public static final PDDLSymbol TOTAL_COST = new PDDLSymbol(SymbolType.FUNCTOR, "total-cost");
 
     /**
      * The specific symbol total-costs.
      */
-    public static final PDDLSymbol TOTAL_TIME = new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, "total-time");
+    public static final PDDLSymbol TOTAL_TIME = new PDDLSymbol(SymbolType.FUNCTOR, "total-time");
 
     /**
      * The error manager of the parser.
@@ -656,7 +656,7 @@ public final class PDDLParser implements Callable<Integer> {
                                 qvar = vj;
                             }
                         }
-                        if (symbol.getKind().equals(PDDLSymbol.Kind.VARIABLE) && qvar == null) {
+                        if (symbol.getKind().equals(SymbolType.VARIABLE) && qvar == null) {
                             this.mgr.logParserError("variable \"" + symbol + "\" is undefined",
                                 this.lexer.getFile(), symbol.getBeginLine(), symbol
                                     .getBeginColumn());
@@ -1440,7 +1440,7 @@ public final class PDDLParser implements Callable<Integer> {
         final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(gd.getSymbol());
         for (int i = 0; i < arguments.size(); i++) {
             final PDDLSymbol s = arguments.get(i);
-            if (s.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+            if (s.getKind().equals(SymbolType.VARIABLE)) {
                 PDDLTypedSymbol param = null;
                 Iterator<PDDLTypedSymbol> itr = context.iterator();
                 while (itr.hasNext() && param == null) {
@@ -1510,7 +1510,7 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkTerm(PDDLSymbol term, List<PDDLTypedSymbol> context) {
         boolean checked = true;
-        if (term.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+        if (term.getKind().equals(SymbolType.VARIABLE)) {
             PDDLTypedSymbol param = null;
             Iterator<PDDLTypedSymbol> itr = context.iterator();
             while (itr.hasNext() && param == null) {

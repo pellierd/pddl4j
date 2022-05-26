@@ -46,71 +46,9 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     public static final String DEFAULT_TASK_ID_SYMBOL = "T";
 
     /**
-     * The enumeration used to specified the different types of the symbol.
-     */
-    public enum Kind {
-        /**
-         * The predicate symbol.
-         */
-        PREDICATE,
-        /**
-         * The type symbol.
-         */
-        TYPE,
-        /**
-         * The action symbol.
-         */
-        ACTION,
-        /**
-         * The method symbol.
-         */
-        METHOD,
-        /**
-         * The task symbol.
-         */
-        TASK,
-        /**
-         * The preference symbol.
-         */
-        PREFERENCE,
-        /**
-         * The functor symbol.
-         */
-        FUNCTOR,
-        /**
-         * The variable symbol.
-         */
-        VARIABLE,
-        /**
-         * The duration variable symbol.
-         */
-        DURATION_VARIABLE,
-        /**
-         * The continuous variable symbol.
-         */
-        CONTINUOUS_VARIABLE,
-        /**
-         * The constant symbol.
-         */
-        CONSTANT,
-        /**
-         * The domain symbol.
-         */
-        DOMAIN,
-        /**
-         * The problem symbol.
-         */
-        PROBLEM,
-        /**
-         * the task id symbol.
-         */
-        TASK_ID,
-    }
-
-    /**
      * The kind of the symbol.
      */
-    private Kind kind;
+    private SymbolType symbolType;
 
     /**
      * The image of the symbol.
@@ -129,7 +67,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      */
     public PDDLSymbol(final PDDLSymbol symbol) {
         super(symbol);
-        this.kind = symbol.getKind();
+        this.symbolType = symbol.getKind();
         this.image = symbol.getImage();
         this.timeSpecifier = symbol.getTimeSpecifier();
     }
@@ -137,12 +75,12 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     /**
      * Create a new symbol from a specified token.
      *
-     * @param kind  the kind of the symbol.
+     * @param symbolType  the kind of the symbol.
      * @param token the token.
      */
-    public PDDLSymbol(final Kind kind, final Token token) {
+    public PDDLSymbol(final SymbolType symbolType, final Token token) {
         super(token.beginLine, token.beginColumn, token.endLine, token.endColumn);
-        this.kind = kind;
+        this.symbolType = symbolType;
         this.image = token.image.toLowerCase(Locale.ENGLISH);
         this.timeSpecifier = null;
     }
@@ -150,17 +88,17 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     /**
      * Create a symbol with a specified image, line and column.
      *
-     * @param kind        the kind of the symbol.
+     * @param symbolType        the kind of the symbol.
      * @param image       the string image of the symbol.
      * @param beginLine   the begin line of the symbol.
      * @param beginColumn the begin column of the symbol.
      * @param endLine     the end line of the symbol.
      * @param endColumn   the end column of the symbol.
      */
-    public PDDLSymbol(final Kind kind, final String image, final int beginLine, final int beginColumn,
+    public PDDLSymbol(final SymbolType symbolType, final String image, final int beginLine, final int beginColumn,
                       final int endLine, final int endColumn) {
         super(beginLine, beginColumn, endLine, endColumn);
-        this.kind = kind;
+        this.symbolType = symbolType;
         this.image = image.toLowerCase(Locale.ENGLISH);
         this.timeSpecifier = null;
     }
@@ -169,11 +107,11 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      * Creates a new symbol with a specified image. The line and the column are initialized to
      * <code>-1</code>.
      *
-     * @param kind  the kind of the symbol.
+     * @param symbolType  the kind of the symbol.
      * @param image the string image of the symbol.
      */
-    public PDDLSymbol(final Kind kind, final String image) {
-        this(kind, image, ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
+    public PDDLSymbol(final SymbolType symbolType, final String image) {
+        this(symbolType, image, ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
             ParsedObject.DEFAULT_END_LINE,  ParsedObject.DEFAULT_END_COLUMN);
     }
 
@@ -182,17 +120,17 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      *
      * @return the kind of this symbol.
      */
-    public final Kind getKind() {
-        return this.kind;
+    public final SymbolType getKind() {
+        return this.symbolType;
     }
 
     /**
      * Sets the kind of this symbol.
      *
-     * @param kind the kind of the symbol.
+     * @param symbolType the kind of the symbol.
      */
-    public final void setKind(final Kind kind) {
-        this.kind = kind;
+    public final void setKind(final SymbolType symbolType) {
+        this.symbolType = symbolType;
     }
 
     /**
@@ -352,7 +290,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        switch (this.kind) {
+        switch (this.symbolType) {
             case TASK_ID:
                 if (this.getTimeSpecifier() != null) {
                     str.append("( ");

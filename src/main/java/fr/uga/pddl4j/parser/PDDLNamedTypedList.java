@@ -52,12 +52,8 @@ public class PDDLNamedTypedList implements Serializable {
      * Creates a named typed list from a specified typed list.
      *
      * @param list the list.
-     * @throws NullPointerException if the specified typed list is null.
      */
     public PDDLNamedTypedList(final PDDLNamedTypedList list) {
-        if (list == null) {
-            throw new NullPointerException("list == null");
-        }
         this.name = new PDDLSymbol(list.getName());
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
@@ -71,9 +67,6 @@ public class PDDLNamedTypedList implements Serializable {
      * @param name the name of the list.
      */
     public PDDLNamedTypedList(final PDDLSymbol name) {
-        if (name == null) {
-            throw new NullPointerException();
-        }
         this.name = name;
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
@@ -94,9 +87,6 @@ public class PDDLNamedTypedList implements Serializable {
      * @param name the name to set.
      */
     public final void setName(final PDDLSymbol name) {
-        if (name == null) {
-            throw new NullPointerException();
-        }
         this.name = name;
     }
 
@@ -124,12 +114,9 @@ public class PDDLNamedTypedList implements Serializable {
      * @param type the type to add.
      */
     public void addType(final PDDLSymbol type) {
-        if (type == null) {
-            throw new NullPointerException();
-        }
-        if (!type.equals(PDDLParser.OBJECT)) {
+         /*if (!type.equals(PDDLParser.OBJECT)) {
             this.types.remove(PDDLParser.OBJECT);
-        }
+        }*/
         if (!this.types.contains(type)) {
             this.types.add(type);
         }
@@ -173,9 +160,6 @@ public class PDDLNamedTypedList implements Serializable {
      * @return <code>true</code> if the argument was added <code>false</code> otherwise.
      */
     public boolean add(final PDDLTypedSymbol arg) {
-        if (arg == null) {
-            throw new NullPointerException("arg == null");
-        }
         return this.arguments.add(arg);
 
     }

@@ -42,6 +42,7 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTimeSpecifier;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.SymbolType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -811,8 +812,8 @@ PDDLSymbol primitive_type() :
 |	t=<NUMBER_TYPE>
 | 	t=<SYMBOL>)
 	{
-		return new PDDLSymbol(PDDLSymbol.Kind.TYPE, t);
-	}
+	return new PDDLSymbol(SymbolType.TYPE, t);
+}
 }
 
 void constants_def() :
@@ -843,8 +844,8 @@ PDDLSymbol constant() :
 	| 	t=<END>
 	| 	t=<START>
 	| 	t=<OVER>) {
-		return new PDDLSymbol(PDDLSymbol.Kind.CONSTANT, t);
-	}
+	return new PDDLSymbol(SymbolType.CONSTANT, t);
+}
 }
 
 void predicates_def() :
@@ -898,7 +899,7 @@ PDDLSymbol task_symbol() : // ADD HDDL
  }
  {
  	t=<SYMBOL> {
- 		return new PDDLSymbol(PDDLSymbol.Kind.TASK, t);
+ 		return new PDDLSymbol(SymbolType.TASK, t);
  	}
  }
 
@@ -931,7 +932,7 @@ PDDLSymbol predicate() :
 | 	t=<END>
 | 	t=<START>
 | 	t=<OVER>) {
-		return new PDDLSymbol(PDDLSymbol.Kind.PREDICATE, t);
+		return new PDDLSymbol(SymbolType.PREDICATE, t);
 	}
 }
 
@@ -940,7 +941,7 @@ PDDLSymbol variable() :
 	Token t = token;
 }
 {
-	t=<VARIABLE_SYMBOL> { return new PDDLSymbol(PDDLSymbol.Kind.VARIABLE, t); }
+	t=<VARIABLE_SYMBOL> { return new PDDLSymbol(SymbolType.VARIABLE, t); }
 }
 
 void functions_def():
@@ -991,7 +992,7 @@ PDDLSymbol functor() :
 	| t=<END>
     | t=<START>
     | t=<OVER>) {
-	    return new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t);
+	    return new PDDLSymbol(SymbolType.FUNCTOR, t);
 	}
 }
 
@@ -1037,7 +1038,7 @@ List<PDDLSymbol> function_type() :
 			|| this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)})
 		token=<NUMBER_TYPE> {
-			typesList.add(new PDDLSymbol(PDDLSymbol.Kind.TYPE, token));
+			typesList.add(new PDDLSymbol(SymbolType.TYPE, token));
 			return typesList;
 		}
 	| 	LOOKAHEAD(2, {(this.isRequirement(PDDLRequireKey.TYPING) && this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS))
@@ -1394,7 +1395,7 @@ PDDLExpression equal_atomic_formula() :
 		arg1=term()
 		arg2=term()
 	end=right_bracket() {
-        exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
+        exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, t));
 	 	args.add(arg1);
 	 	args.add(arg2);
 	 	exp.setArguments(args);
@@ -2055,7 +2056,7 @@ PDDLSymbol method_name() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(PDDLSymbol.Kind.ACTION, t);
+		return new PDDLSymbol(SymbolType.ACTION, t);
 	}
 }
 
@@ -2335,7 +2336,7 @@ PDDLSymbol task_id_symbol() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(PDDLSymbol.Kind.TASK_ID, t);
+		return new PDDLSymbol(SymbolType.TASK_ID, t);
 	}
 }
 
@@ -2763,7 +2764,7 @@ PDDLSymbol action_name() :
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(PDDLSymbol.Kind.ACTION, t);
+		return new PDDLSymbol(SymbolType.ACTION, t);
 	}
 }
 
@@ -2881,7 +2882,7 @@ PDDLSymbol pref_name() :
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(PDDLSymbol.Kind.PREFERENCE, t);
+		return new PDDLSymbol(SymbolType.PREFERENCE, t);
 	}
 }
 
@@ -3051,13 +3052,13 @@ PDDLExpression total_cost() :
 }
 {
 	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
-		PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-		exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, t));
-		exp.setArguments(new ArrayList<PDDLSymbol>());
-		exp.setBegin(begin);
-		exp.setEnd(end);
-		return exp;
-	}
+	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
+	exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, t));
+	exp.setArguments(new ArrayList<PDDLSymbol>());
+	exp.setBegin(begin);
+	exp.setEnd(end);
+	return exp;
+}
 }
 
 PDDLExpression numeric_term() :
@@ -3227,8 +3228,8 @@ PDDLSymbol da_symbol() :
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(PDDLSymbol.Kind.ACTION, t);
-	}
+	return new PDDLSymbol(SymbolType.ACTION, t);
+}
 }
 
 PDDLExpression duration_constraint() :
@@ -3400,7 +3401,7 @@ PDDLExpression var_duration() :
 {
 	t=<VAR_DURATION>
 	{
-		exp.setVariable(new PDDLSymbol(PDDLSymbol.Kind.DURATION_VARIABLE, t));
+		exp.setVariable(new PDDLSymbol(SymbolType.DURATION_VARIABLE, t));
 		return exp;
 	}
 }
@@ -3585,7 +3586,7 @@ PDDLExpression f_duration() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() f=<F_DURATION> argument = task_id_symbol() end=right_bracket() {
-        exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
+        exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, f));
         exp.setArguments(new ArrayList<PDDLSymbol>());
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -4213,7 +4214,7 @@ PDDLSymbol continuous_variable() :
 }
 {
 	t=<CONTINUOUS_VARIABLE>  {
-		return new PDDLSymbol(PDDLSymbol.Kind.CONTINUOUS_VARIABLE, t);
+		return new PDDLSymbol(SymbolType.CONTINUOUS_VARIABLE, t);
 	}
 }
 
@@ -4426,19 +4427,19 @@ PDDLProblem htn_problem() : // ADD HDDL
 PDDLSymbol problem_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> {  return new PDDLSymbol(PDDLSymbol.Kind.PROBLEM, t); }
+	t=<SYMBOL> {  return new PDDLSymbol(SymbolType.PROBLEM, t); }
 }
 
 PDDLSymbol domain_problem_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> {  return new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, t); }
+	t=<SYMBOL> {  return new PDDLSymbol(SymbolType.DOMAIN, t); }
 }
 
 PDDLSymbol domain_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> { return new PDDLSymbol(PDDLSymbol.Kind.DOMAIN, t); }
+	t=<SYMBOL> { return new PDDLSymbol(SymbolType.DOMAIN, t); }
 }
 
 void object_declaration() :
@@ -4786,7 +4787,7 @@ PDDLExpression total_time() :
 		}
 | 	LOOKAHEAD(2)
 		f=<TOTAL_TIME>) {
-			exp.setSymbol(new PDDLSymbol(PDDLSymbol.Kind.FUNCTOR, f));
+			exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, f));
 			exp.setArguments(new ArrayList<PDDLSymbol>());
 			exp.setBeginLine(f.beginLine);
             exp.setBeginColumn(f.beginColumn);

@@ -1,7 +1,6 @@
 package fr.uga.pddl4j.parser;
 
 
-import javax.annotation.processing.SupportedSourceVersion;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -1218,7 +1217,7 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
             throw new IllegalArgumentException("index < 0");
         }
         String img = null;
-        if (symbol.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+        if (symbol.getKind().equals(SymbolType.VARIABLE)) {
             img = symbol.getImage();
             symbol.setImage(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
         }
@@ -1246,7 +1245,7 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      */
     public static final String renameVariables(final PDDLSymbol symbol, final Map<String, String> context) {
         String img = null;
-        if (symbol.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+        if (symbol.getKind().equals(SymbolType.VARIABLE)) {
             img = symbol.getImage();
             final String newImage = context.get(img);
             if (newImage != null) {
@@ -1265,7 +1264,7 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      * @return the old image of the symbol or null if the symbol was not renamed.
      */
     public final static String renameTaskID(PDDLSymbol symbol, final Map<String, String> context) {
-        if (symbol.getKind().equals(PDDLSymbol.Kind.TASK_ID)) {
+        if (symbol.getKind().equals(SymbolType.TASK_ID)) {
             String image = symbol.getImage();
             String newImage = context.get(image);
             if (newImage == null) {

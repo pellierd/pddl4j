@@ -441,7 +441,7 @@ This is a real case that we tackled for a manufacturing company. This company de
       :class: with-shadow
       :scale: 80
 
-There are different kind of pieces at the beginning of the supply chain. A tray contains only one kind of pieces, and, each piece undergoes a sequence of operations from the beginning to the end of the supply chain. At the beginning of the supply chain, a unit is used to store all the trays. The units can have several inputs named "conveyors". The conveyors and the units are specific to a set of pieces: pieces are admissible to identified conveyors and units. Initially, every processing (unit loading/unloading, robot movements etc.) was hard-coded in a database by human operators. Automated planning is now used to optimize unit/robot scheduling and to increase production efficiency.
+There are different symbolType of pieces at the beginning of the supply chain. A tray contains only one symbolType of pieces, and, each piece undergoes a sequence of operations from the beginning to the end of the supply chain. At the beginning of the supply chain, a unit is used to store all the trays. The units can have several inputs named "conveyors". The conveyors and the units are specific to a set of pieces: pieces are admissible to identified conveyors and units. Initially, every processing (unit loading/unloading, robot movements etc.) was hard-coded in a database by human operators. Automated planning is now used to optimize unit/robot scheduling and to increase production efficiency.
 
 .. todo::
     * Try to write your own domain file for this problem.

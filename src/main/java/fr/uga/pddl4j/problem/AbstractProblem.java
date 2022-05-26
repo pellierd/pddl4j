@@ -26,6 +26,7 @@ import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
@@ -1152,7 +1153,7 @@ public abstract class AbstractProblem implements Problem {
                 List<IntSymbol> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
-                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+                    if (argument.getKind().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getImage()) - 1));
                     } else {
                         args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getImage())));
@@ -1166,7 +1167,7 @@ public abstract class AbstractProblem implements Problem {
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
-                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+                    if (argument.getKind().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getImage()) - 1));
                     } else {
                         args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getImage())));
@@ -1180,7 +1181,7 @@ public abstract class AbstractProblem implements Problem {
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
-                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+                    if (argument.getKind().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getImage()) - 1));
                     } else {
                         args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getImage())));
@@ -1268,7 +1269,7 @@ public abstract class AbstractProblem implements Problem {
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final PDDLSymbol argument = exp.getArguments().get(i);
-                    if (argument.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+                    if (argument.getKind().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getImage()) - 1));
                     } else {
                         args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getImage())));

@@ -24,7 +24,6 @@ import fr.uga.pddl4j.parser.lexer.Token;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -244,7 +243,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
                 if (this.getTaskID() == null) {
                     String newTaskID = new String(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size());
                     PDDLSymbol taskID = new PDDLSymbol(this.getSymbol());
-                    taskID.setKind(PDDLSymbol.Kind.TASK_ID);
+                    taskID.setKind(SymbolType.TASK_ID);
                     taskID.setImage(newTaskID);
                     this.setTaskID(taskID);
                     context.put(newTaskID, newTaskID);
