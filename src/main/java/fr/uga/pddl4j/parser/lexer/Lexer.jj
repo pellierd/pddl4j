@@ -1750,10 +1750,7 @@ PDDLExpression f_exp() :
 	|	LOOKAHEAD(2) child=f_head()
 	) {
 		exp.addChild(child);
-		exp.setBeginLine(child.getBeginLine());
-		exp.setBeginColumn(child.getBeginColumn());
-		exp.setEndLine(child.getEndLine());
-        exp.setEndColumn(child.getEndColumn());
+		exp.setLocation(child.getLocation());
 		return exp;
 	}
 }
@@ -1925,10 +1922,7 @@ PDDLExpression f_head() :
 | 	s=functor() {
         exp.setSymbol(s);
 		exp.setArguments(args);
-        exp.setBeginLine(s.getLocation().getBeginLine());
-        exp.setBeginColumn(s.getLocation().getBeginColumn());
-        exp.setEndLine(s.getLocation().getEndLine());
-        exp.setEndColumn(s.getLocation().getEndColumn());
+        exp.setLocation(s.getLocation());
 		return exp;
 	}
 }
@@ -2087,10 +2081,7 @@ PDDLExpression subtask_def() : // ADD HDDL
             taskID=subtask() {
                 exp = new PDDLExpression(PDDLConnective.AND);
                 exp.addChild(taskID);
-                exp.setBeginLine(taskID.getBeginLine());
-                exp.setBeginColumn(taskID.getBeginColumn());
-                exp.setEndLine(taskID.getEndLine());
-                exp.setEndColumn(taskID.getEndColumn());
+                exp.setLocation(taskID.getLocation());
             }
     |   LOOKAHEAD(2)
             exp=and_subtask()
@@ -2184,10 +2175,7 @@ PDDLExpression htn_ordering_constraints_def() : // ADD HDDL
             taskID=htn_ordering_constraint() {
                 exp = new PDDLExpression(PDDLConnective.AND);
                 exp.addChild(taskID);
-                exp.setBeginLine(taskID.getBeginLine());
-                exp.setBeginColumn(taskID.getBeginColumn());
-                exp.setEndLine(taskID.getEndLine());
-                exp.setEndColumn(taskID.getEndColumn());
+                exp.setLocation(taskID.getLocation());
             }
     |   LOOKAHEAD(2)
             exp = and_ordering_constraints()
@@ -2427,10 +2415,7 @@ PDDLExpression htn_constraints_def() : // ADD HDDL
             c = htn_constraint() {
                 exp = new PDDLExpression(PDDLConnective.AND);
                 exp.addChild(c);
-                exp.setBeginLine(c.getBeginLine());
-                exp.setBeginColumn(c.getBeginColumn());
-                exp.setEndLine(c.getEndLine());
-                exp.setEndColumn(c.getEndColumn());
+                exp.setLocation(c.getLocation());
             }
     |   LOOKAHEAD(2)
             exp = and_htn_constraints()
@@ -4219,10 +4204,7 @@ PDDLExpression f_exp_t() :
             }
 	| 	LOOKAHEAD(2)
 		    continuous_variable_name=continuous_variable() {
-		        exp.setBeginLine(continuous_variable_name.getLocation().getBeginLine());
-                exp.setBeginColumn(continuous_variable_name.getLocation().getBeginColumn());
-                exp.setEndLine(continuous_variable_name.getLocation().getEndLine());
-                exp.setEndColumn(continuous_variable_name.getLocation().getEndColumn());
+		        exp.setLocation(continuous_variable_name.getLocation());
                 exp.setVariable(continuous_variable_name);
 		    }
 	) {
@@ -4825,10 +4807,7 @@ PDDLExpression total_time() :
 			exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
 			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			exp.setArguments(new ArrayList<Symbol<String>>());
-			exp.setBeginLine(t.beginLine);
-            exp.setBeginColumn(t.beginColumn);
-            exp.setEndLine(t.endLine);
-            exp.setEndColumn(t.endColumn);
+			exp.setLocation(exp.getSymbol().getLocation());
 			return exp;
 		}
 }

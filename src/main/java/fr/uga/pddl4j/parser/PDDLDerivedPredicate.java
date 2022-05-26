@@ -110,7 +110,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      * This method renames the variable of the derived predicated and simplifies its body before converting it into
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#renameVariables(Expression)
      * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF()
      */
@@ -120,11 +120,11 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
         final List<TypedSymbol<String>> arguments = this.getHead().getArguments();
         for (int i = 0; i < arguments.size(); i++) {
             final TypedSymbol<String> argument = arguments.get(i);
-            final String image = AbstractExpression.renameVariables(argument, i);
+            final String image = Expression.renameVariables(argument, i);
             context.put(image, argument.getValue());
         }
         // Rename the body of the derived predicate
-        this.getBody().renameVariables(context);
+        Expression.renameVariables(this.getBody(), context);
         this.getBody().simplify();
         this.getBody().toNNF();
 

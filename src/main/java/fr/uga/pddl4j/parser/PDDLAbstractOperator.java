@@ -238,7 +238,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#renameVariables(Expression)
      * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF() ()
      */
@@ -253,7 +253,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#renameVariables(Expression)
      * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF() ()
      */
@@ -263,12 +263,12 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol<String>> parameters = this.getParameters();
         for (final TypedSymbol<String> params : parameters) {
-            final String image = AbstractExpression.renameVariables(params, i);
+            final String image = Expression.renameVariables(params, i);
             context.put(image, params.getValue());
             i++;
         }
         // Rename the preconditions
-        this.getPreconditions().renameVariables(context);
+        Expression.renameVariables(this.getPreconditions(), context);
         this.getPreconditions().simplify();
         this.getPreconditions().toNNF();
         return context;

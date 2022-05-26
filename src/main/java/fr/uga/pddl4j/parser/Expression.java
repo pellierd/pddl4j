@@ -1,49 +1,155 @@
-/*
- * Copyright (c) 2022 by Damien Pellier <Damien.Pellier@imag.fr>.
- *
- * This file is part of PDDL4J library.
- *
- * PDDL4J is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PDDL4J is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
- */
-
 package fr.uga.pddl4j.parser;
 
-import java.lang.Cloneable;
-import java.io.Serializable;
-import java.util.List;
+import fr.uga.pddl4j.parser.lexer.Token;
 
-/**
- * This interface defined the common methods to manipulate expressions while parsing and grounding process.
- *
- * @author D. Pellier
- * @version 1.0 - 13.05.2022
- */
-public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends Serializable {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Expression<T> implements Locatable, Serializable {
+
+    /**
+     * The type of the node.
+     */
+    private PDDLConnective connective;
+
+    /**
+     * The symbol used in the atomic formula. The symbol can be a function symbol a predicate symbol or a task symbol.
+     */
+    private Symbol<T> symbol;
+
+    /**
+     * The arguments of the atomic formula of this expression.
+     */
+    private List<Symbol<T>> arguments;
+
+    /**
+     * only for parsing: the variable in quantifiers.
+     */
+    private List<TypedSymbol<T>> quantifiedVariables;
+
+    /**
+     * The value associate to this expression.
+     */
+    private Double value;
+
+    /**
+     * The children expression of this expression.
+     */
+    private List<Expression<T>> children;
+
+    /**
+     * The name of the preference.
+     */
+    private Symbol<T> prefName;
+
+    /**
+     * The variable.
+     */
+    private Symbol<T> variable;
+
+    /**
+     * The taskID. Use to the alias of a task atom.
+     */
+    private Symbol<T> taskID;
+
+    /**
+     * The location of the expression.
+     */
+    private Location location;
+
+    /**
+     * Creates a new expression from another.
+     *
+     * @param other the other expression.
+     */
+    public Expression(final Expression<T> other) {
+        super();
+        this.setConnective(other.getConnective());
+        if (other.getSymbol() != null) {
+            this.setSymbol(new Symbol<>(other.getSymbol()));
+        }
+        if (other.getArguments() != null) {
+            this.setArguments(new ArrayList<>());
+            this.getArguments().addAll(other.getArguments().stream()
+                .map(Symbol<T>::new).collect(Collectors.toList()));
+        }
+        if (other.getQuantifiedVariables() != null) {
+            this.setQuantifiedVariables(new ArrayList<>());
+            this.getQuantifiedVariables().addAll(other.getQuantifiedVariables().stream()
+                .map(TypedSymbol<T>::new).collect(Collectors.toList()));
+        }
+        if (other.getVariable() != null) {
+            this.setVariable(new Symbol<>(other.getVariable()));
+        }
+        if (other.getPrefName() != null) {
+            this.setPrefName(new Symbol<>(other.getPrefName()));
+        }
+        if (other.getTaskID() != null) {
+            this.setTaskID(new Symbol<>(other.getTaskID()));
+        }
+        if (other.getValue() != null) {
+            this.setValue(other.getValue());
+        }
+        if (other.getChildren() != null) {
+            this.setChildren(new ArrayList<>());
+            this.getChildren().addAll(other.getChildren().stream()
+                .map(Expression<T>::new).collect(Collectors.toList()));
+        }
+        if (other.getLocation() != null) {
+            this.setLocation(new Location(other.getLocation()));
+        }
+    }
+
+    /**
+     * Creates a new expression with a specified connective.
+     *
+     * @param connective the connective.
+     */
+    public Expression(final PDDLConnective connective) {
+        super();
+        this.setConnective(connective);
+        this.setSymbol(null);
+        this.setArguments(null);
+        this.setQuantifiedVariables(null);
+        this.setValue(null);
+        this.setVariable(null);
+        this.setChildren(new ArrayList<>());
+        this.setPrefName(null);
+        this.setTaskID(null);
+        this.setLocation(null);
+    }
+
+    /**
+     * Creates a new empty AND expression.
+     */
+    public Expression() {
+        this(PDDLConnective.AND);
+    }
 
     /**
      * Returns the connective of this expression.
      *
      * @return the connective of this expression.
      */
-    PDDLConnective getConnective();
+    public final PDDLConnective getConnective() {
+        return this.connective;
+    }
 
     /**
      * Set the connective of this expression.
      *
      * @param connective the connective.
      */
-    void setConnective(final PDDLConnective connective);
+    public final void setConnective(final PDDLConnective connective) {
+        this.connective = connective;
+    }
 
     /**
      * Returns the symbol to this expression. Expression with a symbol are predicate, function or task formula.
@@ -51,112 +157,145 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      * @return the symbol the new symbol of this expression. If this expression is not ATOM, a FUNCTION or TASK the
      * returned symbol is null.
      */
-    T1 getSymbol();
+    public final Symbol<T> getSymbol() {
+        return this.symbol;
+    }
 
     /**
      * Sets a new symbol to this expression. Expression with a symbol are predicate, function or task formula.
      *
      * @param symbol the new symbol of this expression.
      */
-    void setSymbol(final T1 symbol);
+    public final void setSymbol(final Symbol<T> symbol) {
+        this.symbol = symbol;
+    }
 
     /**
      * Returns the arguments of the atomic formula represented by this expression.
      *
      * @return the arguments of the atomic formula represented by this expression.
      */
-    List<T1> getArguments();
+    public final List<Symbol<T>> getArguments() {
+        return this.arguments;
+    }
 
     /**
      * Sets the argument of the atomic formula represented by this expression.
      *
      * @param arguments the arguments of the atomic formula represented by this expression.
      */
-    void setArguments(final List<T1> arguments);
+    public final void setArguments(final List<Symbol<T>> arguments) {
+        this.arguments = arguments;
+    }
 
     /**
      * Adds an argument to this expression.
      *
      * @param argument the argument to add.
      */
-    boolean addArgument(final T1 argument);
+    public final boolean addArgument(final Symbol<T> argument) {
+        return this.arguments.add(argument);
+    }
+
 
     /**
      * Returns the list of quantified variables of this expression.
      *
      * @return the list of quantified variables of this expression.
      */
-    List<T2> getQuantifiedVariables();
+    public final List<TypedSymbol<T>> getQuantifiedVariables() {
+        return this.quantifiedVariables;
+    }
 
     /**
      * Sets the quantified variables of this expression.
      *
      * @param variables the quantified variables of this expression.
      */
-    void setQuantifiedVariables(final List<T2> variables);
+    public final void setQuantifiedVariables(final List<TypedSymbol<T>> variables) {
+        this.quantifiedVariables = variables;
+    }
 
     /**
      * Adds a quantified variable to this expression.
      *
      * @param variable the quantified variable to add.
      */
-    boolean addQuantifiedVariable(final T2 variable);
+    public final boolean addQuantifiedVariable(final TypedSymbol<T> variable) {
+        return this.quantifiedVariables.add(variable);
+    }
 
     /**
      * Returns the numeric value of this parser node.
      *
      * @return the numeric value of this parser node.
      */
-    Double getValue();
+    public final Double getValue() {
+        return this.value;
+    }
 
     /**
      * Set the numeric value of this expression.
      *
      * @param value the numeric value of this expression.
      */
-    void setValue(final Double value);
+    public final void setValue(final Double value) {
+        this.value = value;
+    }
 
     /**
      * Returns the variable of this expression
      *
      * @return the variable of this expression.
      */
-    T1 getVariable();
+    public final Symbol<T> getVariable() {
+        return this.symbol;
+    }
 
     /**
      * Sets a new variable to this parser node.
      *
      * @param variable the new variable to set.
      */
-    void setVariable(final T1 variable);
+    public final void setVariable(final Symbol<T> variable) {
+        this.variable = variable;
+    }
 
     /**
      * Returns the name of the preference associated to this expression.
      *
      * @return the name of the preference or <code>null</code> if the preference name was not initialized.
      */
-    T1 getPrefName();
+    public final Symbol<T> getPrefName() {
+        return this.prefName;
+    }
 
     /**
      * Sets a name to the preference associated to this expression.
      *
      * @param name the name of the preference to set.
      */
-    void setPrefName(final T1 name);
+    public final void setPrefName(final Symbol<T> name) {
+        this.prefName = name;
+    }
 
     /**
      * Returns the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
      *
      * @return the taskID associated to this expression.
      */
-    T1 getTaskID();
+    public final Symbol<T> getTaskID() {
+        return this.taskID;
+    }
 
     /**
      * Set the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
      *
      * @param taskID the taskID to set.
      */
-    void setTaskID(T1 taskID);
+    public final void setTaskID(Symbol<T> taskID) {
+        this.taskID = taskID;
+    }
 
     /**
      * Add a new child expression to this expression.
@@ -165,78 +304,69 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      * @return <code>true</code> if the expression was added; <code>false</code> otherwise
      * @throws RuntimeException if the specified node is null
      */
-    boolean addChild(final Expression<T1, T2> exp);
+    public final boolean addChild(final Expression<T> exp) {
+        return this.children.add(exp);
+    }
 
     /**
      * Sets the list of children expressions of this expression.
      *
      * @param children the children expression to set.
      */
-    void setChildren(final List<Expression<T1, T2>> children);
+    public final void setChildren(final List<Expression<T>> children) {
+        this.children = children;
+    }
 
     /**
      * Returns the list of children of this expression.
      *
      * @return the list of children of this expression.
      */
-    List<Expression<T1, T2>> getChildren();
+    public final List<Expression<T>> getChildren() {
+        return this.children;
+    }
 
     /**
-     * Returns a deep copy of this expression.
+     * Return the location of the symbol.
      *
-     * @return a deep copy of this expression.
+     * @return the location of the symbol.
      */
-    //Expression<T1, T2> clone();
+    public final Location getLocation() {
+        return this.location;
+    }
 
     /**
-     * Returns if this expression is a literal. A literal is an atomic formula or a negated atomic
-     * formula.
+     * Sets the location of the symbol.
      *
-     * @return <code>true</code> if this expression is a literal <code>false</code> otherwise.
+     * @param location the location to set.
      */
-    boolean isLiteral();
+    public final void setLocation(Location location) {
+        this.location = location;
+    }
 
     /**
-     * Transforms this expression into it negative normal form.
-     */
-    void toNNF();
-
-    /**
-     * Moves the negation inward the expression.
+     * Sets the begin line and column of the expression from a specified token.
      *
-     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     * @param begin the first token of the expression.
      */
-    void moveNegationInward();
+    public final void setBegin(final Token begin) {
+        if (this.getLocation() == null) {
+            this.setLocation(new Location());
+        }
+        this.getLocation().setBegin(begin);
+    }
 
     /**
-     * Move the time specifier inward the expression.
+     * Sets the end line and column of the expression from a specified token.
      *
-     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     * @param end the last token of the expression.
      */
-    void moveTimeSpecifierInward();
-
-    /**
-     * Returns if a specified expression is contains, i.e., is a sub-expression of this expression. More
-     * formally, returns <code>true</code> if and only if this expression contains at least one
-     * subexpression <code>s</code> such that <code>s.equals(exp)</code>.
-     *
-     * @param exp the expression to test.
-     * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
-     *          this expression; <code>false</code> otherwise.
-     */
-    boolean contains(final Expression<T1, T2> exp);
-
-    /**
-     * Removes all the occurrences of a specified expression contained in this expression and
-     * returns <code>true</code> if and only if at least one occurrence was removed.
-     *
-     * @param exp the expression to remove.
-     * @return <code>true</code> if the specified expression <code>exp</code> was removed;
-     *          <code>false</code> otherwise.
-     */
-    boolean remove(final Expression<T1, T2> exp);
+    public final void setEnd(final Token end) {
+        if (this.getLocation() == null) {
+            this.setLocation(new Location());
+        }
+        this.getLocation().setEnd(end);
+    }
 
     /**
      * Assigns a specified expression to this expression. After the method call the expression is equals to the
@@ -245,7 +375,246 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      *
      * @param exp the expression to assigned to this expression.
      */
-    void assign(final Expression<T1, T2> exp);
+    public final void assign(Expression<T> exp) {
+        this.setConnective(exp.getConnective());
+        this.setSymbol(exp.getSymbol());
+        this.setArguments(exp.getArguments());
+        this.setQuantifiedVariables(exp.getQuantifiedVariables());
+        this.setValue(exp.getValue());
+        this.setVariable(exp.getVariable());
+        this.setChildren(exp.getChildren());
+        this.setPrefName(exp.getPrefName());
+        this.setTaskID(exp.getTaskID());
+        this.setLocation(exp.getLocation());
+    }
+
+    /**
+     * Returns if this expression is a literal. A literal is an atomic formula or a negated atomic
+     * formula.
+     *
+     * @return <code>true</code> if this expression is a literal <code>false</code> otherwise.
+     */
+    public final boolean isLiteral() {
+        return this.getConnective().equals(PDDLConnective.ATOM)
+            || (this.getConnective().equals(PDDLConnective.NOT)
+            && this.getChildren().size() == 1
+            && this.getChildren().get(0).getConnective().equals(PDDLConnective.ATOM));
+    }
+
+    /**
+     * Sets the expression into negative normal form. After the method call, negation can occurs only before atomic
+     * formula and time specifier (at start, at end, overall) can only occur before literal. The method is applicable on
+     * expressions containing a goal description, i.e., NOT, AND, OR, WHEN, IMPLY, SOMETIME_AFTER, SOMETIME_BEFORE,
+     * FORALL, EXISTS, ALWAYS, AT_MOST_ONCE, WITHIN, HOLD_AFTER, ALWAYS_WITHIN, HOLD_DURING, AT_START, AT_END, OVERALL,
+     * ATOM, EQUAL_ATOM, EQUAL, LESS, LESS_OR_EQUAL, GREATER, GREATER_OR_EQUAL, ASSIGN, INCREASE, DECREASE, SCALE_UP,
+     * SCALE_DOWN, TRUE and FALSE.
+     *
+     * @throws MalformedExpressionException if this expression is malformed.
+     */
+    public final void toNNF()  {
+
+        switch (this.getConnective()) {
+            case NOT:
+                this.moveNegationInward();
+                break;
+            case AND:
+            case OR:
+            case WHEN:
+            case IMPLY:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+            case FORALL:
+            case EXISTS:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
+                this.getChildren().forEach(Expression::toNNF);
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.moveTimeSpecifierInward();
+                break;
+            case ATOM:
+            case EQUAL_ATOM:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case TASK_ID:
+            case NUMBER:
+            case TRUE:
+            case FALSE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+    /**
+     * Moves the negation inward the expression.
+     *
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     */
+    public final void moveNegationInward() {
+        assert this.getConnective().equals(PDDLConnective.NOT);
+
+        final Expression<T> child = this.getChildren().get(0);
+        switch (child.getConnective()) {
+            case FORALL:
+                this.setConnective(PDDLConnective.EXISTS);
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                Expression<T> negation = new Expression<>(PDDLConnective.NOT);
+                negation.addChild(child.getChildren().get(0));
+                negation.toNNF();
+                this.getChildren().set(0, negation);
+                break;
+            case EXISTS:
+                this.setConnective(PDDLConnective.FORALL);
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                negation = new Expression<>(PDDLConnective.NOT);
+                negation.addChild(child.getChildren().get(0));
+                negation.toNNF();
+                this.getChildren().set(0, negation);
+                break;
+            case AND:
+                this.setConnective(PDDLConnective.OR);
+                this.getChildren().clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    negation = new Expression<>(PDDLConnective.NOT);
+                    negation.addChild(child.getChildren().get(i));
+                    negation.toNNF();
+                    this.getChildren().add(negation);
+                }
+                break;
+            case OR:
+                this.setConnective(PDDLConnective.AND);
+                this.getChildren().clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    negation = new Expression<>(PDDLConnective.NOT);
+                    negation.addChild(child.getChildren().get(i));
+                    negation.toNNF();
+                    this.getChildren().add(negation);
+                }
+                break;
+            case NOT:
+                this.assign(child.getChildren().get(0));
+                this.toNNF();
+                break;
+            case IMPLY: // (not (imply p q)) -> (imply (not p) (not q))
+                this.setConnective(PDDLConnective.IMPLY);
+                final Expression notp = new Expression<>(PDDLConnective.NOT);
+                notp.addChild(child.getChildren().get(0));
+                notp.toNNF();
+                final Expression notq = new Expression<>(PDDLConnective.NOT);
+                notq.addChild(child.getChildren().get(1));
+                notq.toNNF();
+                this.getChildren().clear();
+                this.getChildren().add(notp);
+                this.getChildren().add(notq);
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                this.setConnective(child.getConnective());
+                child.setConnective(PDDLConnective.NOT);
+                break;
+            case TRUE:
+                this.setConnective(PDDLConnective.FALSE);
+                break;
+            case FALSE:
+                this.setConnective(PDDLConnective.TRUE);
+                break;
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case ATOM:
+            case EQUAL_ATOM:
+                // Do nothing
+                break;
+
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
+    /**
+     * Move the time specifier inward the expression.
+     *
+     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
+     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
+     */
+    public final void moveTimeSpecifierInward() {
+        assert this.getConnective().equals(PDDLConnective.AT_START)
+            || this.getConnective().equals(PDDLConnective.AT_END)
+            || this.getConnective().equals(PDDLConnective.OVER_ALL);
+
+        final Expression<T> child = this.getChildren().get(0);
+        switch (child.getConnective()) {
+            case FORALL:
+            case EXISTS:
+                Expression timeExp = new Expression<>(this.getConnective());
+                timeExp.addChild(child.getChildren().get(0));
+                timeExp.moveTimeSpecifierInward();
+                this.getChildren().set(0, timeExp);
+                this.setConnective(child.getConnective());
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                break;
+            case AND:
+            case OR:
+                this.getChildren().clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    timeExp = new Expression<>(this.getConnective());
+                    timeExp.addChild(child.getChildren().get(i));
+                    timeExp.moveTimeSpecifierInward();
+                    this.getChildren().add(timeExp);
+                }
+                this.setConnective(child.getConnective());
+                break;
+            case NOT:
+                child.toNNF();
+                if (!child.getConnective().equals(PDDLConnective.NOT)) {
+                    this.moveTimeSpecifierInward();
+                }
+                break;
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case ATOM:
+            case EQUAL_ATOM:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
 
     /**
      * Simplify the expression. This method removes:
@@ -266,7 +635,284 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      *      SOMETIME_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
      *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT.
      */
-    boolean simplify() throws UnexpectedExpressionException;
+    public final boolean simplify() throws UnexpectedExpressionException {
+        boolean simplified = false;
+        switch (this.getConnective()) {
+            case FORALL:
+            case EXISTS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                Expression<T> child = this.getChildren().get(0);
+                child.simplify();
+                if (child.getConnective().equals(PDDLConnective.TRUE)
+                    || child.getConnective().equals(PDDLConnective.FALSE)) {
+                    this.setConnective(child.getConnective());
+                    simplified = true;
+                }
+                break;
+            case IMPLY:
+                // replace imply expression (imply p q) by its equivalent disjunction (or (not p) q)
+                this.setConnective(PDDLConnective.OR);
+                final Expression notp = new Expression<>(PDDLConnective.NOT);
+                notp.addChild(this.getChildren().get(0));
+                this.getChildren().set(0, notp);
+                simplified = this.simplify();
+                break;
+            case AND:
+                simplified &= this.removeDuplicateChild();
+                simplified &= this.removedTautology();
+                if (this.getChildren().isEmpty()) {
+                    this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
+                } else if (this.getChildren().size() == 1) {
+                    this.assign(this.getChildren().get(0));
+                    this.simplify();
+                    simplified = true;
+                } else {
+                    int i = 0;
+                    while (i < this.getChildren().size()
+                        && !this.getConnective().equals(PDDLConnective.TRUE)
+                        && !this.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = this.getChildren().get(i);
+                        simplified &= child.simplify();
+                        if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            this.setConnective(PDDLConnective.FALSE);
+                            simplified = true;
+                        } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            this.getChildren().remove(i);
+                            simplified = true;
+                        } else if (child.getConnective().equals(PDDLConnective.AND)) {
+                            this.getChildren().remove(i);
+                            this.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                            simplified = true;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case OR:
+                simplified &= this.removeDuplicateChild();
+                simplified &= this.removedTautology();
+                if (this.getChildren().isEmpty()) {
+                    this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
+                } else if (this.getChildren().size() == 1) {
+                    this.assign(this.getChildren().get(0));
+                    this.simplify();
+                    simplified = true;
+                } else {
+                    int i = 0;
+                    while (i < this.getChildren().size()
+                        && !this.getConnective().equals(PDDLConnective.TRUE)
+                        && !this.getConnective().equals(PDDLConnective.FALSE)) {
+                        child = this.getChildren().get(i);
+                        simplified &= child.simplify();
+                        if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                            this.setConnective(PDDLConnective.TRUE);
+                            simplified = true;
+                        } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                            this.getChildren().remove(i);
+                            simplified = true;
+                        } else if (child.getConnective().equals(PDDLConnective.OR)) {
+                            this.getChildren().remove(i);
+                            this.getChildren().addAll(i, child.getChildren());
+                            i += child.getChildren().size();
+                            simplified = true;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                break;
+            case NOT:
+                child = this.getChildren().get(0);
+                simplified &= child.simplify();
+                if (child.getConnective().equals(PDDLConnective.NOT)) {
+                    this.assign(child.getChildren().get(0));
+                    simplified = true;
+                } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                    this.setConnective(PDDLConnective.FALSE);
+                    simplified = true;
+                } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                    this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
+                }
+                break;
+            case WHEN:
+                Expression condition = this.getChildren().get(0);
+                simplified &= condition.simplify();
+                Expression effect = this.getChildren().get(1);
+                simplified &= effect.simplify();
+                if (condition.getConnective().equals(PDDLConnective.TRUE)) {
+                    this.assign(effect);
+                    simplified = true;
+                } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
+                    this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
+                }
+                break;
+            case EQUAL_ATOM:
+                if (this.getArguments().get(0).equals(this.getArguments().get(1))) {
+                    this.setConnective(PDDLConnective.TRUE);
+                    simplified = true;
+                }
+                break;
+            case SOMETIME_AFTER_CONSTRAINT: // Simplification must be checked with the constraints semantic
+            case SOMETIME_BEFORE_CONSTRAINT:
+                simplified &= this.getChildren().get(0).simplify();
+                simplified &= this.getChildren().get(1).simplify();
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                simplified &= this.getChildren().get(0).simplify();
+                simplified &= this.getChildren().get(1).simplify();
+                simplified &= this.getChildren().get(2).simplify();
+                break;
+            case HOLD_DURING_CONSTRAINT:
+                if (this.getChildren().get(0).getValue() > this.getChildren().get(1).getValue()) {
+                    this.setConnective(PDDLConnective.FALSE);
+                    simplified = true;
+                } else {
+                    child = this.getChildren().get(0);
+                    simplified &= child.simplify();
+                    if (child.getConnective().equals(PDDLConnective.TRUE)
+                        || child.getConnective().equals(PDDLConnective.FALSE)) {
+                        this.setConnective(child.getConnective());
+                        simplified = true;
+                    }
+                }
+                break;
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case NUMBER:
+            case TASK_ID:
+            case ATOM:
+            case TRUE:
+            case FALSE:
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+        return simplified;
+    }
+
+
+    /**
+     * Removed duplicated child in conjunction and disjunction expressions. The expression in parameter is
+     * modified. If a duplicated subexpression is found, the duplicated expression is removed.
+     *
+     * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
+     */
+    private final boolean removeDuplicateChild() {
+        assert this.getConnective().equals(PDDLConnective.AND)
+            || this.getConnective().equals(PDDLConnective.OR);
+        boolean modified = false;
+        for (int i = 0; i < this.getChildren().size(); i++) {
+            final Expression ei =  this.getChildren().get(i);
+            for (int j = i + 1; j < this.getChildren().size(); j++) {
+                final Expression ej = this.getChildren().get(j);
+                if (ei.equals(ej)) {
+                    this.getChildren().remove(j);
+                    j--;
+                    modified = true;
+                }
+            }
+        }
+        return modified;
+    }
+
+    /**
+     * Removes tautologies of the form (a and not a) in conjunctive and disjunctive expressions. The expression
+     * in parameter is modified. If a tautology is detected, the subexpression of the tautology are removed and replaced
+     * by a TRUE expression.
+     *
+     * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
+     */
+    private final boolean removedTautology() {
+        assert this.getConnective().equals(PDDLConnective.AND)
+            || this.getConnective().equals(PDDLConnective.OR);
+        boolean modified = false;
+        for (int i = 0; i < this.getChildren().size(); i++) {
+            final Expression ei = this.getChildren().get(i);
+            final Expression neg = new Expression<>(PDDLConnective.NOT);
+            neg.addChild(ei);
+            for (int j = i + 1; j < this.getChildren().size(); j++) {
+                final Expression ej = this.getChildren().get(j);
+                if (ej.equals(neg)) {
+                    ei.setConnective(PDDLConnective.TRUE);
+                    this.getChildren().remove(j);
+                    j--;
+                    modified = true;
+                }
+            }
+        }
+        return modified;
+    }
+
+    /**
+     * Returns if a specified expression is contains, i.e., is a sub-expression of this expression. More
+     * formally, returns <code>true</code> if and only if this expression contains at least one
+     * subexpression <code>s</code> such that <code>s.equals(exp)</code>.
+     *
+     * @param exp the expression to test.
+     * @return <code>true</code> if the specified expression <code>exp</code> is a sub-expression of
+     *          this expression; <code>false</code> otherwise.
+     */
+    public final boolean contains(final Expression<T> exp) {
+        for (Expression s : this.getChildren()) {
+            if (s.equals(exp) || s.contains(exp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Removes all the occurrences of a specified expression contained in this expression and
+     * returns <code>true</code> if and only if at least one occurrence was removed.
+     *
+     * @param exp the expression to remove.
+     * @return <code>true</code> if the specified expression <code>exp</code> was removed;
+     *          <code>false</code> otherwise.
+     */
+    public final boolean remove(final Expression<T> exp) {
+        boolean removed = false;
+        Iterator<Expression<T>> it = this.getChildren().iterator();
+        while (it.hasNext()) {
+            Expression s = it.next();
+            if (s.equals(exp)) {
+                it.remove();
+                removed = true;
+            } else {
+                removed = removed || s.remove(exp);
+            }
+        }
+        return removed;
+    }
+
+
 
     /**
      * Returns if this expression is malformed. An expression is considered as well in the following cases:
@@ -297,7 +943,136 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      *
      * @return <code>true</code> if the expression is malformed; <code>false</code> otherwise.
      */
-    boolean isMalformedExpression();
+    public final boolean isMalformedExpression() {
+        boolean malformed = false;
+        switch (this.getConnective()) {
+            case AND:
+            case OR:
+                Iterator<Expression<T>> i = this.getChildren().iterator();
+                while (!malformed && i.hasNext()) {
+                    malformed |= i.next().isMalformedExpression();
+                }
+                break;
+            case EQUAL_ATOM:
+                malformed = this.getArguments().size() != 2;
+                break;
+            case FORALL:
+            case EXISTS:
+                malformed = this.getQuantifiedVariables().isEmpty()
+                    || this.getChildren().isEmpty()
+                    || this.getChildren().get(0).isMalformedExpression();
+                break;
+            case IMPLY:
+            case WHEN:
+            case EQUAL_COMPARISON:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+                malformed = this.getChildren().size() != 2
+                    || this.getChildren().get(0).isMalformedExpression()
+                    || this.getChildren().get(1).isMalformedExpression();
+                break;
+            case NOT:
+            case UMINUS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case F_EXP_T:
+            case F_EXP:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+                malformed = this.getChildren().size() != 1
+                    || this.getChildren().get(0).isMalformedExpression();
+                break;
+            case ATOM:
+            case TASK:
+            case FN_HEAD:
+                malformed = this.getSymbol() == null;
+                break;
+            case TIMED_LITERAL:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+                malformed = this.getChildren().size() != 2
+                    || !this.getChildren().get(0).getConnective().equals(PDDLConnective.NUMBER)
+                    || this.getChildren().get(1).isMalformedExpression();
+                break;
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                malformed = this.getChildren().size() != 2
+                    || !this.getChildren().get(0).getConnective().equals(PDDLConnective.TASK_ID)
+                    || this.getChildren().get(1).isMalformedExpression();
+                break;
+            case HOLD_DURING_CONSTRAINT:
+                malformed = this.getChildren().size() != 3
+                    || !this.getChildren().get(0).getConnective().equals(PDDLConnective.NUMBER)
+                    || !this.getChildren().get(1).getConnective().equals(PDDLConnective.NUMBER)
+                    || this.getChildren().get(2).isMalformedExpression();
+                break;
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                malformed = this.getChildren().size() != 3
+                    || !this.getChildren().get(0).getConnective().equals(PDDLConnective.TASK_ID)
+                    || !this.getChildren().get(1).getConnective().equals(PDDLConnective.TASK_ID)
+                    || this.getChildren().get(2).isMalformedExpression();
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                malformed = this.getChildren().size() != 4
+                    || !this.getChildren().get(0).getConnective().equals(PDDLConnective.NUMBER)
+                    || !this.getChildren().get(1).getConnective().equals(PDDLConnective.NUMBER)
+                    || this.getChildren().get(2).isMalformedExpression()
+                    || this.getChildren().get(3).isMalformedExpression();
+                break;
+            case NUMBER:
+                malformed = this.getValue() == null;
+                break;
+            case TASK_ID:
+                malformed = this.getTaskID() == null;
+                break;
+            case TIME_VAR:
+            case IS_VIOLATED:
+            case TRUE:
+            case FALSE:
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
+                malformed = this.getChildren().size() != 2
+                    && this.getChildren().get(0).getConnective().equals(PDDLConnective.TASK_ID)
+                    && this.getChildren().get(0).isMalformedExpression()
+                    && this.getChildren().get(1).getConnective().equals(PDDLConnective.TASK_ID)
+                    && this.getChildren().get(1).isMalformedExpression();
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().toString());
+
+        }
+        return malformed;
+    }
 
     /**
      * Returns a string representation of this node.
@@ -305,7 +1080,10 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      * @return a string representation of this node.
      * @see java.lang.Object#toString
      */
-    String toString();
+    @Override
+    public String toString() {
+        return this.toString("");
+    }
 
     /**
      * Returns a string representation of this parser node.
@@ -314,12 +1092,520 @@ public interface Expression<T1 extends Symbol, T2 extends TypedSymbol> extends S
      * @return a string representation of this parser node.
      * @throws MalformedExpressionException if the expression is malformed.
      */
-    String toString(String baseOffset);
+    public String toString(String baseOffset) throws MalformedExpressionException {
+        if (this.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
+        }
+        StringBuilder str = new StringBuilder();
+        switch (this.getConnective()) {
+            case ATOM:
+            case FN_HEAD:
+                str.append("(");
+                str.append(this.getSymbol());
+                str.append(" ");
+                if (!this.getArguments().isEmpty()) {
+                    for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                        str.append(this.getArguments().get(i).toString()).append(" ");
+                    }
+                    str.append(this.getArguments().get(this.getArguments().size() - 1).toString());
+                }
+                str.append(")");
+                break;
+            case TASK:
+                str.append("(");
+                str.append(this.getSymbol());
+                str.append(" ");
+                if (!this.getArguments().isEmpty()) {
+                    if (this.getTaskID() != null) {
+                        str.append(this.getTaskID()).append(" (");
+                    }
+                    for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                        str.append(this.getArguments().get(i).toString()).append(" ");
+                    }
+                    str.append(this.getArguments().get(this.getArguments().size() - 1).toString());
+                }
+                str.append(")");
+                break;
+            case EQUAL_ATOM:
+                str.append("(")
+                    .append(this.getConnective().getImage())
+                    .append(" ");
+                for (int i = 0; i < this.getArguments().size() - 1; i++) {
+                    str.append(this.getArguments().get(i).toString()).append(" ");
+                }
+                str.append(this.getArguments().get(this.getArguments().size() - 1).toString()).append(")");
+                break;
+            case AND:
+            case OR:
+                if (!this.getChildren().isEmpty()) {
+                    String offset = baseOffset + "  ";
+                    str.append("(").append(this.getConnective().getImage());
+                    str.append(" ");
+                    for (int i = 0; i < this.getChildren().size() - 1; i++) {
+                        str.append(this.getChildren().get(i).toString(offset)).append("\n").append(offset);
+                    }
+                    str.append(this.getChildren().get(this.getChildren().size() - 1).toString(offset));
+                    str.append(")");
+                } else {
+                    str.append("()");
+                }
+                break;
+            case IMPLY:
+                str.append("(");
+                str.append(this.getConnective().getImage());
+                str.append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case FORALL:
+            case EXISTS:
+                String off = baseOffset + baseOffset + "  ";
+                str.append(" (");
+                str.append(this.getConnective().getImage());
+                str.append(" (");
+                if (!this.getQuantifiedVariables().isEmpty()) {
+                    for (int i = 0; i < this.getQuantifiedVariables().size() - 1; i++) {
+                        str.append(this.getQuantifiedVariables().get(i).toString());
+                        str.append(", ");
+                    }
+                    str.append(this.getQuantifiedVariables().get(this.getQuantifiedVariables().size() - 1).toString());
+                }
+                str.append(")\n");
+                str.append(off);
+                str.append(this.children.get(0).toString(off));
+                str.append(")");
+                break;
+            case NUMBER:
+                str.append(this.value);
+                break;
+            case F_EXP:
+                str.append(this.children.get(0).toString(baseOffset));
+                break;
+            case F_EXP_T:
+                if (this.children.isEmpty()) {
+                    str.append(this.getVariable());
+                } else {
+                    str.append("(").append(this.getConnective().getImage()).append(" ")
+                        .append(this.getVariable()).append(" ")
+                        .append(this.children.get(0).toString(baseOffset));
+                }
+                break;
+            case TIME_VAR:
+                str.append(this.getVariable());
+                break;
+            case FN_ATOM:
+            case WHEN:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MINUS:
+            case PLUS:
+            case SOMETIME_AFTER_CONSTRAINT:
+            case SOMETIME_BEFORE_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.children.get(0).toString(baseOffset)).append(" ");
+                str.append(this.children.get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.arguments.get(0).toString()).append(" ");
+                str.append(this.arguments.get(1).toString());
+                str.append(")");
+                break;
+            case NOT:
+            case UMINUS:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case AT_END_CONSTRAINT:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString(baseOffset));
+                str.append(")");
+                break;
+            case MINIMIZE:
+            case MAXIMIZE:
+                str.append(this.getConnective().getImage()).append(" ")
+                    .append(this.getChildren().get(0).getValue())
+                    .append(")");
+                break;
+            case IS_VIOLATED:
+                str.append("(").append(this.getConnective().getImage()).append(")");
+                break;
+            case TIMED_LITERAL:
+            case WITHIN_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString(baseOffset));
+                str.append(")");
+                break;
+            case HOLD_DURING_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString()).append(" ");
+                str.append(this.getChildren().get(2).toString(baseOffset));
+                str.append(")");
+                break;
+            case ALWAYS_WITHIN_CONSTRAINT:
+                str.append("(");
+                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString()).append(" ");
+                str.append(this.getChildren().get(2).toString(baseOffset));
+                str.append(this.getChildren().get(3).toString(baseOffset));
+                str.append(")");
+                break;
+            case TASK_ID:
+                str.append(this.getTaskID().toString());
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.getConnective().toString());
+
+        }
+        return str.toString();
+    }
 
     /**
+     * Renames the tag of the tasks contained in the expression. The tag tasks renames have the form T0, ..., Tn.
+     */
+    public static void renameTaskIDs(Expression<String> exp) {
+        Expression.renameTaskIDs(exp, new LinkedHashMap<>());
+    }
+
+    /**
+     * Renames the ID of the task contained in the expression with a specified symbol, i.e., the tag tasks
+     * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are alowed as
+     * tasks expression for the moment in method description.
+     *
+     * @param context the images of the renamed ID of the task.
+     * @throws MalformedExpressionException if this expression is not an AND expression.
+     * @see Expression#isMalformedExpression()
+     */
+    public static void renameTaskIDs(Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
+        if (exp.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + exp.getConnective() + " is malformed");
+        }
+        switch (exp.getConnective()) {
+            case TASK:
+                // Set a dummy taskID to task if no task taskID was specified
+                if (exp.getTaskID() == null) {
+                    String newTaskID = new String(Symbol.DEFAULT_TASK_ID_SYMBOL + context.size());
+                    Symbol<String> taskID = new Symbol<String>(exp.getSymbol());
+                    taskID.setType(SymbolType.TASK_ID);
+                    taskID.setValue(newTaskID);
+                    exp.setTaskID(taskID);
+                    context.put(newTaskID, newTaskID);
+                } else {
+                    Expression.renameTaskID(exp.getTaskID(), context);
+                }
+                break;
+            case F_TASK_TIME:
+                exp.getArguments().get(0).rename(context);
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+                Expression.renameTaskID(exp.getChildren().get(0).getTaskID(), context);
+                Expression.renameTaskID(exp.getChildren().get(1).getTaskID(), context);
+                break;
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                Expression.renameTaskID(exp.getChildren().get(0).getTaskID(), context);
+                break;
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                Expression.renameTaskID(exp.getChildren().get(0).getTaskID(), context);
+                Expression.renameTaskID(exp.getChildren().get(1).getTaskID(), context);
+                break;
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+                // do nothing
+                break;
+            default:
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    Expression<String> ei = exp.getChildren().get(i);
+                    Expression.renameTaskIDs(ei, context);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Renames the variables contained in the expression. The variable renames have the form ?X0,..., ?Xn.
+     */
+    public static void renameVariables(Expression<String> exp) {
+        Expression.renameVariables(exp, new LinkedHashMap<>());
+    }
+
+    /**
+     * Renames the variables contained in the expression with a specified symbol, i.e., the variable
+     * already renamed. The variable renames have the form ?X0, ..., ?Xn.
+     *
+     * @param context the images of the renamed variable.
+     * @throws MalformedExpressionException if this expression is malformed.
+     * @see Expression#isMalformedExpression()
+     */
+    public static void renameVariables(final Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
+        if (exp.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + exp.getConnective() + " is malformed");
+        }
+        switch (exp.getConnective()) {
+            case ATOM:
+            case FN_HEAD:
+            case EQUAL_ATOM:
+            case TASK:
+                for (int i = 0; i < exp.getArguments().size(); i++) {
+                    Expression.renameVariables( exp.getArguments().get(i), context);
+                }
+                break;
+            case AND:
+            case OR:
+            case NOT:
+            case IMPLY:
+            case F_EXP_T:
+            case EQUAL_COMPARISON:
+            case FN_ATOM:
+            case WHEN:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case F_EXP:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    Expression<String> ei = exp.getChildren().get(i);
+                    Expression.renameVariables(ei, context);
+                }
+                break;
+            case FORALL:
+            case EXISTS:
+                for (int i = 0; i < exp.getQuantifiedVariables().size(); i++) {
+                    final Symbol<String> var = exp.getQuantifiedVariables().get(i);
+                    final String image = Expression.renameVariables(var, context.size() + 1);
+                    context.put(image, var.getValue());
+                }
+                Expression<String> e0 = exp.getChildren().get(0);
+                Expression.renameVariables(e0, context);
+                break;
+            case IS_VIOLATED:
+            case NUMBER:
+            case TASK_ID:
+            case TIME_VAR:
+            case TIMED_LITERAL:
+            case TRUE:
+            case FALSE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+    }
+
+    /**
+     * Renames the symbol from a specified index. The symbol is renamed if only if this symbol is a
+     * variable, otherwise nothing is done. After rename operation the variable will have the form
+     * <code>?Xn</code> where <code>n</code> is the specified index.
+     *
+     * @param index the index of the symbol.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws IllegalArgumentException if index is &#60; 0.
+     */
+    public final static String renameVariables(final Symbol<String> symbol, final int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("index < 0");
+        }
+        String img = null;
+        if (symbol.getType().equals(SymbolType.VARIABLE)) {
+            img = symbol.getValue();
+            symbol.setValue(Symbol.DEFAULT_VARIABLE_SYMBOL + index);
+        }
+        return img;
+    }
+
+    /**
+     * Renames the variable contained in this typed list. For instance, if the nth argument is a
+     * variable it will be rename <code>?Xn</code>.
      *
      */
-    //void assignVariables(Expression exp);
+    public static final void renameVariables(final NamedTypedList list) {
+        for (int i = 0; i < list.getArguments().size(); i++) {
+            Expression.renameVariables(list.getArguments().get(i), i);
+        }
+    }
 
-    Expression<T1, T2> getInstance(PDDLConnective connective);
+    /**
+     * Renames the symbol from a specified symbolEncoding. The symbol is renamed if only if this symbol is a
+     * variable, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed variables.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws NullPointerException if context == null.
+     */
+    public static final String renameVariables(final Symbol<String> symbol, final Map<String, String> context) {
+        String img = null;
+        if (symbol.getType().equals(SymbolType.VARIABLE)) {
+            img = symbol.getValue();
+            final String newImage = context.get(img);
+            if (newImage != null) {
+                symbol.setValue(newImage);
+                return img;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Renames the task ID symbol according to a specific context. The symbol is renamed if only if this symbol is a
+     * task ID, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed task ID.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     */
+    public final static String renameTaskID(Symbol<String> symbol, final Map<String, String> context) {
+        if (symbol.getType().equals(SymbolType.TASK_ID)) {
+            String image = symbol.getValue();
+            String newImage = context.get(image);
+            if (newImage == null) {
+                newImage = Symbol.DEFAULT_TASK_ID_SYMBOL + context.size();
+                context.put(image, newImage);
+            }
+            symbol.setValue(newImage);
+            return image;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the set of task IDs contains in this expression.
+     *
+     * @return the set of task IDs contains in exp.
+     * @throws UnexpectedExpressionException if the expression is not a TASK, F_TASK_TIME,
+     *      LESS_ORDERING_CONSTRAINT, LESS_OR_EQUAL_ORDERING_CONSTRAINT, GREATER_ORDERING_CONSTRAINT,
+     *      GREATER_OR_EQUAL_ORDERING_CONSTRAINT, EQUAL_ORDERING_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
+     *      HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
+     *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
+     */
+    public static Set<Symbol<String>> getTaskIDs(Expression<String> exp) throws UnexpectedExpressionException {
+        Set<Symbol<String>> taskIDs  = new HashSet<Symbol<String>>();
+        switch (exp.getConnective()) {
+            case TASK:
+                if (exp.getTaskID() != null) {
+                    taskIDs.add(exp.getTaskID());
+                }
+                break;
+            case TASK_ID:
+                taskIDs.add(exp.getTaskID());
+                break;
+            case F_TASK_TIME:
+                taskIDs.add(exp.getArguments().get(0)); // Add constraints HDDL2.1
+                break;
+            case NOT:
+                if (!exp.getChildren().get(0).getConnective().equals(PDDLConnective.EQUAL_ATOM)) {
+                    throw new UnexpectedExpressionException(exp.getConnective().toString());
+                }
+                break;
+            case AND:
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_BEFORE_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_AFTER_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case SOMETIME_AFTER_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_BETWEEN_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+            case HOLD_DURING_METHOD_CONSTRAINT: // Add method ordering HDDL2.1
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    final Expression<String> c = exp.getChildren().get(i);
+                    taskIDs.addAll(Expression.getTaskIDs(c));
+                }
+                break;
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case EQUAL_ATOM:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+        return taskIDs;
+    }
 }

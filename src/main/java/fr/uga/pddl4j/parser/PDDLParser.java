@@ -621,12 +621,12 @@ public final class PDDLParser implements Callable<Integer> {
         if (exp == null) {
             return true;
         }
-        LinkedList<PDDLExpression> stackGD = new LinkedList<>();
+        LinkedList<Expression<String>> stackGD = new LinkedList<>();
         LinkedList<List<TypedSymbol<String>>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(new LinkedList<>());
         while (!stackGD.isEmpty()) {
-            PDDLExpression gd = stackGD.poll();
+            Expression<String> gd = stackGD.poll();
             List<TypedSymbol<String>> ctx = stackCtx.poll();
             List<TypedSymbol<String>> newCtx = new LinkedList<>(ctx);
             switch (gd.getConnective()) {
@@ -721,7 +721,7 @@ public final class PDDLParser implements Callable<Integer> {
             }
             for (int i = 0; i < gd.getChildren().size(); i++) {
                 stackCtx.add(newCtx);
-                stackGD.add((PDDLExpression) gd.getChildren().get(i));
+                stackGD.add(gd.getChildren().get(i));
             }
         }
         return checked;
@@ -734,10 +734,10 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkInitialFacts() {
         boolean checked = true;
-        LinkedList<PDDLExpression> stackGD = new LinkedList<>();
+        LinkedList<Expression<String>> stackGD = new LinkedList<>();
         stackGD.addAll(this.problem.getInit());
         while (!stackGD.isEmpty()) {
-            PDDLExpression gd = stackGD.poll();
+            Expression<String> gd = stackGD.poll();
             switch (gd.getConnective()) {
                 case ATOM:
                 case FN_ATOM:
@@ -789,10 +789,10 @@ public final class PDDLParser implements Callable<Integer> {
                     }
                     break;
                 case TIMED_LITERAL:
-                    stackGD.add((PDDLExpression) gd.getChildren().get(1));
+                    stackGD.add(gd.getChildren().get(1));
                     break;
                 case NOT:
-                    stackGD.add((PDDLExpression) gd.getChildren().get(0));
+                    stackGD.add(gd.getChildren().get(0));
                     break;
                 default:
                     // do nothing
@@ -1160,9 +1160,9 @@ public final class PDDLParser implements Callable<Integer> {
                 checked &= this.checkParserNode(meth.getConstraints(), meth.getParameters());
             }
             if (this.checkTaskIDsUniqueness(meth)) {
-                final Set<Symbol<String>> taskIds = meth.getSubTasks().getTaskIDs();
+                final Set<Symbol<String>> taskIds = Expression.getTaskIDs(meth.getSubTasks());
                 if (meth.isDurative()) {
-                    final Set<Symbol<String>> durativeIds = meth.getDuration().getTaskIDs();
+                    final Set<Symbol<String>> durativeIds = Expression.getTaskIDs(meth.getDuration());
                     for (Symbol<String> id : durativeIds) {
                         if (!taskIds.contains(id)) {
                             this.mgr.logParserError("task id \"" + id + "\" in the durative constraints of the "
@@ -1172,7 +1172,7 @@ public final class PDDLParser implements Callable<Integer> {
                         }
                     }
                 }
-                final Set<Symbol<String>> orderingIds = meth.getOrdering().getTaskIDs();
+                final Set<Symbol<String>> orderingIds = Expression.getTaskIDs(meth.getOrdering());
                 for (Symbol<String> id : orderingIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the ordering constraints of the"
@@ -1181,7 +1181,7 @@ public final class PDDLParser implements Callable<Integer> {
                         checked = false;
                     }
                 }
-                final Set<Symbol<String>> constIds = meth.getConstraints().getTaskIDs();
+                final Set<Symbol<String>> constIds = Expression.getTaskIDs(meth.getConstraints());
                 for (Symbol<String> id : constIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the constraints of the "
@@ -1212,7 +1212,7 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkOrderingConstraintAcyclicness(final PDDLExpression constraints) {
         Map<Symbol<String>, Set<Symbol<String>>> ordering = new LinkedHashMap<Symbol<String>, Set<Symbol<String>>>();
-        for (Expression<Symbol<String>, TypedSymbol<String>> constraint : constraints.getChildren()) {
+        for (Expression<String> constraint : constraints.getChildren()) {
             Symbol<String> keyTask = constraint.getChildren().get(0).getTaskID();
             Set<Symbol<String>> tasks = ordering.get(keyTask);
             if (tasks == null) {
@@ -1265,8 +1265,8 @@ public final class PDDLParser implements Callable<Integer> {
             final PDDLTaskNetwork tn = this.problem.getInitialTaskNetwork();
             checked = this.checkParserNode(tn.getTasks(), tn.getParameters());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol<String>>())) {
-                final Set<Symbol<String>> taskIds = tn.getTasks().getTaskIDs();
-                final Set<Symbol<String>> orderingIds = tn.getOrdering().getTaskIDs();
+                final Set<Symbol<String>> taskIds = Expression.getTaskIDs(tn.getTasks());
+                final Set<Symbol<String>> orderingIds = Expression.getTaskIDs(tn.getOrdering());
                 for (Symbol<String> id : orderingIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the ordering constrains of the "
@@ -1275,7 +1275,7 @@ public final class PDDLParser implements Callable<Integer> {
                         checked = false;
                     }
                 }
-                final Set<Symbol<String>> constIds = tn.getConstraints().getTaskIDs();
+                final Set<Symbol<String>> constIds = Expression.getTaskIDs(tn.getConstraints());
                 for (Symbol<String> id : constIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the constrains of the "
@@ -1302,7 +1302,7 @@ public final class PDDLParser implements Callable<Integer> {
      * @param taskIDs the set of task IDs already encountered.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(PDDLExpression exp, Set<Symbol<String>> taskIDs) {
+    private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Expression<String> exp, Set<Symbol<String>> taskIDs) {
         boolean unique = true;
         if (exp.getConnective().equals(PDDLConnective.TASK) && exp.getTaskID() != null) {
             if (!taskIDs.add(exp.getTaskID())) {
@@ -1313,7 +1313,7 @@ public final class PDDLParser implements Callable<Integer> {
             }
         } else {
             for (int i = 0; i < exp.getChildren().size(); i++) {
-                PDDLExpression c = (PDDLExpression) exp.getChildren().get(i);
+                Expression<String> c = exp.getChildren().get(i);
                 this.checkTaskIDsUniquenessFromInitialTaskNetwork(c, taskIDs);
             }
         }
@@ -1337,7 +1337,7 @@ public final class PDDLParser implements Callable<Integer> {
      * @param exp the expression.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(PDDLMethod meth, PDDLExpression exp, Set<Symbol<String>> taskIds) {
+    private boolean checkTaskIDsUniqueness(PDDLMethod meth, Expression<String> exp, Set<Symbol<String>> taskIds) {
         boolean unique = true;
         if (exp.getConnective().equals(PDDLConnective.TASK) && exp.getTaskID() != null) {
             if (!taskIds.add(exp.getTaskID())) {
@@ -1348,7 +1348,7 @@ public final class PDDLParser implements Callable<Integer> {
             }
         } else {
             for (int i = 0; i < exp.getChildren().size(); i++) {
-                PDDLExpression c = (PDDLExpression) exp.getChildren().get(i);
+                Expression<String> c = exp.getChildren().get(i);
                 this.checkTaskIDsUniqueness(meth, c, taskIds);
             }
         }
@@ -1367,13 +1367,13 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkParserNode(PDDLExpression exp, List<TypedSymbol<String>> context) {
         boolean checked = true;
-        LinkedList<PDDLExpression> stackGD = new LinkedList<>();
+        LinkedList<Expression<String>> stackGD = new LinkedList<>();
         LinkedList<List<TypedSymbol<String>>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(context);
         Set<PDDLExpression> atoms = new HashSet<>();
         while (!stackGD.isEmpty()) {
-            PDDLExpression gd = stackGD.poll();
+            Expression<String> gd = stackGD.poll();
             List<TypedSymbol<String>> ctx = stackCtx.poll();
             List<TypedSymbol<String>> newCtx = new LinkedList<>(ctx);
             switch (gd.getConnective()) {
@@ -1410,7 +1410,7 @@ public final class PDDLParser implements Callable<Integer> {
             }
             for (int i = 0; i < gd.getChildren().size(); i++) {
                 stackCtx.add(0, newCtx);
-                stackGD.add(0, (PDDLExpression) gd.getChildren().get(i));
+                stackGD.add(0, gd.getChildren().get(i));
             }
         }
         return checked;
@@ -1424,7 +1424,7 @@ public final class PDDLParser implements Callable<Integer> {
      * @param context The symbolEncoding, i.e., the quantified variables if any.
      * @return <code>true</code> if an atom used is well typed and declared, <code>false</code> otherwise.
      */
-    private boolean checkAtom(PDDLExpression gd, List<TypedSymbol<String>> context) {
+    private boolean checkAtom(Expression<String> gd, List<TypedSymbol<String>> context) {
         boolean checked = true;
         List<Symbol<String>> arguments = gd.getArguments();
         final NamedTypedList atomSkeleton = new NamedTypedList(gd.getSymbol());
@@ -1751,13 +1751,13 @@ public final class PDDLParser implements Callable<Integer> {
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol<String>> parameters = action.getParameters();
         for (final TypedSymbol<String> params : parameters) {
-            final String image = AbstractExpression.renameVariables(params, i);
+            final String image = Expression.renameVariables(params, i);
             context.put(image, params.getValue());
             i++;
         }
         // Check preconditions
         final PDDLExpression preconditions = action.getPreconditions();
-        preconditions.renameVariables(context);
+        Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is always applicable: "
@@ -1772,7 +1772,7 @@ public final class PDDLParser implements Callable<Integer> {
         }
         // Check effects
         final PDDLExpression effects = action.getPreconditions();
-        effects.renameVariables(context);
+        Expression.renameVariables(effects, context);
         check &= this.checkExpressionSemantic(effects);
         if (effects.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
@@ -1801,13 +1801,13 @@ public final class PDDLParser implements Callable<Integer> {
         final Map<String, String> context = new LinkedHashMap<>();
         final List<TypedSymbol<String>> parameters = method.getParameters();
         for (final TypedSymbol<String> params : parameters) {
-            final String image = AbstractExpression.renameVariables(params, i);
+            final String image = Expression.renameVariables(params, i);
             context.put(image, params.getValue());
             i++;
         }
         // Check the method preconditions
         final PDDLExpression preconditions = method.getPreconditions();
-        preconditions.renameVariables(context);
+        Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
@@ -1838,16 +1838,16 @@ public final class PDDLParser implements Callable<Integer> {
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM,
      *      WHEN, TRUE and FALSE.
+     * @param exp
      */
-    private boolean checkExpressionSemantic(final PDDLExpression exp) {
-
-        int line = exp.getBeginLine();
-        int column = exp.getBeginColumn();
-
+    private boolean checkExpressionSemantic(final Expression<String> exp) {
         // Expression cannot be evaluated due to lexical failure
-        if (line == ParsedObject.DEFAULT_BEGIN_LINE && column == ParsedObject.DEFAULT_BEGING_COLUMN) {
+        if (exp.getLocation() == null) {
             return false;
         }
+
+        int line = exp.getLocation().getBeginLine();
+        int column = exp.getLocation().getBeginColumn();
 
         boolean check = true;
         switch (exp.getConnective()) {
@@ -1871,7 +1871,7 @@ public final class PDDLParser implements Callable<Integer> {
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
-                PDDLExpression child = (PDDLExpression) exp.getChildren().get(0);
+                Expression<String> child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
                 if (child.getConnective().equals(PDDLConnective.TRUE)
                     || child.getConnective().equals(PDDLConnective.FALSE)) {
@@ -1882,8 +1882,8 @@ public final class PDDLParser implements Callable<Integer> {
                 }
                 break;
             case IMPLY:
-                final PDDLExpression cause = (PDDLExpression) exp.getChildren().get(0);
-                final PDDLExpression consequence = (PDDLExpression) exp.getChildren().get(1);
+                final Expression<String> cause = exp.getChildren().get(0);
+                final Expression<String> consequence = exp.getChildren().get(1);
                 check &= this.checkExpressionSemantic(cause);
                 if (cause.getConnective().equals(PDDLConnective.TRUE)) {
                     check &= this.checkExpressionSemantic(consequence);
@@ -1927,9 +1927,9 @@ public final class PDDLParser implements Callable<Integer> {
                     while (i < exp.getChildren().size()
                         && !exp.getConnective().equals(PDDLConnective.TRUE)
                         && !exp.getConnective().equals(PDDLConnective.FALSE)) {
-                        child = (PDDLExpression) exp.getChildren().get(i);
-                        int childLine = child.getBeginLine();
-                        int childColumn = child.getBeginColumn();
+                        child = exp.getChildren().get(i);
+                        int childLine = child.getLocation().getBeginLine();
+                        int childColumn = child.getLocation().getBeginColumn();
                         check &= this.checkExpressionSemantic(child);
                         if (child.getConnective().equals(PDDLConnective.FALSE)) {
                             exp.setConnective(PDDLConnective.FALSE);
@@ -1971,9 +1971,9 @@ public final class PDDLParser implements Callable<Integer> {
                     while (i < exp.getChildren().size()
                         && !exp.getConnective().equals(PDDLConnective.TRUE)
                         && !exp.getConnective().equals(PDDLConnective.FALSE)) {
-                        child = (PDDLExpression) exp.getChildren().get(i);
-                        int childLine = child.getBeginLine();
-                        int childColumn = child.getBeginColumn();
+                        child = exp.getChildren().get(i);
+                        int childLine = child.getLocation().getBeginLine();
+                        int childColumn = child.getLocation().getBeginColumn();
                         check &= this.checkExpressionSemantic(child);
                         if (child.getConnective().equals(PDDLConnective.TRUE)) {
                             exp.setConnective(PDDLConnective.TRUE);
@@ -2001,7 +2001,7 @@ public final class PDDLParser implements Callable<Integer> {
                 }
                 break;
             case NOT:
-                child = (PDDLExpression) exp.getChildren().get(0);
+                child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
                 if (child.getConnective().equals(PDDLConnective.NOT)) {
                     exp.assign(child.getChildren().get(0));
@@ -2014,9 +2014,9 @@ public final class PDDLParser implements Callable<Integer> {
                 }
                 break;
             case WHEN:
-                PDDLExpression condition = (PDDLExpression) exp.getChildren().get(0);
+                Expression<String> condition = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(condition);
-                PDDLExpression effect = (PDDLExpression) exp.getChildren().get(1);
+                Expression<String> effect =  exp.getChildren().get(1);
                 check &= this.checkExpressionSemantic(effect);
                 if (condition.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.assign(effect);
@@ -2052,12 +2052,12 @@ public final class PDDLParser implements Callable<Integer> {
                             + " expression cannot use a time < 0.0. ",  this.lexer.getFile(), line, column);
                     check = false;
                 }
-                check &= this.checkExpressionSemantic((PDDLExpression) exp.getChildren().get(1));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
                 break;
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
-                check &= this.checkExpressionSemantic((PDDLExpression) exp.getChildren().get(0));
-                check &= this.checkExpressionSemantic((PDDLExpression) exp.getChildren().get(1));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(0));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
                 if (exp.getChildren().get(0).getValue() < 0.0) {
@@ -2065,8 +2065,8 @@ public final class PDDLParser implements Callable<Integer> {
                         + " expression cannot use a time < 0.0. ",  this.lexer.getFile(), line, column);
                     check = false;
                 }
-                check &= this.checkExpressionSemantic((PDDLExpression) exp.getChildren().get(1));
-                check &= this.checkExpressionSemantic((PDDLExpression) exp.getChildren().get(2));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(1));
+                check &= this.checkExpressionSemantic(exp.getChildren().get(2));
                 break;
             case HOLD_DURING_CONSTRAINT:
                 if (exp.getChildren().get(0).getValue() > exp.getChildren().get(1).getValue()) {
@@ -2075,7 +2075,7 @@ public final class PDDLParser implements Callable<Integer> {
                         this.lexer.getFile(), line, column);
                     check = false;
                 } else {
-                    check &= this.checkExpressionSemantic((PDDLExpression) exp.getChildren().get(0));
+                    check &= this.checkExpressionSemantic(exp.getChildren().get(0));
                     if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.TRUE)
                         || exp.getChildren().get(0).getConnective().equals(PDDLConnective.FALSE)) {
                         exp.setConnective(exp.getChildren().get(0).getConnective());
@@ -2105,21 +2105,21 @@ public final class PDDLParser implements Callable<Integer> {
      * @param exp the expression to test. The expression must be a conjunction of a disjunction.
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
-    private boolean checkDuplicateChild(PDDLExpression exp) {
+    private boolean checkDuplicateChild(Expression<String> exp) {
         assert exp.getConnective().equals(PDDLConnective.AND)
             || exp.getConnective().equals(PDDLConnective.OR);
         boolean check = true;
         for (int i = 0; i < exp.getChildren().size(); i++) {
-            final PDDLExpression ei = (PDDLExpression) exp.getChildren().get(i);
+            final Expression<String> ei = exp.getChildren().get(i);
             for (int j = i + 1; j < exp.getChildren().size(); j++) {
-                final PDDLExpression ej = (PDDLExpression) exp.getChildren().get(j);
+                final Expression<String> ej =  exp.getChildren().get(j);
                 if (ei.equals(ej)) {
                     exp.getChildren().remove(j);
                     j--;
                     this.mgr.logParserWarning("Duplicated " + ei.getConnective() + " sub-expression in "
                             + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. "
-                            + "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
-                            ej.getBeginColumn());
+                            + "The duplicated sub-expression can be removed.", this.lexer.getFile(),
+                            ej.getLocation().getBeginLine(), ej.getLocation().getBeginColumn());
                     check = false;
                 }
             }
@@ -2135,23 +2135,23 @@ public final class PDDLParser implements Callable<Integer> {
      * @param exp the expression to test. The expression must be a conjunction of a disjunction.
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
-    private boolean checkTautology(PDDLExpression exp) {
+    private boolean checkTautology(Expression<String> exp) {
         assert exp.getConnective().equals(PDDLConnective.AND)
             || exp.getConnective().equals(PDDLConnective.OR);
         boolean check = true;
         for (int i = 0; i < exp.getChildren().size(); i++) {
-            PDDLExpression ei = (PDDLExpression) exp.getChildren().get(i);
-            PDDLExpression neg = new PDDLExpression(PDDLConnective.NOT);
+            Expression<String> ei =  exp.getChildren().get(i);
+            Expression<String> neg = new Expression<String>(PDDLConnective.NOT);
             neg.addChild(ei);
             for (int j = i + 1; j < exp.getChildren().size(); j++) {
-                PDDLExpression ej = (PDDLExpression) exp.getChildren().get(j);
+                Expression<String> ej = exp.getChildren().get(j);
                 if (ej.equals(neg)) {
                     ei.setConnective(PDDLConnective.TRUE);
                     exp.getChildren().remove(j);
                     j--;
                     this.mgr.logParserWarning("Tautology detected between sub-expressions in "
                             + exp.getConnective() + " expression.",
-                        this.lexer.getFile(), exp.getBeginLine(), exp.getBeginColumn());
+                        this.lexer.getFile(), exp.getLocation().getBeginLine(), exp.getLocation().getBeginColumn());
                     check = false;
                 }
             }

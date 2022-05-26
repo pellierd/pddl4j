@@ -222,29 +222,29 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * method rename the task ID.
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
-     * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#simplify()
-     * @see PDDLExpression#toNNF()
+     * @see Expression#renameVariables(Expression)
+     * @see Expression#simplify()
+     * @see Expression#toNNF()
      */
     protected Map<String, String> normalize(int index) {
         // Rename the parameters
         final Map<String, String> varCtx = super.normalize(index);
         // Rename the variable to carried out task of the method.
-        this.getTask().renameVariables(varCtx);
+        Expression.renameVariables(this.getTask(), varCtx);
         // Rename variables of the tasks contained the method.
-        this.getSubTasks().renameVariables(varCtx);
+        Expression.renameVariables(this.getSubTasks(), varCtx);
         if (this.getSubTasks().getChildren().size() == 1) {
             this.setTotallyOrdered(true);
         }
         // Rename task id the tasks contained the method.
         final Map<String, String> taskIDCtx = new LinkedHashMap<>();
-        this.getSubTasks().renameTaskIDs(taskIDCtx);
+        Expression.renameTaskIDs(this.getSubTasks(), taskIDCtx);
         // Rename the tag ID used in the durations constraints of the method
         if (this.isDurative()) {
-            this.getDuration().renameTaskIDs(taskIDCtx);
+            Expression.renameTaskIDs(this.getDuration(), taskIDCtx);
         }
         // Rename the tag ID used in the ordering constraints of the method
-        this.getOrdering().renameTaskIDs(taskIDCtx);
+        Expression.renameTaskIDs(this.getOrdering(), taskIDCtx);
         // In this case enumerate the orderings constraints in the cas of totally ordered
         if (this.isTotallyOrdered()) {
             this.setOrdering(new PDDLExpression(PDDLConnective.AND));
@@ -257,7 +257,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
             }
         }
         // Rename the logical constraints
-        this.getConstraints().renameVariables(varCtx);
+        Expression.renameVariables(this.getConstraints(), varCtx);
         PDDLExpression preconditions = null;
         if (!this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
             preconditions = this.getPreconditions();
@@ -265,9 +265,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
             preconditions = new PDDLExpression(PDDLConnective.AND);
             preconditions.addChild(this.getPreconditions());
         }
-        Iterator<Expression<Symbol<String>, TypedSymbol<String>>> i = this.getConstraints().getChildren().iterator();
+        Iterator<Expression<String>> i = this.getConstraints().getChildren().iterator();
         while (i.hasNext()) {
-            final Expression<Symbol<String>, TypedSymbol<String>> constraint = i.next();
+            final Expression<String> constraint = i.next();
             switch (constraint.getConnective()) {
                 case EQUAL_COMPARISON:
                     preconditions.addChild(constraint);

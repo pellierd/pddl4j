@@ -599,7 +599,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @param exp the expression.
      */
-    private void initEitherTypes(final Expression<Symbol<String>, TypedSymbol<String>> exp) {
+    private void initEitherTypes(final Expression<String> exp) {
         switch (exp.getConnective()) {
             case AND:
             case OR:
@@ -1095,7 +1095,7 @@ public abstract class AbstractProblem implements Problem {
      * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
      *      LESS_ORDERING_CONSTRAINTS are expected.
      */
-    private IntExpression initOrderingConstraints(final Expression<Symbol<String>, TypedSymbol<String>> exp) {
+    private IntExpression initOrderingConstraints(final Expression<String> exp) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case AND:
@@ -1127,7 +1127,7 @@ public abstract class AbstractProblem implements Problem {
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
-    private IntExpression initExpression(final Expression<Symbol<String>, TypedSymbol<String>> exp) {
+    private IntExpression initExpression(final Expression<String> exp) {
         return this.initExpression(exp, new ArrayList<>());
     }
 
@@ -1144,7 +1144,7 @@ public abstract class AbstractProblem implements Problem {
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
      */
-    protected IntExpression initExpression(final Expression<Symbol<String>, TypedSymbol<String>> exp,
+    protected IntExpression initExpression(final Expression<String> exp,
                                            final List<String> variables) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {

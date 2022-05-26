@@ -109,18 +109,18 @@ public class PDDLAction extends PDDLAbstractOperator {
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see PDDLExpression#renameVariables()
+     * @see PDDLExpression#renameVariables(Expression
      * @see PDDLExpression#simplify()
      * @see PDDLExpression#toNNF() ()
      */
     protected Map<String, String> normalize(int index) {
         final Map<String, String> context = super.normalize(index);
-        this.getEffects().renameVariables(context);
+        Expression.renameVariables(this.getEffects(), context);
         this.getEffects().simplify();
         this.getEffects().toNNF();
         // Rename the duration if the operator is a durative action.
         if (this.getDuration() != null) {
-            this.getDuration().renameVariables(context);
+            Expression.renameVariables(this.getDuration(), context);
         }
         return context;
     }

@@ -546,8 +546,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 Integer index = this.mapOfFluentIndex.get(exp);
                 if (index != null) {
                     effect.getPositiveFluents().set(index);
-                } else {
-                    System.out.println(this.toString(exp) + " not found");
                 }
                 break;
             case NOT:

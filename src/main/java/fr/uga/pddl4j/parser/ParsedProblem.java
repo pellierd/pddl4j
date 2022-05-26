@@ -681,19 +681,19 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     public void normalize() {
         // Rename all the variables from the predicates declaration
         for (int i = 0; i < this.getPredicates().size(); i++) {
-            AbstractExpression.renameVariables(this.getPredicates().get(i));
+            Expression.renameVariables(this.getPredicates().get(i));
         }
         // Rename all the variables from the functions declaration
         for (int i = 0; i < this.getFunctions().size(); i++) {
-            AbstractExpression.renameVariables(this.getFunctions().get(i));
+            Expression.renameVariables(this.getFunctions().get(i));
         }
         // Rename all the variables from the tasks declaration
         for (int i = 0; i < this.getTasks().size(); i++) {
-            AbstractExpression.renameVariables(this.getTasks().get(i));
+            Expression.renameVariables(this.getTasks().get(i));
         }
         // Rename all the variables from the constraint declaration of the domain
         if (this.getConstraints() != null) {
-            this.getConstraints().renameVariables();
+            Expression.renameVariables(this.getConstraints());
             this.getConstraints().toNNF();
         }
         // Rename all the variables from the derived predicates
@@ -712,7 +712,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
 
         // Rename the goal of the problem
         if (this.getGoal() != null) {
-            this.getGoal().renameVariables();
+            Expression.renameVariables(this.getGoal());
             this.getGoal().simplify();
             this.getGoal().toNNF();
         }
@@ -724,9 +724,9 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
             }
             // Rename task id the tasks contained the method.
             final Map<String, String> taskIDCtx = new LinkedHashMap<>();
-            tn.getTasks().renameTaskIDs(taskIDCtx);
+            Expression.renameTaskIDs(tn.getTasks(), taskIDCtx);
             // Rename the tag ID used in the ordering constraints of the method
-            tn.getOrdering().renameTaskIDs(taskIDCtx);
+            Expression.renameTaskIDs(tn.getOrdering(), taskIDCtx);
             // In this case enumerate the orderings contraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
                 tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
