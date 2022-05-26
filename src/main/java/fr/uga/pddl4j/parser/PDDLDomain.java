@@ -65,7 +65,7 @@ public interface PDDLDomain extends Serializable {
      *
      * @return the parsed types in the domain file.
      */
-    List<PDDLTypedSymbol> getTypes();
+    List<TypedSymbol<String>> getTypes();
 
     /**
      * Adds a type to the domain.
@@ -73,14 +73,14 @@ public interface PDDLDomain extends Serializable {
      * @param type the type to add.
      * @return <code>true</code> if the type was added; <code>false</code> otherwise.
      */
-    boolean addType(final PDDLTypedSymbol type);
+    boolean addType(final TypedSymbol<String> type);
 
     /**
      * Returns the parsed constants in the domain file.
      *
      * @return the parsed constants in the domain file.
      */
-    List<PDDLTypedSymbol> getConstants();
+    List<TypedSymbol<String>> getConstants();
 
     /**
      * Adds a constant to the domain.
@@ -88,14 +88,14 @@ public interface PDDLDomain extends Serializable {
      * @param constant the constant to add.
      * @return <code>true</code> if the constant was added; <code>false</code> otherwise.
      */
-    boolean addConstant(final PDDLTypedSymbol constant);
+    boolean addConstant(final TypedSymbol<String> constant);
 
     /**
      * Returns the parsed predicates in the domain file.
      *
      * @return the parsed predicates in the domain file.
      */
-    List<PDDLNamedTypedList> getPredicates();
+    List<NamedTypedList> getPredicates();
 
     /**
      * Adds a predicate to the domain.
@@ -104,14 +104,14 @@ public interface PDDLDomain extends Serializable {
      * @return <code>true</code> if the predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */
-    boolean addPredicate(final PDDLNamedTypedList predicate);
+    boolean addPredicate(final NamedTypedList predicate);
 
     /**
      * Returns the parsed functions in the domain file.
      *
      * @return the parsed functions in the domain file.
      */
-    List<PDDLNamedTypedList> getFunctions();
+    List<NamedTypedList> getFunctions();
 
     /**
      * Adds a function to the domain.
@@ -119,14 +119,14 @@ public interface PDDLDomain extends Serializable {
      * @param function the function to add.
      * @return <code>true</code> if the function was added; <code>false</code> otherwise.
      */
-    boolean addFunction(final PDDLNamedTypedList function);
+    boolean addFunction(final NamedTypedList function);
 
     /**
      * Returns the parsed tasks un the domain file.
      *
      * @return the parsed tasks in the domain file.
      */
-    List<PDDLNamedTypedList> getTasks();
+    List<NamedTypedList> getTasks();
 
     /**
      * Adds a task to the domain.
@@ -134,7 +134,7 @@ public interface PDDLDomain extends Serializable {
      * @param task the task to add.
      * @return <code>true</code> if the task was added; <code>false</code> otherwise.
      */
-    boolean addTask(final PDDLNamedTypedList task);
+    boolean addTask(final NamedTypedList task);
 
     /**
      * Returns the constraints loaded in the domain file.
@@ -210,7 +210,7 @@ public interface PDDLDomain extends Serializable {
      * @param symbol The symbol.
      * @return the type from a specified symbol or <code>null</code> if no type with this symbol was declared.
      */
-    public PDDLTypedSymbol getType(Symbol<String> symbol);
+    public TypedSymbol<String> getType(Symbol<String> symbol);
 
     /**
      * Returns if a specified constant symbol was declared.
@@ -227,7 +227,7 @@ public interface PDDLDomain extends Serializable {
      * @return the constant from a specified symbol or <code>null</code> if no constant with this
      *          symbol was declared.
      */
-    PDDLTypedSymbol getConstant(Symbol<String> symbol);
+    TypedSymbol<String> getConstant(Symbol<String> symbol);
 
     /**
      * Returns if the types of two typed symbol matched, i.e., if the types of the first typed
@@ -238,7 +238,7 @@ public interface PDDLDomain extends Serializable {
      * @return <code>true</code> if the types of the first typed symbol can be viewed as a subtype
      *          of the seconds. <code>false</code> otherwise.
      */
-    boolean isSubType(PDDLTypedSymbol s1, PDDLTypedSymbol s2);
+    boolean isSubType(TypedSymbol<String> s1, TypedSymbol<String> s2);
 
     /**
      * Normalize the domain. This method rename the variables used in the domain and normalize its

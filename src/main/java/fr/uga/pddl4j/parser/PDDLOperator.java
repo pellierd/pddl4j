@@ -49,7 +49,7 @@ public interface PDDLOperator extends ParsedObject {
      *
      * @return the list of parameters of the operator.
      */
-    List<PDDLTypedSymbol> getParameters();
+    List<TypedSymbol<String>> getParameters();
 
     /**
      * Returns the parameter of the operator that has a specified symbol.
@@ -58,21 +58,21 @@ public interface PDDLOperator extends ParsedObject {
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
      *          operator has no such parameter.
      */
-    PDDLTypedSymbol getParameter(final Symbol<String> symbol);
+    TypedSymbol<String> getParameter(final Symbol<String> symbol);
 
     /**
      * Returns the task representation of this operator.
      *
      * @return the task representation of this operator.
      */
-    PDDLNamedTypedList toTask();
+    NamedTypedList toTask();
 
     /**
      * Sets a new list of parameters to this operator.
      *
      * @param parameters The list of parameters to set.
      */
-    void setParameters(final List<PDDLTypedSymbol> parameters);
+    void setParameters(final List<TypedSymbol<String>> parameters);
 
     /**
      * Returns the goal description that represents the preconditions of the operator.

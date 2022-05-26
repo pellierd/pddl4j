@@ -79,7 +79,7 @@ public interface PDDLProblem extends Serializable {
      *
      * @return the list of objects declared in the problem file.
      */
-    List<PDDLTypedSymbol> getObjects();
+    List<TypedSymbol<String>> getObjects();
 
     /**
      * Adds an object to the problem.
@@ -87,7 +87,7 @@ public interface PDDLProblem extends Serializable {
      * @param object the object to add.
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
      */
-    boolean addObject(final PDDLTypedSymbol object);
+    boolean addObject(final TypedSymbol<String> object);
 
     /**
      * Set the initial task network of the problem.
@@ -166,7 +166,7 @@ public interface PDDLProblem extends Serializable {
      * @param symbol The symbol.
      * @return the object from a specified symbol or <code>null</code> if no object with this symbol was declared.
      */
-    PDDLTypedSymbol getObject(final Symbol<String> symbol);
+    TypedSymbol<String> getObject(final Symbol<String> symbol);
 
     /**
      * Normalize the problem. This method renames the variables and then move inward the negation of

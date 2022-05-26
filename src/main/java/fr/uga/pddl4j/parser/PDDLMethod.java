@@ -67,7 +67,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public PDDLMethod(final Symbol<String> name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
                       final PDDLExpression duration, final PDDLExpression preconditions, final PDDLExpression tasks,
                       final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
         super(name, parameters, preconditions, duration);
@@ -87,7 +87,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public PDDLMethod(final Symbol<String> name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
                       final PDDLExpression preconditions, final PDDLExpression tasks,
                       final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
         this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered);
@@ -103,7 +103,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public PDDLMethod(final Symbol<String> name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
                       final PDDLExpression duration, final PDDLExpression preconditions,
                       final PDDLTaskNetwork network) {
         this(name, parameters, task, duration, preconditions, network.getTasks(), network.getOrdering(),
@@ -119,7 +119,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public PDDLMethod(final Symbol<String> name, final List<PDDLTypedSymbol> parameters, final PDDLExpression task,
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
                       final PDDLExpression preconditions, final PDDLTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
@@ -265,9 +265,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
             preconditions = new PDDLExpression(PDDLConnective.AND);
             preconditions.addChild(this.getPreconditions());
         }
-        Iterator<Expression<Symbol<String>, PDDLTypedSymbol>> i = this.getConstraints().getChildren().iterator();
+        Iterator<Expression<Symbol<String>, TypedSymbol<String>>> i = this.getConstraints().getChildren().iterator();
         while (i.hasNext()) {
-            final Expression<Symbol<String>, PDDLTypedSymbol> constraint = i.next();
+            final Expression<Symbol<String>, TypedSymbol<String>> constraint = i.next();
             switch (constraint.getConnective()) {
                 case EQUAL_COMPARISON:
                     preconditions.addChild(constraint);

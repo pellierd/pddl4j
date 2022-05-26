@@ -34,7 +34,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
     /**
      * The head of the derived predicate.
      */
-    private PDDLNamedTypedList head;
+    private NamedTypedList head;
 
     /**
      * The body of the derived predicate.
@@ -55,7 +55,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      * @param head the head of the derived predicate.
      * @param body the body of the derived predicate.
      */
-    public PDDLDerivedPredicate(final PDDLNamedTypedList head, final PDDLExpression body) {
+    public PDDLDerivedPredicate(final NamedTypedList head, final PDDLExpression body) {
         this();
         if (head == null || body == null) {
             throw new NullPointerException();
@@ -69,7 +69,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      *
      * @return the head of the derived predicate.
      */
-    public final PDDLNamedTypedList getHead() {
+    public final NamedTypedList getHead() {
         return this.head;
     }
 
@@ -78,7 +78,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      *
      * @param head the head to set.
      */
-    public final void setHead(final PDDLNamedTypedList head) {
+    public final void setHead(final NamedTypedList head) {
         if (head == null) {
             throw new NullPointerException();
         }
@@ -117,9 +117,9 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
     public void normalize() {
         // Rename the head of the derived predicate
         final Map<String, String> context = new LinkedHashMap<>();
-        final List<PDDLTypedSymbol> arguments = this.getHead().getArguments();
+        final List<TypedSymbol<String>> arguments = this.getHead().getArguments();
         for (int i = 0; i < arguments.size(); i++) {
-            final PDDLTypedSymbol argument = arguments.get(i);
+            final TypedSymbol<String> argument = arguments.get(i);
             final String image = AbstractExpression.renameVariables(argument, i);
             context.put(image, argument.getValue());
         }

@@ -41,7 +41,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
     /**
      * The list of parameters of the operators.
      */
-    private List<PDDLTypedSymbol> parameters;
+    private List<TypedSymbol<String>> parameters;
 
     /**
      * The goal description that represents the preconditions of the operator.
@@ -71,7 +71,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         }
         this.name = new Symbol<String>(other.getName());
         this.parameters = new LinkedList<>();
-        this.parameters.addAll(other.getParameters().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
+        this.parameters.addAll(other.getParameters().stream().map(TypedSymbol<String>::new).collect(Collectors.toList()));
         this.preconditions = new PDDLExpression(other.getPreconditions());
         if (this.duration != null) {
             this.duration = new PDDLExpression(other.getDuration());
@@ -85,7 +85,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
-    protected PDDLAbstractOperator(final Symbol<String> name, final List<PDDLTypedSymbol> parameters,
+    protected PDDLAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
                                    final PDDLExpression preconditions) {
         this(name, parameters, preconditions, null);
     }
@@ -98,7 +98,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param preconditions The goal description that represents the preconditions of the operator.
      * @param duration the duration constraint of the operator.
      */
-    protected PDDLAbstractOperator(final Symbol<String> name, final List<PDDLTypedSymbol> parameters,
+    protected PDDLAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
                                    final PDDLExpression preconditions, final PDDLExpression duration) {
         this.name = name;
         this.parameters = parameters;
@@ -132,7 +132,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @return the list of parameters of the operator.
      */
-    public final List<PDDLTypedSymbol> getParameters() {
+    public final List<TypedSymbol<String>> getParameters() {
         return this.parameters;
     }
 
@@ -143,7 +143,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
      *          operator has no such parameter.
      */
-    public final PDDLTypedSymbol getParameter(final Symbol<String> symbol) {
+    public final TypedSymbol<String> getParameter(final Symbol<String> symbol) {
         final int index = this.parameters.indexOf(symbol);
         return (index == -1) ? null : this.parameters.get(index);
     }
@@ -153,10 +153,10 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @return the task representaion of this operator.
      */
-    public final PDDLNamedTypedList toTask() {
-        PDDLNamedTypedList task = new PDDLNamedTypedList(this.getName());
-        for (PDDLTypedSymbol p : this.getParameters()) {
-            task.add(new PDDLTypedSymbol(p));
+    public final NamedTypedList toTask() {
+        NamedTypedList task = new NamedTypedList(this.getName());
+        for (TypedSymbol<String> p : this.getParameters()) {
+            task.add(new TypedSymbol<String>(p));
         }
         return task;
     }
@@ -167,7 +167,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param parameters The list of parameters to set.
      * @throws NullPointerException if the specified parameters is null.
      */
-    public final void setParameters(final List<PDDLTypedSymbol> parameters) {
+    public final void setParameters(final List<TypedSymbol<String>> parameters) {
         if (parameters == null) {
             throw new NullPointerException();
         }
@@ -261,8 +261,8 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         int i = index;
         // Rename the parameters
         final Map<String, String> context = new LinkedHashMap<>();
-        final List<PDDLTypedSymbol> parameters = this.getParameters();
-        for (final PDDLTypedSymbol params : parameters) {
+        final List<TypedSymbol<String>> parameters = this.getParameters();
+        for (final TypedSymbol<String> params : parameters) {
             final String image = AbstractExpression.renameVariables(params, i);
             context.put(image, params.getValue());
             i++;

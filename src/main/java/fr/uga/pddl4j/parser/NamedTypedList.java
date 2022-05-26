@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLNamedTypedList implements Serializable {
+public class NamedTypedList implements Serializable {
 
     /**
      * The name of the typed list.
@@ -41,7 +41,7 @@ public class PDDLNamedTypedList implements Serializable {
     /**
      * The list of arguments.
      */
-    private List<PDDLTypedSymbol> arguments;
+    private List<TypedSymbol<String>> arguments;
 
     /**
      * The list of the types of this name typed list. The list of types is used to encode function type since PDDL 3.1.
@@ -53,11 +53,11 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @param list the list.
      */
-    public PDDLNamedTypedList(final PDDLNamedTypedList list) {
+    public NamedTypedList(final NamedTypedList list) {
         this.name = new Symbol<String>(list.getName());
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
-        this.arguments.addAll(list.getArguments().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
+        this.arguments.addAll(list.getArguments().stream().map(TypedSymbol<String>::new).collect(Collectors.toList()));
         this.types.addAll(list.types.stream().map(Symbol<String>::new).collect(Collectors.toList()));
     }
 
@@ -66,7 +66,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @param name the name of the list.
      */
-    public PDDLNamedTypedList(final Symbol<String> name) {
+    public NamedTypedList(final Symbol<String> name) {
         this.name = name;
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
@@ -95,7 +95,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @return the list of arguments of this list.
      */
-    public final List<PDDLTypedSymbol> getArguments() {
+    public final List<TypedSymbol<String>> getArguments() {
         return this.arguments;
     }
 
@@ -127,14 +127,14 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @param object the other object.
      * @return <code>true</code> if this named typed list is equal to <code>obj</code>, i.e.,
-     *          <code>other</code> is not null and of type <code>PDDLNamedTypedList</code> and it has the
+     *          <code>other</code> is not null and of type <code>NamedTypedList</code> and it has the
      *          same name and the same list of arguments and types; otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(Object)
      */
     @Override
     public boolean equals(final Object object) {
-        if (object != null && object instanceof PDDLNamedTypedList) {
-            PDDLNamedTypedList other = (PDDLNamedTypedList) object;
+        if (object != null && object instanceof NamedTypedList) {
+            NamedTypedList other = (NamedTypedList) object;
             return other.getName().equals(this.getName())
                 && other.arguments.equals(this.arguments)
                 && other.types.equals(this.types);
@@ -159,7 +159,7 @@ public class PDDLNamedTypedList implements Serializable {
      * @param arg the argument to add.
      * @return <code>true</code> if the argument was added <code>false</code> otherwise.
      */
-    public boolean add(final PDDLTypedSymbol arg) {
+    public boolean add(final TypedSymbol<String> arg) {
         return this.arguments.add(arg);
 
     }
@@ -186,7 +186,7 @@ public class PDDLNamedTypedList implements Serializable {
         final StringBuilder str = new StringBuilder();
         str.append("(");
         str.append(this.name.toString());
-        for (PDDLTypedSymbol argument : this.arguments) {
+        for (TypedSymbol<String> argument : this.arguments) {
             str.append(" ").append(argument.toString());
         }
         str.append(")");

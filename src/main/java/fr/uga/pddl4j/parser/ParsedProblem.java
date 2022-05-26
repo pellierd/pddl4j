@@ -50,27 +50,27 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The list of types declared in the domain.
      */
-    private List<PDDLTypedSymbol> types;
+    private List<TypedSymbol<String>> types;
 
     /**
      * The list of constants declared in the domain.
      */
-    private List<PDDLTypedSymbol> constants;
+    private List<TypedSymbol<String>> constants;
 
     /**
      * The list of predicates used in the domain and the problem.
      */
-    private List<PDDLNamedTypedList> predicates;
+    private List<NamedTypedList> predicates;
 
     /**
      * The list of functions used in the domain and the problem.
      */
-    private List<PDDLNamedTypedList> functions;
+    private List<NamedTypedList> functions;
 
     /**
      * The list of functions used in the domain and the problem.
      */
-    private List<PDDLNamedTypedList> tasks;
+    private List<NamedTypedList> tasks;
 
     /**
      * The constraints declared in the domain.
@@ -100,7 +100,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The list of objects declared in the problem.
      */
-    private List<PDDLTypedSymbol> objects;
+    private List<TypedSymbol<String>> objects;
 
     /**
      * The task network of the problem.
@@ -140,7 +140,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         this.domainName = domain;
         this.requirements = new LinkedHashSet<>();
         this.types = new ArrayList<>();
-        this.types.add(new PDDLTypedSymbol(Symbol.OBJECT_TYPE));
+        this.types.add(new TypedSymbol<String>(Symbol.OBJECT_TYPE));
         this.constants = new ArrayList<>();
         this.predicates = new ArrayList<>();
         this.functions = new ArrayList<>();
@@ -189,23 +189,23 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         this.requirements.addAll(domain.getRequirements());
         this.requirements.addAll(problem.getRequirements());
 
-        for (PDDLTypedSymbol type : domain.getTypes()) {
+        for (TypedSymbol<String> type : domain.getTypes()) {
             this.addType(type);
         }
 
-        for (PDDLTypedSymbol constant : domain.getConstants()) {
+        for (TypedSymbol<String> constant : domain.getConstants()) {
             this.addConstant(constant);
         }
 
-        for (PDDLNamedTypedList predicate : domain.getPredicates()) {
+        for (NamedTypedList predicate : domain.getPredicates()) {
             this.addPredicate(predicate);
         }
 
-        for (PDDLNamedTypedList function : domain.getFunctions()) {
+        for (NamedTypedList function : domain.getFunctions()) {
             this.addFunction(function);
         }
 
-        for (PDDLNamedTypedList task : domain.getTasks()) {
+        for (NamedTypedList task : domain.getTasks()) {
             this.addTask(task);
         }
 
@@ -273,7 +273,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the parsed types in the domain file.
      */
-    public final List<PDDLTypedSymbol> getTypes() {
+    public final List<TypedSymbol<String>> getTypes() {
         return this.types;
     }
 
@@ -283,7 +283,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param type the type to add.
      * @return <code>true</code> if the type was added; <code>false</code> otherwise.
      */
-    public final boolean addType(final PDDLTypedSymbol type) {
+    public final boolean addType(final TypedSymbol<String> type) {
         return this.types.add(type);
     }
 
@@ -292,7 +292,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the parsed constants in the domain file.
      */
-    public final List<PDDLTypedSymbol> getConstants() {
+    public final List<TypedSymbol<String>> getConstants() {
         return this.constants;
     }
 
@@ -302,7 +302,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param constant the constant to add.
      * @return <code>true</code> if the constant was added; <code>false</code> otherwise.
      */
-    public final boolean addConstant(final PDDLTypedSymbol constant) {
+    public final boolean addConstant(final TypedSymbol<String> constant) {
         return this.constants.add(constant);
     }
 
@@ -311,7 +311,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the parsed predicates in the domain file.
      */
-    public final List<PDDLNamedTypedList> getPredicates() {
+    public final List<NamedTypedList> getPredicates() {
         return this.predicates;
     }
 
@@ -322,7 +322,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @return <code>true</code> if the predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */
-    public final boolean addPredicate(final PDDLNamedTypedList predicate) {
+    public final boolean addPredicate(final NamedTypedList predicate) {
         if (predicate == null) {
             throw new NullPointerException();
         }
@@ -334,7 +334,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the parsed functions in the domain file.
      */
-    public final List<PDDLNamedTypedList> getFunctions() {
+    public final List<NamedTypedList> getFunctions() {
         return this.functions;
     }
 
@@ -344,7 +344,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param function the function to add.
      * @return <code>true</code> if the function was added; <code>false</code> otherwise.
      */
-    public final boolean addFunction(final PDDLNamedTypedList function) {
+    public final boolean addFunction(final NamedTypedList function) {
         return this.functions.add(function);
     }
 
@@ -353,7 +353,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the parsed tasks in the domain file.
      */
-    public final List<PDDLNamedTypedList> getTasks() {
+    public final List<NamedTypedList> getTasks() {
         return this.tasks;
     }
 
@@ -363,7 +363,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param task the task to add.
      * @return <code>true</code> if the task was added; <code>false</code> otherwise.
      */
-    public final boolean addTask(final PDDLNamedTypedList task) {
+    public final boolean addTask(final NamedTypedList task) {
         return this.tasks.add(task);
     }
 
@@ -463,7 +463,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param symbol The symbol.
      * @return the type from a specified symbol or <code>null</code> if no type with this symbol was declared.
      */
-    public PDDLTypedSymbol getType(Symbol<String> symbol) {
+    public TypedSymbol<String> getType(Symbol<String> symbol) {
         int index = this.types.indexOf(symbol);
         return (index == -1) ? null : this.types.get(index);
     }
@@ -485,7 +485,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @return the constant from a specified symbol or <code>null</code> if no constant with this
      *          symbol was declared.
      */
-    public PDDLTypedSymbol getConstant(Symbol<String> symbol) {
+    public TypedSymbol<String> getConstant(Symbol<String> symbol) {
         int index = this.constants.indexOf(symbol);
         return (index == -1) ? null : this.constants.get(index);
     }
@@ -513,7 +513,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the list of objects declared in the problem file.
      */
-    public List<PDDLTypedSymbol> getObjects() {
+    public List<TypedSymbol<String>> getObjects() {
         return this.objects;
     }
 
@@ -523,7 +523,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param object the object to add.
      * @return <code>true</code> if the object was added; <code>false</code> otherwise.
      */
-    public final boolean addObject(final PDDLTypedSymbol object) {
+    public final boolean addObject(final TypedSymbol<String> object) {
         return this.objects.add(object);
     }
 
@@ -606,7 +606,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param symbol The symbol.
      * @return the object from a specified symbol or <code>null</code> if no object with this symbol was declared.
      */
-    public final PDDLTypedSymbol getObject(final Symbol<String> symbol) {
+    public final TypedSymbol<String> getObject(final Symbol<String> symbol) {
         final int index = this.objects.indexOf(symbol);
         return (index == -1) ? null : this.objects.get(index);
     }
@@ -650,17 +650,17 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @return <code>true</code> if the types of the first typed symbol can be viewed as a subtype
      *          of the seconds. <code>false</code> otherwise.
      */
-    public boolean isSubType(PDDLTypedSymbol s1, PDDLTypedSymbol s2) {
+    public boolean isSubType(TypedSymbol<String> s1, TypedSymbol<String> s2) {
         List<Symbol<String>> copy = new LinkedList<>(s1.getTypes());
         copy.retainAll(s2.getTypes());
         boolean isSubType = !copy.isEmpty();
         Iterator<Symbol<String>> i = s1.getTypes().iterator();
         while (i.hasNext() && !isSubType) {
-            PDDLTypedSymbol type = this.getType(i.next());
-            LinkedList<PDDLTypedSymbol> stack = new LinkedList<>();
+            TypedSymbol<String> type = this.getType(i.next());
+            LinkedList<TypedSymbol<String>> stack = new LinkedList<>();
             stack.push(type);
             while (!stack.isEmpty() && !isSubType) {
-                PDDLTypedSymbol t = stack.poll();
+                TypedSymbol<String> t = stack.poll();
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
@@ -771,28 +771,28 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         }
         if (!this.constants.isEmpty()) {
             str.append("(:constants ");
-            for (PDDLTypedSymbol c : this.constants) {
+            for (TypedSymbol<String> c : this.constants) {
                 str.append("\n  ").append(c);
             }
             str.append("\n)\n");
         }
         if (!this.predicates.isEmpty()) {
             str.append("(:predicates ");
-            for (PDDLNamedTypedList p : this.predicates) {
+            for (NamedTypedList p : this.predicates) {
                 str.append("\n  ").append(p);
             }
             str.append("\n)\n");
         }
         if (!this.functions.isEmpty()) {
             str.append("(:functions ");
-            for (PDDLNamedTypedList p : this.functions) {
+            for (NamedTypedList p : this.functions) {
                 str.append("\n  ").append(p);
             }
             str.append("\n  )\n");
         }
         if (!this.tasks.isEmpty()) {
             str.append("(:tasks ");
-            for (PDDLNamedTypedList p : this.tasks) {
+            for (NamedTypedList p : this.tasks) {
                 str.append("\n  ").append(p);
             }
             str.append("\n  )\n");
@@ -828,7 +828,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         str.append(")\n");
         if (!this.objects.isEmpty()) {
             str.append("(:objects ");
-            for (PDDLTypedSymbol obj : this.objects) {
+            for (TypedSymbol<String> obj : this.objects) {
                 str.append("\n  ").append(obj);
             }
             str.append("\n)\n");

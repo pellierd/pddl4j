@@ -1229,7 +1229,7 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      * variable it will be rename <code>?Xn</code>.
      *
      */
-    public static final void renameVariables(final PDDLNamedTypedList list) {
+    public static final void renameVariables(final NamedTypedList list) {
         for (int i = 0; i < list.getArguments().size(); i++) {
             AbstractExpression.renameVariables(list.getArguments().get(i), i);
         }

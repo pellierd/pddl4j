@@ -34,14 +34,14 @@ import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.parser.PDDLExpression;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
-import fr.uga.pddl4j.parser.PDDLNamedTypedList;
+import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.PDDLAction;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTimeSpecifier;
-import fr.uga.pddl4j.parser.PDDLTypedSymbol;
+import fr.uga.pddl4j.parser.TypedSymbol;
 import fr.uga.pddl4j.parser.SymbolType;
 
 import java.io.File;
@@ -687,17 +687,17 @@ Set<PDDLRequireKey> require_key() :
 
 void type_def():
 {
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 }
 {
 	try {
 		left_bracket() <TYPES>
 			typedList=typed_list(Lexer.PRIMITIVE_TYPE)
 		right_bracket()  {
-			for (PDDLTypedSymbol type : typedList) {
+			for (TypedSymbol<String> type : typedList) {
 				this.domain.addType(type);
 			}
-			for (PDDLTypedSymbol type : this.domain.getTypes()) {
+			for (TypedSymbol<String> type : this.domain.getTypes()) {
 				if (type.getTypes().isEmpty()
 				        && !type.equals(Symbol.OBJECT_TYPE)
 				        && !type.equals(Symbol.NUMBER_TYPE)) {
@@ -710,13 +710,13 @@ void type_def():
 	}
 }
 
-List<PDDLTypedSymbol> typed_list(int kind) :
+List<TypedSymbol<String>> typed_list(int kind) :
 {
 	Symbol<String> t;
 	List<Symbol<String>> types = null;
-	List<PDDLTypedSymbol> typedList = new ArrayList<PDDLTypedSymbol>();
+	List<TypedSymbol<String>> typedList = new ArrayList<TypedSymbol<String>>();
 	List<Symbol<String>> tmp = new ArrayList<Symbol<String>>();
-	List<PDDLTypedSymbol> nextTypedList = null;
+	List<TypedSymbol<String>> nextTypedList = null;
 }
 {
     (   LOOKAHEAD(2)
@@ -731,7 +731,7 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 					types = new ArrayList<Symbol<String>>();
 				}
 				for (Symbol<String> s : tmp) {
-					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
+					TypedSymbol<String> ts = new TypedSymbol<String>(s);
 					for (Symbol<String> type : types) {
 						ts.addType(type);
 					}
@@ -751,7 +751,7 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 					types = new ArrayList<Symbol<String>>();
 				}
 				for (Symbol<String> s : tmp) {
-					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
+					TypedSymbol<String> ts = new TypedSymbol<String>(s);
 					for (Symbol<String> type : types) {
 						ts.addType(type);
 					}
@@ -772,7 +772,7 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 					types.add(Symbol.OBJECT_TYPE);
 				}
 				for (Symbol<String> s : tmp) {
-					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
+					TypedSymbol<String> ts = new TypedSymbol<String>(s);
 					for (Symbol<String> type : types) {
 						ts.addType(type);
 					}
@@ -820,14 +820,14 @@ Symbol<String> primitive_type() :
 
 void constants_def() :
 {
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 }
 {
 	try {
 		left_bracket() <CONSTANTS>
 			typedList=typed_list(Lexer.CONSTANT)
 		right_bracket() {
-			for (PDDLTypedSymbol constant : typedList) {
+			for (TypedSymbol<String> constant : typedList) {
 			    if (constant.getTypes().isEmpty()) {
 			    	constant.addType(Symbol.OBJECT_TYPE);
 			    }
@@ -856,7 +856,7 @@ Symbol<String> constant() :
 
 void predicates_def() :
 {
-	PDDLNamedTypedList predicate = null;
+	NamedTypedList predicate = null;
 }
 {
 	try {
@@ -870,9 +870,9 @@ void predicates_def() :
 	}
 }
 
-PDDLNamedTypedList comp_task_def() : // ADD HDDL
+NamedTypedList comp_task_def() : // ADD HDDL
 {
-    PDDLNamedTypedList taskID;
+    NamedTypedList taskID;
 }
 {
     left_bracket() <TASK> taskID=task_def() right_bracket() {
@@ -880,10 +880,10 @@ PDDLNamedTypedList comp_task_def() : // ADD HDDL
     }
 }
 
-PDDLNamedTypedList task_def() : // ADD HDDL
+NamedTypedList task_def() : // ADD HDDL
 {
     Symbol<String> name;
-    List<PDDLTypedSymbol> typedList = null;
+    List<TypedSymbol<String>> typedList = null;
 }
 {
     name=task_symbol()
@@ -891,8 +891,8 @@ PDDLNamedTypedList task_def() : // ADD HDDL
     left_bracket()
     typedList=typed_list(Lexer.VARIABLE)
     right_bracket() {
-        PDDLNamedTypedList l = new PDDLNamedTypedList(name);
-        for (PDDLTypedSymbol s : typedList) {
+        NamedTypedList l = new NamedTypedList(name);
+        for (TypedSymbol<String> s : typedList) {
             l.add(s);
         }
         return l;
@@ -911,18 +911,18 @@ Symbol<String> task_symbol() : // ADD HDDL
  }
 
 
-PDDLNamedTypedList atomic_formula_skeleton() :
+NamedTypedList atomic_formula_skeleton() :
 {
 	Symbol<String> predicate = null;
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 }
 {
 	left_bracket()
 		predicate=predicate()
 		typedList=typed_list(Lexer.VARIABLE)
 	right_bracket() {
-		PDDLNamedTypedList l = new PDDLNamedTypedList(predicate);
-		for (PDDLTypedSymbol s : typedList) {
+		NamedTypedList l = new NamedTypedList(predicate);
+		for (TypedSymbol<String> s : typedList) {
 			l.add(s);
 		}
 		return l;
@@ -957,14 +957,14 @@ Symbol<String> variable() :
 
 void functions_def():
 {
-	List<PDDLNamedTypedList> functions = null;
+	List<NamedTypedList> functions = null;
 }
 {
 	try {
 		left_bracket() <FUNCTIONS>
 			functions=function_typed_list(Lexer.ATOMIC_FUNCTION_SKELETON)
 		right_bracket() {
-			for (PDDLNamedTypedList function: functions) {
+			for (NamedTypedList function: functions) {
 				this.domain.addFunction(function);
 			}
 		}
@@ -973,10 +973,10 @@ void functions_def():
 	}
 }
 
-PDDLNamedTypedList atomic_function_skeleton() :
+NamedTypedList atomic_function_skeleton() :
 {
 	Symbol<String> functor = null;
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 }
 {
 	left_bracket()
@@ -984,8 +984,8 @@ PDDLNamedTypedList atomic_function_skeleton() :
 		typedList=typed_list(Lexer.VARIABLE)
 	right_bracket()
 	{
-		PDDLNamedTypedList l = new PDDLNamedTypedList(functor);
-		for (PDDLTypedSymbol s : typedList) {
+		NamedTypedList l = new NamedTypedList(functor);
+		for (TypedSymbol<String> s : typedList) {
 			l.add(s);
 		}
 		return l;
@@ -1008,11 +1008,11 @@ Symbol<String> functor() :
 	}
 }
 
-List<PDDLNamedTypedList> function_typed_list(int type) :
+List<NamedTypedList> function_typed_list(int type) :
 {
-	PDDLNamedTypedList namedTypedList = null;
-	List<PDDLNamedTypedList> typedListList = new ArrayList<PDDLNamedTypedList>();
-	List<PDDLNamedTypedList> nextNamedTypedList = null;
+	NamedTypedList namedTypedList = null;
+	List<NamedTypedList> typedListList = new ArrayList<NamedTypedList>();
+	List<NamedTypedList> nextNamedTypedList = null;
 	List<Symbol<String>> typeList = null;
 }
 {
@@ -1030,7 +1030,7 @@ List<PDDLNamedTypedList> function_typed_list(int type) :
 	)?
 	{
 		// To keep compatibility with PDDL 3.0: if no type is set it is number
-		for (PDDLNamedTypedList ntl : typedListList) {
+		for (NamedTypedList ntl : typedListList) {
 			if (ntl.getTypes().isEmpty()) {
 				ntl.addType(Symbol.NUMBER_TYPE);
 			}
@@ -1107,7 +1107,7 @@ PDDLExpression forall_con_gd() :
 {
 	PDDLExpression conGD = new PDDLExpression(PDDLConnective.FORALL);
 	PDDLExpression child = null;
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 	Token begin = null;
     Token end = null;
 }
@@ -1496,7 +1496,7 @@ PDDLExpression imply_gd() :
 PDDLExpression exists_gd() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.EXISTS);
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 	PDDLExpression s = null;
     Token begin = null;
     Token end = null;
@@ -1519,7 +1519,7 @@ PDDLExpression exists_gd() :
 PDDLExpression forall_gd() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 	PDDLExpression s = null;
     Token begin = null;
     Token end = null;
@@ -1938,7 +1938,7 @@ void structure_def() :
 	PDDLAction op = null;
 	PDDLMethod meth = null;
 	PDDLDerivedPredicate dp = null;
-	PDDLNamedTypedList task = null;
+	NamedTypedList task = null;
 }
 {
 	( 	LOOKAHEAD(2)
@@ -1975,7 +1975,7 @@ void structure_def() :
 PDDLMethod method_def() : // ADD HDDL
 {
 	Symbol<String> name = null;
-	List<PDDLTypedSymbol> parameters = null;
+	List<TypedSymbol<String>> parameters = null;
 	PDDLExpression taskID = null;
 	PDDLExpression precondition = new PDDLExpression(PDDLConnective.AND);
 	PDDLTaskNetwork tn = null;
@@ -2007,7 +2007,7 @@ PDDLMethod method_def() : // ADD HDDL
 PDDLMethod durative_method_def() : // ADD HDDL2.1
 {
     Symbol<String> name = null;
-	List<PDDLTypedSymbol> parameters = null;
+	List<TypedSymbol<String>> parameters = null;
 	PDDLExpression taskID = null;
 	PDDLExpression duration = null;
 	PDDLExpression condition = new PDDLExpression(PDDLConnective.AND);
@@ -2697,7 +2697,7 @@ PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
 
 PDDLDerivedPredicate derived_def() :
 {
-	PDDLNamedTypedList head = null;
+	NamedTypedList head = null;
 	PDDLExpression body = null;
 	Token begin = null;
 	Token end = null;
@@ -2722,7 +2722,7 @@ PDDLDerivedPredicate derived_def() :
 PDDLAction action_def() :
 {
 	Symbol<String> name = null;
-	List<PDDLTypedSymbol> parameters = null;
+	List<TypedSymbol<String>> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
 	Token begin = null;
@@ -2749,7 +2749,7 @@ PDDLAction action_def() :
 PDDLAction htn_action_def() :
 {
 	Symbol<String> name = null;
-	List<PDDLTypedSymbol> parameters = null;
+	List<TypedSymbol<String>> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
     Token begin = null;
@@ -2853,7 +2853,7 @@ PDDLExpression and_pre_gd() :
 PDDLExpression forall_pre_gd() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> vars = null;
+	List<TypedSymbol<String>> vars = null;
 	PDDLExpression s = null;
 	Token begin = null;
     Token end = null;
@@ -2952,7 +2952,7 @@ PDDLExpression c_effect() :
 PDDLExpression forall_effect() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> vars = null;
+	List<TypedSymbol<String>> vars = null;
 	PDDLExpression s = null;
 	Token begin = null;
 	Token end = null;
@@ -3211,7 +3211,7 @@ PDDLExpression decrease() :
 PDDLAction durative_action_def() :
 {
 	Symbol<String> name = null;
-	List<PDDLTypedSymbol> parameters = null;
+	List<TypedSymbol<String>> parameters = null;
 	PDDLExpression duration = null;
 	PDDLExpression condition = null;
 	PDDLExpression effect = null;
@@ -3680,7 +3680,7 @@ PDDLExpression forall_da_gd() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
 	PDDLExpression child;
-	List<PDDLTypedSymbol> typedList;
+	List<TypedSymbol<String>> typedList;
 	Token begin, end;
 }
 {
@@ -3980,7 +3980,7 @@ PDDLExpression when_da_effect() :
 PDDLExpression forall_da_effect() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> typedList;
+	List<TypedSymbol<String>> typedList;
 	PDDLExpression child;
 	Token begin, end;
 }
@@ -4410,7 +4410,7 @@ PDDLProblem htn_problem() : // ADD HDDL
 	Symbol<String> name;
 	Symbol<String> domain;
 	PDDLTaskNetwork taskNetwork;
-	List<PDDLTypedSymbol> parameters = new ArrayList<PDDLTypedSymbol>();
+	List<TypedSymbol<String>> parameters = new ArrayList<TypedSymbol<String>>();
 }
 {
 	try {
@@ -4476,14 +4476,14 @@ Symbol<String> domain_name() :
 
 void object_declaration() :
 {
-	List<PDDLTypedSymbol> typedList = null;
+	List<TypedSymbol<String>> typedList = null;
 }
 {
 	try {
 		left_bracket() <OBJECTS>
 			typedList=typed_list(Lexer.CONSTANT)
 		right_bracket() {
-			for (PDDLTypedSymbol object : typedList) {
+			for (TypedSymbol<String> object : typedList) {
                 if (object.getTypes().isEmpty()) {
                     object.addType(Symbol.OBJECT_TYPE);
                 }
@@ -4679,7 +4679,7 @@ PDDLExpression named_pref_con_gd() :
 PDDLExpression forall_pref_con_gd() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
-	List<PDDLTypedSymbol> typedList;
+	List<TypedSymbol<String>> typedList;
 	PDDLExpression child;
 	Token begin, end;
 }

@@ -34,7 +34,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 13.05.2022
  */
-public class PDDLExpression extends AbstractExpression<Symbol<String>, PDDLTypedSymbol> implements ParsedObject {
+public class PDDLExpression extends AbstractExpression<Symbol<String>, TypedSymbol<String>> implements ParsedObject {
 
     /**
      * The parsed objet to deal with multiple inheritance with <code>Expression</code> and <code>ParseObject</code>.
@@ -61,8 +61,8 @@ public class PDDLExpression extends AbstractExpression<Symbol<String>, PDDLTyped
         }
         if (other.getQuantifiedVariables() != null) {
             this.setQuantifiedVariables(new ArrayList<>());
-            for (PDDLTypedSymbol variable : other.getQuantifiedVariables()) {
-                this.addQuantifiedVariable(new PDDLTypedSymbol(variable));
+            for (TypedSymbol<String> variable : other.getQuantifiedVariables()) {
+                this.addQuantifiedVariable(new TypedSymbol<String>(variable));
             }
         }
         if (other.getVariable() != null) {

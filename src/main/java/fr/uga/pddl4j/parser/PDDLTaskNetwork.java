@@ -35,7 +35,7 @@ public class PDDLTaskNetwork implements Serializable {
     /**
      * The parameter of the task network.
      */
-    private List<PDDLTypedSymbol> parameters;
+    private List<TypedSymbol<String>> parameters;
 
     /**
      * The tasks of the task network.
@@ -76,8 +76,8 @@ public class PDDLTaskNetwork implements Serializable {
      */
     public PDDLTaskNetwork(final PDDLTaskNetwork other) {
         this.parameters = new ArrayList<>();
-        for (PDDLTypedSymbol param : other.getParameters()) {
-            this.parameters.add(new PDDLTypedSymbol(param));
+        for (TypedSymbol<String> param : other.getParameters()) {
+            this.parameters.add(new TypedSymbol<String>(param));
         }
         this.tasks = new PDDLExpression(other.getTasks());
         this.orderingConstraints = new PDDLExpression(other.getOrdering());
@@ -114,7 +114,7 @@ public class PDDLTaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLTaskNetwork(final List<PDDLTypedSymbol> parameters, final PDDLExpression tasks,
+    public PDDLTaskNetwork(final List<TypedSymbol<String>> parameters, final PDDLExpression tasks,
                            final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
         super();
         this.setParameters(parameters);
@@ -129,7 +129,7 @@ public class PDDLTaskNetwork implements Serializable {
      *
      * @return the parameters of the task network.
      */
-    public final List<PDDLTypedSymbol> getParameters() {
+    public final List<TypedSymbol<String>> getParameters() {
         return this.parameters;
     }
 
@@ -138,7 +138,7 @@ public class PDDLTaskNetwork implements Serializable {
      *
      * @param parameters the parameters to set.
      */
-    public void setParameters(List<PDDLTypedSymbol> parameters) {
+    public void setParameters(List<TypedSymbol<String>> parameters) {
         this.parameters = parameters;
     }
 
