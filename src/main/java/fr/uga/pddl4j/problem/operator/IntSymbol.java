@@ -4,7 +4,7 @@ import fr.uga.pddl4j.parser.Symbol;
 
 import java.util.Objects;
 
-public class IntSymbol implements Symbol, Comparable<IntSymbol> {
+public class IntSymbol implements IntInterfaceSymbol, Comparable<IntSymbol> {
 
     /**
      * The constant used to encode the default taskID id.

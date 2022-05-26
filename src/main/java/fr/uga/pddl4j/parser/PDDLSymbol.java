@@ -33,37 +33,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLSymbol implements Symbol, Locatable {
-
-    /**
-     * The name of rename variable.
-     */
-    public static final String DEFAULT_VARIABLE_SYMBOL = "?X";
-
-    /**
-     * The name of rename task tag.
-     */
-    public static final String DEFAULT_TASK_ID_SYMBOL = "T";
-
-    /**
-     * The kind of the symbol.
-     */
-    private SymbolType type;
-
-    /**
-     * The image of the symbol.
-     */
-    private String value;
-
-    /**
-     * The location of the symbol.
-     */
-    private Location location;
-
-    /**
-     * The time specifier of the symbol.
-     */
-    private PDDLTimeSpecifier timeSpecifier;
+public class PDDLSymbol extends Symbol<String> implements Locatable {
 
     /**
      * Creates a symbol from a specified symbol.
@@ -71,13 +41,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      * @param other the symbol.
      */
     public PDDLSymbol(final PDDLSymbol other) {
-        super();
-        this.setType(other.getType());
-        this.setValue(other.getValue());
-        if (other.getLocation() != null) {
-            this.setLocation(new Location(other.getLocation()));
-        }
-        this.timeSpecifier = other.getTimeSpecifier();
+        super(other);
     }
 
     /**
@@ -87,7 +51,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      * @param token the token.
      */
     public PDDLSymbol(final SymbolType type, final Token token) {
-        this(type, token.image.toLowerCase(Locale.ENGLISH),
+        super(type, token.image.toLowerCase(Locale.ENGLISH),
             token.beginLine, token.beginColumn, token.endLine, token.endColumn);
     }
 
@@ -103,10 +67,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      */
     public PDDLSymbol(final SymbolType type, final String value, final int beginLine, final int beginColumn,
                       final int endLine, final int endColumn) {
-        this.setType(type);
-        this.setValue(value.toLowerCase(Locale.ENGLISH));
-        this.setLocation(new Location(beginLine, beginColumn, endLine, endColumn));
-        this.timeSpecifier = null;
+        super(type, value, beginLine, beginColumn, endLine, endColumn);
     }
 
     /**
@@ -117,113 +78,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      * @param value the string image of the symbol.
      */
     public PDDLSymbol(final SymbolType type, final String value) {
-        this(type, value, ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
-            ParsedObject.DEFAULT_END_LINE,  ParsedObject.DEFAULT_END_COLUMN);
-    }
-
-    /**
-     * Returns the kind of this symbol.
-     *
-     * @return the kind of this symbol.
-     */
-    public final SymbolType getType() {
-        return this.type;
-    }
-
-    /**
-     * Sets the kind of this symbol.
-     *
-     * @param type the kind of the symbol.
-     */
-    public final void setType(final SymbolType type) {
-        this.type = type;
-    }
-
-    /**
-     * Returns the string image of this symbol.
-     *
-     * @return the string image of this symbol.
-     */
-    public final String getValue() {
-        return this.value;
-    }
-
-    /**
-     * Returns the string image of this symbol.
-     *
-     * @return the string image of this symbol.
-     */
-    public String getImage() {
-        return this.value;
-    }
-
-    /**
-     * Sets a new image to this symbol.
-     *
-     * @param value the new image to set.
-     */
-    public final void setValue(String value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the location of the symbol.
-     *
-     * @return the location of the symbol.
-     */
-    public Location getLocation() {
-        return this.location;
-    }
-
-    /**
-     * Sets the location of the symbol.
-     *
-     * @param location the location to set.
-     */
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    /**
-     * Returns the time specifier of the symbol.
-     *
-     * @return the time specifier of the symbol.
-     */
-    public final PDDLTimeSpecifier getTimeSpecifier() {
-        return this.timeSpecifier;
-    }
-
-    /**
-     * Sets the time specifier of the symbol.
-     *
-     * @param  timeSpecifier the time specifier to set.
-     */
-    public final void setTimeSpecifier(final PDDLTimeSpecifier timeSpecifier) {
-        this.timeSpecifier = timeSpecifier;
-    }
-
-    /**
-     * Sets the begin line and column of the expression from a specified token.
-     *
-     * @param begin the first token of the expression.
-     */
-    public final void setBegin(final Token begin) {
-        if (this.getLocation() == null) {
-            this.setLocation(new Location());
-        }
-        this.getLocation().setBegin(begin);
-    }
-
-    /**
-     * Sets the end line and column of the expression from a specified token.
-     *
-     * @param end the last token of the expression.
-     */
-    public final void setEnd(final Token end) {
-        if (this.getLocation() == null) {
-            this.setLocation(new Location());
-        }
-        this.getLocation().setEnd(end);
+        super(type, value);
     }
 
     /**
@@ -269,27 +124,6 @@ public class PDDLSymbol implements Symbol, Locatable {
     }*/
 
     /**
-     * Renames the symbol. The symbol is renamed if only if this symbol is contained the map in parameters,
-     * otherwise nothing is done.
-     *
-     * @param context the images of the symbol to renamed .
-     * @return the old image of the symbol or null if the symbol was not renamed.
-     * @throws NullPointerException if context == null.
-     */
-    public final String rename(final Map<String, String> context) {
-        if (context == null) {
-            throw new NullPointerException("context == null");
-        }
-        final String odlImage = this.getValue();
-        final String newImage = context.get(odlImage);
-        if (newImage != null) {
-            this.setValue(newImage);
-            return odlImage;
-        }
-        return null;
-    }
-
-    /**
      * Renames the task ID symbol according to a specific context. The symbol is renamed if only if this symbol is a
      * task ID, otherwise nothing is done.
      *
@@ -319,7 +153,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      *          <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
+    /*@Override
     public boolean equals(final Object object) {
         if (object != null && object instanceof PDDLSymbol) {
             PDDLSymbol other = (PDDLSymbol) object;
@@ -334,7 +168,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      * @return the hash code value of this symbol.
      * @see java.lang.Object#hashCode()
      */
-    @Override
+    /*@Override
     public int hashCode() {
         return Objects.hash(this.getValue());
     }
@@ -344,7 +178,7 @@ public class PDDLSymbol implements Symbol, Locatable {
      *
      * @return a string representation of this symbol.
      */
-    @Override
+    /*@Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         switch (this.type) {
@@ -363,7 +197,7 @@ public class PDDLSymbol implements Symbol, Locatable {
                 str.append(this.getValue());
         }
         return str.toString();
-    }
+    }*/
 
     public PDDLSymbol clone() {
         return new PDDLSymbol(this);
