@@ -699,9 +699,9 @@ void type_def():
 			}
 			for (PDDLTypedSymbol type : this.domain.getTypes()) {
 				if (type.getTypes().isEmpty()
-				        && !type.equals(PDDLParser.OBJECT)
-				        && !type.equals(PDDLParser.NUMBER)) {
-					type.addType(PDDLParser.OBJECT);
+				        && !type.equals(Symbol.OBJECT_TYPE)
+				        && !type.equals(Symbol.NUMBER_TYPE)) {
+					type.addType(Symbol.OBJECT_TYPE);
 				}
 			}
 		}
@@ -769,7 +769,7 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
 					types = new ArrayList<Symbol<String>>();
-					types.add(PDDLParser.OBJECT);
+					types.add(Symbol.OBJECT_TYPE);
 				}
 				for (Symbol<String> s : tmp) {
 					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
@@ -813,7 +813,7 @@ Symbol<String> primitive_type() :
 (	t=<OBJECT_TYPE>
 |	t=<NUMBER_TYPE>
 | 	t=<SYMBOL>) {
-	    return new Symbol<String>(SymbolType.TYPE, t.image,
+	    return new Symbol<String>(SymbolType.TYPE, t.image.toLowerCase(),
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
     }
 }
@@ -828,7 +828,10 @@ void constants_def() :
 			typedList=typed_list(Lexer.CONSTANT)
 		right_bracket() {
 			for (PDDLTypedSymbol constant : typedList) {
-				this.domain.addConstant(constant);
+			    if (constant.getTypes().isEmpty()) {
+			    	constant.addType(Symbol.OBJECT_TYPE);
+			    }
+			    this.domain.addConstant(constant);
 			}
 		}
 	} catch(Throwable e) {
@@ -846,7 +849,8 @@ Symbol<String> constant() :
 	| 	t=<END>
 	| 	t=<START>
 	| 	t=<OVER>) {
-	return new Symbol<String>(SymbolType.CONSTANT, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	return new Symbol<String>(SymbolType.CONSTANT, t.image.toLowerCase(),
+	    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 }
 }
 
@@ -901,7 +905,8 @@ Symbol<String> task_symbol() : // ADD HDDL
  }
  {
  	t=<SYMBOL> {
- 		return new Symbol<String>(SymbolType.TASK, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+ 		return new Symbol<String>(SymbolType.TASK, t.image.toLowerCase(),
+ 		 t.beginLine, t.beginColumn, t.endLine, t.endColumn);
  	}
  }
 
@@ -934,7 +939,8 @@ Symbol<String> predicate() :
 | 	t=<END>
 | 	t=<START>
 | 	t=<OVER>) {
-		return new Symbol<String>(SymbolType.PREDICATE, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+		return new Symbol<String>(SymbolType.PREDICATE, t.image.toLowerCase(),
+		 t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -944,7 +950,7 @@ Symbol<String> variable() :
 }
 {
 	t=<VARIABLE_SYMBOL> {
-	    return new Symbol<String>(SymbolType.VARIABLE, t.image,
+	    return new Symbol<String>(SymbolType.VARIABLE, t.image.toLowerCase(),
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -997,7 +1003,8 @@ Symbol<String> functor() :
 	| t=<END>
     | t=<START>
     | t=<OVER>) {
-	    return new Symbol<String>(SymbolType.FUNCTOR, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	    return new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -1025,7 +1032,7 @@ List<PDDLNamedTypedList> function_typed_list(int type) :
 		// To keep compatibility with PDDL 3.0: if no type is set it is number
 		for (PDDLNamedTypedList ntl : typedListList) {
 			if (ntl.getTypes().isEmpty()) {
-				ntl.addType(PDDLParser.NUMBER);
+				ntl.addType(Symbol.NUMBER_TYPE);
 			}
 		}
 		return typedListList;
@@ -1043,7 +1050,7 @@ List<Symbol<String>> function_type() :
 			|| this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)})
 		t=<NUMBER_TYPE> {
-			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image,
+			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image.toLowerCase(),
 			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			return typesList;
 		}
@@ -1401,7 +1408,8 @@ PDDLExpression equal_atomic_formula() :
 		arg1=term()
 		arg2=term()
 	end=right_bracket() {
-        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn));
+        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+            t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	 	args.add(arg1);
 	 	args.add(arg2);
 	 	exp.setArguments(args);
@@ -2062,7 +2070,8 @@ Symbol<String> method_name() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.ACTION, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+		return new Symbol<String>(SymbolType.ACTION, t.image.toLowerCase(),
+		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -2342,7 +2351,8 @@ Symbol<String> task_id_symbol() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.TASK_ID, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+		return new Symbol<String>(SymbolType.TASK_ID, t.image.toLowerCase(),
+		 t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -2770,7 +2780,8 @@ Symbol<String> action_name() :
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.ACTION, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+		return new Symbol<String>(SymbolType.ACTION, t.image.toLowerCase(),
+		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -2888,7 +2899,8 @@ Symbol<String> pref_name() :
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.PREFERENCE, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+		return new Symbol<String>(SymbolType.PREFERENCE, t.image.toLowerCase(),
+		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -3059,7 +3071,8 @@ PDDLExpression total_cost() :
 {
 	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn));
+	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+	    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	exp.setArguments(new ArrayList<Symbol<String>>());
 	exp.setBegin(begin);
 	exp.setEnd(end);
@@ -3234,7 +3247,8 @@ Symbol<String> da_symbol() :
 }
 {
 	t=<SYMBOL> {
-	return new Symbol<String>(SymbolType.ACTION, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	return new Symbol<String>(SymbolType.ACTION, t.image.toLowerCase(),
+	    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 }
 }
 
@@ -3407,7 +3421,7 @@ PDDLExpression var_duration() :
 {
 	t=<VAR_DURATION>
 	{
-		exp.setVariable(new Symbol<String>(SymbolType.DURATION_VARIABLE, t.image,
+		exp.setVariable(new Symbol<String>(SymbolType.DURATION_VARIABLE, t.image.toLowerCase(),
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 		return exp;
 	}
@@ -3593,7 +3607,7 @@ PDDLExpression f_duration() : // ADD HDDL2.1
 }
 {
     begin=left_bracket() t=<F_DURATION> argument = task_id_symbol() end=right_bracket() {
-        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
+        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
             t.beginLine, t.beginColumn, t.endLine, t.endColumn));
         exp.setArguments(new ArrayList<Symbol<String>>());
         exp.setBegin(begin);
@@ -4222,7 +4236,7 @@ Symbol<String> continuous_variable() :
 }
 {
 	t=<CONTINUOUS_VARIABLE>  {
-		return new Symbol<String>(SymbolType.CONTINUOUS_VARIABLE, t.image,
+		return new Symbol<String>(SymbolType.CONTINUOUS_VARIABLE, t.image.toLowerCase(),
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -4437,7 +4451,8 @@ Symbol<String> problem_name() :
 { Token t = null; }
 {
 	t=<SYMBOL> {
-	    return new Symbol<String>(SymbolType.PROBLEM, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	    return new Symbol<String>(SymbolType.PROBLEM, t.image.toLowerCase(),
+	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -4445,7 +4460,7 @@ Symbol<String> domain_problem_name() :
 { Token t = null; }
 {
 	t=<SYMBOL> {
-	    return new Symbol<String>(SymbolType.DOMAIN, t.image,
+	    return new Symbol<String>(SymbolType.DOMAIN, t.image.toLowerCase(),
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
     }
 }
@@ -4454,7 +4469,8 @@ Symbol<String> domain_name() :
 { Token t = null; }
 {
 	t=<SYMBOL> {
-	    return new Symbol<String>(SymbolType.DOMAIN, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	    return new Symbol<String>(SymbolType.DOMAIN, t.image.toLowerCase(),
+	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -4468,7 +4484,10 @@ void object_declaration() :
 			typedList=typed_list(Lexer.CONSTANT)
 		right_bracket() {
 			for (PDDLTypedSymbol object : typedList) {
-				this.problem.addObject(object);
+                if (object.getTypes().isEmpty()) {
+                    object.addType(Symbol.OBJECT_TYPE);
+                }
+                this.problem.addObject(object);
 			}
 		}
 	} catch(Throwable e) {
@@ -4803,7 +4822,7 @@ PDDLExpression total_time() :
 		}
 | 	LOOKAHEAD(2)
 		t=<TOTAL_TIME>) {
-			exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
+			exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
 			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			exp.setArguments(new ArrayList<Symbol<String>>());
 			exp.setBeginLine(t.beginLine);

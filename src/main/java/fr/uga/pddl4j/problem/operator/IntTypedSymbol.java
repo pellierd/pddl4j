@@ -30,7 +30,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 20.05.2022
  */
-public class IntTypedSymbol implements TypedSymbol {
+public class IntTypedSymbol implements IntInterfaceTypedSymbol {
 
     /**
      * The int representation of the variable. The value must be negative.

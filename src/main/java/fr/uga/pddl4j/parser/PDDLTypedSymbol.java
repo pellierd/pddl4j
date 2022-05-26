@@ -30,12 +30,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public final class PDDLTypedSymbol extends Symbol<String> implements  TypedSymbol {
-
-    /**
-     * The list of the types of this symbol.
-     */
-    private List<Symbol<String>> types;
+public final class PDDLTypedSymbol extends TypedSymbol<String> {
 
     /**
      * Creates a typed symbol from a specified typed symbol.
@@ -45,8 +40,6 @@ public final class PDDLTypedSymbol extends Symbol<String> implements  TypedSymbo
      */
     public PDDLTypedSymbol(final PDDLTypedSymbol symbol) {
         super(symbol);
-        this.types = new ArrayList<>();
-        this.types.addAll(symbol.getTypes().stream().map(Symbol<String>::new).collect(Collectors.toList()));
     }
 
     /**
@@ -58,67 +51,6 @@ public final class PDDLTypedSymbol extends Symbol<String> implements  TypedSymbo
      */
     public PDDLTypedSymbol(final Symbol<String> symbol) {
         super(symbol);
-        this.types = new ArrayList<>();
-        //if (!symbol.equals(PDDLParser.OBJECT) && !symbol.equals(PDDLParser.NUMBER)) {
-        //    this.types.add(PDDLParser.OBJECT);
-        //}
     }
 
-    /**
-     * Returns the list of types of this typed token.
-     *
-     * @return the list of types of this typed token.
-     */
-    public List<Symbol<String>> getTypes() {
-        return this.types;
-    }
-
-    /**
-     * Adds a type to this typed token.
-     *
-     * @param type the type to add.
-     */
-    public void addType(final Symbol<String> type) {
-        /*if (!type.equals(PDDLParser.OBJECT)) {
-            this.types.remove(PDDLParser.OBJECT);
-        }*/
-        if (!this.types.contains(type)) {
-            this.types.add(type);
-        }
-    }
-
-    /**
-     * Returns a string representation of this typed symbol.
-     *
-     * @return a string representation of this typed symbol.
-     */
-    @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder();
-        str.append(super.toString());
-        //if (!this.equals(PDDLParser.OBJECT) && !this.equals(PDDLParser.NUMBER)) {
-        if (!this.getTypes().isEmpty()) {
-            str.append(" - ");
-            if (this.types.size() == 1) {
-                str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));
-            } else if (this.types.size() == 2) {
-                str.append("(either");
-                for (int i = 0; i < this.types.size(); i++) {
-                    str.append(" ");
-                    str.append(this.types.get(i).toString().toUpperCase(Locale.ENGLISH));
-                }
-                str.append(")");
-            }
-        }
-        return str.toString();
-    }
-
-    /**
-     * Returns a deep copy of this typed symbol.
-     *
-     * @return a deep copy of this typed symbol.
-     */
-    public PDDLTypedSymbol clone() {
-        return new PDDLTypedSymbol(this);
-    }
 }

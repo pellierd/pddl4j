@@ -140,7 +140,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         this.domainName = domain;
         this.requirements = new LinkedHashSet<>();
         this.types = new ArrayList<>();
-        this.types.add(new PDDLTypedSymbol(PDDLParser.OBJECT));
+        this.types.add(new PDDLTypedSymbol(Symbol.OBJECT_TYPE));
         this.constants = new ArrayList<>();
         this.predicates = new ArrayList<>();
         this.functions = new ArrayList<>();
@@ -664,7 +664,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                t.getTypes().stream().filter(s -> !s.equals(PDDLParser.OBJECT))
+                t.getTypes().stream().filter(s -> !s.equals(Symbol.OBJECT_TYPE))
                     .forEach(s -> stack.push(this.getType(s)));
             }
         }
@@ -765,7 +765,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         str.append(")\n");
         if (!this.types.isEmpty()) {
             str.append("(:types ");
-            this.types.stream().filter(type -> !type.equals(PDDLParser.OBJECT) && !type.equals(PDDLParser.NUMBER))
+            this.types.stream().filter(type -> !type.equals(Symbol.OBJECT_TYPE) && !type.equals(Symbol.NUMBER_TYPE))
                 .forEach(type -> str.append("\n  ").append(type));
             str.append("\n)\n");
         }

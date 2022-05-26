@@ -119,16 +119,6 @@ public final class PDDLParser implements Callable<Integer> {
     private static final Logger LOGGER = LogManager.getLogger(AbstractPlanner.class.getName());
 
     /**
-     * The specific symbol object.
-     */
-    public static final Symbol<String> OBJECT = new Symbol<String>(SymbolType.TYPE, "object");
-
-    /**
-     * The specific symbol number.
-     */
-    public static final Symbol<String> NUMBER = new Symbol<String>(SymbolType.TYPE, "number");
-
-    /**
      * The specific symbol total-costs.
      */
     public static final Symbol<String> TOTAL_COST = new Symbol<String>(SymbolType.FUNCTOR, "total-cost");
@@ -864,11 +854,11 @@ public final class PDDLParser implements Callable<Integer> {
 
         // Gathering types declaration
         final Map<String, PDDLTypedSymbol> map = new HashMap<>();
-        map.put(PDDLParser.OBJECT.getValue(), new PDDLTypedSymbol(PDDLParser.OBJECT));
+        map.put(Symbol.OBJECT_TYPE.getValue(), new PDDLTypedSymbol(Symbol.OBJECT_TYPE));
 
         for (PDDLTypedSymbol type : types) {
             // Special cas for the type object
-            if ((type.equals(PDDLParser.OBJECT) || type.equals(PDDLParser.NUMBER)) && !type.getTypes().isEmpty()) {
+            if ((type.equals(Symbol.OBJECT_TYPE) || type.equals(Symbol.NUMBER_TYPE)) && !type.getTypes().isEmpty()) {
                 this.mgr.logParserError("type \"" + type.getValue() + "\" cannot be used as derived type",
                     this.lexer.getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
             } else { // General case
@@ -1643,7 +1633,7 @@ public final class PDDLParser implements Callable<Integer> {
                 copy = new LinkedList<>(t.getTypes());
                 copy.retainAll(s2.getTypes());
                 isSubType = !copy.isEmpty();
-                t.getTypes().stream().filter(s -> !s.equals(PDDLParser.OBJECT)).forEach(s ->
+                t.getTypes().stream().filter(s -> !s.equals(Symbol.OBJECT_TYPE)).forEach(s ->
                     stack.push(this.domain.getType(s)));
             }
         }

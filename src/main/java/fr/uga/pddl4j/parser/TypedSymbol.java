@@ -19,6 +19,10 @@
 package fr.uga.pddl4j.parser;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * This interface defines the interface of the typed symbols.
@@ -26,12 +30,79 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 23.05.2022
  */
-public interface TypedSymbol extends Cloneable, Serializable {
+public class TypedSymbol<T> extends Symbol<T> {
 
     /**
-     * Returns a deep copy of the typed symbol.
-     *
-     * @return a deep copy of the typed symbol.
+     * The list of the types of this symbol.
      */
-    TypedSymbol clone();
+    private List<Symbol<T>> types;
+
+    /**
+     * Creates a typed symbol from a specified typed symbol.
+     *
+     * @param other the other symbol.
+     * @throws NullPointerException if the specified typed symbol is null.
+     */
+    public TypedSymbol(final TypedSymbol<T> other) {
+        super(other);
+        this.types = new ArrayList<>();
+        this.types.addAll(other.getTypes().stream().map(Symbol<T>::new).collect(Collectors.toList()));
+    }
+
+    /**
+     * Creates a new typed symbol from a specified symbol. This symbol is by default of type object. If a
+     * typed symbol is created with the specified symbol <code>PDDLParser.OBJECT</code> or
+     * <code>PDDLParser.NUMBER</code>, the typed list is creates with an empty list of super types.
+     *
+     * @param symbol the symbol.
+     */
+    public TypedSymbol(final Symbol<T> symbol) {
+        super(symbol);
+        this.types = new ArrayList<>();
+    }
+
+    /**
+     * Returns the list of types of this typed token.
+     *
+     * @return the list of types of this typed token.
+     */
+    public List<Symbol<T>> getTypes() {
+        return this.types;
+    }
+
+    /**
+     * Adds a type to this typed token.
+     *
+     * @param type the type to add.
+     */
+    public void addType(final Symbol<T> type) {
+        if (!this.getTypes().contains(type)) {
+            this.getTypes().add(type);
+        }
+    }
+
+    /**
+     * Returns a string representation of this typed symbol.
+     *
+     * @return a string representation of this typed symbol.
+     */
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append(super.toString());
+        if (!this.getTypes().isEmpty()) {
+            str.append(" - ");
+            if (this.getTypes().size() == 1) {
+                str.append(this.getTypes().get(0).toString().toUpperCase(Locale.ENGLISH));
+            } else if (this.getTypes().size() == 2) {
+                str.append("(either");
+                for (int i = 0; i < this.getTypes().size(); i++) {
+                    str.append(" ");
+                    str.append(this.getTypes().get(i).toString().toUpperCase(Locale.ENGLISH));
+                }
+                str.append(")");
+            }
+        }
+        return str.toString();
+    }
 }

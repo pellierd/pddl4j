@@ -196,7 +196,7 @@ public class PDDLNamedTypedList implements Serializable {
                 str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));
             } else if (this.types.size() == 2) {
                 str.append("(either");
-                this.types.stream().filter(type -> !type.equals(PDDLParser.OBJECT))
+                this.types.stream().filter(type -> !type.equals(Symbol.OBJECT_TYPE))
                     .forEach(type -> str.append(" ").append(type.toString().toUpperCase(Locale.ENGLISH)));
                 str.append(")");
             }
