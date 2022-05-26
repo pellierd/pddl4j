@@ -38,7 +38,7 @@ import fr.uga.pddl4j.parser.PDDLNamedTypedList;
 import fr.uga.pddl4j.parser.PDDLAction;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
-import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTimeSpecifier;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
@@ -383,7 +383,7 @@ Token left_bracket() :
 PDDLDomain domain() :
 {
 	PDDLExpression exp = null;
-	PDDLSymbol name = null;
+	Symbol<String> name = null;
 }
 {
 	try {
@@ -417,7 +417,7 @@ PDDLDomain domain() :
 ParsedProblem domain_and_problem() :
 {
 	PDDLExpression exp = null;
-	PDDLSymbol name = null;
+	Symbol<String> name = null;
 }
 {
 	try {
@@ -712,10 +712,10 @@ void type_def():
 
 List<PDDLTypedSymbol> typed_list(int kind) :
 {
-	PDDLSymbol t;
-	List<PDDLSymbol> types = null;
+	Symbol<String> t;
+	List<Symbol<String>> types = null;
 	List<PDDLTypedSymbol> typedList = new ArrayList<PDDLTypedSymbol>();
-	List<PDDLSymbol> tmp = new ArrayList<PDDLSymbol>();
+	List<Symbol<String>> tmp = new ArrayList<Symbol<String>>();
 	List<PDDLTypedSymbol> nextTypedList = null;
 }
 {
@@ -728,11 +728,11 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
-					types = new ArrayList<PDDLSymbol>();
+					types = new ArrayList<Symbol<String>>();
 				}
-				for (PDDLSymbol s : tmp) {
+				for (Symbol<String> s : tmp) {
 					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
-					for (PDDLSymbol type : types) {
+					for (Symbol<String> type : types) {
 						ts.addType(type);
 					}
 					typedList.add(ts);
@@ -748,11 +748,11 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
-					types = new ArrayList<PDDLSymbol>();
+					types = new ArrayList<Symbol<String>>();
 				}
-				for (PDDLSymbol s : tmp) {
+				for (Symbol<String> s : tmp) {
 					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
-					for (PDDLSymbol type : types) {
+					for (Symbol<String> type : types) {
 						ts.addType(type);
 					}
 					typedList.add(ts);
@@ -768,12 +768,12 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
-					types = new ArrayList<PDDLSymbol>();
+					types = new ArrayList<Symbol<String>>();
 					types.add(PDDLParser.OBJECT);
 				}
-				for (PDDLSymbol s : tmp) {
+				for (Symbol<String> s : tmp) {
 					PDDLTypedSymbol ts = new PDDLTypedSymbol(s);
-					for (PDDLSymbol type : types) {
+					for (Symbol<String> type : types) {
 						ts.addType(type);
 					}
 					typedList.add(ts);
@@ -787,10 +787,10 @@ List<PDDLTypedSymbol> typed_list(int kind) :
 	}
 }
 
-List<PDDLSymbol> type() :
+List<Symbol<String>> type() :
 {
-	PDDLSymbol s;
-	List<PDDLSymbol> type = new ArrayList<PDDLSymbol>();
+	Symbol<String> s;
+	List<Symbol<String>> type = new ArrayList<Symbol<String>>();
 }
 {
 	(	left_bracket() <EITHER>
@@ -805,17 +805,17 @@ List<PDDLSymbol> type() :
 	}
 }
 
-PDDLSymbol primitive_type() :
+Symbol<String> primitive_type() :
 {
 	Token t = token;
 }
 {
 (	t=<OBJECT_TYPE>
 |	t=<NUMBER_TYPE>
-| 	t=<SYMBOL>)
-	{
-	return new PDDLSymbol(SymbolType.TYPE, t);
-}
+| 	t=<SYMBOL>) {
+	    return new Symbol<String>(SymbolType.TYPE, t.image,
+	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+    }
 }
 
 void constants_def() :
@@ -836,7 +836,7 @@ void constants_def() :
 	}
 }
 
-PDDLSymbol constant() :
+Symbol<String> constant() :
 {
 	Token t;
 }
@@ -846,7 +846,7 @@ PDDLSymbol constant() :
 	| 	t=<END>
 	| 	t=<START>
 	| 	t=<OVER>) {
-	return new PDDLSymbol(SymbolType.CONSTANT, t);
+	return new Symbol<String>(SymbolType.CONSTANT, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 }
 }
 
@@ -878,7 +878,7 @@ PDDLNamedTypedList comp_task_def() : // ADD HDDL
 
 PDDLNamedTypedList task_def() : // ADD HDDL
 {
-    PDDLSymbol name;
+    Symbol<String> name;
     List<PDDLTypedSymbol> typedList = null;
 }
 {
@@ -895,20 +895,20 @@ PDDLNamedTypedList task_def() : // ADD HDDL
     }
 }
 
-PDDLSymbol task_symbol() : // ADD HDDL
+Symbol<String> task_symbol() : // ADD HDDL
  {
  	Token t = token;
  }
  {
  	t=<SYMBOL> {
- 		return new PDDLSymbol(SymbolType.TASK, t);
+ 		return new Symbol<String>(SymbolType.TASK, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
  	}
  }
 
 
 PDDLNamedTypedList atomic_formula_skeleton() :
 {
-	PDDLSymbol predicate = null;
+	Symbol<String> predicate = null;
 	List<PDDLTypedSymbol> typedList = null;
 }
 {
@@ -924,7 +924,7 @@ PDDLNamedTypedList atomic_formula_skeleton() :
 	}
 }
 
-PDDLSymbol predicate() :
+Symbol<String> predicate() :
 {
 	Token t;
 }
@@ -934,16 +934,19 @@ PDDLSymbol predicate() :
 | 	t=<END>
 | 	t=<START>
 | 	t=<OVER>) {
-		return new PDDLSymbol(SymbolType.PREDICATE, t);
+		return new Symbol<String>(SymbolType.PREDICATE, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
-PDDLSymbol variable() :
+Symbol<String> variable() :
 {
 	Token t = token;
 }
 {
-	t=<VARIABLE_SYMBOL> { return new PDDLSymbol(SymbolType.VARIABLE, t); }
+	t=<VARIABLE_SYMBOL> {
+	    return new Symbol<String>(SymbolType.VARIABLE, t.image,
+	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	}
 }
 
 void functions_def():
@@ -966,7 +969,7 @@ void functions_def():
 
 PDDLNamedTypedList atomic_function_skeleton() :
 {
-	PDDLSymbol functor = null;
+	Symbol<String> functor = null;
 	List<PDDLTypedSymbol> typedList = null;
 }
 {
@@ -983,7 +986,7 @@ PDDLNamedTypedList atomic_function_skeleton() :
 	}
 }
 
-PDDLSymbol functor() :
+Symbol<String> functor() :
 {
 	Token t;
 }
@@ -994,7 +997,7 @@ PDDLSymbol functor() :
 	| t=<END>
     | t=<START>
     | t=<OVER>) {
-	    return new PDDLSymbol(SymbolType.FUNCTOR, t);
+	    return new Symbol<String>(SymbolType.FUNCTOR, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -1003,14 +1006,14 @@ List<PDDLNamedTypedList> function_typed_list(int type) :
 	PDDLNamedTypedList namedTypedList = null;
 	List<PDDLNamedTypedList> typedListList = new ArrayList<PDDLNamedTypedList>();
 	List<PDDLNamedTypedList> nextNamedTypedList = null;
-	List<PDDLSymbol> typeList = null;
+	List<Symbol<String>> typeList = null;
 }
 {
 	(LOOKAHEAD(2) namedTypedList=atomic_function_skeleton() {
 		typedListList.add(namedTypedList);
 	})*
 	(<SUB> typeList=function_type() {
-			for (PDDLSymbol t : typeList) {
+			for (Symbol<String> t : typeList) {
 				namedTypedList.addType(t);
 			}
 		}
@@ -1029,18 +1032,19 @@ List<PDDLNamedTypedList> function_typed_list(int type) :
 	}
 }
 
-List<PDDLSymbol> function_type() :
+List<Symbol<String>> function_type() :
 {
-	Token token;
-	PDDLSymbol symbol;
-	List<PDDLSymbol> typesList = new ArrayList<PDDLSymbol>();
+	Token t;
+	Symbol<String> symbol;
+	List<Symbol<String>> typesList = new ArrayList<Symbol<String>>();
 }
 {
 		LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.FLUENTS)
 			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)})
-		token=<NUMBER_TYPE> {
-			typesList.add(new PDDLSymbol(SymbolType.TYPE, token));
+		t=<NUMBER_TYPE> {
+			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image,
+			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			return typesList;
 		}
 	| 	LOOKAHEAD(2, {(this.isRequirement(PDDLRequireKey.TYPING) && this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS))
@@ -1385,10 +1389,10 @@ PDDLExpression not_equal_atomic_formula() :
 PDDLExpression equal_atomic_formula() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_ATOM);
-	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
+	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
 	Token t = null;
-	PDDLSymbol arg1 = null;
-	PDDLSymbol arg2 = null;
+	Symbol<String> arg1 = null;
+	Symbol<String> arg2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1397,7 +1401,7 @@ PDDLExpression equal_atomic_formula() :
 		arg1=term()
 		arg2=term()
 	end=right_bracket() {
-        exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, t));
+        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	 	args.add(arg1);
 	 	args.add(arg2);
 	 	exp.setArguments(args);
@@ -1530,8 +1534,8 @@ PDDLExpression forall_gd() :
 PDDLExpression atomic_formula(int type) :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.ATOM);
-	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
-	PDDLSymbol t = null;
+	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
+	Symbol<String> t = null;
     Token begin = null;
     Token end = null;
 }
@@ -1553,9 +1557,9 @@ PDDLExpression atomic_formula(int type) :
 	}
 }
 
-PDDLSymbol term() :
+Symbol<String> term() :
 {
-	PDDLSymbol t = null;
+	Symbol<String> t = null;
 }
 {
 	(	t=constant()
@@ -1893,8 +1897,8 @@ PDDLExpression unary_op() :
 PDDLExpression f_head() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
-	PDDLSymbol s = null;
+	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
+	Symbol<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1962,7 +1966,7 @@ void structure_def() :
 
 PDDLMethod method_def() : // ADD HDDL
 {
-	PDDLSymbol name = null;
+	Symbol<String> name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression taskID = null;
 	PDDLExpression precondition = new PDDLExpression(PDDLConnective.AND);
@@ -1994,7 +1998,7 @@ PDDLMethod method_def() : // ADD HDDL
 
 PDDLMethod durative_method_def() : // ADD HDDL2.1
 {
-    PDDLSymbol name = null;
+    Symbol<String> name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression taskID = null;
 	PDDLExpression duration = null;
@@ -2052,13 +2056,13 @@ PDDLTaskNetwork task_network() : // ADD HDDL
         }
 }
 
-PDDLSymbol method_name() : // ADD HDDL
+Symbol<String> method_name() : // ADD HDDL
 {
 	Token t = token;
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(SymbolType.ACTION, t);
+		return new Symbol<String>(SymbolType.ACTION, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -2112,7 +2116,7 @@ PDDLExpression and_subtask() : // ADD HDDL
 
 PDDLExpression subtask() :  // ADD HDDL
 {
-    PDDLSymbol taskID;
+    Symbol<String> taskID;
     PDDLExpression task;
     Token begin = null;
     Token end = null;
@@ -2136,8 +2140,8 @@ PDDLExpression subtask() :  // ADD HDDL
 PDDLExpression task_formula(int type) : // ADD HDDL
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK);
-	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
-	PDDLSymbol t = null;
+	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
+	Symbol<String> t = null;
 	Token begin = null;
     Token end = null;
 }
@@ -2297,7 +2301,7 @@ PDDLExpression less_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 PDDLExpression great_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
      PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_ORDERING_CONSTRAINT);
-     List<PDDLSymbol> tasks = new ArrayList<PDDLSymbol>();
+     List<Symbol<String>> tasks = new ArrayList<Symbol<String>>();
      PDDLExpression id1 = null;
      PDDLExpression id2 = null;
      Token begin = null;
@@ -2332,20 +2336,20 @@ PDDLExpression great_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.
     }
 }
 
-PDDLSymbol task_id_symbol() : // ADD HDDL
+Symbol<String> task_id_symbol() : // ADD HDDL
 {
 	Token t = token;
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(SymbolType.TASK_ID, t);
+		return new Symbol<String>(SymbolType.TASK_ID, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
 PDDLExpression task_id() : // ADD HDDL
 {
     PDDLExpression exp = null;
-	PDDLSymbol id = null;
+	Symbol<String> id = null;
 }
 {
     (   LOOKAHEAD(2, { !this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
@@ -2377,7 +2381,7 @@ PDDLExpression timed_task_id() : // ADD HDDL2.1
 
 PDDLExpression start_task_id() : // ADD HDDL2.1
 {
-    PDDLSymbol id = null;
+    Symbol<String> id = null;
     PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK_ID);
 }
 {
@@ -2390,7 +2394,7 @@ PDDLExpression start_task_id() : // ADD HDDL2.1
 
 PDDLExpression end_task_id() : // ADD HDDL2.1
 {
-    PDDLSymbol id = null;
+    Symbol<String> id = null;
     PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK_ID);
 }
 {
@@ -2707,7 +2711,7 @@ PDDLDerivedPredicate derived_def() :
 
 PDDLAction action_def() :
 {
-	PDDLSymbol name = null;
+	Symbol<String> name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
@@ -2734,7 +2738,7 @@ PDDLAction action_def() :
 
 PDDLAction htn_action_def() :
 {
-	PDDLSymbol name = null;
+	Symbol<String> name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
 	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
@@ -2760,13 +2764,13 @@ PDDLAction htn_action_def() :
 	}
 }
 
-PDDLSymbol action_name() :
+Symbol<String> action_name() :
 {
 	Token t = token;
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(SymbolType.ACTION, t);
+		return new Symbol<String>(SymbolType.ACTION, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -2861,7 +2865,7 @@ PDDLExpression forall_pre_gd() :
 
 PDDLExpression pref_gd() :
 {
-	PDDLSymbol pref_name = null;
+	Symbol<String> pref_name = null;
 	PDDLExpression exp = null;
 	Token begin = null;
     Token end = null;
@@ -2878,13 +2882,13 @@ PDDLExpression pref_gd() :
 	}
 }
 
-PDDLSymbol pref_name() :
+Symbol<String> pref_name() :
 {
 	Token t = null;
 }
 {
 	t=<SYMBOL> {
-		return new PDDLSymbol(SymbolType.PREFERENCE, t);
+		return new Symbol<String>(SymbolType.PREFERENCE, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -3055,8 +3059,8 @@ PDDLExpression total_cost() :
 {
 	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, t));
-	exp.setArguments(new ArrayList<PDDLSymbol>());
+	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn));
+	exp.setArguments(new ArrayList<Symbol<String>>());
 	exp.setBegin(begin);
 	exp.setEnd(end);
 	return exp;
@@ -3065,8 +3069,8 @@ PDDLExpression total_cost() :
 
 PDDLExpression numeric_term() :
 {
-	List<PDDLSymbol> tokenList = new ArrayList<PDDLSymbol>();
-	PDDLSymbol s = null;
+	List<Symbol<String>> tokenList = new ArrayList<Symbol<String>>();
+	Symbol<String> s = null;
 	PDDLExpression exp = null;
 }
 {
@@ -3193,7 +3197,7 @@ PDDLExpression decrease() :
 
 PDDLAction durative_action_def() :
 {
-	PDDLSymbol name = null;
+	Symbol<String> name = null;
 	List<PDDLTypedSymbol> parameters = null;
 	PDDLExpression duration = null;
 	PDDLExpression condition = null;
@@ -3224,13 +3228,13 @@ PDDLAction durative_action_def() :
 	}
 }
 
-PDDLSymbol da_symbol() :
+Symbol<String> da_symbol() :
 {
 	Token t = null;
 }
 {
 	t=<SYMBOL> {
-	return new PDDLSymbol(SymbolType.ACTION, t);
+	return new Symbol<String>(SymbolType.ACTION, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 }
 }
 
@@ -3403,7 +3407,8 @@ PDDLExpression var_duration() :
 {
 	t=<VAR_DURATION>
 	{
-		exp.setVariable(new PDDLSymbol(SymbolType.DURATION_VARIABLE, t));
+		exp.setVariable(new Symbol<String>(SymbolType.DURATION_VARIABLE, t.image,
+		    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 		return exp;
 	}
 }
@@ -3583,13 +3588,14 @@ PDDLExpression duration() : // ADD HDDL2.1
 PDDLExpression f_duration() : // ADD HDDL2.1
 {
     PDDLExpression exp = new PDDLExpression(PDDLConnective.F_TASK_TIME);
-    Token f, begin, end;
-    PDDLSymbol argument;
+    Token t, begin, end;
+    Symbol<String> argument;
 }
 {
-    begin=left_bracket() f=<F_DURATION> argument = task_id_symbol() end=right_bracket() {
-        exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, f));
-        exp.setArguments(new ArrayList<PDDLSymbol>());
+    begin=left_bracket() t=<F_DURATION> argument = task_id_symbol() end=right_bracket() {
+        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
+            t.beginLine, t.beginColumn, t.endLine, t.endColumn));
+        exp.setArguments(new ArrayList<Symbol<String>>());
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
@@ -3713,7 +3719,7 @@ PDDLExpression pref_timed_gd() :
 
 PDDLExpression named_pref_timed_gd() :
 {
-	PDDLSymbol pref_name = null;
+	Symbol<String> pref_name = null;
 	PDDLExpression exp;
 	Token begin, end;
 }
@@ -4172,7 +4178,7 @@ PDDLExpression decrease_assign_op_t() :
 PDDLExpression f_exp_t() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.F_EXP_T);
-	PDDLSymbol continuous_variable_name;
+	Symbol<String> continuous_variable_name;
 	PDDLExpression child;
 	Token begin, end;
 }
@@ -4210,13 +4216,14 @@ PDDLExpression f_exp_t() :
 	}
 }
 
-PDDLSymbol continuous_variable() :
+Symbol<String> continuous_variable() :
 {
 	Token t;
 }
 {
 	t=<CONTINUOUS_VARIABLE>  {
-		return new PDDLSymbol(SymbolType.CONTINUOUS_VARIABLE, t);
+		return new Symbol<String>(SymbolType.CONTINUOUS_VARIABLE, t.image,
+		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
 
@@ -4353,8 +4360,8 @@ PDDLProblem problem() :
 
 PDDLProblem pddl_problem() :
 {
-	PDDLSymbol name;
-	PDDLSymbol domain;
+	Symbol<String> name;
+	Symbol<String> domain;
 }
 {
 	try {
@@ -4386,8 +4393,8 @@ PDDLProblem pddl_problem() :
 
 PDDLProblem htn_problem() : // ADD HDDL
 {
-	PDDLSymbol name;
-	PDDLSymbol domain;
+	Symbol<String> name;
+	Symbol<String> domain;
 	PDDLTaskNetwork taskNetwork;
 	List<PDDLTypedSymbol> parameters = new ArrayList<PDDLTypedSymbol>();
 }
@@ -4426,22 +4433,29 @@ PDDLProblem htn_problem() : // ADD HDDL
 }
 
 
-PDDLSymbol problem_name() :
+Symbol<String> problem_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> {  return new PDDLSymbol(SymbolType.PROBLEM, t); }
+	t=<SYMBOL> {
+	    return new Symbol<String>(SymbolType.PROBLEM, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	}
 }
 
-PDDLSymbol domain_problem_name() :
+Symbol<String> domain_problem_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> {  return new PDDLSymbol(SymbolType.DOMAIN, t); }
+	t=<SYMBOL> {
+	    return new Symbol<String>(SymbolType.DOMAIN, t.image,
+	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+    }
 }
 
-PDDLSymbol domain_name() :
+Symbol<String> domain_name() :
 { Token t = null; }
 {
-	t=<SYMBOL> { return new PDDLSymbol(SymbolType.DOMAIN, t); }
+	t=<SYMBOL> {
+	    return new Symbol<String>(SymbolType.DOMAIN, t.image, t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+	}
 }
 
 void object_declaration() :
@@ -4628,7 +4642,7 @@ PDDLExpression and_pref_con_gd() :
 PDDLExpression named_pref_con_gd() :
 {
 	PDDLExpression exp;
-	PDDLSymbol pref_name = null;
+	Symbol<String> pref_name = null;
 	Token begin, end;
 }
 {
@@ -4738,7 +4752,7 @@ PDDLExpression metric_f_exp() :
 PDDLExpression violated_pref_exp() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.IS_VIOLATED);
-	PDDLSymbol pref_name;
+	Symbol<String> pref_name;
 	Token begin, end;
 }
 {
@@ -4756,8 +4770,8 @@ PDDLExpression violated_pref_exp() :
 PDDLExpression constant_f_head() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	List<PDDLSymbol> args = new ArrayList<PDDLSymbol>();
-	PDDLSymbol functor, argument;
+	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
+	Symbol<String> functor, argument;
 	Token begin, end;
 }
 {
@@ -4779,22 +4793,23 @@ PDDLExpression constant_f_head() :
 PDDLExpression total_time() :
 {
 	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
-	Token f, begin, end;
+	Token t, begin, end;
 }
 {
 	(LOOKAHEAD(3)
-		begin=left_bracket() f=<TOTAL_TIME> end=right_bracket() {
+		begin=left_bracket() t=<TOTAL_TIME> end=right_bracket() {
 		    exp.setBegin(begin);
 		    exp.setEnd(end);
 		}
 | 	LOOKAHEAD(2)
-		f=<TOTAL_TIME>) {
-			exp.setSymbol(new PDDLSymbol(SymbolType.FUNCTOR, f));
-			exp.setArguments(new ArrayList<PDDLSymbol>());
-			exp.setBeginLine(f.beginLine);
-            exp.setBeginColumn(f.beginColumn);
-            exp.setEndLine(f.endLine);
-            exp.setEndColumn(f.endColumn);
+		t=<TOTAL_TIME>) {
+			exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
+			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
+			exp.setArguments(new ArrayList<Symbol<String>>());
+			exp.setBeginLine(t.beginLine);
+            exp.setBeginColumn(t.beginColumn);
+            exp.setEndLine(t.endLine);
+            exp.setEndColumn(t.endColumn);
 			return exp;
 		}
 }

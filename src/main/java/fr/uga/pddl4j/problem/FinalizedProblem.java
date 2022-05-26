@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.PDDLSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
@@ -1029,13 +1029,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             final int index = action.getValueOfParameter(i);
             final String type = this.getTypes().get(action.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ? \n");
             } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
                 str.append(" - ");
                 str.append(type);
@@ -1268,12 +1268,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             final int index = method.getValueOfParameter(i);
             final String type = this.getTypes().get(method.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i).append(" - ");
                 str.append(type);
                 str.append(" : ? \n");
             } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
@@ -1302,7 +1302,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             str.append(" ()\n");
         } else {
             for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
-                str.append(" " + PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
+                str.append(" " + Symbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
                 str.append(this.toString(this.getTasks().get(tasknetwork.getTasks().get(i))));
                 str.append("\n");
             }
@@ -1319,11 +1319,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     str.append(" C");
                     str.append(index);
                     str.append(": ");
-                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + r);
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + r);
                     str.append(" ");
                     str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage());
                     str.append(" ");
-                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + c);
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c);
                     str.append("\n");
                     index++;
                 }

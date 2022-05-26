@@ -22,7 +22,7 @@ import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.PDDLNamedTypedList;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
-import fr.uga.pddl4j.parser.PDDLSymbol;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.PDDLTypedSymbol;
 import fr.uga.pddl4j.parser.ParsedProblem;
@@ -515,9 +515,9 @@ public abstract class AbstractProblem implements Problem {
                 ic = this.constantSymbols.size();
                 this.constantSymbols.add(constant.getValue());
             }
-            final LinkedList<PDDLSymbol> types = new LinkedList<>(constant.getTypes());
+            final LinkedList<Symbol<String>> types = new LinkedList<>(constant.getTypes());
             while (!types.isEmpty()) {
-                PDDLSymbol type = types.poll();
+                Symbol<String> type = types.poll();
                 final int it = this.typeSymbols.indexOf(type.getValue());
                 types.addAll(this.problem.getType(type).getTypes());
                 this.domains.get(it).add(new IntSymbol(ic));
@@ -570,13 +570,13 @@ public abstract class AbstractProblem implements Problem {
      */
     private void initEitherTypes(final List<PDDLTypedSymbol> list) {
         for (PDDLTypedSymbol elt : list) {
-            final List<PDDLSymbol> types = elt.getTypes();
+            final List<Symbol<String>> types = elt.getTypes();
             if (types.size() > 1) {
                 String newType;
                 Set<IntSymbol> newTypeDomain = new LinkedHashSet<>();
                 StringBuilder buf = new StringBuilder();
                 buf.append("either");
-                for (PDDLSymbol type : types) {
+                for (Symbol<String> type : types) {
                     final String image = type.getValue();
                     buf.append("~");
                     buf.append(image);
@@ -599,7 +599,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @param exp the expression.
      */
-    private void initEitherTypes(final Expression<PDDLSymbol, PDDLTypedSymbol> exp) {
+    private void initEitherTypes(final Expression<Symbol<String>, PDDLTypedSymbol> exp) {
         switch (exp.getConnective()) {
             case AND:
             case OR:
@@ -683,10 +683,10 @@ public abstract class AbstractProblem implements Problem {
             final List<PDDLTypedSymbol> arguments = predicate.getArguments();
             final List<IntSymbol> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol arg : arguments) {
-                final List<PDDLSymbol> types = arg.getTypes();
+                final List<Symbol<String>> types = arg.getTypes();
                 if (types.size() > 1) {
                     final StringBuilder image = new StringBuilder("either");
-                    for (PDDLSymbol type : types) {
+                    for (Symbol<String> type : types) {
                         image.append("~");
                         image.append(type.getValue());
                     }
@@ -711,10 +711,10 @@ public abstract class AbstractProblem implements Problem {
             List<PDDLTypedSymbol> arguments = function.getArguments();
             List<IntSymbol> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol argument : arguments) {
-                List<PDDLSymbol> types = argument.getTypes();
+                List<Symbol<String>> types = argument.getTypes();
                 if (types.size() > 1) {
                     StringBuilder type = new StringBuilder("either");
-                    for (PDDLSymbol type1 : types) {
+                    for (Symbol<String> type1 : types) {
                         type.append("~").append(type1.getValue());
                     }
                     argType.add(new IntSymbol(this.typeSymbols.indexOf(type.toString())));
@@ -739,10 +739,10 @@ public abstract class AbstractProblem implements Problem {
             final List<PDDLTypedSymbol> arguments = task.getArguments();
             final List<IntSymbol> argType = new ArrayList<>(arguments.size());
             for (PDDLTypedSymbol arg : arguments) {
-                final List<PDDLSymbol> types = arg.getTypes();
+                final List<Symbol<String>> types = arg.getTypes();
                 if (types.size() > 1) {
                     final StringBuilder image = new StringBuilder("either");
-                    for (PDDLSymbol type : types) {
+                    for (Symbol<String> type : types) {
                         image.append("~");
                         image.append(type.getValue());
                     }
@@ -1095,7 +1095,7 @@ public abstract class AbstractProblem implements Problem {
      * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
      *      LESS_ORDERING_CONSTRAINTS are expected.
      */
-    private IntExpression initOrderingConstraints(final Expression<PDDLSymbol, PDDLTypedSymbol> exp) {
+    private IntExpression initOrderingConstraints(final Expression<Symbol<String>, PDDLTypedSymbol> exp) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case AND:
@@ -1127,7 +1127,7 @@ public abstract class AbstractProblem implements Problem {
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
-    private IntExpression initExpression(final Expression<PDDLSymbol, PDDLTypedSymbol> exp) {
+    private IntExpression initExpression(final Expression<Symbol<String>, PDDLTypedSymbol> exp) {
         return this.initExpression(exp, new ArrayList<>());
     }
 
@@ -1144,7 +1144,7 @@ public abstract class AbstractProblem implements Problem {
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
      */
-    protected IntExpression initExpression(final Expression<PDDLSymbol, PDDLTypedSymbol> exp,
+    protected IntExpression initExpression(final Expression<Symbol<String>, PDDLTypedSymbol> exp,
                                            final List<String> variables) {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
@@ -1152,7 +1152,7 @@ public abstract class AbstractProblem implements Problem {
                 intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
                 List<IntSymbol> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
-                    final PDDLSymbol argument = exp.getArguments().get(i);
+                    final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
                     } else {
@@ -1166,7 +1166,7 @@ public abstract class AbstractProblem implements Problem {
                 intExp.setSymbol(new IntSymbol(this.getFunctions().indexOf(functor)));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
-                    final PDDLSymbol argument = exp.getArguments().get(i);
+                    final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
                     } else {
@@ -1180,7 +1180,7 @@ public abstract class AbstractProblem implements Problem {
                 intExp.setSymbol(new IntSymbol(this.getPredicateSymbols().indexOf(predicate)));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
-                    final PDDLSymbol argument = exp.getArguments().get(i);
+                    final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
                     } else {
@@ -1268,7 +1268,7 @@ public abstract class AbstractProblem implements Problem {
                 intExp.setPrimtive(this.getPrimitiveTaskSymbols().contains(task));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
-                    final PDDLSymbol argument = exp.getArguments().get(i);
+                    final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
                     } else {
@@ -1300,13 +1300,13 @@ public abstract class AbstractProblem implements Problem {
             final int index = action.getValueOfParameter(i);
             final String type = this.getTypes().get(action.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ? \n");
             } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
                 str.append(" - ");
                 str.append(type);
@@ -1343,13 +1343,13 @@ public abstract class AbstractProblem implements Problem {
             final int index = method.getValueOfParameter(i);
             final String type = this.getTypes().get(method.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ? \n");
             } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
@@ -1400,13 +1400,13 @@ public abstract class AbstractProblem implements Problem {
             final int index = taskNetwork.getValueOfParameter(i);
             final String type = this.getTypes().get(taskNetwork.getTypeOfParameters(i));
             if (index == -1) {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ? \n");
             } else {
-                str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i);
                 str.append(" - ");
                 str.append(type);
                 str.append(" : ");
@@ -1461,7 +1461,7 @@ public abstract class AbstractProblem implements Problem {
                 List<IntSymbol> arguments = exp.getArguments();
                 for (IntSymbol arg : arguments) {
                     if (arg.getValue() < 0) {
-                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
                         str.append(" ").append(this.getConstantSymbols().get(arg.getValue()));
                     }
@@ -1473,7 +1473,7 @@ public abstract class AbstractProblem implements Problem {
                 arguments = exp.getArguments();
                 for (IntSymbol arg : arguments) {
                     if (arg.getValue() < 0) {
-                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
                         str.append(" ").append(this.getConstantSymbols().get(arg.getValue()));
                     }
@@ -1483,7 +1483,7 @@ public abstract class AbstractProblem implements Problem {
             case TASK:
                 str.append("(");
                 if (exp.getTaskID().equals(IntSymbol.DEFAULT_TASK_ID)) {
-                    str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                     str.append(exp.getTaskID());
                     str.append(" (");
                 }
@@ -1491,7 +1491,7 @@ public abstract class AbstractProblem implements Problem {
                 arguments = exp.getArguments();
                 for (IntSymbol arg : arguments) {
                     if (arg.getValue() < 0) {
-                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
                         str.append(" ").append(this.getConstantSymbols().get(arg.getValue()));
                     }
@@ -1506,7 +1506,7 @@ public abstract class AbstractProblem implements Problem {
                 arguments = exp.getArguments();
                 for (IntSymbol arg : arguments) {
                     if (arg.getValue() < 0) {
-                        str.append(" ").append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
+                        str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
                         str.append(" ").append(this.getConstantSymbols().get(arg.getValue()));
                     }
@@ -1533,7 +1533,7 @@ public abstract class AbstractProblem implements Problem {
                 str.append(" (").append(exp.getConnective().getImage());
                 str.append(" (");
                 for (IntTypedSymbol var: exp.getQuantifiedVariables()) {
-                    str.append(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL);
+                    str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                     str.append(-var.getVariable() - 1);
                     str.append(" - ");
                     str.append(this.getTypes().get(var.getType()));
@@ -1608,12 +1608,12 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case LESS_ORDERING_CONSTRAINT:
                 str.append("(");
-                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(0).getTaskID());
                 str.append(" ");
                 str.append(exp.getConnective().getImage());
                 str.append(" ");
-                str.append(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(1).getTaskID());
                 str.append(")");
                 break;
@@ -1811,11 +1811,11 @@ public abstract class AbstractProblem implements Problem {
      * @param types the list of types.
      * @return the string representation of this type.
      */
-    private String toStringType(final List<PDDLSymbol> types) {
+    private String toStringType(final List<Symbol<String>> types) {
         final StringBuilder str = new StringBuilder();
         if (types.size() > 1) {
             str.append("either");
-            for (PDDLSymbol type : types) {
+            for (Symbol<String> type : types) {
                 str.append("~");
                 str.append(type.getValue());
             }

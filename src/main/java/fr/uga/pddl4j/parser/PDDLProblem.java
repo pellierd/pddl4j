@@ -36,28 +36,28 @@ public interface PDDLProblem extends Serializable {
      *
      * @return the name of the domain.
      */
-    PDDLSymbol getDomainName();
+    Symbol<String> getDomainName();
 
     /**
      * Sets a name to the domain.
      *
      * @param name the name to set.
      */
-    void setDomainName(final PDDLSymbol name);
+    void setDomainName(final Symbol<String> name);
 
     /**
      * Return the name of the problem.
      *
      * @return the name of the problem.
      */
-    PDDLSymbol getProblemName();
+    Symbol<String> getProblemName();
 
     /**
      * Sets the name of the problem.
      *
      * @param name the name to set.
      */
-    void setProblemName(final PDDLSymbol name);
+    void setProblemName(final Symbol<String> name);
 
     /**
      * Returns the set of requirements.
@@ -166,7 +166,7 @@ public interface PDDLProblem extends Serializable {
      * @param symbol The symbol.
      * @return the object from a specified symbol or <code>null</code> if no object with this symbol was declared.
      */
-    PDDLTypedSymbol getObject(final PDDLSymbol symbol);
+    PDDLTypedSymbol getObject(final Symbol<String> symbol);
 
     /**
      * Normalize the problem. This method renames the variables and then move inward the negation of

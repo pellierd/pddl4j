@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
+public final class PDDLTypedSymbol extends Symbol<String> implements  TypedSymbol {
 
     /**
      * The list of the types of this symbol.
      */
-    private List<PDDLSymbol> types;
+    private List<Symbol<String>> types;
 
     /**
      * Creates a typed symbol from a specified typed symbol.
@@ -46,7 +46,7 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
     public PDDLTypedSymbol(final PDDLTypedSymbol symbol) {
         super(symbol);
         this.types = new ArrayList<>();
-        this.types.addAll(symbol.getTypes().stream().map(PDDLSymbol::new).collect(Collectors.toList()));
+        this.types.addAll(symbol.getTypes().stream().map(Symbol<String>::new).collect(Collectors.toList()));
     }
 
     /**
@@ -56,7 +56,7 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
      *
      * @param symbol the symbol.
      */
-    public PDDLTypedSymbol(final PDDLSymbol symbol) {
+    public PDDLTypedSymbol(final Symbol<String> symbol) {
         super(symbol);
         this.types = new ArrayList<>();
         //if (!symbol.equals(PDDLParser.OBJECT) && !symbol.equals(PDDLParser.NUMBER)) {
@@ -69,7 +69,7 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
      *
      * @return the list of types of this typed token.
      */
-    public List<PDDLSymbol> getTypes() {
+    public List<Symbol<String>> getTypes() {
         return this.types;
     }
 
@@ -78,7 +78,7 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
      *
      * @param type the type to add.
      */
-    public void addType(final PDDLSymbol type) {
+    public void addType(final Symbol<String> type) {
         /*if (!type.equals(PDDLParser.OBJECT)) {
             this.types.remove(PDDLParser.OBJECT);
         }*/

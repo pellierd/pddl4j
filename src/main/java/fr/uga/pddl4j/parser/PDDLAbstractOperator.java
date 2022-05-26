@@ -36,7 +36,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
     /**
      * The name of the operator.
      */
-    private PDDLSymbol name;
+    private Symbol<String> name;
 
     /**
      * The list of parameters of the operators.
@@ -69,7 +69,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         if (other == null) {
             throw new NullPointerException();
         }
-        this.name = new PDDLSymbol(other.getName());
+        this.name = new Symbol<String>(other.getName());
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
         this.preconditions = new PDDLExpression(other.getPreconditions());
@@ -85,7 +85,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
-    protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters,
+    protected PDDLAbstractOperator(final Symbol<String> name, final List<PDDLTypedSymbol> parameters,
                                    final PDDLExpression preconditions) {
         this(name, parameters, preconditions, null);
     }
@@ -98,7 +98,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param preconditions The goal description that represents the preconditions of the operator.
      * @param duration the duration constraint of the operator.
      */
-    protected PDDLAbstractOperator(final PDDLSymbol name, final List<PDDLTypedSymbol> parameters,
+    protected PDDLAbstractOperator(final Symbol<String> name, final List<PDDLTypedSymbol> parameters,
                                    final PDDLExpression preconditions, final PDDLExpression duration) {
         this.name = name;
         this.parameters = parameters;
@@ -111,7 +111,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @return the name of the operator.
      */
-    public final PDDLSymbol getName() {
+    public final Symbol<String> getName() {
         return this.name;
     }
 
@@ -120,7 +120,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @param name the name to set.
      */
-    public final void setName(final PDDLSymbol name) {
+    public final void setName(final Symbol<String> name) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -143,7 +143,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
      *          operator has no such parameter.
      */
-    public final PDDLTypedSymbol getParameter(final PDDLSymbol symbol) {
+    public final PDDLTypedSymbol getParameter(final Symbol<String> symbol) {
         final int index = this.parameters.indexOf(symbol);
         return (index == -1) ? null : this.parameters.get(index);
     }

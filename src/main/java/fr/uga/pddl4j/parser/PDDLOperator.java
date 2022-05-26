@@ -35,14 +35,14 @@ public interface PDDLOperator extends ParsedObject {
      *
      * @return the name of the operator.
      */
-    PDDLSymbol getName();
+    Symbol<String> getName();
 
     /**
      * Sets a new name to the operator.
      *
      * @param name the name to set.
      */
-    void setName(final PDDLSymbol name);
+    void setName(final Symbol<String> name);
 
     /**
      * Returns the list of parameters of the operator.
@@ -58,7 +58,7 @@ public interface PDDLOperator extends ParsedObject {
      * @return the parameter of the operator that has a specified symbol or <code>null</code> if the
      *          operator has no such parameter.
      */
-    PDDLTypedSymbol getParameter(final PDDLSymbol symbol);
+    PDDLTypedSymbol getParameter(final Symbol<String> symbol);
 
     /**
      * Returns the task representation of this operator.

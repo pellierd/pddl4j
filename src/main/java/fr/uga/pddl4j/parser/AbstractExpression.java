@@ -1212,14 +1212,14 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      * @return the old image of the symbol or null if the symbol was not renamed.
      * @throws IllegalArgumentException if index is &#60; 0.
      */
-    public final static String renameVariables(final PDDLSymbol symbol, final int index) {
+    public final static String renameVariables(final Symbol<String> symbol, final int index) {
         if (index < 0) {
             throw new IllegalArgumentException("index < 0");
         }
         String img = null;
         if (symbol.getType().equals(SymbolType.VARIABLE)) {
             img = symbol.getValue();
-            symbol.setValue(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
+            symbol.setValue(Symbol.DEFAULT_VARIABLE_SYMBOL + index);
         }
         return img;
     }
@@ -1243,7 +1243,7 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      * @return the old image of the symbol or null if the symbol was not renamed.
      * @throws NullPointerException if context == null.
      */
-    public static final String renameVariables(final PDDLSymbol symbol, final Map<String, String> context) {
+    public static final String renameVariables(final Symbol<String> symbol, final Map<String, String> context) {
         String img = null;
         if (symbol.getType().equals(SymbolType.VARIABLE)) {
             img = symbol.getValue();
@@ -1263,12 +1263,12 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      * @param context the images of the already renamed task ID.
      * @return the old image of the symbol or null if the symbol was not renamed.
      */
-    public final static String renameTaskID(PDDLSymbol symbol, final Map<String, String> context) {
+    public final static String renameTaskID(Symbol<String> symbol, final Map<String, String> context) {
         if (symbol.getType().equals(SymbolType.TASK_ID)) {
             String image = symbol.getValue();
             String newImage = context.get(image);
             if (newImage == null) {
-                newImage = PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size();
+                newImage = Symbol.DEFAULT_TASK_ID_SYMBOL + context.size();
                 context.put(image, newImage);
             }
             symbol.setValue(newImage);

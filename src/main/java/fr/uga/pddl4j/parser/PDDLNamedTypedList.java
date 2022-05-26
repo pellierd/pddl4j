@@ -36,7 +36,7 @@ public class PDDLNamedTypedList implements Serializable {
     /**
      * The name of the typed list.
      */
-    private PDDLSymbol name;
+    private Symbol<String> name;
 
     /**
      * The list of arguments.
@@ -46,7 +46,7 @@ public class PDDLNamedTypedList implements Serializable {
     /**
      * The list of the types of this name typed list. The list of types is used to encode function type since PDDL 3.1.
      */
-    private List<PDDLSymbol> types;
+    private List<Symbol<String>> types;
 
     /**
      * Creates a named typed list from a specified typed list.
@@ -54,11 +54,11 @@ public class PDDLNamedTypedList implements Serializable {
      * @param list the list.
      */
     public PDDLNamedTypedList(final PDDLNamedTypedList list) {
-        this.name = new PDDLSymbol(list.getName());
+        this.name = new Symbol<String>(list.getName());
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
         this.arguments.addAll(list.getArguments().stream().map(PDDLTypedSymbol::new).collect(Collectors.toList()));
-        this.types.addAll(list.types.stream().map(PDDLSymbol::new).collect(Collectors.toList()));
+        this.types.addAll(list.types.stream().map(Symbol<String>::new).collect(Collectors.toList()));
     }
 
     /**
@@ -66,7 +66,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @param name the name of the list.
      */
-    public PDDLNamedTypedList(final PDDLSymbol name) {
+    public PDDLNamedTypedList(final Symbol<String> name) {
         this.name = name;
         this.arguments = new ArrayList<>();
         this.types = new ArrayList<>();
@@ -77,7 +77,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @return the name of this typed list.
      */
-    public final PDDLSymbol getName() {
+    public final Symbol<String> getName() {
         return this.name;
     }
 
@@ -86,7 +86,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @param name the name to set.
      */
-    public final void setName(final PDDLSymbol name) {
+    public final void setName(final Symbol<String> name) {
         this.name = name;
     }
 
@@ -104,7 +104,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @return the list of types of this typed token.
      */
-    public List<PDDLSymbol> getTypes() {
+    public List<Symbol<String>> getTypes() {
         return this.types;
     }
 
@@ -113,7 +113,7 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @param type the type to add.
      */
-    public void addType(final PDDLSymbol type) {
+    public void addType(final Symbol<String> type) {
          /*if (!type.equals(PDDLParser.OBJECT)) {
             this.types.remove(PDDLParser.OBJECT);
         }*/
@@ -168,7 +168,7 @@ public class PDDLNamedTypedList implements Serializable {
      * Renames the variable contained in this typed list. For instance, if the nth argument is a
      * variable it will be rename <code>?Xn</code>.
      *
-     * @see PDDLSymbol#renameVariables(int)
+     * @see Symbol<String>#renameVariables(int)
      */
     /*public final void renameVariables() {
         for (int i = 0; i < this.arguments.size(); i++) {

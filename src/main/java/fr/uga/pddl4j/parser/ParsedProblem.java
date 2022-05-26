@@ -40,7 +40,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The name of the domain.
      */
-    private PDDLSymbol domainName;
+    private Symbol<String> domainName;
 
     /**
      * The set of requirements.
@@ -95,7 +95,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The problemName of the problem.
      */
-    private PDDLSymbol problemName;
+    private Symbol<String> problemName;
 
     /**
      * The list of objects declared in the problem.
@@ -134,7 +134,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @param domain the problemName of the domain.
      */
-    public ParsedProblem(final PDDLSymbol domain) {
+    public ParsedProblem(final Symbol<String> domain) {
         this();
         // Attributes of a domain
         this.domainName = domain;
@@ -165,7 +165,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param problem the name of the problem.
      * @param domain the name of the domain.
      */
-    public ParsedProblem(final PDDLSymbol problem, final PDDLSymbol domain) {
+    public ParsedProblem(final Symbol<String> problem, final Symbol<String> domain) {
         this(domain);
         this.problemName = problem;
         this.requirements = new LinkedHashSet<>();
@@ -236,7 +236,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the problemName of the domain.
      */
-    public final PDDLSymbol getDomainName() {
+    public final Symbol<String> getDomainName() {
         return this.domainName;
     }
 
@@ -245,7 +245,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @param name the problemName to set.
      */
-    public final void setDomainName(final PDDLSymbol name) {
+    public final void setDomainName(final Symbol<String> name) {
         this.domainName = name;
     }
 
@@ -453,7 +453,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param type the type symbol.
      * @return <code>true</code> if the specified symbol is a declared type; <code>false</code> otherwise.
      */
-    public boolean isDeclaredType(final PDDLSymbol type) {
+    public boolean isDeclaredType(final Symbol<String> type) {
         return this.types.contains(type);
     }
 
@@ -463,7 +463,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param symbol The symbol.
      * @return the type from a specified symbol or <code>null</code> if no type with this symbol was declared.
      */
-    public PDDLTypedSymbol getType(PDDLSymbol symbol) {
+    public PDDLTypedSymbol getType(Symbol<String> symbol) {
         int index = this.types.indexOf(symbol);
         return (index == -1) ? null : this.types.get(index);
     }
@@ -474,7 +474,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param constant the constant symbol.
      * @return <code>true</code> if the specified symbol is a declared constant; <code>false</code> otherwise.
      */
-    public boolean isDeclaredConstant(final PDDLSymbol constant) {
+    public boolean isDeclaredConstant(final Symbol<String> constant) {
         return this.types.contains(constant);
     }
 
@@ -485,7 +485,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @return the constant from a specified symbol or <code>null</code> if no constant with this
      *          symbol was declared.
      */
-    public PDDLTypedSymbol getConstant(PDDLSymbol symbol) {
+    public PDDLTypedSymbol getConstant(Symbol<String> symbol) {
         int index = this.constants.indexOf(symbol);
         return (index == -1) ? null : this.constants.get(index);
     }
@@ -495,7 +495,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the problemName of the problem.
      */
-    public final PDDLSymbol getProblemName() {
+    public final Symbol<String> getProblemName() {
         return this.problemName;
     }
 
@@ -504,7 +504,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @param problemName the problemName to set.
      */
-    public final void setProblemName(final PDDLSymbol problemName) {
+    public final void setProblemName(final Symbol<String> problemName) {
         this.problemName = problemName;
     }
 
@@ -606,7 +606,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param symbol The symbol.
      * @return the object from a specified symbol or <code>null</code> if no object with this symbol was declared.
      */
-    public final PDDLTypedSymbol getObject(final PDDLSymbol symbol) {
+    public final PDDLTypedSymbol getObject(final Symbol<String> symbol) {
         final int index = this.objects.indexOf(symbol);
         return (index == -1) ? null : this.objects.get(index);
     }
@@ -651,10 +651,10 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *          of the seconds. <code>false</code> otherwise.
      */
     public boolean isSubType(PDDLTypedSymbol s1, PDDLTypedSymbol s2) {
-        List<PDDLSymbol> copy = new LinkedList<>(s1.getTypes());
+        List<Symbol<String>> copy = new LinkedList<>(s1.getTypes());
         copy.retainAll(s2.getTypes());
         boolean isSubType = !copy.isEmpty();
-        Iterator<PDDLSymbol> i = s1.getTypes().iterator();
+        Iterator<Symbol<String>> i = s1.getTypes().iterator();
         while (i.hasNext() && !isSubType) {
             PDDLTypedSymbol type = this.getType(i.next());
             LinkedList<PDDLTypedSymbol> stack = new LinkedList<>();
@@ -732,7 +732,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
                 tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
                     PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    c.setArguments(new LinkedList<PDDLSymbol>());
+                    c.setArguments(new LinkedList<Symbol<String>>());
                     c.getArguments().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
                     c.getArguments().add(tn.getTasks().getChildren().get(i).getTaskID());
                     tn.getOrdering().addChild(c);

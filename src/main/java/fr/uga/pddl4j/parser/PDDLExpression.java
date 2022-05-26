@@ -34,7 +34,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 13.05.2022
  */
-public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymbol> implements ParsedObject {
+public class PDDLExpression extends AbstractExpression<Symbol<String>, PDDLTypedSymbol> implements ParsedObject {
 
     /**
      * The parsed objet to deal with multiple inheritance with <code>Expression</code> and <code>ParseObject</code>.
@@ -51,12 +51,12 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
         super();
         this.setConnective(other.getConnective());
         if (other.getSymbol() != null) {
-            this.setSymbol(new PDDLSymbol(other.getSymbol()));
+            this.setSymbol(new Symbol<String>(other.getSymbol()));
         }
         if (other.getArguments() != null) {
             this.setArguments(new ArrayList<>());
-            for (PDDLSymbol argument: other.getArguments()) {
-                this.addArgument(new PDDLSymbol(argument));
+            for (Symbol<String> argument: other.getArguments()) {
+                this.addArgument(new Symbol<String>(argument));
             }
         }
         if (other.getQuantifiedVariables() != null) {
@@ -66,13 +66,13 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             }
         }
         if (other.getVariable() != null) {
-            this.setVariable(new PDDLSymbol(other.getVariable()));
+            this.setVariable(new Symbol<String>(other.getVariable()));
         }
         if (other.getPrefName() != null) {
-            this.setPrefName(new PDDLSymbol(other.getPrefName()));
+            this.setPrefName(new Symbol<String>(other.getPrefName()));
         }
         if (other.getTaskID() != null) {
-            this.setTaskID(new PDDLSymbol(other.getTaskID()));
+            this.setTaskID(new Symbol<String>(other.getTaskID()));
         }
         if (other.getValue() != null) {
             this.setValue(other.getValue());
@@ -241,8 +241,8 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             case TASK:
                 // Set a dummy taskID to task if no task taskID was specified
                 if (this.getTaskID() == null) {
-                    String newTaskID = new String(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size());
-                    PDDLSymbol taskID = new PDDLSymbol(this.getSymbol());
+                    String newTaskID = new String(Symbol.DEFAULT_TASK_ID_SYMBOL + context.size());
+                    Symbol<String> taskID = new Symbol<String>(this.getSymbol());
                     taskID.setType(SymbolType.TASK_ID);
                     taskID.setValue(newTaskID);
                     this.setTaskID(taskID);
@@ -371,7 +371,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             case FORALL:
             case EXISTS:
                 for (int i = 0; i < this.getQuantifiedVariables().size(); i++) {
-                    final PDDLSymbol var = this.getQuantifiedVariables().get(i);
+                    final Symbol<String> var = this.getQuantifiedVariables().get(i);
                     final String image = AbstractExpression.renameVariables(var, context.size() + 1);
                     context.put(image, var.getValue());
                 }
@@ -445,8 +445,8 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
      *      HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
      *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
      */
-    public Set<PDDLSymbol> getTaskIDs() throws UnexpectedExpressionException {
-        Set<PDDLSymbol> taskIDs  = new HashSet<PDDLSymbol>();
+    public Set<Symbol<String>> getTaskIDs() throws UnexpectedExpressionException {
+        Set<Symbol<String>> taskIDs  = new HashSet<Symbol<String>>();
         switch (this.getConnective()) {
             case TASK:
                 if (this.getTaskID() != null) {

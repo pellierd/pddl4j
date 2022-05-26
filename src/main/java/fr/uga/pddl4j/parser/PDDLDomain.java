@@ -36,14 +36,14 @@ public interface PDDLDomain extends Serializable {
      *
      * @return the name of the domain.
      */
-    PDDLSymbol getDomainName();
+    Symbol<String> getDomainName();
 
     /**
      * Sets a name to the domain.
      *
      * @param name the name to set.
      */
-    void setDomainName(final PDDLSymbol name);
+    void setDomainName(final Symbol<String> name);
 
     /**
      * Returns the set of requirements.
@@ -202,7 +202,7 @@ public interface PDDLDomain extends Serializable {
      * @param type the type symbol.
      * @return <code>true</code> if the specified symbol is a declared type; <code>false</code> otherwise.
      */
-    boolean isDeclaredType(final PDDLSymbol type);
+    boolean isDeclaredType(final Symbol<String> type);
 
     /**
      * Returns the type from a specified symbol.
@@ -210,7 +210,7 @@ public interface PDDLDomain extends Serializable {
      * @param symbol The symbol.
      * @return the type from a specified symbol or <code>null</code> if no type with this symbol was declared.
      */
-    public PDDLTypedSymbol getType(PDDLSymbol symbol);
+    public PDDLTypedSymbol getType(Symbol<String> symbol);
 
     /**
      * Returns if a specified constant symbol was declared.
@@ -218,7 +218,7 @@ public interface PDDLDomain extends Serializable {
      * @param constant the constant symbol.
      * @return <code>true</code> if the specified symbol is a declared constant; <code>false</code> otherwise.
      */
-    boolean isDeclaredConstant(final PDDLSymbol constant);
+    boolean isDeclaredConstant(final Symbol<String> constant);
 
     /**
      * Returns the constant from a specified symbol.
@@ -227,7 +227,7 @@ public interface PDDLDomain extends Serializable {
      * @return the constant from a specified symbol or <code>null</code> if no constant with this
      *          symbol was declared.
      */
-    PDDLTypedSymbol getConstant(PDDLSymbol symbol);
+    PDDLTypedSymbol getConstant(Symbol<String> symbol);
 
     /**
      * Returns if the types of two typed symbol matched, i.e., if the types of the first typed
