@@ -5,6 +5,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymbol> implements Expression<T1, T2> {
 
@@ -1202,4 +1203,78 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
         return str.toString();
     }
 
+
+    /**
+     * Renames the symbol from a specified index. The symbol is renamed if only if this symbol is a
+     * variable, otherwise nothing is done. After rename operation the variable will have the form
+     * <code>?Xn</code> where <code>n</code> is the specified index.
+     *
+     * @param index the index of the symbol.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws IllegalArgumentException if index is &#60; 0.
+     */
+    public final static String renameVariables(final PDDLSymbol symbol, final int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("index < 0");
+        }
+        String img = null;
+        if (symbol.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+            img = symbol.getImage();
+            symbol.setImage(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
+        }
+        return img;
+    }
+
+    /**
+     * Renames the variable contained in this typed list. For instance, if the nth argument is a
+     * variable it will be rename <code>?Xn</code>.
+     *
+     */
+    public static final void renameVariables(final PDDLNamedTypedList list) {
+        for (int i = 0; i < list.getArguments().size(); i++) {
+            AbstractExpression.renameVariables(list.getArguments().get(i), i);
+        }
+    }
+
+    /**
+     * Renames the symbol from a specified symbolEncoding. The symbol is renamed if only if this symbol is a
+     * variable, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed variables.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws NullPointerException if context == null.
+     */
+    public static final String renameVariables(final PDDLSymbol symbol, final Map<String, String> context) {
+        String img = null;
+        if (symbol.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
+            img = symbol.getImage();
+            final String newImage = context.get(img);
+            if (newImage != null) {
+                symbol.setImage(newImage);
+                return img;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Renames the task ID symbol according to a specific context. The symbol is renamed if only if this symbol is a
+     * task ID, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed task ID.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     */
+    public final static String renameTaskID(PDDLSymbol symbol, final Map<String, String> context) {
+        if (symbol.getKind().equals(PDDLSymbol.Kind.TASK_ID)) {
+            String image = symbol.getImage();
+            String newImage = context.get(image);
+            if (newImage == null) {
+                newImage = PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size();
+                context.put(image, newImage);
+            }
+            symbol.setImage(newImage);
+            return image;
+        }
+        return null;
+    }
 }

@@ -249,7 +249,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
                     this.setTaskID(taskID);
                     context.put(newTaskID, newTaskID);
                 } else {
-                    this.getTaskID().renameTaskID(context);
+                    AbstractExpression.renameTaskID(this.getTaskID(), context);
                 }
                 break;
             case F_TASK_TIME:
@@ -260,19 +260,19 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
             case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
-                this.getChildren().get(0).getTaskID().renameTaskID(context);
-                this.getChildren().get(1).getTaskID().renameTaskID(context);
+                AbstractExpression.renameTaskID(this.getChildren().get(0).getTaskID(), context);
+                AbstractExpression.renameTaskID(this.getChildren().get(0).getTaskID(), context);
                 break;
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
             case SOMETIME_BEFORE_METHOD_CONSTRAINT:
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
-                this.getChildren().get(0).getTaskID().renameTaskID(context);
+                AbstractExpression.renameTaskID(this.getChildren().get(0).getTaskID(), context);
                 break;
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
-                this.getChildren().get(0).getTaskID().renameTaskID(context);
-                this.getChildren().get(1).getTaskID().renameTaskID(context);
+                AbstractExpression.renameTaskID(this.getChildren().get(0).getTaskID(), context);
+                AbstractExpression.renameTaskID(this.getChildren().get(1).getTaskID(), context);
                 break;
             case AT_END_METHOD_CONSTRAINT:
             case AT_START_METHOD_CONSTRAINT:
@@ -315,7 +315,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             case EQUAL_ATOM:
             case TASK:
                 for (int i = 0; i < this.getArguments().size(); i++) {
-                    this.getArguments().get(i).renameVariables(context);
+                   AbstractExpression.renameVariables( this.getArguments().get(i), context);
                 }
                 break;
             case AND:
@@ -373,7 +373,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             case EXISTS:
                 for (int i = 0; i < this.getQuantifiedVariables().size(); i++) {
                     final PDDLSymbol var = this.getQuantifiedVariables().get(i);
-                    final String image = var.renameVariables(context.size() + 1);
+                    final String image = AbstractExpression.renameVariables(var, context.size() + 1);
                     context.put(image, var.getImage());
                 }
                 PDDLExpression e0 = (PDDLExpression)  this.getChildren().get(0);

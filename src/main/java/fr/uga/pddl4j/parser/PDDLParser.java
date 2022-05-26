@@ -1761,7 +1761,7 @@ public final class PDDLParser implements Callable<Integer> {
         final Map<String, String> context = new LinkedHashMap<>();
         final List<PDDLTypedSymbol> parameters = action.getParameters();
         for (final PDDLTypedSymbol params : parameters) {
-            final String image = params.renameVariables(i);
+            final String image = AbstractExpression.renameVariables(params, i);
             context.put(image, params.getImage());
             i++;
         }
@@ -1811,7 +1811,7 @@ public final class PDDLParser implements Callable<Integer> {
         final Map<String, String> context = new LinkedHashMap<>();
         final List<PDDLTypedSymbol> parameters = method.getParameters();
         for (final PDDLTypedSymbol params : parameters) {
-            final String image = params.renameVariables(i);
+            final String image = AbstractExpression.renameVariables(params, i);
             context.put(image, params.getImage());
             i++;
         }

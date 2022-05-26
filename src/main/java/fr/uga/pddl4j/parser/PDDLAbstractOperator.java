@@ -263,7 +263,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         final Map<String, String> context = new LinkedHashMap<>();
         final List<PDDLTypedSymbol> parameters = this.getParameters();
         for (final PDDLTypedSymbol params : parameters) {
-            final String image = params.renameVariables(i);
+            final String image = AbstractExpression.renameVariables(params, i);
             context.put(image, params.getImage());
             i++;
         }

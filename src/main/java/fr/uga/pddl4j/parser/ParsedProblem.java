@@ -681,15 +681,15 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     public void normalize() {
         // Rename all the variables from the predicates declaration
         for (int i = 0; i < this.getPredicates().size(); i++) {
-            this.getPredicates().get(i).renameVariables();
+            AbstractExpression.renameVariables(this.getPredicates().get(i));
         }
         // Rename all the variables from the functions declaration
         for (int i = 0; i < this.getFunctions().size(); i++) {
-            this.getFunctions().get(i).renameVariables();
+            AbstractExpression.renameVariables(this.getFunctions().get(i));
         }
         // Rename all the variables from the tasks declaration
         for (int i = 0; i < this.getTasks().size(); i++) {
-            this.getTasks().get(i).renameVariables();
+            AbstractExpression.renameVariables(this.getTasks().get(i));
         }
         // Rename all the variables from the constraint declaration of the domain
         if (this.getConstraints() != null) {

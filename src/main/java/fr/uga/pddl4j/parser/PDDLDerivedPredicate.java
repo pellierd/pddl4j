@@ -120,7 +120,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
         final List<PDDLTypedSymbol> arguments = this.getHead().getArguments();
         for (int i = 0; i < arguments.size(); i++) {
             final PDDLTypedSymbol argument = arguments.get(i);
-            final String image = argument.renameVariables(i);
+            final String image = AbstractExpression.renameVariables(argument, i);
             context.put(image, argument.getImage());
         }
         // Rename the body of the derived predicate

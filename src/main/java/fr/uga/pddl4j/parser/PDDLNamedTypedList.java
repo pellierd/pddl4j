@@ -186,11 +186,11 @@ public class PDDLNamedTypedList implements Serializable {
      *
      * @see PDDLSymbol#renameVariables(int)
      */
-    public final void renameVariables() {
+    /*public final void renameVariables() {
         for (int i = 0; i < this.arguments.size(); i++) {
             arguments.get(i).renameVariables(i);
         }
-    }
+    }*/
 
     /**
      * Returns a string representation of this named typed list.

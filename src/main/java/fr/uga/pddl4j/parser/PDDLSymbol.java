@@ -240,7 +240,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      * @return the old image of the symbol or null if the symbol was not renamed.
      * @throws IllegalArgumentException if index is &#60; 0.
      */
-    public final String renameVariables(final int index) {
+    /*public final String renameVariables(final int index) {
         if (index < 0) {
             throw new IllegalArgumentException("index < 0");
         }
@@ -250,7 +250,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
             this.setImage(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
         }
         return img;
-    }
+    }*/
 
     /**
      * Renames the symbol from a specified symbolEncoding. The symbol is renamed if only if this symbol is a
@@ -260,7 +260,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      * @return the old image of the symbol or null if the symbol was not renamed.
      * @throws NullPointerException if context == null.
      */
-    public final String renameVariables(final Map<String, String> context) {
+    /*public final String renameVariables(final Map<String, String> context) {
         String img = null;
         if (this.getKind().equals(PDDLSymbol.Kind.VARIABLE)) {
             img = this.getImage();
@@ -271,7 +271,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
             }
         }
         return null;
-    }
+    }*/
 
     /**
      * Renames the symbol. The symbol is renamed if only if this symbol is contained the map in parameters,
@@ -301,7 +301,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      * @param context the images of the already renamed task ID.
      * @return the old image of the symbol or null if the symbol was not renamed.
      */
-    public final String renameTaskID(final Map<String, String> context) {
+    /*public final String renameTaskID(final Map<String, String> context) {
         if (this.getKind().equals(Kind.TASK_ID)) {
             String image = this.getImage();
             String newImage = context.get(image);
@@ -313,7 +313,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
             return image;
         }
         return null;
-    }
+    }*/
 
     /**
      * Return if this symbol is equal to another object.
