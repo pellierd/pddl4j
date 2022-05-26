@@ -231,8 +231,8 @@ public class AbstractPDDLExpression extends AbstractExpression<PDDLSymbol, PDDLT
                 if (this.getTaskID() == null) {
                     String newTaskID = new String(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size());
                     PDDLSymbol taskID = new PDDLSymbol(this.getSymbol());
-                    taskID.setKind(SymbolType.TASK_ID);
-                    taskID.setImage(newTaskID);
+                    taskID.setType(SymbolType.TASK_ID);
+                    taskID.setValue(newTaskID);
                     this.setTaskID(taskID);
                     context.put(newTaskID, newTaskID);
                 } else {
@@ -361,7 +361,7 @@ public class AbstractPDDLExpression extends AbstractExpression<PDDLSymbol, PDDLT
                 for (int i = 0; i < this.getQuantifiedVariables().size(); i++) {
                     final PDDLSymbol var = this.getQuantifiedVariables().get(i);
                     final String image = AbstractExpression.renameVariables(var, context.size() + 1);
-                    context.put(image, var.getImage());
+                    context.put(image, var.getValue());
                 }
                 AbstractPDDLExpression e0 = (AbstractPDDLExpression)  this.getChildren().get(0);
                 e0.renameVariables(context);

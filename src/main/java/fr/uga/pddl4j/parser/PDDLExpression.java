@@ -243,8 +243,8 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
                 if (this.getTaskID() == null) {
                     String newTaskID = new String(PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size());
                     PDDLSymbol taskID = new PDDLSymbol(this.getSymbol());
-                    taskID.setKind(SymbolType.TASK_ID);
-                    taskID.setImage(newTaskID);
+                    taskID.setType(SymbolType.TASK_ID);
+                    taskID.setValue(newTaskID);
                     this.setTaskID(taskID);
                     context.put(newTaskID, newTaskID);
                 } else {
@@ -260,7 +260,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
             case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
                 AbstractExpression.renameTaskID(this.getChildren().get(0).getTaskID(), context);
-                AbstractExpression.renameTaskID(this.getChildren().get(0).getTaskID(), context);
+                AbstractExpression.renameTaskID(this.getChildren().get(1).getTaskID(), context);
                 break;
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
@@ -373,7 +373,7 @@ public class PDDLExpression extends AbstractExpression<PDDLSymbol, PDDLTypedSymb
                 for (int i = 0; i < this.getQuantifiedVariables().size(); i++) {
                     final PDDLSymbol var = this.getQuantifiedVariables().get(i);
                     final String image = AbstractExpression.renameVariables(var, context.size() + 1);
-                    context.put(image, var.getImage());
+                    context.put(image, var.getValue());
                 }
                 PDDLExpression e0 = (PDDLExpression)  this.getChildren().get(0);
                 e0.renameVariables(context);

@@ -264,7 +264,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         final List<PDDLTypedSymbol> parameters = this.getParameters();
         for (final PDDLTypedSymbol params : parameters) {
             final String image = AbstractExpression.renameVariables(params, i);
-            context.put(image, params.getImage());
+            context.put(image, params.getValue());
             i++;
         }
         // Rename the preconditions

@@ -697,11 +697,13 @@ void type_def():
 			for (PDDLTypedSymbol type : typedList) {
 				this.domain.addType(type);
 			}
-//			for (PDDLTypedSymbol token : this.types_def) {
-//				if (token.getTypes().isEmpty()) {
-//					token.addType(PDDLParser.OBJECT);
-//				}
-//			}
+			for (PDDLTypedSymbol type : this.domain.getTypes()) {
+				if (type.getTypes().isEmpty()
+				        && !type.equals(PDDLParser.OBJECT)
+				        && !type.equals(PDDLParser.NUMBER)) {
+					type.addType(PDDLParser.OBJECT);
+				}
+			}
 		}
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -1911,10 +1913,10 @@ PDDLExpression f_head() :
 | 	s=functor() {
         exp.setSymbol(s);
 		exp.setArguments(args);
-        exp.setBeginLine(s.getBeginLine());
-        exp.setBeginColumn(s.getBeginColumn());
-        exp.setEndLine(s.getEndLine());
-        exp.setEndColumn(s.getEndColumn());
+        exp.setBeginLine(s.getLocation().getBeginLine());
+        exp.setBeginColumn(s.getLocation().getBeginColumn());
+        exp.setEndLine(s.getLocation().getEndLine());
+        exp.setEndColumn(s.getLocation().getEndColumn());
 		return exp;
 	}
 }
@@ -4197,10 +4199,10 @@ PDDLExpression f_exp_t() :
             }
 	| 	LOOKAHEAD(2)
 		    continuous_variable_name=continuous_variable() {
-		        exp.setBeginLine(continuous_variable_name.getBeginLine());
-                exp.setBeginColumn(continuous_variable_name.getBeginColumn());
-                exp.setEndLine(continuous_variable_name.getEndLine());
-                exp.setEndColumn(continuous_variable_name.getEndColumn());
+		        exp.setBeginLine(continuous_variable_name.getLocation().getBeginLine());
+                exp.setBeginColumn(continuous_variable_name.getLocation().getBeginColumn());
+                exp.setEndLine(continuous_variable_name.getLocation().getEndLine());
+                exp.setEndColumn(continuous_variable_name.getLocation().getEndColumn());
                 exp.setVariable(continuous_variable_name);
 		    }
 	) {

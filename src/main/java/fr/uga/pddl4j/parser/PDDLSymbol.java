@@ -33,7 +33,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLSymbol extends AbstractParsedObject implements Symbol {
+public class PDDLSymbol implements Symbol, Locatable {
 
     /**
      * The name of rename variable.
@@ -48,12 +48,17 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     /**
      * The kind of the symbol.
      */
-    private SymbolType symbolType;
+    private SymbolType type;
 
     /**
      * The image of the symbol.
      */
-    private String image;
+    private String value;
+
+    /**
+     * The location of the symbol.
+     */
+    private Location location;
 
     /**
      * The time specifier of the symbol.
@@ -63,43 +68,44 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     /**
      * Creates a symbol from a specified symbol.
      *
-     * @param symbol the symbol.
+     * @param other the symbol.
      */
-    public PDDLSymbol(final PDDLSymbol symbol) {
-        super(symbol);
-        this.symbolType = symbol.getKind();
-        this.image = symbol.getImage();
-        this.timeSpecifier = symbol.getTimeSpecifier();
+    public PDDLSymbol(final PDDLSymbol other) {
+        super();
+        this.setType(other.getType());
+        this.setValue(other.getValue());
+        if (other.getLocation() != null) {
+            this.setLocation(new Location(other.getLocation()));
+        }
+        this.timeSpecifier = other.getTimeSpecifier();
     }
 
     /**
      * Create a new symbol from a specified token.
      *
-     * @param symbolType  the kind of the symbol.
+     * @param type  the type of the symbol.
      * @param token the token.
      */
-    public PDDLSymbol(final SymbolType symbolType, final Token token) {
-        super(token.beginLine, token.beginColumn, token.endLine, token.endColumn);
-        this.symbolType = symbolType;
-        this.image = token.image.toLowerCase(Locale.ENGLISH);
-        this.timeSpecifier = null;
+    public PDDLSymbol(final SymbolType type, final Token token) {
+        this(type, token.image.toLowerCase(Locale.ENGLISH),
+            token.beginLine, token.beginColumn, token.endLine, token.endColumn);
     }
 
     /**
      * Create a symbol with a specified image, line and column.
      *
-     * @param symbolType        the kind of the symbol.
-     * @param image       the string image of the symbol.
+     * @param type        the kind of the symbol.
+     * @param value       the string image of the symbol.
      * @param beginLine   the begin line of the symbol.
      * @param beginColumn the begin column of the symbol.
      * @param endLine     the end line of the symbol.
      * @param endColumn   the end column of the symbol.
      */
-    public PDDLSymbol(final SymbolType symbolType, final String image, final int beginLine, final int beginColumn,
+    public PDDLSymbol(final SymbolType type, final String value, final int beginLine, final int beginColumn,
                       final int endLine, final int endColumn) {
-        super(beginLine, beginColumn, endLine, endColumn);
-        this.symbolType = symbolType;
-        this.image = image.toLowerCase(Locale.ENGLISH);
+        this.setType(type);
+        this.setValue(value.toLowerCase(Locale.ENGLISH));
+        this.setLocation(new Location(beginLine, beginColumn, endLine, endColumn));
         this.timeSpecifier = null;
     }
 
@@ -107,11 +113,11 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      * Creates a new symbol with a specified image. The line and the column are initialized to
      * <code>-1</code>.
      *
-     * @param symbolType  the kind of the symbol.
-     * @param image the string image of the symbol.
+     * @param type  the kind of the symbol.
+     * @param value the string image of the symbol.
      */
-    public PDDLSymbol(final SymbolType symbolType, final String image) {
-        this(symbolType, image, ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
+    public PDDLSymbol(final SymbolType type, final String value) {
+        this(type, value, ParsedObject.DEFAULT_BEGIN_LINE, ParsedObject.DEFAULT_BEGING_COLUMN,
             ParsedObject.DEFAULT_END_LINE,  ParsedObject.DEFAULT_END_COLUMN);
     }
 
@@ -120,35 +126,62 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      *
      * @return the kind of this symbol.
      */
-    public final SymbolType getKind() {
-        return this.symbolType;
+    public final SymbolType getType() {
+        return this.type;
     }
 
     /**
      * Sets the kind of this symbol.
      *
-     * @param symbolType the kind of the symbol.
+     * @param type the kind of the symbol.
      */
-    public final void setKind(final SymbolType symbolType) {
-        this.symbolType = symbolType;
+    public final void setType(final SymbolType type) {
+        this.type = type;
     }
 
     /**
-     * Return the string image of this symbol.
+     * Returns the string image of this symbol.
      *
      * @return the string image of this symbol.
      */
-    public final String getImage() {
-        return this.image;
+    public final String getValue() {
+        return this.value;
+    }
+
+    /**
+     * Returns the string image of this symbol.
+     *
+     * @return the string image of this symbol.
+     */
+    public String getImage() {
+        return this.value;
     }
 
     /**
      * Sets a new image to this symbol.
      *
-     * @param image the new image to set.
+     * @param value the new image to set.
      */
-    public final void setImage(String image) {
-        this.image = image;
+    public final void setValue(String value) {
+        this.value = value;
+    }
+
+    /**
+     * Return the location of the symbol.
+     *
+     * @return the location of the symbol.
+     */
+    public Location getLocation() {
+        return this.location;
+    }
+
+    /**
+     * Sets the location of the symbol.
+     *
+     * @param location the location to set.
+     */
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     /**
@@ -167,6 +200,30 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      */
     public final void setTimeSpecifier(final PDDLTimeSpecifier timeSpecifier) {
         this.timeSpecifier = timeSpecifier;
+    }
+
+    /**
+     * Sets the begin line and column of the expression from a specified token.
+     *
+     * @param begin the first token of the expression.
+     */
+    public final void setBegin(final Token begin) {
+        if (this.getLocation() == null) {
+            this.setLocation(new Location());
+        }
+        this.getLocation().setBegin(begin);
+    }
+
+    /**
+     * Sets the end line and column of the expression from a specified token.
+     *
+     * @param end the last token of the expression.
+     */
+    public final void setEnd(final Token end) {
+        if (this.getLocation() == null) {
+            this.setLocation(new Location());
+        }
+        this.getLocation().setEnd(end);
     }
 
     /**
@@ -223,10 +280,10 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
         if (context == null) {
             throw new NullPointerException("context == null");
         }
-        final String odlImage = this.getImage();
+        final String odlImage = this.getValue();
         final String newImage = context.get(odlImage);
         if (newImage != null) {
-            this.setImage(newImage);
+            this.setValue(newImage);
             return odlImage;
         }
         return null;
@@ -266,7 +323,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     public boolean equals(final Object object) {
         if (object != null && object instanceof PDDLSymbol) {
             PDDLSymbol other = (PDDLSymbol) object;
-            return this.getImage().equals(other.getImage());
+            return this.getValue().equals(other.getValue());
         }
         return false;
     }
@@ -279,7 +336,7 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getImage());
+        return Objects.hash(this.getValue());
     }
 
     /**
@@ -290,20 +347,20 @@ public class PDDLSymbol extends AbstractParsedObject implements Symbol {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        switch (this.symbolType) {
+        switch (this.type) {
             case TASK_ID:
                 if (this.getTimeSpecifier() != null) {
                     str.append("( ");
                     str.append(this.getTimeSpecifier());
                     str.append(" ");
-                    str.append(this.getImage());
+                    str.append(this.getValue());
                     str.append(")");
                 } else {
-                    str.append(this.getImage());
+                    str.append(this.getValue());
                 }
                 break;
             default:
-                str.append(this.getImage());
+                str.append(this.getValue());
         }
         return str.toString();
     }

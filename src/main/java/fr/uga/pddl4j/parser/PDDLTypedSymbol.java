@@ -22,7 +22,6 @@ package fr.uga.pddl4j.parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -58,12 +57,11 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
      * @param symbol the symbol.
      */
     public PDDLTypedSymbol(final PDDLSymbol symbol) {
-        super(symbol.getKind(), symbol.getImage(), symbol.getBeginLine(), symbol.getBeginColumn(), symbol
-            .getEndLine(), symbol.getEndColumn());
+        super(symbol);
         this.types = new ArrayList<>();
-        if (!symbol.equals(PDDLParser.OBJECT) && !symbol.equals(PDDLParser.NUMBER)) {
-            this.types.add(PDDLParser.OBJECT);
-        }
+        //if (!symbol.equals(PDDLParser.OBJECT) && !symbol.equals(PDDLParser.NUMBER)) {
+        //    this.types.add(PDDLParser.OBJECT);
+        //}
     }
 
     /**
@@ -81,12 +79,9 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
      * @param type the type to add.
      */
     public void addType(final PDDLSymbol type) {
-        if (type == null) {
-            throw new NullPointerException();
-        }
-        if (!type.equals(PDDLParser.OBJECT)) {
+        /*if (!type.equals(PDDLParser.OBJECT)) {
             this.types.remove(PDDLParser.OBJECT);
-        }
+        }*/
         if (!this.types.contains(type)) {
             this.types.add(type);
         }
@@ -101,7 +96,8 @@ public final class PDDLTypedSymbol extends PDDLSymbol implements  TypedSymbol {
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append(super.toString());
-        if (!this.equals(PDDLParser.OBJECT) && !this.equals(PDDLParser.NUMBER)) {
+        //if (!this.equals(PDDLParser.OBJECT) && !this.equals(PDDLParser.NUMBER)) {
+        if (!this.getTypes().isEmpty()) {
             str.append(" - ");
             if (this.types.size() == 1) {
                 str.append(this.types.get(0).toString().toUpperCase(Locale.ENGLISH));

@@ -1128,8 +1128,8 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
             case EQUAL_ORDERING_CONSTRAINT:
                 str.append("(");
                 str.append(this.getConnective().getImage()).append(" ");
-                str.append(this.arguments.get(0).toString()).append(" ");
-                str.append(this.arguments.get(1).toString());
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString());
                 str.append(")");
                 break;
             case NOT:
@@ -1217,9 +1217,9 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
             throw new IllegalArgumentException("index < 0");
         }
         String img = null;
-        if (symbol.getKind().equals(SymbolType.VARIABLE)) {
-            img = symbol.getImage();
-            symbol.setImage(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
+        if (symbol.getType().equals(SymbolType.VARIABLE)) {
+            img = symbol.getValue();
+            symbol.setValue(PDDLSymbol.DEFAULT_VARIABLE_SYMBOL + index);
         }
         return img;
     }
@@ -1245,11 +1245,11 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      */
     public static final String renameVariables(final PDDLSymbol symbol, final Map<String, String> context) {
         String img = null;
-        if (symbol.getKind().equals(SymbolType.VARIABLE)) {
-            img = symbol.getImage();
+        if (symbol.getType().equals(SymbolType.VARIABLE)) {
+            img = symbol.getValue();
             final String newImage = context.get(img);
             if (newImage != null) {
-                symbol.setImage(newImage);
+                symbol.setValue(newImage);
                 return img;
             }
         }
@@ -1264,14 +1264,14 @@ public abstract class AbstractExpression<T1 extends Symbol, T2 extends TypedSymb
      * @return the old image of the symbol or null if the symbol was not renamed.
      */
     public final static String renameTaskID(PDDLSymbol symbol, final Map<String, String> context) {
-        if (symbol.getKind().equals(SymbolType.TASK_ID)) {
-            String image = symbol.getImage();
+        if (symbol.getType().equals(SymbolType.TASK_ID)) {
+            String image = symbol.getValue();
             String newImage = context.get(image);
             if (newImage == null) {
                 newImage = PDDLSymbol.DEFAULT_TASK_ID_SYMBOL + context.size();
                 context.put(image, newImage);
             }
-            symbol.setImage(newImage);
+            symbol.setValue(newImage);
             return image;
         }
         return null;

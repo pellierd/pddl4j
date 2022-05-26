@@ -656,10 +656,10 @@ public final class PDDLParser implements Callable<Integer> {
                                 qvar = vj;
                             }
                         }
-                        if (symbol.getKind().equals(SymbolType.VARIABLE) && qvar == null) {
+                        if (symbol.getType().equals(SymbolType.VARIABLE) && qvar == null) {
                             this.mgr.logParserError("variable \"" + symbol + "\" is undefined",
-                                this.lexer.getFile(), symbol.getBeginLine(), symbol
-                                    .getBeginColumn());
+                                this.lexer.getFile(), symbol.getLocation().getBeginLine(), symbol
+                                    .getLocation().getBeginColumn());
                             error = true;
                         } else {
                             PDDLTypedSymbol object = null;
@@ -674,16 +674,16 @@ public final class PDDLParser implements Callable<Integer> {
                             }
                             if (object == null) {
                                 this.mgr.logParserError("object \"" + symbol + "\" is undefined",
-                                    this.lexer.getFile(), symbol.getBeginLine(), symbol
-                                        .getBeginColumn());
+                                    this.lexer.getFile(), symbol.getLocation().getBeginLine(), symbol
+                                        .getLocation().getBeginColumn());
                                 error = true;
                             } else {
                                 for (PDDLSymbol type : object.getTypes()) {
                                     if (!this.domain.isDeclaredType(type)) {
-                                        this.mgr.logParserError("type \"" + type.getImage()
-                                            + "\" of the object \"" + object.getImage()
+                                        this.mgr.logParserError("type \"" + type.getValue()
+                                            + "\" of the object \"" + object.getValue()
                                             + "\" is undefined", this.lexer.getFile(), type
-                                            .getBeginLine(), type.getBeginColumn());
+                                            .getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                                         error = true;
                                     }
                                 }
@@ -696,15 +696,15 @@ public final class PDDLParser implements Callable<Integer> {
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                            .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                            .getName().getBeginColumn());
+                            .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                            .getName().getLocation().getBeginColumn());
                         checked = false;
                     } else if (checked && gd.getConnective().equals(PDDLConnective.FN_HEAD)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                            .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                            .getName().getBeginColumn());
+                            .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                            .getName().getLocation().getBeginColumn());
                         checked = false;
                     }
                     break;
@@ -714,9 +714,9 @@ public final class PDDLParser implements Callable<Integer> {
                         error = false;
                         for (PDDLSymbol type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {
-                                this.mgr.logParserError("type \"" + type.getImage()
+                                this.mgr.logParserError("type \"" + type.getValue()
                                     + "\" used in quantified expression is undefined", this.lexer
-                                    .getFile(), type.getBeginLine(), type.getBeginColumn());
+                                    .getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                                 error = true;
                             }
                         }
@@ -765,16 +765,16 @@ public final class PDDLParser implements Callable<Integer> {
                         }
                         if (object == null) {
                             this.mgr.logParserError("object \"" + arguments.get(i) + "\" is undefined",
-                                this.lexer.getFile(), symbol.getBeginLine(), symbol
-                                    .getBeginColumn());
+                                this.lexer.getFile(), symbol.getLocation().getBeginLine(), symbol
+                                    .getLocation().getBeginColumn());
                             error = true;
                         } else {
                             for (PDDLSymbol type : object.getTypes()) {
                                 if (!this.domain.isDeclaredType(type)) {
-                                    this.mgr.logParserError("type \"" + type.getImage()
-                                        + "\" of the object \"" + object.getImage()
+                                    this.mgr.logParserError("type \"" + type.getValue()
+                                        + "\" of the object \"" + object.getValue()
                                         + "\" is undefined", this.lexer.getFile(), type
-                                        .getBeginLine(), type.getBeginColumn());
+                                        .getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                                     error = true;
                                 }
                             }
@@ -786,15 +786,15 @@ public final class PDDLParser implements Callable<Integer> {
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                            .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                            .getName().getBeginColumn());
+                            .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                            .getName().getLocation().getBeginColumn());
                         checked = false;
                     } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                            .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                            .getName().getBeginColumn());
+                            .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                            .getName().getLocation().getBeginColumn());
                         checked = false;
                     }
                     break;
@@ -823,9 +823,9 @@ public final class PDDLParser implements Callable<Integer> {
         for (PDDLTypedSymbol object : objects) {
             for (PDDLSymbol type : object.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
-                    this.mgr.logParserError("type \"" + type.getImage() + "\" of the object \""
-                        + object.getImage() + "\" is undefined", this.lexer
-                        .getFile(), type.getBeginLine(), type.getBeginColumn());
+                    this.mgr.logParserError("type \"" + type.getValue() + "\" of the object \""
+                        + object.getValue() + "\" is undefined", this.lexer
+                        .getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                     checked = false;
                 }
             }
@@ -846,7 +846,7 @@ public final class PDDLParser implements Callable<Integer> {
             && !this.domain.getDomainName().equals(this.problem.getDomainName())) {
             this.mgr.logParserWarning("domain name \"" + this.problem.getDomainName()
                 + "\" used in problem doest not match.", this.lexer.getFile(), this.problem
-                .getDomainName().getBeginLine(), this.problem.getDomainName().getBeginColumn());
+                .getDomainName().getLocation().getBeginLine(), this.problem.getDomainName().getLocation().getBeginColumn());
             checked = false;
         }
         return checked;
@@ -864,24 +864,24 @@ public final class PDDLParser implements Callable<Integer> {
 
         // Gathering types declaration
         final Map<String, PDDLTypedSymbol> map = new HashMap<>();
-        map.put(PDDLParser.OBJECT.getImage(), new PDDLTypedSymbol(PDDLParser.OBJECT));
+        map.put(PDDLParser.OBJECT.getValue(), new PDDLTypedSymbol(PDDLParser.OBJECT));
 
         for (PDDLTypedSymbol type : types) {
             // Special cas for the type object
             if ((type.equals(PDDLParser.OBJECT) || type.equals(PDDLParser.NUMBER)) && !type.getTypes().isEmpty()) {
-                this.mgr.logParserError("type \"" + type.getImage() + "\" cannot be used as derived type",
-                    this.lexer.getFile(), type.getBeginLine(), type.getBeginColumn());
+                this.mgr.logParserError("type \"" + type.getValue() + "\" cannot be used as derived type",
+                    this.lexer.getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
             } else { // General case
                 // check if all super types are defined otherwise create a new type inherited from object
                 type.getTypes().stream().filter(superType -> !types.contains(superType)).forEach(superType -> {
                     PDDLTypedSymbol st = new PDDLTypedSymbol(superType);
-                    map.put(superType.getImage(), st);
+                    map.put(superType.getValue(), st);
                 });
                 // If the type was already encountered, it means that there is multiple inheritance
                 // thus the super types are gathered
-                PDDLTypedSymbol t = map.get(type.getImage());
+                PDDLTypedSymbol t = map.get(type.getValue());
                 if (t == null) {
-                    map.put(type.getImage(), type);
+                    map.put(type.getValue(), type);
                 } else {
                     Set<PDDLSymbol> set = new HashSet<>();
                     set.addAll(t.getTypes());
@@ -903,14 +903,14 @@ public final class PDDLParser implements Callable<Integer> {
             while (!open.isEmpty() && consistent) {
                 final PDDLTypedSymbol current = open.poll();
                 for (PDDLSymbol st : current.getTypes()) {
-                    final PDDLTypedSymbol c = map.get(st.getImage());
+                    final PDDLTypedSymbol c = map.get(st.getValue());
                     consistent = !c.equals(type);
                     open.add(c);
                 }
             }
             if (!consistent) {
-                this.mgr.logParserError("Inconsistent types declaration for type \"" + type.getImage()
-                    + "\"", this.lexer.getFile(), type.getBeginLine(), type.getBeginColumn());
+                this.mgr.logParserError("Inconsistent types declaration for type \"" + type.getValue()
+                    + "\"", this.lexer.getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
             }
         }
 
@@ -934,17 +934,17 @@ public final class PDDLParser implements Callable<Integer> {
         boolean checked = true;
         for (PDDLTypedSymbol constant : constants) {
             if (!set.add(constant)) {
-                this.mgr.logParserError("constant \"" + constant.getImage()
-                        + "\" already defined", this.lexer.getFile(), constant.getBeginLine(),
-                    constant.getBeginColumn());
+                this.mgr.logParserError("constant \"" + constant.getValue()
+                        + "\" already defined", this.lexer.getFile(), constant.getLocation().getBeginLine(),
+                    constant.getLocation().getBeginColumn());
                 checked = false;
             }
             for (PDDLSymbol type : constant.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
-                    this.mgr.logParserError("type \"" + type.getImage() + "\" of the constant \""
-                        + constant.getImage() + "\" is undefined", this.lexer
-                        .getFile(), constant.getBeginLine(), constant
-                        .getBeginColumn());
+                    this.mgr.logParserError("type \"" + type.getValue() + "\" of the constant \""
+                        + constant.getValue() + "\" is undefined", this.lexer
+                        .getFile(), constant.getLocation().getBeginLine(), constant
+                        .getLocation().getBeginColumn());
                 }
                 checked = false;
             }
@@ -967,21 +967,21 @@ public final class PDDLParser implements Callable<Integer> {
             for (PDDLTypedSymbol variable : predicate.getArguments()) {
                 for (PDDLSymbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
-                        this.mgr.logParserError("type \"" + type.getImage()
-                            + "\" of the variable \"" + variable.getImage()
+                        this.mgr.logParserError("type \"" + type.getValue()
+                            + "\" of the variable \"" + variable.getValue()
                             + "\" is undefined in predicate declaration \"" + predicate.getName() + "\"",
-                            this.lexer.getFile(), variable.getBeginLine(), variable.getBeginColumn());
+                            this.lexer.getFile(), variable.getLocation().getBeginLine(),
+                            variable.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
             }
             PDDLSymbol predicateSymbol = predicate.getName();
-            String str = predicateSymbol.getImage() + "/" + predicate.getArguments().size();
+            String str = predicateSymbol.getValue() + "/" + predicate.getArguments().size();
 
             if (!set.add(str)) {
-                this.mgr.logParserError("predicate \"" + str + "\" declared twice", this.lexer
-                    .getFile(), predicateSymbol.getBeginLine(), predicateSymbol
-                    .getBeginColumn());
+                this.mgr.logParserError("predicate \"" + str + "\" declared twice", this.lexer.getFile(),
+                    predicateSymbol.getLocation().getBeginLine(), predicateSymbol.getLocation().getBeginColumn());
                 checked = false;
             }
         }
@@ -1004,21 +1004,21 @@ public final class PDDLParser implements Callable<Integer> {
             for (PDDLTypedSymbol variable : task.getArguments()) {
                 for (PDDLSymbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
-                        this.mgr.logParserError("type \"" + type.getImage()
-                            + "\" of the variable \"" + variable.getImage()
+                        this.mgr.logParserError("type \"" + type.getValue()
+                            + "\" of the variable \"" + variable.getValue()
                             + "\" is undefined in task declaration \"" + task.getName() + "\"", this.lexer.getFile(),
-                            variable.getBeginLine(), variable.getBeginColumn());
+                            variable.getLocation().getBeginLine(), variable.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
             }
             PDDLSymbol symbol = task.getName();
-            String taskSymbol = symbol.getImage() + "/" + task.getArguments().size();
+            String taskSymbol = symbol.getValue() + "/" + task.getArguments().size();
 
             if (!taskSet.add(taskSymbol)) {
                 this.mgr.logParserError("task \"" + taskSymbol + "\" declared twice", this.lexer
-                    .getFile(), symbol.getBeginLine(), symbol
-                    .getBeginColumn());
+                    .getFile(), symbol.getLocation().getBeginLine(), symbol
+                    .getLocation().getBeginColumn());
                 checked = false;
             }
         }
@@ -1037,7 +1037,7 @@ public final class PDDLParser implements Callable<Integer> {
         Set<String> predicates = new HashSet<>();
         for (PDDLNamedTypedList predicate : this.domain.getPredicates()) {
             PDDLSymbol predicateSymbol = predicate.getName();
-            String str = predicateSymbol.getImage() + "/" + predicate.getArguments().size();
+            String str = predicateSymbol.getValue() + "/" + predicate.getArguments().size();
             predicates.add(str);
         }
 
@@ -1049,27 +1049,27 @@ public final class PDDLParser implements Callable<Integer> {
             for (PDDLTypedSymbol variable : function.getArguments()) {
                 for (PDDLSymbol type : variable.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
-                        this.mgr.logParserError("type \"" + type.getImage()
-                            + "\" of the variable \"" + variable.getImage()
+                        this.mgr.logParserError("type \"" + type.getValue()
+                            + "\" of the variable \"" + variable.getValue()
                             + "\" is undefined", this.lexer.getFile(), variable
-                            .getBeginLine(), variable.getBeginColumn());
+                            .getLocation().getBeginLine(), variable.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
             }
 
-            String str = functionSymbol.getImage() + "/" + function.getArguments().size();
+            String str = functionSymbol.getValue() + "/" + function.getArguments().size();
             if (!set.add(str)) {
                 this.mgr.logParserError("predicate \"" + str + "\" declared twice", this.lexer
-                    .getFile(), functionSymbol.getBeginLine(), functionSymbol
-                    .getBeginColumn());
+                    .getFile(), functionSymbol.getLocation().getBeginLine(), functionSymbol
+                    .getLocation().getBeginColumn());
                 checked = false;
             }
             if (predicates.contains(str)) {
                 this.mgr.logParserError("function \"" + str
                         + "\" is ambiguous with a predicate already declared",
-                    this.lexer.getFile(), functionSymbol.getBeginLine(), functionSymbol
-                        .getBeginColumn());
+                    this.lexer.getFile(), functionSymbol.getLocation().getBeginLine(), functionSymbol
+                        .getLocation().getBeginColumn());
                 checked = false;
             }
         }
@@ -1089,9 +1089,9 @@ public final class PDDLParser implements Callable<Integer> {
             for (PDDLTypedSymbol argument : head.getArguments()) {
                 for (PDDLSymbol type : argument.getTypes()) {
                     if (!this.domain.isDeclaredType(type)) {
-                        this.mgr.logParserError("type \"" + type.getImage()
+                        this.mgr.logParserError("type \"" + type.getValue()
                             + "\" used in derived predicate", this.lexer.getFile(), type
-                            .getBeginLine(), type.getBeginColumn());
+                            .getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1099,7 +1099,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (checked && !this.isDeclaredPredicate(head)) {
                 this.mgr.logParserError("predicate \"" + head.getName() + "/"
                         + head.getArguments().size() + "\" is undefined", this.lexer.getFile(),
-                    head.getName().getBeginLine(), head.getName().getBeginColumn());
+                    head.getName().getLocation().getBeginLine(), head.getName().getLocation().getBeginColumn());
                 checked = false;
             }
             if (checked) {
@@ -1153,17 +1153,17 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkMethodDeclaration() {
         Set<String> actionSet = this.domain.getActions().stream().map(
-            action -> action.getName().getImage()).collect(Collectors.toSet());
+            action -> action.getName().getValue()).collect(Collectors.toSet());
         boolean checked = this.checkMethodsUniqueness();
         for (PDDLMethod meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
                 PDDLSymbol taskSymbol = meth.getTask().getSymbol();
-                if (actionSet.contains(taskSymbol.getImage())) {
-                    this.mgr.logParserError("task symbol \"" + taskSymbol.getImage()
+                if (actionSet.contains(taskSymbol.getValue())) {
+                    this.mgr.logParserError("task symbol \"" + taskSymbol.getValue()
                             + "\" already used as action name",
-                            this.lexer.getFile(), taskSymbol.getBeginLine(), taskSymbol.getBeginColumn());
+                            this.lexer.getFile(), taskSymbol.getLocation().getBeginLine(), taskSymbol.getLocation().getBeginColumn());
                     checked &= false;
                 }
                 checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
@@ -1177,7 +1177,7 @@ public final class PDDLParser implements Callable<Integer> {
                         if (!taskIds.contains(id)) {
                             this.mgr.logParserError("task id \"" + id + "\" in the durative constraints of the "
                                 + "method " + "\"" + meth.getName() + "\" is undefined",
-                                this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
+                                this.lexer.getFile(), id.getLocation().getBeginLine(), id.getLocation().getBeginColumn());
                             checked = false;
                         }
                     }
@@ -1187,7 +1187,7 @@ public final class PDDLParser implements Callable<Integer> {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the ordering constraints of the"
                             + " method \"" + meth.getName() + "\" is undefined",
-                            this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
+                            this.lexer.getFile(), id.getLocation().getBeginLine(), id.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1196,7 +1196,7 @@ public final class PDDLParser implements Callable<Integer> {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the constraints of the "
                             + "method " + "\"" + meth.getName() + "\" is undefined",
-                            this.lexer.getFile(), id.getBeginLine(), id.getBeginColumn());
+                            this.lexer.getFile(), id.getLocation().getBeginLine(), id.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1251,8 +1251,8 @@ public final class PDDLParser implements Callable<Integer> {
             Map.Entry<PDDLSymbol, Set<PDDLSymbol>> entry = i.next();
             PDDLSymbol task = entry.getKey();
             if (entry.getValue().contains(task)) {
-                this.mgr.logParserError("cyclical constraint involving the task \"" + task.getImage()
-                    + "\" in method declaration", this.lexer.getFile(), task.getBeginLine(), task.getBeginColumn());
+                this.mgr.logParserError("cyclical constraint involving the task \"" + task.getValue()
+                    + "\" in method declaration", this.lexer.getFile(), task.getLocation().getBeginLine(), task.getLocation().getBeginColumn());
                 check = false;
             }
         }
@@ -1280,8 +1280,8 @@ public final class PDDLParser implements Callable<Integer> {
                 for (PDDLSymbol id : orderingIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the ordering constrains of the "
-                                + "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
-                                id.getBeginColumn());
+                                + "initial task network is undefined", this.lexer.getFile(), id.getLocation().getBeginLine(),
+                                id.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1289,8 +1289,8 @@ public final class PDDLParser implements Callable<Integer> {
                 for (PDDLSymbol id : constIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the constrains of the "
-                            +  "initial task network is undefined", this.lexer.getFile(), id.getBeginLine(),
-                            id.getBeginColumn());
+                            +  "initial task network is undefined", this.lexer.getFile(), id.getLocation().getBeginLine(),
+                            id.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1318,7 +1318,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (!taskIDs.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in initial task network "
                     + "is already defined", this.lexer
-                    .getFile(), exp.getTaskID().getBeginLine(), exp.getTaskID().getBeginColumn());
+                    .getFile(), exp.getTaskID().getLocation().getBeginLine(), exp.getTaskID().getLocation().getBeginColumn());
                 unique = false;
             }
         } else {
@@ -1353,7 +1353,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (!taskIds.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in method "
                     + "\"" + meth.getName() + "\" is already defined", this.lexer
-                    .getFile(), exp.getTaskID().getBeginLine(), exp.getTaskID().getBeginColumn());
+                    .getFile(), exp.getTaskID().getLocation().getBeginLine(), exp.getTaskID().getLocation().getBeginColumn());
                 unique = false;
             }
         } else {
@@ -1398,9 +1398,9 @@ public final class PDDLParser implements Callable<Integer> {
                         boolean error = false;
                         for (PDDLSymbol type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {
-                                this.mgr.logParserError("type \"" + type.getImage()
+                                this.mgr.logParserError("type \"" + type.getValue()
                                     + "\" used in quantified expression is undefined", this.lexer
-                                    .getFile(), type.getBeginLine(), type.getBeginColumn());
+                                    .getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                                 error |= true;
                             }
                         }
@@ -1440,7 +1440,7 @@ public final class PDDLParser implements Callable<Integer> {
         final PDDLNamedTypedList atomSkeleton = new PDDLNamedTypedList(gd.getSymbol());
         for (int i = 0; i < arguments.size(); i++) {
             final PDDLSymbol s = arguments.get(i);
-            if (s.getKind().equals(SymbolType.VARIABLE)) {
+            if (s.getType().equals(SymbolType.VARIABLE)) {
                 PDDLTypedSymbol param = null;
                 Iterator<PDDLTypedSymbol> itr = context.iterator();
                 while (itr.hasNext() && param == null) {
@@ -1450,8 +1450,8 @@ public final class PDDLParser implements Callable<Integer> {
                     }
                 }
                 if (param == null) {
-                    this.mgr.logParserError("variable \"" + s.getImage() + "\" is undefined",
-                        this.lexer.getFile(), s.getBeginLine(), s.getBeginColumn());
+                    this.mgr.logParserError("variable \"" + s.getValue() + "\" is undefined",
+                        this.lexer.getFile(), s.getLocation().getBeginLine(), s.getLocation().getBeginColumn());
                     checked = false;
                 } else {
                     final PDDLTypedSymbol arg = new PDDLTypedSymbol(s);
@@ -1466,8 +1466,8 @@ public final class PDDLParser implements Callable<Integer> {
                     }
                 }
                 if (constant == null) {
-                    this.mgr.logParserError("constant \"" + s.getImage() + "\" is undefined",
-                        this.lexer.getFile(), s.getBeginLine(), s.getBeginColumn());
+                    this.mgr.logParserError("constant \"" + s.getValue() + "\" is undefined",
+                        this.lexer.getFile(), s.getLocation().getBeginLine(), s.getLocation().getBeginColumn());
                     checked = false;
                 } else {
                     atomSkeleton.add(constant);
@@ -1479,22 +1479,22 @@ public final class PDDLParser implements Callable<Integer> {
             && !this.isDeclaredPredicate(atomSkeleton)) {
             this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                .getName().getBeginColumn());
+                .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                .getName().getLocation().getBeginColumn());
             checked = false;
         } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
             && !this.isDeclaredFunction(atomSkeleton)) {
             this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                .getName().getBeginColumn());
+                .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                .getName().getLocation().getBeginColumn());
             checked = false;
         } else if (checked && gd.getConnective().equals(PDDLConnective.TASK)
             && !this.isDeclaredTask(atomSkeleton)) {
             this.mgr.logParserError("task \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
-                .getFile(), atomSkeleton.getName().getBeginLine(), atomSkeleton
-                .getName().getBeginColumn());
+                .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
+                .getName().getLocation().getBeginColumn());
             checked = false;
         }
         return checked;
@@ -1510,7 +1510,7 @@ public final class PDDLParser implements Callable<Integer> {
      */
     private boolean checkTerm(PDDLSymbol term, List<PDDLTypedSymbol> context) {
         boolean checked = true;
-        if (term.getKind().equals(SymbolType.VARIABLE)) {
+        if (term.getType().equals(SymbolType.VARIABLE)) {
             PDDLTypedSymbol param = null;
             Iterator<PDDLTypedSymbol> itr = context.iterator();
             while (itr.hasNext() && param == null) {
@@ -1520,8 +1520,8 @@ public final class PDDLParser implements Callable<Integer> {
                 }
             }
             if (param == null) {
-                this.mgr.logParserError("variable \"" + term.getImage() + "\" is undefined",
-                    this.lexer.getFile(), term.getBeginLine(), term.getBeginColumn());
+                this.mgr.logParserError("variable \"" + term.getValue() + "\" is undefined",
+                    this.lexer.getFile(), term.getLocation().getBeginLine(), term.getLocation().getBeginColumn());
                 checked = false;
             }
         } else {
@@ -1532,8 +1532,8 @@ public final class PDDLParser implements Callable<Integer> {
                 }
             }
             if (constant == null) {
-                this.mgr.logParserError("constant \"" + term.getImage() + "\" is undefined",
-                    this.lexer.getFile(), term.getBeginLine(), term.getBeginColumn());
+                this.mgr.logParserError("constant \"" + term.getValue() + "\" is undefined",
+                    this.lexer.getFile(), term.getLocation().getBeginLine(), term.getLocation().getBeginColumn());
                 checked = false;
             }
         }
@@ -1664,15 +1664,15 @@ public final class PDDLParser implements Callable<Integer> {
         for (PDDLTypedSymbol parameter : action.getParameters()) {
             if (!set.add(parameter)) {
                 this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in the action \""
-                    + action.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
-                    .getBeginColumn());
+                    + action.getName() + "\"", this.lexer.getFile(), parameter.getLocation().getBeginLine(), parameter
+                    .getLocation().getBeginColumn());
                 checked = false;
             }
             for (PDDLSymbol type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
-                    this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
+                    this.mgr.logParserError("type \"" + type.getValue() + "\" of the parameter \""
                             + parameter + "\" in the action \"" + action.getName() + "\" is undefined",
-                        this.lexer.getFile(), parameter.getBeginLine(), parameter.getBeginColumn());
+                        this.lexer.getFile(), parameter.getLocation().getBeginLine(), parameter.getLocation().getBeginColumn());
                     checked = false;
                 }
             }
@@ -1694,15 +1694,15 @@ public final class PDDLParser implements Callable<Integer> {
         for (PDDLTypedSymbol parameter : method.getParameters()) {
             if (!set.add(parameter)) {
                 this.mgr.logParserError("parameter \"" + parameter + "\" is defined twice in method \""
-                    + method.getName() + "\"", this.lexer.getFile(), parameter.getBeginLine(), parameter
-                    .getBeginColumn());
+                    + method.getName() + "\"", this.lexer.getFile(), parameter.getLocation().getBeginLine(), parameter
+                    .getLocation().getBeginColumn());
                 checked = false;
             }
             for (PDDLSymbol type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
-                    this.mgr.logParserError("type \"" + type.getImage() + "\" of the parameter \""
+                    this.mgr.logParserError("type \"" + type.getValue() + "\" of the parameter \""
                             + parameter + "\" in method \"" + method.getName() + "\" is undefined",
-                        this.lexer.getFile(), parameter.getBeginLine(), parameter.getBeginColumn());
+                        this.lexer.getFile(), parameter.getLocation().getBeginLine(), parameter.getLocation().getBeginColumn());
                     checked = false;
                 }
             }
@@ -1722,7 +1722,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (!set.add(op.getName())) {
                 PDDLSymbol name = op.getName();
                 this.mgr.logParserError("action \"" + name + "\" declared twice", this.lexer
-                    .getFile(), name.getBeginLine(), name.getBeginColumn());
+                    .getFile(), name.getLocation().getBeginLine(), name.getLocation().getBeginColumn());
                 checked = false;
             }
         }
@@ -1741,7 +1741,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (!set.add(meth.getName())) {
                 PDDLSymbol name = meth.getName();
                 this.mgr.logParserError("method \"" + name + "\" declared twice", this.lexer
-                    .getFile(), name.getBeginLine(), name.getBeginColumn());
+                    .getFile(), name.getLocation().getBeginLine(), name.getLocation().getBeginColumn());
                 checked = false;
             }
         }
@@ -1762,7 +1762,7 @@ public final class PDDLParser implements Callable<Integer> {
         final List<PDDLTypedSymbol> parameters = action.getParameters();
         for (final PDDLTypedSymbol params : parameters) {
             final String image = AbstractExpression.renameVariables(params, i);
-            context.put(image, params.getImage());
+            context.put(image, params.getValue());
             i++;
         }
         // Check preconditions
@@ -1772,12 +1772,12 @@ public final class PDDLParser implements Callable<Integer> {
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is always applicable: "
                     + "action preconditions can be simplified to TRUE.", this.lexer.getFile(),
-                action.getName().getBeginLine(), action.getName().getBeginColumn());
+                action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
         } else if (preconditions.getConnective().equals(PDDLConnective.FALSE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is never applicable: "
                     + "action preconditions can be simplified to FALSE.", this.lexer.getFile(),
-                action.getName().getBeginLine(), action.getName().getBeginColumn());
+                action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
         }
         // Check effects
@@ -1787,12 +1787,12 @@ public final class PDDLParser implements Callable<Integer> {
         if (effects.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
                     + "action effects can be simplified to TRUE.", this.lexer.getFile(),
-                action.getName().getBeginLine(), action.getName().getBeginColumn());
+                action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
         } else if (effects.getConnective().equals(PDDLConnective.FALSE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced invalid effects: "
                     + "action effects can be simplified to FALSE.", this.lexer.getFile(),
-                action.getName().getBeginLine(), action.getName().getBeginColumn());
+                action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
         }
         return check;
@@ -1812,7 +1812,7 @@ public final class PDDLParser implements Callable<Integer> {
         final List<PDDLTypedSymbol> parameters = method.getParameters();
         for (final PDDLTypedSymbol params : parameters) {
             final String image = AbstractExpression.renameVariables(params, i);
-            context.put(image, params.getImage());
+            context.put(image, params.getValue());
             i++;
         }
         // Check the method preconditions
@@ -1822,12 +1822,12 @@ public final class PDDLParser implements Callable<Integer> {
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
                     + "method preconditions can be simplified to TRUE.", this.lexer.getFile(),
-                method.getName().getBeginLine(), method.getName().getBeginColumn());
+                method.getName().getLocation().getBeginLine(), method.getName().getLocation().getBeginColumn());
             check = false;
         } else if (preconditions.getConnective().equals(PDDLConnective.FALSE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is never applicable: "
                     + "method preconditions can be simplified to FALSE.", this.lexer.getFile(),
-                method.getName().getBeginLine(), method.getName().getBeginColumn());
+                method.getName().getLocation().getBeginLine(), method.getName().getLocation().getBeginColumn());
             check = false;
         }
         return check;
@@ -2130,8 +2130,6 @@ public final class PDDLParser implements Callable<Integer> {
                             + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. "
                             + "The duplicated sub-expression can be removed.", this.lexer.getFile(), ej.getBeginLine(),
                             ej.getBeginColumn());
-                    System.out.println("ei = " + ei.toString());
-                    System.out.println("ej = " + ej.toString());
                     check = false;
                 }
             }
