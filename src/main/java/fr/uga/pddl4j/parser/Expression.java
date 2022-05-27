@@ -1,6 +1,7 @@
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Token;
+import fr.uga.pddl4j.problem.operator.IntExpression;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,11 @@ public class Expression<T> implements Locatable, Serializable {
     private Symbol<T> taskID;
 
     /**
+     * A flag to indicate if this expression represents a primitive task.
+     */
+    private boolean isPrimtive;
+
+    /**
      * The location of the expression.
      */
     private Location location;
@@ -102,6 +109,7 @@ public class Expression<T> implements Locatable, Serializable {
             this.getChildren().addAll(other.getChildren().stream()
                 .map(Expression<T>::new).collect(Collectors.toList()));
         }
+        this.setPrimtive(other.isPrimtive());
         if (other.getLocation() != null) {
             this.setLocation(new Location(other.getLocation()));
         }
@@ -123,6 +131,7 @@ public class Expression<T> implements Locatable, Serializable {
         this.setChildren(new ArrayList<>());
         this.setPrefName(null);
         this.setTaskID(null);
+        this.setPrimtive(false);
         this.setLocation(null);
     }
 
@@ -327,6 +336,24 @@ public class Expression<T> implements Locatable, Serializable {
     }
 
     /**
+     * Returns <code>true</code> if the expression is a primitive task.
+     *
+     * @return <code>true</code> if the expression is a primitive task, <code>false</code> otherwise.
+     */
+    public final boolean isPrimtive() {
+        return this.isPrimtive;
+    }
+
+    /**
+     * Sets the boolean flag used to specified if the expression is a primitive task to a specified value.
+     *
+     * @param flag the flag.
+     */
+    public final void setPrimtive(final boolean flag) {
+        this.isPrimtive = flag;
+    }
+
+    /**
      * Return the location of the symbol.
      *
      * @return the location of the symbol.
@@ -385,6 +412,7 @@ public class Expression<T> implements Locatable, Serializable {
         this.setChildren(exp.getChildren());
         this.setPrefName(exp.getPrefName());
         this.setTaskID(exp.getTaskID());
+        this.setPrimtive(exp.isPrimtive());
         this.setLocation(exp.getLocation());
     }
 
@@ -912,7 +940,40 @@ public class Expression<T> implements Locatable, Serializable {
         return removed;
     }
 
+    /**
+     * Returns if the expression is equal to another object. The primitive flag and the task id are not used for
+     * comparison.
+     *
+     * @param object the other object.
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object != null && object instanceof IntExpression) {
+            final Expression<T> other = (Expression<T>) object;
+            return Objects.equals(this.getConnective(), other.getConnective())
+                && Objects.equals(this.getSymbol(), other.getSymbol())
+                && Objects.equals(this.getArguments(), other.getArguments())
+                && Objects.equals(this.getValue(), other.getValue())
+                && Objects.equals(this.getQuantifiedVariables(), other.getQuantifiedVariables())
+                && Objects.equals(this.getVariable(), other.getVariable())
+                && Objects.equals(this.getChildren(), other.getChildren());
+        }
+        return false;
+    }
 
+    /**
+     * Returns the hash code value of the expression.
+     *
+     * @return the hash code value of the expression.
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getConnective(), this.getSymbol(), this.getArguments(), this.getValue(),
+            this.getQuantifiedVariables(), this.getVariable(), this.getChildren());
+    }
 
     /**
      * Returns if this expression is malformed. An expression is considered as well in the following cases:
