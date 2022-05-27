@@ -54,6 +54,18 @@ public class TypedSymbol<T> extends Symbol<T> {
      * typed symbol is created with the specified symbol <code>PDDLParser.OBJECT</code> or
      * <code>PDDLParser.NUMBER</code>, the typed list is creates with an empty list of super types.
      *
+     * @param type the type of symbol.
+     * @param value the value of the symbol.
+     */
+    public TypedSymbol(final SymbolType type, final T value) {
+        this(new Symbol<>(type, value));
+    }
+
+    /**
+     * Creates a new typed symbol from a specified symbol. This symbol is by default of type object. If a
+     * typed symbol is created with the specified symbol <code>PDDLParser.OBJECT</code> or
+     * <code>PDDLParser.NUMBER</code>, the typed list is creates with an empty list of super types.
+     *
      * @param symbol the symbol.
      */
     public TypedSymbol(final Symbol<T> symbol) {

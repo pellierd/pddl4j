@@ -448,13 +448,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case FORALL:
             case EXISTS:
-                if (inertia.getArguments().get(0).equals(exp.getQuantifiedVariables().get(0).getVariable())) {
+                if (inertia.getArguments().get(0).equals(exp.getQuantifiedVariables().get(0).getValue())) {
                     final IntExpression ei = new IntExpression(exp);
                     //ei.setType(ti);
-                    ei.getQuantifiedVariables().get(0).setType(ti);
+                    ei.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ti));
                     this.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
                     final IntExpression es = new IntExpression(exp);
-                    es.getQuantifiedVariables().get(0).setType(ts);
+                    es.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ts));
                     this.replace(es, inertia, PDDLConnective.FALSE, ti, ts);
                     exp.getChildren().clear();
                     if (exp.getConnective().equals(PDDLConnective.FORALL)) {
@@ -773,7 +773,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && this.getDomains().get(ei.getQuantifiedVariables().get(0).getType()).isEmpty()) {
+                        && this.getDomains().get(ei.getQuantifiedVariables().get(0).getTypes().get(0).getValue()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -791,7 +791,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
-                        && this.getDomains().get(ei.getQuantifiedVariables().get(0).getType()).isEmpty()) {
+                        && this.getDomains().get(ei.getQuantifiedVariables().get(0).getTypes().get(0).getValue()).isEmpty()) {
                         i.remove();
                         continue;
                     }
@@ -803,9 +803,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case FORALL:
-                Set<IntSymbol> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getType());
+                Set<IntSymbol> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 IntExpression qExp = exp.getChildren().get(0);
-                int var = exp.getQuantifiedVariables().get(0).getVariable();
+                int var = exp.getQuantifiedVariables().get(0).getValue();
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 Iterator<IntSymbol> it = constants.iterator();
@@ -822,9 +822,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 this.expandQuantifiedExpression(exp, simplify);
                 break;
             case EXISTS:
-                constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getType());
+                constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 qExp = exp.getChildren().get(0);
-                var = exp.getQuantifiedVariables().get(0).getVariable();
+                var = exp.getQuantifiedVariables().get(0).getValue();
                 exp.setConnective(PDDLConnective.OR);
                 exp.getChildren().clear();
                 it = constants.iterator();

@@ -1203,7 +1203,8 @@ public abstract class AbstractProblem implements Problem {
                 final List<TypedSymbol<String>> qvar = exp.getQuantifiedVariables();
                 final String type = this.toStringType(qvar.get(0).getTypes());
                 int typeIndex = this.getTypes().indexOf(type);
-                final IntTypedSymbol intQvar  = new IntTypedSymbol(-variables.size() - 1, typeIndex);
+                final TypedSymbol<Integer> intQvar  = new TypedSymbol<Integer>(SymbolType.VARIABLE, -variables.size() - 1);
+                intQvar.addType(new Symbol<>(SymbolType.TYPE, typeIndex));
                 intExp.getQuantifiedVariables().add(intQvar);
                 newVariables.add(qvar.get(0).getValue());
                 if (qvar.size() == 1) {
@@ -1535,11 +1536,11 @@ public abstract class AbstractProblem implements Problem {
             case EXISTS:
                 str.append(" (").append(exp.getConnective().getImage());
                 str.append(" (");
-                for (IntTypedSymbol var: exp.getQuantifiedVariables()) {
+                for (TypedSymbol<Integer> var: exp.getQuantifiedVariables()) {
                     str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
-                    str.append(-var.getVariable() - 1);
+                    str.append(-var.getValue() - 1);
                     str.append(" - ");
-                    str.append(this.getTypes().get(var.getType()));
+                    str.append(this.getTypes().get(var.getTypes().get(0).getValue()));
                 }
                 str.append(")\n");
                 String offsetEx = baseOffset + baseOffset + "  ";

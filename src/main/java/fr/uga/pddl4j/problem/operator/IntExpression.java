@@ -22,6 +22,7 @@ package fr.uga.pddl4j.problem.operator;
 import fr.uga.pddl4j.parser.MalformedExpressionException;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.parser.TypedSymbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
@@ -72,12 +73,12 @@ public class IntExpression implements Serializable {
     /**
      * The quantified variable of the expression.
      */
-    private List<IntTypedSymbol> quantifiedVariables;
+    private List<TypedSymbol<Integer>> quantifiedVariables;
 
     /**
      * The variable, e.g, ?duration, etc.
      */
-    private IntSymbol variable;
+    private Symbol<Integer> variable;
 
     /**
      * The value of the expression. This attribute is used to store value of number expression.
@@ -105,18 +106,18 @@ public class IntExpression implements Serializable {
         }
         if (other.getArguments() != null) {
             this.arguments = new ArrayList<>();
-            this.arguments.addAll(other.getArguments().stream().map(Symbol::new).collect(Collectors.toList()));
+            this.getArguments().addAll(other.getArguments().stream().map(Symbol::new).collect(Collectors.toList()));
         }
         final List<IntExpression> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
         this.children.addAll(otherChildren.stream().map(IntExpression::new).collect(Collectors.toList()));
-        this.quantifiedVariables = new ArrayList<>();
         if (other.getQuantifiedVariables() != null) {
-            for (IntTypedSymbol var : other.getQuantifiedVariables()) {
-                this.quantifiedVariables.add(new IntTypedSymbol(var));
-            }
+            this.quantifiedVariables = new ArrayList<>(other.getQuantifiedVariables().size());
+            this.getQuantifiedVariables().addAll(other.getQuantifiedVariables().stream().map(TypedSymbol::new).collect(Collectors.toList()));
         }
-        this.variable = new IntSymbol(other.getVariable());
+        if (other.getVariable() != null) {
+            this.variable = new Symbol<>(other.getVariable());
+        }
         this.value = other.getValue();
         this.isPrimtive = other.isPrimtive();
     }
@@ -133,7 +134,7 @@ public class IntExpression implements Serializable {
         this.arguments = null;
         this.children = new ArrayList<>();
         this.quantifiedVariables = new ArrayList<>();
-        this.variable = IntSymbol.DEFAULT_VARIABLE;
+        this.variable = null;
         this.value = IntExpression.DEFAULT_VALUE;
         this.isPrimtive = false;
     }
@@ -233,7 +234,7 @@ public class IntExpression implements Serializable {
      *
      * @return the variable of the expression.
      */
-    public final IntSymbol getVariable() {
+    public final Symbol<Integer> getVariable() {
         return this.variable;
     }
 
@@ -242,7 +243,7 @@ public class IntExpression implements Serializable {
      *
      * @param variable the variable of the expression.
      */
-    public final void setVariable(final IntSymbol variable) {
+    public final void setVariable(final Symbol<Integer> variable) {
         this.variable = variable;
     }
 
@@ -287,7 +288,7 @@ public class IntExpression implements Serializable {
      *
      * @return the list of quantified variable of the expression.
      */
-    public final List<IntTypedSymbol> getQuantifiedVariables() {
+    public final List<TypedSymbol<Integer>> getQuantifiedVariables() {
         return this.quantifiedVariables;
     }
 
@@ -296,7 +297,7 @@ public class IntExpression implements Serializable {
      *
      * @param  variables the list of quantified variable of the expression.
      */
-    public final void setQuantifiedVariables(final List<IntTypedSymbol> variables) {
+    public final void setQuantifiedVariables(final List<TypedSymbol<Integer>> variables) {
         this.quantifiedVariables = variables;
     }
 
