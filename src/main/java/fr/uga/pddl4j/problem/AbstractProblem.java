@@ -80,7 +80,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The values domain of associated to the type.
      */
-    private List<Set<IntSymbol>> domains;
+    private List<Set<Symbol<Integer>>> domains;
 
     /**
      * The constant symbols.
@@ -333,7 +333,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the domains for each type of the problem.
      */
-    public final List<Set<IntSymbol>> getDomains() {
+    public final List<Set<Symbol<Integer>>> getDomains() {
         return this.domains;
     }
 
@@ -518,7 +518,7 @@ public abstract class AbstractProblem implements Problem {
                 Symbol<String> type = types.poll();
                 final int it = this.typeSymbols.indexOf(type.getValue());
                 types.addAll(this.problem.getType(type).getTypes());
-                this.domains.get(it).add(new IntSymbol(ic));
+                this.domains.get(it).add(new Symbol<>(SymbolType.CONSTANT, ic));
             }
         }
     }
@@ -571,7 +571,7 @@ public abstract class AbstractProblem implements Problem {
             final List<Symbol<String>> types = elt.getTypes();
             if (types.size() > 1) {
                 String newType;
-                Set<IntSymbol> newTypeDomain = new LinkedHashSet<>();
+                Set<Symbol<Integer>> newTypeDomain = new LinkedHashSet<>();
                 StringBuilder buf = new StringBuilder();
                 buf.append("either");
                 for (Symbol<String> type : types) {
@@ -579,7 +579,7 @@ public abstract class AbstractProblem implements Problem {
                     buf.append("~");
                     buf.append(image);
                     int typeIndex = this.typeSymbols.indexOf(image);
-                    final Set<IntSymbol> typeDomain = this.domains.get(typeIndex);
+                    final Set<Symbol<Integer>> typeDomain = this.domains.get(typeIndex);
                     newTypeDomain.addAll(typeDomain);
                 }
                 newType = buf.toString();
@@ -1640,8 +1640,8 @@ public abstract class AbstractProblem implements Problem {
                     str.append(": ");
                     str.append(this.getTypes().get(i));
                     str.append(":");
-                    Set<IntSymbol> domain = this.getDomains().get(i);
-                    for (IntSymbol constant : domain) {
+                    Set<Symbol<Integer>> domain = this.getDomains().get(i);
+                    for (Symbol<Integer> constant : domain) {
                         str.append(" ");
                         str.append(constant);
                     }

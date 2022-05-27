@@ -358,7 +358,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     if (ti == -1) {
                         ti = this.getTypes().size();
                         this.getTypes().add(sti);
-                        final Set<IntSymbol> dt1 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
+                        final Set<Symbol<Integer>> dt1 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
                         dt1.retainAll(this.getInferredDomains().get(itIndex));
                         this.getDomains().add(dt1);
                     }
@@ -368,7 +368,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     if (ts == -1) {
                         ts = this.getTypes().size();
                         this.getTypes().add(sts);
-                        final Set<IntSymbol> dt2 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
+                        final Set<Symbol<Integer>> dt2 = new LinkedHashSet<>(this.getDomains().get(dtIndex));
                         dt2.removeAll(this.getInferredDomains().get(itIndex));
                         this.getDomains().add(dt2);
                     }
@@ -803,12 +803,12 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case FORALL:
-                Set<IntSymbol> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
+                Set<Symbol<Integer>> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 Expression<Integer> qExp = exp.getChildren().get(0);
                 int var = exp.getQuantifiedVariables().get(0).getValue();
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
-                Iterator<IntSymbol> it = constants.iterator();
+                Iterator<Symbol<Integer>> it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     int cons = it.next().getValue();
                     Expression<Integer> copy = new Expression<>(qExp);

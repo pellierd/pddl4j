@@ -17,6 +17,7 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -71,7 +72,7 @@ public interface Problem extends Serializable {
      *
      * @return the domains for each type of the problem.
      */
-    List<Set<IntSymbol>> getDomains();
+    List<Set<Symbol<Integer>>> getDomains();
 
     /**
      * Returns the list of constant symbols of the problem.

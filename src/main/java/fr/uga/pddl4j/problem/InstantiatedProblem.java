@@ -194,8 +194,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 }
             }
         } else {
-            final Set<IntSymbol> values = this.getDomains().get(action.getTypeOfParameters(index));
-            for (IntSymbol value : values) {
+            final Set<Symbol<Integer>> values = this.getDomains().get(action.getTypeOfParameters(index));
+            for (Symbol<Integer> value : values) {
                 final int varIndex = -index - 1;
                 final Expression<Integer> precond = new Expression<>(action.getPreconditions());
                 this.substitute(precond, varIndex, value.getValue(), true);
@@ -240,15 +240,15 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         boolean instantiable = true;
         int i = 0;
         while (i < t.getArguments().size() && instantiable) {
-            final int var = t.getArguments().get(i).getValue();
-            final int cons = task.getArguments().get(i).getValue();
-            final int type = copy.getTypeOfParameters((-var - 1));
-            final Set<IntSymbol> domain = this.getDomains().get(type);
-            if (domain.contains(new IntSymbol(cons))) {
-                this.substitute(copy.getPreconditions(), var, cons, true);
-                this.substitute(copy.getTask(), var, cons, true);
-                this.substitute(copy.getSubTasks(), var, cons, true);
-                copy.setValueOfParameter((-var - 1), cons);
+            final Symbol<Integer> var = t.getArguments().get(i);
+            final Symbol<Integer> cons = task.getArguments().get(i);
+            final int type = copy.getTypeOfParameters((-var.getValue() - 1));
+            final Set<Symbol<Integer>> domain = this.getDomains().get(type);
+            if (domain.contains(cons)) {
+                this.substitute(copy.getPreconditions(), var.getValue(), cons.getValue(), true);
+                this.substitute(copy.getTask(), var.getValue(), cons.getValue(), true);
+                this.substitute(copy.getSubTasks(), var.getValue(), cons.getValue(), true);
+                copy.setValueOfParameter((-var.getValue() - 1), cons.getValue());
             } else {
                 instantiable = false;
             }
@@ -291,8 +291,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         } else if (method.getValueOfParameter(index) >= 0) {
             this.instantiate(method, index + 1, bound, methods);
         } else {
-            final Set<IntSymbol> values = this.getDomains().get(method.getTypeOfParameters(index));
-            for (IntSymbol value : values) {
+            final Set<Symbol<Integer>> values = this.getDomains().get(method.getTypeOfParameters(index));
+            for (Symbol<Integer> value : values) {
                 final int varIndex = -index - 1;
                 final Expression<Integer> preconditionCopy = new Expression<>(method.getPreconditions());
 
@@ -338,8 +338,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             networks.add(network);
         } else {
-            final Set<IntSymbol> values = this.getDomains().get(network.getTypeOfParameters(index));
-            for (IntSymbol value : values) {
+            final Set<Symbol<Integer>> values = this.getDomains().get(network.getTypeOfParameters(index));
+            for (Symbol<Integer> value : values) {
                 final int varIndex = -index - 1;
                 final IntTaskNetwork copy = new IntTaskNetwork(arity);
                 copy.setOrderingConstraints(new Expression<>(network.getOrderingConstraints()));
