@@ -15,12 +15,12 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 
 import java.util.ArrayList;
@@ -45,12 +45,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     /**
      * The table that contains the ground inertia.
      */
-    private Map<IntExpression, Inertia> groundInertia;
+    private Map<Expression<Integer>, Inertia> groundInertia;
 
     /**
      * The table that contains the ground inertia.
      */
-    private Map<IntExpression, Inertia> numericGroundInertia;
+    private Map<Expression<Integer>, Inertia> numericGroundInertia;
 
     /**
      * Creates a new problem from a domain and problem.
@@ -67,7 +67,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @return the list of ground inertia of the problem.
      */
-    protected Map<IntExpression, Inertia> getGroundInertia() {
+    protected Map<Expression<Integer>, Inertia> getGroundInertia() {
         return this.groundInertia;
     }
 
@@ -76,7 +76,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @return the list of numeric ground inertia of the problem.
      */
-    protected Map<IntExpression, Inertia> getGroundNumericInertia() {
+    protected Map<Expression<Integer>, Inertia> getGroundNumericInertia() {
         return this.numericGroundInertia;
     }
 
@@ -97,7 +97,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @param exp the effect.
      */
-    private void extractGroundInertia(final IntExpression exp) {
+    private void extractGroundInertia(final Expression<Integer> exp) {
         switch (exp.getConnective()) {
             case ATOM:
                 Inertia inertia = this.groundInertia.get(exp);
@@ -129,7 +129,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 extractGroundInertia(exp.getChildren().get(1));
                 break;
             case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
+                final Expression<Integer> neg = exp.getChildren().get(0);
                 if (neg.getConnective().equals(PDDLConnective.ATOM)) {
                     inertia = this.groundInertia.get(neg);
                     if (inertia == null) {
@@ -216,7 +216,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @param exp the effect.
      */
-    private void extractGroundNumericInertia(final IntExpression exp) {
+    private void extractGroundNumericInertia(final Expression<Integer> exp) {
         switch (exp.getConnective()) {
             case AND:
                 exp.getChildren().forEach(this::extractGroundNumericInertia);
@@ -327,7 +327,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param exp    the expression to simply.
      * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
-    protected void simplifyWithGroundInertia(final IntExpression exp, final boolean effect) {
+    protected void simplifyWithGroundInertia(final Expression<Integer> exp, final boolean effect) {
         switch (exp.getConnective()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
@@ -351,9 +351,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 break;
             case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
+                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
@@ -370,7 +370,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case OR:
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
@@ -396,7 +396,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
                 break;
             case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
+                final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundInertia(neg, effect);
                 if (!effect) {
                     if (neg.getConnective().equals(PDDLConnective.TRUE)) {
@@ -464,13 +464,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param exp    the expression to simply.
      * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
-    private void simplifyWithGroundNumericInertia(final IntExpression exp, final boolean effect) {
+    private void simplifyWithGroundNumericInertia(final Expression<Integer> exp, final boolean effect) {
         //System.out.println(exp.getConnective() + " " + Encoder.toString(exp));
         switch (exp.getConnective()) {
             case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
+                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
@@ -486,7 +486,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case OR:
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
@@ -500,7 +500,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 break;
             case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
+                final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(neg, effect);
                 if (!effect) {
                     if (neg.getConnective().equals(PDDLConnective.TRUE)) {
@@ -529,8 +529,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case MINUS:
             case MULTIPLICATION:
             case DIVISION:
-                IntExpression op1 = exp.getChildren().get(0);
-                IntExpression op2 = exp.getChildren().get(1);
+                Expression<Integer> op1 = exp.getChildren().get(0);
+                Expression<Integer> op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
                 this.simplifyWithGroundNumericInertia(op2, effect);
                 if (op1.getConnective().equals(PDDLConnective.FALSE)
@@ -627,7 +627,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 break;
             case F_EXP:
-                IntExpression fexp = exp.getChildren().get(0);
+                Expression<Integer> fexp = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(fexp, effect);
                 if (fexp.getConnective().equals(PDDLConnective.NUMBER)) {
                     exp.setValue(fexp.getValue());
@@ -670,7 +670,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     protected void simplyMethodsWithGroundInertia() {
         final List<IntMethod> toAdd = new ArrayList<>(this.getIntMethods().size());
-        final Set<IntExpression> toRemove = new HashSet<>();
+        final Set<Expression<Integer>> toRemove = new HashSet<>();
         for (IntMethod m : this.getIntMethods()) {
             this.simplifyWithGroundInertia(m.getPreconditions(), false);
             this.simplify(m.getPreconditions());
@@ -691,7 +691,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @return the list of task no more reachable.
      */
     private void simplyRecursivelyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
-                                                                  final Set<IntExpression> tasks) {
+                                                                  final Set<Expression<Integer>> tasks) {
         while (!tasks.isEmpty()) {
             this.simplyMethodsWithTasksNoMoreReachable(methods, tasks);
         }
@@ -705,8 +705,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @return the list of task no more reachable.
      */
     private void simplyMethodsWithTasksNoMoreReachable(final List<IntMethod> methods,
-                                                       final Set<IntExpression> tasks) {
-        final Set<IntExpression> tasksNoMoreReachable = new LinkedHashSet<>();
+                                                       final Set<Expression<Integer>> tasks) {
+        final Set<Expression<Integer>> tasksNoMoreReachable = new LinkedHashSet<>();
         for (int i = 0; i < methods.size(); i++) {
             final IntMethod method = methods.get(i);
             if (this.isSimplified(method, tasks)) {
@@ -743,11 +743,11 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param tasks  the set of tasks that are no more reachable.
      * @return <code>true</code> if the method is simplified, <code>false</code>
      */
-    private boolean isSimplified(IntMethod method, Set<IntExpression> tasks) {
+    private boolean isSimplified(IntMethod method, Set<Expression<Integer>> tasks) {
         boolean isSimplified = true;
         if (!tasks.contains(method.getTask())) {
-            final List<IntExpression> subtasks = method.getSubTasks().getChildren();
-            final Iterator<IntExpression> i = subtasks.iterator();
+            final List<Expression<Integer>> subtasks = method.getSubTasks().getChildren();
+            final Iterator<Expression<Integer>> i = subtasks.iterator();
             isSimplified = false;
             while (i.hasNext() && !isSimplified) {
                 isSimplified = tasks.contains(i.next());
@@ -784,7 +784,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         switch (data) {
             case GROUND_INERTIA:
                 int i = 0;
-                for (Map.Entry<IntExpression, Inertia> e : this.getGroundInertia().entrySet()) {
+                for (Map.Entry<Expression<Integer>, Inertia> e : this.getGroundInertia().entrySet()) {
                     str.append(i);
                     str.append(": ");
                     str.append(this.toString(e.getKey()));
@@ -796,7 +796,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case GROUND_NUMERIC_INERTIA:
                 i = 0;
-                for (Map.Entry<IntExpression, Inertia> e : this.getGroundNumericInertia().entrySet()) {
+                for (Map.Entry<Expression<Integer>, Inertia> e : this.getGroundNumericInertia().entrySet()) {
                     str.append(i);
                     str.append(": ");
                     str.append(this.toString(e.getKey()));

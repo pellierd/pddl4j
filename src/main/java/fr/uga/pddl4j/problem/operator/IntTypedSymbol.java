@@ -25,7 +25,7 @@ import java.util.Objects;
 
 /**
  * This class implements a typed symbol. This class is used to store the quantified variables of the class
- * <code>IntExpression</code>.
+ * <code>Expression</code>.
  *
  * @author D. Pellier
  * @version 1.0 - 20.05.2022

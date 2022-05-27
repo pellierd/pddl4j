@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
@@ -35,9 +36,7 @@ import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
@@ -89,29 +88,29 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     private Goal goal;
 
     /**
-     * The table of the relevant fluents in the form of <code>IntExpression</code>.
+     * The table of the relevant fluents in the form of <code>Expression<Integer></code>.
      */
-    private List<IntExpression> intExpFluents;
+    private List<Expression<Integer>> intExpFluents;
 
     /**
      * The map used to encode fluents into bit set representation.
      */
-    private Map<IntExpression, Integer> mapOfFluentIndex;
+    private Map<Expression<Integer>, Integer> mapOfFluentIndex;
 
     /**
-     * The table of the relevant numeric fluent in the form of <code>IntExpression</code>.
+     * The table of the relevant numeric fluent in the form of <code>Expression</code>.
      */
-    private List<IntExpression> intExpNumericFluents;
+    private List<Expression<Integer>> intExpNumericFluents;
 
     /**
      * The map used to encode numeric fluents into bit set representation.
      */
-    private Map<IntExpression, Integer> mapOfNumericFluentIndex;
+    private Map<Expression<Integer>, Integer> mapOfNumericFluentIndex;
 
     /**
      * Returns the map used to encode the task into integer.
      */
-    private Map<IntExpression, Integer> mapOfTasksIndex;
+    private Map<Expression<Integer>, Integer> mapOfTasksIndex;
 
     /**
      * The initial task network.
@@ -188,11 +187,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Returns the list of relevant fluents of the problem in the form of <code>IntExpression</code>.
+     * Returns the list of relevant fluents of the problem in the form of <code>Expression</code>.
      *
-     * @return the list of relevant fluents of the problem in the form of <code>IntExpression</code>.
+     * @return the list of relevant fluents of the problem in the form of <code>Expression</code>.
      */
-    private List<IntExpression> getIntExpFluents() {
+    private List<Expression<Integer>> getIntExpFluents() {
         return this.intExpFluents;
     }
 
@@ -202,16 +201,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the map used to encode fluents into bit set representation.
      */
-    private Map<IntExpression, Integer> getMapOfFluentIndex() {
+    private Map<Expression<Integer>, Integer> getMapOfFluentIndex() {
         return this.mapOfFluentIndex;
     }
 
     /**
-     * Returns the list of relevant numeric fluents of the problem in the form of <code>IntExpression</code>.
+     * Returns the list of relevant numeric fluents of the problem in the form of <code>Expression</code>.
      *
-     * @return the list of relevant numericfluents of the problem in the form of <code>IntExpression</code>.
+     * @return the list of relevant numericfluents of the problem in the form of <code>Expression</code>.
      */
-    private List<IntExpression> getIntExpNumericFluents() {
+    private List<Expression<Integer>> getIntExpNumericFluents() {
         return this.intExpNumericFluents;
     }
 
@@ -220,7 +219,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the map used to encode numeric fluents into bit set representation.
      */
-    private Map<IntExpression, Integer> getMapOfNumericFluentIndex() {
+    private Map<Expression<Integer>, Integer> getMapOfNumericFluentIndex() {
         return this.mapOfNumericFluentIndex;
     }
 
@@ -229,7 +228,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the map used to encode the task into integer.
      */
-    private Map<IntExpression, Integer> getMapOfTasksIndex() {
+    private Map<Expression<Integer>, Integer> getMapOfTasksIndex() {
         return this.mapOfTasksIndex;
     }
 
@@ -279,12 +278,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      */
     protected void extractRelevantFluents() {
-        final Set<IntExpression> facts = new LinkedHashSet<>(10000);
+        final Set<Expression<Integer>> facts = new LinkedHashSet<>(10000);
         for (IntAction a : this.getIntActions()) {
             extractRelevantFluents(a.getPreconditions(), facts);
             extractRelevantFluents(a.getEffects(), facts);
         }
-        for (IntExpression p : this.getIntInitialState()) {
+        for (Expression<Integer> p : this.getIntInitialState()) {
             Inertia inertia = this.getGroundInertia().get(p);
             if (inertia == null) {
                 inertia = Inertia.INERTIA;
@@ -296,8 +295,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
         this.intExpFluents = new ArrayList<>(facts.size());
         this.fluents = new ArrayList<>(facts.size());
-        for (IntExpression exp : facts) {
-            final IntExpression relevant = new IntExpression(exp);
+        for (Expression<Integer> exp : facts) {
+            final Expression<Integer> relevant = new Expression<>(exp);
             this.intExpFluents.add(relevant);
             int[] arguments = new int[exp.getArguments().size()];
             for (int i = 0; i < exp.getArguments().size(); i++) {
@@ -318,7 +317,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param exp   the expression.
      * @param facts the set of relevant facts.
      */
-    protected void extractRelevantFluents(final IntExpression exp, final Set<IntExpression> facts) {
+    protected void extractRelevantFluents(final Expression<Integer> exp, final Set<Expression<Integer>> facts) {
         switch (exp.getConnective()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
@@ -336,7 +335,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 break;
             case AND:
             case OR:
-                for (IntExpression e : exp.getChildren()) {
+                for (Expression<Integer> e : exp.getChildren()) {
                     this.extractRelevantFluents(e, facts);
                 }
                 break;
@@ -404,7 +403,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Extracts the relevant numeric fluents.
      **/
     protected void extractRelevantNumericFluents() {
-        final Set<IntExpression> fluents = new LinkedHashSet<>(100);
+        final Set<Expression<Integer>> fluents = new LinkedHashSet<>(100);
         for (IntAction a : this.getIntActions()) {
             if (a.isDurative()) {
                 this.extractRelevantNumericFluents(a.getDuration(), fluents);
@@ -414,8 +413,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
         this.intExpNumericFluents = new ArrayList<>(fluents.size());
         this.numericFluents = new ArrayList<>(fluents.size());
-        for (IntExpression exp : fluents) {
-            final IntExpression relevant = new IntExpression(exp);
+        for (Expression<Integer> exp : fluents) {
+            final Expression<Integer> relevant = new Expression<>(exp);
             this.intExpNumericFluents.add(relevant);
             int[] arguments = new int[exp.getArguments().size()];
             for (int i = 0; i < exp.getArguments().size(); i++) {
@@ -436,14 +435,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param exp   the expression.
      * @param fluents the set of relevant facts.
      */
-    private void extractRelevantNumericFluents(final IntExpression exp, final Set<IntExpression> fluents) {
+    private void extractRelevantNumericFluents(final Expression<Integer> exp, final Set<Expression<Integer>> fluents) {
         switch (exp.getConnective()) {
             case FN_HEAD:
                 fluents.add(exp);
                 break;
             case AND:
             case OR:
-                for (IntExpression e : exp.getChildren()) {
+                for (Expression<Integer> e : exp.getChildren()) {
                     this.extractRelevantNumericFluents(e, fluents);
                 }
                 break;
@@ -492,7 +491,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         // Create a map of the relevant fluents with their index to speedup the bit set encoding of the actions
         this.mapOfFluentIndex = new LinkedHashMap<>(this.getIntExpFluents().size());
         int index = 0;
-        for (IntExpression fluent : this.getIntExpFluents()) {
+        for (Expression<Integer> fluent : this.getIntExpFluents()) {
             this.mapOfFluentIndex.put(fluent, index);
             index++;
         }
@@ -504,7 +503,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void initMapOfNumericFluentIndex() {
         this.mapOfNumericFluentIndex = new LinkedHashMap<>(this.getIntExpNumericFluents().size());
         int index = 0;
-        for (IntExpression fluent : this.getIntExpNumericFluents()) {
+        for (Expression<Integer> fluent : this.getIntExpNumericFluents()) {
             this.mapOfNumericFluentIndex.put(fluent, index);
         }
     }
@@ -535,12 +534,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
+     * Encode an specified <code>Expression</code> in its <code>BitExp</code> representation.The
      * specified map is used to speed-up the search by mapping the an expression to this index.
      *
      * @return the expression in bit set representation.
      */
-    private Effect finalizeEffect(final IntExpression exp) throws UnexpectedExpressionException {
+    private Effect finalizeEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
         final Effect effect = new Effect();
         switch (exp.getConnective()) {
             case ATOM:
@@ -556,8 +555,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 }
                 break;
             case AND:
-                final List<IntExpression> children = exp.getChildren();
-                for (IntExpression ei : children) {
+                final List<Expression<Integer>> children = exp.getChildren();
+                for (Expression<Integer> ei : children) {
                     switch (ei.getConnective()) {
                         case ATOM:
                             index = this.mapOfFluentIndex.get(ei);
@@ -616,10 +615,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final List<IntAction> normalisedActions = new ArrayList<>();
         this.toCNF(action.getEffects());
         this.simplify(action.getEffects());
-        final IntExpression precond = new IntExpression(action.getPreconditions());
+        final Expression<Integer> precond = new Expression<>(action.getPreconditions());
         this.toDNF(precond);
         if (precond.getChildren().size() > 1) {
-            for (final IntExpression ei : precond.getChildren()) {
+            for (final Expression<Integer> ei : precond.getChildren()) {
                 final String name = action.getName();
                 final int arity = action.arity();
                 final IntAction newAction = new IntAction(name, arity);
@@ -631,11 +630,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     newAction.setValueOfParameter(i, action.getValueOfParameter(i));
                 }
                 if (action.isDurative()) {
-                    newAction.setDuration(new IntExpression(action.getDuration()));
+                    newAction.setDuration(new Expression<>(action.getDuration()));
                 }
                 newAction.setPreconditions(ei);
 
-                newAction.setEffects(new IntExpression(action.getEffects()));
+                newAction.setEffects(new Expression<>(action.getEffects()));
                 normalisedActions.add(newAction);
             }
         } else {
@@ -647,7 +646,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * Encodes a numeric assignment.
      */
-    private NumericAssignment finalizeNumericAssignment(final IntExpression exp) {
+    private NumericAssignment finalizeNumericAssignment(final Expression<Integer> exp) {
 
         final NumericVariable fluent = new NumericVariable(this.mapOfNumericFluentIndex.get(exp.getChildren().get(0)));
         final ArithmeticExpression arithmeticExpression = this.finalizeArithmeticExpression(exp.getChildren().get(1));
@@ -701,7 +700,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         encoded.setPrecondition(this.finalizeCondition(action.getPreconditions()));
 
         // Initialize the effects of the action
-        final LinkedList<IntExpression> effects = new LinkedList<>();
+        final LinkedList<Expression<Integer>> effects = new LinkedList<>();
         if (action.getEffects().getConnective().equals(PDDLConnective.ATOM)) {
             effects.add(action.getEffects());
         } else {
@@ -711,10 +710,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         //System.out.println(this.toString(action));
         final ConditionalEffect unCondEffects = new ConditionalEffect();
         boolean hasUnConditionalEffects = false;
-        while (!effects.isEmpty()) { //for (IntExpression ei : effects) {
-            IntExpression ei = effects.poll();
+        while (!effects.isEmpty()) { //for (Expression ei : effects) {
+            Expression<Integer> ei = effects.poll();
             final PDDLConnective connective = ei.getConnective();
-            final List<IntExpression> children = ei.getChildren();
+            final List<Expression<Integer>> children = ei.getChildren();
             //System.out.println("EXP " + this.toString(ei));
             switch (connective) {
                 case WHEN:
@@ -780,9 +779,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         } else {
             this.toDNF(this.getIntGoal());
             List<Goal> goals = new ArrayList<>(this.getIntGoal().getChildren().size());
-            for (IntExpression exp : this.getIntGoal().getChildren()) {
+            for (Expression<Integer> exp : this.getIntGoal().getChildren()) {
                 if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-                    IntExpression and = new IntExpression(PDDLConnective.AND);
+                    Expression<Integer> and = new Expression<>(PDDLConnective.AND);
                     and.getChildren().add(exp);
                     goals.add(new Goal(this.finalizeCondition(and)));
                 } else {
@@ -794,7 +793,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 final int dummyPredicateIndex = this.getPredicateSymbols().size();
                 this.getPredicateSymbols().add(Constants.DUMMY_GOAL);
                 this.getPredicateSignatures().add(new ArrayList<>());
-                IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
+                Expression<Integer> dummyGoal = new Expression<>(PDDLConnective.ATOM);
                 dummyGoal.setSymbol(new Symbol<>(SymbolType.PREDICATE, dummyPredicateIndex));
                 dummyGoal.setArguments(new ArrayList<>(0));
                 final int dummyGoalIndex = this.getIntExpFluents().size();
@@ -820,13 +819,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode an specified <code>IntExpression</code> that represents a condition in its <code>BitExp</code>
+     * Encode an specified <code>Expression</code> that represents a condition in its <code>BitExp</code>
      * representation. The map of fluent index is used to speed-up the encoding.
      *
-     * @param exp the <code>IntExpression</code>.
+     * @param exp the <code>Expression</code>.
      * @return the condition encoded.
      */
-    protected Condition finalizeCondition(final IntExpression exp) throws UnexpectedExpressionException {
+    protected Condition finalizeCondition(final Expression<Integer> exp) throws UnexpectedExpressionException {
         final Condition condition = new Condition();
         switch (exp.getConnective()) {
             case ATOM:
@@ -836,7 +835,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 condition.getNegativeFluents().set(this.getMapOfFluentIndex().get(exp.getChildren().get(0)));
                 break;
             case AND:
-                for (IntExpression e : exp.getChildren()) {
+                for (Expression<Integer> e : exp.getChildren()) {
                     Condition ce = this.finalizeCondition(e);
                     condition.getPositiveFluents().or(ce.getPositiveFluents());
                     condition.getNegativeFluents().or(ce.getNegativeFluents());
@@ -860,19 +859,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode an specified <code>IntExpression</code> in its <code>BitExp</code> representation.The
+     * Encode an specified <code>Expression</code> in its <code>BitExp</code> representation.The
      * specified map is used to speed-up the search by mapping the an expression to this index.
      *
-     * @param exp the <code>IntExpression</code>.
+     * @param exp the <code>Expression</code>.
      * @return the expression in bit set representation.
      */
-    private List<NumericConstraint> finalizeNumericConstraints(final IntExpression exp)
+    private List<NumericConstraint> finalizeNumericConstraints(final Expression<Integer> exp)
         throws UnexpectedExpressionException {
 
         final List<NumericConstraint> constraints = new ArrayList<>();
         switch (exp.getConnective()) {
             case AND:
-                for (IntExpression e : exp.getChildren()) {
+                for (Expression<Integer> e : exp.getChildren()) {
                     constraints.addAll(this.finalizeNumericConstraints(e));
                 }
                 break;
@@ -897,7 +896,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param exp the exp to encode.
      */
-    private NumericConstraint encodeNumericConstraint(final IntExpression exp) {
+    private NumericConstraint encodeNumericConstraint(final Expression<Integer> exp) {
 
         ArithmeticExpression left = this.finalizeArithmeticExpression(exp.getChildren().get(0));
         ArithmeticExpression right = this.finalizeArithmeticExpression(exp.getChildren().get(1));
@@ -929,7 +928,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param exp the expression to encode.
      */
-    private ArithmeticExpression finalizeArithmeticExpression(final IntExpression exp) {
+    private ArithmeticExpression finalizeArithmeticExpression(final Expression<Integer> exp) {
         ArithmeticExpression arithmeticExpression;
         ArithmeticExpression left;
         ArithmeticExpression right;
@@ -982,7 +981,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void finalizeInitialState() {
         this.initialState = new InitialState();
-        for (final IntExpression fact : this.getIntInitialState()) {
+        for (final Expression<Integer> fact : this.getIntInitialState()) {
             switch (fact.getConnective()) {
                 case ATOM:
                     Integer i = this.mapOfFluentIndex.get(fact);
@@ -1006,7 +1005,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Encode the numeric fluent of the initial state.
      */
     protected void finalizeInitialNumericFluent() {
-        for (Map.Entry<IntExpression, Integer> e : this.mapOfNumericFluentIndex.entrySet()) {
+        for (Map.Entry<Expression<Integer>, Integer> e : this.mapOfNumericFluentIndex.entrySet()) {
             int index = e.getValue();
             double value = this.getIntInitFunctionCost().get(e.getKey());
             NumericVariable fluent = new NumericVariable(index, value);
@@ -1532,14 +1531,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void extractRelevantTasks() {
         this.tasks = new ArrayList<>();
-        for (IntExpression task : this.getRelevantPrimitiveTasks()) {
+        for (Expression<Integer> task : this.getRelevantPrimitiveTasks()) {
             int[] arguments = new int[task.getArguments().size()];
             for (int i = 0; i < task.getArguments().size(); i++) {
                 arguments[i] = task.getArguments().get(i).getValue();
             }
             this.tasks.add(new Task(task.getSymbol().getValue(), arguments, true));
         }
-        for (IntExpression task : this.getRelevantCompundTasks()) {
+        for (Expression<Integer> task : this.getRelevantCompundTasks()) {
             int[] arguments = new int[task.getArguments().size()];
             for (int i = 0; i < task.getArguments().size(); i++) {
                 arguments[i] = task.getArguments().get(i).getValue();
@@ -1552,14 +1551,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Creates the map index for the task.
      */
     protected void initMapOfTaskIndex() {
-        List<IntExpression> tasks = new ArrayList<>();
+        List<Expression<Integer>> tasks = new ArrayList<>();
         tasks.addAll(this.getRelevantPrimitiveTasks());
         tasks.addAll(this.getRelevantCompundTasks());
 
         // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
         this.mapOfTasksIndex = new LinkedHashMap<>(tasks.size());
         int index = 0;
-        for (IntExpression task : tasks) {
+        for (Expression<Integer> task : tasks) {
             this.mapOfTasksIndex.put(task, index);
             index++;
         }
@@ -1617,8 +1616,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param taskMap the map that associates at a specified task its index in the table of relevant tasks.
      * @return the list of methods encoded into final compact representation.
      */
-    private Method finalizeMethod(final IntMethod method, final Map<IntExpression, Integer> factMap,
-                                    final Map<IntExpression, Integer> taskMap) throws UnexpectedExpressionException {
+    private Method finalizeMethod(final IntMethod method, final Map<Expression<Integer>, Integer> factMap,
+                                    final Map<Expression<Integer>, Integer> taskMap) throws UnexpectedExpressionException {
 
         final int arity = method.arity();
         final Method encoded = new Method(method.getName(), arity);
@@ -1649,7 +1648,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         this.encodeTasks(taskNetwork.getTasks(), tasks);
         // We encode then the ordering constraints
         final OrderingConstraintSet constraints = new OrderingConstraintSet(tasks.size());
-        for (IntExpression c : taskNetwork.getOrderingConstraints().getChildren()) {
+        for (Expression<Integer> c : taskNetwork.getOrderingConstraints().getChildren()) {
             constraints.set(c.getChildren().get(0).getTaskID().getValue(),
                 c.getChildren().get(1).getTaskID().getValue());
         }
@@ -1667,10 +1666,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     private List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
         final List<IntMethod> normalisedMethods = new ArrayList<>();
-        final IntExpression precond = new IntExpression(method.getPreconditions());
+        final Expression<Integer> precond = new Expression<Integer>(method.getPreconditions());
         this.toDNF(precond);
         if (precond.getChildren().size() > 1) {
-            for (final IntExpression ei : precond.getChildren()) {
+            for (final Expression<Integer> ei : precond.getChildren()) {
                 final String name = method.getName();
                 final int arity = method.arity();
                 final IntMethod newMethod = new IntMethod(name, arity);
@@ -1681,7 +1680,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     newMethod.setValueOfParameter(i, method.getValueOfParameter(i));
                 }
                 newMethod.setPreconditions(ei);
-                newMethod.setTask(new IntExpression(method.getTask()));
+                newMethod.setTask(new Expression<Integer>(method.getTask()));
                 newMethod.setTaskNetwork(new IntTaskNetwork(method.getTaskNetwork()));
                 normalisedMethods.add(newMethod);
             }
@@ -1692,19 +1691,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode the list of tasks expressed as an IntExpression into a list of integer.
+     * Encode the list of tasks expressed as an expression into a list of integer.
      *
-     * @param exp   the list of tasks expressed as an IntExpression.
+     * @param exp   the list of tasks expressed as an expression.
      * @param tasks the list of task encoded as integer.
      */
-    private void encodeTasks(IntExpression exp, List<Integer> tasks) {
+    private void encodeTasks(Expression<Integer> exp, List<Integer> tasks) {
         switch (exp.getConnective()) {
             case TASK:
                 tasks.add(this.mapOfTasksIndex.get(exp));
                 break;
             case AND:
             case OR:
-                for (IntExpression e : exp.getChildren()) {
+                for (Expression<Integer> e : exp.getChildren()) {
                     this.encodeTasks(e, tasks);
                 }
                 break;

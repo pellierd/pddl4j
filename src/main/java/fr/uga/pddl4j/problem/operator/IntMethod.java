@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
@@ -33,7 +34,7 @@ public final class IntMethod extends AbstractIntOperator {
     /**
      * The task carries out by this method.
      */
-    private IntExpression task;
+    private Expression<Integer> task;
 
     /**
      * The task network of the methode.
@@ -48,12 +49,12 @@ public final class IntMethod extends AbstractIntOperator {
      */
     public IntMethod(final IntMethod other) {
         super(other);
-        this.task = new IntExpression(other.getTask());
+        this.task = new Expression<>(other.getTask());
         this.taskNetwork = new IntTaskNetwork(other.taskNetwork);
     }
 
     /**
-     * Create a new method with a specified name. The task is set to a empty IntExpression with TASK as connective and
+     * Create a new method with a specified name. The task is set to a empty expression with TASK as connective and
      * the task network is set to an empty task network.
      *
      * @param name  the name of the method.
@@ -61,7 +62,7 @@ public final class IntMethod extends AbstractIntOperator {
      */
     public IntMethod(final String name, final int arity) {
         super(name, arity);
-        this.task = new IntExpression(PDDLConnective.TASK);
+        this.task = new Expression<>(PDDLConnective.TASK);
         this.taskNetwork = new IntTaskNetwork();
     }
 
@@ -70,7 +71,7 @@ public final class IntMethod extends AbstractIntOperator {
      *
      * @return the task carried out by the method.
      */
-    public final IntExpression getTask() {
+    public final Expression<Integer> getTask() {
         return this.task;
     }
 
@@ -79,7 +80,7 @@ public final class IntMethod extends AbstractIntOperator {
      *
      * @param task the task the carried out by the method.
      */
-    public final void setTask(final IntExpression task) {
+    public final void setTask(final Expression<Integer> task) {
         this.task = task;
     }
 
@@ -88,7 +89,7 @@ public final class IntMethod extends AbstractIntOperator {
      *
      * @return the subtasks of the method.
      */
-    public final IntExpression getSubTasks() {
+    public final Expression<Integer> getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
@@ -97,7 +98,7 @@ public final class IntMethod extends AbstractIntOperator {
      *
      * @param tasks the subtasks to set.
      */
-    public final void setSubTasks(final IntExpression tasks) {
+    public final void setSubTasks(final Expression<Integer> tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 
@@ -106,7 +107,7 @@ public final class IntMethod extends AbstractIntOperator {
      *
      * @return the ordering constraints of the method.
      */
-    public final IntExpression getOrderingConstraints() {
+    public final Expression<Integer> getOrderingConstraints() {
         return this.taskNetwork.getOrderingConstraints();
     }
 
@@ -115,7 +116,7 @@ public final class IntMethod extends AbstractIntOperator {
      *
      * @param ordering the orderings constraints to set
      */
-    public final void setOrderingConstraints(final IntExpression ordering) {
+    public final void setOrderingConstraints(final Expression<Integer> ordering) {
         this.taskNetwork.setOrderingConstraints(ordering);
     }
 

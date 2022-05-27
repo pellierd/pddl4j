@@ -15,13 +15,13 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.util.IntMatrix;
 
@@ -148,7 +148,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the effect.
      */
-    private void extract(final IntExpression exp) {
+    private void extract(final Expression<Integer> exp) {
         switch (exp.getConnective()) {
             case ATOM:
                 int predicate = exp.getSymbol().getValue();
@@ -178,7 +178,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 this.extract(exp.getChildren().get(1));
                 break;
             case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
+                final Expression<Integer> neg = exp.getChildren().get(0);
                 if (neg.getConnective().equals(PDDLConnective.ATOM)) {
                     predicate = neg.getSymbol().getValue();
                     switch (this.inertia.get(predicate)) {
@@ -257,7 +257,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the effect.
      */
-    private void extractNumericInertia(final IntExpression exp) {
+    private void extractNumericInertia(final Expression<Integer> exp) {
         switch (exp.getConnective()) {
             case AND:
                 exp.getChildren().forEach(this::extractNumericInertia);
@@ -297,7 +297,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             if (this.getPredicateSignatures().get(i).size() == 1
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Symbol<Integer>> newTypeDomain = new LinkedHashSet<>();
-                for (IntExpression fact : this.getIntInitialState()) {
+                for (Expression<Integer> fact : this.getIntInitialState()) {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
@@ -325,7 +325,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     }
 
     private List<IntAction> simplifyActionsWithInferredTypes(final IntAction action) {
-        final List<IntExpression> unaryInertia = new ArrayList<>();
+        final List<Expression<Integer>> unaryInertia = new ArrayList<>();
         unaryInertia.addAll(this.collectUnaryInertia(action.getPreconditions()));
         unaryInertia.addAll(this.collectUnaryInertia(action.getEffects()));
 
@@ -336,7 +336,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             return actions;
         }
 
-        for (final IntExpression inertia : unaryInertia) {
+        for (final Expression<Integer> inertia : unaryInertia) {
             final List<IntAction> newActions = new ArrayList<>();
             for (final IntAction o : actions) {
                 if (o.arity() > 0) {
@@ -408,7 +408,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param ti         the type intersection.
      * @param ts         the type substract.
      */
-    private void replace(final IntExpression exp, final IntExpression inertia, final PDDLConnective connective,
+    private void replace(final Expression<Integer> exp, final Expression<Integer> inertia, final PDDLConnective connective,
                          final int ti, final int ts) {
         switch (exp.getConnective()) {
             case ATOM:
@@ -417,9 +417,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
+                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.replace(ei, inertia, connective, ti, ts);
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         exp.setConnective(PDDLConnective.FALSE);
@@ -434,7 +434,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case OR:
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.replace(ei, inertia, connective, ti, ts);
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
                         exp.setConnective(PDDLConnective.TRUE);
@@ -449,11 +449,11 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FORALL:
             case EXISTS:
                 if (inertia.getArguments().get(0).equals(exp.getQuantifiedVariables().get(0).getValue())) {
-                    final IntExpression ei = new IntExpression(exp);
+                    final Expression<Integer> ei = new Expression<>(exp);
                     //ei.setType(ti);
                     ei.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ti));
                     this.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
-                    final IntExpression es = new IntExpression(exp);
+                    final Expression<Integer> es = new Expression<>(exp);
                     es.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ts));
                     this.replace(es, inertia, PDDLConnective.FALSE, ti, ts);
                     exp.getChildren().clear();
@@ -534,8 +534,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp the expression.
      * @return the list of unary inertia expression collected.
      */
-    private List<IntExpression> collectUnaryInertia(final IntExpression exp) {
-        final List<IntExpression> unaryInertia = new ArrayList<>();
+    private List<Expression<Integer>> collectUnaryInertia(final Expression<Integer> exp) {
+        final List<Expression<Integer>> unaryInertia = new ArrayList<>();
         switch (exp.getConnective()) {
             case ATOM:
                 if (this.getInferredDomains().get(exp.getSymbol().getValue()) != null) {
@@ -544,13 +544,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case AND:
             case OR:
-                for (final IntExpression ei : exp.getChildren()) {
+                for (final Expression<Integer> ei : exp.getChildren()) {
                     unaryInertia.addAll(this.collectUnaryInertia(ei));
                 }
                 break;
             case FORALL:
             case EXISTS:
-                final IntExpression qExp = exp.getChildren().get(0);
+                final Expression<Integer> qExp = exp.getChildren().get(0);
                 unaryInertia.addAll(this.collectUnaryInertia(qExp));
                 break;
             case AT_START:
@@ -625,7 +625,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             this.predicatesTables.add(pTables);
         }
 
-        for (IntExpression fact : this.getIntInitialState()) {
+        for (Expression<Integer> fact : this.getIntInitialState()) {
             if (fact.getConnective().equals(PDDLConnective.NOT)) {
                 fact = fact.getChildren().get(0);
             }
@@ -764,12 +764,12 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp the expression.
      * @param simplify the flag to indicate if logical simplifications must be done during the expansion.
      */
-    protected void expandQuantifiedExpression(final IntExpression exp, boolean simplify) {
+    protected void expandQuantifiedExpression(final Expression<Integer> exp, boolean simplify) {
         switch (exp.getConnective()) {
             case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
+                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
@@ -787,7 +787,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case OR:
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
                     if ((ei.getConnective().equals(PDDLConnective.FORALL)
                         || ei.getConnective().equals(PDDLConnective.EXISTS))
@@ -804,14 +804,14 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case FORALL:
                 Set<IntSymbol> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
-                IntExpression qExp = exp.getChildren().get(0);
+                Expression<Integer> qExp = exp.getChildren().get(0);
                 int var = exp.getQuantifiedVariables().get(0).getValue();
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 Iterator<IntSymbol> it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     int cons = it.next().getValue();
-                    IntExpression copy = new IntExpression(qExp);
+                    Expression<Integer> copy = new Expression<>(qExp);
                     this.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
@@ -830,7 +830,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     int cons = it.next().getValue();
-                    IntExpression copy = new IntExpression(qExp);
+                    Expression<Integer> copy = new Expression<>(qExp);
                     this.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
@@ -913,7 +913,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the atomic expression to simplify.
      */
-    private void simplyAtom(final IntExpression exp) {
+    private void simplyAtom(final Expression<Integer> exp) {
         final int predicate = exp.getSymbol().getValue();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
@@ -966,7 +966,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param cons the constant.
      * @param simplify a flag to indicate if the expression must be simplified during the subtitution process.
      */
-    protected void substitute(final IntExpression exp, final int var, final int cons, boolean simplify) {
+    protected void substitute(final Expression<Integer> exp, final int var, final int cons, boolean simplify) {
         boolean updated = false;
         switch (exp.getConnective()) {
             case ATOM:
@@ -1022,9 +1022,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
+                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.substitute(ei, var, cons, simplify);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (simplify && ei.getConnective().equals(PDDLConnective.FALSE)) {
@@ -1035,7 +1035,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case OR:
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = i.next();
+                    final Expression<Integer> ei = i.next();
                     this.substitute(ei, var, cons, simplify);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (simplify && ei.getConnective().equals(PDDLConnective.TRUE)) {
@@ -1044,7 +1044,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 }
                 break;
             case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
+                final Expression<Integer> neg = exp.getChildren().get(0);
                 this.substitute(neg, var, cons, simplify);
                 if (simplify && neg.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.setConnective(PDDLConnective.FALSE);
@@ -1129,7 +1129,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the expression to simplify.
      */
-    protected void simplify(final IntExpression exp) {
+    protected void simplify(final Expression<Integer> exp) {
         switch (exp.getConnective()) {
             case ATOM:
                 break;
@@ -1152,7 +1152,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case AND:
                 int i = 0;
                 while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final IntExpression ei = exp.getChildren().get(i);
+                    final Expression<Integer> ei = exp.getChildren().get(i);
                     this.simplify(ei);
                     if (ei.getConnective().equals(PDDLConnective.FALSE)) {
                         // If a child expression is FALSE, the whole conjunction becomes FALSE.
@@ -1166,7 +1166,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                         int j = 0;
                         int added = 0;
                         while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
-                            final IntExpression ej = ei.getChildren().get(j);
+                            final Expression<Integer> ej = ei.getChildren().get(j);
                             if (ej.getConnective().equals(PDDLConnective.FALSE)) {
                                 exp.setConnective(PDDLConnective.FALSE);
                             } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
@@ -1178,8 +1178,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                         i += added + 1;
                     } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
                         // Simplification of the conditional expression.
-                        final IntExpression antecedent = ei.getChildren().get(0);
-                        final IntExpression consequent = ei.getChildren().get(1);
+                        final Expression<Integer> antecedent = ei.getChildren().get(0);
+                        final Expression<Integer> consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional
                         // effect is removed from the action. In this case, the effect is never applicable
                         // because it requires FALSE to hold, i.e., the state must be inconsistent.
@@ -1195,7 +1195,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                                 while (j < consequent.getChildren().size()
                                     && exp.getConnective().equals(PDDLConnective.AND)) {
 
-                                    final IntExpression ej = consequent.getChildren().get(j);
+                                    final Expression<Integer> ej = consequent.getChildren().get(j);
                                     if (ej.getConnective().equals(PDDLConnective.FALSE)) {
                                         exp.setConnective(PDDLConnective.FALSE);
                                     } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
@@ -1230,7 +1230,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case OR:
                 i = 0;
                 while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final IntExpression ei = exp.getChildren().get(i);
+                    final Expression<Integer> ei = exp.getChildren().get(i);
                     this.simplify(ei);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnective().equals(PDDLConnective.TRUE)) {
@@ -1242,7 +1242,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                         int j = 0;
                         int added = 0;
                         while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
-                            final IntExpression ej = ei.getChildren().get(j);
+                            final Expression<Integer> ej = ei.getChildren().get(j);
                             if (ej.getConnective().equals(PDDLConnective.TRUE)) {
                                 exp.setConnective(PDDLConnective.TRUE);
                             } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
@@ -1254,8 +1254,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                         i += added + 1;
                     } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
                         // Simplification of the conditional expression.
-                        final IntExpression antecedent = ei.getChildren().get(0);
-                        final IntExpression consequent = ei.getChildren().get(1);
+                        final Expression<Integer> antecedent = ei.getChildren().get(0);
+                        final Expression<Integer> consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
                         // removed from the action. In this case, the effect is never applicable because it
                         // requires FALSE to hold, i.e., the state must be inconsistent.
@@ -1271,7 +1271,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                                 while (j < consequent.getChildren().size()
                                     && exp.getConnective().equals(PDDLConnective.OR)) {
 
-                                    final IntExpression ej = consequent.getChildren().get(j);
+                                    final Expression<Integer> ej = consequent.getChildren().get(j);
                                     if (ej.getConnective().equals(PDDLConnective.TRUE)) {
                                         exp.setConnective(PDDLConnective.TRUE);
                                     } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
@@ -1302,7 +1302,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 } else if (exp.getChildren().size() == 1) {
                     exp.assign(exp.getChildren().get(0));
                 } else {
-                    final Iterator<IntExpression> it = exp.getChildren().iterator();
+                    final Iterator<Expression<Integer>> it = exp.getChildren().iterator();
                     while (it.hasNext()) {
                         if (it.next().getConnective().equals(PDDLConnective.FALSE)) {
                             it.remove();
@@ -1325,7 +1325,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 this.simplify(exp.getChildren().get(0));
                 break;
             case NOT:
-                final IntExpression neg = exp.getChildren().get(0);
+                final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplify(neg);
                 if (neg.getConnective().equals(PDDLConnective.TRUE)) {
                     exp.setConnective(PDDLConnective.FALSE);
@@ -1383,29 +1383,29 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the expression to transform in CNF.
      */
-    protected void toCNF(final IntExpression exp) throws UnexpectedExpressionException {
+    protected void toCNF(final Expression<Integer> exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case WHEN:
-                final IntExpression antecedent = exp.getChildren().get(0);
-                final IntExpression consequence = exp.getChildren().get(1);
+                final Expression<Integer> antecedent = exp.getChildren().get(0);
+                final Expression<Integer> consequence = exp.getChildren().get(1);
                 this.toDNF(antecedent);
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
-                for (IntExpression ei : antecedent.getChildren()) {
-                    final IntExpression newWhen = new IntExpression(PDDLConnective.WHEN);
+                for (Expression<Integer> ei : antecedent.getChildren()) {
+                    final Expression<Integer> newWhen = new Expression<>(PDDLConnective.WHEN);
                     newWhen.getChildren().add(ei);
-                    newWhen.getChildren().add(new IntExpression(consequence));
+                    newWhen.getChildren().add(new Expression<>(consequence));
                     exp.getChildren().add(newWhen);
                 }
                 break;
             case AND:
-                final List<IntExpression> children = exp.getChildren();
+                final List<Expression<Integer>> children = exp.getChildren();
                 int i = 0;
                 while (i < children.size()) {
-                    final IntExpression ei = children.get(i);
+                    final Expression<Integer> ei = children.get(i);
                     this.toCNF(ei);
                     exp.getChildren().remove(i);
-                    for (IntExpression ej : ei.getChildren()) {
+                    for (Expression<Integer> ej : ei.getChildren()) {
                         exp.getChildren().add(i, ej);
                         i++;
                     }
@@ -1422,7 +1422,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case SCALE_DOWN:
             case NOT:
             case TRUE:
-                IntExpression copy = new IntExpression(exp);
+                Expression<Integer> copy = new Expression<Integer>(exp);
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 exp.getChildren().add(copy);
@@ -1437,17 +1437,17 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param exp the expression to transform in DNF.
      */
-    protected void toDNF(final IntExpression exp) throws UnexpectedExpressionException {
+    protected void toDNF(final Expression<Integer> exp) throws UnexpectedExpressionException {
         switch (exp.getConnective()) {
             case OR:
-                List<IntExpression> children = exp.getChildren();
+                List<Expression<Integer>> children = exp.getChildren();
                 int index = 0;
                 while (index < children.size()) {
-                    final IntExpression ei = children.get(index);
+                    final Expression<Integer> ei = children.get(index);
                     this.toDNF(ei);
                     if (ei.getConnective().equals(PDDLConnective.OR)) {
                         children.remove(index);
-                        for (IntExpression ej : ei.getChildren()) {
+                        for (Expression<Integer> ej : ei.getChildren()) {
                             children.add(index, ej);
                             index++;
                         }
@@ -1456,15 +1456,15 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case AND:
                 children = exp.getChildren();
-                for (IntExpression child : children) {
+                for (Expression<Integer> child : children) {
                     this.toDNF(child);
                 }
-                IntExpression dnf = exp.getChildren().get(0);
+                Expression<Integer> dnf = exp.getChildren().get(0);
                 for (int i = 1; i < exp.getChildren().size(); i++) {
-                    final IntExpression orExp = exp.getChildren().get(i);
-                    final IntExpression newOr = new IntExpression(PDDLConnective.OR);
-                    for (IntExpression newAnd : dnf.getChildren()) {
-                        for (IntExpression ek : orExp.getChildren()) {
+                    final Expression<Integer> orExp = exp.getChildren().get(i);
+                    final Expression<Integer> newOr = new Expression<>(PDDLConnective.OR);
+                    for (Expression<Integer> newAnd : dnf.getChildren()) {
+                        for (Expression<Integer> ek : orExp.getChildren()) {
                             ek.getChildren().stream().filter(el -> !newAnd.getChildren().contains(el)).forEach(el -> {
                                 if (el.getConnective().equals(PDDLConnective.OR)
                                     || el.getConnective().equals(PDDLConnective.AND)
@@ -1475,7 +1475,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                                 }
                             });
                             boolean add = true;
-                            for (IntExpression el : newAnd.getChildren()) {
+                            for (Expression<Integer> el : newAnd.getChildren()) {
                                 if (el.getConnective().equals(PDDLConnective.FALSE)) {
                                     add = false;
                                     break;
@@ -1511,8 +1511,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case OVER_ALL:
             case FALSE:
             case TRUE:
-                IntExpression and = new IntExpression(PDDLConnective.AND);
-                and.getChildren().add(new IntExpression(exp));
+                Expression<Integer> and = new Expression<>(PDDLConnective.AND);
+                and.getChildren().add(new Expression<>(exp));
                 exp.setConnective(PDDLConnective.OR);
                 exp.getChildren().clear();
                 exp.getChildren().add(and);

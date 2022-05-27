@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
@@ -43,7 +44,7 @@ public final class IntAction extends AbstractIntOperator {
     /**
      * The expression that represents the effect of the action.
      */
-    private IntExpression effects;
+    private Expression<Integer> effects;
 
     /**
      * The cost of the action.
@@ -53,7 +54,7 @@ public final class IntAction extends AbstractIntOperator {
     /**
      * The duration of the action.
      */
-    private IntExpression duration;
+    private Expression<Integer> duration;
 
     /**
      * Create a new action from a specified action. This constructor create a deep copy of the
@@ -63,10 +64,10 @@ public final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final IntAction other) {
         super(other);
-        this.effects = new IntExpression(other.getEffects());
+        this.effects = new Expression<>(other.getEffects());
         this.cost = other.getCost();
         if (other.getDuration() != null) {
-            this.duration = new IntExpression(other.getDuration());
+            this.duration = new Expression<>(other.getDuration());
         }
     }
 
@@ -78,7 +79,7 @@ public final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);
-        this.effects = new IntExpression(PDDLConnective.AND);
+        this.effects = new Expression<>(PDDLConnective.AND);
         this.cost = IntAction.DEFAULT_COST;
         this.duration = null;
     }
@@ -97,7 +98,7 @@ public final class IntAction extends AbstractIntOperator {
      *
      * @return the duration of the action.
      */
-    public final IntExpression getDuration() {
+    public final Expression<Integer> getDuration() {
         return this.duration;
     }
 
@@ -106,7 +107,7 @@ public final class IntAction extends AbstractIntOperator {
      *
      * @param duration the duration to set.
      */
-    public final void setDuration(final IntExpression duration) {
+    public final void setDuration(final Expression<Integer> duration) {
         this.duration = duration;
     }
 
@@ -133,7 +134,7 @@ public final class IntAction extends AbstractIntOperator {
      *
      * @return the effects of the action.
      */
-    public final IntExpression getEffects() {
+    public final Expression<Integer> getEffects() {
         return this.effects;
     }
 
@@ -142,7 +143,7 @@ public final class IntAction extends AbstractIntOperator {
      *
      * @param effects the effects to set
      */
-    public final void setEffects(final IntExpression effects) {
+    public final void setEffects(final Expression<Integer> effects) {
         this.effects = effects;
     }
 

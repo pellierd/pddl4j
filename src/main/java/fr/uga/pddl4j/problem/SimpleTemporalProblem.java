@@ -15,13 +15,12 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,7 +62,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             //System.out.println("*** Precondition ***");
             //System.out.println(Encoder.toString(a.getPreconditions()));
 
-            final IntExpression startPrecondition = new IntExpression(a.getPreconditions());
+            final Expression<Integer> startPrecondition = new Expression<>(a.getPreconditions());
             this.extract(startPrecondition, PDDLConnective.AT_START);
             //System.out.println("*** At start precondition ***");
             //System.out.println(Encoder.toString(startPrecondition));
@@ -75,7 +74,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             //System.out.println("*** At start precondition ***");
             //System.out.println(Encoder.toString(startPrecondition));
 
-            final IntExpression endPrecondition = new IntExpression(a.getPreconditions());
+            final Expression<Integer> endPrecondition = new Expression<>(a.getPreconditions());
             this.extract(endPrecondition, PDDLConnective.AT_END);
             this.simplify(endPrecondition);
             this.toDNF(endPrecondition);
@@ -83,7 +82,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             //System.out.println("*** At end precondition ***");
             //System.out.println(Encoder.toString(endPrecondition));
 
-            final IntExpression overAllPrecondition = new IntExpression(a.getPreconditions());
+            final Expression<Integer> overAllPrecondition = new Expression<>(a.getPreconditions());
             this.extract(overAllPrecondition, PDDLConnective.OVER_ALL);
             //System.out.println("*** Over all precondition AV Simplify ***");
             //System.out.println(Encoder.toString(overAllPrecondition));
@@ -113,14 +112,14 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             // The list of monitoring action need to deal with over all condition in conditional effect
             final List<IntAction> monitoringActions = new ArrayList<>();
             // The effect of the start action
-            final IntExpression startEffect = new IntExpression(PDDLConnective.AND);
+            final Expression<Integer> startEffect = new Expression<>(PDDLConnective.AND);
             // The effect of the end action
-            final IntExpression endEffect = new IntExpression(PDDLConnective.AND);
+            final Expression<Integer> endEffect = new Expression<>(PDDLConnective.AND);
 
             // Iterate over the effect of the action the action to initialize the start and end effect and the list of
             // monitoring actions needed to deal with over all condition in conditional effects.
             // We suppose that the effect is a conjunction of at_start or at_end or when.
-            for (IntExpression effect : a.getEffects().getChildren()) {
+            for (Expression<Integer> effect : a.getEffects().getChildren()) {
                 //System.out.println("EFFECT : "+ this.toString(effect));
                 switch (effect.getConnective()) {
                     case AT_START:
@@ -131,19 +130,19 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                         break;
                     case WHEN:
                         // Extract the start effect condition of the conditional effect
-                        final IntExpression ps = new IntExpression(effect.getChildren().get(0));
+                        final Expression<Integer> ps = new Expression<>(effect.getChildren().get(0));
                         this.extract(ps, PDDLConnective.AT_START);
                         // Extract the end effect condition of the conditional effect
-                        final IntExpression pe = new IntExpression(effect.getChildren().get(0));
+                        final Expression<Integer> pe = new Expression<>(effect.getChildren().get(0));
                         this.extract(pe, PDDLConnective.AT_END);
                         // Extract the overall effect condition of the conditional effect
-                        final IntExpression pi = new IntExpression(effect.getChildren().get(0));
+                        final Expression<Integer> pi = new Expression<>(effect.getChildren().get(0));
                         this.extract(pi, PDDLConnective.OVER_ALL);
                         // Extract the start effect of the conditional effect
-                        final IntExpression qs = new IntExpression(effect.getChildren().get(1));
+                        final Expression<Integer> qs = new Expression<>(effect.getChildren().get(1));
                         this.extract(qs, PDDLConnective.AT_START);
                         // Extract the end effect of the conditional effect
-                        final IntExpression qe = new IntExpression(effect.getChildren().get(1));
+                        final Expression<Integer> qe = new Expression<>(effect.getChildren().get(1));
                         this.extract(qe, PDDLConnective.AT_END);
 
                         if (!ps.getChildren().isEmpty() && pe.getChildren().isEmpty() && pi.getChildren().isEmpty()
@@ -151,7 +150,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                             // CASE at start only in condition and at start only in effects
                             // We add the condition of the effect to the start action and the effect to the start
                             // action.
-                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
+                            Expression<Integer> when = new Expression<>(PDDLConnective.WHEN);
                             when.addChild(ps);
                             when.addChild(ps);
                             startEffect.addChild(when);
@@ -161,7 +160,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                             // CASE at end only in condition and at end only in effects
                             // We add the condition of the effect to the end action and the effect to the end action.
 
-                            IntExpression when = new IntExpression(PDDLConnective.WHEN);
+                            Expression<Integer> when = new Expression<>(PDDLConnective.WHEN);
                             when.addChild(pe);
                             when.addChild(qe);
                             endEffect.addChild(when);
@@ -169,19 +168,19 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                                 && !qe.getChildren().isEmpty()) {
                             // CASE at star and possibly at end but no overall in condition and at end in effects
                             // Create the conditional effect for the start action
-                            final IntExpression startWhen = new IntExpression(PDDLConnective.WHEN);
+                            final Expression<Integer> startWhen = new Expression<>(PDDLConnective.WHEN);
                             startWhen.addChild(ps);
                             // Create the dummy predicate to memorize the effect at end
-                            final IntExpression mps = this.createDummyPredicate();
+                            final Expression<Integer> mps = this.createDummyPredicate();
                             startWhen.addChild(mps);
                             startEffect.addChild(startWhen);
 
                             // Create the conditional effect for the end action
-                            final IntExpression endWhen = new IntExpression(PDDLConnective.WHEN);
+                            final Expression<Integer> endWhen = new Expression<>(PDDLConnective.WHEN);
                             if (pe.getChildren().isEmpty()) {
                                 endWhen.addChild(mps);
                             } else {
-                                final IntExpression and = new IntExpression(PDDLConnective.AND);
+                                final Expression<Integer> and = new Expression<>(PDDLConnective.AND);
                                 and.addChild(pe);
                                 and.addChild(mps);
                                 endWhen.addChild(and);
@@ -195,25 +194,25 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                             // Create the monitoring action with no precondition but effects of the form
                             // (when (and (Mpi) (not pi)) (not (Mpi)))
                             final IntAction monitoring = this.createMonitoringAction();
-                            final IntExpression when = new IntExpression(PDDLConnective.WHEN);
-                            IntExpression and = new IntExpression(PDDLConnective.AND);
-                            final IntExpression mpi = this.createDummyPredicate();
+                            final Expression<Integer> when = new Expression<>(PDDLConnective.WHEN);
+                            Expression<Integer> and = new Expression<>(PDDLConnective.AND);
+                            final Expression<Integer> mpi = this.createDummyPredicate();
                             and.addChild(mpi);
-                            final IntExpression notPi = new IntExpression(PDDLConnective.NOT);
+                            final Expression<Integer> notPi = new Expression<>(PDDLConnective.NOT);
                             notPi.addChild(pi);
                             // REMOVED FOR TESTnotPi.moveNegationInward();
                             and.addChild(notPi);
                             when.addChild(and);
-                            final IntExpression notMpi = new IntExpression(PDDLConnective.NOT);
+                            final Expression<Integer> notMpi = new Expression<>(PDDLConnective.NOT);
                             notMpi.addChild(mpi);
                             when.addChild(notMpi);
                             monitoring.getEffects().addChild(when);
                             monitoringActions.add(monitoring);
 
                             // Create the start effect: (when ps (Mps))
-                            IntExpression mps = this.createDummyPredicate();
+                            Expression<Integer> mps = this.createDummyPredicate();
                             if (!ps.getChildren().isEmpty()) {
-                                IntExpression startWhen = new IntExpression(PDDLConnective.WHEN);
+                                Expression<Integer> startWhen = new Expression<>(PDDLConnective.WHEN);
                                 startWhen.addChild(ps);
                                 startWhen.addChild(mps);
                                 startEffect.addChild(startWhen);
@@ -222,13 +221,13 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                             }
 
                             // Create the start effect: (when (and (Mps) (Mpi) pe) q).
-                            and = new IntExpression(PDDLConnective.AND);
+                            and = new Expression<>(PDDLConnective.AND);
                             and.addChild(mps);
                             and.addChild(mpi);
                             if (!pe.getChildren().isEmpty()) {
                                 and.addChild(pe);
                             }
-                            IntExpression endWhen = new IntExpression(PDDLConnective.WHEN);
+                            Expression<Integer> endWhen = new Expression<>(PDDLConnective.WHEN);
                             endWhen.addChild(and);
                             endWhen.addChild(qe);
                             endEffect.addChild(endWhen);
@@ -263,10 +262,10 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             //System.out.println(Encoder.toString(endEffect));
 
             // Create a start action for each conjunction of the start precondition
-            for (IntExpression precondition : startPrecondition.getChildren()) {
+            for (Expression<Integer> precondition : startPrecondition.getChildren()) {
                 IntAction startAction = new IntAction(a.getName() + "_" + "start", a.arity());
                 startAction.setCost(a.getCost());
-                startAction.setDuration(new IntExpression(a.getDuration()));
+                startAction.setDuration(new Expression<>(a.getDuration()));
                 for (int i = 0; i < a.arity(); i++) {
                     startAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
                 }
@@ -274,7 +273,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                     startAction.setValueOfParameter(i, a.getValueOfParameter(i));
                 }
                 startAction.setPreconditions(precondition);
-                startAction.setEffects(new IntExpression(startEffect));
+                startAction.setEffects(new Expression<>(startEffect));
                 expandedActions.add(startAction);
 
                 //System.out.println("*"+Encoder.toString(startAction));
@@ -286,10 +285,10 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                 //}
             }
 
-            for (IntExpression precondition : endPrecondition.getChildren()) {
+            for (Expression<Integer> precondition : endPrecondition.getChildren()) {
                 IntAction endAction = new IntAction(a.getName() + "_" + "end", a.arity());
                 endAction.setCost(a.getCost());
-                endAction.setDuration(new IntExpression(a.getDuration()));
+                endAction.setDuration(new Expression<>(a.getDuration()));
                 for (int i = 0; i < a.arity(); i++) {
                     endAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
                 }
@@ -297,7 +296,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                     endAction.setValueOfParameter(i, a.getValueOfParameter(i));
                 }
                 endAction.setPreconditions(precondition);
-                endAction.setEffects(new IntExpression(endEffect));
+                endAction.setEffects(new Expression<>(endEffect));
                 expandedActions.add(endAction);
 
                 /*System.out.println("*"+Encoder.toString(endAction));
@@ -309,11 +308,11 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
                 }*/
             }
             //System.out.println(Encoder.toString(overAllPrecondition));
-            for (IntExpression precondition : overAllPrecondition.getChildren()) {
+            for (Expression<Integer> precondition : overAllPrecondition.getChildren()) {
                 if (!precondition.getConnective().equals(PDDLConnective.FALSE)) {
                     IntAction invAction = new IntAction(a.getName() + "_" + "inv", a.arity());
                     invAction.setCost(a.getCost());
-                    invAction.setDuration(new IntExpression(a.getDuration()));
+                    invAction.setDuration(new Expression<>(a.getDuration()));
                     for (int i = 0; i < a.arity(); i++) {
                         invAction.setTypeOfParameter(i, a.getTypeOfParameters(i));
                     }
@@ -358,13 +357,13 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
      * @param exp the expression.
      * @param timeSpecifier the time specifier.
      */
-    private void extract(IntExpression exp, PDDLConnective timeSpecifier) {
+    private void extract(Expression<Integer> exp, PDDLConnective timeSpecifier) {
         switch (exp.getConnective()) {
             case OR:
             case AND:
-                Iterator<IntExpression> i = exp.getChildren().iterator();
+                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext()) {
-                    IntExpression e = i.next();
+                    Expression<Integer> e = i.next();
                     this.extract(e, timeSpecifier);
                     if (e.getConnective().equals(PDDLConnective.AND)
                         && e.getChildren().isEmpty()) {
@@ -396,10 +395,10 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
      *
      * @return the dummy predicate created.
      */
-    private IntExpression createDummyPredicate() {
+    private Expression<Integer> createDummyPredicate() {
         this.getPredicateSymbols().add("^M" + this.dummyPredicateCounter);
         this.dummyPredicateCounter++;
-        final IntExpression atom = new IntExpression(PDDLConnective.ATOM);
+        final Expression<Integer> atom = new Expression<>(PDDLConnective.ATOM);
         atom.setSymbol(new Symbol<>(SymbolType.PREDICATE, this.getPredicateSymbols().size() - 1));
         return atom;
 

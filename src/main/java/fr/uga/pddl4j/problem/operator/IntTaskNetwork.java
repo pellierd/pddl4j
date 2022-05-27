@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 import java.io.Serializable;
@@ -47,12 +48,12 @@ public final class IntTaskNetwork implements Serializable {
     /**
      * The expression that represents the list of tasks of the task network.
      */
-    private IntExpression tasks;
+    private Expression<Integer> tasks;
 
     /**
      * The expression that represents the ordering constraints of the task network.
      */
-    private IntExpression orderingConstraints;
+    private Expression<Integer> orderingConstraints;
 
     /**
      * A boolean flag to indicate if the task network is totally ordered or not.
@@ -73,8 +74,8 @@ public final class IntTaskNetwork implements Serializable {
      * @param arity the arity of the task network.
      */
     public IntTaskNetwork(final int arity) {
-        this.tasks = new IntExpression(PDDLConnective.AND);
-        this.orderingConstraints = new IntExpression(PDDLConnective.AND);
+        this.tasks = new Expression<>(PDDLConnective.AND);
+        this.orderingConstraints = new Expression<>(PDDLConnective.AND);
         this.parameters =  new int[arity];
         Arrays.fill(this.parameters, -1);
         this.instantiations = new int[arity];
@@ -89,8 +90,8 @@ public final class IntTaskNetwork implements Serializable {
      */
     public IntTaskNetwork(final IntTaskNetwork other) {
         super();
-        this.tasks = new IntExpression(other.getTasks());
-        this.orderingConstraints = new IntExpression(other.getOrderingConstraints());
+        this.tasks = new Expression<>(other.getTasks());
+        this.orderingConstraints = new Expression<>(other.getOrderingConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered;
         this.parameters = new int[other.arity()];
         System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.arity());
@@ -107,7 +108,7 @@ public final class IntTaskNetwork implements Serializable {
      * @param orderingConstraints the orderings constraints of the task network.
      * @param totallyOrdered the boolean flag to indicate if the task network is totally ordered or not.
      */
-    public IntTaskNetwork(final IntExpression tasks, final IntExpression orderingConstraints,
+    public IntTaskNetwork(final Expression<Integer> tasks, final Expression<Integer> orderingConstraints,
                           final boolean totallyOrdered) {
         super();
         this.tasks = tasks;
@@ -122,7 +123,7 @@ public final class IntTaskNetwork implements Serializable {
      *
      * @return the tasks of the method.
      */
-    public final IntExpression getTasks() {
+    public final Expression<Integer> getTasks() {
         return this.tasks;
     }
 
@@ -131,7 +132,7 @@ public final class IntTaskNetwork implements Serializable {
      *
      * @param tasks the tasks to set.
      */
-    public final void setTasks(final IntExpression tasks) {
+    public final void setTasks(final Expression<Integer> tasks) {
         this.tasks = tasks;
     }
 
@@ -140,7 +141,7 @@ public final class IntTaskNetwork implements Serializable {
      *
      * @return the ordering constraints of the method.
      */
-    public final IntExpression getOrderingConstraints() {
+    public final Expression<Integer> getOrderingConstraints() {
         return this.orderingConstraints;
     }
 
@@ -149,7 +150,7 @@ public final class IntTaskNetwork implements Serializable {
      *
      * @param ordering the orderings constraints to set
      */
-    public final void setOrderingConstraints(final IntExpression ordering) {
+    public final void setOrderingConstraints(final Expression<Integer> ordering) {
         this.orderingConstraints = ordering;
     }
 

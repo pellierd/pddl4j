@@ -15,18 +15,17 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -50,12 +49,12 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     /**
      * The list of relevant primitive tasks.
      */
-    private List<IntExpression> relevantPrimitiveTasks;
+    private List<Expression<Integer>> relevantPrimitiveTasks;
 
     /**
      * The list of relevant compund tasks.
      */
-    private List<IntExpression> relevantCompundTasks;
+    private List<Expression<Integer>> relevantCompundTasks;
 
     /**
      * The list of relevant action for a specific task.
@@ -77,7 +76,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      *
      * @return the list of relevant primitive tasks.
      */
-    protected List<IntExpression> getRelevantPrimitiveTasks() {
+    protected List<Expression<Integer>> getRelevantPrimitiveTasks() {
         return relevantPrimitiveTasks;
     }
 
@@ -87,7 +86,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      *
      * @return the list of relevant compund tasks of the problem.
      */
-    protected List<IntExpression> getRelevantCompundTasks() {
+    protected List<Expression<Integer>> getRelevantCompundTasks() {
         return relevantCompundTasks;
     }
 
@@ -185,10 +184,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         }
         final int arity = action.arity();
         if (index == arity) {
-            final IntExpression precond = action.getPreconditions();
+            final Expression<Integer> precond = action.getPreconditions();
             this.simplify(precond);
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
-                final IntExpression effect = action.getEffects();
+                final Expression<Integer> effect = action.getEffects();
                 this.simplify(effect);
                 if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
                     actions.add(action);
@@ -198,10 +197,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final Set<IntSymbol> values = this.getDomains().get(action.getTypeOfParameters(index));
             for (IntSymbol value : values) {
                 final int varIndex = -index - 1;
-                final IntExpression precond = new IntExpression(action.getPreconditions());
+                final Expression<Integer> precond = new Expression<>(action.getPreconditions());
                 this.substitute(precond, varIndex, value.getValue(), true);
                 if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
-                    final IntExpression effects = new IntExpression(action.getEffects());
+                    final Expression<Integer> effects = new Expression<>(action.getEffects());
                     this.substitute(effects, varIndex, value.getValue(), true);
                     if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
@@ -214,7 +213,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                             copy.setValueOfParameter(i, action.getValueOfParameter(i));
                         }
                         if (action.isDurative()) {
-                            final IntExpression duration = new IntExpression(action.getDuration());
+                            final Expression<Integer> duration = new Expression<>(action.getDuration());
                             this.substitute(duration, varIndex, value.getValue(), true);
                             copy.setDuration(duration);
                         }
@@ -235,8 +234,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      * @param task   the tasks that accomplish the method.
      */
     private void instantiate(final IntMethod method, final int index, final int bound,
-                             final List<IntMethod> methods, final IntExpression task) {
-        final IntExpression t = method.getTask();
+                             final List<IntMethod> methods, final Expression<Integer> task) {
+        final Expression<Integer> t = method.getTask();
         final IntMethod copy = new IntMethod(method);
         boolean instantiable = true;
         int i = 0;
@@ -284,7 +283,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         }
         final int arity = method.arity();
         if (index == arity) {
-            final IntExpression precond = method.getPreconditions();
+            final Expression<Integer> precond = method.getPreconditions();
             this.simplify(precond);
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 methods.add(method);
@@ -295,19 +294,19 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final Set<IntSymbol> values = this.getDomains().get(method.getTypeOfParameters(index));
             for (IntSymbol value : values) {
                 final int varIndex = -index - 1;
-                final IntExpression preconditionCopy = new IntExpression(method.getPreconditions());
+                final Expression<Integer> preconditionCopy = new Expression<>(method.getPreconditions());
 
                 this.substitute(preconditionCopy, varIndex, value.getValue(), true);
                 if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
-                    copy.setOrderingConstraints(new IntExpression(method.getOrderingConstraints()));
+                    copy.setOrderingConstraints(new Expression<>(method.getOrderingConstraints()));
 
-                    final IntExpression taskCopy = new IntExpression(method.getTask());
+                    final Expression<Integer> taskCopy = new Expression<>(method.getTask());
                     this.substitute(taskCopy, varIndex, value.getValue(), true);
                     copy.setTask(taskCopy);
 
-                    final IntExpression subTasksCopy = new IntExpression(method.getSubTasks());
+                    final Expression<Integer> subTasksCopy = new Expression<>(method.getSubTasks());
                     this.substitute(subTasksCopy, varIndex, value.getValue(), true);
                     copy.setSubTasks(subTasksCopy);
 
@@ -343,9 +342,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             for (IntSymbol value : values) {
                 final int varIndex = -index - 1;
                 final IntTaskNetwork copy = new IntTaskNetwork(arity);
-                copy.setOrderingConstraints(new IntExpression(network.getOrderingConstraints()));
+                copy.setOrderingConstraints(new Expression<>(network.getOrderingConstraints()));
 
-                final IntExpression tasksCopy = new IntExpression(network.getTasks());
+                final Expression tasksCopy = new Expression<>(network.getTasks());
                 this.substitute(tasksCopy, varIndex, value.getValue(), true);
                 copy.setTasks(tasksCopy);
 
@@ -388,7 +387,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     protected void instantiateInitialTaskNetwork() {
         final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
         if (taskNetworks.size() > 1) {
-            IntExpression root = new IntExpression(PDDLConnective.TASK);
+            Expression<Integer> root = new Expression<>(PDDLConnective.TASK);
             root.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().size()));
             this.getTaskSymbols().add("__top");
             this.getCompoundTaskSymbols().add("__top");
@@ -402,8 +401,8 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 for (int i = 0; i < tn.arity(); i++) {
                     method.setValueOfParameter(i, tn.getValueOfParameter(i));
                 }
-                method.setTask(new IntExpression(root));
-                method.setPreconditions(new IntExpression(PDDLConnective.AND));
+                method.setTask(new Expression<>(root));
+                method.setPreconditions(new Expression<>(PDDLConnective.AND));
                 method.setTaskNetwork(tn);
                 this.getIntMethods().add(method);
                 index++;
@@ -411,7 +410,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
 
             // Creates the abstract initial task network
             IntTaskNetwork newTaskNetwork = new IntTaskNetwork();
-            newTaskNetwork.getTasks().addChild(new IntExpression(root));
+            newTaskNetwork.getTasks().addChild(new Expression<>(root));
             this.setIntInitialTaskNetwork(newTaskNetwork);
         } else {
             this.setIntInitialTaskNetwork(taskNetworks.get(0));
@@ -427,10 +426,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final List<IntMethod> instMethods = new ArrayList<>(Constants.DEFAULT_METHOD_TABLE_SIZE);
 
         // Init the set used to store the compound tasks
-        final Set<IntExpression> compound = new LinkedHashSet<>();
+        final Set<Expression<Integer>> compound = new LinkedHashSet<>();
 
         // Init the set used to store the primtive tasks
-        final Set<IntExpression> primtive = new LinkedHashSet<>();
+        final Set<Expression<Integer>> primtive = new LinkedHashSet<>();
 
         // Init the table used to store for each task the list of methods that are relevant
         this.relevantMethods = new ArrayList<List<Integer>>();
@@ -454,13 +453,13 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         this.expandQuantifiedExpressionAndSimplyMethods(meths);
 
         // Compute the set of primitive task from the action already instantiated
-        LinkedHashSet<IntExpression> primitiveTaskSet = this.computePrimitiveTaskSet(this.getIntActions());
+        LinkedHashSet<Expression<Integer>> primitiveTaskSet = this.computePrimitiveTaskSet(this.getIntActions());
 
         // TInit the list of pending tasks to decompose
-        final LinkedList<IntExpression> tasks = new LinkedList<>();
+        final LinkedList<Expression<Integer>> tasks = new LinkedList<>();
 
         // Add the task of the initial task network with the compound tasks
-        for (IntExpression subtasks : this.getIntInitialTaskNetwork().getTasks().getChildren()) {
+        for (Expression<Integer> subtasks : this.getIntInitialTaskNetwork().getTasks().getChildren()) {
             if (!tasks.contains(subtasks)) {
                 if (!subtasks.isPrimtive()) {
                     tasks.add(subtasks);
@@ -474,7 +473,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         // Start exploring the task tree
         int indexMethod = 0;
         while (!tasks.isEmpty()) {
-            final IntExpression task = tasks.pop();
+            final Expression<Integer> task = tasks.pop();
             final List<IntMethod> relevant = new ArrayList<>();
             final List<Integer> relevantIndex = new ArrayList<>();
             for (IntMethod method : meths) {
@@ -483,12 +482,12 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                     final List<IntMethod> instantiated = new ArrayList<>(100);
                     this.instantiate(method, 0, Integer.MAX_VALUE, instantiated, task);
                     for (IntMethod instance : instantiated) {
-                        final Iterator<IntExpression> i = instance.getSubTasks().getChildren().iterator();
-                        final Set<IntExpression> primitiveSet = new LinkedHashSet<>();
-                        final Set<IntExpression> compoundSet = new LinkedHashSet<>();
+                        final Iterator<Expression<Integer>> i = instance.getSubTasks().getChildren().iterator();
+                        final Set<Expression<Integer>> primitiveSet = new LinkedHashSet<>();
+                        final Set<Expression<Integer>> compoundSet = new LinkedHashSet<>();
                         boolean stop = false;
                         while (i.hasNext() && !stop) {
-                            final IntExpression subtask = i.next();
+                            final Expression<Integer> subtask = i.next();
                             if (subtask.isPrimtive()) {
                                 if (!primitiveTaskSet.contains(subtask)) {
                                     stop = true;
@@ -525,10 +524,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         this.relevantActions = new ArrayList<Integer>(primitiveTaskSet.size());
         this.relevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
         int index = 0;
-        Iterator<IntExpression> i = primitiveTaskSet.iterator();
+        Iterator<Expression<Integer>> i = primitiveTaskSet.iterator();
         while (i.hasNext()) {
             // The action at index i can be remove because it not reachable from the initial task network.
-            IntExpression primitiveTask = i.next();
+            Expression<Integer> primitiveTask = i.next();
             if (!primtive.contains(primitiveTask)) {
                 this.getIntActions().remove(index);
                 i.remove();
@@ -588,10 +587,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      * @param actions the list of actions already instantiated.
      * @return the list of possible primitive tasks from the action already instantiated.
      */
-    private LinkedHashSet<IntExpression> computePrimitiveTaskSet(List<IntAction> actions) {
-        LinkedHashSet<IntExpression> tasks = new LinkedHashSet<>();
+    private LinkedHashSet<Expression<Integer>> computePrimitiveTaskSet(List<IntAction> actions) {
+        LinkedHashSet<Expression<Integer>> tasks = new LinkedHashSet<>();
         for (IntAction a : actions) {
-            IntExpression task = new IntExpression(PDDLConnective.TASK);
+            Expression<Integer> task = new Expression<>(PDDLConnective.TASK);
             task.setPrimtive(true);
             task.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().indexOf(a.getName())));
             List<Symbol<Integer>> arguments = new ArrayList<>(a.getInstantiations().length);

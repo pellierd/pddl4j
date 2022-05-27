@@ -19,6 +19,7 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
@@ -32,7 +33,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
     /**
      * The expression that represents the preconditions of the operator.
      */
-    private IntExpression preconditions;
+    private Expression<Integer> preconditions;
 
     /**
      * Creates a new operator from an other.
@@ -41,8 +42,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      */
     protected AbstractIntOperator(final AbstractIntOperator other) {
         super(other);
-        //this.preconditions = other.getPrecondition();
-        this.setPreconditions(new IntExpression(other.getPreconditions()));
+        this.setPreconditions(new Expression<>(other.getPreconditions()));
     }
 
     /**
@@ -53,7 +53,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      */
     protected AbstractIntOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new IntExpression(PDDLConnective.OR);
+        this.preconditions = new Expression<>(PDDLConnective.OR);
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      * @param preconditions  the preconditions of the operator.
      */
     protected AbstractIntOperator(final String name, final int[] parameters, final int[] instantiations,
-                                  final IntExpression preconditions) {
+                                  final Expression<Integer> preconditions) {
         super(name, parameters, instantiations);
         this.preconditions = preconditions;
     }
@@ -75,7 +75,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      *
      * @return the preconditions of the operator.
      */
-    public final IntExpression getPreconditions() {
+    public final Expression<Integer> getPreconditions() {
         return this.preconditions;
     }
 
@@ -84,7 +84,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      *
      * @param preconditions the preconditions to set.
      */
-    public final void setPreconditions(final IntExpression preconditions) {
+    public final void setPreconditions(final Expression<Integer> preconditions) {
         this.preconditions = preconditions;
     }
 }

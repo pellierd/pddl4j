@@ -1,7 +1,6 @@
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Token;
-import fr.uga.pddl4j.problem.operator.IntExpression;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -203,6 +202,9 @@ public class Expression<T> implements Locatable, Serializable {
      * @param argument the argument to add.
      */
     public final boolean addArgument(final Symbol<T> argument) {
+        if (this.getArguments() == null) {
+            this.setArguments(new ArrayList<>());
+        }
         return this.arguments.add(argument);
     }
 
@@ -231,6 +233,9 @@ public class Expression<T> implements Locatable, Serializable {
      * @param variable the quantified variable to add.
      */
     public final boolean addQuantifiedVariable(final TypedSymbol<T> variable) {
+        if (this.getQuantifiedVariables() == null) {
+            this.setQuantifiedVariables(new ArrayList<>());
+        }
         return this.quantifiedVariables.add(variable);
     }
 
@@ -314,6 +319,9 @@ public class Expression<T> implements Locatable, Serializable {
      * @throws RuntimeException if the specified node is null
      */
     public final boolean addChild(final Expression<T> exp) {
+        if (this.getChildren() == null) {
+            this.setChildren(new ArrayList<>());
+        }
         return this.children.add(exp);
     }
 
@@ -950,7 +958,7 @@ public class Expression<T> implements Locatable, Serializable {
     @Override
     public boolean equals(final Object object) {
         if (this == object) return true;
-        if (object != null && object instanceof IntExpression) {
+        if (object != null && object instanceof Expression) {
             final Expression<T> other = (Expression<T>) object;
             return Objects.equals(this.getConnective(), other.getConnective())
                 && Objects.equals(this.getSymbol(), other.getSymbol())

@@ -31,11 +31,9 @@ import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntExpression;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
-import fr.uga.pddl4j.problem.operator.IntTypedSymbol;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 
 import org.apache.logging.log4j.LogManager;
@@ -137,22 +135,22 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The set of fluents of the initial state of the problem.
      */
-    private Set<IntExpression> intInitialState;
+    private Set<Expression<Integer>> intInitialState;
 
     /**
      * The set of numeric fluent of the initial state of the problem.
      */
-    private Set<IntExpression> intInitFunctions;
+    private Set<Expression<Integer>> intInitFunctions;
 
     /**
      * The initial value of the numeric fluent of the initial state.
      */
-    private Map<IntExpression, Double> intInitFunctionCost;
+    private Map<Expression<Integer>, Double> intInitFunctionCost;
 
     /**
      * The goal representation into in representation.
      */
-    private IntExpression intGoal;
+    private Expression<Integer> intGoal;
 
     /**
      * The list of methods defined in the problem.
@@ -786,44 +784,44 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns the list of fluent in the form of <code>IntExpression</code> of the initial state.
+     * Returns the list of fluent in the form of <code>Expression</code> of the initial state.
      *
-     * @return the list of fluent in the form of <code>IntExpression</code> of the initial state.
-     * @see IntExpression
+     * @return the list of fluent in the form of <code>Expression</code> of the initial state.
+     * @see Expression
      */
-    protected Set<IntExpression> getIntInitialState() {
+    protected Set<Expression<Integer>> getIntInitialState() {
         return this.intInitialState;
     }
 
     /**
-     * Returns the map that store the value of the numeric fluents in the form of <code>IntExpression</code> of the
+     * Returns the map that store the value of the numeric fluents in the form of <code>Expression</code> of the
      * initial state.
      *
-     * @return the map that store the value of the numeric fluents in the form of <code>IntExpression</code> of the
+     * @return the map that store the value of the numeric fluents in the form of <code>Expression</code> of the
      *      initial state.
-     * @see IntExpression
+     * @see Expression
      */
-    protected Map<IntExpression, Double> getIntInitFunctionCost() {
+    protected Map<Expression<Integer>, Double> getIntInitFunctionCost() {
         return this.intInitFunctionCost;
     }
 
     /**
-     * Returns the goal of the problem as an <code>IntExpression</code>.
+     * Returns the goal of the problem as an <code>Expression</code>.
      *
-     * @return the goal of the problem as an <code>IntExpression</code>.
-     * @see IntExpression
+     * @return the goal of the problem as an <code>Expression</code>.
+     * @see Expression
      */
-    protected IntExpression getIntGoal() {
+    protected Expression<Integer> getIntGoal() {
         return this.intGoal;
     }
 
     /**
-     * Returns the list of numeric fluents in the form of <code>IntExpression</code> of the initial state.
+     * Returns the list of numeric fluents in the form of <code>Expression</code> of the initial state.
      *
-     * @return the list of numeric fluents in the form of <code>IntExpression</code> of the initial state.
-     * @see IntExpression
+     * @return the list of numeric fluents in the form of <code>Expression</code> of the initial state.
+     * @see Expression
      */
-    protected Set<IntExpression> getIntInitFunctions() {
+    protected Set<Expression<Integer>> getIntInitFunctions() {
         return this.intInitFunctions;
     }
 
@@ -861,9 +859,9 @@ public abstract class AbstractProblem implements Problem {
         this.intInitialState = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
         this.intInitFunctions = new LinkedHashSet<>();
-        final Set<IntExpression> init =  this.getParsedProblem().getInit().stream().map(this::initExpression)
+        final Set<Expression<Integer>> init =  this.getParsedProblem().getInit().stream().map(this::initExpression)
             .collect(Collectors.toCollection(LinkedHashSet::new));
-        for (IntExpression exp : init) {
+        for (Expression<Integer> exp : init) {
             switch (exp.getConnective()) {
                 case FN_ATOM:
                     this.intInitFunctions.add(exp);
@@ -883,7 +881,7 @@ public abstract class AbstractProblem implements Problem {
      * Encodes a specified goal into its integer representation.
      **/
     protected void initGoal() {
-        this.intGoal = new IntExpression(PDDLConnective.AND);
+        this.intGoal = new Expression<Integer>(PDDLConnective.AND);
         if (this.getParsedProblem().getGoal() != null) {
             this.intGoal = this.initExpression(this.getParsedProblem().getGoal());
         }
@@ -916,16 +914,16 @@ public abstract class AbstractProblem implements Problem {
         }
         // Encode the duration of the action
         if (action.isDurative()) {
-            final IntExpression duration = this.initExpression(action.getDuration(), variables);
+            final Expression<Integer> duration = this.initExpression(action.getDuration(), variables);
             intAction.setDuration(duration);
         }
         // Encode the preconditions of the operator
-        final IntExpression preconditions = this.initExpression(action.getPreconditions(), variables);
+        final Expression<Integer> preconditions = this.initExpression(action.getPreconditions(), variables);
         //preconditions.moveNegationInward();
         preconditions.toNNF();
         intAction.setPreconditions(preconditions);
         // Encode the effects of the operator
-        final IntExpression effects = this.initExpression(action.getEffects(), variables);
+        final Expression<Integer> effects = this.initExpression(action.getEffects(), variables);
         intAction.setEffects(effects);
         //effects.moveNegationInward();
         effects.toNNF();
@@ -958,25 +956,25 @@ public abstract class AbstractProblem implements Problem {
             variables.add(parameter.getValue());
         }
         // Encode the task carried out by the method
-        final IntExpression task = this.initExpression(method.getTask(), variables);
+        final Expression<Integer> task = this.initExpression(method.getTask(), variables);
         intMeth.setTask(task);
         // Encode the preconditions of the method
-        final IntExpression preconditions = this.initExpression(method.getPreconditions(), variables);
+        final Expression<Integer> preconditions = this.initExpression(method.getPreconditions(), variables);
         intMeth.setPreconditions(preconditions);
         // Encode the subtasks of the method
-        final IntExpression subtasks = this.initExpression(method.getSubTasks(), variables);
+        final Expression<Integer> subtasks = this.initExpression(method.getSubTasks(), variables);
         intMeth.setSubTasks(subtasks);
         // Encode the ordering constraints of the method
-        IntExpression orderingConstraints = null;
+        Expression<Integer> orderingConstraints = null;
         // Express the total ordering into explicites constraints
         if (method.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-            orderingConstraints = new IntExpression(PDDLConnective.AND);
+            orderingConstraints = new Expression<>(PDDLConnective.AND);
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
-                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                final Expression<Integer> constraint = new Expression<>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                final Expression<Integer> t1 = new Expression<>(PDDLConnective.TASK);
                 t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                 constraint.addChild(t1);
-                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                final Expression<Integer> t2 = new Expression<>(PDDLConnective.TASK);
                 t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
@@ -985,29 +983,29 @@ public abstract class AbstractProblem implements Problem {
             final int size = subtasks.getChildren().size();
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
             orderingConstraints = this.initOrderingConstraints(method.getOrdering());
-            for (IntExpression c : orderingConstraints.getChildren()) {
+            for (Expression<Integer> c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID().getValue(),
                     c.getChildren().get(1).getTaskID().getValue());
             }
             if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
+                Expression<Integer> orderedSubtasks = new Expression<>(PDDLConnective.AND);
                 for (int i = 0; i < size; i++) {
                     int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
                     constraints.removeRow(subtaskIndex);
                     constraints.removeColumn(subtaskIndex);
-                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
+                    Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
                     subtasks.getChildren().remove(subtaskIndex);
                     st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     orderedSubtasks.addChild(st);
                 }
                 intMeth.setSubTasks(orderedSubtasks);
-                orderingConstraints = new IntExpression(PDDLConnective.AND);
+                orderingConstraints = new Expression<>(PDDLConnective.AND);
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
-                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                    final Expression<Integer> constraint = new Expression<>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    final Expression<Integer> t1 = new Expression<>(PDDLConnective.TASK);
                     t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     constraint.addChild(t1);
-                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                    final Expression<Integer> t2 = new Expression<>(PDDLConnective.TASK);
                     t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
@@ -1037,16 +1035,16 @@ public abstract class AbstractProblem implements Problem {
         // Encode the tasks of the task network
         this.intInitialTaskNetwork.setTasks(this.initExpression(taskNetwork.getTasks(), variables));
         // Encode the ordering constraints of the task network
-        IntExpression orderingConstraints = null;
-        IntExpression subtasks = this.intInitialTaskNetwork.getTasks();
+        Expression<Integer> orderingConstraints = null;
+        Expression<Integer> subtasks = this.intInitialTaskNetwork.getTasks();
         if (taskNetwork.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-            orderingConstraints = new IntExpression(PDDLConnective.AND);
+            orderingConstraints = new Expression<>(PDDLConnective.AND);
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
-                final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                final Expression<Integer> constraint = new Expression<>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                final Expression<Integer> t1 = new Expression<>(PDDLConnective.TASK);
                 t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                 constraint.addChild(t1);
-                final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                final Expression<Integer> t2 = new Expression<>(PDDLConnective.TASK);
                 t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
@@ -1055,29 +1053,29 @@ public abstract class AbstractProblem implements Problem {
             final int size = subtasks.getChildren().size();
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
             orderingConstraints = this.initOrderingConstraints(taskNetwork.getOrdering());
-            for (IntExpression c : orderingConstraints.getChildren()) {
+            for (Expression<Integer> c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID().getValue(),
                     c.getChildren().get(1).getTaskID().getValue());
             }
             if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                IntExpression orderedSubtasks = new IntExpression(PDDLConnective.AND);
+                Expression<Integer> orderedSubtasks = new Expression<>(PDDLConnective.AND);
                 for (int i = 0; i < size; i++) {
                     int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
                     constraints.removeRow(subtaskIndex);
                     constraints.removeColumn(subtaskIndex);
-                    IntExpression st = subtasks.getChildren().get(subtaskIndex);
+                    Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
                     subtasks.getChildren().remove(subtaskIndex);
                     st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     orderedSubtasks.addChild(st);
                 }
                 this.intInitialTaskNetwork.setTasks(orderedSubtasks);
-                orderingConstraints = new IntExpression(PDDLConnective.AND);
+                orderingConstraints = new Expression<>(PDDLConnective.AND);
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
-                    final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-                    final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                    final Expression<Integer> constraint = new Expression<>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    final Expression<Integer> t1 = new Expression<>(PDDLConnective.TASK);
                     t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     constraint.addChild(t1);
-                    final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                    final Expression<Integer> t2 = new Expression<>(PDDLConnective.TASK);
                     t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
@@ -1095,8 +1093,8 @@ public abstract class AbstractProblem implements Problem {
      * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
      *      LESS_ORDERING_CONSTRAINTS are expected.
      */
-    private IntExpression initOrderingConstraints(final Expression<String> exp) {
-        final IntExpression intExp = new IntExpression(exp.getConnective());
+    private Expression<Integer> initOrderingConstraints(final Expression<String> exp) {
+        final Expression<Integer> intExp = new Expression<>(exp.getConnective());
         switch (exp.getConnective()) {
             case AND:
                 for (int i = 0; i < exp.getChildren().size(); i++) {
@@ -1108,11 +1106,11 @@ public abstract class AbstractProblem implements Problem {
             case GREATER_ORDERING_CONSTRAINT:
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
             case EQUAL_ORDERING_CONSTRAINT:
-                IntExpression t1 = new IntExpression(PDDLConnective.TASK);
+                Expression<Integer> t1 = new Expression<>(PDDLConnective.TASK);
                 t1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
                     Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
                 intExp.addChild(t1);
-                IntExpression t2 = new IntExpression(PDDLConnective.TASK);
+                Expression<Integer> t2 = new Expression<>(PDDLConnective.TASK);
                 t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
                     Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
                 intExp.addChild(t2);
@@ -1129,7 +1127,7 @@ public abstract class AbstractProblem implements Problem {
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
      */
-    private IntExpression initExpression(final Expression<String> exp) {
+    private Expression<Integer> initExpression(final Expression<String> exp) {
         return this.initExpression(exp, new ArrayList<>());
     }
 
@@ -1146,9 +1144,9 @@ public abstract class AbstractProblem implements Problem {
      * @param variables the list of variable already encoded.
      * @return the integer representation of the specified expression.
      */
-    protected IntExpression initExpression(final Expression<String> exp,
+    protected Expression<Integer> initExpression(final Expression<String> exp,
                                            final List<String> variables) {
-        final IntExpression intExp = new IntExpression(exp.getConnective());
+        final Expression<Integer> intExp = new Expression<>(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
                 //intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
@@ -1205,7 +1203,7 @@ public abstract class AbstractProblem implements Problem {
                 int typeIndex = this.getTypes().indexOf(type);
                 final TypedSymbol<Integer> intQvar  = new TypedSymbol<Integer>(SymbolType.VARIABLE, -variables.size() - 1);
                 intQvar.addType(new Symbol<>(SymbolType.TYPE, typeIndex));
-                intExp.getQuantifiedVariables().add(intQvar);
+                intExp.addQuantifiedVariable(intQvar);
                 newVariables.add(qvar.get(0).getValue());
                 if (qvar.size() == 1) {
                     intExp.getChildren().add(this.initExpression(exp.getChildren().get(0), newVariables));
@@ -1364,13 +1362,13 @@ public abstract class AbstractProblem implements Problem {
         str.append("Task: ").append(toString(method.getTask()));
         str.append("\n");
         str.append("Preconditions:\n");
-        str.append(toString(method.getPreconditions()));
+        str.append(this.toString(method.getPreconditions()));
         str.append("\n");
         str.append("Subtasks:\n");
-        str.append(toString(method.getSubTasks()));
+        str.append(this.toString(method.getSubTasks()));
         str.append("\n");
         str.append("Ordering:\n");
-        str.append(toString(method.getOrderingConstraints()));
+        str.append(this.toString(method.getOrderingConstraints()));
         str.append("\n");
         return str.toString();
     }
@@ -1433,7 +1431,7 @@ public abstract class AbstractProblem implements Problem {
      * @param exp the expression.
      * @return a string representation of the specified expression.
      */
-    protected String toString(final IntExpression exp) {
+    protected String toString(final Expression<Integer> exp) {
         return this.toString(exp, " ");
     }
 
@@ -1444,7 +1442,7 @@ public abstract class AbstractProblem implements Problem {
      * @param separator the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression.
      */
-    protected String toString(final IntExpression exp, final String separator) {
+    protected String toString(final Expression<Integer> exp, final String separator) {
         return this.toString(exp, "", separator);
     }
 
@@ -1456,7 +1454,7 @@ public abstract class AbstractProblem implements Problem {
      * @param separator  the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression node.
      */
-    protected String toString(final IntExpression exp, String baseOffset, final String separator) {
+    protected String toString(final Expression<Integer> exp, String baseOffset, final String separator) {
         final StringBuilder str = new StringBuilder();
         switch (exp.getConnective()) {
             case ATOM:
@@ -1765,12 +1763,12 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case INT_INITIAL_STATE:
                 str.append("(and");
-                for (IntExpression e : this.getIntInitialState()) {
+                for (Expression<Integer> e : this.getIntInitialState()) {
                     str.append("\n ");
                     str.append(this.toString(e));
                 }
                 if (this.getIntInitFunctions() != null) {
-                    for (IntExpression e : this.getIntInitFunctions()) {
+                    for (Expression<Integer> e : this.getIntInitFunctions()) {
                         str.append("\n ");
                         str.append(this.toString(e));
                     }
