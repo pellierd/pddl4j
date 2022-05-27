@@ -115,7 +115,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The typed signature of the tasks.
      */
-    private List<List<IntSymbol>> taskSignatures;
+    private List<List<Symbol<Integer>>> taskSignatures;
 
     /**
      * The set primitive task symbols, i.e., the set of action symbol.
@@ -378,7 +378,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the signatures of the task defined in the problem.
      */
-    protected List<List<IntSymbol>> getTaskSignatures() {
+    protected List<List<Symbol<Integer>>> getTaskSignatures() {
         return this.taskSignatures;
     }
 
@@ -735,7 +735,7 @@ public abstract class AbstractProblem implements Problem {
         for (NamedTypedList task : tasks) {
             this.taskSymbols.add(task.getName().getValue());
             final List<TypedSymbol<String>> arguments = task.getArguments();
-            final List<IntSymbol> argType = new ArrayList<>(arguments.size());
+            final List<Symbol<Integer>> argType = new ArrayList<>(arguments.size());
             for (TypedSymbol<String> arg : arguments) {
                 final List<Symbol<String>> types = arg.getTypes();
                 if (types.size() > 1) {
@@ -744,9 +744,9 @@ public abstract class AbstractProblem implements Problem {
                         image.append("~");
                         image.append(type.getValue());
                     }
-                    argType.add(new IntSymbol(this.typeSymbols.indexOf(image.toString())));
+                    argType.add(new Symbol<>(SymbolType.TYPE, this.typeSymbols.indexOf(image.toString())));
                 } else {
-                    argType.add(new IntSymbol(this.typeSymbols.indexOf(types.get(0).getValue())));
+                    argType.add(new Symbol<>(SymbolType.TYPE, this.typeSymbols.indexOf(types.get(0).getValue())));
                 }
             }
             this.taskSignatures.add(argType);
