@@ -25,8 +25,6 @@ import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Effect;
 
-import fr.uga.pddl4j.problem.operator.IntSymbol;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -93,7 +91,7 @@ public interface Problem extends Serializable {
      *
      * @return the signatures of the predicates defined in the problem.
      */
-    List<List<IntSymbol>> getPredicateSignatures();
+    List<List<Symbol<Integer>>> getPredicateSignatures();
 
     /**
      * Returns the list of relevant fluents used the problem.

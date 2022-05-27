@@ -614,7 +614,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         final int tableSize = this.getConstantSymbols().size();
         final int nbPredicate = this.getPredicateSymbols().size();
         this.predicatesTables = new ArrayList<>(nbPredicate);
-        for (final List<IntSymbol> arguments : this.getPredicateSignatures()) {
+        for (final List<Symbol<Integer>> arguments : this.getPredicateSignatures()) {
             final int arity = arguments.size();
             final int nbTables = (int) Math.pow(2, arity);
             final List<IntMatrix> pTables = new ArrayList<>(nbTables);
@@ -931,7 +931,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         int j = 0;
         int max = 1;
         final int[] index = new int[indexSize];
-        final List<IntSymbol> predArg = this.getPredicateSignatures().get(predicate);
+        final List<Symbol<Integer>> predArg = this.getPredicateSignatures().get(predicate);
         for (int i = 0; i < mask.length; i++) {
             if (mask[i] == 0) {
                 max *= this.getDomains().get(predArg.get(i).getValue()).size();

@@ -95,7 +95,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The typed signature of the predicates.
      */
-    private List<List<IntSymbol>> predicateSignatures;
+    private List<List<Symbol<Integer>>> predicateSignatures;
 
     /**
      * The function symbols.
@@ -360,7 +360,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the signatures of the predicates defined in the problem.
      */
-    public final List<List<IntSymbol>> getPredicateSignatures() {
+    public final List<List<Symbol<Integer>>> getPredicateSignatures() {
         return this.predicateSignatures;
     }
 
@@ -669,7 +669,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the predicates information (symbols and signatures) declared in the domain.
+     * Initializes the predicate information (symbols and signatures) declared in the domain.
      */
     protected void initPredicates() {
         final List<NamedTypedList> predicates = this.problem.getPredicates();
@@ -679,7 +679,7 @@ public abstract class AbstractProblem implements Problem {
         for (NamedTypedList predicate : predicates) {
             this.predicateSymbols.add(predicate.getName().getValue());
             final List<TypedSymbol<String>> arguments = predicate.getArguments();
-            final List<IntSymbol> argType = new ArrayList<>(arguments.size());
+            final List<Symbol<Integer>> argType = new ArrayList<>(arguments.size());
             for (TypedSymbol<String> arg : arguments) {
                 final List<Symbol<String>> types = arg.getTypes();
                 if (types.size() > 1) {
@@ -688,9 +688,9 @@ public abstract class AbstractProblem implements Problem {
                         image.append("~");
                         image.append(type.getValue());
                     }
-                    argType.add(new IntSymbol(this.typeSymbols.indexOf(image.toString())));
+                    argType.add(new Symbol<Integer>(SymbolType.TYPE, this.typeSymbols.indexOf(image.toString())));
                 } else {
-                    argType.add(new IntSymbol(this.typeSymbols.indexOf(types.get(0).getValue())));
+                    argType.add(new Symbol<Integer>(SymbolType.TYPE, this.typeSymbols.indexOf(types.get(0).getValue())));
                 }
             }
             this.predicateSignatures.add(argType);
