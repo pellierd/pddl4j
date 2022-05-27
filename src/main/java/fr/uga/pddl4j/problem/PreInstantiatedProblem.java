@@ -17,6 +17,8 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
@@ -52,7 +54,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
     /**
      * The table of inferred domains based on unary inertia encoding.
      */
-    private List<Set<IntSymbol>> inferredDomains;
+    private List<Set<Symbol<Integer>>> inferredDomains;
 
     /**
      * The list of predicates tables used to count the occurrence of a specified predicate in the
@@ -92,7 +94,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @return the list of domains inferred from unary predicate.
      */
-    private List<Set<IntSymbol>> getInferredDomains() {
+    private List<Set<Symbol<Integer>>> getInferredDomains() {
         return this.inferredDomains;
     }
 
@@ -294,13 +296,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         for (int i = 0; i < this.getPredicateSymbols().size(); i++) {
             if (this.getPredicateSignatures().get(i).size() == 1
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
-                final Set<IntSymbol> newTypeDomain = new LinkedHashSet<>();
+                final Set<Symbol<Integer>> newTypeDomain = new LinkedHashSet<>();
                 for (IntExpression fact : this.getIntInitialState()) {
                     if (fact.getConnective().equals(PDDLConnective.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
                     if (fact.getSymbol().getValue() == i) {
-                        newTypeDomain.add(new IntSymbol(fact.getArguments().get(0)));
+                        newTypeDomain.add(new Symbol<>(fact.getArguments().get(0)));
                     }
                 }
                 this.inferredDomains.add(newTypeDomain);
@@ -630,7 +632,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             final int arity = this.getPredicateSignatures().get(fact.getSymbol().getValue()).size();
             final List<IntMatrix> pTables = this.predicatesTables.get(fact.getSymbol().getValue());
             final int[] set = new int[arity];
-            final List<IntSymbol> arguments = fact.getArguments();
+            final List<Symbol<Integer>> arguments = fact.getArguments();
             for (final IntMatrix intMatrix : pTables) {
                 int indexSize = 0;
                 for (int aSet : set) {
@@ -916,7 +918,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
         int indexSize = 0;
-        final List<IntSymbol> arguments = exp.getArguments();
+        final List<Symbol<Integer>> arguments = exp.getArguments();
         final int[] mask = new int[arguments.size()];
         for (int i = 0; i < arguments.size(); i++) {
             if (arguments.get(i).getValue() >= 0) {
@@ -968,10 +970,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         boolean updated = false;
         switch (exp.getConnective()) {
             case ATOM:
-                List<IntSymbol> arguments = exp.getArguments();
+                List<Symbol<Integer>> arguments = exp.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
                     if (arguments.get(i).getValue() == var) {
-                        arguments.set(i, new IntSymbol(cons));
+                        arguments.set(i, new Symbol<>(SymbolType.CONSTANT, cons));
                         updated = true;
                     }
                 }
@@ -983,7 +985,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 arguments = exp.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
                     if (arguments.get(i).getValue() == var) {
-                        arguments.set(i, new IntSymbol(cons));
+                        arguments.set(i, new Symbol<>(SymbolType.CONSTANT, cons));
                     }
                 }
                 break;
@@ -991,7 +993,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 arguments = exp.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
                     if (arguments.get(i).getValue() == var) {
-                        arguments.set(i, new IntSymbol(cons));
+                        arguments.set(i, new Symbol<>(SymbolType.CONSTANT, cons));
                         updated = true;
                     }
                 }
@@ -1004,12 +1006,12 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 // Get and substitute the first argument
                 final int arg1 = arguments.get(0).getValue();
                 if (arg1 == var) {
-                    arguments.set(0, new IntSymbol(cons));
+                    arguments.set(0, new Symbol<>(SymbolType.CONSTANT, cons));
                 }
                 // Get and substitute the second argument
                 final int arg2 = arguments.get(1).getValue();
                 if (arg2 == var) {
-                    arguments.set(1, new IntSymbol(cons));
+                    arguments.set(1, new Symbol<>(SymbolType.CONSTANT, cons));
                 }
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1 == arg2) {
@@ -1134,7 +1136,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FN_HEAD:
                 break;
             case EQUAL_ATOM:
-                List<IntSymbol> args = exp.getArguments();
+                List<Symbol<Integer>> args = exp.getArguments();
                 // Get and substitute the first argument
                 final int arg1 = args.get(0).getValue();
                 // Get and substitute the second argument

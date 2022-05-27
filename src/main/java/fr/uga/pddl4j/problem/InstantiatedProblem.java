@@ -594,9 +594,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
             task.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().indexOf(a.getName())));
-            List<IntSymbol> arguments = new ArrayList<>(a.getInstantiations().length);
+            List<Symbol<Integer>> arguments = new ArrayList<>(a.getInstantiations().length);
             for (Integer arg : a.getInstantiations()) {
-                arguments.add(new IntSymbol(arg));
+                arguments.add(new Symbol<>(SymbolType.CONSTANT, arg));
             }
             task.setArguments(arguments);
             tasks.add(task);

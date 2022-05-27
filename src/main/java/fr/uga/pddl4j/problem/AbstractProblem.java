@@ -1152,13 +1152,13 @@ public abstract class AbstractProblem implements Problem {
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
                 //intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
-                List<IntSymbol> args = new ArrayList<>(exp.getArguments().size());
+                List<Symbol<Integer>> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
-                        args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
+                        args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1170,9 +1170,9 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
-                        args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
+                        args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1184,9 +1184,9 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
-                        args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
+                        args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1272,9 +1272,9 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
-                        args.add(new IntSymbol(-variables.indexOf(argument.getValue()) - 1));
+                        args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new IntSymbol(this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
@@ -1461,8 +1461,8 @@ public abstract class AbstractProblem implements Problem {
             case ATOM:
                 str.append("(");
                 str.append(this.getPredicateSymbols().get(exp.getSymbol().getValue()));
-                List<IntSymbol> arguments = exp.getArguments();
-                for (IntSymbol arg : arguments) {
+                List<Symbol<Integer>> arguments = exp.getArguments();
+                for (Symbol<Integer> arg : arguments) {
                     if (arg.getValue() < 0) {
                         str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
@@ -1474,7 +1474,7 @@ public abstract class AbstractProblem implements Problem {
             case FN_HEAD:
                 str.append("(").append(this.getFunctions().get(exp.getSymbol().getValue()));
                 arguments = exp.getArguments();
-                for (IntSymbol arg : arguments) {
+                for (Symbol<Integer> arg : arguments) {
                     if (arg.getValue() < 0) {
                         str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
@@ -1492,7 +1492,7 @@ public abstract class AbstractProblem implements Problem {
                 }
                 str.append(this.getTaskSymbols().get(exp.getSymbol().getValue()));
                 arguments = exp.getArguments();
-                for (IntSymbol arg : arguments) {
+                for (Symbol<Integer> arg : arguments) {
                     if (arg.getValue() < 0) {
                         str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {
@@ -1507,7 +1507,7 @@ public abstract class AbstractProblem implements Problem {
             case EQUAL_ATOM:
                 str.append("(").append("=");
                 arguments = exp.getArguments();
-                for (IntSymbol arg : arguments) {
+                for (Symbol<Integer> arg : arguments) {
                     if (arg.getValue() < 0) {
                         str.append(" ").append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(-arg.getValue() - 1);
                     } else {

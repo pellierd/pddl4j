@@ -62,7 +62,7 @@ public class IntExpression implements Serializable {
      * The list of arguments of the expression. This attribute is used to store the argument of the
      * atomic expression.
      */
-    private List<IntSymbol> arguments;
+    private List<Symbol<Integer>> arguments;
 
     /**
      * The children of the expression.
@@ -85,7 +85,7 @@ public class IntExpression implements Serializable {
     private Double value;
 
     /**
-     * A flag to indicate if this expression represente a primitive task.
+     * A flag to indicate if this expression represents a primitive task.
      */
     private boolean isPrimtive;
 
@@ -103,11 +103,9 @@ public class IntExpression implements Serializable {
         if (other.getTaskID() != null) {
             this.taskID = new Symbol<Integer>(other.getTaskID());
         }
-        this.arguments = new ArrayList<>();
         if (other.getArguments() != null) {
-            for (IntSymbol arg : other.getArguments()) {
-                this.arguments.add(arg);
-            }
+            this.arguments = new ArrayList<>();
+            this.arguments.addAll(other.getArguments().stream().map(Symbol::new).collect(Collectors.toList()));
         }
         final List<IntExpression> otherChildren = other.getChildren();
         this.children = new ArrayList<>(otherChildren.size());
@@ -132,7 +130,7 @@ public class IntExpression implements Serializable {
         this.connective = connective;
         this.symbol = null;
         this.taskID = null;
-        this.arguments = new ArrayList<>(0);
+        this.arguments = null;
         this.children = new ArrayList<>();
         this.quantifiedVariables = new ArrayList<>();
         this.variable = IntSymbol.DEFAULT_VARIABLE;
@@ -217,7 +215,7 @@ public class IntExpression implements Serializable {
      *
      * @return the arguments the list of arguments of this expression.
      */
-    public final List<IntSymbol> getArguments() {
+    public final List<Symbol<Integer>> getArguments() {
         return this.arguments;
     }
 
@@ -226,7 +224,7 @@ public class IntExpression implements Serializable {
      *
      * @param args the arguments to set.
      */
-    public final void setArguments(final List<IntSymbol> args) {
+    public final void setArguments(final List<Symbol<Integer>> args) {
         this.arguments = args;
     }
 
