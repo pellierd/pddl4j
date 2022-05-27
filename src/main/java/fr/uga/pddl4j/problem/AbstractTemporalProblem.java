@@ -17,8 +17,8 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -85,7 +85,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
      *
      * @return the signatures of the functions defined in the problem.
      */
-    public List<List<IntSymbol>> getFunctionSignatures() {
+    public List<List<Symbol<Integer>>> getFunctionSignatures() {
         return super.getFunctionSignatures();
     }
 

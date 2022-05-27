@@ -15,11 +15,9 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLDomain;
-import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
+import fr.uga.pddl4j.parser.Symbol;
 
 import java.util.List;
 import java.util.Set;
@@ -67,7 +65,7 @@ public class AbstractNumericProblem extends ADLProblem implements Numeric {
      *
      * @return the signatures of the functions defined in the problem.
      */
-    public List<List<IntSymbol>> getFunctionSignatures() {
+    public List<List<Symbol<Integer>>> getFunctionSignatures() {
         return super.getFunctionSignatures();
     }
 

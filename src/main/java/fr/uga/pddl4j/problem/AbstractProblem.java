@@ -105,7 +105,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The typed signature of the functions.
      */
-    private List<List<IntSymbol>> functionSignatures;
+    private List<List<Symbol<Integer>>> functionSignatures;
 
     /**
      * The task symbols.
@@ -396,7 +396,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the signatures of the functions defined in the problem.
      */
-    protected List<List<IntSymbol>> getFunctionSignatures() {
+    protected List<List<Symbol<Integer>>> getFunctionSignatures() {
         return this.functionSignatures;
     }
 
@@ -707,7 +707,7 @@ public abstract class AbstractProblem implements Problem {
         for (NamedTypedList function : functions) {
             this.functionSymbols.add(function.getName().getValue());
             List<TypedSymbol<String>> arguments = function.getArguments();
-            List<IntSymbol> argType = new ArrayList<>(arguments.size());
+            List<Symbol<Integer>> argType = new ArrayList<>(arguments.size());
             for (TypedSymbol<String> argument : arguments) {
                 List<Symbol<String>> types = argument.getTypes();
                 if (types.size() > 1) {
@@ -715,9 +715,9 @@ public abstract class AbstractProblem implements Problem {
                     for (Symbol<String> type1 : types) {
                         type.append("~").append(type1.getValue());
                     }
-                    argType.add(new IntSymbol(this.typeSymbols.indexOf(type.toString())));
+                    argType.add(new Symbol<>(SymbolType.TYPE, this.typeSymbols.indexOf(type.toString())));
                 } else {
-                    argType.add(new IntSymbol(this.typeSymbols.indexOf(types.get(0).getValue())));
+                    argType.add(new Symbol<>(SymbolType.TYPE, this.typeSymbols.indexOf(types.get(0).getValue())));
                 }
             }
             this.functionSignatures.add(argType);
