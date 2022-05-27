@@ -75,7 +75,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The constraints declared in the domain.
      */
-    private PDDLExpression constraints;
+    private Expression<String> constraints;
 
     /**
      * The list of actions of the domain.
@@ -110,18 +110,18 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The list of initial facts declared in the problem.
      */
-    private List<PDDLExpression> initialFacts;
+    private List<Expression<String>> initialFacts;
 
     /**
      * The goal of the problem.
      */
-    private PDDLExpression goal;
+    private Expression<String> goal;
 
 
     /**
      * The metric constraints of the problem.
      */
-    private PDDLExpression metric;
+    private Expression<String> metric;
 
     /**
      * Creates a new domain.
@@ -372,7 +372,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the constraints loaded in the domain file or null if the domain has no constraints.
      */
-    public final PDDLExpression getConstraints() {
+    public final Expression<String> getConstraints() {
         return this.constraints;
     }
 
@@ -381,7 +381,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @param constraints the constraint of the domain.
      */
-    public final void setConstraints(final PDDLExpression constraints) {
+    public final void setConstraints(final Expression<String> constraints) {
         this.constraints = constraints;
     }
 
@@ -550,7 +550,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the list of initial facts defined in the problem file.
      */
-    public List<PDDLExpression> getInit() {
+    public List<Expression<String>> getInit() {
         return this.initialFacts;
     }
 
@@ -560,7 +560,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param fact the fact to add.
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
      */
-    public final boolean addInitialFact(final PDDLExpression fact) {
+    public final boolean addInitialFact(final Expression<String> fact) {
         return this.initialFacts.add(fact);
     }
 
@@ -569,7 +569,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the list of goal defined in the problem file.
      */
-    public PDDLExpression getGoal() {
+    public Expression<String> getGoal() {
         return this.goal;
     }
 
@@ -578,7 +578,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @param goal the goal of this problem.
      */
-    public void setGoal(final PDDLExpression goal) {
+    public void setGoal(final Expression<String> goal) {
         this.goal = goal;
     }
 
@@ -587,7 +587,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the metric of the problem or <code>null</code> if the problem has no metric specification.
      */
-    public PDDLExpression getMetric() {
+    public Expression<String> getMetric() {
         return this.metric;
     }
 
@@ -596,7 +596,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @param metric the metric to set.
      */
-    public final void setMetric(final PDDLExpression metric) {
+    public final void setMetric(final Expression<String> metric) {
         this.metric = metric;
     }
 
@@ -729,9 +729,9 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
             Expression.renameTaskIDs(tn.getOrdering(), taskIDCtx);
             // In this case enumerate the orderings contraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
-                tn.setOrderingConstraints(new PDDLExpression(PDDLConnective.AND));
+                tn.setOrderingConstraints(new Expression<String>(PDDLConnective.AND));
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
-                    PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                    Expression<String> c = new Expression<String>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     c.setArguments(new LinkedList<Symbol<String>>());
                     c.getArguments().add(tn.getTasks().getChildren().get(i - 1).getTaskID());
                     c.getArguments().add(tn.getTasks().getChildren().get(i).getTaskID());
@@ -839,7 +839,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
             str.append("\n)\n");
         }
         str.append("(:initialization");
-        for (PDDLExpression fact : this.initialFacts) {
+        for (Expression<String> fact : this.initialFacts) {
             str.append("\n  ").append(fact);
         }
         str.append("\n)\n");

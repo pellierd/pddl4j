@@ -46,12 +46,12 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
     /**
      * The goal description that represents the preconditions of the operator.
      */
-    private PDDLExpression preconditions;
+    private Expression<String> preconditions;
 
     /**
      * The duration constraints of the operator.
      */
-    private PDDLExpression duration;
+    private Expression<String> duration;
 
     /**
      * Create a new operator from another.
@@ -72,9 +72,9 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
         this.name = new Symbol<String>(other.getName());
         this.parameters = new LinkedList<>();
         this.parameters.addAll(other.getParameters().stream().map(TypedSymbol<String>::new).collect(Collectors.toList()));
-        this.preconditions = new PDDLExpression(other.getPreconditions());
+        this.preconditions = new Expression<String>(other.getPreconditions());
         if (this.duration != null) {
-            this.duration = new PDDLExpression(other.getDuration());
+            this.duration = new Expression<String>(other.getDuration());
         }
     }
 
@@ -86,7 +86,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
     protected PDDLAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
-                                   final PDDLExpression preconditions) {
+                                   final Expression<String> preconditions) {
         this(name, parameters, preconditions, null);
     }
 
@@ -99,7 +99,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param duration the duration constraint of the operator.
      */
     protected PDDLAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
-                                   final PDDLExpression preconditions, final PDDLExpression duration) {
+                                   final Expression<String> preconditions, final Expression<String> duration) {
         this.name = name;
         this.parameters = parameters;
         this.preconditions = preconditions;
@@ -179,7 +179,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @return The goal description that represents the preconditions of the operator.
      */
-    public final PDDLExpression getPreconditions() {
+    public final Expression<String> getPreconditions() {
         return this.preconditions;
     }
 
@@ -190,7 +190,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *                      operator to set.
      * @throws NullPointerException if the specified preconditions is null.
      */
-    public final void setPreconditions(final PDDLExpression preconditions) {
+    public final void setPreconditions(final Expression<String> preconditions) {
         if (preconditions == null) {
             throw new NullPointerException();
         }
@@ -211,7 +211,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @return the duration constraints of the operator.
      */
-    public final PDDLExpression getDuration() {
+    public final Expression<String> getDuration() {
         return this.duration;
     }
 
@@ -220,7 +220,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @param duration the duration constraint to set
      */
-    public final void setDuration(final PDDLExpression duration) {
+    public final void setDuration(final Expression<String> duration) {
         this.duration = duration;
     }
 
@@ -238,9 +238,9 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see PDDLExpression#renameVariables(Expression)
-     * @see PDDLExpression#simplify()
-     * @see PDDLExpression#toNNF() ()
+     * @see Expression<String>#renameVariables(Expression)
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
      */
     public final void normalize() {
         this.normalize(0);
@@ -253,9 +253,9 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see PDDLExpression#renameVariables(Expression)
-     * @see PDDLExpression#simplify()
-     * @see PDDLExpression#toNNF() ()
+     * @see Expression<String>#renameVariables(Expression)
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
      */
     protected Map<String, String> normalize(int index) {
         int i = index;

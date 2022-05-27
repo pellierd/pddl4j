@@ -31,7 +31,7 @@ import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
 import fr.uga.pddl4j.parser.PDDLParser;
-import fr.uga.pddl4j.parser.PDDLExpression;
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLDomain;
 import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.NamedTypedList;
@@ -382,7 +382,7 @@ Token left_bracket() :
 
 PDDLDomain domain() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 	Symbol<String> name = null;
 }
 {
@@ -416,7 +416,7 @@ PDDLDomain domain() :
 
 ParsedProblem domain_and_problem() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 	Symbol<String> name = null;
 }
 {
@@ -1061,9 +1061,9 @@ List<Symbol<String>> function_type() :
         }
 }
 
-PDDLExpression con_gd() :
+Expression<String> con_gd() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=and_con_gd()
@@ -1083,10 +1083,10 @@ PDDLExpression con_gd() :
 	}
 }
 
-PDDLExpression and_con_gd() :
+Expression<String> and_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.AND);
+	Expression<String> child = null;
 	Token begin = null;
 	Token end = null;
 }
@@ -1103,10 +1103,10 @@ PDDLExpression and_con_gd() :
 	}
 }
 
-PDDLExpression forall_con_gd() :
+Expression<String> forall_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.FORALL);
-	PDDLExpression child = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.FORALL);
+	Expression<String> child = null;
 	List<TypedSymbol<String>> typedList = null;
 	Token begin = null;
     Token end = null;
@@ -1127,10 +1127,10 @@ PDDLExpression forall_con_gd() :
 	}
 }
 
-PDDLExpression at_end_con_gd() :
+Expression<String> at_end_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression exp = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.AT_END);
+	Expression<String> exp = null;
 	Token begin = null;
     Token end = null;
 }
@@ -1146,10 +1146,10 @@ PDDLExpression at_end_con_gd() :
 	}
 }
 
-PDDLExpression always_con_gd() :
+Expression<String> always_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_CONSTRAINT);
-	PDDLExpression exp = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.ALWAYS_CONSTRAINT);
+	Expression<String> exp = null;
 	Token begin = null;
     Token end = null;
 
@@ -1166,10 +1166,10 @@ PDDLExpression always_con_gd() :
 	}
 }
 
-PDDLExpression sometime_con_gd() :
+Expression<String> sometime_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_CONSTRAINT);
-	PDDLExpression exp = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.SOMETIME_CONSTRAINT);
+	Expression<String> exp = null;
 	Token begin = null;
     Token end = null;
 }
@@ -1185,10 +1185,10 @@ PDDLExpression sometime_con_gd() :
 	}
 }
 
-PDDLExpression within_con_gd() :
+Expression<String> within_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.WITHIN_CONSTRAINT);
-	PDDLExpression exp, time;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.WITHIN_CONSTRAINT);
+	Expression<String> exp, time;
     Token begin, end;
 }
 {
@@ -1205,10 +1205,10 @@ PDDLExpression within_con_gd() :
 	}
 }
 
-PDDLExpression at_most_once_con_gd() :
+Expression<String> at_most_once_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.AT_MOST_ONCE_CONSTRAINT);
-	PDDLExpression exp;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.AT_MOST_ONCE_CONSTRAINT);
+	Expression<String> exp;
     Token begin, end;
 }
 {
@@ -1223,11 +1223,11 @@ PDDLExpression at_most_once_con_gd() :
 	}
 }
 
-PDDLExpression sometime_after_con_gd() :
+Expression<String> sometime_after_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_AFTER_CONSTRAINT);
-	PDDLExpression gd1 = null;
-	PDDLExpression gd2 = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.SOMETIME_AFTER_CONSTRAINT);
+	Expression<String> gd1 = null;
+	Expression<String> gd2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1245,11 +1245,11 @@ PDDLExpression sometime_after_con_gd() :
 	}
 }
 
-PDDLExpression sometime_before_con_gd() :
+Expression<String> sometime_before_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE_CONSTRAINT);
-	PDDLExpression gd1 = null;
-	PDDLExpression gd2 = null;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.SOMETIME_BEFORE_CONSTRAINT);
+	Expression<String> gd1 = null;
+	Expression<String> gd2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1267,10 +1267,10 @@ PDDLExpression sometime_before_con_gd() :
 	}
 }
 
-PDDLExpression always_within_con_gd() :
+Expression<String> always_within_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.ALWAYS_WITHIN_CONSTRAINT);
-	PDDLExpression gd1, gd2, time;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.ALWAYS_WITHIN_CONSTRAINT);
+	Expression<String> gd1, gd2, time;
     Token begin, end;
 }
 {
@@ -1287,10 +1287,10 @@ PDDLExpression always_within_con_gd() :
 	}
 }
 
-PDDLExpression hold_during_con_gd() :
+Expression<String> hold_during_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_DURING_CONSTRAINT);
-	PDDLExpression exp, lower, upper;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.HOLD_DURING_CONSTRAINT);
+	Expression<String> exp, lower, upper;
     Token begin, end;
 }
 {
@@ -1309,10 +1309,10 @@ PDDLExpression hold_during_con_gd() :
 	}
 }
 
-PDDLExpression hold_after_con_gd() :
+Expression<String> hold_after_con_gd() :
 {
-	PDDLExpression conGD = new PDDLExpression(PDDLConnective.HOLD_AFTER_CONSTRAINT);
-	PDDLExpression exp, time;
+	Expression<String> conGD = new Expression<String>(PDDLConnective.HOLD_AFTER_CONSTRAINT);
+	Expression<String> exp, time;
     Token begin, end;
 }
 {
@@ -1329,9 +1329,9 @@ PDDLExpression hold_after_con_gd() :
 	}
 }
 
-PDDLExpression gd() :
+Expression<String> gd() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2)
@@ -1360,9 +1360,9 @@ PDDLExpression gd() :
 	}
 }
 
-PDDLExpression equal_gd() :
+Expression<String> equal_gd() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(LOOKAHEAD(2)
@@ -1374,10 +1374,10 @@ PDDLExpression equal_gd() :
 	}
 }
 
-PDDLExpression not_equal_atomic_formula() :
+Expression<String> not_equal_atomic_formula() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.NOT);
-	PDDLExpression c = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.NOT);
+	Expression<String> c = null;
     Token begin = null;
     Token end = null;
 }
@@ -1393,9 +1393,9 @@ PDDLExpression not_equal_atomic_formula() :
 	}
 }
 
-PDDLExpression equal_atomic_formula() :
+Expression<String> equal_atomic_formula() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_ATOM);
+	Expression<String> exp = new Expression<String>(PDDLConnective.EQUAL_ATOM);
 	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
 	Token t = null;
 	Symbol<String> arg1 = null;
@@ -1419,10 +1419,10 @@ PDDLExpression equal_atomic_formula() :
 	}
 }
 
-PDDLExpression and_gd() :
+Expression<String> and_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression s = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1438,10 +1438,10 @@ PDDLExpression and_gd() :
 	}
 }
 
-PDDLExpression or_gd() :
+Expression<String> or_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.OR);
-	PDDLExpression s = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.OR);
+	Expression<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1457,10 +1457,10 @@ PDDLExpression or_gd() :
 	}
 }
 
-PDDLExpression not_gd() :
+Expression<String> not_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.NOT);
-	PDDLExpression s = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.NOT);
+	Expression<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1474,11 +1474,11 @@ PDDLExpression not_gd() :
 	}
 }
 
-PDDLExpression imply_gd() :
+Expression<String> imply_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.IMPLY);
-	PDDLExpression p = null;
-	PDDLExpression q = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.IMPLY);
+	Expression<String> p = null;
+	Expression<String> q = null;
     Token begin = null;
     Token end = null;
 }
@@ -1493,11 +1493,11 @@ PDDLExpression imply_gd() :
 	}
 }
 
-PDDLExpression exists_gd() :
+Expression<String> exists_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.EXISTS);
+	Expression<String> exp = new Expression<String>(PDDLConnective.EXISTS);
 	List<TypedSymbol<String>> typedList = null;
-	PDDLExpression s = null;
+	Expression<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1516,11 +1516,11 @@ PDDLExpression exists_gd() :
 	}
 }
 
-PDDLExpression forall_gd() :
+Expression<String> forall_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FORALL);
 	List<TypedSymbol<String>> typedList = null;
-	PDDLExpression s = null;
+	Expression<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1539,9 +1539,9 @@ PDDLExpression forall_gd() :
 	}
 }
 
-PDDLExpression atomic_formula(int type) :
+Expression<String> atomic_formula(int type) :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.ATOM);
+	Expression<String> exp = new Expression<String>(PDDLConnective.ATOM);
 	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
 	Symbol<String> t = null;
     Token begin = null;
@@ -1577,9 +1577,9 @@ Symbol<String> term() :
 	}
 }
 
-PDDLExpression literal(int type) :
+Expression<String> literal(int type) :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=atomic_formula(type)
@@ -1589,10 +1589,10 @@ PDDLExpression literal(int type) :
 	}
 }
 
-PDDLExpression not_atomic_formula(int type) :
+Expression<String> not_atomic_formula(int type) :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.NOT);
-	PDDLExpression s = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.NOT);
+	Expression<String> s = null;
     Token begin = null;
     Token end = null;
 }
@@ -1607,9 +1607,9 @@ PDDLExpression not_atomic_formula(int type) :
 	}
 }
 
-PDDLExpression f_comp() :
+Expression<String> f_comp() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	exp=binary_comp() {
@@ -1617,9 +1617,9 @@ PDDLExpression f_comp() :
 	}
 }
 
-PDDLExpression binary_comp() :
+Expression<String> binary_comp() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=greater_comp()
@@ -1632,11 +1632,11 @@ PDDLExpression binary_comp() :
 	}
 }
 
-PDDLExpression greater_comp() :
+Expression<String> greater_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_COMPARISON);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_COMPARISON);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1653,11 +1653,11 @@ PDDLExpression greater_comp() :
 	}
 }
 
-PDDLExpression greater_equal_comp() :
+Expression<String> greater_equal_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1674,11 +1674,11 @@ PDDLExpression greater_equal_comp() :
 	}
 }
 
-PDDLExpression less_equal_comp() :
+Expression<String> less_equal_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1695,11 +1695,11 @@ PDDLExpression less_equal_comp() :
 	}
 }
 
-PDDLExpression less_comp() :
+Expression<String> less_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_COMPARISON);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.LESS_COMPARISON);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1716,11 +1716,11 @@ PDDLExpression less_comp() :
 	}
 }
 
-PDDLExpression equal_comp() :
+Expression<String> equal_comp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_COMPARISON);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.EQUAL_COMPARISON);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1737,10 +1737,10 @@ PDDLExpression equal_comp() :
 	}
 }
 
-PDDLExpression f_exp() :
+Expression<String> f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.F_EXP);
-	PDDLExpression child = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.F_EXP);
+	Expression<String> child = null;
     Token begin = null;
     Token end = null;
 }
@@ -1755,14 +1755,14 @@ PDDLExpression f_exp() :
 	}
 }
 
-PDDLExpression number() :
+Expression<String> number() :
 {
 	Token t = null;
 }
 {
 	t=<NUMBER>
 	{
-		PDDLExpression exp = new PDDLExpression(PDDLConnective.NUMBER);
+		Expression<String> exp = new Expression<String>(PDDLConnective.NUMBER);
 		exp.setValue(Double.parseDouble(t.image));
 		exp.setBegin(t);
         exp.setEnd(t);
@@ -1770,9 +1770,9 @@ PDDLExpression number() :
 	}
 }
 
-PDDLExpression op() :
+Expression<String> op() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=binary_operation()
@@ -1782,9 +1782,9 @@ PDDLExpression op() :
 	}
 }
 
-PDDLExpression binary_operation():
+Expression<String> binary_operation():
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=add_op()
@@ -1796,11 +1796,11 @@ PDDLExpression binary_operation():
 	}
 }
 
-PDDLExpression add_op() :
+Expression<String> add_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.PLUS);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.PLUS);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1818,11 +1818,11 @@ PDDLExpression add_op() :
 	}
 }
 
-PDDLExpression substract_op() :
+Expression<String> substract_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINUS);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MINUS);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1839,11 +1839,11 @@ PDDLExpression substract_op() :
 	}
 }
 
-PDDLExpression multiply_op() :
+Expression<String> multiply_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MULTIPLICATION);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MULTIPLICATION);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1860,11 +1860,11 @@ PDDLExpression multiply_op() :
 	}
 }
 
-PDDLExpression divide_op() :
+Expression<String> divide_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIVISION);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.DIVISION);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1881,10 +1881,10 @@ PDDLExpression divide_op() :
 	}
 }
 
-PDDLExpression unary_op() :
+Expression<String> unary_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.UMINUS);
-	PDDLExpression op1 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.UMINUS);
+	Expression<String> op1 = null;
     Token begin = null;
     Token end = null;
 }
@@ -1899,9 +1899,9 @@ PDDLExpression unary_op() :
 	}
 }
 
-PDDLExpression f_head() :
+Expression<String> f_head() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FN_HEAD);
 	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
 	Symbol<String> s = null;
     Token begin = null;
@@ -1970,8 +1970,8 @@ PDDLMethod method_def() : // ADD HDDL
 {
 	Symbol<String> name = null;
 	List<TypedSymbol<String>> parameters = null;
-	PDDLExpression taskID = null;
-	PDDLExpression precondition = new PDDLExpression(PDDLConnective.AND);
+	Expression<String> taskID = null;
+	Expression<String> precondition = new Expression<String>(PDDLConnective.AND);
 	PDDLTaskNetwork tn = null;
 	Token begin = null;
     Token end = null;
@@ -2002,9 +2002,9 @@ PDDLMethod durative_method_def() : // ADD HDDL2.1
 {
     Symbol<String> name = null;
 	List<TypedSymbol<String>> parameters = null;
-	PDDLExpression taskID = null;
-	PDDLExpression duration = null;
-	PDDLExpression condition = new PDDLExpression(PDDLConnective.AND);
+	Expression<String> taskID = null;
+	Expression<String> duration = null;
+	Expression<String> condition = new Expression<String>(PDDLConnective.AND);
 	PDDLTaskNetwork tn = null;
 	Token begin = null;
     Token end = null;
@@ -2034,9 +2034,9 @@ PDDLMethod durative_method_def() : // ADD HDDL2.1
 
 PDDLTaskNetwork task_network() : // ADD HDDL
 {
-    PDDLExpression tasks = null;
-    PDDLExpression ordering = new PDDLExpression(PDDLConnective.AND);
-    PDDLExpression constraints = new PDDLExpression(PDDLConnective.AND);
+    Expression<String> tasks = null;
+    Expression<String> ordering = new Expression<String>(PDDLConnective.AND);
+    Expression<String> constraints = new Expression<String>(PDDLConnective.AND);
     PDDLTaskNetwork tn = null;
 }
 {
@@ -2069,17 +2069,17 @@ Symbol<String> method_name() : // ADD HDDL
 	}
 }
 
-PDDLExpression subtask_def() : // ADD HDDL
+Expression<String> subtask_def() : // ADD HDDL
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-    PDDLExpression taskID = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+    Expression<String> taskID = null;
     Token begin;
     Token end;
 }
 {
     (   LOOKAHEAD(2)
             taskID=subtask() {
-                exp = new PDDLExpression(PDDLConnective.AND);
+                exp = new Expression<String>(PDDLConnective.AND);
                 exp.addChild(taskID);
                 exp.setLocation(taskID.getLocation());
             }
@@ -2095,10 +2095,10 @@ PDDLExpression subtask_def() : // ADD HDDL
     }
 }
 
-PDDLExpression and_subtask() : // ADD HDDL
+Expression<String> and_subtask() : // ADD HDDL
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-    PDDLExpression task = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+    Expression<String> task = null;
     int i = 0;
     Token begin = null;
     Token end = null;
@@ -2114,10 +2114,10 @@ PDDLExpression and_subtask() : // ADD HDDL
     }
 }
 
-PDDLExpression subtask() :  // ADD HDDL
+Expression<String> subtask() :  // ADD HDDL
 {
     Symbol<String> taskID;
-    PDDLExpression task;
+    Expression<String> task;
     Token begin = null;
     Token end = null;
 }
@@ -2137,9 +2137,9 @@ PDDLExpression subtask() :  // ADD HDDL
         return task;
     }
 }
-PDDLExpression task_formula(int type) : // ADD HDDL
+Expression<String> task_formula(int type) : // ADD HDDL
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK);
+	Expression<String> exp = new Expression<String>(PDDLConnective.TASK);
 	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
 	Symbol<String> t = null;
 	Token begin = null;
@@ -2163,17 +2163,17 @@ PDDLExpression task_formula(int type) : // ADD HDDL
 	}
 }
 
-PDDLExpression htn_ordering_constraints_def() : // ADD HDDL
+Expression<String> htn_ordering_constraints_def() : // ADD HDDL
 {
-    PDDLExpression exp = null;
-    PDDLExpression taskID = null;
+    Expression<String> exp = null;
+    Expression<String> taskID = null;
 }
 {
     (   LOOKAHEAD(2)
             exp=empty_and()
     |   LOOKAHEAD(2)
             taskID=htn_ordering_constraint() {
-                exp = new PDDLExpression(PDDLConnective.AND);
+                exp = new Expression<String>(PDDLConnective.AND);
                 exp.addChild(taskID);
                 exp.setLocation(taskID.getLocation());
             }
@@ -2184,10 +2184,10 @@ PDDLExpression htn_ordering_constraints_def() : // ADD HDDL
     }
 }
 
-PDDLExpression and_ordering_constraints() : // ADD HDDL
+Expression<String> and_ordering_constraints() : // ADD HDDL
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-    PDDLExpression ordering = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+    Expression<String> ordering = null;
     Token begin = null;
     Token end = null;
 }
@@ -2201,9 +2201,9 @@ PDDLExpression and_ordering_constraints() : // ADD HDDL
     }
 }
 
-PDDLExpression htn_ordering_constraint() : // ADD HDDL
+Expression<String> htn_ordering_constraint() : // ADD HDDL
 {
-    PDDLExpression exp = null;
+    Expression<String> exp = null;
 }
 {
     (   LOOKAHEAD(3)
@@ -2223,11 +2223,11 @@ PDDLExpression htn_ordering_constraint() : // ADD HDDL
     }
 }
 
-PDDLExpression less_htn_ordering_constraint() : // ADD HDDL
+Expression<String> less_htn_ordering_constraint() : // ADD HDDL
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-    PDDLExpression id1 = null;
-    PDDLExpression id2 = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -2241,11 +2241,11 @@ PDDLExpression less_htn_ordering_constraint() : // ADD HDDL
     }
 }
 
-PDDLExpression equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
+Expression<String> equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_ORDERING_CONSTRAINT);
-    PDDLExpression id1 = null;
-    PDDLExpression id2 = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.EQUAL_ORDERING_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -2259,11 +2259,11 @@ PDDLExpression equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression less_htn_temporal_ordering_constraint() : // ADD HDDL2.1
+Expression<String> less_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
-    PDDLExpression id1 = null;
-    PDDLExpression id2 = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -2277,11 +2277,11 @@ PDDLExpression less_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression less_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
+Expression<String> less_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_ORDERING_CONSTRAINT);
-     PDDLExpression id1 = null;
-     PDDLExpression id2 = null;
+     Expression<String> exp = new Expression<String>(PDDLConnective.LESS_OR_EQUAL_ORDERING_CONSTRAINT);
+     Expression<String> id1 = null;
+     Expression<String> id2 = null;
      Token begin = null;
      Token end = null;
 }
@@ -2295,12 +2295,12 @@ PDDLExpression less_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression great_htn_temporal_ordering_constraint() : // ADD HDDL2.1
+Expression<String> great_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-     PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_ORDERING_CONSTRAINT);
+     Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_ORDERING_CONSTRAINT);
      List<Symbol<String>> tasks = new ArrayList<Symbol<String>>();
-     PDDLExpression id1 = null;
-     PDDLExpression id2 = null;
+     Expression<String> id1 = null;
+     Expression<String> id2 = null;
      Token begin = null;
      Token end = null;
 }
@@ -2314,11 +2314,11 @@ PDDLExpression great_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression great_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
+Expression<String> great_or_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_ORDERING_CONSTRAINT);
-    PDDLExpression id1 = null;
-    PDDLExpression id2 = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_OR_EQUAL_ORDERING_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
     Token begin = null;
     Token end = null;
 
@@ -2344,15 +2344,15 @@ Symbol<String> task_id_symbol() : // ADD HDDL
 	}
 }
 
-PDDLExpression task_id() : // ADD HDDL
+Expression<String> task_id() : // ADD HDDL
 {
-    PDDLExpression exp = null;
+    Expression<String> exp = null;
 	Symbol<String> id = null;
 }
 {
     (   LOOKAHEAD(2, { !this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
 	        id = task_id_symbol() {
-                exp = new PDDLExpression(PDDLConnective.TASK_ID);
+                exp = new Expression<String>(PDDLConnective.TASK_ID);
 		        exp.setTaskID(id);
 		    }
 	|   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
@@ -2363,9 +2363,9 @@ PDDLExpression task_id() : // ADD HDDL
 
 }
 
-PDDLExpression timed_task_id() : // ADD HDDL2.1
+Expression<String> timed_task_id() : // ADD HDDL2.1
 {
-    PDDLExpression exp = null;
+    Expression<String> exp = null;
 }
 {
     (   LOOKAHEAD(2)
@@ -2377,10 +2377,10 @@ PDDLExpression timed_task_id() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression start_task_id() : // ADD HDDL2.1
+Expression<String> start_task_id() : // ADD HDDL2.1
 {
     Symbol<String> id = null;
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK_ID);
+    Expression<String> exp = new Expression<String>(PDDLConnective.TASK_ID);
 }
 {
     left_bracket() <START> id = task_id_symbol() right_bracket() {
@@ -2390,10 +2390,10 @@ PDDLExpression start_task_id() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression end_task_id() : // ADD HDDL2.1
+Expression<String> end_task_id() : // ADD HDDL2.1
 {
     Symbol<String> id = null;
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.TASK_ID);
+    Expression<String> exp = new Expression<String>(PDDLConnective.TASK_ID);
 }
 {
     left_bracket() <END> id = task_id_symbol() right_bracket() {
@@ -2403,17 +2403,17 @@ PDDLExpression end_task_id() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression htn_constraints_def() : // ADD HDDL
+Expression<String> htn_constraints_def() : // ADD HDDL
 {
-    PDDLExpression exp = null;
-    PDDLExpression c = null;
+    Expression<String> exp = null;
+    Expression<String> c = null;
 }
 {
     (   LOOKAHEAD(2)
             exp = empty_and()
     |   LOOKAHEAD(2)
             c = htn_constraint() {
-                exp = new PDDLExpression(PDDLConnective.AND);
+                exp = new Expression<String>(PDDLConnective.AND);
                 exp.addChild(c);
                 exp.setLocation(c.getLocation());
             }
@@ -2425,10 +2425,10 @@ PDDLExpression htn_constraints_def() : // ADD HDDL
     }
 }
 
-PDDLExpression and_htn_constraints() :  // ADD HDDL
+Expression<String> and_htn_constraints() :  // ADD HDDL
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-    PDDLExpression c = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+    Expression<String> c = null;
     Token begin = null;
     Token end = null;
 }
@@ -2442,9 +2442,9 @@ PDDLExpression and_htn_constraints() :  // ADD HDDL
     }
 }
 
-PDDLExpression htn_constraint() : // ADD HDDL
+Expression<String> htn_constraint() : // ADD HDDL
 {
-    PDDLExpression exp = null;
+    Expression<String> exp = null;
 }
 {
     (   LOOKAHEAD(2)
@@ -2478,11 +2478,11 @@ PDDLExpression htn_constraint() : // ADD HDDL
     }
 }
 
-PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
+Expression<String> hold_before_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BEFORE_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.HOLD_BEFORE_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2496,11 +2496,11 @@ PDDLExpression hold_before_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
+Expression<String> hold_after_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_AFTER_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression effect = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.HOLD_AFTER_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> effect = null;
     Token begin = null;
     Token end = null;
 }
@@ -2514,12 +2514,12 @@ PDDLExpression hold_after_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression hold_between_htn_constraint() : // ADD HDDL2.1
+Expression<String> hold_between_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_BETWEEN_METHOD_CONSTRAINT);
-    PDDLExpression id1 = null;
-    PDDLExpression id2 = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.HOLD_BETWEEN_METHOD_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2534,12 +2534,12 @@ PDDLExpression hold_between_htn_constraint() : // ADD HDDL2.1
 }
 }
 
-PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
+Expression<String> hold_during_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.HOLD_DURING_METHOD_CONSTRAINT);
-    PDDLExpression id1 = null;
-    PDDLExpression id2 = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.HOLD_DURING_METHOD_CONSTRAINT);
+    Expression<String> id1 = null;
+    Expression<String> id2 = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2554,11 +2554,11 @@ PDDLExpression hold_during_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
+Expression<String> at_end_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression effect = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AT_END_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> effect = null;
     Token begin = null;
     Token end = null;
 }
@@ -2572,11 +2572,11 @@ PDDLExpression at_end_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
+Expression<String> at_start_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AT_START_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2590,11 +2590,11 @@ PDDLExpression at_start_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression always_htn_constraint() : // ADD HDDL2.1
+Expression<String> always_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.ALWAYS_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.ALWAYS_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2608,11 +2608,11 @@ PDDLExpression always_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
+Expression<String> at_most_one_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_MOST_ONCE_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.AT_MOST_ONCE_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2626,11 +2626,11 @@ PDDLExpression at_most_one_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
+Expression<String> sometime_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.SOMETIME_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2644,11 +2644,11 @@ PDDLExpression sometime_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
+Expression<String> sometime_before_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_BEFORE_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.SOMETIME_BEFORE_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2662,11 +2662,11 @@ PDDLExpression sometime_before_htn_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
+Expression<String> sometime_after_htn_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.SOMETIME_AFTER_METHOD_CONSTRAINT);
-    PDDLExpression id = null;
-    PDDLExpression gd = null;
+    Expression<String> exp = new Expression<String>(PDDLConnective.SOMETIME_AFTER_METHOD_CONSTRAINT);
+    Expression<String> id = null;
+    Expression<String> gd = null;
     Token begin = null;
     Token end = null;
 }
@@ -2683,7 +2683,7 @@ PDDLExpression sometime_after_htn_constraint() : // ADD HDDL2.1
 PDDLDerivedPredicate derived_def() :
 {
 	NamedTypedList head = null;
-	PDDLExpression body = null;
+	Expression<String> body = null;
 	Token begin = null;
 	Token end = null;
 }
@@ -2708,8 +2708,8 @@ PDDLAction action_def() :
 {
 	Symbol<String> name = null;
 	List<TypedSymbol<String>> parameters = null;
-	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
+	Expression<String> preconds = new Expression<String>(PDDLConnective.AND);
+	Expression<String> effects = new Expression<String>(PDDLConnective.AND);
 	Token begin = null;
 	Token end = null;
 }
@@ -2735,8 +2735,8 @@ PDDLAction htn_action_def() :
 {
 	Symbol<String> name = null;
 	List<TypedSymbol<String>> parameters = null;
-	PDDLExpression preconds = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression effects = new PDDLExpression(PDDLConnective.AND);
+	Expression<String> preconds = new Expression<String>(PDDLConnective.AND);
+	Expression<String> effects = new Expression<String>(PDDLConnective.AND);
     Token begin = null;
     Token end = null;
 
@@ -2770,9 +2770,9 @@ Symbol<String> action_name() :
 	}
 }
 
-PDDLExpression pre_gd() :
+Expression<String> pre_gd() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.PREFERENCES)}) exp=pref_gd()
@@ -2785,7 +2785,7 @@ PDDLExpression pre_gd() :
 	}
 }
 
-PDDLExpression empty_or() :
+Expression<String> empty_or() :
 {
     Token begin = null;
     Token end = null;
@@ -2793,14 +2793,14 @@ PDDLExpression empty_or() :
 {
 	begin=left_bracket() end=right_bracket()
 	{
-		PDDLExpression or = new PDDLExpression(PDDLConnective.OR);
+		Expression<String> or = new Expression<String>(PDDLConnective.OR);
 		or.setBegin(begin);
 		or.setEnd(end);
 		return or;
 	}
 }
 
-PDDLExpression empty_and() :
+Expression<String> empty_and() :
 {
 	Token begin = null;
     Token end = null;
@@ -2808,17 +2808,17 @@ PDDLExpression empty_and() :
 {
 	begin=left_bracket() end=right_bracket()
 	{
-		PDDLExpression and = new PDDLExpression(PDDLConnective.AND);
+		Expression<String> and = new Expression<String>(PDDLConnective.AND);
 		and.setBegin(begin);
         and.setEnd(end);
         return and;
 	}
 }
 
-PDDLExpression and_pre_gd() :
+Expression<String> and_pre_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression s;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> s;
 	Token begin = null;
     Token end = null;
 }
@@ -2835,11 +2835,11 @@ PDDLExpression and_pre_gd() :
 	}
 }
 
-PDDLExpression forall_pre_gd() :
+Expression<String> forall_pre_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FORALL);
 	List<TypedSymbol<String>> vars = null;
-	PDDLExpression s = null;
+	Expression<String> s = null;
 	Token begin = null;
     Token end = null;
 }
@@ -2859,10 +2859,10 @@ PDDLExpression forall_pre_gd() :
 	}
 }
 
-PDDLExpression pref_gd() :
+Expression<String> pref_gd() :
 {
 	Symbol<String> pref_name = null;
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 	Token begin = null;
     Token end = null;
 }
@@ -2889,9 +2889,9 @@ Symbol<String> pref_name() :
 	}
 }
 
-PDDLExpression effect() :
+Expression<String> effect() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=empty_or()
@@ -2902,10 +2902,10 @@ PDDLExpression effect() :
 	}
 }
 
-PDDLExpression and_c_effect() :
+Expression<String> and_c_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression s = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> s = null;
 	Token begin = null;
 	Token end = null;
 }
@@ -2921,9 +2921,9 @@ PDDLExpression and_c_effect() :
 	}
 }
 
-PDDLExpression c_effect() :
+Expression<String> c_effect() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) exp=forall_effect()
@@ -2934,11 +2934,11 @@ PDDLExpression c_effect() :
 	}
 }
 
-PDDLExpression forall_effect() :
+Expression<String> forall_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FORALL);
 	List<TypedSymbol<String>> vars = null;
-	PDDLExpression s = null;
+	Expression<String> s = null;
 	Token begin = null;
 	Token end = null;
 }
@@ -2957,11 +2957,11 @@ PDDLExpression forall_effect() :
 	}
 }
 
-PDDLExpression when_con_effect() :
+Expression<String> when_con_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.WHEN);
-	PDDLExpression condition = null;
-	PDDLExpression effects = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.WHEN);
+	Expression<String> condition = null;
+	Expression<String> effects = null;
 	Token begin = null;
 	Token end = null;
 }
@@ -2978,9 +2978,9 @@ PDDLExpression when_con_effect() :
 	}
 }
 
-PDDLExpression cond_effect() :
+Expression<String> cond_effect() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=and_p_effect()
@@ -2990,10 +2990,10 @@ PDDLExpression cond_effect() :
 	}
 }
 
-PDDLExpression and_p_effect() :
+Expression<String> and_p_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression s = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> s = null;
 	Token begin = null;
 	Token end = null;
 }
@@ -3009,9 +3009,9 @@ PDDLExpression and_p_effect() :
 	}
 }
 
-PDDLExpression p_effect() :
+Expression<String> p_effect() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
  	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
@@ -3025,11 +3025,11 @@ PDDLExpression p_effect() :
 
 }
 
-PDDLExpression increase_total_cost() :
+Expression<String> increase_total_cost() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.INCREASE);
-	PDDLExpression op1 = null;
-	PDDLExpression op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.INCREASE);
+	Expression<String> op1 = null;
+	Expression<String> op2 = null;
     Token begin = null;
     Token end = null;
 }
@@ -3047,7 +3047,7 @@ PDDLExpression increase_total_cost() :
 	}
 }
 
-PDDLExpression total_cost() :
+Expression<String> total_cost() :
 {
 	Token t;
     Token begin;
@@ -3055,7 +3055,7 @@ PDDLExpression total_cost() :
 }
 {
 	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FN_HEAD);
 	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
 	    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	exp.setArguments(new ArrayList<Symbol<String>>());
@@ -3065,11 +3065,11 @@ PDDLExpression total_cost() :
 }
 }
 
-PDDLExpression numeric_term() :
+Expression<String> numeric_term() :
 {
 	List<Symbol<String>> tokenList = new ArrayList<Symbol<String>>();
 	Symbol<String> s = null;
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(   exp=f_head()
@@ -3079,9 +3079,9 @@ PDDLExpression numeric_term() :
 	}
 }
 
-PDDLExpression assign_op() :
+Expression<String> assign_op() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=assign()
@@ -3094,10 +3094,10 @@ PDDLExpression assign_op() :
 	}
 }
 
-PDDLExpression assign() :
+Expression<String> assign() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.ASSIGN);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3113,10 +3113,10 @@ PDDLExpression assign() :
 	}
 }
 
-PDDLExpression scale_up() :
+Expression<String> scale_up() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_UP);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.SCALE_UP);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3133,10 +3133,10 @@ PDDLExpression scale_up() :
 	}
 }
 
-PDDLExpression scale_down() :
+Expression<String> scale_down() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_DOWN);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.SCALE_DOWN);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3153,10 +3153,10 @@ PDDLExpression scale_down() :
 	}
 }
 
-PDDLExpression increase() :
+Expression<String> increase() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.INCREASE);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.INCREASE);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3173,10 +3173,10 @@ PDDLExpression increase() :
 	}
 }
 
-PDDLExpression decrease() :
+Expression<String> decrease() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DECREASE);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.DECREASE);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3197,9 +3197,9 @@ PDDLAction durative_action_def() :
 {
 	Symbol<String> name = null;
 	List<TypedSymbol<String>> parameters = null;
-	PDDLExpression duration = null;
-	PDDLExpression condition = null;
-	PDDLExpression effect = null;
+	Expression<String> duration = null;
+	Expression<String> condition = null;
+	Expression<String> effect = null;
 	Token begin = null;
     Token end = null;
 
@@ -3237,9 +3237,9 @@ Symbol<String> da_symbol() :
 }
 }
 
-PDDLExpression duration_constraint() :
+Expression<String> duration_constraint() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(2) exp=empty_or()
@@ -3249,10 +3249,10 @@ PDDLExpression duration_constraint() :
 		return exp;
 	}
 }
-PDDLExpression and_simple_duration_constraint() :
+Expression<String> and_simple_duration_constraint() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3267,9 +3267,9 @@ PDDLExpression and_simple_duration_constraint() :
 	}
 }
 
-PDDLExpression simple_duration_constraint() :
+Expression<String> simple_duration_constraint() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=d_op()
@@ -3279,9 +3279,9 @@ PDDLExpression simple_duration_constraint() :
 	}
 }
 
-PDDLExpression at_simple_duration_constraint() :
+Expression<String> at_simple_duration_constraint() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 }
 {
 	(	LOOKAHEAD(3) exp=at_start_simple_duration_constraint()
@@ -3291,10 +3291,10 @@ PDDLExpression at_simple_duration_constraint() :
 	}
 }
 
-PDDLExpression at_start_simple_duration_constraint() :
+Expression<String> at_start_simple_duration_constraint() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_START);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3308,10 +3308,10 @@ PDDLExpression at_start_simple_duration_constraint() :
 	}
 }
 
-PDDLExpression at_end_simple_duration_constraint() :
+Expression<String> at_end_simple_duration_constraint() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_END);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3325,9 +3325,9 @@ PDDLExpression at_end_simple_duration_constraint() :
 	}
 }
 
-PDDLExpression d_op() :
+Expression<String> d_op() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2)
@@ -3341,10 +3341,10 @@ PDDLExpression d_op() :
 	}
 }
 
-PDDLExpression equal_d_op() :
+Expression<String> equal_d_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_COMPARISON);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.EQUAL_COMPARISON);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3360,10 +3360,10 @@ PDDLExpression equal_d_op() :
 	}
 }
 
-PDDLExpression gequal_d_op() :
+Expression<String> gequal_d_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3379,10 +3379,10 @@ PDDLExpression gequal_d_op() :
 	}
 }
 
-PDDLExpression lequal_d_op() :
+Expression<String> lequal_d_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3398,9 +3398,9 @@ PDDLExpression lequal_d_op() :
 	}
 }
 
-PDDLExpression var_duration() :
+Expression<String> var_duration() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.TIME_VAR);
+	Expression<String> exp = new Expression<String>(PDDLConnective.TIME_VAR);
 	Token t;
 }
 {
@@ -3412,9 +3412,9 @@ PDDLExpression var_duration() :
 	}
 }
 
-PDDLExpression d_value() :
+Expression<String> d_value() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=number()
@@ -3426,9 +3426,9 @@ PDDLExpression d_value() :
 	}
 }
 
-PDDLExpression method_duration_constraint() : // ADD HDDL2.1
+Expression<String> method_duration_constraint() : // ADD HDDL2.1
 {
-    PDDLExpression exp;
+    Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=empty_or()
@@ -3440,10 +3440,10 @@ PDDLExpression method_duration_constraint() : // ADD HDDL2.1
 	}
 }
 
-PDDLExpression and_simple_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> and_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3458,9 +3458,9 @@ PDDLExpression and_simple_method_duration_constraint() : // ADD HDDL2.1
 	}
 }
 
-PDDLExpression simple_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2)
@@ -3479,10 +3479,10 @@ PDDLExpression simple_method_duration_constraint() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression equal_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> equal_method_duration_constraint() : // ADD HDDL2.1
 {
-  	PDDLExpression exp = new PDDLExpression(PDDLConnective.EQUAL_COMPARISON);
-  	PDDLExpression op1, op2;
+  	Expression<String> exp = new Expression<String>(PDDLConnective.EQUAL_COMPARISON);
+  	Expression<String> op1, op2;
   	Token begin, end;
 }
 {
@@ -3498,10 +3498,10 @@ PDDLExpression equal_method_duration_constraint() : // ADD HDDL2.1
   	}
 }
 
-PDDLExpression great_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> great_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_COMPARISON);
-   	PDDLExpression op1, op2;
+   	Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_COMPARISON);
+   	Expression<String> op1, op2;
    	Token begin, end;
 }
 {
@@ -3517,10 +3517,10 @@ PDDLExpression great_method_duration_constraint() : // ADD HDDL2.1
    	}
 }
 
-PDDLExpression great_or_equal_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> great_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
-   	PDDLExpression op1, op2;
+   	Expression<String> exp = new Expression<String>(PDDLConnective.GREATER_OR_EQUAL_COMPARISON);
+   	Expression<String> op1, op2;
    	Token begin, end;
 }
 {
@@ -3536,10 +3536,10 @@ PDDLExpression great_or_equal_method_duration_constraint() : // ADD HDDL2.1
    	}
 }
 
-PDDLExpression less_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> less_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_COMPARISON);
-   	PDDLExpression op1, op2;
+   	Expression<String> exp = new Expression<String>(PDDLConnective.LESS_COMPARISON);
+   	Expression<String> op1, op2;
    	Token begin, end;
 }
 {
@@ -3555,10 +3555,10 @@ PDDLExpression less_method_duration_constraint() : // ADD HDDL2.1
    	}
 }
 
-PDDLExpression less_or_equal_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> less_or_equal_method_duration_constraint() : // ADD HDDL2.1
 {
-   	PDDLExpression exp = new PDDLExpression(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
-   	PDDLExpression op1, op2;
+   	Expression<String> exp = new Expression<String>(PDDLConnective.LESS_OR_EQUAL_COMPARISON);
+   	Expression<String> op1, op2;
    	Token begin, end;
 }
 {
@@ -3574,9 +3574,9 @@ PDDLExpression less_or_equal_method_duration_constraint() : // ADD HDDL2.1
    	}
 }
 
-PDDLExpression duration() : // ADD HDDL2.1
+Expression<String> duration() : // ADD HDDL2.1
 {
-    PDDLExpression duration;
+    Expression<String> duration;
 }
 {
     (duration = var_duration() | duration = f_duration()) {
@@ -3584,9 +3584,9 @@ PDDLExpression duration() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression f_duration() : // ADD HDDL2.1
+Expression<String> f_duration() : // ADD HDDL2.1
 {
-    PDDLExpression exp = new PDDLExpression(PDDLConnective.F_TASK_TIME);
+    Expression<String> exp = new Expression<String>(PDDLConnective.F_TASK_TIME);
     Token t, begin, end;
     Symbol<String> argument;
 }
@@ -3601,9 +3601,9 @@ PDDLExpression f_duration() : // ADD HDDL2.1
     }
 }
 
-PDDLExpression temporal_simple_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> temporal_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(3) exp=at_start_simple_method_duration_constraint()
@@ -3613,10 +3613,10 @@ PDDLExpression temporal_simple_method_duration_constraint() : // ADD HDDL2.1
 	}
 }
 
-PDDLExpression at_start_simple_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> at_start_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_START);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3630,10 +3630,10 @@ PDDLExpression at_start_simple_method_duration_constraint() : // ADD HDDL2.1
 	}
 }
 
-PDDLExpression at_end_simple_method_duration_constraint() : // ADD HDDL2.1
+Expression<String> at_end_simple_method_duration_constraint() : // ADD HDDL2.1
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_END);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3647,9 +3647,9 @@ PDDLExpression at_end_simple_method_duration_constraint() : // ADD HDDL2.1
 	}
 }
 
-PDDLExpression da_gd():
+Expression<String> da_gd():
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=pref_timed_gd()
@@ -3661,10 +3661,10 @@ PDDLExpression da_gd():
 	}
 }
 
-PDDLExpression forall_da_gd() :
+Expression<String> forall_da_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.FORALL);
+	Expression<String> child;
 	List<TypedSymbol<String>> typedList;
 	Token begin, end;
 }
@@ -3684,10 +3684,10 @@ PDDLExpression forall_da_gd() :
 	}
 }
 
-PDDLExpression and_da_gd() :
+Expression<String> and_da_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3702,9 +3702,9 @@ PDDLExpression and_da_gd() :
 	}
 }
 
-PDDLExpression pref_timed_gd() :
+Expression<String> pref_timed_gd() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2)
@@ -3716,10 +3716,10 @@ PDDLExpression pref_timed_gd() :
 	}
 }
 
-PDDLExpression named_pref_timed_gd() :
+Expression<String> named_pref_timed_gd() :
 {
 	Symbol<String> pref_name = null;
-	PDDLExpression exp;
+	Expression<String> exp;
 	Token begin, end;
 }
 {
@@ -3734,9 +3734,9 @@ PDDLExpression named_pref_timed_gd() :
 	}
 }
 
-PDDLExpression timed_gd() :
+Expression<String> timed_gd() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=at_timed_gd()
@@ -3746,10 +3746,10 @@ PDDLExpression timed_gd() :
 	}
 }
 
-PDDLExpression over_timed_gd() :
+Expression<String> over_timed_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.OVER_ALL);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.OVER_ALL);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3763,9 +3763,9 @@ PDDLExpression over_timed_gd() :
 	}
 }
 
-PDDLExpression at_timed_gd() :
+Expression<String> at_timed_gd() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(3) exp=at_start_timed_gd()
@@ -3775,10 +3775,10 @@ PDDLExpression at_timed_gd() :
 	}
 }
 
-PDDLExpression at_start_timed_gd() :
+Expression<String> at_start_timed_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_START);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3792,10 +3792,10 @@ PDDLExpression at_start_timed_gd() :
 	}
 }
 
-PDDLExpression at_end_timed_gd() :
+Expression<String> at_end_timed_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_END);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3809,9 +3809,9 @@ PDDLExpression at_end_timed_gd() :
 	}
 }
 
-PDDLExpression da_effect() :
+Expression<String> da_effect() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(
@@ -3833,9 +3833,9 @@ PDDLExpression da_effect() :
 	}
 }
 
-PDDLExpression da_assign_op() :
+Expression<String> da_assign_op() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=da_assign()
@@ -3848,10 +3848,10 @@ PDDLExpression da_assign_op() :
 	}
 }
 
-PDDLExpression da_assign() :
+Expression<String> da_assign() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.ASSIGN);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3867,10 +3867,10 @@ PDDLExpression da_assign() :
 	}
 }
 
-PDDLExpression da_scale_up() :
+Expression<String> da_scale_up() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_UP);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.SCALE_UP);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3886,10 +3886,10 @@ PDDLExpression da_scale_up() :
 	}
 }
 
-PDDLExpression da_scale_down() :
+Expression<String> da_scale_down() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.SCALE_DOWN);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.SCALE_DOWN);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3905,10 +3905,10 @@ PDDLExpression da_scale_down() :
 	}
 }
 
-PDDLExpression da_increase() :
+Expression<String> da_increase() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.INCREASE);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.INCREASE);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3924,10 +3924,10 @@ PDDLExpression da_increase() :
 	}
 }
 
-PDDLExpression da_decrease() :
+Expression<String> da_decrease() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DECREASE);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.DECREASE);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -3943,10 +3943,10 @@ PDDLExpression da_decrease() :
 	}
 }
 
-PDDLExpression when_da_effect() :
+Expression<String> when_da_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.WHEN);
-	PDDLExpression condition, effect;
+	Expression<String> exp = new Expression<String>(PDDLConnective.WHEN);
+	Expression<String> condition, effect;
 	Token begin, end;
 }
 {
@@ -3962,11 +3962,11 @@ PDDLExpression when_da_effect() :
 	}
 }
 
-PDDLExpression forall_da_effect() :
+Expression<String> forall_da_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FORALL);
 	List<TypedSymbol<String>> typedList;
-	PDDLExpression child;
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -3984,10 +3984,10 @@ PDDLExpression forall_da_effect() :
 	}
 }
 
-PDDLExpression and_da_effect() :
+Expression<String> and_da_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4002,9 +4002,9 @@ PDDLExpression and_da_effect() :
 	}
 }
 
-PDDLExpression timed_effect() :
+Expression<String> timed_effect() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2)
@@ -4016,9 +4016,9 @@ PDDLExpression timed_effect() :
 	}
 }
 
-PDDLExpression at_f_assign_da() :
+Expression<String> at_f_assign_da() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(3) exp=at_start_f_assign_da()
@@ -4028,10 +4028,10 @@ PDDLExpression at_f_assign_da() :
 	}
 }
 
-PDDLExpression at_start_f_assign_da() :
+Expression<String> at_start_f_assign_da() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_START);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4046,10 +4046,10 @@ PDDLExpression at_start_f_assign_da() :
 }
 
 
-PDDLExpression at_end_f_assign_da() :
+Expression<String> at_end_f_assign_da() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_END);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4063,9 +4063,9 @@ PDDLExpression at_end_f_assign_da() :
 	}
 }
 
-PDDLExpression at_a_effect() :
+Expression<String> at_a_effect() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(4) exp=at_start_a_effect()
@@ -4076,9 +4076,9 @@ PDDLExpression at_a_effect() :
 }
 
 
-PDDLExpression a_effect() :
+Expression<String> a_effect() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
  	(	LOOKAHEAD(2) exp=f_assign_da()
@@ -4090,10 +4090,10 @@ PDDLExpression a_effect() :
 	}
 }
 
-PDDLExpression at_start_a_effect() :
+Expression<String> at_start_a_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_START);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_START);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4107,10 +4107,10 @@ PDDLExpression at_start_a_effect() :
 	}
 }
 
-PDDLExpression at_end_a_effect() :
+Expression<String> at_end_a_effect() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AT_END);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AT_END);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4124,9 +4124,9 @@ PDDLExpression at_end_a_effect() :
 	}
 }
 
-PDDLExpression assign_op_t() :
+Expression<String> assign_op_t() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=increase_assign_op_t()
@@ -4136,10 +4136,10 @@ PDDLExpression assign_op_t() :
 	}
 }
 
-PDDLExpression increase_assign_op_t() :
+Expression<String> increase_assign_op_t() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.ASSIGN);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4155,10 +4155,10 @@ PDDLExpression increase_assign_op_t() :
 	}
 }
 
-PDDLExpression decrease_assign_op_t() :
+Expression<String> decrease_assign_op_t() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.ASSIGN);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.ASSIGN);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4174,11 +4174,11 @@ PDDLExpression decrease_assign_op_t() :
 	}
 }
 
-PDDLExpression f_exp_t() :
+Expression<String> f_exp_t() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.F_EXP_T);
+	Expression<String> exp = new Expression<String>(PDDLConnective.F_EXP_T);
 	Symbol<String> continuous_variable_name;
-	PDDLExpression child;
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4223,9 +4223,9 @@ Symbol<String> continuous_variable() :
 	}
 }
 
-PDDLExpression f_assign_da() :
+Expression<String> f_assign_da() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=da_assign()
@@ -4238,9 +4238,9 @@ PDDLExpression f_assign_da() :
 	}
 }
 
-PDDLExpression f_exp_da() :
+Expression<String> f_exp_da() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=da_op()
@@ -4252,9 +4252,9 @@ PDDLExpression f_exp_da() :
 }
 
 
-PDDLExpression da_op() :
+Expression<String> da_op() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=da_add_op()
@@ -4266,10 +4266,10 @@ PDDLExpression da_op() :
 	}
 }
 
-PDDLExpression da_add_op() :
+Expression<String> da_add_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.PLUS);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.PLUS);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4285,10 +4285,10 @@ PDDLExpression da_add_op() :
 	}
 }
 
-PDDLExpression da_substract_op() :
+Expression<String> da_substract_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINUS);
-	PDDLExpression op1, op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MINUS);
+	Expression<String> op1, op2 = null;
 	Token begin, end;
 }
 {
@@ -4304,10 +4304,10 @@ PDDLExpression da_substract_op() :
 	}
 }
 
-PDDLExpression da_multiply_op() :
+Expression<String> da_multiply_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MULTIPLICATION);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MULTIPLICATION);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4323,10 +4323,10 @@ PDDLExpression da_multiply_op() :
 	}
 }
 
-PDDLExpression da_divide_op() :
+Expression<String> da_divide_op() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIVISION);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.DIVISION);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4479,7 +4479,7 @@ void object_declaration() :
 
 void init() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	try {
@@ -4494,9 +4494,9 @@ void init() :
 }
 
 
-PDDLExpression init_el() :
+Expression<String> init_el() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(
@@ -4511,10 +4511,10 @@ PDDLExpression init_el() :
 	}
 }
 
-PDDLExpression equal_init_el() :
+Expression<String> equal_init_el() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_ATOM);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.FN_ATOM);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4530,10 +4530,10 @@ PDDLExpression equal_init_el() :
 	}
 }
 
-PDDLExpression timed_literal() :
+Expression<String> timed_literal() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.TIMED_LITERAL);
-	PDDLExpression literal, time;
+	Expression<String> exp = new Expression<String>(PDDLConnective.TIMED_LITERAL);
+	Expression<String> literal, time;
 	Token begin, end;
 }
 {
@@ -4561,7 +4561,7 @@ void goal() :
 
 void pddl_goal() :
 {
-	PDDLExpression exp = null;
+	Expression<String> exp = null;
 	Boolean goal_utilities = false;
 	if (this.isRequirement(PDDLRequireKey.GOAL_UTILITIES)
 			&& !this.isRequirement(PDDLRequireKey.PREFERENCES)) {
@@ -4585,7 +4585,7 @@ void pddl_goal() :
 
 void pddl_const(int type) :
 {
-	PDDLExpression conGD;
+	Expression<String> conGD;
 }
 {
 	try {
@@ -4604,9 +4604,9 @@ void pddl_const(int type) :
 }
 
 
-PDDLExpression pref_con_gd() :
+Expression<String> pref_con_gd() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2)
@@ -4622,10 +4622,10 @@ PDDLExpression pref_con_gd() :
 	}
 }
 
-PDDLExpression and_pref_con_gd() :
+Expression<String> and_pref_con_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.AND);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.AND);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4640,9 +4640,9 @@ PDDLExpression and_pref_con_gd() :
 	}
 }
 
-PDDLExpression named_pref_con_gd() :
+Expression<String> named_pref_con_gd() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 	Symbol<String> pref_name = null;
 	Token begin, end;
 }
@@ -4658,11 +4658,11 @@ PDDLExpression named_pref_con_gd() :
 	}
 }
 
-PDDLExpression forall_pref_con_gd() :
+Expression<String> forall_pref_con_gd() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FORALL);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FORALL);
 	List<TypedSymbol<String>> typedList;
-	PDDLExpression child;
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4682,7 +4682,7 @@ PDDLExpression forall_pref_con_gd() :
 
 void metric_spec() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	try {
@@ -4697,10 +4697,10 @@ void metric_spec() :
 
 }
 
-PDDLExpression maximize() :
+Expression<String> maximize() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MAXIMIZE);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MAXIMIZE);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4716,10 +4716,10 @@ PDDLExpression maximize() :
 	}
 }
 
-PDDLExpression minimize() :
+Expression<String> minimize() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINIMIZE);
-	PDDLExpression child;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MINIMIZE);
+	Expression<String> child;
 	Token begin, end;
 }
 {
@@ -4735,9 +4735,9 @@ PDDLExpression minimize() :
 	}
 }
 
-PDDLExpression metric_f_exp() :
+Expression<String> metric_f_exp() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=op_metric_f_exp()
@@ -4750,9 +4750,9 @@ PDDLExpression metric_f_exp() :
 	}
 }
 
-PDDLExpression violated_pref_exp() :
+Expression<String> violated_pref_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.IS_VIOLATED);
+	Expression<String> exp = new Expression<String>(PDDLConnective.IS_VIOLATED);
 	Symbol<String> pref_name;
 	Token begin, end;
 }
@@ -4768,9 +4768,9 @@ PDDLExpression violated_pref_exp() :
 	}
 }
 
-PDDLExpression constant_f_head() :
+Expression<String> constant_f_head() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FN_HEAD);
 	List<Symbol<String>> args = new ArrayList<Symbol<String>>();
 	Symbol<String> functor, argument;
 	Token begin, end;
@@ -4791,9 +4791,9 @@ PDDLExpression constant_f_head() :
 	}
 }
 
-PDDLExpression total_time() :
+Expression<String> total_time() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.FN_HEAD);
+	Expression<String> exp = new Expression<String>(PDDLConnective.FN_HEAD);
 	Token t, begin, end;
 }
 {
@@ -4812,9 +4812,9 @@ PDDLExpression total_time() :
 		}
 }
 
-PDDLExpression op_metric_f_exp() :
+Expression<String> op_metric_f_exp() :
 {
-	PDDLExpression exp;
+	Expression<String> exp;
 }
 {
 	(	LOOKAHEAD(2) exp=add_op_metric_f_exp()
@@ -4826,10 +4826,10 @@ PDDLExpression op_metric_f_exp() :
 	}
 }
 
-PDDLExpression add_op_metric_f_exp() :
+Expression<String> add_op_metric_f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.PLUS);
-	PDDLExpression op;
+	Expression<String> exp = new Expression<String>(PDDLConnective.PLUS);
+	Expression<String> op;
 	Token begin, end;
 }
 {
@@ -4846,10 +4846,10 @@ PDDLExpression add_op_metric_f_exp() :
 	}
 }
 
-PDDLExpression substract_op_metric_f_exp() :
+Expression<String> substract_op_metric_f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MINUS);
-	PDDLExpression op1, op2 = null;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MINUS);
+	Expression<String> op1, op2 = null;
 	Token begin, end;
 }
 {
@@ -4866,10 +4866,10 @@ PDDLExpression substract_op_metric_f_exp() :
 	}
 }
 
-PDDLExpression div_op_metric_f_exp() :
+Expression<String> div_op_metric_f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.DIVISION);
-	PDDLExpression op1, op2;
+	Expression<String> exp = new Expression<String>(PDDLConnective.DIVISION);
+	Expression<String> op1, op2;
 	Token begin, end;
 }
 {
@@ -4887,10 +4887,10 @@ PDDLExpression div_op_metric_f_exp() :
 }
 
 
-PDDLExpression multi_op_metric_f_exp() :
+Expression<String> multi_op_metric_f_exp() :
 {
-	PDDLExpression exp = new PDDLExpression(PDDLConnective.MULTIPLICATION);
-	PDDLExpression op;
+	Expression<String> exp = new Expression<String>(PDDLConnective.MULTIPLICATION);
+	Expression<String> op;
 	Token begin, end;
 }
 {

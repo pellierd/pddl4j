@@ -79,7 +79,7 @@ public interface PDDLOperator extends ParsedObject {
      *
      * @return The goal description that represents the preconditions of the operator.
      */
-    PDDLExpression getPreconditions();
+    Expression<String> getPreconditions();
 
     /**
      * Sets new preconditions to the operator.
@@ -87,7 +87,7 @@ public interface PDDLOperator extends ParsedObject {
      * @param preconditions The new goal description that represents the preconditions of the
      *                      operator to set.
      */
-    void setPreconditions(final PDDLExpression preconditions);
+    void setPreconditions(final Expression<String> preconditions);
 
     /**
      * Return the arity of the operator, i.e., the number of parameters of the operator.
@@ -102,14 +102,14 @@ public interface PDDLOperator extends ParsedObject {
      *
      * @return the duration constraints of the operator.
      */
-    PDDLExpression getDuration();
+    Expression<String> getDuration();
 
     /**
      * Sets new duration constraints to the operator.
      *
      * @param duration the duration constraint to set
      */
-    void setDuration(final PDDLExpression duration);
+    void setDuration(final Expression<String> duration);
 
     /**
      * Returns if this action is durative operator. If the method return <code>false</code>, the accessor
@@ -122,8 +122,8 @@ public interface PDDLOperator extends ParsedObject {
     /**
      * Normalizes the operators.
      *
-     * @see PDDLExpression#renameVariables()
-     * @see PDDLExpression#moveNegationInward()
+     * @see Expression<String>#renameVariables()
+     * @see Expression<String>#moveNegationInward()
      */
     void normalize();
 

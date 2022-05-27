@@ -21,7 +21,7 @@ package fr.uga.pddl4j.parser;
 
 /**
  * This enumeration defines the connective that can be used in PDDL expressions implemented by the
- * class <code>PDDLExpression</code>.
+ * class <code>Expression</code>.
  *
  * @author D. Pellier
  * @version 1.0 - 28.01.2010

@@ -25,7 +25,7 @@ package fr.uga.pddl4j.parser;
  * wrong.
  *
  * @author Damien Pellier
- * @see PDDLExpression
+ * @see Expression
  */
 public class MalformedExpressionException extends RuntimeException {
 

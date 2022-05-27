@@ -616,7 +616,7 @@ public final class PDDLParser implements Callable<Integer> {
      * @param exp The expression.
      * @return <code>true</code> if a specified ground PDDL expression is well formed; <code>false</code> otherwise.
      */
-    private boolean checkGroundedParserNode(PDDLExpression exp) {
+    private boolean checkGroundedParserNode(Expression<String> exp) {
         boolean checked = true;
         if (exp == null) {
             return true;
@@ -1117,7 +1117,7 @@ public final class PDDLParser implements Callable<Integer> {
             if (this.checkActionParameters(action)) {
                 checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
                 checked &= this.checkParserNode(action.getEffects(), action.getParameters());
-                final PDDLExpression effects = new PDDLExpression(action.getEffects());
+                final Expression<String> effects = new Expression<String>(action.getEffects());
                 if (action.getDuration() != null) {
                     checked &= this.checkParserNode(action.getDuration(), action.getParameters());
                 }
@@ -1206,11 +1206,11 @@ public final class PDDLParser implements Callable<Integer> {
      * Checks that the orderings constraints are acyclic. It wor
      *
      * @param constraints the ordering constraints expression. We make the assumption that the constraints are described
-     *                    by an AND PDDLExpression.
+     *                    by an AND Expression<String>.
      *
      * @return true if a set of ordering constraints are acyclic, false otherwise.
      */
-    private boolean checkOrderingConstraintAcyclicness(final PDDLExpression constraints) {
+    private boolean checkOrderingConstraintAcyclicness(final Expression<String> constraints) {
         Map<Symbol<String>, Set<Symbol<String>>> ordering = new LinkedHashMap<Symbol<String>, Set<Symbol<String>>>();
         for (Expression<String> constraint : constraints.getChildren()) {
             Symbol<String> keyTask = constraint.getChildren().get(0).getTaskID();
@@ -1365,13 +1365,13 @@ public final class PDDLParser implements Callable<Integer> {
      * @param context The symbolEncoding.
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
-    private boolean checkParserNode(PDDLExpression exp, List<TypedSymbol<String>> context) {
+    private boolean checkParserNode(Expression<String> exp, List<TypedSymbol<String>> context) {
         boolean checked = true;
         LinkedList<Expression<String>> stackGD = new LinkedList<>();
         LinkedList<List<TypedSymbol<String>>> stackCtx = new LinkedList<>();
         stackGD.add(exp);
         stackCtx.add(context);
-        Set<PDDLExpression> atoms = new HashSet<>();
+        Set<Expression<String>> atoms = new HashSet<>();
         while (!stackGD.isEmpty()) {
             Expression<String> gd = stackGD.poll();
             List<TypedSymbol<String>> ctx = stackCtx.poll();
@@ -1756,7 +1756,7 @@ public final class PDDLParser implements Callable<Integer> {
             i++;
         }
         // Check preconditions
-        final PDDLExpression preconditions = action.getPreconditions();
+        final Expression<String> preconditions = action.getPreconditions();
         Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
@@ -1771,7 +1771,7 @@ public final class PDDLParser implements Callable<Integer> {
             check = false;
         }
         // Check effects
-        final PDDLExpression effects = action.getPreconditions();
+        final Expression<String> effects = action.getPreconditions();
         Expression.renameVariables(effects, context);
         check &= this.checkExpressionSemantic(effects);
         if (effects.getConnective().equals(PDDLConnective.TRUE)) {
@@ -1806,7 +1806,7 @@ public final class PDDLParser implements Callable<Integer> {
             i++;
         }
         // Check the method preconditions
-        final PDDLExpression preconditions = method.getPreconditions();
+        final Expression<String> preconditions = method.getPreconditions();
         Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {

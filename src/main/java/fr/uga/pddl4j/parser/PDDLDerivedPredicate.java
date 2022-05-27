@@ -39,7 +39,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
     /**
      * The body of the derived predicate.
      */
-    private PDDLExpression body;
+    private Expression<String> body;
 
     /**
      * Creates a new derived predicate.
@@ -55,7 +55,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      * @param head the head of the derived predicate.
      * @param body the body of the derived predicate.
      */
-    public PDDLDerivedPredicate(final NamedTypedList head, final PDDLExpression body) {
+    public PDDLDerivedPredicate(final NamedTypedList head, final Expression<String> body) {
         this();
         if (head == null || body == null) {
             throw new NullPointerException();
@@ -90,7 +90,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      *
      * @return the body of the derived predicate.
      */
-    public final PDDLExpression getBody() {
+    public final Expression<String> getBody() {
         return body;
     }
 
@@ -99,7 +99,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      *
      * @param body the body to set.
      */
-    public final void setBody(final PDDLExpression body) {
+    public final void setBody(final Expression<String> body) {
         if (body == null) {
             throw new NullPointerException();
         }
@@ -110,9 +110,9 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      * This method renames the variable of the derived predicated and simplifies its body before converting it into
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see PDDLExpression#renameVariables(Expression)
-     * @see PDDLExpression#simplify()
-     * @see PDDLExpression#toNNF()
+     * @see Expression<String>#renameVariables(Expression)
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF()
      */
     public void normalize() {
         // Rename the head of the derived predicate

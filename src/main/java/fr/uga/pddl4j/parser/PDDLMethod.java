@@ -36,7 +36,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
     /**
      * The task performed by the method.
      */
-    private PDDLExpression task;
+    private Expression<String> task;
 
     /**
      * The task network of the method.
@@ -50,7 +50,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      */
     public PDDLMethod(final PDDLMethod other) {
         super(other);
-        this.task = new PDDLExpression(other.getTask());
+        this.task = new Expression<String>(other.getTask());
         this.taskNetwork = new PDDLTaskNetwork(other.taskNetwork);
     }
 
@@ -67,9 +67,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
-                      final PDDLExpression duration, final PDDLExpression preconditions, final PDDLExpression tasks,
-                      final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                      final Expression<String> duration, final Expression<String> preconditions, final Expression<String> tasks,
+                      final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
         super(name, parameters, preconditions, duration);
         this.task = task;
         this.taskNetwork = new PDDLTaskNetwork(tasks, ordering, constraints, ordered);
@@ -87,9 +87,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
-                      final PDDLExpression preconditions, final PDDLExpression tasks,
-                      final PDDLExpression ordering, final PDDLExpression constraints, final boolean ordered) {
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                      final Expression<String> preconditions, final Expression<String> tasks,
+                      final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
         this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered);
     }
 
@@ -103,8 +103,8 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
-                      final PDDLExpression duration, final PDDLExpression preconditions,
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                      final Expression<String> duration, final Expression<String> preconditions,
                       final PDDLTaskNetwork network) {
         this(name, parameters, task, duration, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
@@ -119,8 +119,8 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression task,
-                      final PDDLExpression preconditions, final PDDLTaskNetwork network) {
+    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                      final Expression<String> preconditions, final PDDLTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
     }
@@ -130,7 +130,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @return the method tasks.
      */
-    public final PDDLExpression getTask() {
+    public final Expression<String> getTask() {
         return this.task;
     }
 
@@ -139,7 +139,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      *  @param task The task performed by the method.
      */
-    public final void setTask(final PDDLExpression task) {
+    public final void setTask(final Expression<String> task) {
         this.task = task;
     }
 
@@ -148,7 +148,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @return the tasks of the task network.
      */
-    public final PDDLExpression getSubTasks() {
+    public final Expression<String> getSubTasks() {
         return this.taskNetwork.getTasks();
     }
 
@@ -157,7 +157,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      *  @param tasks The tasks to set.
      */
-    public final void setSubTasks(final PDDLExpression tasks) {
+    public final void setSubTasks(final Expression<String> tasks) {
         this.taskNetwork.setTasks(tasks);
     }
 
@@ -166,7 +166,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @return the ordering constraints of the task network.
      */
-    public final PDDLExpression getOrdering() {
+    public final Expression<String> getOrdering() {
         return this.taskNetwork.getOrdering();
     }
 
@@ -175,7 +175,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setOrdering(final PDDLExpression constraints) {
+    public final void setOrdering(final Expression<String> constraints) {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 
@@ -184,7 +184,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      * @return the logical constraints of the task network.
      */
-    public final PDDLExpression getConstraints() {
+    public final Expression<String> getConstraints() {
         return this.taskNetwork.getConstraints();
     }
 
@@ -193,7 +193,7 @@ public class PDDLMethod extends PDDLAbstractOperator {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setLogicalConstraints(final PDDLExpression constraints) {
+    public final void setLogicalConstraints(final Expression<String> constraints) {
         this.taskNetwork.setConstraints(constraints);
     }
 
@@ -247,9 +247,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
         Expression.renameTaskIDs(this.getOrdering(), taskIDCtx);
         // In this case enumerate the orderings constraints in the cas of totally ordered
         if (this.isTotallyOrdered()) {
-            this.setOrdering(new PDDLExpression(PDDLConnective.AND));
+            this.setOrdering(new Expression<String>(PDDLConnective.AND));
             for (int j = 1; j < this.getSubTasks().getChildren().size(); j++) {
-                PDDLExpression c = new PDDLExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                Expression<String> c = new Expression<String>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 c.setArguments(new LinkedList<Symbol<String>>());
                 c.getArguments().add(this.getSubTasks().getChildren().get(j - 1).getTaskID());
                 c.getArguments().add(this.getSubTasks().getChildren().get(j).getTaskID());
@@ -258,11 +258,11 @@ public class PDDLMethod extends PDDLAbstractOperator {
         }
         // Rename the logical constraints
         Expression.renameVariables(this.getConstraints(), varCtx);
-        PDDLExpression preconditions = null;
+        Expression<String> preconditions = null;
         if (!this.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
             preconditions = this.getPreconditions();
         } else {
-            preconditions = new PDDLExpression(PDDLConnective.AND);
+            preconditions = new Expression<String>(PDDLConnective.AND);
             preconditions.addChild(this.getPreconditions());
         }
         Iterator<Expression<String>> i = this.getConstraints().getChildren().iterator();

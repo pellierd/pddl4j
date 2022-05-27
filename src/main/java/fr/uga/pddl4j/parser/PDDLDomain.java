@@ -141,14 +141,14 @@ public interface PDDLDomain extends Serializable {
      *
      * @return the constraints loaded in the domain file or null if the domain has no constraints.
      */
-    PDDLExpression getConstraints();
+    Expression<String> getConstraints();
 
     /**
      * Sets the constraints to the domain.
      *
      * @param constraints the constraint of the domain.
      */
-    void setConstraints(final PDDLExpression constraints);
+    void setConstraints(final Expression<String> constraints);
 
     /**
      * Returns the list of parsed ops.

@@ -108,7 +108,7 @@ public interface PDDLProblem extends Serializable {
      *
      * @return the list of initial facts defined in the problem file.
      */
-    List<PDDLExpression> getInit();
+    List<Expression<String>> getInit();
 
     /**
      * Adds an initial fact to the problem.
@@ -116,49 +116,49 @@ public interface PDDLProblem extends Serializable {
      * @param fact the fact to add.
      * @return <code>true</code> if the fact was added; <code>false</code> otherwise.
      */
-    boolean addInitialFact(final PDDLExpression fact);
+    boolean addInitialFact(final Expression<String> fact);
 
     /**
      * Returns the list of goal defined in the problem file.
      *
      * @return the list of goal defined in the problem file.
      */
-    PDDLExpression getGoal();
+    Expression<String> getGoal();
 
     /**
      * Set the goal of this problem.
      *
      * @param goal the goal of this problem.
      */
-    void setGoal(final PDDLExpression goal);
+    void setGoal(final Expression<String> goal);
 
     /**
      * Returns the metric of the problem or <code>null</code> if the problem has no metric specification.
      *
      * @return the metric of the problem or <code>null</code> if the problem has no metric specification.
      */
-    PDDLExpression getMetric();
+    Expression<String> getMetric();
 
     /**
      * Returns the constraints loaded in the domain file.
      *
      * @return the constraints loaded in the domain file or null if the domain has no constraints.
      */
-    PDDLExpression getConstraints();
+    Expression<String> getConstraints();
 
     /**
      * Sets the constraints to the domain.
      *
      * @param constraints the constraint of the domain.
      */
-    void setConstraints(final PDDLExpression constraints);
+    void setConstraints(final Expression<String> constraints);
 
     /**
      * Sets the metric of the problem.
      *
      * @param metric the metric to set.
      */
-    void setMetric(final PDDLExpression metric);
+    void setMetric(final Expression<String> metric);
 
     /**
      * Returns the object from a specified symbol.

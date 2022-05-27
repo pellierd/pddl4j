@@ -40,7 +40,7 @@ public class PDDLAction extends PDDLAbstractOperator {
     /**
      * The goal description that represents the effects of the operator.
      */
-    private PDDLExpression effects;
+    private Expression<String> effects;
 
     /**
      * Create a new operator from another.
@@ -49,7 +49,7 @@ public class PDDLAction extends PDDLAbstractOperator {
      */
     public PDDLAction(final PDDLAction other) {
         super(other);
-        this.effects = new PDDLExpression(other.getEffects());
+        this.effects = new Expression<String>(other.getEffects());
     }
 
     /**
@@ -60,8 +60,8 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
      */
-    public PDDLAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression preconds,
-                      final PDDLExpression effects) {
+    public PDDLAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconds,
+                      final Expression<String> effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -76,8 +76,8 @@ public class PDDLAction extends PDDLAbstractOperator {
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
-    public PDDLAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final PDDLExpression preconditions,
-                      final PDDLExpression effects, final PDDLExpression duration) {
+    public PDDLAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconditions,
+                      final Expression<String> effects, final Expression<String> duration) {
         super(name, parameters, preconditions, duration);
         this.effects = effects;
     }
@@ -88,7 +88,7 @@ public class PDDLAction extends PDDLAbstractOperator {
      *
      * @return The goal description that represents the effects of the operator.
      */
-    public final PDDLExpression getEffects() {
+    public final Expression<String> getEffects() {
         return this.effects;
     }
 
@@ -98,7 +98,7 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @param effects he new goal description that represents the effects of the operator to set.
      * @throws NullPointerException if the specified effects is null.
      */
-    public final void setEffects(final PDDLExpression effects) {
+    public final void setEffects(final Expression<String> effects) {
         this.effects = effects;
     }
 
@@ -109,9 +109,9 @@ public class PDDLAction extends PDDLAbstractOperator {
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see PDDLExpression#renameVariables(Expression
-     * @see PDDLExpression#simplify()
-     * @see PDDLExpression#toNNF() ()
+     * @see Expression<String>#renameVariables(Expression
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
      */
     protected Map<String, String> normalize(int index) {
         final Map<String, String> context = super.normalize(index);
