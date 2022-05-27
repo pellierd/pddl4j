@@ -974,10 +974,10 @@ public abstract class AbstractProblem implements Problem {
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                 final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new IntSymbol(i));
+                t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                 constraint.addChild(t1);
                 final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new IntSymbol(i + 1));
+                t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
             }
@@ -997,7 +997,7 @@ public abstract class AbstractProblem implements Problem {
                     constraints.removeColumn(subtaskIndex);
                     IntExpression st = subtasks.getChildren().get(subtaskIndex);
                     subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(new IntSymbol(i));
+                    st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     orderedSubtasks.addChild(st);
                 }
                 intMeth.setSubTasks(orderedSubtasks);
@@ -1005,10 +1005,10 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
                     final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new IntSymbol(i));
+                    t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     constraint.addChild(t1);
                     final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new IntSymbol(i + 1));
+                    t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }
@@ -1044,10 +1044,10 @@ public abstract class AbstractProblem implements Problem {
             for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                 final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                 final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new IntSymbol(i));
+                t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                 constraint.addChild(t1);
                 final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new IntSymbol(i + 1));
+                t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                 constraint.addChild(t2);
                 orderingConstraints.addChild(constraint);
             }
@@ -1067,7 +1067,7 @@ public abstract class AbstractProblem implements Problem {
                     constraints.removeColumn(subtaskIndex);
                     IntExpression st = subtasks.getChildren().get(subtaskIndex);
                     subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(new IntSymbol(i));
+                    st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     orderedSubtasks.addChild(st);
                 }
                 this.intInitialTaskNetwork.setTasks(orderedSubtasks);
@@ -1075,10 +1075,10 @@ public abstract class AbstractProblem implements Problem {
                 for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
                     final IntExpression constraint = new IntExpression(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     final IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                    t1.setTaskID(new IntSymbol(i));
+                    t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     constraint.addChild(t1);
                     final IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                    t2.setTaskID(new IntSymbol(i + 1));
+                    t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }
@@ -1109,10 +1109,12 @@ public abstract class AbstractProblem implements Problem {
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
             case EQUAL_ORDERING_CONSTRAINT:
                 IntExpression t1 = new IntExpression(PDDLConnective.TASK);
-                t1.setTaskID(new IntSymbol(exp.getChildren().get(0).getTaskID().getValue().substring(1)));
+                t1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
                 intExp.addChild(t1);
                 IntExpression t2 = new IntExpression(PDDLConnective.TASK);
-                t2.setTaskID(new IntSymbol(exp.getChildren().get(1).getTaskID().getValue().substring(1)));
+                t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
                 intExp.addChild(t2);
                 break;
             default:
@@ -1149,7 +1151,7 @@ public abstract class AbstractProblem implements Problem {
         final IntExpression intExp = new IntExpression(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
-                intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
+                //intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
                 List<IntSymbol> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
@@ -1163,7 +1165,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FN_HEAD:
                 final String functor = exp.getSymbol().getValue();
-                intExp.setSymbol(new IntSymbol(this.getFunctions().indexOf(functor)));
+                intExp.setSymbol(new Symbol<Integer>(SymbolType.FUNCTOR, this.getFunctions().indexOf(functor)));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
@@ -1177,7 +1179,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case ATOM:
                 final String predicate = exp.getSymbol().getValue();
-                intExp.setSymbol(new IntSymbol(this.getPredicateSymbols().indexOf(predicate)));
+                intExp.setSymbol(new Symbol<>(SymbolType.PREDICATE, this.getPredicateSymbols().indexOf(predicate)));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
@@ -1264,7 +1266,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK: // ADD TO DEAL WITH HTN
                 final String task = exp.getSymbol().getValue();
-                intExp.setSymbol(new IntSymbol(this.getTaskSymbols().indexOf(task)));
+                intExp.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().indexOf(task)));
                 intExp.setPrimtive(this.getPrimitiveTaskSymbols().contains(task));
                 args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
@@ -1276,7 +1278,8 @@ public abstract class AbstractProblem implements Problem {
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
-                    intExp.setTaskID(new IntSymbol(exp.getTaskID().getValue().substring(1)));
+                    intExp.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                        Integer.valueOf(exp.getTaskID().getValue().substring(1))));
                 }
                 intExp.setArguments(args);
                 break;

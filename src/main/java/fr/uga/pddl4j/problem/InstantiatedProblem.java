@@ -17,6 +17,8 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntExpression;
@@ -24,6 +26,7 @@ import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -386,7 +389,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
         if (taskNetworks.size() > 1) {
             IntExpression root = new IntExpression(PDDLConnective.TASK);
-            root.setSymbol(new IntSymbol(this.getTaskSymbols().size()));
+            root.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().size()));
             this.getTaskSymbols().add("__top");
             this.getCompoundTaskSymbols().add("__top");
             root.setPrimtive(false);
@@ -590,7 +593,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         for (IntAction a : actions) {
             IntExpression task = new IntExpression(PDDLConnective.TASK);
             task.setPrimtive(true);
-            task.setSymbol(new IntSymbol(this.getTaskSymbols().indexOf(a.getName())));
+            task.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().indexOf(a.getName())));
             List<IntSymbol> arguments = new ArrayList<>(a.getInstantiations().length);
             for (Integer arg : a.getInstantiations()) {
                 arguments.add(new IntSymbol(arg));

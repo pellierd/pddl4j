@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
@@ -794,7 +795,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 this.getPredicateSymbols().add(Constants.DUMMY_GOAL);
                 this.getPredicateSignatures().add(new ArrayList<>());
                 IntExpression dummyGoal = new IntExpression(PDDLConnective.ATOM);
-                dummyGoal.setSymbol(new IntSymbol(dummyPredicateIndex));
+                dummyGoal.setSymbol(new Symbol<>(SymbolType.PREDICATE, dummyPredicateIndex));
                 dummyGoal.setArguments(new ArrayList<>(0));
                 final int dummyGoalIndex = this.getIntExpFluents().size();
                 this.getIntExpFluents().add(dummyGoal);

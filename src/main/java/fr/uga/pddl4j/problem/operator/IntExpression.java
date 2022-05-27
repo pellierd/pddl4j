@@ -21,6 +21,7 @@ package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.MalformedExpressionException;
 import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 
 import java.io.Serializable;
@@ -50,12 +51,12 @@ public class IntExpression implements Serializable {
     /**
      * The integer representation of the symbol of the atomic formula represented by this expression.
      */
-    private IntSymbol symbol;
+    private Symbol<Integer> symbol;
 
     /**
      * The integer representation of the task ID.
      */
-    private IntSymbol taskID;
+    private Symbol<Integer> taskID;
 
     /**
      * The list of arguments of the expression. This attribute is used to store the argument of the
@@ -89,15 +90,19 @@ public class IntExpression implements Serializable {
     private boolean isPrimtive;
 
     /**
-     * Creates a new expression from an other one. This constructor make a deep copy of the specified
+     * Creates a new expression from another one. This constructor make a deep copy of the specified
      * expression.
      *
      * @param other the expression.
      */
     public IntExpression(final IntExpression other) {
         this.connective = other.getConnective();
-        this.symbol = new IntSymbol(other.getSymbol());
-        this.taskID = new IntSymbol(other.getTaskID());
+        if (other.getSymbol() != null) {
+            this.symbol = new Symbol<>(other.getSymbol());
+        }
+        if (other.getTaskID() != null) {
+            this.taskID = new Symbol<Integer>(other.getTaskID());
+        }
         this.arguments = new ArrayList<>();
         if (other.getArguments() != null) {
             for (IntSymbol arg : other.getArguments()) {
@@ -125,8 +130,8 @@ public class IntExpression implements Serializable {
      */
     public IntExpression(final PDDLConnective connective) {
         this.connective = connective;
-        this.symbol = IntSymbol.DEFAULT_SYMBOL;
-        this.taskID = IntSymbol.DEFAULT_TASK_ID;
+        this.symbol = null;
+        this.taskID = null;
         this.arguments = new ArrayList<>(0);
         this.children = new ArrayList<>();
         this.quantifiedVariables = new ArrayList<>();
@@ -177,7 +182,7 @@ public class IntExpression implements Serializable {
      *
      * @return the symbol of the atomic formula represented by this expression.
      */
-    public final IntSymbol getSymbol() {
+    public final Symbol<Integer> getSymbol() {
         return this.symbol;
     }
     /**
@@ -185,7 +190,7 @@ public class IntExpression implements Serializable {
      *
      * @param symbol the new symbol to set
      */
-    public final void setSymbol(IntSymbol symbol) {
+    public final void setSymbol(Symbol<Integer> symbol) {
         this.symbol = symbol;
     }
 
@@ -194,7 +199,7 @@ public class IntExpression implements Serializable {
      *
      * @return the taskID.
      */
-    public final IntSymbol getTaskID() {
+    public final Symbol<Integer> getTaskID() {
         return this.taskID;
     }
 
@@ -203,7 +208,7 @@ public class IntExpression implements Serializable {
      *
      * @param taskID the new predicate to set.
      */
-    public final void setTaskID(final IntSymbol taskID) {
+    public final void setTaskID(final Symbol<Integer> taskID) {
         this.taskID = taskID;
     }
 
