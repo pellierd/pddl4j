@@ -804,12 +804,12 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case FORALL:
                 Set<Symbol<Integer>> constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 Expression<Integer> qExp = exp.getChildren().get(0);
-                int var = exp.getQuantifiedVariables().get(0).getValue();
+                Symbol<Integer> var = exp.getQuantifiedVariables().get(0);
                 exp.setConnective(PDDLConnective.AND);
                 exp.getChildren().clear();
                 Iterator<Symbol<Integer>> it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    int cons = it.next().getValue();
+                    Symbol<Integer> cons = it.next();
                     Expression<Integer> copy = new Expression<>(qExp);
                     this.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
@@ -823,12 +823,12 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EXISTS:
                 constants = this.getDomains().get(exp.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 qExp = exp.getChildren().get(0);
-                var = exp.getQuantifiedVariables().get(0).getValue();
+                var = exp.getQuantifiedVariables().get(0);
                 exp.setConnective(PDDLConnective.OR);
                 exp.getChildren().clear();
                 it = constants.iterator();
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    int cons = it.next().getValue();
+                    Symbol<Integer> cons = it.next();
                     Expression<Integer> copy = new Expression<>(qExp);
                     this.substitute(copy, var, cons, simplify);
                     exp.getChildren().add(copy);
@@ -965,14 +965,14 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param cons the constant.
      * @param simplify a flag to indicate if the expression must be simplified during the subtitution process.
      */
-    protected void substitute(final Expression<Integer> exp, final int var, final int cons, boolean simplify) {
+    protected void substitute(final Expression<Integer> exp, final Symbol<Integer> var, final  Symbol<Integer> cons, boolean simplify) {
         boolean updated = false;
         switch (exp.getConnective()) {
             case ATOM:
                 List<Symbol<Integer>> arguments = exp.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
-                    if (arguments.get(i).getValue() == var) {
-                        arguments.set(i, new Symbol<>(SymbolType.CONSTANT, cons));
+                    if (arguments.get(i).equals(var)) {
+                        arguments.set(i, cons);
                         updated = true;
                     }
                 }
@@ -983,16 +983,16 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case TASK:
                 arguments = exp.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
-                    if (arguments.get(i).getValue() == var) {
-                        arguments.set(i, new Symbol<>(SymbolType.CONSTANT, cons));
+                    if (arguments.get(i).equals(var)) {
+                        arguments.set(i, cons);
                     }
                 }
                 break;
             case FN_HEAD:
                 arguments = exp.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
-                    if (arguments.get(i).getValue() == var) {
-                        arguments.set(i, new Symbol<>(SymbolType.CONSTANT, cons));
+                    if (arguments.get(i).equals(var)) {
+                        arguments.set(i, cons);
                         updated = true;
                     }
                 }
@@ -1003,19 +1003,21 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case EQUAL_ATOM:
                 arguments = exp.getArguments();
                 // Get and substitute the first argument
-                final int arg1 = arguments.get(0).getValue();
-                if (arg1 == var) {
-                    arguments.set(0, new Symbol<>(SymbolType.CONSTANT, cons));
+                final Symbol<Integer> arg1 = arguments.get(0);
+                if (arg1.equals(var)) {
+                    arguments.set(0, cons);
                 }
                 // Get and substitute the second argument
-                final int arg2 = arguments.get(1).getValue();
-                if (arg2 == var) {
-                    arguments.set(1, new Symbol<>(SymbolType.CONSTANT, cons));
+                final Symbol<Integer> arg2 = arguments.get(1);
+                if (arg2.equals(var)) {
+                    arguments.set(1, cons);
                 }
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
-                if (arg1 == arg2) {
+                if (arg1.equals(arg2)) {
                     exp.setConnective(PDDLConnective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0) {
+                } else if (arg1.getType().equals(SymbolType.CONSTANT)
+                        && arg2.getType().equals(SymbolType.CONSTANT)
+                        && arg1.getValue().equals(arg2.getValue())) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
                     exp.setConnective(PDDLConnective.FALSE);
                 }

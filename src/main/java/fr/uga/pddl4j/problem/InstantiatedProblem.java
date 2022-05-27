@@ -194,13 +194,13 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             }
         } else {
             final Set<Symbol<Integer>> values = this.getDomains().get(action.getTypeOfParameters(index));
-            for (Symbol<Integer> value : values) {
-                final int varIndex = -index - 1;
+            for (Symbol<Integer> constant : values) {
+                final Symbol<Integer> varIndex = new Symbol<>(SymbolType.VARIABLE, -index - 1);
                 final Expression<Integer> precond = new Expression<>(action.getPreconditions());
-                this.substitute(precond, varIndex, value.getValue(), true);
+                this.substitute(precond, varIndex, constant, true);
                 if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                     final Expression<Integer> effects = new Expression<>(action.getEffects());
-                    this.substitute(effects, varIndex, value.getValue(), true);
+                    this.substitute(effects, varIndex, constant, true);
                     if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
@@ -213,10 +213,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                         }
                         if (action.isDurative()) {
                             final Expression<Integer> duration = new Expression<>(action.getDuration());
-                            this.substitute(duration, varIndex, value.getValue(), true);
+                            this.substitute(duration, varIndex, constant, true);
                             copy.setDuration(duration);
                         }
-                        copy.setValueOfParameter(index, value.getValue());
+                        copy.setValueOfParameter(index, constant.getValue());
                         this.instantiate(copy, index + 1, bound, actions);
                     }
                 }
@@ -244,9 +244,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final int type = copy.getTypeOfParameters((-var.getValue() - 1));
             final Set<Symbol<Integer>> domain = this.getDomains().get(type);
             if (domain.contains(cons)) {
-                this.substitute(copy.getPreconditions(), var.getValue(), cons.getValue(), true);
-                this.substitute(copy.getTask(), var.getValue(), cons.getValue(), true);
-                this.substitute(copy.getSubTasks(), var.getValue(), cons.getValue(), true);
+                this.substitute(copy.getPreconditions(), var, cons, true);
+                this.substitute(copy.getTask(), var, cons, true);
+                this.substitute(copy.getSubTasks(), var, cons, true);
                 copy.setValueOfParameter((-var.getValue() - 1), cons.getValue());
             } else {
                 instantiable = false;
@@ -291,22 +291,22 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             this.instantiate(method, index + 1, bound, methods);
         } else {
             final Set<Symbol<Integer>> values = this.getDomains().get(method.getTypeOfParameters(index));
-            for (Symbol<Integer> value : values) {
-                final int varIndex = -index - 1;
+            for (Symbol<Integer> constant : values) {
+                final Symbol<Integer> varIndex = new Symbol<>(SymbolType.VARIABLE, -index - 1);
                 final Expression<Integer> preconditionCopy = new Expression<>(method.getPreconditions());
 
-                this.substitute(preconditionCopy, varIndex, value.getValue(), true);
+                this.substitute(preconditionCopy, varIndex, constant, true);
                 if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
                     copy.setOrderingConstraints(new Expression<>(method.getOrderingConstraints()));
 
                     final Expression<Integer> taskCopy = new Expression<>(method.getTask());
-                    this.substitute(taskCopy, varIndex, value.getValue(), true);
+                    this.substitute(taskCopy, varIndex, constant, true);
                     copy.setTask(taskCopy);
 
                     final Expression<Integer> subTasksCopy = new Expression<>(method.getSubTasks());
-                    this.substitute(subTasksCopy, varIndex, value.getValue(), true);
+                    this.substitute(subTasksCopy, varIndex, constant, true);
                     copy.setSubTasks(subTasksCopy);
 
                     for (int i = 0; i < arity; i++) {
@@ -316,7 +316,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                         copy.setValueOfParameter(i, method.getValueOfParameter(i));
                     }
 
-                    copy.setValueOfParameter(index, value.getValue());
+                    copy.setValueOfParameter(index, constant.getValue());
                     this.instantiate(copy, index + 1, bound, methods);
                 }
             }
@@ -338,13 +338,13 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             networks.add(network);
         } else {
             final Set<Symbol<Integer>> values = this.getDomains().get(network.getTypeOfParameters(index));
-            for (Symbol<Integer> value : values) {
-                final int varIndex = -index - 1;
+            for (Symbol<Integer> constant : values) {
+                final Symbol<Integer> varIndex = new Symbol<Integer>(SymbolType.VARIABLE, -index - 1);
                 final IntTaskNetwork copy = new IntTaskNetwork(arity);
                 copy.setOrderingConstraints(new Expression<>(network.getOrderingConstraints()));
 
                 final Expression tasksCopy = new Expression<>(network.getTasks());
-                this.substitute(tasksCopy, varIndex, value.getValue(), true);
+                this.substitute(tasksCopy, varIndex, constant, true);
                 copy.setTasks(tasksCopy);
 
                 for (int i = 0; i < arity; i++) {
@@ -354,7 +354,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                     copy.setValueOfParameter(i, network.getValueOfParameter(i));
                 }
 
-                copy.setValueOfParameter(index, value.getValue());
+                copy.setValueOfParameter(index, constant.getValue());
                 this.instantiate(copy, index + 1, networks);
             }
         }
