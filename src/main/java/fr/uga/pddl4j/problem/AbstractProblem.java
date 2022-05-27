@@ -32,7 +32,6 @@ import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 
@@ -1149,7 +1148,6 @@ public abstract class AbstractProblem implements Problem {
         final Expression<Integer> intExp = new Expression<>(exp.getConnective());
         switch (exp.getConnective()) {
             case EQUAL_ATOM:
-                //intExp.setSymbol(IntSymbol.EQUAL_SYMBOL);
                 List<Symbol<Integer>> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
                     final Symbol<String> argument = exp.getArguments().get(i);
@@ -1484,11 +1482,9 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK:
                 str.append("(");
-                if (exp.getTaskID().equals(IntSymbol.DEFAULT_TASK_ID)) {
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                    str.append(exp.getTaskID());
-                    str.append(" (");
-                }
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                str.append(exp.getTaskID());
+                str.append(" (");
                 str.append(this.getTaskSymbols().get(exp.getSymbol().getValue()));
                 arguments = exp.getArguments();
                 for (Symbol<Integer> arg : arguments) {
@@ -1498,10 +1494,7 @@ public abstract class AbstractProblem implements Problem {
                         str.append(" ").append(this.getConstantSymbols().get(arg.getValue()));
                     }
                 }
-                if (exp.getTaskID().equals(IntSymbol.DEFAULT_TASK_ID)) {
-                    str.append(")");
-                }
-                str.append(")");
+                str.append("))");
                 break;
             case EQUAL_ATOM:
                 str.append("(").append("=");

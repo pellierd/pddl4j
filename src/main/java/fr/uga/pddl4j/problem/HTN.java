@@ -29,7 +29,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.problem.operator.IntSymbol;
+import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
@@ -55,7 +55,7 @@ public interface HTN extends Problem {
      *
      * @return the signatures of the task defined in the problem.
      */
-    List<List<IntSymbol>> getTaskSignatures();
+    List<List<Symbol<Integer>>> getTaskSignatures();
 
     /**
      * Returns the relevant operators or resolver for a task.

@@ -22,7 +22,6 @@ import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.util.IntMatrix;
 
 import java.util.ArrayList;

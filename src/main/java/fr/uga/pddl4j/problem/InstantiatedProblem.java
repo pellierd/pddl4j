@@ -23,7 +23,6 @@ import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
-import fr.uga.pddl4j.problem.operator.IntSymbol;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 
 import java.util.ArrayList;
