@@ -24,6 +24,7 @@ import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.util.IntMatrix;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -492,7 +493,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case HOLD_DURING_CONSTRAINT:
                 this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
                 this.replace(exp.getChildren().get(1), inertia, connective, ti, ts);
-                this.replace(exp.getChildren().get(3), inertia, connective, ti, ts);
+                this.replace(exp.getChildren().get(2), inertia, connective, ti, ts);
                 break;
             case EQUAL_ATOM:
             case FN_HEAD:
@@ -811,7 +812,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
                     Symbol<Integer> cons = it.next();
                     Expression<Integer> copy = new Expression<>(qExp);
-                    this.substitute(copy, var, cons, simplify);
+                    this.substitute(copy, var, cons);
                     exp.getChildren().add(copy);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (simplify && copy.getConnective().equals(PDDLConnective.FALSE)) {
@@ -830,7 +831,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 while (it.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
                     Symbol<Integer> cons = it.next();
                     Expression<Integer> copy = new Expression<>(qExp);
-                    this.substitute(copy, var, cons, simplify);
+                    this.substitute(copy, var, cons);
                     exp.getChildren().add(copy);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
                     if (simplify && copy.getConnective().equals(PDDLConnective.TRUE)) {
@@ -861,7 +862,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             case HOLD_DURING_CONSTRAINT:
                 this.expandQuantifiedExpression(exp.getChildren().get(0), simplify);
                 this.expandQuantifiedExpression(exp.getChildren().get(1), simplify);
-                this.expandQuantifiedExpression(exp.getChildren().get(3), simplify);
+                this.expandQuantifiedExpression(exp.getChildren().get(2), simplify);
                 break;
             case ATOM:
                 this.simplyAtom(exp);
@@ -911,8 +912,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * </ul>
      *
      * @param exp the atomic expression to simplify.
+     * @return if the atomic expression was simply or not.
      */
-    private void simplyAtom(final Expression<Integer> exp) {
+    private boolean simplyAtom(final Expression<Integer> exp) {
         final int predicate = exp.getSymbol().getValue();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
@@ -949,13 +951,18 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         final Inertia inertia = this.getInertia().get(predicate);
         if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
             exp.setConnective(PDDLConnective.FALSE);
+            return true;
         } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
             // CASE 2: If the expression is a negative inertia and then the number of all possible
             // type-consistent ground instances of the specified expression then the expression is
             // simplified to TRUE.
             exp.setConnective(PDDLConnective.TRUE);
+            return true;
+        } else {
+            return false;
         }
     }
+
 
     /**
      * Substitutes all occurrence of a specified variable into an expression by a constant.
@@ -963,419 +970,21 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp  the expression.
      * @param var  the variable.
      * @param cons the constant.
-     * @param simplify a flag to indicate if the expression must be simplified during the subtitution process.
      */
-    protected void substitute(final Expression<Integer> exp, final Symbol<Integer> var, final  Symbol<Integer> cons, boolean simplify) {
-        boolean updated = false;
-        switch (exp.getConnective()) {
-            case ATOM:
-                List<Symbol<Integer>> arguments = exp.getArguments();
-                for (int i = 0; i < arguments.size(); i++) {
-                    if (arguments.get(i).equals(var)) {
-                        arguments.set(i, cons);
-                        updated = true;
-                    }
+    protected void substitute(final Expression<Integer> exp, final Symbol<Integer> var, final  Symbol<Integer> cons) {
+        final Iterator<Expression<Integer>> it = exp.iterator();
+        boolean simplified = false;
+        while (it.hasNext()) {
+            Expression<Integer> e = it.next();
+            if (e.isLeaf()) {
+                e.substitute(var, cons);
+                if (e.getConnective().equals(PDDLConnective.ATOM)) {
+                    simplified |= this.simplyAtom(e);
                 }
-                if (updated) {
-                    this.simplyAtom(exp);
-                }
-                break;
-            case TASK:
-                arguments = exp.getArguments();
-                for (int i = 0; i < arguments.size(); i++) {
-                    if (arguments.get(i).equals(var)) {
-                        arguments.set(i, cons);
-                    }
-                }
-                break;
-            case FN_HEAD:
-                arguments = exp.getArguments();
-                for (int i = 0; i < arguments.size(); i++) {
-                    if (arguments.get(i).equals(var)) {
-                        arguments.set(i, cons);
-                        updated = true;
-                    }
-                }
-                //if (updated) {
-                //    Instantiation.simplyFunction(exp);
-                //}
-                break;
-            case EQUAL_ATOM:
-                arguments = exp.getArguments();
-                // Get and substitute the first argument
-                final Symbol<Integer> arg1 = arguments.get(0);
-                if (arg1.equals(var)) {
-                    arguments.set(0, cons);
-                }
-                // Get and substitute the second argument
-                final Symbol<Integer> arg2 = arguments.get(1);
-                if (arg2.equals(var)) {
-                    arguments.set(1, cons);
-                }
-                // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
-                if (arg1.equals(arg2)) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (arg1.getType().equals(SymbolType.CONSTANT)
-                        && arg2.getType().equals(SymbolType.CONSTANT)
-                        && arg1.getValue().equals(arg2.getValue())) {
-                    // The equality is ground and the equality is FALSE because arg1 != arg2
-                    exp.setConnective(PDDLConnective.FALSE);
-                }
-                break;
-            case AND:
-                Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final Expression<Integer> ei = i.next();
-                    this.substitute(ei, var, cons, simplify);
-                    // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (simplify && ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    }
-                }
-                break;
-            case OR:
-                i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final Expression<Integer> ei = i.next();
-                    this.substitute(ei, var, cons, simplify);
-                    // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (simplify && ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    }
-                }
-                break;
-            case NOT:
-                final Expression<Integer> neg = exp.getChildren().get(0);
-                this.substitute(neg, var, cons, simplify);
-                if (simplify && neg.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else if (simplify && neg.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                }
-                break;
-            case WHEN:
-            case LESS_COMPARISON:
-            case LESS_OR_EQUAL_COMPARISON:
-            case EQUAL_COMPARISON:
-            case GREATER_COMPARISON:
-            case GREATER_OR_EQUAL_COMPARISON:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case MULTIPLICATION:
-            case DIVISION:
-            case MINUS:
-            case PLUS:
-            case SOMETIME_AFTER_CONSTRAINT:
-            case SOMETIME_BEFORE_CONSTRAINT:
-            case WITHIN_CONSTRAINT:
-            case HOLD_AFTER_CONSTRAINT:
-                this.substitute(exp.getChildren().get(0), var, cons, simplify);
-                this.substitute(exp.getChildren().get(1), var, cons, simplify);
-                break;
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-            case UMINUS:
-            case ALWAYS_CONSTRAINT:
-            case OVER_ALL:
-            case SOMETIME_CONSTRAINT:
-            case AT_MOST_ONCE_CONSTRAINT:
-            case F_EXP:
-                this.substitute(exp.getChildren().get(0), var, cons, simplify);
-                break;
-            case F_EXP_T:
-                if (!exp.getChildren().isEmpty()) {
-                    this.substitute(exp.getChildren().get(0), var, cons, simplify);
-                }
-                break;
-            case ALWAYS_WITHIN_CONSTRAINT:
-            case HOLD_DURING_CONSTRAINT:
-                this.substitute(exp.getChildren().get(0), var, cons, simplify);
-                this.substitute(exp.getChildren().get(1), var, cons, simplify);
-                this.substitute(exp.getChildren().get(3), var, cons, simplify);
-                break;
-            case FN_ATOM:
-            case NUMBER:
-            case TIMED_LITERAL:
-            case TIME_VAR:
-            case IS_VIOLATED:
-            case MINIMIZE:
-            case MAXIMIZE:
-                break;
-            default:
-                // do nothing
+            }
         }
-    }
-
-    /**
-     * This method simplify a specified expression. The rules of simplification are as below:
-     * <ul>
-     * <li> not true eqv false </li>
-     * <li> true ^ phi eqv phi </li>
-     * <li> false ^ phi eqv false </li>
-     * <li> true v phi eqv true </li>
-     * <li> false v phi eqv false </li>
-     * <li> not false eqv true </li>
-     * <li> phi ^ phi eqv phi </li>
-     * <li> phi v phi eqv phi </li>
-     * <li> phi ^ not phi eqv false </li>
-     * <li> phi v not phi eqv true </li>
-     * <li> x = x eqv true </li>
-     * <li> x = y eqv false </li>
-     * </ul>
-     *
-     * @param exp the expression to simplify.
-     */
-    protected void simplify(final Expression<Integer> exp) {
-        switch (exp.getConnective()) {
-            case ATOM:
-                break;
-            case FN_HEAD:
-                break;
-            case EQUAL_ATOM:
-                List<Symbol<Integer>> args = exp.getArguments();
-                // Get and substitute the first argument
-                final int arg1 = args.get(0).getValue();
-                // Get and substitute the second argument
-                final int arg2 = args.get(1).getValue();
-                if (arg1 == arg2) {
-                    // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (arg1 >= 0 && arg2 >= 0) {
-                    // The equality is ground and the equality is FALSE because arg1 != arg2
-                    exp.setConnective(PDDLConnective.FALSE);
-                }
-                break;
-            case AND:
-                int i = 0;
-                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
-                    final Expression<Integer> ei = exp.getChildren().get(i);
-                    this.simplify(ei);
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                        exp.setConnective(PDDLConnective.FALSE);
-                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        // If a child expression is TRUE, we can remove the child expression.
-                        exp.getChildren().remove(i);
-                    } else if (ei.getConnective().equals(PDDLConnective.AND)) {
-                        // If the child expression to add is a conjunction, we can simplify the expression by
-                        exp.getChildren().remove(i); // removing the inner conjunction.
-                        int j = 0;
-                        int added = 0;
-                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.AND)) {
-                            final Expression<Integer> ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                exp.setConnective(PDDLConnective.FALSE);
-                            } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                exp.getChildren().add(i + added, ej);
-                                added++;
-                            }
-                            j++;
-                        }
-                        i += added + 1;
-                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
-                        // Simplification of the conditional expression.
-                        final Expression<Integer> antecedent = ei.getChildren().get(0);
-                        final Expression<Integer> consequent = ei.getChildren().get(1);
-                        // If the antecedent of a conditional effect becomes FALSE , the conditional
-                        // effect is removed from the action. In this case, the effect is never applicable
-                        // because it requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the antecedent of a conditional effect becomes TRUE, the conditional
-                            // effect becomes unconditional.
-                            if (consequent.getConnective().equals(PDDLConnective.AND)) {
-                                exp.getChildren().remove(i);
-                                int j = 0;
-                                int added = 0;
-                                while (j < consequent.getChildren().size()
-                                    && exp.getConnective().equals(PDDLConnective.AND)) {
-
-                                    final Expression<Integer> ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                        exp.setConnective(PDDLConnective.FALSE);
-                                    } else if (!ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                        exp.getChildren().add(i + added, ej);
-                                        added++;
-                                    }
-                                    j++;
-                                }
-                                i += added + 1;
-                            } else {
-                                exp.getChildren().set(i, consequent);
-                                i++;
-                            }
-                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the consequent of a conditional effect becomes TRUE, the conditional
-                            // effect is removed because it does not lead to any state transition.
-                            exp.getChildren().remove(i);
-                        } else {
-                            i++;
-                        }
-                    } else {
-                        i++;
-                    }
-                }
-                // Finally, if the conjunction is empty, the expression becomes TRUE.
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (exp.getChildren().size() == 1) {
-                    exp.assign(exp.getChildren().get(0));
-                }
-                break;
-            case OR:
-                i = 0;
-                while (i < exp.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
-                    final Expression<Integer> ei = exp.getChildren().get(i);
-                    this.simplify(ei);
-                    // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    } else if (ei.getConnective().equals(PDDLConnective.OR)) {
-                        // If the child expression to add is a disjunction, we can simplify the expression by
-                        // removing the inner disjunction.
-                        exp.getChildren().remove(i);
-                        int j = 0;
-                        int added = 0;
-                        while (j < ei.getChildren().size() && exp.getConnective().equals(PDDLConnective.OR)) {
-                            final Expression<Integer> ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                exp.setConnective(PDDLConnective.TRUE);
-                            } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                exp.getChildren().add(i + added, ej);
-                                added++;
-                            }
-                            j++;
-                        }
-                        i += added + 1;
-                    } else if (ei.getConnective().equals(PDDLConnective.WHEN)) {
-                        // Simplification of the conditional expression.
-                        final Expression<Integer> antecedent = ei.getChildren().get(0);
-                        final Expression<Integer> consequent = ei.getChildren().get(1);
-                        // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
-                        // removed from the action. In this case, the effect is never applicable because it
-                        // requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the antecedent of a conditional effect becomes TRUE, the conditional effect
-                            // becomes unconditional.
-                            if (consequent.getConnective().equals(PDDLConnective.OR)) {
-                                exp.getChildren().remove(i);
-                                int j = 0;
-                                int added = 0;
-                                while (j < consequent.getChildren().size()
-                                    && exp.getConnective().equals(PDDLConnective.OR)) {
-
-                                    final Expression<Integer> ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(PDDLConnective.TRUE)) {
-                                        exp.setConnective(PDDLConnective.TRUE);
-                                    } else if (!ej.getConnective().equals(PDDLConnective.FALSE)) {
-                                        exp.getChildren().add(i + added, ej);
-                                        added++;
-                                    }
-                                    j++;
-                                }
-                                i += added + 1;
-                            } else {
-                                exp.getChildren().set(i, consequent);
-                                i++;
-                            }
-                        } else if (consequent.getConnective().equals(PDDLConnective.TRUE)) {
-                            // If the consequent of a conditional effect becomes TRUE, the conditional
-                            // effect is removed because it does not lead to any state transition.
-                            exp.getChildren().remove(i);
-                        } else {
-                            i++;
-                        }
-                    } else {
-                        i++;
-                    }
-                }
-                // Finally, if the disjunction is empty, the expression becomes TRUE.
-                if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                } else if (exp.getChildren().size() == 1) {
-                    exp.assign(exp.getChildren().get(0));
-                } else {
-                    final Iterator<Expression<Integer>> it = exp.getChildren().iterator();
-                    while (it.hasNext()) {
-                        if (it.next().getConnective().equals(PDDLConnective.FALSE)) {
-                            it.remove();
-                        }
-                    }
-                    if (exp.getChildren().isEmpty()) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    }
-                }
-                break;
-            case FORALL:
-            case EXISTS:
-            case AT_START:
-            case AT_END:
-            case UMINUS:
-            case ALWAYS_CONSTRAINT:
-            case OVER_ALL:
-            case SOMETIME_CONSTRAINT:
-            case AT_MOST_ONCE_CONSTRAINT:
-                this.simplify(exp.getChildren().get(0));
-                break;
-            case NOT:
-                final Expression<Integer> neg = exp.getChildren().get(0);
-                this.simplify(neg);
-                if (neg.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
-                }
-                break;
-            case WHEN:
-            case LESS_COMPARISON:
-            case LESS_OR_EQUAL_COMPARISON:
-            case EQUAL_COMPARISON:
-            case GREATER_COMPARISON:
-            case GREATER_OR_EQUAL_COMPARISON:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case MULTIPLICATION:
-            case DIVISION:
-            case MINUS:
-            case PLUS:
-            case SOMETIME_AFTER_CONSTRAINT:
-            case SOMETIME_BEFORE_CONSTRAINT:
-            case WITHIN_CONSTRAINT:
-            case HOLD_AFTER_CONSTRAINT:
-                this.simplify(exp.getChildren().get(0));
-                this.simplify(exp.getChildren().get(1));
-                break;
-            case F_EXP_T:
-            case F_EXP:
-                this.simplify(exp.getChildren().get(0));
-                break;
-            case ALWAYS_WITHIN_CONSTRAINT:
-            case HOLD_DURING_CONSTRAINT:
-                this.simplify(exp.getChildren().get(0));
-                this.simplify(exp.getChildren().get(1));
-                this.simplify(exp.getChildren().get(3));
-                break;
-            case FN_ATOM:
-            case NUMBER:
-            case TIMED_LITERAL:
-            case TIME_VAR:
-            case IS_VIOLATED:
-            case MINIMIZE:
-            case MAXIMIZE:
-                break;
-            default:
-                // do nothing
+        if (simplified) {
+            exp.simplify();
         }
     }
 

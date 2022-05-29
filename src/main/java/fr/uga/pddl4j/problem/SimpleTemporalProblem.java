@@ -66,7 +66,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             this.extract(startPrecondition, PDDLConnective.AT_START);
             //System.out.println("*** At start precondition ***");
             //System.out.println(Encoder.toString(startPrecondition));
-            this.simplify(startPrecondition);
+            startPrecondition.simplify();
             //System.out.println("*** At start precondition ***");
             //System.out.println(Encoder.toString(startPrecondition));
             this.toDNF(startPrecondition);
@@ -76,7 +76,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
 
             final Expression<Integer> endPrecondition = new Expression<>(a.getPreconditions());
             this.extract(endPrecondition, PDDLConnective.AT_END);
-            this.simplify(endPrecondition);
+            endPrecondition.simplify();
             this.toDNF(endPrecondition);
 
             //System.out.println("*** At end precondition ***");
@@ -86,7 +86,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             this.extract(overAllPrecondition, PDDLConnective.OVER_ALL);
             //System.out.println("*** Over all precondition AV Simplify ***");
             //System.out.println(Encoder.toString(overAllPrecondition));
-            this.simplify(overAllPrecondition);
+            overAllPrecondition.simplify();
             this.toDNF(overAllPrecondition);
 
             //System.out.println("*** Over all precondition ***");
@@ -249,14 +249,14 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
 
             //System.out.println("START EFFECT AVANT  SIM: ");
             //System.out.println(Encoder.toString(startEffect));
-            this.simplify(startEffect);
+            startEffect.simplify();
             //startEffect.toConjunctiveNormalForm(this);
             //System.out.println("START EFFECT APRES SIM: ");
             //System.out.println(Encoder.toString(startEffect));
 
             //System.out.println("END EFFECT AVANT  SIM: ");
             //System.out.println(Encoder.toString(endEffect));
-            this.simplify(endEffect);
+            endEffect.simplify();
             //endEffect.toConjunctiveNormalForm(this);
             //System.out.println("END EFFECT APRES  SIM: ");
             //System.out.println(Encoder.toString(endEffect));

@@ -138,10 +138,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     private List<IntAction> instantiate(final IntAction action, final int bound) {
         final List<IntAction> instOps = new ArrayList<>(100);
         this.expandQuantifiedExpression(action.getPreconditions(), true);
-        this.simplify(action.getPreconditions());
+        action.getPreconditions().simplify();
         if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
             this.expandQuantifiedExpression(action.getEffects(), true);
-            this.simplify(action.getEffects());
+            action.getEffects().simplify();
             if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                 this.instantiate(action, 0, bound, instOps);
             }
@@ -184,10 +184,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final int arity = action.arity();
         if (index == arity) {
             final Expression<Integer> precond = action.getPreconditions();
-            this.simplify(precond);
+            precond.simplify();
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 final Expression<Integer> effect = action.getEffects();
-                this.simplify(effect);
+                effect.simplify();
                 if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
                     actions.add(action);
                 }
@@ -197,10 +197,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             for (Symbol<Integer> constant : values) {
                 final Symbol<Integer> varIndex = new Symbol<>(SymbolType.VARIABLE, -index - 1);
                 final Expression<Integer> precond = new Expression<>(action.getPreconditions());
-                this.substitute(precond, varIndex, constant, true);
+                this.substitute(precond, varIndex, constant);
                 if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                     final Expression<Integer> effects = new Expression<>(action.getEffects());
-                    this.substitute(effects, varIndex, constant, true);
+                    this.substitute(effects, varIndex, constant);
                     if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
@@ -213,7 +213,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                         }
                         if (action.isDurative()) {
                             final Expression<Integer> duration = new Expression<>(action.getDuration());
-                            this.substitute(duration, varIndex, constant, true);
+                            this.substitute(duration, varIndex, constant);
                             copy.setDuration(duration);
                         }
                         copy.setValueOfParameter(index, constant.getValue());
@@ -244,9 +244,9 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final int type = copy.getTypeOfParameters((-var.getValue() - 1));
             final Set<Symbol<Integer>> domain = this.getDomains().get(type);
             if (domain.contains(cons)) {
-                this.substitute(copy.getPreconditions(), var, cons, true);
-                this.substitute(copy.getTask(), var, cons, true);
-                this.substitute(copy.getSubTasks(), var, cons, true);
+                this.substitute(copy.getPreconditions(), var, cons);
+                this.substitute(copy.getTask(), var, cons);
+                this.substitute(copy.getSubTasks(), var, cons);
                 copy.setValueOfParameter((-var.getValue() - 1), cons.getValue());
             } else {
                 instantiable = false;
@@ -283,7 +283,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final int arity = method.arity();
         if (index == arity) {
             final Expression<Integer> precond = method.getPreconditions();
-            this.simplify(precond);
+            precond.simplify();
             if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
                 methods.add(method);
             }
@@ -295,18 +295,18 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 final Symbol<Integer> varIndex = new Symbol<>(SymbolType.VARIABLE, -index - 1);
                 final Expression<Integer> preconditionCopy = new Expression<>(method.getPreconditions());
 
-                this.substitute(preconditionCopy, varIndex, constant, true);
+                this.substitute(preconditionCopy, varIndex, constant);
                 if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
                     copy.setOrderingConstraints(new Expression<>(method.getOrderingConstraints()));
 
                     final Expression<Integer> taskCopy = new Expression<>(method.getTask());
-                    this.substitute(taskCopy, varIndex, constant, true);
+                    this.substitute(taskCopy, varIndex, constant);
                     copy.setTask(taskCopy);
 
                     final Expression<Integer> subTasksCopy = new Expression<>(method.getSubTasks());
-                    this.substitute(subTasksCopy, varIndex, constant, true);
+                    this.substitute(subTasksCopy, varIndex, constant);
                     copy.setSubTasks(subTasksCopy);
 
                     for (int i = 0; i < arity; i++) {
@@ -344,7 +344,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 copy.setOrderingConstraints(new Expression<>(network.getOrderingConstraints()));
 
                 final Expression tasksCopy = new Expression<>(network.getTasks());
-                this.substitute(tasksCopy, varIndex, constant, true);
+                this.substitute(tasksCopy, varIndex, constant);
                 copy.setTasks(tasksCopy);
 
                 for (int i = 0; i < arity; i++) {
@@ -573,7 +573,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         while (i.hasNext()) {
             final IntMethod method = i.next();
             this.expandQuantifiedExpression(method.getPreconditions(), true);
-            this.simplify(method.getPreconditions());
+            method.getPreconditions().simplify();
             if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 i.remove();
             }

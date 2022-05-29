@@ -1482,9 +1482,14 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case TASK:
                 str.append("(");
-                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                str.append(exp.getTaskID());
-                str.append(" (");
+                if (exp.getTaskID() != null) {
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
+                    str.append(exp.getTaskID());
+                    str.append(" (");
+                } else {
+                    str.append("(");
+                }
+
                 str.append(this.getTaskSymbols().get(exp.getSymbol().getValue()));
                 arguments = exp.getArguments();
                 for (Symbol<Integer> arg : arguments) {

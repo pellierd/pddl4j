@@ -195,7 +195,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     protected void simplifyGoalWithGroundInertia() {
         this.simplifyWithGroundInertia(this.getIntGoal(), false);
         this.simplifyWithGroundNumericInertia(this.getIntGoal(), false);
-        this.simplify(this.getIntGoal());
+        this.getIntGoal().simplify();
     }
 
     /**
@@ -266,12 +266,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             this.simplifyWithGroundInertia(a.getPreconditions(), false);
             // ADD to symplified Numeric function
             this.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
-            this.simplify(a.getPreconditions());
+            a.getPreconditions().simplify();
             if (!a.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 this.simplifyWithGroundInertia(a.getEffects(), true);
                 // ADD for numeric fluents
                 this.simplifyWithGroundNumericInertia(a.getEffects(), true);
-                this.simplify(a.getEffects());
+                a.getEffects().simplify();
                 if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
                     toAdd.add(a);
                 } else {
@@ -673,7 +673,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         final Set<Expression<Integer>> toRemove = new HashSet<>();
         for (IntMethod m : this.getIntMethods()) {
             this.simplifyWithGroundInertia(m.getPreconditions(), false);
-            this.simplify(m.getPreconditions());
+            m.getPreconditions().simplify();
             if (!m.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
                 toAdd.add(m);
             } else {

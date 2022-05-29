@@ -135,7 +135,7 @@ test {
     useJUnit()
     // set heap size for the test JVM(s)
     minHeapSize = "512m"
-    maxHeapSize = "2048m"
+    maxHeapSize = "4096m"
     forkEvery = 1 // One new JVM for each test
 
     testLogging {

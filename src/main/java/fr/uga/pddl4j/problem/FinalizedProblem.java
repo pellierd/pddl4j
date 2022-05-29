@@ -614,7 +614,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     private List<IntAction> normalizeAction(final IntAction action) {
         final List<IntAction> normalisedActions = new ArrayList<>();
         this.toCNF(action.getEffects());
-        this.simplify(action.getEffects());
+        action.getEffects().simplify();
         final Expression<Integer> precond = new Expression<>(action.getPreconditions());
         this.toDNF(precond);
         if (precond.getChildren().size() > 1) {
