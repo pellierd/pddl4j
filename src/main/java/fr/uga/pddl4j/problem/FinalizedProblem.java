@@ -613,10 +613,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     private List<IntAction> normalizeAction(final IntAction action) {
         final List<IntAction> normalisedActions = new ArrayList<>();
-        this.toCNF(action.getEffects());
+        action.getEffects().toCNF();
         action.getEffects().simplify();
         final Expression<Integer> precond = new Expression<>(action.getPreconditions());
-        this.toDNF(precond);
+        precond.toDNF();
         if (precond.getChildren().size() > 1) {
             for (final Expression<Integer> ei : precond.getChildren()) {
                 final String name = action.getName();
@@ -777,7 +777,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         if (this.getIntGoal().getConnective().equals(PDDLConnective.FALSE)) {
             this.goal = null;
         } else {
-            this.toDNF(this.getIntGoal());
+            this.getIntGoal().toDNF();
             List<Goal> goals = new ArrayList<>(this.getIntGoal().getChildren().size());
             for (Expression<Integer> exp : this.getIntGoal().getChildren()) {
                 if (exp.getConnective().equals(PDDLConnective.ATOM)) {
@@ -1667,7 +1667,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     private List<IntMethod> normalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
         final List<IntMethod> normalisedMethods = new ArrayList<>();
         final Expression<Integer> precond = new Expression<Integer>(method.getPreconditions());
-        this.toDNF(precond);
+        precond.toDNF();
         if (precond.getChildren().size() > 1) {
             for (final Expression<Integer> ei : precond.getChildren()) {
                 final String name = method.getName();

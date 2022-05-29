@@ -55,7 +55,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             // System.out.println("******************************************************");
             //System.out.println(Encoder.toString(a));
 
-            this.expandQuantifiedExpression(a.getPreconditions(), false);
+            a.getPreconditions().expandQuantifiedExpression(this.getDomains(), this);
             // REMOVED FOR TEST a.getPreconditions().moveTimeSpecifierInward();
             // REMOVED FOR TESTa.getPreconditions().moveNegationInward();
 
@@ -69,7 +69,7 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             startPrecondition.simplify();
             //System.out.println("*** At start precondition ***");
             //System.out.println(Encoder.toString(startPrecondition));
-            this.toDNF(startPrecondition);
+            startPrecondition.toDNF();
 
             //System.out.println("*** At start precondition ***");
             //System.out.println(Encoder.toString(startPrecondition));
@@ -77,27 +77,27 @@ public class SimpleTemporalProblem extends AbstractTemporalProblem {
             final Expression<Integer> endPrecondition = new Expression<>(a.getPreconditions());
             this.extract(endPrecondition, PDDLConnective.AT_END);
             endPrecondition.simplify();
-            this.toDNF(endPrecondition);
+            endPrecondition.toDNF();
 
             //System.out.println("*** At end precondition ***");
             //System.out.println(Encoder.toString(endPrecondition));
 
             final Expression<Integer> overAllPrecondition = new Expression<>(a.getPreconditions());
             this.extract(overAllPrecondition, PDDLConnective.OVER_ALL);
-            //System.out.println("*** Over all precondition AV Simplify ***");
+            //System.out.println("*** Over all precondition AV AtomicFormulaSimplifier ***");
             //System.out.println(Encoder.toString(overAllPrecondition));
             overAllPrecondition.simplify();
-            this.toDNF(overAllPrecondition);
+            overAllPrecondition.toDNF();
 
             //System.out.println("*** Over all precondition ***");
             //System.out.println(Encoder.toString(overAllPrecondition));
 
 
             // Expands the quantified expression on the effect of the action
-            this.expandQuantifiedExpression(a.getEffects(), false);
+            a.getEffects().expandQuantifiedExpression(this.getDomains(), this);
             // REMOVED FOR TESTa.getEffects().moveTimeSpecifierInward();
             // REMOVED FOR TESTa.getEffects().moveNegationInward();
-            this.toCNF(a.getEffects());
+            a.getEffects().toCNF();
             //this.simplify(a.getEffects());
 
             //System.out.println("*** EFFECT ***");

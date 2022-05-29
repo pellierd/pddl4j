@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.PDDLRequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
@@ -27,6 +28,7 @@ import fr.uga.pddl4j.problem.operator.Effect;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,7 +37,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 4.0 - 26.11.2020
  */
-public interface Problem extends Serializable {
+public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> {
 
     /**
      * Returns the PDDL problem of the problem.
@@ -70,7 +72,7 @@ public interface Problem extends Serializable {
      *
      * @return the domains for each type of the problem.
      */
-    List<Set<Symbol<Integer>>> getDomains();
+    Map<Integer, Set<Symbol<Integer>>> getDomains();
 
     /**
      * Returns the list of constant symbols of the problem.
@@ -138,7 +140,7 @@ public interface Problem extends Serializable {
     /**
      * Returns a string representation of a specified operator.
      *
-     * @param action     the action.
+     * @param action the action.
      * @return a string representation of the specified operator.
      */
     String toString(final Action action);
@@ -194,7 +196,7 @@ public interface Problem extends Serializable {
     /**
      * Returns a string representation of a conditional effect.
      *
-     * @param effect  the conditional effect.
+     * @param effect the conditional effect.
      * @return a string representation of the specified conditional effect.
      */
     String toString(final ConditionalEffect effect);
@@ -203,9 +205,10 @@ public interface Problem extends Serializable {
      * Returns a short string representation of the specified operator, i.e., its name and its
      * instantiated parameters. This method can be used for actions and methods.
      *
-     * @param operator  the operator.
+     * @param operator the operator.
      * @return a string representation of the specified operator.
      */
     String toShortString(final AbstractGroundOperator operator);
 
+    boolean simplify(final Expression<Integer> exp);
 }

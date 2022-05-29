@@ -39,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -79,7 +80,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The values domain of associated to the type.
      */
-    private List<Set<Symbol<Integer>>> domains;
+    private Map<Integer, Set<Symbol<Integer>>> domains;
 
     /**
      * The constant symbols.
@@ -332,7 +333,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the domains for each type of the problem.
      */
-    public final List<Set<Symbol<Integer>>> getDomains() {
+    public final Map<Integer, Set<Symbol<Integer>>> getDomains() {
         return this.domains;
     }
 
@@ -491,10 +492,12 @@ public abstract class AbstractProblem implements Problem {
         final List<TypedSymbol<String>> types = this.problem.getTypes();
         final int nbTypes = types.size();
         this.typeSymbols = new ArrayList<>(nbTypes);
-        this.domains = new ArrayList<>(nbTypes);
+        this.domains = new LinkedHashMap<>(nbTypes);
+        int i = 0;
         for (TypedSymbol<String> type : types) {
             this.typeSymbols.add(type.getValue());
-            this.domains.add(new LinkedHashSet<>());
+            this.domains.put(i, new LinkedHashSet<>());
+            i++;
         }
     }
 
@@ -584,7 +587,8 @@ public abstract class AbstractProblem implements Problem {
                 newType = buf.toString();
                 int index = this.typeSymbols.indexOf(newType);
                 if (index == -1) {
-                    this.domains.add(new LinkedHashSet<>(newTypeDomain));
+                    index = this.typeSymbols.size();
+                    this.domains.put(index, new LinkedHashSet<>(newTypeDomain));
                     this.typeSymbols.add(newType);
                 }
             }

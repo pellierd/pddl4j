@@ -120,6 +120,11 @@ public class ADLProblem extends FinalizedProblem {
             LOGGER.debug("Goal declared:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
+
+        // Create the predicates tables used to count the occurrences of the predicates in the
+        // initial state
+        this.createPredicatesTables();
+
     }
 
     /**
@@ -144,9 +149,6 @@ public class ADLProblem extends FinalizedProblem {
                     + this.toString(Data.INT_ACTIONS) + "\n");
             }
         }
-        // Create the predicates tables used to count the occurrences of the predicates in the
-        // initial state
-        this.createPredicatesTables();
     }
 
     /**

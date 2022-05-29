@@ -190,7 +190,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     }
 
     /**
-     * Simplify a specified goal expression based on the ground inertia information.
+     * AtomicFormulaSimplifier a specified goal expression based on the ground inertia information.
      */
     protected void simplifyGoalWithGroundInertia() {
         this.simplifyWithGroundInertia(this.getIntGoal(), false);
@@ -305,7 +305,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
 
     /**
-     * Simplify a specified expression based on the ground inertia information.
+     * AtomicFormulaSimplifier a specified expression based on the ground inertia information.
      * <p>
      * <i>Definition:</i> A ground fact is a positive ground inertia iff it does not occur positively in
      * an unconditional effect or the consequent of a conditional effect of an action.
@@ -459,7 +459,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
 
 
     /**
-     * Simplify a specified expression based on the ground inertia information.
+     * AtomicFormulaSimplifier a specified expression based on the ground inertia information.
      *
      * @param exp    the expression to simply.
      * @param effect a boolean to indicate if the expression is an effect or a precondition.
