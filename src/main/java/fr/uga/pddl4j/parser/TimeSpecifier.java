@@ -21,7 +21,7 @@ package fr.uga.pddl4j.parser;
  * @author D. Pellier
  * @version 1.0 - 15.03.2022
  */
-public enum PDDLTimeSpecifier {
+public enum TimeSpecifier {
     /**
      * START time specifier.
      */

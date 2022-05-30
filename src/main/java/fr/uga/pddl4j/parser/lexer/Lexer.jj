@@ -37,10 +37,10 @@ import fr.uga.pddl4j.parser.PDDLProblem;
 import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.PDDLAction;
 import fr.uga.pddl4j.parser.PDDLMethod;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
-import fr.uga.pddl4j.parser.PDDLTimeSpecifier;
+import fr.uga.pddl4j.parser.TimeSpecifier;
 import fr.uga.pddl4j.parser.TypedSymbol;
 import fr.uga.pddl4j.parser.SymbolType;
 
@@ -100,7 +100,7 @@ public class Lexer {
   		this.skipToNextBlock();
 	}
 
-	public boolean isRequirement(PDDLRequireKey key) {
+	public boolean isRequirement(RequireKey key) {
 		if (domain != null && this.problem != null) {
 			return this.domain.getRequirements().contains(key)
 			|| this.problem.getRequirements().contains(key);
@@ -113,7 +113,7 @@ public class Lexer {
 		}
 	}
 
-	public Set<PDDLRequireKey> getRequirements() {
+	public Set<RequireKey> getRequirements() {
 		return this.domain.getRequirements();
 	}
 
@@ -393,16 +393,16 @@ PDDLDomain domain() :
 			}
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
-		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
+		[LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
 		[LOOKAHEAD(2) constants_def()]
 		[LOOKAHEAD(2) predicates_def()]
 		[LOOKAHEAD(2, {
-			this.isRequirement(PDDLRequireKey.FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)
+			this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
+			|| this.isRequirement(RequireKey.ACTION_COSTS)
 		}) functions_def()]
-		[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+		[LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
 		(structure_def())+
 		right_bracket()
 		<EOF>
@@ -427,16 +427,16 @@ ParsedProblem domain_and_problem() :
             }
         right_bracket()
         [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
-        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.TYPING)}) type_def() ]
+        [LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
         [LOOKAHEAD(2) constants_def()]
         [LOOKAHEAD(2) predicates_def()]
         [LOOKAHEAD(2, {
-            this.isRequirement(PDDLRequireKey.FLUENTS)
-            || this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-            || this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
-            || this.isRequirement(PDDLRequireKey.ACTION_COSTS)
+            this.isRequirement(RequireKey.FLUENTS)
+            || this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+            || this.isRequirement(RequireKey.OBJECT_FLUENTS)
+            || this.isRequirement(RequireKey.ACTION_COSTS)
         }) functions_def()]
-        [LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
+        [LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
         (structure_def())+
         right_bracket()
     	//Problem file
@@ -452,9 +452,9 @@ ParsedProblem domain_and_problem() :
 void require_def(int type) :
 {
 	Token t = null;
-	Set<PDDLRequireKey> requirements = null;
+	Set<RequireKey> requirements = null;
 	if (type == Lexer.PARSER_DOMAIN) {
-		this.domain.addRequirement(PDDLRequireKey.STRIPS);
+		this.domain.addRequirement(RequireKey.STRIPS);
 	}
 }
 {
@@ -462,11 +462,11 @@ void require_def(int type) :
 		t=left_bracket() <REQUIREMENTS>
 			(requirements=require_key() {
 				if (type == Lexer.PARSER_DOMAIN) {
-					for (PDDLRequireKey r : requirements) {
+					for (RequireKey r : requirements) {
 						this.domain.addRequirement(r);
 					}
 				} else {
-					for (PDDLRequireKey r : requirements) {
+					for (RequireKey r : requirements) {
 						this.problem.addRequirement(r);
 					}
 				}
@@ -476,209 +476,209 @@ void require_def(int type) :
 	}
 }
 
-Set<PDDLRequireKey> require_key() :
+Set<RequireKey> require_key() :
 {
-	Set<PDDLRequireKey> requirements = new LinkedHashSet<PDDLRequireKey>();
+	Set<RequireKey> requirements = new LinkedHashSet<RequireKey>();
 }
 {
 	(	<STRIPS> {
-			requirements.add(PDDLRequireKey.STRIPS);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.STRIPS);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	| 	<TYPING> {
-			requirements.add(PDDLRequireKey.TYPING);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.TYPING);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	| 	<NEGATIVE_PRECONDITIONS> {
-			requirements.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.NEGATIVE_PRECONDITIONS);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<DISJUNCTIVE_PRECONDITIONS> {
-			requirements.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<EQUALITY> {
-			requirements.add(PDDLRequireKey.EQUALITY);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.EQUALITY);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<EXISTENTIAL_PRECONDITIONS> {
-			requirements.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-			if (requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)) {
-				requirements.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+			requirements.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			if (requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)) {
+				requirements.add(RequireKey.QUANTIFIED_PRECONDITIONS);
 			}
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<UNIVERSAL_PRECONDITIONS> {
-			requirements.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-			if (requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)) {
-				requirements.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
+			requirements.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+			if (requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)) {
+				requirements.add(RequireKey.QUANTIFIED_PRECONDITIONS);
 			}
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<QUANTIFIED_PRECONDITIONS> {
-			requirements.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
-			requirements.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-			requirements.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+			requirements.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+			requirements.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<CONDITIONAL_EFFECTS> {
-			requirements.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
-			if (requirements.contains(PDDLRequireKey.STRIPS)
-					&& requirements.contains(PDDLRequireKey.TYPING)
-					&& requirements.contains(PDDLRequireKey.NEGATIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EQUALITY)
-					&& requirements.contains(PDDLRequireKey.QUANTIFIED_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)
-					&& requirements.contains(PDDLRequireKey.CONDITIONAL_EFFECTS)) {
-				requirements.add(PDDLRequireKey.ADL);
+			requirements.add(RequireKey.CONDITIONAL_EFFECTS);
+			if (requirements.contains(RequireKey.STRIPS)
+					&& requirements.contains(RequireKey.TYPING)
+					&& requirements.contains(RequireKey.NEGATIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EQUALITY)
+					&& requirements.contains(RequireKey.QUANTIFIED_PRECONDITIONS)
+					&& requirements.contains(RequireKey.UNIVERSAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.EXISTENTIAL_PRECONDITIONS)
+					&& requirements.contains(RequireKey.CONDITIONAL_EFFECTS)) {
+				requirements.add(RequireKey.ADL);
 			}
 		}
 	|	<FLUENTS> {
-			requirements.add(PDDLRequireKey.FLUENTS);
-			requirements.add(PDDLRequireKey.NUMERIC_FLUENTS);
-			requirements.add(PDDLRequireKey.OBJECT_FLUENTS);
+			requirements.add(RequireKey.FLUENTS);
+			requirements.add(RequireKey.NUMERIC_FLUENTS);
+			requirements.add(RequireKey.OBJECT_FLUENTS);
 		}
 	|	<NUMERIC_FLUENTS> {
-			requirements.add(PDDLRequireKey.NUMERIC_FLUENTS);
-			if (requirements.contains(PDDLRequireKey.OBJECT_FLUENTS)) {
-				requirements.add(PDDLRequireKey.FLUENTS);
+			requirements.add(RequireKey.NUMERIC_FLUENTS);
+			if (requirements.contains(RequireKey.OBJECT_FLUENTS)) {
+				requirements.add(RequireKey.FLUENTS);
 			}
 		}
 	|	<OBJECT_FLUENTS> {
-			requirements.add(PDDLRequireKey.OBJECT_FLUENTS);
-			if (requirements.contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
-				requirements.add(PDDLRequireKey.FLUENTS);
+			requirements.add(RequireKey.OBJECT_FLUENTS);
+			if (requirements.contains(RequireKey.NUMERIC_FLUENTS)) {
+				requirements.add(RequireKey.FLUENTS);
 			}
 		}
 	|	<GOAL_UTILITIES> {
-			requirements.add(PDDLRequireKey.GOAL_UTILITIES);
+			requirements.add(RequireKey.GOAL_UTILITIES);
 		}
 	|	<ADL> {
-			requirements.add(PDDLRequireKey.ADL);
-			requirements.add(PDDLRequireKey.STRIPS);
-			requirements.add(PDDLRequireKey.TYPING);
-			requirements.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
-			requirements.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
-			requirements.add(PDDLRequireKey.EQUALITY);
-			requirements.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-			requirements.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-			requirements.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+			requirements.add(RequireKey.ADL);
+			requirements.add(RequireKey.STRIPS);
+			requirements.add(RequireKey.TYPING);
+			requirements.add(RequireKey.NEGATIVE_PRECONDITIONS);
+			requirements.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+			requirements.add(RequireKey.EQUALITY);
+			requirements.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+			requirements.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+			requirements.add(RequireKey.CONDITIONAL_EFFECTS);
 		}
 	|	<ACTION_COSTS> {
-			requirements.add(PDDLRequireKey.ACTION_COSTS);
+			requirements.add(RequireKey.ACTION_COSTS);
 		}
 	|	<DURATIVE_ACTIONS> {
-			requirements.add(PDDLRequireKey.DURATIVE_ACTIONS);
-			requirements.add(PDDLRequireKey.DURATION_INEQUALITIES);
+			requirements.add(RequireKey.DURATIVE_ACTIONS);
+			requirements.add(RequireKey.DURATION_INEQUALITIES);
 		}
 	|	<DERIVED_PREDICATES> {
-			requirements.add(PDDLRequireKey.DERIVED_PREDICATES);
+			requirements.add(RequireKey.DERIVED_PREDICATES);
 		}
 	| 	<TIMED_INITIAL_LITERALS> {
-			requirements.add(PDDLRequireKey.TIMED_INITIAL_LITERALS);
+			requirements.add(RequireKey.TIMED_INITIAL_LITERALS);
 		}
 	|	<PREFERENCES> {
-			requirements.add(PDDLRequireKey.PREFERENCES);
+			requirements.add(RequireKey.PREFERENCES);
 		}
 	|	<CONSTRAINTS> {
-			requirements.add(PDDLRequireKey.CONSTRAINTS);
+			requirements.add(RequireKey.CONSTRAINTS);
 		}
 	|	<CONTINUS_EFFECTS> {
-			requirements.add(PDDLRequireKey.CONTINOUS_EFFECTS);
+			requirements.add(RequireKey.CONTINOUS_EFFECTS);
 		}
 	|	<DURATION_INEQUALITIES> {
-			requirements.add(PDDLRequireKey.DURATION_INEQUALITIES);
+			requirements.add(RequireKey.DURATION_INEQUALITIES);
 		}
 	|	<HIERARCHY> { // ADD HDDL
-    		requirements.add(PDDLRequireKey.HIERARCHY);
+    		requirements.add(RequireKey.HIERARCHY);
         }
     |   <METHOD_PRECONDITIONS> { // ADD HDDL
-            requirements.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+            requirements.add(RequireKey.METHOD_PRECONDITIONS);
         }
     |   <METHOD_CONSTRAINTS> { // ADD HDDL 2.1
-            requirements.add(PDDLRequireKey.METHOD_CONSTRAINTS);
+            requirements.add(RequireKey.METHOD_CONSTRAINTS);
         }
 )
 	{ return requirements; }
@@ -725,7 +725,7 @@ List<TypedSymbol<String>> typed_list(int kind) :
 			(t=primitive_type() {
 				tmp.add(t);
 			})*
-			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
+			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
 					types = new ArrayList<Symbol<String>>();
@@ -745,7 +745,7 @@ List<TypedSymbol<String>> typed_list(int kind) :
 			(t=constant() {
 				tmp.add(t);
 			})*
-			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
+			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
 					types = new ArrayList<Symbol<String>>();
@@ -765,7 +765,7 @@ List<TypedSymbol<String>> typed_list(int kind) :
 			(t=variable() {
 				tmp.add(t);
 			})*
-			(LOOKAHEAD(1, { this.isRequirement(PDDLRequireKey.TYPING)})
+			(LOOKAHEAD(1, { this.isRequirement(RequireKey.TYPING)})
 				<SUB> types=type() nextTypedList=typed_list(kind))? {
 				if (types == null) {
 					types = new ArrayList<Symbol<String>>();
@@ -1046,16 +1046,16 @@ List<Symbol<String>> function_type() :
 	List<Symbol<String>> typesList = new ArrayList<Symbol<String>>();
 }
 {
-		LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)})
+		LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.ACTION_COSTS)})
 		t=<NUMBER_TYPE> {
 			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image.toLowerCase(),
 			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			return typesList;
 		}
-	| 	LOOKAHEAD(2, {(this.isRequirement(PDDLRequireKey.TYPING) && this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS))
-        	                    || this.isRequirement(PDDLRequireKey.FLUENTS)})
+	| 	LOOKAHEAD(2, {(this.isRequirement(RequireKey.TYPING) && this.isRequirement(RequireKey.OBJECT_FLUENTS))
+        	                    || this.isRequirement(RequireKey.FLUENTS)})
 		    typesList=type() {
 		        return typesList;
         }
@@ -1338,22 +1338,22 @@ Expression<String> gd() :
 			exp=atomic_formula(Lexer.TERM)
 	|	LOOKAHEAD(2)
 			exp=and_gd()
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)})
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS)})
 			exp=or_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.NEGATIVE_PRECONDITIONS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.NEGATIVE_PRECONDITIONS)})
 			exp=not_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS)
-				&& this.isRequirement(PDDLRequireKey.NEGATIVE_PRECONDITIONS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DISJUNCTIVE_PRECONDITIONS)
+				&& this.isRequirement(RequireKey.NEGATIVE_PRECONDITIONS)})
 			exp=imply_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.EXISTENTIAL_PRECONDITIONS)})
 			exp=exists_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)})
 			exp=forall_gd()
-	| 	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.EQUALITY)})
+	| 	LOOKAHEAD(3, { this.isRequirement(RequireKey.EQUALITY)})
 			exp=equal_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)})
 			exp=f_comp()
 	) {
 		return exp;
@@ -1939,28 +1939,28 @@ void structure_def() :
 			op = action_def() {
 				this.domain.addAction(op);
 			}
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
 			op = durative_action_def() {
 				this.domain.addAction(op);
 			}
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DERIVED_PREDICATES)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DERIVED_PREDICATES)})
 			dp = derived_def() {
 				this.domain.addDerivedPredicate(dp);
 			}
-    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HIERARCHY)}) // ADD HDDL
             op = htn_action_def() {
                 this.domain.addAction(op);
             }
-    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HIERARCHY)}) // ADD HDDL
             task = comp_task_def() {
                 this.domain.addTask(task);
             }
-    |   LOOKAHEAD (2, {this.isRequirement(PDDLRequireKey.HIERARCHY)}) // ADD HDDL
+    |   LOOKAHEAD (2, {this.isRequirement(RequireKey.HIERARCHY)}) // ADD HDDL
             meth = method_def() {
                 this.domain.addMethod(meth);
             }
-    |	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS) // ADD HDDL2.1
-                && this.isRequirement(PDDLRequireKey.HIERARCHY)})
+    |	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS) // ADD HDDL2.1
+                && this.isRequirement(RequireKey.HIERARCHY)})
             meth = durative_method_def() {
             }
 	)
@@ -1982,7 +1982,7 @@ PDDLMethod method_def() : // ADD HDDL
 		begin=left_bracket() <METHOD> name=method_name()
 			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
-			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
+			[LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_PRECONDITIONS)})
 			    <PRECONDITION> precondition=pre_gd()
 			]
             tn = task_network()
@@ -2016,7 +2016,7 @@ PDDLMethod durative_method_def() : // ADD HDDL2.1
 	        <PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[<DURATION> duration=method_duration_constraint()]
-			[LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_PRECONDITIONS)})
+			[LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_PRECONDITIONS)})
 			    <CONDITION> condition=da_gd()
 			]
             tn = task_network()
@@ -2208,15 +2208,15 @@ Expression<String> htn_ordering_constraint() : // ADD HDDL
 {
     (   LOOKAHEAD(3)
             exp = less_htn_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = equal_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = less_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = less_or_equal_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = great_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = great_or_equal_htn_temporal_ordering_constraint()
     ) {
         return exp;
@@ -2350,12 +2350,12 @@ Expression<String> task_id() : // ADD HDDL
 	Symbol<String> id = null;
 }
 {
-    (   LOOKAHEAD(2, { !this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
+    (   LOOKAHEAD(2, { !this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
 	        id = task_id_symbol() {
                 exp = new Expression<String>(PDDLConnective.TASK_ID);
 		        exp.setTaskID(id);
 		    }
-	|   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATIVE_ACTIONS)})
+	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
 	        exp = timed_task_id()
 	) {
 	    return exp;
@@ -2380,12 +2380,12 @@ Expression<String> timed_task_id() : // ADD HDDL2.1
 Expression<String> start_task_id() : // ADD HDDL2.1
 {
     Symbol<String> id = null;
-    Expression<String> exp = new Expression<String>(PDDLConnective.TASK_ID);
+    Expression<String> exp = new Expression<String>(PDDLConnective.TIMED_TASK_ID);
 }
 {
     left_bracket() <START> id = task_id_symbol() right_bracket() {
-        id.setTimeSpecifier(PDDLTimeSpecifier.START);
         exp.setTaskID(id);
+        exp.setTimeSpecifier(TimeSpecifier.START);
         return exp;
     }
 }
@@ -2393,12 +2393,12 @@ Expression<String> start_task_id() : // ADD HDDL2.1
 Expression<String> end_task_id() : // ADD HDDL2.1
 {
     Symbol<String> id = null;
-    Expression<String> exp = new Expression<String>(PDDLConnective.TASK_ID);
+    Expression<String> exp = new Expression<String>(PDDLConnective.TIMED_TASK_ID);
 }
 {
     left_bracket() <END> id = task_id_symbol() right_bracket() {
-        id.setTimeSpecifier(PDDLTimeSpecifier.END);
         exp.setTaskID(id);
+        exp.setTimeSpecifier(TimeSpecifier.END);
         return exp;
     }
 }
@@ -2451,27 +2451,27 @@ Expression<String> htn_constraint() : // ADD HDDL
             exp = equal_atomic_formula()
     |   LOOKAHEAD(2)
             exp = not_equal_atomic_formula()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = hold_before_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = hold_after_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = hold_between_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = hold_during_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = at_end_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = at_start_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = always_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = at_most_one_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = sometime_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = sometime_before_htn_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_CONSTRAINTS)}) // ADD HDDL2.1
             exp = sometime_after_htn_constraint()
     ) {
         return exp;
@@ -2775,9 +2775,9 @@ Expression<String> pre_gd() :
 	Expression<String> exp = null;
 }
 {
-	(	LOOKAHEAD(3, { this.isRequirement(PDDLRequireKey.PREFERENCES)}) exp=pref_gd()
+	(	LOOKAHEAD(3, { this.isRequirement(RequireKey.PREFERENCES)}) exp=pref_gd()
 	|	LOOKAHEAD(2) exp=and_pre_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)}) exp=forall_pre_gd()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)}) exp=forall_pre_gd()
 	|	LOOKAHEAD(2) exp=empty_or()
 	|	LOOKAHEAD(2) exp=gd()
 	) {
@@ -2926,8 +2926,8 @@ Expression<String> c_effect() :
 	Expression<String> exp = null;
 }
 {
-	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) exp=forall_effect()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)}) exp=when_con_effect()
+	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) exp=forall_effect()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)}) exp=when_con_effect()
 	|	LOOKAHEAD(2) exp=p_effect()
 	) {
 		return exp;
@@ -3014,10 +3014,10 @@ Expression<String> p_effect() :
 	Expression<String> exp = null;
 }
 {
- 	(	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
-    			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-    			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) exp=assign_op()
-    	|   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.ACTION_COSTS) }) exp=increase_total_cost()
+ 	(	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
+    			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+    			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) exp=assign_op()
+    	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.ACTION_COSTS) }) exp=increase_total_cost()
     	|	LOOKAHEAD(2) exp=literal(Lexer.TERM)
     	) {
     		return exp;
@@ -3243,7 +3243,7 @@ Expression<String> duration_constraint() :
 }
 {
 	(	LOOKAHEAD(2) exp=empty_or()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) exp=and_simple_duration_constraint()
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) exp=and_simple_duration_constraint()
 	|	LOOKAHEAD(2) exp=simple_duration_constraint()
 	) {
 		return exp;
@@ -3332,9 +3332,9 @@ Expression<String> d_op() :
 {
 	(	LOOKAHEAD(2)
 			exp=equal_d_op()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
 			exp=gequal_d_op()
-	| 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+	| 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
 			exp=lequal_d_op()
 	) {
 		return exp;
@@ -3418,9 +3418,9 @@ Expression<String> d_value() :
 }
 {
 	(	LOOKAHEAD(2) exp=number()
-	| 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)}) exp=f_exp()
+	| 	LOOKAHEAD(2, { this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)}) exp=f_exp()
 	) {
 		return exp;
 	}
@@ -3433,7 +3433,7 @@ Expression<String> method_duration_constraint() : // ADD HDDL2.1
 {
 	(	LOOKAHEAD(2) exp=empty_or()
 	|	LOOKAHEAD(2) exp=simple_method_duration_constraint() // ADD HDDL2.1
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) // ADD HDDL2.1
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) // ADD HDDL2.1
             exp=and_simple_method_duration_constraint()
 	) {
 	    return exp;
@@ -3465,13 +3465,13 @@ Expression<String> simple_method_duration_constraint() : // ADD HDDL2.1
 {
 	(	LOOKAHEAD(2)
             exp=equal_method_duration_constraint()
-    |	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+    |	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
              exp=great_method_duration_constraint()
-    | 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+    | 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
             exp=great_or_equal_method_duration_constraint()
-    |   LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+    |   LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
             exp=less_method_duration_constraint()
-    | 	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)})
+    | 	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATION_INEQUALITIES)})
             exp=less_or_equal_method_duration_constraint()
 	|	LOOKAHEAD(2) exp=at_simple_duration_constraint()
 	) {
@@ -3654,7 +3654,7 @@ Expression<String> da_gd():
 {
 	(	LOOKAHEAD(2) exp=pref_timed_gd()
 	|	LOOKAHEAD(2) exp=and_da_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)})
 			exp=forall_da_gd()
 	) {
 		return exp;
@@ -3709,7 +3709,7 @@ Expression<String> pref_timed_gd() :
 {
 	(	LOOKAHEAD(2)
 			exp=timed_gd()
-	|	LOOKAHEAD(2, { this.isRequirement(PDDLRequireKey.PREFERENCES)})
+	|	LOOKAHEAD(2, { this.isRequirement(RequireKey.PREFERENCES)})
 			exp=named_pref_timed_gd()
 	) {
 		return exp;
@@ -3819,13 +3819,13 @@ Expression<String> da_effect() :
 			exp=and_da_effect()
 	| 	LOOKAHEAD(2)
 			exp=timed_effect()
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)})
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)})
 			exp=forall_da_effect()
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONDITIONAL_EFFECTS)})
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.CONDITIONAL_EFFECTS)})
 			exp=when_da_effect()
-	| 	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)})
+	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)})
 			exp=da_assign_op()
 
 	) {
@@ -4009,7 +4009,7 @@ Expression<String> timed_effect() :
 {
 	(	LOOKAHEAD(2)
 			exp=at_a_effect()
-	|	LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.CONTINOUS_EFFECTS)})
+	|	LOOKAHEAD(3, {this.isRequirement(RequireKey.CONTINOUS_EFFECTS)})
 			exp=assign_op_t()
 	) {
 		return exp;
@@ -4244,7 +4244,7 @@ Expression<String> f_exp_da() :
 }
 {
 	(	LOOKAHEAD(2) exp=da_op()
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.DURATION_INEQUALITIES)}) exp=var_duration()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.DURATION_INEQUALITIES)}) exp=var_duration()
 	|	LOOKAHEAD(2) exp=f_exp()
 	) {
 		return exp;
@@ -4346,7 +4346,7 @@ PDDLProblem problem() :
 {
 }
 {
-    (   LOOKAHEAD({this.isRequirement(PDDLRequireKey.HIERARCHY)})
+    (   LOOKAHEAD({this.isRequirement(RequireKey.HIERARCHY)})
             htn_problem()
     |    pddl_problem()
     ) {
@@ -4374,8 +4374,8 @@ PDDLProblem pddl_problem() :
 		[LOOKAHEAD(2) object_declaration()]
         init()
 		goal()
-		[LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
-		[LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)}) metric_spec()]
+		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
+		[LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)}) metric_spec()]
 		// [length-spec()] not implemented
 		right_bracket()
 		<EOF>
@@ -4417,7 +4417,7 @@ PDDLProblem htn_problem() : // ADD HDDL
         right_bracket()
 		init()
 		[LOOKAHEAD(2) goal()]
-		[LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)}) metric_spec()]
+		[LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)}) metric_spec()]
 		right_bracket()
 		<EOF>
 	} catch(Throwable e) {
@@ -4500,12 +4500,12 @@ Expression<String> init_el() :
 }
 {
 	(
-		LOOKAHEAD(3, {this.isRequirement(PDDLRequireKey.TIMED_INITIAL_LITERALS)}) exp=timed_literal()
+		LOOKAHEAD(3, {this.isRequirement(RequireKey.TIMED_INITIAL_LITERALS)}) exp=timed_literal()
 	|	LOOKAHEAD(2) exp=literal(Lexer.CONSTANT)
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.NUMERIC_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.OBJECT_FLUENTS)
-			|| this.isRequirement(PDDLRequireKey.ACTION_COSTS)}) exp=equal_init_el()
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.FLUENTS)
+			|| this.isRequirement(RequireKey.NUMERIC_FLUENTS)
+			|| this.isRequirement(RequireKey.OBJECT_FLUENTS)
+			|| this.isRequirement(RequireKey.ACTION_COSTS)}) exp=equal_init_el()
 	) {
 		return exp;
 	}
@@ -4563,9 +4563,9 @@ void pddl_goal() :
 {
 	Expression<String> exp = null;
 	Boolean goal_utilities = false;
-	if (this.isRequirement(PDDLRequireKey.GOAL_UTILITIES)
-			&& !this.isRequirement(PDDLRequireKey.PREFERENCES)) {
-		this.getRequirements().add(PDDLRequireKey.PREFERENCES);
+	if (this.isRequirement(RequireKey.GOAL_UTILITIES)
+			&& !this.isRequirement(RequireKey.PREFERENCES)) {
+		this.getRequirements().add(RequireKey.PREFERENCES);
 		goal_utilities = true;
 	}
 
@@ -4575,7 +4575,7 @@ void pddl_goal() :
 		exp=pre_gd() {
 			this.problem.setGoal(exp);
 			if (goal_utilities) {
-				this.getRequirements().remove(PDDLRequireKey.PREFERENCES);
+				this.getRequirements().remove(RequireKey.PREFERENCES);
 			}
 	   	}
 	} catch(Throwable e) {
@@ -4611,9 +4611,9 @@ Expression<String> pref_con_gd() :
 {
 	(	LOOKAHEAD(2)
 			exp=and_pref_con_gd()
-	|	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.UNIVERSAL_PRECONDITIONS)})
+	|	LOOKAHEAD(2, {this.isRequirement(RequireKey.UNIVERSAL_PRECONDITIONS)})
 			exp=forall_pref_con_gd()
-	| 	LOOKAHEAD(2, {this.isRequirement(PDDLRequireKey.PREFERENCES)})
+	| 	LOOKAHEAD(2, {this.isRequirement(RequireKey.PREFERENCES)})
 			exp=named_pref_con_gd()
 	|	LOOKAHEAD(2)
 			exp=con_gd()

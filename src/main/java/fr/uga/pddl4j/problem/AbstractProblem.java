@@ -21,7 +21,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
 import fr.uga.pddl4j.parser.PDDLDerivedPredicate;
 import fr.uga.pddl4j.parser.PDDLMethod;
 import fr.uga.pddl4j.parser.NamedTypedList;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.PDDLTaskNetwork;
 import fr.uga.pddl4j.parser.TypedSymbol;
@@ -39,7 +39,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -70,7 +69,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The set of requirements of the problem.
      */
-    private Set<PDDLRequireKey> requirements;
+    private Set<RequireKey> requirements;
 
     /**
      * The type symbols of the problem.
@@ -315,7 +314,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the requirements of the problem.
      */
-    public final Set<PDDLRequireKey> getRequirements() {
+    public final Set<RequireKey> getRequirements() {
         return this.requirements;
     }
 
@@ -469,14 +468,14 @@ public abstract class AbstractProblem implements Problem {
      * @throws RequirementNotSupportedException if the requirements of the domain and the problem are not supported.
      */
     protected void initRequirements() throws RequirementNotSupportedException {
-        this.requirements = new LinkedHashSet<PDDLRequireKey>();
+        this.requirements = new LinkedHashSet<RequireKey>();
         this.requirements.addAll(this.problem.getRequirements());
 
         if (!this.getAcceptedRequirements().containsAll(this.requirements)) {
             this.requirements.removeAll(this.getAcceptedRequirements());
             StringBuilder str = new StringBuilder();
             str.append("Requirements not supported:");
-            for (PDDLRequireKey requirement : this.requirements) {
+            for (RequireKey requirement : this.requirements) {
                 str.append(" ");
                 str.append(requirement.getImage());
             }

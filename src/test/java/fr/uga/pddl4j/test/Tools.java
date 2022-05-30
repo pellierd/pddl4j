@@ -3,7 +3,7 @@ package fr.uga.pddl4j.test;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.PDDLParser;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
@@ -412,14 +412,14 @@ public abstract class Tools {
                     System.out.println(" * Instantiation [" + currentProblem + "]" + "...");
                     Problem pb;
                     String typeOfProblem;
-                    if (problemParsed.getRequirements().contains(PDDLRequireKey.HIERARCHY)) {
+                    if (problemParsed.getRequirements().contains(RequireKey.HIERARCHY)) {
                         pb = new HTNProblem(problemParsed);
                         typeOfProblem = "HTN";
-                    } else if (problemParsed.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)) {
+                    } else if (problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
                         pb = new SimpleTemporalProblem(problemParsed);
                         typeOfProblem = "Temporal";
-                    } else if (!problemParsed.getRequirements().contains(PDDLRequireKey.DURATIVE_ACTIONS)
-                            && problemParsed.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+                    } else if (!problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
+                            && problemParsed.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
 
                         pb = new NumericProblem(problemParsed);
                         typeOfProblem = "Numeric";

@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 
@@ -45,9 +45,9 @@ public class AbstractNumericProblem extends ADLProblem implements Numeric {
      *
      * @return the list of PDDL requirements accepted by the problem.
      */
-    public Set<PDDLRequireKey> getAcceptedRequirements() {
-        Set<PDDLRequireKey> accepted = super.getAcceptedRequirements();
-        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
+    public Set<RequireKey> getAcceptedRequirements() {
+        Set<RequireKey> accepted = super.getAcceptedRequirements();
+        accepted.add(RequireKey.NUMERIC_FLUENTS);
         return accepted;
     }
 

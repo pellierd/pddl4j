@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.problem.operator.Method;
@@ -49,20 +49,20 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
      * @return the list of PDDL requirements accepted by the problem.
      */
     @Override
-    public Set<PDDLRequireKey> getAcceptedRequirements() {
-        Set<PDDLRequireKey> accepted = new HashSet<>();
-        accepted.add(PDDLRequireKey.ADL);
-        accepted.add(PDDLRequireKey.STRIPS);
-        accepted.add(PDDLRequireKey.TYPING);
-        accepted.add(PDDLRequireKey.EQUALITY);
-        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
-        accepted.add(PDDLRequireKey.HIERARCHY);
-        accepted.add(PDDLRequireKey.METHOD_PRECONDITIONS);
+    public Set<RequireKey> getAcceptedRequirements() {
+        Set<RequireKey> accepted = new HashSet<>();
+        accepted.add(RequireKey.ADL);
+        accepted.add(RequireKey.STRIPS);
+        accepted.add(RequireKey.TYPING);
+        accepted.add(RequireKey.EQUALITY);
+        accepted.add(RequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(RequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(RequireKey.HIERARCHY);
+        accepted.add(RequireKey.METHOD_PRECONDITIONS);
         return accepted;
     }
 

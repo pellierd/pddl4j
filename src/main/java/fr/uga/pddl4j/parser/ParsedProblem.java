@@ -45,7 +45,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     /**
      * The set of requirements.
      */
-    private Set<PDDLRequireKey> requirements;
+    private Set<RequireKey> requirements;
 
     /**
      * The list of types declared in the domain.
@@ -254,7 +254,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      *
      * @return the set of requirements.
      */
-    public final Set<PDDLRequireKey> getRequirements() {
+    public final Set<RequireKey> getRequirements() {
         return this.requirements;
     }
 
@@ -264,7 +264,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
-    public final boolean addRequirement(final PDDLRequireKey requirement) {
+    public final boolean addRequirement(final RequireKey requirement) {
         return this.requirements.add(requirement);
     }
 
@@ -759,7 +759,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
     private String toPDDLDomainString() {
         StringBuilder str = new StringBuilder();
         str.append("(define (domain ").append(this.domainName).append(")").append("\n(:requirements");
-        for (PDDLRequireKey r : this.requirements) {
+        for (RequireKey r : this.requirements) {
             str.append(" ").append(r);
         }
         str.append(")\n");
@@ -822,7 +822,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
         StringBuilder str = new StringBuilder();
         str.append("(define (problem ").append(this.problemName).append(")").append("\n(:domain ")
             .append(this.getDomainName()).append(")").append("\n(:requirements");
-        for (PDDLRequireKey r : this.requirements) {
+        for (RequireKey r : this.requirements) {
             str.append(" ").append(r);
         }
         str.append(")\n");

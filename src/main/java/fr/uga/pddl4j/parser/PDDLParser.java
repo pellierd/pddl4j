@@ -566,8 +566,8 @@ public final class PDDLParser implements Callable<Integer> {
      * <code>false</code> otherwise.
      */
     private boolean checkRequirements() {
-        return (this.getDomain().getRequirements().contains(PDDLRequireKey.METHOD_PRECONDITIONS)
-            && !this.getDomain().getRequirements().contains(PDDLRequireKey.HIERARCHY));
+        return (this.getDomain().getRequirements().contains(RequireKey.METHOD_PRECONDITIONS)
+            && !this.getDomain().getRequirements().contains(RequireKey.HIERARCHY));
     }
 
     /**

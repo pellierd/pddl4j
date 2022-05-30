@@ -64,7 +64,7 @@ public interface PDDLProblem extends Serializable {
      *
      * @return the set of requirements.
      */
-    Set<PDDLRequireKey> getRequirements();
+    Set<RequireKey> getRequirements();
 
     /**
      * Adds a requirements to the domain.
@@ -72,7 +72,7 @@ public interface PDDLProblem extends Serializable {
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
-    boolean addRequirement(final PDDLRequireKey requirement);
+    boolean addRequirement(final RequireKey requirement);
 
     /**
      * Returns the list of objects declared in the problem file.

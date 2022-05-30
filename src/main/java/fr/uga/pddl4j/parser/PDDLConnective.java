@@ -240,6 +240,10 @@ public enum PDDLConnective {
      */
     TASK_ID(""),
     /**
+     * PDDLConnective for time task id used in HDDL fragment.
+     */
+    TIMED_TASK_ID(""),
+    /**
      * PDDLConnective for ordering constraints used in HDDL fragment.
      */
     LESS_ORDERING_CONSTRAINT("<"),

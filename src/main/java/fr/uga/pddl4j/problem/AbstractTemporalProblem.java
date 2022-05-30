@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
@@ -53,21 +53,21 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
      *
      * @return the list of PDDL requirements accepted by the problem.
      */
-    public Set<PDDLRequireKey> getAcceptedRequirements() {
-        Set<PDDLRequireKey> accepted = new HashSet<>();
-        accepted.add(PDDLRequireKey.ADL);
-        accepted.add(PDDLRequireKey.STRIPS);
-        accepted.add(PDDLRequireKey.TYPING);
-        accepted.add(PDDLRequireKey.EQUALITY);
-        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
-        accepted.add(PDDLRequireKey.DURATIVE_ACTIONS);
-        accepted.add(PDDLRequireKey.DURATION_INEQUALITIES);
-        accepted.add(PDDLRequireKey.NUMERIC_FLUENTS);
+    public Set<RequireKey> getAcceptedRequirements() {
+        Set<RequireKey> accepted = new HashSet<>();
+        accepted.add(RequireKey.ADL);
+        accepted.add(RequireKey.STRIPS);
+        accepted.add(RequireKey.TYPING);
+        accepted.add(RequireKey.EQUALITY);
+        accepted.add(RequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(RequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(RequireKey.DURATIVE_ACTIONS);
+        accepted.add(RequireKey.DURATION_INEQUALITIES);
+        accepted.add(RequireKey.NUMERIC_FLUENTS);
         return accepted;
     }
 
@@ -126,7 +126,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
         }
 
         // Collect the function information (symbols and signatures)
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
             this.initFunctions();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Functions declared:\n"
@@ -164,7 +164,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
     @Override
     protected void preinstantiation() {
         super.preinstantiation();
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
             this.extractNumericInertia();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Numeric inertia detected:\n"
@@ -199,7 +199,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
             LOGGER.debug("Ground inertia detected:\n\n"
                 + this.toString(Data.GROUND_INERTIA) + "\n");
         }
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
             this.extractGroundNumericInertia();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Ground numeric inertia detected:\n\n"
@@ -230,7 +230,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
         }
         this.initOfMapFluentIndex();
 
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
             this.extractRelevantNumericFluents();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Relevant numeric fluents:\n"
@@ -246,7 +246,7 @@ public abstract class AbstractTemporalProblem extends ADLProblem implements Nume
         }
 
         this.finalizeInitialState();
-        if (this.getRequirements().contains(PDDLRequireKey.NUMERIC_FLUENTS)) {
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
             this.finalizeInitialNumericFluent();
             NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
             this.getInitialState().addNumericFluent(duration);

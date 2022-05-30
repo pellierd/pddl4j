@@ -38,11 +38,6 @@ public class Symbol<T> implements Serializable {
     private Location location;
 
     /**
-     * The time specifier of the symbol.
-     */
-    private PDDLTimeSpecifier timeSpecifier;
-
-    /**
      * Creates a symbol from a specified symbol.
      *
      * @param other the symbol.
@@ -52,7 +47,6 @@ public class Symbol<T> implements Serializable {
         if (other.getLocation() != null) {
             this.setLocation(new Location(other.getLocation()));
         }
-        this.setTimeSpecifier(other.getTimeSpecifier());
     }
 
     /**
@@ -66,7 +60,6 @@ public class Symbol<T> implements Serializable {
         this.setType(type);
         this.setValue(value);
         this.setLocation(location);
-        this.timeSpecifier = null;
     }
 
     /**
@@ -82,7 +75,6 @@ public class Symbol<T> implements Serializable {
     public Symbol(final SymbolType type, final T value, final int beginLine, final int beginColumn,
                   final int endLine, final int endColumn) {
         this(type, value, new Location(beginLine, beginColumn, endLine, endColumn));
-        this.timeSpecifier = null;
     }
 
     /**
@@ -173,25 +165,6 @@ public class Symbol<T> implements Serializable {
         this.getLocation().setEnd(end);
     }
 
-
-    /**
-     * Returns the time specifier of the symbol.
-     *
-     * @return the time specifier of the symbol.
-     */
-    public final PDDLTimeSpecifier getTimeSpecifier() {
-        return this.timeSpecifier;
-    }
-
-    /**
-     * Sets the time specifier of the symbol.
-     *
-     * @param  timeSpecifier the time specifier to set.
-     */
-    public final void setTimeSpecifier(final PDDLTimeSpecifier timeSpecifier) {
-        this.timeSpecifier = timeSpecifier;
-    }
-
     /**
      * Return the string image of this symbol.
      *
@@ -255,22 +228,6 @@ public class Symbol<T> implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder();
-        switch (this.type) {
-            case TASK_ID:
-                if (this.getTimeSpecifier() != null) {
-                    str.append("( ");
-                    str.append(this.getTimeSpecifier());
-                    str.append(" ");
-                    str.append(this.getImage());
-                    str.append(")");
-                } else {
-                    str.append(this.getImage());
-                }
-                break;
-            default:
-                str.append(this.getImage());
-        }
-        return str.toString();
+        return this.getImage();
     }
 }

@@ -15,7 +15,7 @@ package fr.uga.pddl4j.problem;
  * If not, see <http://www.gnu.org/licenses/>
  */
 
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,18 +50,18 @@ public class ADLProblem extends FinalizedProblem {
      * @return the list of PDDL requirements accepted by the problem.
      */
     @Override
-    public Set<PDDLRequireKey> getAcceptedRequirements() {
-        Set<PDDLRequireKey> accepted = new HashSet<>();
-        accepted.add(PDDLRequireKey.ADL);
-        accepted.add(PDDLRequireKey.STRIPS);
-        accepted.add(PDDLRequireKey.TYPING);
-        accepted.add(PDDLRequireKey.EQUALITY);
-        accepted.add(PDDLRequireKey.NEGATIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.DISJUNCTIVE_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.EXISTENTIAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.UNIVERSAL_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.QUANTIFIED_PRECONDITIONS);
-        accepted.add(PDDLRequireKey.CONDITIONAL_EFFECTS);
+    public Set<RequireKey> getAcceptedRequirements() {
+        Set<RequireKey> accepted = new HashSet<>();
+        accepted.add(RequireKey.ADL);
+        accepted.add(RequireKey.STRIPS);
+        accepted.add(RequireKey.TYPING);
+        accepted.add(RequireKey.EQUALITY);
+        accepted.add(RequireKey.NEGATIVE_PRECONDITIONS);
+        accepted.add(RequireKey.DISJUNCTIVE_PRECONDITIONS);
+        accepted.add(RequireKey.EXISTENTIAL_PRECONDITIONS);
+        accepted.add(RequireKey.UNIVERSAL_PRECONDITIONS);
+        accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
+        accepted.add(RequireKey.CONDITIONAL_EFFECTS);
         return accepted;
     }
 
@@ -141,7 +141,7 @@ public class ADLProblem extends FinalizedProblem {
                 + this.toString(Data.INERTIA) + "\n");
         }
         // Infer the type from the unary inertia
-        if (!this.getRequirements().contains(PDDLRequireKey.TYPING)) {
+        if (!this.getRequirements().contains(RequireKey.TYPING)) {
             this.inferTypesFromInertia();
             this.simplifyActionsWithInferredTypes();
             if (LOGGER.isDebugEnabled()) {

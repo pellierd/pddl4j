@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLRequireKey;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.plan.Plan;
@@ -51,14 +51,14 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      *
      * @return the requirements of the problem.
      */
-    Set<PDDLRequireKey> getRequirements();
+    Set<RequireKey> getRequirements();
 
     /**
      * Returns the accepted requirements of the problem.
      *
      * @return the accepted requirements of the problem.
      */
-    Set<PDDLRequireKey> getAcceptedRequirements();
+    Set<RequireKey> getAcceptedRequirements();
 
     /**
      * Returns the list of the type symbols of the problem.

@@ -50,7 +50,7 @@ public interface PDDLDomain extends Serializable {
      *
      * @return the set of requirements.
      */
-    Set<PDDLRequireKey> getRequirements();
+    Set<RequireKey> getRequirements();
 
     /**
      * Adds a requirements to the domain.
@@ -58,7 +58,7 @@ public interface PDDLDomain extends Serializable {
      * @param requirement the requirement to add.
      * @return <code>true</code> if the requirement was added; <code>false</code> otherwise.
      */
-    boolean addRequirement(final PDDLRequireKey requirement);
+    boolean addRequirement(final RequireKey requirement);
 
     /**
      * Returns the parsed types in the domain file.

@@ -68,6 +68,11 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     private boolean isPrimtive;
 
     /**
+     * The time specifier of the symbol.
+     */
+    private TimeSpecifier timeSpecifier;
+
+    /**
      * The location of the expression.
      */
     private Location location;
@@ -114,6 +119,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         if (other.getLocation() != null) {
             this.setLocation(new Location(other.getLocation()));
         }
+        this.setTimeSpecifier(other.getTimeSpecifier());
     }
 
     /**
@@ -133,6 +139,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         this.setPrefName(null);
         this.setTaskID(null);
         this.setPrimtive(false);
+        this.setTimeSpecifier(null);
         this.setLocation(null);
     }
 
@@ -362,6 +369,25 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     public final void setPrimtive(final boolean flag) {
         this.isPrimtive = flag;
     }
+
+    /**
+     * Returns the time specifier of the symbol.
+     *
+     * @return the time specifier of the symbol.
+     */
+    public final TimeSpecifier getTimeSpecifier() {
+        return this.timeSpecifier;
+    }
+
+    /**
+     * Sets the time specifier of the symbol.
+     *
+     * @param  timeSpecifier the time specifier to set.
+     */
+    public final void setTimeSpecifier(final TimeSpecifier timeSpecifier) {
+        this.timeSpecifier = timeSpecifier;
+    }
+
 
     /**
      * Return the location of the symbol.
@@ -1791,6 +1817,13 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case TASK_ID:
                 str.append(this.getTaskID().toString());
+                break;
+            case TIMED_TASK_ID:
+                str.append("( ");
+                str.append(this.getTimeSpecifier());
+                str.append(" ");
+                str.append(this.getTaskID().getImage());
+                str.append(")");
                 break;
             default:
                 throw new UnexpectedExpressionException(this.getConnective().toString());
