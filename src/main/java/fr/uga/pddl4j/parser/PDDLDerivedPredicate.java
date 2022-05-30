@@ -107,30 +107,6 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
     }
 
     /**
-     * This method renames the variable of the derived predicated and simplifies its body before converting it into
-     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
-     *
-     * @see Expression<String>#renameVariables(Expression)
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF()
-     */
-    public void normalize() {
-        // Rename the head of the derived predicate
-        final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol<String>> arguments = this.getHead().getArguments();
-        for (int i = 0; i < arguments.size(); i++) {
-            final TypedSymbol<String> argument = arguments.get(i);
-            final String image = Expression.renameVariables(argument, i);
-            context.put(image, argument.getValue());
-        }
-        // Rename the body of the derived predicate
-        Expression.renameVariables(this.getBody(), context);
-        this.getBody().simplify();
-        this.getBody().toNNF();
-
-    }
-
-    /**
      * Returns if this derived predicate is equal to another object.
      *
      * @param obj the other object.

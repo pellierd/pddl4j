@@ -103,29 +103,6 @@ public class PDDLAction extends PDDLAbstractOperator {
     }
 
     /**
-     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
-     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
-     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
-     *
-     * @param index the index of the first variable, index, i.e., ?Xi.
-     * @return the renamed variable.
-     * @see Expression<String>#renameVariables(Expression
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
-     */
-    protected Map<String, String> normalize(int index) {
-        final Map<String, String> context = super.normalize(index);
-        Expression.renameVariables(this.getEffects(), context);
-        this.getEffects().simplify();
-        this.getEffects().toNNF();
-        // Rename the duration if the operator is a durative action.
-        if (this.getDuration() != null) {
-            Expression.renameVariables(this.getDuration(), context);
-        }
-        return context;
-    }
-
-    /**
      * Returns a PDDL string representation of the operator.
      *
      * @return a string PDDL representation of the operator.

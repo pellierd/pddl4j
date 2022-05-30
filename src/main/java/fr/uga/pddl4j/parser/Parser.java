@@ -53,7 +53,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
- * Implements the <code>PDDLParser</code> of the PDD4L library.
+ * Implements the <code>Parser</code> of the PDD4L library.
  *
  * <p>
  * A simple example of how to use the parser:
@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
  * public static void main(String[] args) {
  *
  *  if (args.length == 2 &amp;&amp; args[0].equals(&quot;-p&quot;)) {
- *      PDDLParser parser = new PDDLParser();
+ *      Parser parser = new Parser();
  *      try {
  *          parser.parse(args[1]);
  *        } catch (FileNotFoundException e) {
@@ -72,7 +72,7 @@ import java.util.stream.Collectors;
  *          parser.getErrorManager().printAll();
  *      }
  *  } else if (args.length == 4 &amp;&amp; args[0].equals(&quot;-o&quot;) &amp;&amp; args[2].equals(&quot;-f&quot;)) {
- *    PDDLParser parser = new PDDLParser();
+ *    Parser parser = new Parser();
  *    try {
  *          parser.parse(args[1], args[3]);
  *        } catch (FileNotFoundException e) {
@@ -101,8 +101,8 @@ import java.util.stream.Collectors;
  * @author D Pellier
  * @version 2.0 - 28.01.10
  */
-@CommandLine.Command(name = "PDDLParser",
-    version = "PDDLParser 1.0",
+@CommandLine.Command(name = "Parser",
+    version = "Parser 1.0",
     description = "Parse PDDL domain and problem.",
     sortOptions = false,
     mixinStandardHelpOptions = true,
@@ -111,7 +111,7 @@ import java.util.stream.Collectors;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class PDDLParser implements Callable<Integer> {
+public final class Parser implements Callable<Integer> {
 
     /**
      * The logger of the class.
@@ -159,9 +159,9 @@ public final class PDDLParser implements Callable<Integer> {
     private File problemFile;
 
     /**
-     * Create a new <code>PDDLParser</code>.
+     * Create a new <code>Parser</code>.
      */
-    public PDDLParser() {
+    public Parser() {
         super();
         this.mgr = new ErrorManager();
     }
@@ -1748,16 +1748,16 @@ public final class PDDLParser implements Callable<Integer> {
         boolean check = true;
         int i = 0;
         // Rename the parameters
-        final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol<String>> parameters = action.getParameters();
-        for (final TypedSymbol<String> params : parameters) {
-            final String image = Expression.renameVariables(params, i);
-            context.put(image, params.getValue());
-            i++;
-        }
+        //final Map<String, String> context = new LinkedHashMap<>();
+        //final List<TypedSymbol<String>> parameters = action.getParameters();
+        //for (final TypedSymbol<String> params : parameters) {
+            //final String image = Expression.renameVariables(params, i);
+        //    context.put(image, params.getValue());
+        //    i++;
+        //}
         // Check preconditions
         final Expression<String> preconditions = action.getPreconditions();
-        Expression.renameVariables(preconditions, context);
+        //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is always applicable: "
@@ -1772,7 +1772,7 @@ public final class PDDLParser implements Callable<Integer> {
         }
         // Check effects
         final Expression<String> effects = action.getPreconditions();
-        Expression.renameVariables(effects, context);
+        //Expression.renameVariables(effects, context);
         check &= this.checkExpressionSemantic(effects);
         if (effects.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
@@ -1798,16 +1798,16 @@ public final class PDDLParser implements Callable<Integer> {
         boolean check = true;
         int i = 0;
         // Rename the parameters
-        final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol<String>> parameters = method.getParameters();
-        for (final TypedSymbol<String> params : parameters) {
-            final String image = Expression.renameVariables(params, i);
-            context.put(image, params.getValue());
-            i++;
-        }
+        //final Map<String, String> context = new LinkedHashMap<>();
+        //final List<TypedSymbol<String>> parameters = method.getParameters();
+        //for (final TypedSymbol<String> params : parameters) {
+        //    //final String image = Expression.renameVariables(params, i);
+        //    context.put(image, params.getValue());
+        //    i++;
+        //}
         // Check the method preconditions
         final Expression<String> preconditions = method.getPreconditions();
-        Expression.renameVariables(preconditions, context);
+        //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
@@ -2169,13 +2169,13 @@ public final class PDDLParser implements Callable<Integer> {
     }
 
     /**
-     * The main method of the <code>PDDLParser</code> planner.
+     * The main method of the <code>Parser</code> planner.
      *
      * @param args the arguments of the command line.
      */
     public static void main(String[] args) {
         try {
-            final PDDLParser parser = new PDDLParser();
+            final Parser parser = new Parser();
             CommandLine cmd = new CommandLine(parser);
             int exitCode = (int) cmd.execute(args);
             System.exit(exitCode);

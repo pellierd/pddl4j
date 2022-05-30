@@ -675,44 +675,42 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
      * Normalize the domain. This method rename the variables used in the domain and normalize its
      * actions and derived predicates.
      *
-     * @see PDDLAction#normalize()
-     * @see PDDLDerivedPredicate#normalize()
      */
     public void normalize() {
         // Rename all the variables from the predicates declaration
         for (int i = 0; i < this.getPredicates().size(); i++) {
-            Expression.renameVariables(this.getPredicates().get(i));
+            this.renameVariables(this.getPredicates().get(i));
         }
         // Rename all the variables from the functions declaration
         for (int i = 0; i < this.getFunctions().size(); i++) {
-            Expression.renameVariables(this.getFunctions().get(i));
+            this.renameVariables(this.getFunctions().get(i));
         }
         // Rename all the variables from the tasks declaration
         for (int i = 0; i < this.getTasks().size(); i++) {
-            Expression.renameVariables(this.getTasks().get(i));
+            this.renameVariables(this.getTasks().get(i));
         }
         // Rename all the variables from the constraint declaration of the domain
         if (this.getConstraints() != null) {
-            Expression.renameVariables(this.getConstraints());
+            this.renameVariables(this.getConstraints());
             this.getConstraints().toNNF();
         }
         // Rename all the variables from the derived predicates
         for (int i = 0; i < this.getDerivesPredicates().size(); i++) {
-            this.getDerivesPredicates().get(i).normalize();
+            this.normalize(this.getDerivesPredicates().get(i));
         }
 
         // Rename all the variable from the actions
         for (int i = 0; i < this.getActions().size(); i++) {
-            this.getActions().get(i).normalize();
+            this.normalize(this.getActions().get(i));
         }
         // Rename all the variable from the methods
         for (int i = 0; i < this.getMethods().size(); i++) {
-            this.getMethods().get(i).normalize();
+            this.normalize(this.getMethods().get(i));
         }
 
         // Rename the goal of the problem
         if (this.getGoal() != null) {
-            Expression.renameVariables(this.getGoal());
+            this.renameVariables(this.getGoal());
             this.getGoal().simplify();
             this.getGoal().toNNF();
         }
@@ -724,9 +722,9 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
             }
             // Rename task id the tasks contained the method.
             final Map<String, String> taskIDCtx = new LinkedHashMap<>();
-            Expression.renameTaskIDs(tn.getTasks(), taskIDCtx);
+            this.renameTaskIDs(tn.getTasks(), taskIDCtx);
             // Rename the tag ID used in the ordering constraints of the method
-            Expression.renameTaskIDs(tn.getOrdering(), taskIDCtx);
+            this.renameTaskIDs(tn.getOrdering(), taskIDCtx);
             // In this case enumerate the orderings contraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
                 tn.setOrderingConstraints(new Expression<String>(PDDLConnective.AND));
@@ -738,6 +736,433 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
                     tn.getOrdering().addChild(c);
                 }
             }
+        }
+    }
+
+    /**
+     * Normalizes the methods. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
+     *
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
+     */
+    private final void normalize(PDDLAction action) {
+        this.normalize(action, 0);
+    }
+
+    /**
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
+     *
+     * @param index the index of the first variable, index, i.e., ?Xi.
+     * @return the renamed variable.
+     * @see Expression<String>#renameVariables(Expression
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
+     */
+    private Map<String, String> normalize(PDDLAction action, int index) {
+        final Map<String, String> context = this.normalizeParameters(action, index);
+        // Rename the preconditions
+        this.renameVariables(action.getPreconditions(), context);
+        action.getPreconditions().simplify();
+        action.getPreconditions().toNNF();
+        this.renameVariables(action.getEffects(), context);
+        action.getEffects().simplify();
+        action.getEffects().toNNF();
+        // Rename the duration if the operator is a durative action.
+        if (action.getDuration() != null) {
+            this.renameVariables(action.getDuration(), context);
+        }
+        return context;
+    }
+
+
+    /**
+     * Normalizes the methods. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
+     *
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
+     */
+    private final void normalize(PDDLMethod method) {
+        this.normalize(method, 0);
+    }
+
+    /**
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
+     *
+     * @param index the index of the first variable, index, i.e., ?Xi.
+     * @return the renamed variable.
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF() ()
+     */
+    private Map<String, String> normalizeParameters(PDDLOperator operator, int index) {
+        int i = index;
+        // Rename the parameters
+        final Map<String, String> context = new LinkedHashMap<>();
+        final List<TypedSymbol<String>> parameters = operator.getParameters();
+        for (final TypedSymbol<String> params : parameters) {
+            final String image = this.renameVariables(params, i);
+            context.put(image, params.getValue());
+            i++;
+        }
+        return context;
+    }
+
+
+
+    /**
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, and its
+     * durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence. More over the
+     * method rename the task ID.
+     *
+     * @param index the index of the first variable, index, i.e., ?Xi.
+     * @see Expression#simplify()
+     * @see Expression#toNNF()
+     */
+    private Map<String, String> normalize(PDDLMethod method, int index) {
+        // Rename the parameters
+        final Map<String, String> varCtx = this.normalizeParameters(method, index);
+        // Rename the preconditions
+        this.renameVariables(method.getPreconditions(), varCtx);
+        method.getPreconditions().simplify();
+        method.getPreconditions().toNNF();
+        // Rename the variable to carried out task of the method.
+        this.renameVariables(method.getTask(), varCtx);
+        // Rename variables of the tasks contained the method.
+        this.renameVariables(method.getSubTasks(), varCtx);
+        if (method.getSubTasks().getChildren().size() == 1) {
+            method.setTotallyOrdered(true);
+        }
+        // Rename task id the tasks contained the method.
+        final Map<String, String> taskIDCtx = new LinkedHashMap<>();
+        this.renameTaskIDs(method.getSubTasks(), taskIDCtx);
+        // Rename the tag ID used in the durations constraints of the method
+        if (method.isDurative()) {
+            this.renameTaskIDs(method.getDuration(), taskIDCtx);
+        }
+        // Rename the tag ID used in the ordering constraints of the method
+        this.renameTaskIDs(method.getOrdering(), taskIDCtx);
+        // In this case enumerate the orderings constraints in the cas of totally ordered
+        if (method.isTotallyOrdered()) {
+            method.setOrdering(new Expression<String>(PDDLConnective.AND));
+            for (int j = 1; j < method.getSubTasks().getChildren().size(); j++) {
+                Expression<String> c = new Expression<String>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
+                c.setArguments(new LinkedList<Symbol<String>>());
+                c.getArguments().add(method.getSubTasks().getChildren().get(j - 1).getTaskID());
+                c.getArguments().add(method.getSubTasks().getChildren().get(j).getTaskID());
+                method.getOrdering().addChild(c);
+            }
+        }
+        // Rename the logical constraints
+        this.renameVariables(method.getConstraints(), varCtx);
+        Expression<String> preconditions = null;
+        if (!method.getPreconditions().getConnective().equals(PDDLConnective.AND)) {
+            preconditions = method.getPreconditions();
+        } else {
+            preconditions = new Expression<String>(PDDLConnective.AND);
+            preconditions.addChild(method.getPreconditions());
+        }
+        Iterator<Expression<String>> i = method.getConstraints().getChildren().iterator();
+        while (i.hasNext()) {
+            final Expression<String> constraint = i.next();
+            switch (constraint.getConnective()) {
+                case EQUAL_COMPARISON:
+                    preconditions.addChild(constraint);
+                    i.remove();
+                    break;
+                case NOT:
+                    if (constraint.getChildren().get(0).equals(PDDLConnective.EQUAL_COMPARISON)) {
+                        preconditions.addChild(constraint);
+                        i.remove();
+                    }
+                    break;
+                default:
+            }
+        }
+        method.setPreconditions(preconditions);
+        method.getPreconditions().simplify();
+        method.getPreconditions().toNNF();
+        return varCtx;
+    }
+
+    /**
+     * This method renames the variable of the derived predicated and simplifies its body before converting it into
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
+     *
+     * @see Expression<String>#renameVariables(Expression)
+     * @see Expression<String>#simplify()
+     * @see Expression<String>#toNNF()
+     */
+    private void normalize(final PDDLDerivedPredicate derivedPredicate) {
+        // Rename the head of the derived predicate
+        final Map<String, String> context = new LinkedHashMap<>();
+        final List<TypedSymbol<String>> arguments = derivedPredicate.getHead().getArguments();
+        for (int i = 0; i < arguments.size(); i++) {
+            final TypedSymbol<String> argument = arguments.get(i);
+            final String image = this.renameVariables(argument, i);
+            context.put(image, argument.getValue());
+        }
+        // Rename the body of the derived predicate
+        this.renameVariables(derivedPredicate.getBody(), context);
+        derivedPredicate.getBody().simplify();
+        derivedPredicate.getBody().toNNF();
+
+    }
+
+    /**
+     * Renames the variables contained in the expression. The variable renames have the form ?X0,..., ?Xn.
+     */
+    private void renameVariables(Expression<String> exp) {
+        this.renameVariables(exp, new LinkedHashMap<>());
+    }
+
+    /**
+     * Renames the variables contained in the expression with a specified symbol, i.e., the variable
+     * already renamed. The variable renames have the form ?X0, ..., ?Xn.
+     *
+     * @param context the images of the renamed variable.
+     * @throws MalformedExpressionException if this expression is malformed.
+     * @see Expression#isMalformedExpression()
+     */
+    private void renameVariables(final Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
+        if (exp.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + exp.getConnective() + " is malformed");
+        }
+        switch (exp.getConnective()) {
+            case ATOM:
+            case FN_HEAD:
+            case EQUAL_ATOM:
+            case TASK:
+                for (int i = 0; i < exp.getArguments().size(); i++) {
+                    this.renameVariables( exp.getArguments().get(i), context);
+                }
+                break;
+            case AND:
+            case OR:
+            case NOT:
+            case IMPLY:
+            case F_EXP_T:
+            case EQUAL_COMPARISON:
+            case FN_ATOM:
+            case WHEN:
+            case LESS_COMPARISON:
+            case LESS_OR_EQUAL_COMPARISON:
+            case GREATER_COMPARISON:
+            case GREATER_OR_EQUAL_COMPARISON:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MINUS:
+            case PLUS:
+            case ASSIGN:
+            case INCREASE:
+            case DECREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+            case MINIMIZE:
+            case MAXIMIZE:
+            case UMINUS:
+            case F_EXP:
+            case ALWAYS_CONSTRAINT:
+            case SOMETIME_CONSTRAINT:
+            case AT_MOST_ONCE_CONSTRAINT:
+            case HOLD_AFTER_CONSTRAINT:
+            case WITHIN_CONSTRAINT:
+            case ALWAYS_WITHIN_CONSTRAINT:
+            case HOLD_DURING_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    Expression<String> ei = exp.getChildren().get(i);
+                    this.renameVariables(ei, context);
+                }
+                break;
+            case FORALL:
+            case EXISTS:
+                for (int i = 0; i < exp.getQuantifiedVariables().size(); i++) {
+                    final Symbol<String> var = exp.getQuantifiedVariables().get(i);
+                    final String image = this.renameVariables(var, context.size() + 1);
+                    context.put(image, var.getValue());
+                }
+                Expression<String> e0 = exp.getChildren().get(0);
+                this.renameVariables(e0, context);
+                break;
+            case IS_VIOLATED:
+            case NUMBER:
+            case TASK_ID:
+            case TIME_VAR:
+            case TIMED_LITERAL:
+            case TRUE:
+            case FALSE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+    }
+
+    /**
+     * Renames the symbol from a specified index. The symbol is renamed if only if this symbol is a
+     * variable, otherwise nothing is done. After rename operation the variable will have the form
+     * <code>?Xn</code> where <code>n</code> is the specified index.
+     *
+     * @param index the index of the symbol.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws IllegalArgumentException if index is &#60; 0.
+     */
+    private String renameVariables(final Symbol<String> symbol, final int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("index < 0");
+        }
+        String img = null;
+        if (symbol.getType().equals(SymbolType.VARIABLE)) {
+            img = symbol.getValue();
+            symbol.setValue(Symbol.DEFAULT_VARIABLE_SYMBOL + index);
+        }
+        return img;
+    }
+
+    /**
+     * Renames the variable contained in this typed list. For instance, if the nth argument is a
+     * variable it will be rename <code>?Xn</code>.
+     *
+     */
+    private void renameVariables(final NamedTypedList list) {
+        for (int i = 0; i < list.getArguments().size(); i++) {
+            this.renameVariables(list.getArguments().get(i), i);
+        }
+    }
+
+    /**
+     * Renames the symbol from a specified symbolEncoding. The symbol is renamed if only if this symbol is a
+     * variable, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed variables.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     * @throws NullPointerException if context == null.
+     */
+    private String renameVariables(final Symbol<String> symbol, final Map<String, String> context) {
+        String img = null;
+        if (symbol.getType().equals(SymbolType.VARIABLE)) {
+            img = symbol.getValue();
+            final String newImage = context.get(img);
+            if (newImage != null) {
+                symbol.setValue(newImage);
+                return img;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Renames the task ID symbol according to a specific context. The symbol is renamed if only if this symbol is a
+     * task ID, otherwise nothing is done.
+     *
+     * @param context the images of the already renamed task ID.
+     * @return the old image of the symbol or null if the symbol was not renamed.
+     */
+    private String renameTaskID(Symbol<String> symbol, final Map<String, String> context) {
+        if (symbol.getType().equals(SymbolType.TASK_ID)) {
+            String image = symbol.getValue();
+            String newImage = context.get(image);
+            if (newImage == null) {
+                newImage = Symbol.DEFAULT_TASK_ID_SYMBOL + context.size();
+                context.put(image, newImage);
+            }
+            symbol.setValue(newImage);
+            return image;
+        }
+        return null;
+    }
+
+
+    /**
+     * Renames the tag of the tasks contained in the expression. The tag tasks renames have the form T0, ..., Tn.
+     */
+    public void renameTaskIDs(Expression<String> exp) {
+        this.renameTaskIDs(exp, new LinkedHashMap<>());
+    }
+
+    /**
+     * Renames the ID of the task contained in the expression with a specified symbol, i.e., the tag tasks
+     * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are alowed as
+     * tasks expression for the moment in method description.
+     *
+     * @param context the images of the renamed ID of the task.
+     * @throws MalformedExpressionException if this expression is not an AND expression.
+     * @see Expression#isMalformedExpression()
+     */
+    private void renameTaskIDs(Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
+        if (exp.isMalformedExpression()) {
+            throw new MalformedExpressionException("Expression " + exp.getConnective() + " is malformed");
+        }
+        switch (exp.getConnective()) {
+            case TASK:
+                // Set a dummy taskID to task if no task taskID was specified
+                if (exp.getTaskID() == null) {
+                    String newTaskID = new String(Symbol.DEFAULT_TASK_ID_SYMBOL + context.size());
+                    Symbol<String> taskID = new Symbol<String>(exp.getSymbol());
+                    taskID.setType(SymbolType.TASK_ID);
+                    taskID.setValue(newTaskID);
+                    exp.setTaskID(taskID);
+                    context.put(newTaskID, newTaskID);
+                } else {
+                    this.renameTaskID(exp.getTaskID(), context);
+                }
+                break;
+            case F_TASK_TIME:
+                exp.getArguments().get(0).rename(context);
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+            case EQUAL_ORDERING_CONSTRAINT: // Add method ordering HDDL2.1
+                this.renameTaskID(exp.getChildren().get(0).getTaskID(), context);
+                this.renameTaskID(exp.getChildren().get(1).getTaskID(), context);
+                break;
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case SOMETIME_BEFORE_METHOD_CONSTRAINT:
+            case SOMETIME_AFTER_METHOD_CONSTRAINT:
+                this.renameTaskID(exp.getChildren().get(0).getTaskID(), context);
+                break;
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+            case HOLD_DURING_METHOD_CONSTRAINT:
+                this.renameTaskID(exp.getChildren().get(0).getTaskID(), context);
+                this.renameTaskID(exp.getChildren().get(1).getTaskID(), context);
+                break;
+            case AT_END_METHOD_CONSTRAINT:
+            case AT_START_METHOD_CONSTRAINT:
+            case ALWAYS_METHOD_CONSTRAINT:
+            case AT_MOST_ONCE_METHOD_CONSTRAINT:
+            case SOMETIME_METHOD_CONSTRAINT:
+                // do nothing
+                break;
+            default:
+                for (int i = 0; i < exp.getChildren().size(); i++) {
+                    Expression<String> ei = exp.getChildren().get(i);
+                    this.renameTaskIDs(ei, context);
+                }
+                break;
         }
     }
 

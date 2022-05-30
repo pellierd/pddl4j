@@ -17,10 +17,8 @@ package fr.uga.pddl4j.examples;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.ParsedProblem;
-
-import java.io.FileNotFoundException;
 
 /**
  * The class is an example class. It shows how to use the library to create a PDDL parser and use it to parse PDDL
@@ -47,7 +45,7 @@ public class PDDLParserExample {
 
         try {
             // Creates an instance of the PDDL parser
-            final PDDLParser parser = new PDDLParser();
+            final Parser parser = new Parser();
             // Parses the domain and the problem files.
             final ParsedProblem parsedProblem = parser.parse(args[0], args[1]);
             // Gets the error manager of the parser

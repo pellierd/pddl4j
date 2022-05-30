@@ -234,47 +234,6 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
     }
 
     /**
-     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
-     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
-     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
-     *
-     * @see Expression<String>#renameVariables(Expression)
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
-     */
-    public final void normalize() {
-        this.normalize(0);
-    }
-
-    /**
-     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
-     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
-     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
-     *
-     * @param index the index of the first variable, index, i.e., ?Xi.
-     * @return the renamed variable.
-     * @see Expression<String>#renameVariables(Expression)
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
-     */
-    protected Map<String, String> normalize(int index) {
-        int i = index;
-        // Rename the parameters
-        final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol<String>> parameters = this.getParameters();
-        for (final TypedSymbol<String> params : parameters) {
-            final String image = Expression.renameVariables(params, i);
-            context.put(image, params.getValue());
-            i++;
-        }
-        // Rename the preconditions
-        Expression.renameVariables(this.getPreconditions(), context);
-        this.getPreconditions().simplify();
-        this.getPreconditions().toNNF();
-        return context;
-    }
-
-    /**
      * Return if this operator is equals to another object.
      *
      * @param object the other object.

@@ -2,7 +2,7 @@ package fr.uga.pddl4j.test;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
@@ -131,7 +131,7 @@ public abstract class Tools {
         try {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
-            PDDLParser parser = new PDDLParser();
+            Parser parser = new Parser();
             ParsedProblem parsedProblem = parser.parse(domain, problem);
             ErrorManager errorManager = parser.getErrorManager();
             if (errorManager.isEmpty()) {
@@ -396,7 +396,7 @@ public abstract class Tools {
 
             // Parses the PDDL domain and problem description
             try {
-                PDDLParser parser = new PDDLParser();
+                Parser parser = new Parser();
                 ParsedProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
                 ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
@@ -449,7 +449,7 @@ public abstract class Tools {
     }
 
     /**
-     * Instantiate the PDDLParser and parse all domains and problems in the specified test path.
+     * Instantiate the Parser and parse all domains and problems in the specified test path.
      *
      * @param currentTestPath the path where try to find domain and problems pddl files
      * @param extension the file extension .pddl or .hddl
@@ -463,7 +463,7 @@ public abstract class Tools {
             return null;
         }
 
-        final PDDLParser parser = new PDDLParser();
+        final Parser parser = new Parser();
         final ArrayList<String> errors = new ArrayList<>();
         String currentDomain = currentTestPath + "domain" + extension;
         boolean oneDomainPerProblem = false;

@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
@@ -374,7 +374,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        final PDDLParser parser = this.getParser();
+        final Parser parser = this.getParser();
         final ParsedProblem parsedProblem = parser.parse(this.getDomain(), this.getProblem());
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);

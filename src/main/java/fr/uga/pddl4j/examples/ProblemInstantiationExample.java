@@ -17,7 +17,7 @@ package fr.uga.pddl4j.examples;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -48,7 +48,7 @@ public class ProblemInstantiationExample {
 
         try {
             // Creates an instance of the PDDL parser
-            final PDDLParser parser = new PDDLParser();
+            final Parser parser = new Parser();
             // Parses the domain and the problem files.
             final ParsedProblem parsedProblem = parser.parse(args[0], args[1]);
             // Gets the error manager of the parser

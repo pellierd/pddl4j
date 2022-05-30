@@ -19,9 +19,6 @@
 
 package fr.uga.pddl4j.test.parser;
 
-import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
 import fr.uga.pddl4j.test.Tools;
 
 import org.junit.Assert;
@@ -30,9 +27,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * This class implements the junit test of the pddl parser of the library on HDDL IPC benchmarks. The IPC

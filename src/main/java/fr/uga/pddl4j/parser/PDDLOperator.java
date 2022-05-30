@@ -119,12 +119,4 @@ public interface PDDLOperator extends ParsedObject {
      */
     boolean isDurative();
 
-    /**
-     * Normalizes the operators.
-     *
-     * @see Expression<String>#renameVariables()
-     * @see Expression<String>#moveNegationInward()
-     */
-    void normalize();
-
 }

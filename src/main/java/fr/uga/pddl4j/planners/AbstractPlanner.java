@@ -17,7 +17,7 @@ package fr.uga.pddl4j.planners;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.PDDLParser;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
@@ -66,7 +66,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     /**
      * The parser of the planner.
      */
-    private PDDLParser parser;
+    private Parser parser;
 
     /**
      * The parsed problem.
@@ -89,7 +89,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     public AbstractPlanner() {
         super();
         this.setConfiguration(Planner.getDefaultConfiguration());
-        this.parser = new PDDLParser();
+        this.parser = new Parser();
         this.statistics = new Statistics();
         this.parsedProblem = null;
         this.instantiateProblem = null;
@@ -311,7 +311,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      *
      * @return the parser used by the planner.
      */
-    protected PDDLParser getParser() {
+    protected Parser getParser() {
         return this.parser;
     }
 

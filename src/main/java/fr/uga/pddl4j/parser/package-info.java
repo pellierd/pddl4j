@@ -24,7 +24,7 @@
  * public static void main(String[] args) {
  *
  *  if (args.length == 2 &amp;&amp; args[0].equals(&quot;-p&quot;)) {
- *      PDDLParser parser = new PDDLParser();
+ *      Parser parser = new Parser();
  *      try {
  *          parser.parse(args[1]);
  *        } catch (FileNotFoundException e) {
@@ -34,7 +34,7 @@
  *          parser.getErrorManager().printAll();
  *      }
  *  } else if (args.length == 4 &amp;&amp; args[0].equals(&quot;-o&quot;) &amp;&amp; args[2].equals(&quot;-f&quot;)) {
- *    PDDLParser parser = new PDDLParser();
+ *    Parser parser = new Parser();
  *    try {
  *          parser.parse(args[1], args[3]);
  *        } catch (FileNotFoundException e) {
