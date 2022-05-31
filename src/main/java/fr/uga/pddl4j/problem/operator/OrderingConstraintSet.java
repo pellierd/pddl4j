@@ -52,7 +52,7 @@ public class OrderingConstraintSet extends SquareBitMatrix {
 
     /**
      * Returns <code>true</code> if the orderings constraints is totally ordered. A ordering constraints set with
-     * strictly less than 2 constraints is tottally ordered.
+     * strictly less than 2 constraints is totally ordered.
      *
      * @return <code>true</code> if the ordering constraints set is totally ordered; <code>false</code> otherwise.
      */

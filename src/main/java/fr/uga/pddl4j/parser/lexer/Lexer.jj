@@ -2051,7 +2051,7 @@ PDDLTaskNetwork task_network() : // ADD HDDL
     | LOOKAHEAD (1)
         (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
         tasks = subtask_def()
-        [<ORDERING> ordering = htn_ordering_constraints_def()]
+        //[<ORDERING> ordering = htn_ordering_constraints_def()]
         [<CONSTRAINTS> constraints = htn_constraints_def()]
         {
             return new PDDLTaskNetwork(tasks, ordering, constraints, true);
@@ -2206,7 +2206,7 @@ Expression<String> htn_ordering_constraint() : // ADD HDDL
     Expression<String> exp = null;
 }
 {
-    (   LOOKAHEAD(3)
+    (   LOOKAHEAD(3, {!this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
             exp = less_htn_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = equal_htn_temporal_ordering_constraint()
@@ -2218,6 +2218,8 @@ Expression<String> htn_ordering_constraint() : // ADD HDDL
             exp = great_htn_temporal_ordering_constraint()
     |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
             exp = great_or_equal_htn_temporal_ordering_constraint()
+    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+                exp = not_equal_htn_temporal_ordering_constraint()
     ) {
         return exp;
     }
@@ -2327,6 +2329,23 @@ Expression<String> great_or_equal_htn_temporal_ordering_constraint() : // ADD HD
     begin=left_bracket() <GEQUAL> id1 = timed_task_id() id2 = timed_task_id() end=right_bracket() {
         exp.addChild(id1);
         exp.addChild(id2);
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> not_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(PDDLConnective.NOT);
+    Expression<String> equal = null;
+    Token begin = null;
+    Token end = null;
+
+}
+{
+    begin=left_bracket() <NOT> equal = equal_htn_temporal_ordering_constraint() end=right_bracket() {
+        exp.addChild(equal);
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
