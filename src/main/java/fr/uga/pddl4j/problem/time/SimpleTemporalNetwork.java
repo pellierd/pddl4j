@@ -6,6 +6,8 @@ import java.util.List;
 
 public class SimpleTemporalNetwork implements Serializable {
 
+    private boolean update;
+
     private List<List<TemporalRelation>> network;
 
     private SimpleTemporalNetwork(int size) {
@@ -17,6 +19,7 @@ public class SimpleTemporalNetwork implements Serializable {
             }
             this.network.add(list);
         }
+        this.update = false;
     }
 
     public TemporalRelation get(int i, int j) {
@@ -26,39 +29,68 @@ public class SimpleTemporalNetwork implements Serializable {
     public void set(int i, int j, TemporalRelation relation) {
         this.network.get(i).set(j, relation);
         this.network.get(j).set(i, relation.symmetric());
+        this.update = true;
     }
 
+
+    /**
+     * Returns if the network is consistent or not.
+     *
+     * @return if the network is consistent or not.
+     */
     private boolean isConsistent() {
-        boolean update = false;
-        do {
-            for (int k = 0; k < this.size(); k++) {
-                for (int i = 0; i < this.size(); i++) {
-                    for (int j = i + 1; j < this.size(); j++) {
-                        if (i != k && j != k) {
-                            TemporalRelation cij = this.get(i, j);
-                            TemporalRelation cik = this.get(i, k);
-                            TemporalRelation ckj = this.get(k, j);
-                            TemporalRelation newcij = cij.intersect(cik.compose(ckj));
-                            this.set(i, j, newcij);
-                            if (newcij.equals(TemporalRelation.EMPTY)) {
-                                return false;
-                            }
+        for (int k = 0; k < this.network.size(); k++) {
+            for (int i = 0; i < this.network.size(); i++) {
+                for (int j = i + 1; j < this.network.size(); j++) {
+                    if (i != k && j != k) {
+                        TemporalRelation cij = this.get(i, j);
+                        TemporalRelation cik = this.get(i, k);
+                        TemporalRelation ckj = this.get(k, j);
+                        TemporalRelation newcij = cij.intersect(cik.compose(ckj));
+                        this.set(i, j, newcij);
+                        if (newcij.equals(TemporalRelation.EMPTY)) {
+                            return false;
                         }
                     }
                 }
             }
-        } while (update);
+        }
         return true;
     }
 
-    public int size() {
-        return this.network.size();
+    /**
+     * Compute the transitive closure of the relation.
+     */
+    public void transitiveClosure() {
+        for (int k = 0; k < this.network.size(); k++) {
+            for (int i = 0; i < this.network.size(); i++) {
+                for (int j = i + 1; j < this.network.size(); j++) {
+                    if (i != k && j != k) {
+                        this.set(i, j, this.get(i, j).intersect(this.get(i, k).compose(this.get(k, j))));
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * The number of tasks of the simple temporal network.
+     *
+     * @return number of tasks of the simple temporal network.
+     */
+    public int size() {
+        return this.network.size()/2;
+    }
+
+    /**
+     * Returns a string representation of the simple task network.
+     *
+     * @return a string representation of the simple task network.
+     */
     public String toString() {
         StringBuilder str = new StringBuilder();
-        for (int i = 0; i < this.size(); i++) {
-            for (int j = 0; j < this.size(); j++) {
+        for (int i = 0; i < this.network.size(); i++) {
+            for (int j = 0; j < this.network.size(); j++) {
                 str.append("(T");
                 str.append(i/2);
                 if (i%2 == 0) {
@@ -96,7 +128,7 @@ public class SimpleTemporalNetwork implements Serializable {
         // T0_start = T2_start
         network.set(0, 4, TemporalRelation.EQUAL);
         // T2_end < T0_start
-        //network.set(5, 0, TemporalRelation.LESS);
+        network.set(5, 0, TemporalRelation.LESS);
 
         // T3_end > T2_start
         //network.set(7, 4, TemporalRelation.GREATER);
