@@ -959,6 +959,11 @@ public abstract class AbstractProblem implements Problem {
         // Encode the task carried out by the method
         final Expression<Integer> task = this.initExpression(method.getTask(), variables);
         intMeth.setTask(task);
+        // Encode the duration of the method
+        if (method.isDurative()) {
+            final Expression<Integer> duration = this.initExpression(method.getDuration(), variables);
+            intMeth.setDuration(duration);
+        }
         // Encode the preconditions of the method
         final Expression<Integer> preconditions = this.initExpression(method.getPreconditions(), variables);
         intMeth.setPreconditions(preconditions);

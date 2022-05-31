@@ -36,6 +36,11 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
     private Expression<Integer> preconditions;
 
     /**
+     * The duration of the action.
+     */
+    private Expression<Integer> duration;
+
+    /**
      * Creates a new operator from an other.
      *
      * @param other the other operator.
@@ -43,6 +48,9 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
     protected AbstractIntOperator(final AbstractIntOperator other) {
         super(other);
         this.setPreconditions(new Expression<>(other.getPreconditions()));
+        if (other.getDuration() != null) {
+            this.duration = new Expression<>(other.getDuration());
+        }
     }
 
     /**
@@ -54,6 +62,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
     protected AbstractIntOperator(final String name, final int arity) {
         super(name, arity);
         this.preconditions = new Expression<>(PDDLConnective.OR);
+        this.duration = null;
     }
 
     /**
@@ -86,6 +95,33 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      */
     public final void setPreconditions(final Expression<Integer> preconditions) {
         this.preconditions = preconditions;
+    }
+
+    /**
+     * Returns if this action is a durative action.
+     *
+     * @return <code>true</code> if this action is durative; <code>false</code> otherwise.
+     */
+    public final boolean isDurative() {
+        return this.duration != null;
+    }
+
+    /**
+     * Returns the duration of the action.
+     *
+     * @return the duration of the action.
+     */
+    public final Expression<Integer> getDuration() {
+        return this.duration;
+    }
+
+    /**
+     * Sets the duration of the action.
+     *
+     * @param duration the duration to set.
+     */
+    public final void setDuration(final Expression<Integer> duration) {
+        this.duration = duration;
     }
 }
 

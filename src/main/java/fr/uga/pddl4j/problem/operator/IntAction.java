@@ -52,11 +52,6 @@ public final class IntAction extends AbstractIntOperator {
     private double cost;
 
     /**
-     * The duration of the action.
-     */
-    private Expression<Integer> duration;
-
-    /**
      * Create a new action from a specified action. This constructor create a deep copy of the
      * specified action.
      *
@@ -66,9 +61,6 @@ public final class IntAction extends AbstractIntOperator {
         super(other);
         this.effects = new Expression<>(other.getEffects());
         this.cost = other.getCost();
-        if (other.getDuration() != null) {
-            this.duration = new Expression<>(other.getDuration());
-        }
     }
 
     /**
@@ -81,34 +73,6 @@ public final class IntAction extends AbstractIntOperator {
         super(name, arity);
         this.effects = new Expression<>(PDDLConnective.AND);
         this.cost = IntAction.DEFAULT_COST;
-        this.duration = null;
-    }
-
-    /**
-     * Returns if this action is a durative action.
-     *
-     * @return <code>true</code> if this action is durative; <code>false</code> otherwise.
-     */
-    public final boolean isDurative() {
-        return this.duration != null;
-    }
-
-    /**
-     * Returns the duration of the action.
-     *
-     * @return the duration of the action.
-     */
-    public final Expression<Integer> getDuration() {
-        return this.duration;
-    }
-
-    /**
-     * Sets the duration of the action.
-     *
-     * @param duration the duration to set.
-     */
-    public final void setDuration(final Expression<Integer> duration) {
-        this.duration = duration;
     }
 
     /**
