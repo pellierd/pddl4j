@@ -56,6 +56,11 @@ public final class IntTaskNetwork implements Serializable {
     private Expression<Integer> orderingConstraints;
 
     /**
+     * The expression that represents the constraints of the task network.
+     */
+    private Expression<Integer> constraints;
+
+    /**
      * A boolean flag to indicate if the task network is totally ordered or not.
      */
     private boolean isTotallyOrdered;
@@ -76,6 +81,7 @@ public final class IntTaskNetwork implements Serializable {
     public IntTaskNetwork(final int arity) {
         this.tasks = new Expression<>(PDDLConnective.AND);
         this.orderingConstraints = new Expression<>(PDDLConnective.AND);
+        this.constraints = new Expression<>(PDDLConnective.AND);
         this.parameters =  new int[arity];
         Arrays.fill(this.parameters, -1);
         this.instantiations = new int[arity];
@@ -92,6 +98,7 @@ public final class IntTaskNetwork implements Serializable {
         super();
         this.tasks = new Expression<>(other.getTasks());
         this.orderingConstraints = new Expression<>(other.getOrderingConstraints());
+        this.constraints = new Expression<>(other.getConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered;
         this.parameters = new int[other.arity()];
         System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.arity());
@@ -152,6 +159,24 @@ public final class IntTaskNetwork implements Serializable {
      */
     public final void setOrderingConstraints(final Expression<Integer> ordering) {
         this.orderingConstraints = ordering;
+    }
+
+    /**
+     * Returns the logicial constraints between the tasks of the task network.
+     *
+     * @return the logical constraints of the task network.
+     */
+    public final Expression<Integer> getConstraints() {
+        return this.constraints;
+    }
+
+    /**
+     *  Sets the logical constraints between the tasks of the task network.
+     *
+     *  @param constraints The constraints to set.
+     */
+    public final void setConstraints(final Expression<Integer> constraints) {
+        this.constraints = constraints;
     }
 
     /**

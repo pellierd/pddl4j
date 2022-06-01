@@ -727,7 +727,7 @@ public class ParsedProblem implements PDDLDomain, PDDLProblem {
             this.renameTaskIDs(tn.getOrdering(), taskIDCtx);
             // In this case enumerate the orderings contraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
-                tn.setOrderingConstraints(new Expression<String>(PDDLConnective.AND));
+                tn.setOrdering(new Expression<String>(PDDLConnective.AND));
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
                     Expression<String> c = new Expression<String>(PDDLConnective.LESS_ORDERING_CONSTRAINT);
                     c.setArguments(new LinkedList<Symbol<String>>());

@@ -121,6 +121,25 @@ public final class IntMethod extends AbstractIntOperator {
     }
 
     /**
+     * Returns the logical constraints between the tasks of the task network.
+     *
+     * @return the logical constraints of the task network.
+     */
+    public final Expression<Integer> getConstraints() {
+        return this.taskNetwork.getConstraints();
+    }
+
+    /**
+     *  Sets the logical constraints between the tasks of the task network.
+     *
+     *  @param constraints The constraints to set.
+     */
+    public final void setLogicalConstraints(final Expression<Integer> constraints) {
+        this.taskNetwork.setConstraints(constraints);
+    }
+
+
+    /**
      * Returns the task network of this method.
      *
      * @return the task network of this method.

@@ -627,12 +627,15 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case HOLD_AFTER_CONSTRAINT:
             case WITHIN_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(1));
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(1));
                 this.initEitherTypes(exp.getChildren().get(2));
                 break;
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_CONSTRAINT:
                 this.initEitherTypes(exp.getChildren().get(2));
                 break;
@@ -973,6 +976,10 @@ public abstract class AbstractProblem implements Problem {
         // Encode the ordering constraints of the method
         Expression<Integer> orderingConstraints = this.initOrderingConstraints(method);
         intMeth.setOrderingConstraints(orderingConstraints);
+        // Encode the constraints of the method
+        Expression<Integer> constraints = this.initExpression(method.getConstraints(), variables);
+        //intMeth.setConstraints(constraints);
+
         return intMeth;
     }
 
@@ -1012,7 +1019,7 @@ public abstract class AbstractProblem implements Problem {
         } else {
             final int size = subtasks.getChildren().size();
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = this.initOrderingConstraints(taskNetwork.getOrdering());
+            orderingConstraints = this.initExpression(taskNetwork.getOrdering());
             for (Expression<Integer> c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID().getValue(),
                     c.getChildren().get(1).getTaskID().getValue());
@@ -1094,7 +1101,7 @@ public abstract class AbstractProblem implements Problem {
         } else {
             final int size = method.getSubTasks().getChildren().size();
             final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
-            orderingConstraints = this.initOrderingConstraints(method.getOrdering());
+            orderingConstraints = this.initExpression(method.getOrdering());
 
             // Code for reordering subtask if totally ordered
             /*for (Expression<Integer> c : orderingConstraints.getChildren()) {
@@ -1132,58 +1139,7 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Encode the ordering constraints of method. The index used to encode a task in the ordering constraints
-     * expression returned is the index of the task in the AND expression of the tasks list of a method.
-     *
-     * @param exp the constraints to encode. The constraints must be an AND expression.
-     * @throws UnexpectedExpressionException if the exp in parameter is unexpected. Only AND and
-     *      LESS_ORDERING_CONSTRAINTS are expected.
-     */
-    private Expression<Integer> initOrderingConstraints(final Expression<String> exp) {
-        final Expression<Integer> intExp = new Expression<>(exp.getConnective());
-        switch (exp.getConnective()) {
-            case AND:
-                for (int i = 0; i < exp.getChildren().size(); i++) {
-                    intExp.addChild(this.initOrderingConstraints(exp.getChildren().get(i)));
-                }
-                break;
-            case NOT:
-                Expression<Integer> expression = new Expression<>(PDDLConnective.NOT);
-                expression.addChild(this.initOrderingConstraints(exp.getChildren().get(0)));
-                break;
-            case LESS_ORDERING_CONSTRAINT:
-            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
-            case GREATER_ORDERING_CONSTRAINT:
-            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
-            case EQUAL_ORDERING_CONSTRAINT:
-                Expression<Integer> t1 = new Expression<>();
-                if (exp.getChildren().get(0).getTimeSpecifier() != null) {
-                    t1.setConnective(PDDLConnective.TIMED_TASK_ID);
-                } else {
-                    t1.setConnective(PDDLConnective.TASK_ID);
-                }
-                t1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
-                intExp.addChild(t1);
-                Expression<Integer> t2 = new Expression<>();
-                if (exp.getChildren().get(0).getTimeSpecifier() != null) {
-                    t2.setConnective(PDDLConnective.TIMED_TASK_ID);
-                } else {
-                    t2.setConnective(PDDLConnective.TASK_ID);
-                }
-                t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
-                intExp.addChild(t2);
-
-                break;
-            default:
-                throw new UnexpectedExpressionException(exp.toString());
-        }
-        return intExp;
-    }
-
-    /**
-     * Encodes an specified expression into its integer representation.
+     * Encodes a specified expression into its integer representation.
      *
      * @param exp the expression to encode.
      * @return the integer representation of the specified expression.
@@ -1341,6 +1297,49 @@ public abstract class AbstractProblem implements Problem {
                         Integer.valueOf(exp.getTaskID().getValue().substring(1))));
                 }
                 intExp.setArguments(args);
+                break;
+            case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
+                Expression<Integer> t1 = new Expression<>();
+                if (exp.getChildren().get(0).getTimeSpecifier() != null) {
+                    t1.setConnective(PDDLConnective.TIMED_TASK_ID);
+                } else {
+                    t1.setConnective(PDDLConnective.TASK_ID);
+                }
+                t1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
+                intExp.addChild(t1);
+                Expression<Integer> t2 = new Expression<>();
+                if (exp.getChildren().get(0).getTimeSpecifier() != null) {
+                    t2.setConnective(PDDLConnective.TIMED_TASK_ID);
+                } else {
+                    t2.setConnective(PDDLConnective.TASK_ID);
+                }
+                t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
+                intExp.addChild(t2);
+                break;
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+                final Expression<Integer> t = new Expression<>(PDDLConnective.TASK_ID);
+                t.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
+                intExp.addChild(t);
+                intExp.addChild(this.initExpression(exp.getChildren().get(1)));
+                break;
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+                final Expression<Integer> task1 = new Expression<>(PDDLConnective.TASK_ID);
+                task1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
+                intExp.addChild(task1);
+                final Expression<Integer> task2 = new Expression<>(PDDLConnective.TASK_ID);
+                task2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
+                    Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
+                intExp.addChild(task2);
+                intExp.addChild(this.initExpression(exp.getChildren().get(2)));
                 break;
             default:
                 // do nothing
