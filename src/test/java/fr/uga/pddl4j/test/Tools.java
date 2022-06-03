@@ -12,6 +12,7 @@ import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.NumericProblem;
 import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemImpl;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -415,15 +416,15 @@ public abstract class Tools {
                         pb = new HTNProblem(problemParsed);
                         typeOfProblem = "HTN";
                     } else if (problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
-                        pb = new ADLProblem(problemParsed);
+                        pb = new ProblemImpl(problemParsed);
                         typeOfProblem = "Temporal";
                     } else if (!problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
                             && problemParsed.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
 
-                        pb = new NumericProblem(problemParsed);
+                        pb = new ProblemImpl(problemParsed);
                         typeOfProblem = "Numeric";
                     } else {
-                        pb = new ADLProblem(problemParsed);
+                        pb = new ProblemImpl(problemParsed);
                         typeOfProblem = "ADL";
                     }
                     pb.instantiate();

@@ -27,7 +27,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public class TimeConditionEffect implements Serializable {
+public class TimeConditionalEffect implements Serializable {
 
     /**
      * The conditions of the expression.
@@ -37,23 +37,23 @@ public class TimeConditionEffect implements Serializable {
     /**
      * The effects associated to the conditions.
      */
-    private Effect effect;
+    private TimeEffect effect;
 
     /**
      * Creates a conditional effect from an other. This constructor is the copy constructor.
      *
      * @param other the other conditional bit expression.
      */
-    public TimeConditionEffect(final TimeConditionEffect other) {
+    public TimeConditionalEffect(final TimeConditionalEffect other) {
         this.condition = new TimeCondition(other.getCondition());
-        this.effect = new Effect(other.getEffect());
+        this.effect = new TimeEffect(other.getEffect());
     }
 
     /**
      * Creates a new empty conditional effect.
      */
-    public TimeConditionEffect() {
-        this(new TimeCondition(), new Effect());
+    public TimeConditionalEffect() {
+        this(new TimeCondition(), new TimeEffect());
     }
 
     /**
@@ -61,7 +61,7 @@ public class TimeConditionEffect implements Serializable {
      *
      * @param effects the effects.
      */
-    public TimeConditionEffect(final Effect effects) {
+    public TimeConditionalEffect(final TimeEffect effects) {
         this(new TimeCondition(), effects);
     }
 
@@ -71,7 +71,7 @@ public class TimeConditionEffect implements Serializable {
      * @param condition the conditions.
      * @param effect    the effects.
      */
-    public TimeConditionEffect(TimeCondition condition, Effect effect) {
+    public TimeConditionalEffect(TimeCondition condition, TimeEffect effect) {
         this.setEffect(effect);
         this.setCondition(condition);
     }
@@ -99,7 +99,7 @@ public class TimeConditionEffect implements Serializable {
      *
      * @return the effects of the conditional effect.
      */
-    public final Effect getEffect() {
+    public final TimeEffect getEffect() {
         return this.effect;
     }
 
@@ -108,7 +108,7 @@ public class TimeConditionEffect implements Serializable {
      *
      * @param effects the effects to set
      */
-    public final void setEffect(Effect effects) {
+    public final void setEffect(TimeEffect effects) {
         this.effect = effects;
     }
 

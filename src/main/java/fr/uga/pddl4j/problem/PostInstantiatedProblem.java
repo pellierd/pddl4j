@@ -224,6 +224,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case WHEN:
                 extractGroundNumericInertia(exp.getChildren().get(1));
                 break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
             case NOT:
                 extractGroundNumericInertia(exp.getChildren().get(0));
                 break;
@@ -500,6 +503,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 break;
             case NOT:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
                 final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(neg, effect);
                 if (!effect) {

@@ -34,6 +34,7 @@ import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Constants;
+import fr.uga.pddl4j.problem.operator.DurativeAction;
 import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
@@ -41,11 +42,15 @@ import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
+import fr.uga.pddl4j.problem.operator.TimeCondition;
+import fr.uga.pddl4j.problem.operator.TimeConditionalEffect;
+import fr.uga.pddl4j.problem.operator.TimeEffect;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -66,6 +71,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * The list of instantiated actions encoded into bit sets.
      */
     private List<Action> actions;
+
+    /**
+     * The list of instantiated durative actions encoded into bit sets.
+     */
+    private List<DurativeAction> durativeActions;
 
     /**
      * The list of relevant fluents.
@@ -148,6 +158,15 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     public final List<Action> getActions() {
         return this.actions;
+    }
+
+    /**
+     * Returns the list of instantiated durative actions of the problem.
+     *
+     * @return the list of instantiated durative actions of the problem.
+     */
+    public final List<DurativeAction> getDurativeActions() {
+        return this.durativeActions;
     }
 
     /**
@@ -513,14 +532,20 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * map is used to speed-up the search by mapping the an expression to this index.
      *
      */
-    protected void finalizeActions()
-        throws UnexpectedExpressionException {
+    protected void finalizeActions()  throws UnexpectedExpressionException {
         this.actions = new ArrayList<>(this.getIntActions().size());
+        this.durativeActions = new ArrayList<>(this.getIntActions().size());
         final List<Action> addedActions = new ArrayList<>();
         int actionIndex = 0;
         for (IntAction intAction : this.getIntActions()) {
             List<IntAction> normalized = this.normalizeAction(intAction);
-            this.actions.add(this.finalizeAction(normalized.get(0)));
+            for (IntAction na : normalized) {
+                if (!na.isDurative()) {
+                    this.actions.add(this.finalizeAction(na));
+                } else {
+                    this.durativeActions.add(this.finalizeDurativeAction(na));
+                }
+            }
             for (int i  = 1; i < normalized.size(); i++) {
                 // update the index of the relevant action must push in the HTN problem class
                 if (this.getTaskResolvers() != null) {
@@ -602,6 +627,130 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
         return effect;
     }
+
+
+    /**
+     * Encode an specified <code>Expression</code> in its <code>BitExp</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @return the expression in bit set representation.
+     */
+    private TimeEffect finalizeTimeEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
+        final TimeEffect timeEffect = new TimeEffect();
+        switch (exp.getConnective()) {
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                Effect effect =  null;
+                if (exp.getConnective().equals(Connector.AT_START)) {
+                    effect = timeEffect.getAtStartEffect();
+                } else if (exp.getConnective().equals(Connector.AT_END)) {
+                    effect = timeEffect.getAtEndEffect();
+                } else {
+                    effect = timeEffect.getOverallEffect();
+                }
+                Expression<Integer> sub = exp.getChildren().get(0);
+                switch (sub.getConnective()) {
+                    case ATOM:
+                        effect.getPositiveFluents().set(this.getMapOfFluentIndex().get(sub));
+                        break;
+                    case NOT:
+                        effect.getNegativeFluents().set(this.getMapOfFluentIndex().get(sub.getChildren().get(0)));
+                        break;
+                    case ASSIGN:
+                    case INCREASE:
+                    case DECREASE:
+                    case SCALE_UP:
+                    case SCALE_DOWN:
+                        NumericAssignment assignment = this.finalizeNumericAssignment(sub);
+                        effect.addNumericAssignment(assignment);
+                        break;
+                    default:
+                        throw new UnexpectedExpressionException(sub.getConnective().toString());
+                }
+                break;
+            case AND:
+                for (Expression<Integer> e : exp.getChildren()) {
+                    TimeEffect te = this.finalizeTimeEffect(e);
+                    timeEffect.getAtStartEffect().getPositiveFluents().or(te.getAtStartEffect().getPositiveFluents());
+                    timeEffect.getAtStartEffect().getNegativeFluents().or(te.getAtStartEffect().getNegativeFluents());
+                    timeEffect.getAtStartEffect().getNumericAssignments().addAll(te.getAtStartEffect().getNumericAssignments());
+                    timeEffect.getAtEndEffect().getPositiveFluents().or(te.getAtEndEffect().getPositiveFluents());
+                    timeEffect.getAtEndEffect().getNegativeFluents().or(te.getAtEndEffect().getNegativeFluents());
+                    timeEffect.getAtEndEffect().getNumericAssignments().addAll(te.getAtEndEffect().getNumericAssignments());
+                    timeEffect.getOverallEffect().getPositiveFluents().or(te.getOverallEffect().getPositiveFluents());
+                    timeEffect.getOverallEffect().getNegativeFluents().or(te.getOverallEffect().getNegativeFluents());
+                    timeEffect.getOverallEffect().getNumericAssignments().addAll(te.getOverallEffect().getNumericAssignments());
+                }
+                break;
+            case TRUE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+        return timeEffect;
+    }
+
+
+    /**
+     * Encode an specified <code>Expression</code> in its <code>BitExp</code> representation.The
+     * specified map is used to speed-up the search by mapping the an expression to this index.
+     *
+     * @return the expression in bit set representation.
+     */
+    private List<TimeConditionalEffect> finalizeTimeConditionalEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
+        List<TimeConditionalEffect> effects = new ArrayList<>();
+        switch (exp.getConnective()) {
+            case WHEN:
+                TimeConditionalEffect tce = new TimeConditionalEffect();
+                tce.setCondition(this.finalizeTimeCondition(exp.getChildren().get(0)));
+                tce.setEffect(this.finalizeTimeEffect(exp.getChildren().get(1)));
+                effects.add(tce);
+                break;
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                tce = new TimeConditionalEffect();
+                tce.setEffect(this.finalizeTimeEffect(exp));
+                effects.add(tce);
+                break;
+            case AND:
+                for (Expression<Integer> e : exp.getChildren()) {
+                    effects.addAll(this.finalizeTimeConditionalEffect(e));
+                }
+                break;
+            case TRUE:
+                // Do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(exp.getConnective().toString());
+        }
+        final TimeConditionalEffect utce = new TimeConditionalEffect();
+        Iterator<TimeConditionalEffect> it = effects.iterator();
+        boolean exist = false;
+        while (it.hasNext()) {
+            TimeConditionalEffect tcei = it.next();
+            if (tcei.getCondition().isEmpty()) {
+                utce.getEffect().getAtStartEffect().getPositiveFluents().or(tcei.getEffect().getAtStartEffect().getPositiveFluents());
+                utce.getEffect().getAtStartEffect().getNegativeFluents().or(tcei.getEffect().getAtStartEffect().getNegativeFluents());
+                utce.getEffect().getAtStartEffect().getNumericAssignments().addAll(tcei.getEffect().getAtStartEffect().getNumericAssignments());
+                utce.getEffect().getAtEndEffect().getPositiveFluents().or(tcei.getEffect().getAtEndEffect().getPositiveFluents());
+                utce.getEffect().getAtEndEffect().getNegativeFluents().or(tcei.getEffect().getAtEndEffect().getNegativeFluents());
+                utce.getEffect().getAtEndEffect().getNumericAssignments().addAll(tcei.getEffect().getAtEndEffect().getNumericAssignments());
+                utce.getEffect().getOverallEffect().getPositiveFluents().or(tcei.getEffect().getOverallEffect().getPositiveFluents());
+                utce.getEffect().getOverallEffect().getNegativeFluents().or(tcei.getEffect().getOverallEffect().getNegativeFluents());
+                utce.getEffect().getOverallEffect().getNumericAssignments().addAll(tcei.getEffect().getOverallEffect().getNumericAssignments());
+                it.remove();
+                exist = true;
+            }
+        }
+        if (exist) {
+            effects.add(utce);
+        }
+        return effects;
+    }
+
 
     /**
      * Normalize an action, i.e, put in disjunctive normal form (DNF) for preconditions and put
@@ -769,6 +918,35 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
+     * Encodes a specified action.
+     *
+     * @param action the action to be encoded. The precondition of the action must be a simple conjunction of atomic
+     *               formulas
+     * @return the action encoded.
+     */
+    private DurativeAction finalizeDurativeAction(final IntAction action) {
+        final int arity = action.arity();
+        final DurativeAction encoded = new DurativeAction(action.getName(), arity);
+
+        // Initialize the parameters of the action
+        for (int i = 0; i < arity; i++) {
+            encoded.setValueOfParameter(i, action.getValueOfParameter(i));
+            encoded.setTypeOfParameter(i, action.getTypeOfParameters(i));
+        }
+
+        List<NumericConstraint> duration = this.finalizeNumericConstraints(action.getDuration());
+        encoded.setDurationConstraints(duration);
+
+        // Initialize the preconditions of the action
+
+        encoded.setPrecondition(this.finalizeTimeCondition(action.getPreconditions()));
+
+        encoded.setConditionalEffects(this.finalizeTimeConditionalEffect(action.getEffects()));
+
+        return encoded;
+    }
+
+    /**
      * Encode a specified goal in a disjunction of <code>BitExp</code>. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
      */
@@ -856,6 +1034,67 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
         return condition;
+    }
+
+    /**
+     * Encode an specified <code>Expression</code> that represents a condition in its <code>BitExp</code>
+     * representation. The map of fluent index is used to speed-up the encoding.
+     *
+     * @param exp the <code>Expression</code>.
+     * @return the condition encoded.
+     */
+    protected TimeCondition finalizeTimeCondition(final Expression<Integer> exp) throws UnexpectedExpressionException {
+        final TimeCondition timeCondition = new TimeCondition();
+        switch (exp.getConnective()) {
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
+                Condition condition = null;
+                if (exp.getConnective().equals(Connector.AT_START)) {
+                    condition = timeCondition.getAtStartCondition();
+                } else if (exp.getConnective().equals(Connector.AT_END)) {
+                    condition = timeCondition.getAtEndCondition();
+                } else {
+                    condition = timeCondition.getOverallCondition();
+                }
+                Expression<Integer> sub = exp.getChildren().get(0);
+                switch (sub.getConnective()) {
+                    case ATOM:
+                        condition.getPositiveFluents().set(this.getMapOfFluentIndex().get(sub));
+                        break;
+                    case NOT:
+                        condition.getNegativeFluents().set(this.getMapOfFluentIndex().get(sub.getChildren().get(0)));
+                        break;
+                    case LESS_COMPARISON:
+                    case LESS_OR_EQUAL_COMPARISON:
+                    case GREATER_COMPARISON:
+                    case GREATER_OR_EQUAL_COMPARISON:
+                    case EQUAL_COMPARISON:
+                        condition.getNumericConstraints().add(this.encodeNumericConstraint(sub));
+                        break;
+                }
+                break;
+            case AND:
+                for (Expression<Integer> e : exp.getChildren()) {
+                    TimeCondition ce = this.finalizeTimeCondition(e);
+                    timeCondition.getAtStartCondition().getPositiveFluents().or(ce.getAtStartCondition().getPositiveFluents());
+                    timeCondition.getAtStartCondition().getNegativeFluents().or(ce.getAtStartCondition().getNegativeFluents());
+                    timeCondition.getAtStartCondition().getNumericConstraints().addAll(ce.getAtStartCondition().getNumericConstraints());
+                    timeCondition.getAtEndCondition().getPositiveFluents().or(ce.getAtEndCondition().getPositiveFluents());
+                    timeCondition.getAtEndCondition().getNegativeFluents().or(ce.getAtEndCondition().getNegativeFluents());
+                    timeCondition.getAtEndCondition().getNumericConstraints().addAll(ce.getAtEndCondition().getNumericConstraints());
+                    timeCondition.getOverallCondition().getPositiveFluents().or(ce.getOverallCondition().getPositiveFluents());
+                    timeCondition.getOverallCondition().getNegativeFluents().or(ce.getOverallCondition().getNegativeFluents());
+                    timeCondition.getOverallCondition().getNumericConstraints().addAll(ce.getOverallCondition().getNumericConstraints());
+                }
+                break;
+            case TRUE:
+                // do nothing
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString(exp));
+        }
+        return timeCondition;
     }
 
     /**

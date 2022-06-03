@@ -93,7 +93,7 @@ public abstract class AbstractFluentDescription implements FluentDescription {
      *
      * @return <code>true</code> if the fluent description is empty; <code>false</code> otherwise.
      */
-    public final boolean isEmpty() {
+    public boolean isEmpty() {
         return this.positive.isEmpty() && this.negative.isEmpty();
     }
 

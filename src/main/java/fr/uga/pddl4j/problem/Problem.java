@@ -24,6 +24,7 @@ import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
+import fr.uga.pddl4j.problem.operator.DurativeAction;
 import fr.uga.pddl4j.problem.operator.Effect;
 
 import java.io.Serializable;
@@ -108,6 +109,13 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      * @return the list of instantiated actions of the problem.
      */
     List<Action> getActions();
+
+    /**
+     * Returns the list of instantiated durative actions of the problem.
+     *
+     * @return the list of instantiated durative actions of the problem.
+     */
+    List<DurativeAction> getDurativeActions();
 
     /**
      * Returns the goal of the problem or null if the goal can is not reachable.

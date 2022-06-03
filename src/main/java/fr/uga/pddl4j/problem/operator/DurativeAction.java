@@ -19,7 +19,6 @@
 
 package fr.uga.pddl4j.problem.operator;
 
-import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 
@@ -38,7 +37,7 @@ public class DurativeAction extends AbstractDurativeOperator {
     /**
      * The list of effects of the action.
      */
-    private List<TimeConditionEffect> effects;
+    private List<TimeConditionalEffect> effects;
 
     /**
      * The duration of the action.
@@ -58,7 +57,7 @@ public class DurativeAction extends AbstractDurativeOperator {
     public DurativeAction(final DurativeAction other) {
         super(other);
         this.effects = new ArrayList<>();
-        this.effects.addAll(other.getConditionalEffects().stream().map(TimeConditionEffect::new)
+        this.effects.addAll(other.getConditionalEffects().stream().map(TimeConditionalEffect::new)
             .collect(Collectors.toList()));
         if (this.getDurationConstraints() != null) {
             this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
@@ -91,10 +90,10 @@ public class DurativeAction extends AbstractDurativeOperator {
      * @param precondition the precondition of the action.
      * @param effect       the effects of the action.
      */
-    public DurativeAction(final String name, final int arity, final TimeCondition precondition, final Effect effect) {
+    public DurativeAction(final String name, final int arity, final TimeCondition precondition, final TimeEffect effect) {
         this(name, arity);
         this.setPrecondition(precondition);
-        this.addConditionalEffect(new TimeConditionEffect(effect));
+        this.addConditionalEffect(new TimeConditionalEffect(effect));
         this.duration = new NumericVariable(-2);
         this.duration.setValue(0.0);
         this.durationConstraints = null;
@@ -105,7 +104,7 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @return the effects of the action.
      */
-    public final List<TimeConditionEffect> getConditionalEffects() {
+    public final List<TimeConditionalEffect> getConditionalEffects() {
         return this.effects;
     }
 
@@ -114,7 +113,7 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @param effects the conditional effects of the action.
      */
-    public final void setConditionalEffects(List<TimeConditionEffect> effects) {
+    public final void setConditionalEffects(List<TimeConditionalEffect> effects) {
         this.effects = effects;
     }
 
@@ -123,7 +122,7 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @param effect the conditional effect to addValue.
      */
-    public final void addConditionalEffect(TimeConditionEffect effect) {
+    public final void addConditionalEffect(TimeConditionalEffect effect) {
         this.effects.add(effect);
     }
 
@@ -132,15 +131,21 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @return the unconditional effect of the action.
      */
-    public final Effect getUnconditionalEffect() {
-        final Effect ucEffect = new Effect();
+    public final TimeEffect getUnconditionalEffect() {
+        final TimeEffect uce = new TimeEffect();
         this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
-            final Effect condEff = cEffect.getEffect();
-            ucEffect.getPositiveFluents().or(condEff.getPositiveFluents());
-            ucEffect.getNegativeFluents().or(condEff.getNegativeFluents());
-            ucEffect.getNumericAssignments().addAll(condEff.getNumericAssignments());
+            final TimeEffect te = cEffect.getEffect();
+            uce.getAtStartEffect().getPositiveFluents().or(te.getAtStartEffect().getPositiveFluents());
+            uce.getAtStartEffect().getNegativeFluents().or(te.getAtStartEffect().getNegativeFluents());
+            uce.getAtStartEffect().getNumericAssignments().addAll(te.getAtStartEffect().getNumericAssignments());
+            uce.getAtEndEffect().getPositiveFluents().or(te.getAtEndEffect().getPositiveFluents());
+            uce.getAtEndEffect().getNegativeFluents().or(te.getAtEndEffect().getNegativeFluents());
+            uce.getAtEndEffect().getNumericAssignments().addAll(te.getAtEndEffect().getNumericAssignments());
+            uce.getOverallEffect().getPositiveFluents().or(te.getOverallEffect().getPositiveFluents());
+            uce.getOverallEffect().getNegativeFluents().or(te.getOverallEffect().getNegativeFluents());
+            uce.getOverallEffect().getNumericAssignments().addAll(te.getOverallEffect().getNumericAssignments());
         });
-        return ucEffect;
+        return uce;
     }
 
     /**
