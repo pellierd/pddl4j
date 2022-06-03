@@ -350,7 +350,7 @@ public final class Parser implements Callable<Integer> {
         this.checkRequirements();
         this.checkObjectsDeclaration();
         this.checkInitialTaskNetwork();
-        this.checkInitialFacts();
+        this.checkInitialState();
         this.checkGoal();
         this.checkProblemConstraints();
         this.checkMetric();
@@ -402,7 +402,7 @@ public final class Parser implements Callable<Integer> {
         this.checkDomainName();
         this.checkObjectsDeclaration();
         this.checkInitialTaskNetwork();
-        this.checkInitialFacts();
+        this.checkInitialState();
         this.checkGoal();
         this.checkProblemConstraints();
         this.checkMetric();
@@ -732,7 +732,7 @@ public final class Parser implements Callable<Integer> {
      *
      * @return <code>true</code> if the initial facts are well formed; <code>false</code> otherwise.
      */
-    private boolean checkInitialFacts() {
+    private boolean checkInitialState() {
         boolean checked = true;
         LinkedList<Expression<String>> stackGD = new LinkedList<>();
         stackGD.addAll(this.problem.getInit());
@@ -742,11 +742,14 @@ public final class Parser implements Callable<Integer> {
                 case ATOM:
                 case FN_ATOM:
                     boolean error = false;
-                    List<Symbol<String>> arguments = gd.getArguments();
-                    if (arguments == null) {
-                        arguments = gd.getChildren().get(0).getArguments();
+                    Expression<String> fluent = null;
+                    if (gd.getConnective().equals(Connector.ATOM)) {
+                        fluent = gd;
+                    } else {
+                        fluent = gd.getChildren().get(0);
                     }
-                    final NamedTypedList atomSkeleton = new NamedTypedList(gd.getSymbol());
+                    List<Symbol<String>> arguments = fluent.getArguments();
+                    final NamedTypedList atomSkeleton = new NamedTypedList(fluent.getSymbol());
                     for (int i = 0; i < arguments.size(); i++) {
                         Symbol<String> symbol = arguments.get(i);
                         TypedSymbol<String> object = this.problem.getObject(symbol);

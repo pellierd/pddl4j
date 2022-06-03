@@ -1549,6 +1549,11 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 malformed = this.getChildren().size() != 1
                     || this.getChildren().get(0).isMalformedExpression();
                 break;
+            case FN_ATOM:
+                    malformed = this.getChildren().size() != 2
+                        || this.getChildren().get(0).isMalformedExpression()
+                        || !this.getChildren().get(1).getConnective().equals(Connector.NUMBER);
+                break;
             case ATOM:
             case TASK:
             case FN_HEAD:
