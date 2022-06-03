@@ -19,8 +19,6 @@
 
 package fr.uga.pddl4j.problem.operator;
 
-import fr.uga.pddl4j.problem.operator.GroundOperator;
-
 import java.util.Arrays;
 
 /**
@@ -30,7 +28,7 @@ import java.util.Arrays;
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public abstract class AbstractGroundOperator implements GroundOperator {
+public abstract class AbstractInstantiatedOperator implements Operator {
 
     /**
      * The name of the operator.
@@ -56,7 +54,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
     /**
      * Creates a new operator.
      */
-    private AbstractGroundOperator() {
+    private AbstractInstantiatedOperator() {
         super();
     }
 
@@ -65,7 +63,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
      *
      * @param other the other operator.
      */
-    protected AbstractGroundOperator(final GroundOperator other) {
+    protected AbstractInstantiatedOperator(final Operator other) {
         super();
         this.setName(other.getName());
         this.parameters = new int[other.arity()];
@@ -81,7 +79,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
      * @param name     the name of the operator.
      * @param arity    the arity of the operator.
      */
-    protected AbstractGroundOperator(final String name, final int arity) {
+    protected AbstractInstantiatedOperator(final String name, final int arity) {
         this(name, new int[arity], new int[arity]);
         Arrays.fill(this.parameters, -1);
         Arrays.fill(this.instantiations, -1);
@@ -96,7 +94,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
      * @param parameters     the types of the parameters.
      * @param instantiations the values of the parameters.
      */
-    protected AbstractGroundOperator(final String name, final int[] parameters, final int[] instantiations) {
+    protected AbstractInstantiatedOperator(final String name, final int[] parameters, final int[] instantiations) {
         super();
         this.name = name;
         this.parameters = parameters;
@@ -245,7 +243,7 @@ public abstract class AbstractGroundOperator implements GroundOperator {
     /**
      * Returns <code>true</code> if this operator is equal to an object. This
      * method returns <code>true</code> if the object is a not null instance
-     * of the class <code>GroundOperator</code> and both operator have the same name.
+     * of the class <code>Operator</code> and both operator have the same name.
      *
      * @param obj the object to be compared.
      * @return <code>true</code> if this operator is equal to an object;
@@ -253,10 +251,10 @@ public abstract class AbstractGroundOperator implements GroundOperator {
      */
     @Override
     public final boolean equals(final Object obj) {
-        if (obj != null && obj instanceof GroundOperator) {
-            final GroundOperator other = (GroundOperator) obj;
+        if (obj != null && obj instanceof Operator) {
+            final Operator other = (Operator) obj;
             return this.getName().equals(other.getName())
-                && Arrays.equals(this.getInstantiations(), ((GroundOperator) obj).getInstantiations());
+                && Arrays.equals(this.getInstantiations(), ((Operator) obj).getInstantiations());
         }
         return false;
     }

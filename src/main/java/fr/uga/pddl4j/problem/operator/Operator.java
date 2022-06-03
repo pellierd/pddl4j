@@ -27,7 +27,7 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public interface GroundOperator extends Serializable {
+public interface Operator extends Serializable {
 
     /**
      * Return the name of this operator.

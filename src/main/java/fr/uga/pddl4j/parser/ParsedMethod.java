@@ -27,7 +27,7 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class PDDLMethod extends PDDLAbstractOperator {
+public class ParsedMethod extends ParsedAbstractOperator {
 
     /**
      * The task performed by the method.
@@ -37,17 +37,17 @@ public class PDDLMethod extends PDDLAbstractOperator {
     /**
      * The task network of the method.
      */
-    private PDDLTaskNetwork taskNetwork;
+    private ParsedTaskNetwork taskNetwork;
 
     /**
      * Create a new method from another.
      *
      * @param other the other method.
      */
-    public PDDLMethod(final PDDLMethod other) {
+    public ParsedMethod(final ParsedMethod other) {
         super(other);
         this.task = new Expression<String>(other.getTask());
-        this.taskNetwork = new PDDLTaskNetwork(other.taskNetwork);
+        this.taskNetwork = new ParsedTaskNetwork(other.taskNetwork);
     }
 
     /**
@@ -63,12 +63,12 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                      final Expression<String> duration, final Expression<String> preconditions, final Expression<String> tasks,
-                      final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                        final Expression<String> duration, final Expression<String> preconditions, final Expression<String> tasks,
+                        final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
         super(name, parameters, preconditions, duration);
         this.task = task;
-        this.taskNetwork = new PDDLTaskNetwork(tasks, ordering, constraints, ordered);
+        this.taskNetwork = new ParsedTaskNetwork(tasks, ordering, constraints, ordered);
     }
 
     /**
@@ -83,9 +83,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                      final Expression<String> preconditions, final Expression<String> tasks,
-                      final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                        final Expression<String> preconditions, final Expression<String> tasks,
+                        final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
         this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered);
     }
 
@@ -99,9 +99,9 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                      final Expression<String> duration, final Expression<String> preconditions,
-                      final PDDLTaskNetwork network) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                        final Expression<String> duration, final Expression<String> preconditions,
+                        final ParsedTaskNetwork network) {
         this(name, parameters, task, duration, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
     }
@@ -115,8 +115,8 @@ public class PDDLMethod extends PDDLAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public PDDLMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                      final Expression<String> preconditions, final PDDLTaskNetwork network) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
+                        final Expression<String> preconditions, final ParsedTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
     }

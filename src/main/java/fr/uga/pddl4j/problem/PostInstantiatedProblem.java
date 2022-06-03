@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
@@ -57,7 +57,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @param problem the problem.
      */
-    public PostInstantiatedProblem(final ParsedProblem problem) {
+    public PostInstantiatedProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 
@@ -130,7 +130,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case NOT:
                 final Expression<Integer> neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
+                if (neg.getConnective().equals(Connector.ATOM)) {
                     inertia = this.groundInertia.get(neg);
                     if (inertia == null) {
                         inertia = Inertia.INERTIA;
@@ -257,7 +257,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         for (IntAction a : this.getIntActions()) {
             if (a.isDurative()) {
                 this.simplifyWithGroundNumericInertia(a.getDuration(), false);
-                if (a.getDuration().getConnective().equals(PDDLConnective.FALSE)) {
+                if (a.getDuration().getConnective().equals(Connector.FALSE)) {
                     toRemove.add(index);
                     index++;
                     continue;
@@ -267,12 +267,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             // ADD to symplified Numeric function
             this.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
             a.getPreconditions().simplify();
-            if (!a.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+            if (!a.getPreconditions().getConnective().equals(Connector.FALSE)) {
                 this.simplifyWithGroundInertia(a.getEffects(), true);
                 // ADD for numeric fluents
                 this.simplifyWithGroundNumericInertia(a.getEffects(), true);
                 a.getEffects().simplify();
-                if (!a.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                if (!a.getEffects().getConnective().equals(Connector.FALSE)) {
                     toAdd.add(a);
                 } else {
                     toRemove.add(index);
@@ -284,16 +284,16 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         }
 
         // Simplification for HTN
-        /*if (this.relevantActions != null) {
-            final Set<IntExpression> primitiveTasksNoMoreReachable = new HashSet<IntExpression>();
+        /*if (this.getRelevantActions() != null) {
+            final Set<Expression<Integer>> primitiveTasksNoMoreReachable = new HashSet<Expression<Integer>>();
             // Update the relevant actions for the tasks
-            for (int i = 0; i < this.relevantActions.size(); i++) {
-                if (toRemove.contains(this.relevantActions.get(i))) {
-                    primitiveTasksNoMoreReachable.add(this.tableOfRelevantPrimitiveTasks.remove(i));
-                    this.relevantActions.remove(i);
+            for (int i = 0; i < this.getRelevantActions().size(); i++) {
+                if (toRemove.contains(this.getRelevantActions().get(i))) {
+                    primitiveTasksNoMoreReachable.add(this.getRelevantPrimitiveTasks().remove(i));
+                    this.getRelevantActions().remove(i);
                     i--;
                 } else {
-                    this.relevantActions.set(i, i);
+                    this.getRelevantActions().set(i, i);
                 }
             }
         }*/
@@ -340,26 +340,26 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // antecedents of conditional effects can be simplified to TRUE.
                 if (!effect && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.NEGATIVE))
                     && this.getIntInitialState().contains(exp)) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                    exp.setConnective(Connector.TRUE);
                 } else if (!effect
                     && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.POSITIVE))
                     && !this.getIntInitialState().contains(exp)) {
                     // If the antecedent of a conditional effect becomes TRUE, the conditional
                     // effect
                     // becomes unconditional.
-                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.setConnective(Connector.FALSE);
                 }
                 break;
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                while (i.hasNext() && exp.getConnective().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
+                    if (ei.getConnective().equals(Connector.FALSE)) {
+                        exp.setConnective(Connector.FALSE);
                     }
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (ei.getConnective().equals(Connector.TRUE)) {
                         i.remove();
                     }
                 }
@@ -369,14 +369,14 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                while (i.hasNext() && exp.getConnective().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
+                    if (ei.getConnective().equals(Connector.TRUE)) {
+                        exp.setConnective(Connector.TRUE);
                     }
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (ei.getConnective().equals(Connector.FALSE)) {
                         i.remove();
                     }
                 }
@@ -399,10 +399,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundInertia(neg, effect);
                 if (!effect) {
-                    if (neg.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
+                    if (neg.getConnective().equals(Connector.TRUE)) {
+                        exp.setConnective(Connector.FALSE);
+                    } else if (neg.getConnective().equals(Connector.FALSE)) {
+                        exp.setConnective(Connector.TRUE);
                     }
                 }
                 break;
@@ -469,13 +469,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         switch (exp.getConnective()) {
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                while (i.hasNext() && exp.getConnective().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (ei.getConnective().equals(Connector.FALSE)) {
+                        exp.setConnective(Connector.FALSE);
+                    } else if (ei.getConnective().equals(Connector.TRUE)) {
                         i.remove();
                     }
                 }
@@ -485,13 +485,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                while (i.hasNext() && exp.getConnective().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (ei.getConnective().equals(Connector.TRUE)) {
+                        exp.setConnective(Connector.TRUE);
+                    } else if (ei.getConnective().equals(Connector.FALSE)) {
                         i.remove();
                     }
                 }
@@ -503,10 +503,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(neg, effect);
                 if (!effect) {
-                    if (neg.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    } else if (neg.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
+                    if (neg.getConnective().equals(Connector.TRUE)) {
+                        exp.setConnective(Connector.FALSE);
+                    } else if (neg.getConnective().equals(Connector.FALSE)) {
+                        exp.setConnective(Connector.TRUE);
                     }
                 }
                 break;
@@ -520,8 +520,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case SCALE_UP:
             case SCALE_DOWN:
                 this.simplifyWithGroundNumericInertia(exp.getChildren().get(1), effect);
-                if (exp.getChildren().get(1).getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                if (exp.getChildren().get(1).getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.FALSE);
                     exp.getChildren().clear();
                 }
                 break;
@@ -533,12 +533,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 Expression<Integer> op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
                 this.simplifyWithGroundNumericInertia(op2, effect);
-                if (op1.getConnective().equals(PDDLConnective.FALSE)
-                    || op2.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                if (op1.getConnective().equals(Connector.FALSE)
+                    || op2.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.FALSE);
                     exp.getChildren().clear();
-                } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
-                    && op2.getConnective().equals(PDDLConnective.NUMBER)) {
+                } else if (op1.getConnective().equals(Connector.NUMBER)
+                    && op2.getConnective().equals(Connector.NUMBER)) {
                     switch (exp.getConnective()) {
                         case PLUS:
                             exp.setValue(op1.getValue() + op2.getValue());
@@ -555,18 +555,18 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                         default:
                             throw new UnexpectedExpressionException(this.toString(exp));
                     }
-                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.setConnective(Connector.NUMBER);
 
                 }
                 break;
             case UMINUS:
                 op1 = exp.getChildren().get(0);
-                if (op1.getConnective().equals(PDDLConnective.NUMBER)) {
-                    exp.setConnective(PDDLConnective.NUMBER);
+                if (op1.getConnective().equals(Connector.NUMBER)) {
+                    exp.setConnective(Connector.NUMBER);
                     exp.setValue(-op1.getValue());
                     exp.getChildren().clear();
-                } else if (op1.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (op1.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.FALSE);
                     exp.getChildren().clear();
                 }
                 break;
@@ -579,46 +579,46 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
                 this.simplifyWithGroundNumericInertia(op2, effect);
-                if (op1.getConnective().equals(PDDLConnective.FALSE)
-                    || op2.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                if (op1.getConnective().equals(Connector.FALSE)
+                    || op2.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.FALSE);
                     exp.getChildren().clear();
-                } else if (op1.getConnective().equals(PDDLConnective.NUMBER)
-                    && op2.getConnective().equals(PDDLConnective.NUMBER)) {
+                } else if (op1.getConnective().equals(Connector.NUMBER)
+                    && op2.getConnective().equals(Connector.NUMBER)) {
                     switch (exp.getConnective()) {
                         case LESS_COMPARISON:
                             if (op1.getValue() < op2.getValue()) {
-                                exp.setConnective(PDDLConnective.TRUE);
+                                exp.setConnective(Connector.TRUE);
                             } else {
-                                exp.setConnective(PDDLConnective.FALSE);
+                                exp.setConnective(Connector.FALSE);
                             }
                             break;
                         case LESS_OR_EQUAL_COMPARISON:
                             if (op1.getValue() <= op2.getValue()) {
-                                exp.setConnective(PDDLConnective.TRUE);
+                                exp.setConnective(Connector.TRUE);
                             } else {
-                                exp.setConnective(PDDLConnective.FALSE);
+                                exp.setConnective(Connector.FALSE);
                             }
                             break;
                         case GREATER_COMPARISON:
                             if (op1.getValue() > op2.getValue()) {
-                                exp.setConnective(PDDLConnective.TRUE);
+                                exp.setConnective(Connector.TRUE);
                             } else {
-                                exp.setConnective(PDDLConnective.FALSE);
+                                exp.setConnective(Connector.FALSE);
                             }
                             break;
                         case GREATER_OR_EQUAL_COMPARISON:
                             if (op1.getValue() >= op2.getValue()) {
-                                exp.setConnective(PDDLConnective.TRUE);
+                                exp.setConnective(Connector.TRUE);
                             } else {
-                                exp.setConnective(PDDLConnective.FALSE);
+                                exp.setConnective(Connector.FALSE);
                             }
                             break;
                         case EQUAL_COMPARISON:
                             if (op1.getValue() == op2.getValue()) {
-                                exp.setConnective(PDDLConnective.TRUE);
+                                exp.setConnective(Connector.TRUE);
                             } else {
-                                exp.setConnective(PDDLConnective.FALSE);
+                                exp.setConnective(Connector.FALSE);
                             }
                             break;
                         default:
@@ -629,12 +629,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case F_EXP:
                 Expression<Integer> fexp = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(fexp, effect);
-                if (fexp.getConnective().equals(PDDLConnective.NUMBER)) {
+                if (fexp.getConnective().equals(Connector.NUMBER)) {
                     exp.setValue(fexp.getValue());
-                    exp.setConnective(PDDLConnective.NUMBER);
+                    exp.setConnective(Connector.NUMBER);
                     exp.getChildren().clear();
-                } else if (fexp.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                } else if (fexp.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.FALSE);
                     exp.getChildren().clear();
                 }
                 break;
@@ -644,9 +644,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                     Double value = this.getIntInitFunctionCost().get(exp);
                     // The numeric fluent is never modified and does not appear in the initial state
                     if (value == null) {
-                        exp.setConnective(PDDLConnective.FALSE);
+                        exp.setConnective(Connector.FALSE);
                     } else {
-                        exp.setConnective(PDDLConnective.NUMBER);
+                        exp.setConnective(Connector.NUMBER);
                         exp.setValue(value);
                     }
                 }
@@ -671,14 +671,27 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     protected void simplyMethodsWithGroundInertia() {
         final List<IntMethod> toAdd = new ArrayList<>(this.getIntMethods().size());
         final Set<Expression<Integer>> toRemove = new HashSet<>();
-        for (IntMethod m : this.getIntMethods()) {
+        int i = 0;
+        Iterator<IntMethod> it = this.getIntMethods().iterator();
+        //for (IntMethod m : this.getIntMethods()) {
+        while (it.hasNext()) {
+            IntMethod m = it.next();
             this.simplifyWithGroundInertia(m.getPreconditions(), false);
             m.getPreconditions().simplify();
-            if (!m.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+            if (!m.getPreconditions().getConnective().equals(Connector.FALSE)) {
                 toAdd.add(m);
+                for (Expression<Integer> f : this.getIntInitialState()) {
+                    this.toString(f);
+                }
+
             } else {
+                System.out.println("Method "+ i + " can be removed for task " + this.toString(m.getTask()));
+                //System.out.println(this.toString(m));
                 toRemove.add(m.getTask());
+                //updateRelevantMethods(i);
+                it.remove();
             }
+            i++;
         }
         this.simplyRecursivelyMethodsWithTasksNoMoreReachable(this.getIntMethods(), toRemove);
     }
@@ -714,14 +727,14 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 for (int j = 0; j < this.getRelevantMethods().size(); j++) {
                     final List<Integer> relevant = this.getRelevantMethods().get(j);
                     if (relevant.remove(Integer.valueOf(i))) {
-                        //System.out.println("remove " + i);
+                        System.out.println("remove " + i);
                         this.updateRelevantMethods(i);
                         // There is no more relevant method for the compound task
                         if (relevant.isEmpty()) {
                             tasksNoMoreReachable.add(this.getRelevantCompundTasks().get(j));
                             this.getRelevantCompundTasks().remove(j);
                             this.getRelevantMethods().remove(j);
-                            //System.out.println("A task is no more reachable");
+                            System.out.println("A task is no more reachable");
                             j--;
                         }
                         break;

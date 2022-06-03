@@ -141,12 +141,12 @@ public final class Parser implements Callable<Integer> {
     /**
      * The planning domain parsed.
      */
-    private PDDLDomain domain;
+    private ParsedDomain domain;
 
     /**
      * The planning problem parsed.
      */
-    private PDDLProblem problem;
+    private ParsedProblem problem;
 
     /**
      * The domain file.
@@ -242,7 +242,7 @@ public final class Parser implements Callable<Integer> {
      * @return a the pddl domain parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified domain does not exist.
      */
-    public PDDLDomain parseDomain(String domain) throws FileNotFoundException {
+    public ParsedDomain parseDomain(String domain) throws FileNotFoundException {
         this.domainFile = new File(domain);
         return this.parseDomain(new File(domain));
     }
@@ -254,7 +254,7 @@ public final class Parser implements Callable<Integer> {
      * @return a the pddl domain parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified domain file does not exist.
      */
-    public PDDLDomain parseDomain(File domain) throws FileNotFoundException {
+    public ParsedDomain parseDomain(File domain) throws FileNotFoundException {
         this.domainFile = domain;
         return this.parseDomain();
     }
@@ -265,7 +265,7 @@ public final class Parser implements Callable<Integer> {
      * @return the pddl domain parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified domain file does not exist.
      */
-    public PDDLDomain parseDomain() throws FileNotFoundException {
+    public ParsedDomain parseDomain() throws FileNotFoundException {
         if (!this.getDomainFile().exists()) {
             throw new FileNotFoundException("File  \"" + this.getDomainFile().getName() + "\" does not exist.\n");
         }
@@ -305,7 +305,7 @@ public final class Parser implements Callable<Integer> {
      * @return a the pddl problem parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
-    public PDDLProblem parseProblem(String problem) throws FileNotFoundException {
+    public ParsedProblem parseProblem(String problem) throws FileNotFoundException {
         this.problemFile = new File(problem);
         return this.parseProblem();
     }
@@ -317,7 +317,7 @@ public final class Parser implements Callable<Integer> {
      * @return a the pddl problem parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
-    public PDDLProblem parseProblem(File problem) throws FileNotFoundException {
+    public ParsedProblem parseProblem(File problem) throws FileNotFoundException {
         this.problemFile = problem;
         return this.parseProblem();
     }
@@ -328,7 +328,7 @@ public final class Parser implements Callable<Integer> {
      * @return the pddl problem parsed or null if a lexical error or parser error occurred.
      * @throws FileNotFoundException if the specified problem file does not exist.
      */
-    public PDDLProblem parseProblem() throws FileNotFoundException {
+    public ParsedProblem parseProblem() throws FileNotFoundException {
         if (!this.getProblemFile().exists()) {
             throw new FileNotFoundException("File  \"" + this.getProblemFile().getName() + "\" does not exist.\n");
         }
@@ -365,7 +365,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed.
      * @throws FileNotFoundException if the specified file does not exist.
      */
-    public ParsedProblem parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
+    public ParsedProblemImpl parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
         return this.parseDomainAndProblem(new File(domainAndProblem));
     }
 
@@ -376,7 +376,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed.
      * @throws FileNotFoundException if the specified file does not exist.
      */
-    public ParsedProblem parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
+    public ParsedProblemImpl parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
         if (!domainAndProblem.exists()) {
             throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.\n");
         }
@@ -406,7 +406,7 @@ public final class Parser implements Callable<Integer> {
         this.checkGoal();
         this.checkProblemConstraints();
         this.checkMetric();
-        return new ParsedProblem(this.getDomain(), this.getProblem());
+        return new ParsedProblemImpl(this.getDomain(), this.getProblem());
     }
 
     /**
@@ -511,7 +511,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    public ParsedProblem parse(String domain, String problem) throws FileNotFoundException {
+    public ParsedProblemImpl parse(String domain, String problem) throws FileNotFoundException {
         return this.parse(new File(domain), new File(problem));
     }
 
@@ -523,7 +523,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed or null if an error occurred while parsing domain or problem.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    public ParsedProblem parse(File domain, File problem) throws FileNotFoundException {
+    public ParsedProblemImpl parse(File domain, File problem) throws FileNotFoundException {
         if (!domain.exists()) {
             throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.\n");
         }
@@ -531,10 +531,10 @@ public final class Parser implements Callable<Integer> {
             throw new FileNotFoundException("File  \"" + problem.getName() + "\" does not exist.\n");
         }
         // Parse and check the domain
-        PDDLDomain pddlDomain = this.parseDomain(domain);
+        ParsedDomain pddlDomain = this.parseDomain(domain);
         // Parse and check the problem
-        PDDLProblem pddlProblem = this.parseProblem(problem);
-        return (pddlDomain != null && pddlProblem != null) ? new ParsedProblem(pddlDomain, pddlProblem) : null;
+        ParsedProblem pddlProblem = this.parseProblem(problem);
+        return (pddlDomain != null && pddlProblem != null) ? new ParsedProblemImpl(pddlDomain, pddlProblem) : null;
     }
 
     /**
@@ -542,7 +542,7 @@ public final class Parser implements Callable<Integer> {
      *
      * @return the domain parsed.
      */
-    private final PDDLDomain getDomain() {
+    private final ParsedDomain getDomain() {
         return this.domain;
     }
 
@@ -551,7 +551,7 @@ public final class Parser implements Callable<Integer> {
      *
      * @return the problem parsed.
      */
-    private final PDDLProblem getProblem() {
+    private final ParsedProblem getProblem() {
         return this.problem;
     }
 
@@ -682,14 +682,14 @@ public final class Parser implements Callable<Integer> {
                         }
                         checked = !error;
                     }
-                    if (checked && gd.getConnective().equals(PDDLConnective.ATOM)
+                    if (checked && gd.getConnective().equals(Connector.ATOM)
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                             .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                             .getName().getLocation().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(PDDLConnective.FN_HEAD)
+                    } else if (checked && gd.getConnective().equals(Connector.FN_HEAD)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -772,14 +772,14 @@ public final class Parser implements Callable<Integer> {
                         }
                     }
                     checked = !error;
-                    if (checked && gd.getConnective().equals(PDDLConnective.ATOM)
+                    if (checked && gd.getConnective().equals(Connector.ATOM)
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                             .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                             .getName().getLocation().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
+                    } else if (checked && gd.getConnective().equals(Connector.FN_ATOM)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1074,7 +1074,7 @@ public final class Parser implements Callable<Integer> {
      */
     private boolean checkDerivedPredicateDeclaration() {
         boolean checked = true;
-        for (PDDLDerivedPredicate axiom : this.domain.getDerivesPredicates()) {
+        for (ParsedDerivedPredicate axiom : this.domain.getDerivesPredicates()) {
             NamedTypedList head = axiom.getHead();
             for (TypedSymbol<String> argument : head.getArguments()) {
                 for (Symbol<String> type : argument.getTypes()) {
@@ -1113,7 +1113,7 @@ public final class Parser implements Callable<Integer> {
      */
     private boolean checkActionDeclaration() {
         boolean checked = this.checkActionsUniqueness();
-        for (PDDLAction action : this.domain.getActions()) {
+        for (ParsedAction action : this.domain.getActions()) {
             if (this.checkActionParameters(action)) {
                 checked &= this.checkParserNode(action.getPreconditions(), action.getParameters());
                 checked &= this.checkParserNode(action.getEffects(), action.getParameters());
@@ -1122,7 +1122,7 @@ public final class Parser implements Callable<Integer> {
                     checked &= this.checkParserNode(action.getDuration(), action.getParameters());
                 }
             }
-            this.checkActionSemantic(new PDDLAction(action));
+            this.checkActionSemantic(new ParsedAction(action));
         }
         return checked;
     }
@@ -1145,7 +1145,7 @@ public final class Parser implements Callable<Integer> {
         Set<String> actionSet = this.domain.getActions().stream().map(
             action -> action.getName().getValue()).collect(Collectors.toSet());
         boolean checked = this.checkMethodsUniqueness();
-        for (PDDLMethod meth : this.domain.getMethods()) {
+        for (ParsedMethod meth : this.domain.getMethods()) {
             if (this.checkMethodParameters(meth)) {
                 checked &= this.checkParserNode(meth.getPreconditions(), meth.getParameters());
                 checked &= this.checkParserNode(meth.getTask(), meth.getParameters());
@@ -1197,7 +1197,7 @@ public final class Parser implements Callable<Integer> {
             } else {
                 checked = false;
             }
-            this.checkMethodSemantic(new PDDLMethod(meth));
+            this.checkMethodSemantic(new ParsedMethod(meth));
         }
         return checked;
     }
@@ -1262,7 +1262,7 @@ public final class Parser implements Callable<Integer> {
     private boolean checkInitialTaskNetwork() {
         boolean checked = true;
         if (problem.getInitialTaskNetwork() != null) {
-            final PDDLTaskNetwork tn = this.problem.getInitialTaskNetwork();
+            final ParsedTaskNetwork tn = this.problem.getInitialTaskNetwork();
             checked = this.checkParserNode(tn.getTasks(), tn.getParameters());
             if (this.checkTaskIDsUniquenessFromInitialTaskNetwork(tn.getTasks(), new HashSet<Symbol<String>>())) {
                 final Set<Symbol<String>> taskIds = Expression.getTaskIDs(tn.getTasks());
@@ -1304,7 +1304,7 @@ public final class Parser implements Callable<Integer> {
      */
     private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Expression<String> exp, Set<Symbol<String>> taskIDs) {
         boolean unique = true;
-        if (exp.getConnective().equals(PDDLConnective.TASK) && exp.getTaskID() != null) {
+        if (exp.getConnective().equals(Connector.TASK) && exp.getTaskID() != null) {
             if (!taskIDs.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in initial task network "
                     + "is already defined", this.lexer
@@ -1326,7 +1326,7 @@ public final class Parser implements Callable<Integer> {
      * @param meth the methode to be tested.
      * @return true if the all the task ids used in a method declaration are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(PDDLMethod meth) {
+    private boolean checkTaskIDsUniqueness(ParsedMethod meth) {
         return this.checkTaskIDsUniqueness(meth, meth.getSubTasks(), new HashSet<Symbol<String>>());
     }
 
@@ -1337,9 +1337,9 @@ public final class Parser implements Callable<Integer> {
      * @param exp the expression.
      * @return true if the all the task ids used in the expression are unique; false otherwise.
      */
-    private boolean checkTaskIDsUniqueness(PDDLMethod meth, Expression<String> exp, Set<Symbol<String>> taskIds) {
+    private boolean checkTaskIDsUniqueness(ParsedMethod meth, Expression<String> exp, Set<Symbol<String>> taskIds) {
         boolean unique = true;
-        if (exp.getConnective().equals(PDDLConnective.TASK) && exp.getTaskID() != null) {
+        if (exp.getConnective().equals(Connector.TASK) && exp.getTaskID() != null) {
             if (!taskIds.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in method "
                     + "\"" + meth.getName() + "\" is already defined", this.lexer
@@ -1465,21 +1465,21 @@ public final class Parser implements Callable<Integer> {
 
             }
         }
-        if (checked && gd.getConnective().equals(PDDLConnective.ATOM)
+        if (checked && gd.getConnective().equals(Connector.ATOM)
             && !this.isDeclaredPredicate(atomSkeleton)) {
             this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                 .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                 .getName().getLocation().getBeginColumn());
             checked = false;
-        } else if (checked && gd.getConnective().equals(PDDLConnective.FN_ATOM)
+        } else if (checked && gd.getConnective().equals(Connector.FN_ATOM)
             && !this.isDeclaredFunction(atomSkeleton)) {
             this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                 .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                 .getName().getLocation().getBeginColumn());
             checked = false;
-        } else if (checked && gd.getConnective().equals(PDDLConnective.TASK)
+        } else if (checked && gd.getConnective().equals(Connector.TASK)
             && !this.isDeclaredTask(atomSkeleton)) {
             this.mgr.logParserError("task \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1648,7 +1648,7 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if the parameters of the specified action are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkActionParameters(PDDLAction action) {
+    private boolean checkActionParameters(ParsedAction action) {
         boolean checked = true;
         Set<Symbol<String>> set = new HashSet<>();
         for (TypedSymbol<String> parameter : action.getParameters()) {
@@ -1678,7 +1678,7 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if the parameters of the specified method are well formed;
      * <code>false</code> otherwise.
      */
-    private boolean checkMethodParameters(PDDLMethod method) {
+    private boolean checkMethodParameters(ParsedMethod method) {
         boolean checked = true;
         Set<Symbol<String>> set = new HashSet<>();
         for (TypedSymbol<String> parameter : method.getParameters()) {
@@ -1708,7 +1708,7 @@ public final class Parser implements Callable<Integer> {
     private boolean checkActionsUniqueness() {
         boolean checked = true;
         Set<Symbol<String>> set = new HashSet<>();
-        for (PDDLAction op : this.domain.getActions()) {
+        for (ParsedAction op : this.domain.getActions()) {
             if (!set.add(op.getName())) {
                 Symbol<String> name = op.getName();
                 this.mgr.logParserError("action \"" + name + "\" declared twice", this.lexer
@@ -1727,7 +1727,7 @@ public final class Parser implements Callable<Integer> {
     private boolean checkMethodsUniqueness() {
         boolean checked = true;
         Set<Symbol<String>> set = new HashSet<>();
-        for (PDDLMethod meth : this.domain.getMethods()) {
+        for (ParsedMethod meth : this.domain.getMethods()) {
             if (!set.add(meth.getName())) {
                 Symbol<String> name = meth.getName();
                 this.mgr.logParserError("method \"" + name + "\" declared twice", this.lexer
@@ -1744,7 +1744,7 @@ public final class Parser implements Callable<Integer> {
      * @param action the action to check.
      * @return <code>true</code> if the action succeeds the test; <code>false</code> otherwise.
      */
-    private boolean checkActionSemantic(PDDLAction action) {
+    private boolean checkActionSemantic(ParsedAction action) {
         boolean check = true;
         int i = 0;
         // Rename the parameters
@@ -1759,12 +1759,12 @@ public final class Parser implements Callable<Integer> {
         final Expression<String> preconditions = action.getPreconditions();
         //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
-        if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
+        if (preconditions.getConnective().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is always applicable: "
                     + "action preconditions can be simplified to TRUE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
-        } else if (preconditions.getConnective().equals(PDDLConnective.FALSE)) {
+        } else if (preconditions.getConnective().equals(Connector.FALSE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is never applicable: "
                     + "action preconditions can be simplified to FALSE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
@@ -1774,12 +1774,12 @@ public final class Parser implements Callable<Integer> {
         final Expression<String> effects = action.getPreconditions();
         //Expression.renameVariables(effects, context);
         check &= this.checkExpressionSemantic(effects);
-        if (effects.getConnective().equals(PDDLConnective.TRUE)) {
+        if (effects.getConnective().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
                     + "action effects can be simplified to TRUE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
-        } else if (effects.getConnective().equals(PDDLConnective.FALSE)) {
+        } else if (effects.getConnective().equals(Connector.FALSE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced invalid effects: "
                     + "action effects can be simplified to FALSE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
@@ -1794,7 +1794,7 @@ public final class Parser implements Callable<Integer> {
      * @param method the method to check.
      * @return <code>true</code> if the method succeeds the test; <code>false</code> otherwise.
      */
-    private boolean checkMethodSemantic(PDDLMethod method) {
+    private boolean checkMethodSemantic(ParsedMethod method) {
         boolean check = true;
         int i = 0;
         // Rename the parameters
@@ -1809,12 +1809,12 @@ public final class Parser implements Callable<Integer> {
         final Expression<String> preconditions = method.getPreconditions();
         //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
-        if (preconditions.getConnective().equals(PDDLConnective.TRUE)) {
+        if (preconditions.getConnective().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
                     + "method preconditions can be simplified to TRUE.", this.lexer.getFile(),
                 method.getName().getLocation().getBeginLine(), method.getName().getLocation().getBeginColumn());
             check = false;
-        } else if (preconditions.getConnective().equals(PDDLConnective.FALSE)) {
+        } else if (preconditions.getConnective().equals(Connector.FALSE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is never applicable: "
                     + "method preconditions can be simplified to FALSE.", this.lexer.getFile(),
                 method.getName().getLocation().getBeginLine(), method.getName().getLocation().getBeginColumn());
@@ -1873,8 +1873,8 @@ public final class Parser implements Callable<Integer> {
             case HOLD_DURING_METHOD_CONSTRAINT:
                 Expression<String> child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
-                if (child.getConnective().equals(PDDLConnective.TRUE)
-                    || child.getConnective().equals(PDDLConnective.FALSE)) {
+                if (child.getConnective().equals(Connector.TRUE)
+                    || child.getConnective().equals(Connector.FALSE)) {
                     exp.setConnective(child.getConnective());
                     this.mgr.logParserWarning(exp.getConnective() + " expression is always " + exp.getConnective()
                             + ".", this.lexer.getFile(), line, column);
@@ -1885,26 +1885,26 @@ public final class Parser implements Callable<Integer> {
                 final Expression<String> cause = exp.getChildren().get(0);
                 final Expression<String> consequence = exp.getChildren().get(1);
                 check &= this.checkExpressionSemantic(cause);
-                if (cause.getConnective().equals(PDDLConnective.TRUE)) {
+                if (cause.getConnective().equals(Connector.TRUE)) {
                     check &= this.checkExpressionSemantic(consequence);
                     exp.assign(consequence);
                     this.mgr.logParserWarning("IMPLY expression cause always TRUE.", this.lexer.getFile(),
                         line, column);
                     check = false;
-                } else if (cause.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (cause.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.TRUE);
                     this.mgr.logParserWarning("IMPLY expression cause always FALSE.", this.lexer.getFile(),
                         line, column);
                     check = false;
                 } else {
                     check &= this.checkExpressionSemantic(consequence);
-                    if (consequence.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
+                    if (consequence.getConnective().equals(Connector.TRUE)) {
+                        exp.setConnective(Connector.TRUE);
                         this.mgr.logParserWarning("IMPLY expression consequence always TRUE.",
                             this.lexer.getFile(), line, column);
                         check = false;
-                    } else if (consequence.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.NOT);
+                    } else if (consequence.getConnective().equals(Connector.FALSE)) {
+                        exp.setConnective(Connector.NOT);
                         exp.getChildren().remove(1);
                         this.mgr.logParserWarning("IMPLY expression consequence always FALSE.",
                             this.lexer.getFile(), line, column);
@@ -1916,7 +1916,7 @@ public final class Parser implements Callable<Integer> {
                 check &= this.checkDuplicateChild(exp);
                 check &= this.checkTautology(exp);
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                    exp.setConnective(Connector.TRUE);
                     this.mgr.logParserWarning("AND expression is empty.", this.lexer.getFile(), line, column);
                     check = false;
                 } else if (exp.getChildren().size() == 1) {
@@ -1925,25 +1925,25 @@ public final class Parser implements Callable<Integer> {
                 } else {
                     int i = 0;
                     while (i < exp.getChildren().size()
-                        && !exp.getConnective().equals(PDDLConnective.TRUE)
-                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
+                        && !exp.getConnective().equals(Connector.TRUE)
+                        && !exp.getConnective().equals(Connector.FALSE)) {
                         child = exp.getChildren().get(i);
                         int childLine = child.getLocation().getBeginLine();
                         int childColumn = child.getLocation().getBeginColumn();
                         check &= this.checkExpressionSemantic(child);
-                        if (child.getConnective().equals(PDDLConnective.FALSE)) {
-                            exp.setConnective(PDDLConnective.FALSE);
+                        if (child.getConnective().equals(Connector.FALSE)) {
+                            exp.setConnective(Connector.FALSE);
                             this.mgr.logParserWarning("AND expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always FALSE.",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
+                        } else if (child.getConnective().equals(Connector.TRUE)) {
                             exp.getChildren().remove(i);
                             this.mgr.logParserWarning("AND expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always TRUE.",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(PDDLConnective.AND)) {
+                        } else if (child.getConnective().equals(Connector.AND)) {
                             exp.getChildren().remove(i);
                             exp.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
@@ -1960,7 +1960,7 @@ public final class Parser implements Callable<Integer> {
                 check &= this.checkDuplicateChild(exp);
                 check &= this.checkTautology(exp);
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                    exp.setConnective(Connector.TRUE);
                     this.mgr.logParserWarning("OR expression is empty.",  this.lexer.getFile(), line, column);
                     check = false;
                 } else if (exp.getChildren().size() == 1) {
@@ -1969,25 +1969,25 @@ public final class Parser implements Callable<Integer> {
                 } else {
                     int i = 0;
                     while (i < exp.getChildren().size()
-                        && !exp.getConnective().equals(PDDLConnective.TRUE)
-                        && !exp.getConnective().equals(PDDLConnective.FALSE)) {
+                        && !exp.getConnective().equals(Connector.TRUE)
+                        && !exp.getConnective().equals(Connector.FALSE)) {
                         child = exp.getChildren().get(i);
                         int childLine = child.getLocation().getBeginLine();
                         int childColumn = child.getLocation().getBeginColumn();
                         check &= this.checkExpressionSemantic(child);
-                        if (child.getConnective().equals(PDDLConnective.TRUE)) {
-                            exp.setConnective(PDDLConnective.TRUE);
+                        if (child.getConnective().equals(Connector.TRUE)) {
+                            exp.setConnective(Connector.TRUE);
                             this.mgr.logParserWarning("OR expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always TRUE.",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
+                        } else if (child.getConnective().equals(Connector.FALSE)) {
                             exp.getChildren().remove(i);
                             this.mgr.logParserWarning("OR expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always FALSE. ",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(PDDLConnective.OR)) {
+                        } else if (child.getConnective().equals(Connector.OR)) {
                             exp.getChildren().remove(i);
                             exp.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
@@ -2003,14 +2003,14 @@ public final class Parser implements Callable<Integer> {
             case NOT:
                 child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
-                if (child.getConnective().equals(PDDLConnective.NOT)) {
+                if (child.getConnective().equals(Connector.NOT)) {
                     exp.assign(child.getChildren().get(0));
                     this.mgr.logParserWarning("NOT expression contains a double negation that "
                         + "can be removed.", this.lexer.getFile(), line, column);
-                } else if (child.getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
-                } else if (child.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (child.getConnective().equals(Connector.TRUE)) {
+                    exp.setConnective(Connector.FALSE);
+                } else if (child.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.TRUE);
                 }
                 break;
             case WHEN:
@@ -2018,13 +2018,13 @@ public final class Parser implements Callable<Integer> {
                 check &= this.checkExpressionSemantic(condition);
                 Expression<String> effect =  exp.getChildren().get(1);
                 check &= this.checkExpressionSemantic(effect);
-                if (condition.getConnective().equals(PDDLConnective.TRUE)) {
+                if (condition.getConnective().equals(Connector.TRUE)) {
                     exp.assign(effect);
                     this.mgr.logParserWarning("WHEN expression with condition always TRUE. "
                         + "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
                     check = false;
-                } else if (condition.getConnective().equals(PDDLConnective.FALSE)) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                } else if (condition.getConnective().equals(Connector.FALSE)) {
+                    exp.setConnective(Connector.TRUE);
                     this.mgr.logParserWarning("WHEN expression with condition always FALSE. "
                         + "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
                     check = false;
@@ -2032,7 +2032,7 @@ public final class Parser implements Callable<Integer> {
                 break;
             case EQUAL_ATOM:
                 if (exp.getArguments().get(0).equals(exp.getArguments().get(1))) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                    exp.setConnective(Connector.TRUE);
                     this.mgr.logParserWarning("EQUAL expression always TRUE. "
                         + "The expression can be removed.", this.lexer.getFile(), line, column);
                     check = false;
@@ -2070,14 +2070,14 @@ public final class Parser implements Callable<Integer> {
                 break;
             case HOLD_DURING_CONSTRAINT:
                 if (exp.getChildren().get(0).getValue() > exp.getChildren().get(1).getValue()) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.setConnective(Connector.FALSE);
                     this.mgr.logParserError("HOLD_DURING_CONSTRAINT expression with invalid interval",
                         this.lexer.getFile(), line, column);
                     check = false;
                 } else {
                     check &= this.checkExpressionSemantic(exp.getChildren().get(0));
-                    if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.TRUE)
-                        || exp.getChildren().get(0).getConnective().equals(PDDLConnective.FALSE)) {
+                    if (exp.getChildren().get(0).getConnective().equals(Connector.TRUE)
+                        || exp.getChildren().get(0).getConnective().equals(Connector.FALSE)) {
                         exp.setConnective(exp.getChildren().get(0).getConnective());
                         check = false;
                     }
@@ -2106,8 +2106,8 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
     private boolean checkDuplicateChild(Expression<String> exp) {
-        assert exp.getConnective().equals(PDDLConnective.AND)
-            || exp.getConnective().equals(PDDLConnective.OR);
+        assert exp.getConnective().equals(Connector.AND)
+            || exp.getConnective().equals(Connector.OR);
         boolean check = true;
         for (int i = 0; i < exp.getChildren().size(); i++) {
             final Expression<String> ei = exp.getChildren().get(i);
@@ -2136,17 +2136,17 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
     private boolean checkTautology(Expression<String> exp) {
-        assert exp.getConnective().equals(PDDLConnective.AND)
-            || exp.getConnective().equals(PDDLConnective.OR);
+        assert exp.getConnective().equals(Connector.AND)
+            || exp.getConnective().equals(Connector.OR);
         boolean check = true;
         for (int i = 0; i < exp.getChildren().size(); i++) {
             Expression<String> ei =  exp.getChildren().get(i);
-            Expression<String> neg = new Expression<String>(PDDLConnective.NOT);
+            Expression<String> neg = new Expression<String>(Connector.NOT);
             neg.addChild(ei);
             for (int j = i + 1; j < exp.getChildren().size(); j++) {
                 Expression<String> ej = exp.getChildren().get(j);
                 if (ej.equals(neg)) {
-                    ei.setConnective(PDDLConnective.TRUE);
+                    ei.setConnective(Connector.TRUE);
                     exp.getChildren().remove(j);
                     j--;
                     this.mgr.logParserWarning("Tautology detected between sub-expressions in "

@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Symbol;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class AbstractNumericProblem extends ADLProblem implements Numeric {
      *
      * @param problem The problem.
      */
-    public AbstractNumericProblem(final ParsedProblem problem) {
+    public AbstractNumericProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 

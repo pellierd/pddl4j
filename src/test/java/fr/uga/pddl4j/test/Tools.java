@@ -2,9 +2,9 @@ package fr.uga.pddl4j.test;
 
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
@@ -12,7 +12,6 @@ import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.NumericProblem;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.SimpleTemporalProblem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -132,7 +131,7 @@ public abstract class Tools {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
             Parser parser = new Parser();
-            ParsedProblem parsedProblem = parser.parse(domain, problem);
+            ParsedProblemImpl parsedProblem = parser.parse(domain, problem);
             ErrorManager errorManager = parser.getErrorManager();
             if (errorManager.isEmpty()) {
                 return new ADLProblem(parsedProblem);
@@ -229,7 +228,7 @@ public abstract class Tools {
                 Planner planner = Planner.getInstance(name, config);
 
 
-                ParsedProblem parsedProblem = planner.parse(currentDomain, currentProblem);
+                ParsedProblemImpl parsedProblem = planner.parse(currentDomain, currentProblem);
                 ErrorManager errorManager = planner.getParserErrorManager();
                 if (!errorManager.isEmpty()) {
                     errorManager.printAll();
@@ -397,7 +396,7 @@ public abstract class Tools {
             // Parses the PDDL domain and problem description
             try {
                 Parser parser = new Parser();
-                ParsedProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                ParsedProblemImpl problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
                 ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
                         || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
@@ -416,7 +415,7 @@ public abstract class Tools {
                         pb = new HTNProblem(problemParsed);
                         typeOfProblem = "HTN";
                     } else if (problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
-                        pb = new SimpleTemporalProblem(problemParsed);
+                        pb = new ADLProblem(problemParsed);
                         typeOfProblem = "Temporal";
                     } else if (!problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
                             && problemParsed.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {

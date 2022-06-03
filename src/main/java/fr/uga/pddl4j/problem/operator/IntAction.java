@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.Connector;
 
 /**
  * This class implements an action. This class is used to store compact representation of an action
@@ -71,7 +71,7 @@ public final class IntAction extends AbstractIntOperator {
      */
     public IntAction(final String name, final int arity) {
         super(name, arity);
-        this.effects = new Expression<>(PDDLConnective.AND);
+        this.effects = new Expression<>(Connector.AND);
         this.cost = IntAction.DEFAULT_COST;
     }
 

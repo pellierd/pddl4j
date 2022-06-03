@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +40,7 @@ public class HTNProblem extends AbstractHTNProblem {
      *
      * @param problem the problem.
      */
-    public HTNProblem(final ParsedProblem problem) {
+    public HTNProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 
@@ -160,12 +160,12 @@ public class HTNProblem extends AbstractHTNProblem {
             LOGGER.debug("Initial tasknetwork instantiated:\n"
                 + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
         }
-
         this.instantiateMethods();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Methods instantiated:\n\n"
                 + this.toString(Data.INT_METHODS));
         }
+
         this.simplyMethodsWithGroundInertia();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Methods simplified based on ground inertia:\n\n"
@@ -186,10 +186,16 @@ public class HTNProblem extends AbstractHTNProblem {
         }
         this.initOfMapFluentIndex();
         this.finalizeActions();
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Actions:\n\n"
                 + this.toString(Data.ACTIONS) + "\n");
         }
+
+
+
+
+
         this.extractRelevantTasks();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Relevant tasks:\n"
@@ -226,6 +232,8 @@ public class HTNProblem extends AbstractHTNProblem {
             LOGGER.debug("Goal:\n"
                 + this.toString(Data.GOAL));
         }
+
+
     }
 
     /**

@@ -30,7 +30,7 @@ import java.util.Objects;
  * @author D. Pellier
  * @version 1.0 - 20.12.2019
  */
-public class PDDLTaskNetwork implements Serializable {
+public class ParsedTaskNetwork implements Serializable {
 
     /**
      * The parameter of the task network.
@@ -60,7 +60,7 @@ public class PDDLTaskNetwork implements Serializable {
     /**
      * Create a new task network.
      */
-    protected PDDLTaskNetwork() {
+    protected ParsedTaskNetwork() {
         super();
         this.parameters = null;
         this.tasks = null;
@@ -74,7 +74,7 @@ public class PDDLTaskNetwork implements Serializable {
      *
      * @param other the other task network.
      */
-    public PDDLTaskNetwork(final PDDLTaskNetwork other) {
+    public ParsedTaskNetwork(final ParsedTaskNetwork other) {
         this.parameters = new ArrayList<>();
         for (TypedSymbol<String> param : other.getParameters()) {
             this.parameters.add(new TypedSymbol<String>(param));
@@ -94,8 +94,8 @@ public class PDDLTaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLTaskNetwork(final Expression<String> tasks,
-                           final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedTaskNetwork(final Expression<String> tasks,
+                             final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
         super();
         this.setParameters(new ArrayList<>());
         this.setTasks(tasks);
@@ -114,8 +114,8 @@ public class PDDLTaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public PDDLTaskNetwork(final List<TypedSymbol<String>> parameters, final Expression<String> tasks,
-                           final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedTaskNetwork(final List<TypedSymbol<String>> parameters, final Expression<String> tasks,
+                             final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
         super();
         this.setParameters(parameters);
         this.setTasks(tasks);
@@ -237,7 +237,7 @@ public class PDDLTaskNetwork implements Serializable {
     @Override
     public boolean equals(final Object object) {
         if (object != null && object.getClass().equals(this.getClass())) {
-            final PDDLTaskNetwork other = (PDDLTaskNetwork) object;
+            final ParsedTaskNetwork other = (ParsedTaskNetwork) object;
             return this.getTasks().equals(other.getTasks())
                 && this.getOrdering().equals(other.getOrdering())
                 && this.getConstraints().equals(other.getConstraints())

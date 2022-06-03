@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
@@ -29,7 +29,7 @@ import fr.uga.pddl4j.problem.numeric.NumericAssignment;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericFluent;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
-import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
+import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
@@ -137,7 +137,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param problem the problem.
      */
-    public FinalizedProblem(final ParsedProblem problem) {
+    public FinalizedProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 
@@ -701,7 +701,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
         // Initialize the effects of the action
         final LinkedList<Expression<Integer>> effects = new LinkedList<>();
-        if (action.getEffects().getConnective().equals(PDDLConnective.ATOM)) {
+        if (action.getEffects().getConnective().equals(Connector.ATOM)) {
             effects.add(action.getEffects());
         } else {
             effects.addAll(action.getEffects().getChildren());
@@ -712,7 +712,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         boolean hasUnConditionalEffects = false;
         while (!effects.isEmpty()) { //for (Expression ei : effects) {
             Expression<Integer> ei = effects.poll();
-            final PDDLConnective connective = ei.getConnective();
+            final Connector connective = ei.getConnective();
             final List<Expression<Integer>> children = ei.getChildren();
             //System.out.println("EXP " + this.toString(ei));
             switch (connective) {
@@ -774,14 +774,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void finalizeGoal() {
 
-        if (this.getIntGoal().getConnective().equals(PDDLConnective.FALSE)) {
+        if (this.getIntGoal().getConnective().equals(Connector.FALSE)) {
             this.goal = null;
         } else {
             this.getIntGoal().toDNF();
             List<Goal> goals = new ArrayList<>(this.getIntGoal().getChildren().size());
             for (Expression<Integer> exp : this.getIntGoal().getChildren()) {
-                if (exp.getConnective().equals(PDDLConnective.ATOM)) {
-                    Expression<Integer> and = new Expression<>(PDDLConnective.AND);
+                if (exp.getConnective().equals(Connector.ATOM)) {
+                    Expression<Integer> and = new Expression<>(Connector.AND);
                     and.getChildren().add(exp);
                     goals.add(new Goal(this.finalizeCondition(and)));
                 } else {
@@ -793,7 +793,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 final int dummyPredicateIndex = this.getPredicateSymbols().size();
                 this.getPredicateSymbols().add(Constants.DUMMY_GOAL);
                 this.getPredicateSignatures().add(new ArrayList<>());
-                Expression<Integer> dummyGoal = new Expression<>(PDDLConnective.ATOM);
+                Expression<Integer> dummyGoal = new Expression<>(Connector.ATOM);
                 dummyGoal.setSymbol(new Symbol<>(SymbolType.PREDICATE, dummyPredicateIndex));
                 dummyGoal.setArguments(new ArrayList<>(0));
                 final int dummyGoalIndex = this.getIntExpFluents().size();
@@ -1319,7 +1319,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                     str.append(": ");
                     str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + r);
                     str.append(" ");
-                    str.append(PDDLConnective.LESS_ORDERING_CONSTRAINT.getImage());
+                    str.append(Connector.LESS_ORDERING_CONSTRAINT.getImage());
                     str.append(" ");
                     str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c);
                     str.append("\n");
@@ -1480,7 +1480,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param operator  the operator.
      * @return a string representation of the specified operator.
      */
-    public final String toShortString(final AbstractGroundOperator operator) {
+    public final String toShortString(final AbstractInstantiatedOperator operator) {
         final StringBuilder str = new StringBuilder();
         str.append(operator.getName());
         for (int i = 0; i < operator.arity(); i++) {

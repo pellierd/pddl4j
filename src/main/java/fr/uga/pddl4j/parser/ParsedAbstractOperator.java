@@ -19,10 +19,8 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
  * @author D. Pellier
  * @version 1.0 - 25.03.2020
  */
-public abstract class PDDLAbstractOperator extends AbstractParsedObject implements PDDLOperator {
+public abstract class ParsedAbstractOperator extends AbstractParsedObject implements ParsedOperator {
 
     /**
      * The name of the operator.
@@ -56,7 +54,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
     /**
      * Create a new operator from another.
      */
-    private PDDLAbstractOperator() {
+    private ParsedAbstractOperator() {
         super();
     }
 
@@ -65,7 +63,7 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      *
      * @param other the other operator.
      */
-    protected PDDLAbstractOperator(final PDDLOperator other) {
+    protected ParsedAbstractOperator(final ParsedOperator other) {
         if (other == null) {
             throw new NullPointerException();
         }
@@ -85,8 +83,8 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param parameters The list of parameters of the operator.
      * @param preconditions The goal description that represents the preconditions of the operator.
      */
-    protected PDDLAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
-                                   final Expression<String> preconditions) {
+    protected ParsedAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                                     final Expression<String> preconditions) {
         this(name, parameters, preconditions, null);
     }
 
@@ -98,8 +96,8 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      * @param preconditions The goal description that represents the preconditions of the operator.
      * @param duration the duration constraint of the operator.
      */
-    protected PDDLAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
-                                   final Expression<String> preconditions, final Expression<String> duration) {
+    protected ParsedAbstractOperator(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                                     final Expression<String> preconditions, final Expression<String> duration) {
         this.name = name;
         this.parameters = parameters;
         this.preconditions = preconditions;
@@ -243,8 +241,8 @@ public abstract class PDDLAbstractOperator extends AbstractParsedObject implemen
      */
     @Override
     public final boolean equals(final Object object) {
-        if (object != null && object instanceof PDDLAbstractOperator) {
-            final PDDLAbstractOperator other = (PDDLAction) object;
+        if (object != null && object instanceof ParsedAbstractOperator) {
+            final ParsedAbstractOperator other = (ParsedAction) object;
             return this.name.equals(other.name);
         }
         return false;

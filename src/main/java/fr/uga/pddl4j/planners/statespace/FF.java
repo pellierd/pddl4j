@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.planners.statespace;
 
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 
@@ -131,7 +131,7 @@ public final class FF extends AbstractStateSpacePlanner<ADLProblem>  {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public ADLProblem instantiate(final ParsedProblem problem) {
+    public ADLProblem instantiate(final ParsedProblemImpl problem) {
         ADLProblem pb = new ADLProblem(problem);
         pb.instantiate();
         return pb;

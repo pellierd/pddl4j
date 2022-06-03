@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.Connector;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -79,9 +79,9 @@ public final class IntTaskNetwork implements Serializable {
      * @param arity the arity of the task network.
      */
     public IntTaskNetwork(final int arity) {
-        this.tasks = new Expression<>(PDDLConnective.AND);
-        this.orderingConstraints = new Expression<>(PDDLConnective.AND);
-        this.constraints = new Expression<>(PDDLConnective.AND);
+        this.tasks = new Expression<>(Connector.AND);
+        this.orderingConstraints = new Expression<>(Connector.AND);
+        this.constraints = new Expression<>(Connector.AND);
         this.parameters =  new int[arity];
         Arrays.fill(this.parameters, -1);
         this.instantiations = new int[arity];

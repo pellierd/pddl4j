@@ -29,7 +29,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
  */
-public class ADLProblem extends FinalizedProblem {
+public class ProblemImpl extends FinalizedProblem {
 
     /**
      * The logger of the class.
@@ -40,7 +40,7 @@ public class ADLProblem extends FinalizedProblem {
      * Create a new ADL problem from a domain and problem.
      * @param problem The problem.
      */
-    public ADLProblem(final ParsedProblemImpl problem) {
+    public ProblemImpl(final ParsedProblemImpl problem) {
         super(problem);
     }
 
@@ -62,6 +62,9 @@ public class ADLProblem extends FinalizedProblem {
         accepted.add(RequireKey.UNIVERSAL_PRECONDITIONS);
         accepted.add(RequireKey.QUANTIFIED_PRECONDITIONS);
         accepted.add(RequireKey.CONDITIONAL_EFFECTS);
+        accepted.add(RequireKey.NUMERIC_FLUENTS);
+        accepted.add(RequireKey.DURATIVE_ACTIONS);
+        accepted.add(RequireKey.DURATION_INEQUALITIES);
         return accepted;
     }
 
@@ -100,6 +103,14 @@ public class ADLProblem extends FinalizedProblem {
                 + this.toString(Data.PREDICATE_SIGNATURES) + "\n");
         }
 
+        // Collect the function information (symbols and signatures)
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
+            this.initFunctions();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Functions declared:\n"
+                    + this.toString(Data.FUNCTION_SIGNATURES) + "\n");
+            }
+        }
 
         // Encode the actions of the domain into integer representation
         this.initActions();
@@ -140,6 +151,14 @@ public class ADLProblem extends FinalizedProblem {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Inertia detected:\n"
                 + this.toString(Data.INERTIA) + "\n");
+        }
+
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
+            this.extractNumericInertia();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Numeric inertia detected:\n"
+                    + this.toString(Data.NUMERIC_INERTIA) + "\n");
+            }
         }
 
         // Infer the type from the unary inertia
@@ -183,6 +202,13 @@ public class ADLProblem extends FinalizedProblem {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Ground inertia detected:\n\n"
                 + this.toString(Data.GROUND_INERTIA) + "\n");
+        }
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
+            this.extractGroundNumericInertia();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Ground numeric inertia detected:\n\n"
+                    + this.toString(Data.GROUND_NUMERIC_INERTIA) + "\n");
+            }
         }
         this.simplyActionsWithGroundInertia();
         if (LOGGER.isDebugEnabled()) {

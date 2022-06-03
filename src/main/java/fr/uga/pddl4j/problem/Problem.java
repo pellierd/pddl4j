@@ -16,11 +16,11 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Expression;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.parser.ParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.problem.operator.AbstractGroundOperator;
+import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
@@ -44,7 +44,7 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      *
      * @return the PDDL problem of the problem.
      */
-    ParsedProblem getParsedProblem();
+    ParsedProblemImpl getParsedProblem();
 
     /**
      * Returns the requirements of the problem.
@@ -208,7 +208,7 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      * @param operator the operator.
      * @return a string representation of the specified operator.
      */
-    String toShortString(final AbstractGroundOperator operator);
+    String toShortString(final AbstractInstantiatedOperator operator);
 
     boolean simplify(final Expression<Integer> exp);
 }

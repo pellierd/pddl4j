@@ -19,17 +19,13 @@
 
 package fr.uga.pddl4j.parser;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * This class implements a derived predicate of the PDDL 3.0 language.
  *
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public class PDDLDerivedPredicate extends AbstractParsedObject {
+public class ParsedDerivedPredicate extends AbstractParsedObject {
 
     /**
      * The head of the derived predicate.
@@ -44,7 +40,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
     /**
      * Creates a new derived predicate.
      */
-    private PDDLDerivedPredicate() {
+    private ParsedDerivedPredicate() {
         this.head = null;
         this.body = null;
     }
@@ -55,7 +51,7 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      * @param head the head of the derived predicate.
      * @param body the body of the derived predicate.
      */
-    public PDDLDerivedPredicate(final NamedTypedList head, final Expression<String> body) {
+    public ParsedDerivedPredicate(final NamedTypedList head, final Expression<String> body) {
         this();
         if (head == null || body == null) {
             throw new NullPointerException();
@@ -111,14 +107,14 @@ public class PDDLDerivedPredicate extends AbstractParsedObject {
      *
      * @param obj the other object.
      * @return <code>true</code> if <code>obj</code> is not <code>null</code>, is an instance
-     *          of the class <code>DerivedPredicate</code> and has the same head and body;
+     *          of the class <code>ParsedDerivedPredicate</code> and has the same head and body;
      *          otherwise it returns <code>false</code>.
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass().equals(this.getClass())) {
-            final PDDLDerivedPredicate other = (PDDLDerivedPredicate) obj;
+            final ParsedDerivedPredicate other = (ParsedDerivedPredicate) obj;
             return ((this.head == null && other.head == null)
                 || this.head != null && this.head.equals(other.head))
                 && ((this.body == null && other.body == null)

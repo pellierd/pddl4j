@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.examples.asp;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
@@ -161,7 +161,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public ADLProblem instantiate(ParsedProblem problem) {
+    public ADLProblem instantiate(ParsedProblemImpl problem) {
         final ADLProblem pb = new ADLProblem(problem);
         pb.instantiate();
         return pb;

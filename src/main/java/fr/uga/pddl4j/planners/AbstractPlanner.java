@@ -18,7 +18,7 @@ package fr.uga.pddl4j.planners;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.LogManager;
@@ -71,7 +71,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
     /**
      * The parsed problem.
      */
-    private ParsedProblem parsedProblem;
+    private ParsedProblemImpl parsedProblem;
 
     /**
      * The instantiated problem.
@@ -225,7 +225,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException           if an error occur during parsing.
      */
-    public ParsedProblem parse(final String domain, final String problem) throws IOException {
+    public ParsedProblemImpl parse(final String domain, final String problem) throws IOException {
         this.parsedProblem = this.parser.parse(domain, problem);
         return this.parsedProblem;
     }
@@ -237,7 +237,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
      * @throws FileNotFoundException if the domain or the problem file was not found.
      * @throws IOException if an error occur during parsing.
      */
-    public ParsedProblem parse() throws IOException {
+    public ParsedProblemImpl parse() throws IOException {
         this.parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
         return this.parsedProblem;
     }
@@ -339,7 +339,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        final ParsedProblem parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
+        final ParsedProblemImpl parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
         ErrorManager errorManager = this.parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {

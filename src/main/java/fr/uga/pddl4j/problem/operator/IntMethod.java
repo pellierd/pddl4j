@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
+import fr.uga.pddl4j.parser.Connector;
 
 /**
  * This class implements an method. This class is used to store compact representation of method
@@ -62,7 +62,7 @@ public final class IntMethod extends AbstractIntOperator {
      */
     public IntMethod(final String name, final int arity) {
         super(name, arity);
-        this.task = new Expression<>(PDDLConnective.TASK);
+        this.task = new Expression<>(Connector.TASK);
         this.taskNetwork = new IntTaskNetwork();
     }
 

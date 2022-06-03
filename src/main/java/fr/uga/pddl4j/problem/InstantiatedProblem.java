@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.Constants;
@@ -65,7 +65,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      *
      * @param problem the problem.
      */
-    public InstantiatedProblem(final ParsedProblem problem) {
+    public InstantiatedProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 
@@ -139,10 +139,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final List<IntAction> instOps = new ArrayList<>(100);
         action.getPreconditions().expandQuantifiedExpression(this.getDomains(), this);
         action.getPreconditions().simplify();
-        if (!action.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+        if (!action.getPreconditions().getConnective().equals(Connector.FALSE)) {
             action.getEffects().expandQuantifiedExpression(this.getDomains(), this);
             action.getEffects().simplify();
-            if (!action.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+            if (!action.getEffects().getConnective().equals(Connector.FALSE)) {
                 this.instantiate(action, 0, bound, instOps);
             }
         }
@@ -185,10 +185,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             final Expression<Integer> precond = action.getPreconditions();
             precond.simplify();
-            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+            if (!precond.getConnective().equals(Connector.FALSE)) {
                 final Expression<Integer> effect = action.getEffects();
                 effect.simplify();
-                if (!effect.getConnective().equals(PDDLConnective.FALSE)) {
+                if (!effect.getConnective().equals(Connector.FALSE)) {
                     actions.add(action);
                 }
             }
@@ -198,10 +198,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 final Symbol<Integer> varIndex = new Symbol<>(SymbolType.VARIABLE, -index - 1);
                 final Expression<Integer> precond = new Expression<>(action.getPreconditions());
                 precond.substitute(varIndex, constant, this);
-                if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+                if (!precond.getConnective().equals(Connector.FALSE)) {
                     final Expression<Integer> effects = new Expression<>(action.getEffects());
                     effects.substitute(varIndex, constant, this);
-                    if (!effects.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (!effects.getConnective().equals(Connector.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
                         copy.setEffects(effects);
@@ -284,7 +284,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             final Expression<Integer> precond = method.getPreconditions();
             precond.simplify();
-            if (!precond.getConnective().equals(PDDLConnective.FALSE)) {
+            if (!precond.getConnective().equals(Connector.FALSE)) {
                 methods.add(method);
             }
         } else if (method.getValueOfParameter(index) >= 0) {
@@ -296,7 +296,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 final Expression<Integer> preconditionCopy = new Expression<>(method.getPreconditions());
 
                 preconditionCopy.substitute(varIndex, constant, this);
-                if (!preconditionCopy.getConnective().equals(PDDLConnective.FALSE)) {
+                if (!preconditionCopy.getConnective().equals(Connector.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
                     copy.setOrderingConstraints(new Expression<>(method.getOrderingConstraints()));
@@ -386,7 +386,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     protected void instantiateInitialTaskNetwork() {
         final List<IntTaskNetwork> taskNetworks = this.instantiate(this.getIntInitialTaskNetwork());
         if (taskNetworks.size() > 1) {
-            Expression<Integer> root = new Expression<>(PDDLConnective.TASK);
+            Expression<Integer> root = new Expression<>(Connector.TASK);
             root.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().size()));
             this.getTaskSymbols().add("__top");
             this.getCompoundTaskSymbols().add("__top");
@@ -401,7 +401,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                     method.setValueOfParameter(i, tn.getValueOfParameter(i));
                 }
                 method.setTask(new Expression<>(root));
-                method.setPreconditions(new Expression<>(PDDLConnective.AND));
+                method.setPreconditions(new Expression<>(Connector.AND));
                 method.setTaskNetwork(tn);
                 this.getIntMethods().add(method);
                 index++;
@@ -448,7 +448,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             }
         }
 
-        // Expand the quantified expression contains in the the method precondition
+        // Expand the quantified expression contains in the method precondition
         this.expandQuantifiedExpressionAndSimplyMethods(meths);
 
         // Compute the set of primitive task from the action already instantiated
@@ -574,7 +574,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final IntMethod method = i.next();
             method.getPreconditions().expandQuantifiedExpression(this.getDomains(), this);
             method.getPreconditions().simplify();
-            if (method.getPreconditions().getConnective().equals(PDDLConnective.FALSE)) {
+            if (method.getPreconditions().getConnective().equals(Connector.FALSE)) {
                 i.remove();
             }
         }
@@ -589,7 +589,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     private LinkedHashSet<Expression<Integer>> computePrimitiveTaskSet(List<IntAction> actions) {
         LinkedHashSet<Expression<Integer>> tasks = new LinkedHashSet<>();
         for (IntAction a : actions) {
-            Expression<Integer> task = new Expression<>(PDDLConnective.TASK);
+            Expression<Integer> task = new Expression<>(Connector.TASK);
             task.setPrimtive(true);
             task.setSymbol(new Symbol<>(SymbolType.TASK, this.getTaskSymbols().indexOf(a.getName())));
             List<Symbol<Integer>> arguments = new ArrayList<>(a.getInstantiations().length);

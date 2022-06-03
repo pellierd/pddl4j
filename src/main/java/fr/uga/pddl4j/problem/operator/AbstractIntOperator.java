@@ -19,8 +19,8 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
 
 /**
  * This abstract class implements the common part of an operator (action of method) with integer representation.
@@ -28,7 +28,7 @@ import fr.uga.pddl4j.parser.PDDLConnective;
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public abstract class AbstractIntOperator extends AbstractGroundOperator {
+public abstract class AbstractIntOperator extends AbstractInstantiatedOperator {
 
     /**
      * The expression that represents the preconditions of the operator.
@@ -61,7 +61,7 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
      */
     protected AbstractIntOperator(final String name, final int arity) {
         super(name, arity);
-        this.preconditions = new Expression<>(PDDLConnective.OR);
+        this.preconditions = new Expression<>(Connector.OR);
         this.duration = null;
     }
 
@@ -124,5 +124,4 @@ public abstract class AbstractIntOperator extends AbstractGroundOperator {
         this.duration = duration;
     }
 }
-
 

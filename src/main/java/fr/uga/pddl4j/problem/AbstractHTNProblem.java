@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
@@ -39,7 +39,7 @@ public abstract class AbstractHTNProblem extends ADLProblem implements HTN {
      *
      * @param problem the problem.
      */
-    public AbstractHTNProblem(final ParsedProblem problem) {
+    public AbstractHTNProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 

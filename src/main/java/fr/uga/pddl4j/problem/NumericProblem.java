@@ -15,7 +15,7 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,7 +37,7 @@ public class NumericProblem extends AbstractNumericProblem {
      *
      * @param problem The problem.
      */
-    public NumericProblem(final ParsedProblem problem) {
+    public NumericProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 

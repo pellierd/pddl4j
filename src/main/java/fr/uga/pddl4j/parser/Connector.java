@@ -26,7 +26,7 @@ package fr.uga.pddl4j.parser;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public enum PDDLConnective {
+public enum Connector {
     /**
      * The connective for an atom, i.e, atomic formula.
      */
@@ -232,79 +232,79 @@ public enum PDDLConnective {
      */
     FALSE("false"),
     /**
-     * PDDLConnective for task used in HDDL fragment.
+     * Connector for task used in HDDL fragment.
      */
     TASK(""),
     /**
-     * PDDLConnective for task id used in HDDL fragment.
+     * Connector for task id used in HDDL fragment.
      */
     TASK_ID(""),
     /**
-     * PDDLConnective for time task id used in HDDL fragment.
+     * Connector for time task id used in HDDL fragment.
      */
     TIMED_TASK_ID(""),
     /**
-     * PDDLConnective for ordering constraints used in HDDL fragment.
+     * Connector for ordering constraints used in HDDL fragment.
      */
     LESS_ORDERING_CONSTRAINT("<"),
     /**
-     * PDDLConnective for ordering constraints used in HDDL fragment.
+     * Connector for ordering constraints used in HDDL fragment.
      */
     LESS_OR_EQUAL_ORDERING_CONSTRAINT("<="),
     /**
-     * PDDLConnective for ordering constraints used in HDDL fragment.
+     * Connector for ordering constraints used in HDDL fragment.
      */
     GREATER_ORDERING_CONSTRAINT(">"),
     /**
-     * PDDLConnective for ordering constraints used in HDDL fragment.
+     * Connector for ordering constraints used in HDDL fragment.
      */
     GREATER_OR_EQUAL_ORDERING_CONSTRAINT(">="),
     /**
-     * PDDLConnective for ordering constraints used in HDDL fragment.
+     * Connector for ordering constraints used in HDDL fragment.
      */
     EQUAL_ORDERING_CONSTRAINT("="),
     /**
-     * PDDLConnective for hold before method constraints in HDDL fragment.
+     * Connector for hold before method constraints in HDDL fragment.
      */
     HOLD_BEFORE_METHOD_CONSTRAINT("hold-before"),
     /**
-     * PDDLConnective for hold after method constraints in HDDL fragment.
+     * Connector for hold after method constraints in HDDL fragment.
      */
     HOLD_AFTER_METHOD_CONSTRAINT("hold-after"),
     /**
-     * PDDLConnective for hold between method constraints in HDDL fragment.
+     * Connector for hold between method constraints in HDDL fragment.
      */
     HOLD_BETWEEN_METHOD_CONSTRAINT("hold-between"),
     /**
-     * PDDLConnective for hold during method constraints in HDDL fragment.
+     * Connector for hold during method constraints in HDDL fragment.
      */
     HOLD_DURING_METHOD_CONSTRAINT("hold-during"),
     /**
-     * PDDLConnective for at end method constraints in HDDL fragment.
+     * Connector for at end method constraints in HDDL fragment.
      */
     AT_END_METHOD_CONSTRAINT("at-end"),
     /**
-     * PDDLConnective for at start between method constraints in HDDL fragment.
+     * Connector for at start between method constraints in HDDL fragment.
      */
     AT_START_METHOD_CONSTRAINT("at-start"),
     /**
-     * PDDLConnective for always method constraints in HDDL fragment.
+     * Connector for always method constraints in HDDL fragment.
      */
     ALWAYS_METHOD_CONSTRAINT("always"),
     /**
-     * PDDLConnective for at most once method constraints in HDDL fragment.
+     * Connector for at most once method constraints in HDDL fragment.
      */
     AT_MOST_ONCE_METHOD_CONSTRAINT("at-most-once"),
     /**
-     * PDDLConnective for sometime method constraints in HDDL fragment.
+     * Connector for sometime method constraints in HDDL fragment.
      */
     SOMETIME_METHOD_CONSTRAINT("sometime"),
     /**
-     * PDDLConnective for sometime before method constraints in HDDL fragment.
+     * Connector for sometime before method constraints in HDDL fragment.
      */
     SOMETIME_BEFORE_METHOD_CONSTRAINT("sometimes-before"),
     /**
-     * PDDLConnective for sometime after method constraints in HDDL fragment.
+     * Connector for sometime after method constraints in HDDL fragment.
      */
     SOMETIME_AFTER_METHOD_CONSTRAINT("sometimes-after");
 
@@ -318,7 +318,7 @@ public enum PDDLConnective {
      *
      * @param image the image of the connective. The image of the connective must be not null.
      */
-    PDDLConnective(String image) {
+    Connector(String image) {
         this.image = image;
     }
 

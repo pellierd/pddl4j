@@ -28,7 +28,7 @@ import java.util.List;
  * @version 1.0 - 25.03.2020
  */
 
-public interface PDDLOperator extends ParsedObject {
+public interface ParsedOperator extends ParsedObject {
 
     /**
      * Returns the name of the operator.

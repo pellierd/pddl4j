@@ -29,7 +29,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 28.01.2010
  */
-public interface PDDLDomain extends Serializable {
+public interface ParsedDomain extends Serializable {
 
     /**
      * Returns the name of the domain.
@@ -155,7 +155,7 @@ public interface PDDLDomain extends Serializable {
      *
      * @return the list of parsed ops.
      */
-    List<PDDLAction> getActions();
+    List<ParsedAction> getActions();
 
     /**
      * Adds an action to the domain.
@@ -163,14 +163,14 @@ public interface PDDLDomain extends Serializable {
      * @param action the action to add.
      * @return <code>true</code> if the action was added; <code>false</code> otherwise.
      */
-    boolean addAction(final PDDLAction action);
+    boolean addAction(final ParsedAction action);
 
     /**
      * Returns the list of parsed methods.
      *
      * @return the list of parsed methods.
      */
-    List<PDDLMethod> getMethods();
+    List<ParsedMethod> getMethods();
 
     /**
      * Adds a method to the domain.
@@ -178,14 +178,14 @@ public interface PDDLDomain extends Serializable {
      * @param method the method to add.
      * @return <code>true</code> if the method was added; <code>false</code> otherwise.
      */
-    boolean addMethod(final PDDLMethod method);
+    boolean addMethod(final ParsedMethod method);
 
     /**
      * Returns the list of parsed derived predicates.
      *
      * @return the list of parsed derived predicates.
      */
-    List<PDDLDerivedPredicate> getDerivesPredicates();
+    List<ParsedDerivedPredicate> getDerivesPredicates();
 
     /**
      * Adds a derived predicate to the domain.
@@ -194,7 +194,7 @@ public interface PDDLDomain extends Serializable {
      * @return <code>true</code> if the derived predicate was added; <code>false</code> otherwise.
      * @throws NullPointerException if the specified predicate is null.
      */
-    boolean addDerivedPredicate(final PDDLDerivedPredicate predicate);
+    boolean addDerivedPredicate(final ParsedDerivedPredicate predicate);
 
     /**
      * Returns if a specified type symbol was declared.
@@ -244,8 +244,8 @@ public interface PDDLDomain extends Serializable {
      * Normalize the domain. This method rename the variables used in the domain and normalize its
      * ops and derived predicates.
      *
-     * @see PDDLAction#normalize()
-     * @see PDDLDerivedPredicate#normalize()
+     * @see ParsedAction#normalize()
+     * @see ParsedDerivedPredicate#normalize()
      */
     void normalize();
 

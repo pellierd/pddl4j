@@ -25,7 +25,7 @@ package fr.uga.pddl4j.problem.operator;
  * @author D. Pellier
  * @version 1.0 - 07.06.2010
  */
-public abstract class AbstractOperator extends AbstractGroundOperator {
+public abstract class AbstractOperator extends AbstractInstantiatedOperator {
 
     /**
      * The precondition of the operator.
@@ -33,7 +33,7 @@ public abstract class AbstractOperator extends AbstractGroundOperator {
     private Condition precondition;
 
     /**
-     * Creates a new operator from an other.
+     * Creates a new operator from another.
      *
      * @param other the other operator.
      */

@@ -20,7 +20,6 @@
 package fr.uga.pddl4j.parser;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class implements a planning operator parsed.
@@ -35,7 +34,7 @@ import java.util.Map;
  * @author D. Pellier
  * @version 1.1 - 28.01.2010
  */
-public class PDDLAction extends PDDLAbstractOperator {
+public class ParsedAction extends ParsedAbstractOperator {
 
     /**
      * The goal description that represents the effects of the operator.
@@ -47,7 +46,7 @@ public class PDDLAction extends PDDLAbstractOperator {
      *
      * @param other the other operator.
      */
-    public PDDLAction(final PDDLAction other) {
+    public ParsedAction(final ParsedAction other) {
         super(other);
         this.effects = new Expression<String>(other.getEffects());
     }
@@ -60,8 +59,8 @@ public class PDDLAction extends PDDLAbstractOperator {
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
      */
-    public PDDLAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconds,
-                      final Expression<String> effects) {
+    public ParsedAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconds,
+                        final Expression<String> effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -76,8 +75,8 @@ public class PDDLAction extends PDDLAbstractOperator {
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
-    public PDDLAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconditions,
-                      final Expression<String> effects, final Expression<String> duration) {
+    public ParsedAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconditions,
+                        final Expression<String> effects, final Expression<String> duration) {
         super(name, parameters, preconditions, duration);
         this.effects = effects;
     }

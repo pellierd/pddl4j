@@ -15,16 +15,15 @@
 
 package fr.uga.pddl4j.problem;
 
+import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.PDDLConnective;
-import fr.uga.pddl4j.parser.ParsedProblem;
+import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.util.IntMatrix;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -67,7 +66,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      *
      * @param problem the problem.
      */
-    public PreInstantiatedProblem(final ParsedProblem problem) {
+    public PreInstantiatedProblem(final ParsedProblemImpl problem) {
         super(problem);
     }
 
@@ -179,7 +178,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case NOT:
                 final Expression<Integer> neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(PDDLConnective.ATOM)) {
+                if (neg.getConnective().equals(Connector.ATOM)) {
                     predicate = neg.getSymbol().getValue();
                     switch (this.inertia.get(predicate)) {
                         case INERTIA:
@@ -298,7 +297,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Symbol<Integer>> newTypeDomain = new LinkedHashSet<>();
                 for (Expression<Integer> fact : this.getIntInitialState()) {
-                    if (fact.getConnective().equals(PDDLConnective.NOT)) {
+                    if (fact.getConnective().equals(Connector.NOT)) {
                         fact = fact.getChildren().get(0);
                     }
                     if (fact.getSymbol().getValue() == i) {
@@ -374,20 +373,20 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     }
                     final IntAction op1 = new IntAction(o);
                     op1.setTypeOfParameter(index, ti);
-                    this.replace(op1.getPreconditions(), inertia, PDDLConnective.TRUE, ti, ts);
-                    this.replace(op1.getEffects(), inertia, PDDLConnective.TRUE, ti, ts);
-                    if (!op1.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
-                        && !op1.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                    this.replace(op1.getPreconditions(), inertia, Connector.TRUE, ti, ts);
+                    this.replace(op1.getEffects(), inertia, Connector.TRUE, ti, ts);
+                    if (!op1.getPreconditions().getConnective().equals(Connector.FALSE)
+                        && !op1.getEffects().getConnective().equals(Connector.FALSE)) {
                         newActions.add(op1);
                     }
 
                     final IntAction op2 = new IntAction(o);
                     op2.setTypeOfParameter(index, ts);
-                    this.replace(op2.getPreconditions(), inertia, PDDLConnective.FALSE, ti, ts);
-                    this.replace(op2.getEffects(), inertia, PDDLConnective.FALSE, ti, ts);
+                    this.replace(op2.getPreconditions(), inertia, Connector.FALSE, ti, ts);
+                    this.replace(op2.getEffects(), inertia, Connector.FALSE, ti, ts);
 
-                    if (!op2.getPreconditions().getConnective().equals(PDDLConnective.FALSE)
-                        && !op2.getEffects().getConnective().equals(PDDLConnective.FALSE)) {
+                    if (!op2.getPreconditions().getConnective().equals(Connector.FALSE)
+                        && !op2.getEffects().getConnective().equals(Connector.FALSE)) {
                         newActions.add(op2);
                     }
                 }
@@ -408,7 +407,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param ti         the type intersection.
      * @param ts         the type substract.
      */
-    private void replace(final Expression<Integer> exp, final Expression<Integer> inertia, final PDDLConnective connective,
+    private void replace(final Expression<Integer> exp, final Expression<Integer> inertia, final Connector connective,
                          final int ti, final int ts) {
         switch (exp.getConnective()) {
             case ATOM:
@@ -418,32 +417,32 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.AND)) {
+                while (i.hasNext() && exp.getConnective().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
                     this.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(PDDLConnective.FALSE)) {
-                        exp.setConnective(PDDLConnective.FALSE);
-                    } else if (ei.getConnective().equals(PDDLConnective.TRUE)) {
+                    if (ei.getConnective().equals(Connector.FALSE)) {
+                        exp.setConnective(Connector.FALSE);
+                    } else if (ei.getConnective().equals(Connector.TRUE)) {
                         i.remove();
                     }
                 }
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.TRUE);
+                    exp.setConnective(Connector.TRUE);
                 }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(PDDLConnective.OR)) {
+                while (i.hasNext() && exp.getConnective().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
                     this.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(PDDLConnective.TRUE)) {
-                        exp.setConnective(PDDLConnective.TRUE);
-                    } else if (ei.getConnective().equals(PDDLConnective.FALSE)) {
+                    if (ei.getConnective().equals(Connector.TRUE)) {
+                        exp.setConnective(Connector.TRUE);
+                    } else if (ei.getConnective().equals(Connector.FALSE)) {
                         i.remove();
                     }
                 }
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                    exp.setConnective(Connector.FALSE);
                 }
                 break;
             case FORALL:
@@ -452,15 +451,15 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     final Expression<Integer> ei = new Expression<>(exp);
                     //ei.setType(ti);
                     ei.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ti));
-                    this.replace(ei, inertia, PDDLConnective.TRUE, ti, ts);
+                    this.replace(ei, inertia, Connector.TRUE, ti, ts);
                     final Expression<Integer> es = new Expression<>(exp);
                     es.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ts));
-                    this.replace(es, inertia, PDDLConnective.FALSE, ti, ts);
+                    this.replace(es, inertia, Connector.FALSE, ti, ts);
                     exp.getChildren().clear();
-                    if (exp.getConnective().equals(PDDLConnective.FORALL)) {
-                        exp.setConnective(PDDLConnective.AND);
+                    if (exp.getConnective().equals(Connector.FORALL)) {
+                        exp.setConnective(Connector.AND);
                     } else {
-                        exp.setConnective(PDDLConnective.OR);
+                        exp.setConnective(Connector.OR);
                     }
                     exp.getChildren().add(ei);
                     exp.getChildren().add(es);
@@ -470,10 +469,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case NOT:
                 this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                if (exp.getChildren().get(0).getConnective().equals(PDDLConnective.TRUE)) {
-                    exp.setConnective(PDDLConnective.FALSE);
+                if (exp.getChildren().get(0).getConnective().equals(Connector.TRUE)) {
+                    exp.setConnective(Connector.FALSE);
                 } else {
-                    exp.setConnective(PDDLConnective.TRUE);
+                    exp.setConnective(Connector.TRUE);
                 }
                 break;
             case AT_START:
@@ -626,7 +625,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         }
 
         for (Expression<Integer> fact : this.getIntInitialState()) {
-            if (fact.getConnective().equals(PDDLConnective.NOT)) {
+            if (fact.getConnective().equals(Connector.NOT)) {
                 fact = fact.getChildren().get(0);
             }
             final int arity = this.getPredicateSignatures().get(fact.getSymbol().getValue()).size();
@@ -773,7 +772,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @return if the atomic expression was simply or not.
      */
     public boolean simplify(final Expression<Integer> exp) {
-        if (!exp.getConnective().equals(PDDLConnective.ATOM)) return false;
+        if (!exp.getConnective().equals(Connector.ATOM)) return false;
         final int predicate = exp.getSymbol().getValue();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
@@ -809,13 +808,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         // 0 then the expression is simplified to FALSE.
         final Inertia inertia = this.getInertia().get(predicate);
         if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
-            exp.setConnective(PDDLConnective.FALSE);
+            exp.setConnective(Connector.FALSE);
             return true;
         } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
             // CASE 2: If the expression is a negative inertia and then the number of all possible
             // type-consistent ground instances of the specified expression then the expression is
             // simplified to TRUE.
-            exp.setConnective(PDDLConnective.TRUE);
+            exp.setConnective(Connector.TRUE);
             return true;
         } else {
             return false;
