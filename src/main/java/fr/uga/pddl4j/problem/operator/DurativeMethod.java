@@ -19,17 +19,19 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
+import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
+
 import java.util.List;
 
 /**
- * This class implements an method. This class is used to store compact representation of a method in a planning
- * problem.
+ * This class implements a durative method. This class is used to store compact representation of a durative method.
  *
  * @author D. Pellier
- * @version 1.0 - 31.03.2020
+ * @version 1.0 - 04.06.2022
  * @since 4.0
  */
-public final class Method extends AbstractOperator {
+public final class DurativeMethod extends AbstractDurativeOperator {
 
     /**
      * The default task index.
@@ -44,7 +46,7 @@ public final class Method extends AbstractOperator {
     /**
      * The task network of the method.
      */
-    private TaskNetwork taskNetwork;
+    private TemporalTaskNetwork taskNetwork;
 
     /**
      * Create a new method from a specified method. This constructor create a deep copy of the
@@ -52,10 +54,10 @@ public final class Method extends AbstractOperator {
      *
      * @param other the other method.
      */
-    public Method(final Method other) {
+    public DurativeMethod(final DurativeMethod other) {
         super(other);
         this.task = other.getTask();
-        this.taskNetwork = new TaskNetwork(other.taskNetwork);
+        this.taskNetwork = new TemporalTaskNetwork(other.taskNetwork);
     }
 
     /**
@@ -65,10 +67,10 @@ public final class Method extends AbstractOperator {
      * @param name  the name of the method.
      * @param arity the arity of the method. The arity cannot be less that 0.
      */
-    public Method(final String name, final int arity) {
+    public DurativeMethod(final String name, final int arity) {
         super(name, arity);
         this.task = Method.DEFAULT_TASK_INDEX;
-        this.taskNetwork = new TaskNetwork();
+        this.taskNetwork = new TemporalTaskNetwork();
     }
 
     /**
@@ -112,7 +114,7 @@ public final class Method extends AbstractOperator {
      *
      * @return the ordering constraints of the method.
      */
-    public final OrderingConstraintNetwork getOrderingConstraints() {
+    public final SimpleTemporalNetwork getOrderingConstraints() {
         return this.taskNetwork.getOrderingConstraints();
     }
 
@@ -121,7 +123,7 @@ public final class Method extends AbstractOperator {
      *
      * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final OrderingConstraintNetwork constraints) {
+    public final void setOrderingConstraints(final SimpleTemporalNetwork constraints) {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 
@@ -130,7 +132,7 @@ public final class Method extends AbstractOperator {
      *
      * @return the task network of this method.
      */
-    public final TaskNetwork getTaskNetwork() {
+    public final TemporalTaskNetwork getTaskNetwork() {
         return this.taskNetwork;
     }
 
@@ -139,7 +141,7 @@ public final class Method extends AbstractOperator {
      *
      * @param taskNetwork the task network to set.
      */
-    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
+    public final void setTaskNetwork(final TemporalTaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
     }
 }

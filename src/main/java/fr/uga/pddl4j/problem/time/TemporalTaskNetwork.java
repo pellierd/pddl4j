@@ -17,28 +17,26 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.problem.operator;
+package fr.uga.pddl4j.problem.time;
 
-import fr.uga.pddl4j.util.BitVector;
+import fr.uga.pddl4j.problem.operator.DurativeMethod;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * This class implements an task network. This class is used to store compact representation of a task network
- * in a planning problem.
+ * This class implements a temporal task network.
  *
  * @author D. Pellier
- * @version 1.0 - 01.03.2020
+ * @version 1.0 - 04.06.2023
  * @since 4.0
  */
-public final class TaskNetwork implements Serializable {
+public final class TemporalTaskNetwork implements Serializable {
 
     /**
-     * The array that defined the list of task of task network. Each task is defined as an integer. The integer
+     * The array that defined the list of tasks of task network. Each task is defined as an integer. The integer
      * indicates the index of the task in the task table of the planning problem.
      */
     private LinkedList<Integer> tasks;
@@ -46,16 +44,16 @@ public final class TaskNetwork implements Serializable {
     /**
      * The represents the ordering constraints of the task network.
      */
-    private OrderingConstraintNetwork orderingConstraints;
+    private SimpleTemporalNetwork temporalNetwork;
 
     /**
      * Create a new task network. The list of task is set to an empty set with no ordering constraints and not totally
      * ordered.
      */
-    public TaskNetwork() {
+    public TemporalTaskNetwork() {
         super();
-        this.tasks = new LinkedList<Integer>();
-        this.orderingConstraints = new OrderingConstraintNetwork(0);
+        this.setTasks(new LinkedList<Integer>());
+        this.setOrderingConstraints(new SimpleTemporalNetwork());
     }
 
     /**
@@ -64,10 +62,10 @@ public final class TaskNetwork implements Serializable {
      *
      * @param other the other task network.
      */
-    public TaskNetwork(final TaskNetwork other) {
+    public TemporalTaskNetwork(final TemporalTaskNetwork other) {
         super();
         this.tasks = new LinkedList<Integer>(other.getTasks());
-        this.orderingConstraints = new OrderingConstraintNetwork(other.getOrderingConstraints());
+        this.temporalNetwork = new SimpleTemporalNetwork(other.getOrderingConstraints());
     }
 
     /**
@@ -77,15 +75,16 @@ public final class TaskNetwork implements Serializable {
      * Warning, the constructor does not check that the ordering constraints are not cyclic.
      *
      * @param tasks       the tasks of the task network.
-     * @param constraints the orderings constraints of the task network.
+     * @param network the orderings constraints of the task network.
      */
-    public TaskNetwork(final List<Integer> tasks, final OrderingConstraintNetwork constraints) {
+    public TemporalTaskNetwork(final List<Integer> tasks, final SimpleTemporalNetwork network) {
         super();
-        this.tasks = new LinkedList<Integer>(tasks);
-        this.setOrderingConstraints(constraints);
+        this.setTasks(new LinkedList<Integer>(tasks));
+        this.setOrderingConstraints(network);
         this.transitiveClosure();
 
-        if (this.isTotallyOrdered()) {
+        // Set the tasks in the good order
+        /*if (this.isTotallyOrdered()) {
             LinkedList<Integer> orderedTasks = new LinkedList<>();
             List<Integer> numberOfConstraints = new ArrayList<>();
             for (int i = 0; i < constraints.rows(); i++) {
@@ -97,7 +96,7 @@ public final class TaskNetwork implements Serializable {
                 orderedTasks.add(0, this.tasks.get(numberOfConstraints.indexOf(i)));
             }
             this.tasks = orderedTasks;
-        }
+        }*/
     }
 
     /**
@@ -137,21 +136,21 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Returns the ordering constraints of the method.
+     * Returns the simple temporal network of this temporal task network.
      *
-     * @return the ordering constraints of the method.
+     * @return the simple temporal networks of this temporal task network.
      */
-    public final OrderingConstraintNetwork getOrderingConstraints() {
-        return this.orderingConstraints;
+    public final SimpleTemporalNetwork getOrderingConstraints() {
+        return this.temporalNetwork;
     }
 
     /**
-     * Sets the new ordering constraints of the method.
+     * Sets the new simple temporal network of the temporal task network.
      *
-     * @param constraints the orderings constraints to set
+     * @param network the simple temporal networks to set.
      */
-    public final void setOrderingConstraints(final OrderingConstraintNetwork constraints) {
-        this.orderingConstraints = constraints;
+    public final void setOrderingConstraints(final SimpleTemporalNetwork network) {
+        this.temporalNetwork = network;
     }
 
     /**
@@ -160,31 +159,31 @@ public final class TaskNetwork implements Serializable {
      * @param task   the task to decompose.
      * @param method the method to be used to decompose.
      */
-    public void decompose(final int task, final Method method) {
-        final int numberOfSubtasks = method.getSubTasks().size();
+    public void decompose(final int task, final DurativeMethod method) {
+        /*final int numberOfSubtasks = method.getSubTasks().size();
         final int newSize = this.tasks.size() - 1 + numberOfSubtasks;
         // Make a copy of the constraints of the task to remove
-        final BitVector row = new BitVector(this.getOrderingConstraints().getRow(task));
+        final BitVector row = new BitVector(this.getSimpleTemporalNetwork().getRow(task));
         // Remove the task to replace
         this.removeTask(task);
         // Resize the matrix to add the contraints for the method subtasks
-        this.orderingConstraints.resize(newSize, newSize);
+        this.getSimpleTemporalNetwork().resize(newSize, newSize);
         // Add the subtasks contraints to the tasknetwork
         for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {
             final BitVector cti = method.getOrderingConstraints().getRow(i);
-            final BitVector ri = this.orderingConstraints.getRow(this.tasks.size() + i);
+            final BitVector ri = this.getSimpleTemporalNetwork().getRow(this.tasks.size() + i);
             ri.or(cti);
-            ri.shiftRight(this.tasks.size());
+            ri.shiftRight(this.getTasks().size());
         }
         // Shifts constraints on added subtasks
         for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i + 1)) {
             final int rowIndex = i < task ? i : i - 1;
             for (int j = this.size(); j < newSize; j++) {
-                this.orderingConstraints.set(j, rowIndex);
+                this.getSimpleTemporalNetwork().set(j, rowIndex);
             }
         }
         // Update the list of task of the task network
-        this.tasks.addAll(method.getSubTasks());
+        this.tasks.addAll(method.getSubTasks());*/
     }
 
     /**
@@ -193,20 +192,20 @@ public final class TaskNetwork implements Serializable {
      * @param task the index of the task to remove.
      */
     public final void removeTask(final int task) {
-        this.tasks.remove(task);
-        this.orderingConstraints.removeRow(task);
-        this.orderingConstraints.removeColumn(task);
+        this.getTasks().remove(task);
+        this.getOrderingConstraints().removeRow(task);
+        this.getOrderingConstraints().removeColumn(task);
     }
 
     /**
-     * Returns <code>true</code> if the task network is totally ordered. The return value is computed from the ordering
-     * constraints of the task network. A task network with an empty set of constraints or only one constraint is
-     * totally ordered.
+     * Returns <code>true</code> if the temporal task network is totally ordered. The return value is computed from the
+     * ordering constraints of the temporal task network. A temporal task network with an empty set of constraints or
+     * only one constraint is totally ordered.
      *
      * @return <code>true</code> if the task network is totally ordered.
      */
     public final boolean isTotallyOrdered() {
-        return this.orderingConstraints.isTotallyOrdered();
+        return this.getOrderingConstraints().isTotallyOrdered();
     }
 
     /**
@@ -216,7 +215,7 @@ public final class TaskNetwork implements Serializable {
      *      otherwise.
      */
     public final boolean isAcyclic() {
-        return this.orderingConstraints.isAcyclic();
+        return this.getOrderingConstraints().isAcyclic();
     }
 
     /**
@@ -224,7 +223,7 @@ public final class TaskNetwork implements Serializable {
      * on Warshall algorithm. The complexity is O(n^3) where n is the number of tasks of the task network.
      */
     public final void transitiveClosure() {
-        this.orderingConstraints.transitiveClosure();
+        this.getOrderingConstraints().transitiveClosure();
     }
 
     /**
@@ -235,7 +234,7 @@ public final class TaskNetwork implements Serializable {
      * @return the  list of tasks with no successors.
      */
     public final List<Integer> getTasksWithNosSuccessors() {
-        return this.orderingConstraints.getTasksWithNoSuccessors();
+        return this.getOrderingConstraints().getTasksWithNoSuccessors();
     }
 
     /**
@@ -245,31 +244,31 @@ public final class TaskNetwork implements Serializable {
      * @return the  list of tasks with no predecessors.
      */
     public final List<Integer> getTasksWithNoPredecessors() {
-        return this.orderingConstraints.getTasksWithNoPredecessors();
+        return this.getOrderingConstraints().getTasksWithNoPredecessors();
     }
 
     /**
-     * Returns <code>true</code> if this task network is equal to an object. This
+     * Returns <code>true</code> if this temporal task network is equal to an object. This
      * method returns <code>true</code> if the object is a not null instance
-     * of the class <code>IntTaskNetwork</code> and both task network have the same
-     * set of tasks, ordering constraints expression.
+     * of the class <code>TemporalTaskNetwork</code> and both temporal task network have the same
+     * set of tasks and simple task network.
      *
      * @param obj the object to be compared.
-     * @return <code>true</code> if this task network is equal to an object;
+     * @return <code>true</code> if this temporal task network is equal to an object;
      * <code>false</code> otherwise.
      */
     @Override
     public final boolean equals(final Object obj) {
-        if (obj != null && obj instanceof TaskNetwork) {
-            final TaskNetwork other = (TaskNetwork) obj;
-            return this.getTasks().equals(other.getTasks())
-                && this.getOrderingConstraints().equals(other.getOrderingConstraints());
+        if (obj != null && obj instanceof TemporalTaskNetwork) {
+            final TemporalTaskNetwork other = (TemporalTaskNetwork) obj;
+            return Objects.equals(this.getTasks(), other.getTasks())
+                && Objects.equals(this.getOrderingConstraints(), other.getOrderingConstraints());
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this task network. This method is supported
+     * Returns a hash code value for this temporal task network. This method is supported
      * for the benefit of hash tables such as those provided by
      * <code>java.util.Hashtable</code>.
      *

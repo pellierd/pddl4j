@@ -17,7 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.problem.operator;
+package fr.uga.pddl4j.problem.time;
+
+import fr.uga.pddl4j.problem.operator.Condition;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -30,7 +32,7 @@ import java.util.Objects;
  * @since 4.0
  * @see Condition
  */
-public class TimeCondition implements Serializable {
+public class TemporalCondition implements Serializable {
 
     /**
      * The condition used to store the 'at start' condition of the time description.
@@ -52,7 +54,7 @@ public class TimeCondition implements Serializable {
      *
      * @param other the time condition.
      */
-    public TimeCondition(final TimeCondition other) {
+    public TemporalCondition(final TemporalCondition other) {
         this.setAtStartCondition(new Condition(other.getAtStartCondition()));
         this.setOverallCondition(new Condition(other.getOverallCondition()));
         this.setAtEndCondition(new Condition(other.getAtEndCondition()));
@@ -61,7 +63,7 @@ public class TimeCondition implements Serializable {
     /**
      * Creates new empty time condition.
      */
-    public TimeCondition() {
+    public TemporalCondition() {
         this(new Condition(), new Condition(), new Condition());
     }
 
@@ -72,7 +74,7 @@ public class TimeCondition implements Serializable {
      * @param overall the overall condition.
      * @param atEnd the atEnd condition.
      */
-    public TimeCondition(final Condition atStart, final Condition overall, final Condition atEnd) {
+    public TemporalCondition(final Condition atStart, final Condition overall, final Condition atEnd) {
         this.setAtStartCondition(atStart);
         this.setOverallCondition(overall);
         this.setAtEndCondition(atEnd);
@@ -182,7 +184,7 @@ public class TimeCondition implements Serializable {
 
     /**
      * Return if a specified object is equals to this time condition. The specified object is equal to
-     * the time conditiion if and only if the object is an instance of the class <code>TimeCondition</code>
+     * the time conditiion if and only if the object is an instance of the class <code>TemporalCondition</code>
      * and it has the same at start, at end and overall condition.
      *
      * @param obj the specified object to compared.
@@ -192,7 +194,7 @@ public class TimeCondition implements Serializable {
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj instanceof Condition) {
-            TimeCondition other = (TimeCondition) obj;
+            TemporalCondition other = (TemporalCondition) obj;
             return Objects.equals(this.getAtStartCondition(), other.getAtStartCondition())
                 && Objects.equals(this.getOverallCondition(),other.getOverallCondition())
                 && Objects.equals(this.getAtEndCondition(), other.getAtEndCondition());

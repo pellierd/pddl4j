@@ -21,6 +21,9 @@ package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
+import fr.uga.pddl4j.problem.time.TemporalCondition;
+import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
+import fr.uga.pddl4j.problem.time.TemporalEffect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +40,7 @@ public class DurativeAction extends AbstractDurativeOperator {
     /**
      * The list of effects of the action.
      */
-    private List<TimeConditionalEffect> effects;
+    private List<TemporalConditionalEffect> effects;
 
     /**
      * The duration of the action.
@@ -57,7 +60,7 @@ public class DurativeAction extends AbstractDurativeOperator {
     public DurativeAction(final DurativeAction other) {
         super(other);
         this.effects = new ArrayList<>();
-        this.effects.addAll(other.getConditionalEffects().stream().map(TimeConditionalEffect::new)
+        this.effects.addAll(other.getConditionalEffects().stream().map(TemporalConditionalEffect::new)
             .collect(Collectors.toList()));
         if (this.getDurationConstraints() != null) {
             this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
@@ -90,10 +93,10 @@ public class DurativeAction extends AbstractDurativeOperator {
      * @param precondition the precondition of the action.
      * @param effect       the effects of the action.
      */
-    public DurativeAction(final String name, final int arity, final TimeCondition precondition, final TimeEffect effect) {
+    public DurativeAction(final String name, final int arity, final TemporalCondition precondition, final TemporalEffect effect) {
         this(name, arity);
         this.setPrecondition(precondition);
-        this.addConditionalEffect(new TimeConditionalEffect(effect));
+        this.addConditionalEffect(new TemporalConditionalEffect(effect));
         this.duration = new NumericVariable(-2);
         this.duration.setValue(0.0);
         this.durationConstraints = null;
@@ -104,7 +107,7 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @return the effects of the action.
      */
-    public final List<TimeConditionalEffect> getConditionalEffects() {
+    public final List<TemporalConditionalEffect> getConditionalEffects() {
         return this.effects;
     }
 
@@ -113,7 +116,7 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @param effects the conditional effects of the action.
      */
-    public final void setConditionalEffects(List<TimeConditionalEffect> effects) {
+    public final void setConditionalEffects(List<TemporalConditionalEffect> effects) {
         this.effects = effects;
     }
 
@@ -122,7 +125,7 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @param effect the conditional effect to addValue.
      */
-    public final void addConditionalEffect(TimeConditionalEffect effect) {
+    public final void addConditionalEffect(TemporalConditionalEffect effect) {
         this.effects.add(effect);
     }
 
@@ -131,10 +134,10 @@ public class DurativeAction extends AbstractDurativeOperator {
      *
      * @return the unconditional effect of the action.
      */
-    public final TimeEffect getUnconditionalEffect() {
-        final TimeEffect uce = new TimeEffect();
+    public final TemporalEffect getUnconditionalEffect() {
+        final TemporalEffect uce = new TemporalEffect();
         this.effects.stream().filter(cEffect -> cEffect.getCondition().isEmpty()).forEach(cEffect -> {
-            final TimeEffect te = cEffect.getEffect();
+            final TemporalEffect te = cEffect.getEffect();
             uce.getAtStartEffect().getPositiveFluents().or(te.getAtStartEffect().getPositiveFluents());
             uce.getAtStartEffect().getNegativeFluents().or(te.getAtStartEffect().getNegativeFluents());
             uce.getAtStartEffect().getNumericAssignments().addAll(te.getAtStartEffect().getNumericAssignments());

@@ -1,11 +1,13 @@
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.problem.time.TemporalCondition;
+
 public abstract class AbstractDurativeOperator extends AbstractInstantiatedOperator {
 
     /**
      * The time condition of the operator.
      */
-    private TimeCondition precondition;
+    private TemporalCondition precondition;
 
     /**
      * Creates a new operator from an other.
@@ -25,7 +27,7 @@ public abstract class AbstractDurativeOperator extends AbstractInstantiatedOpera
      */
     protected AbstractDurativeOperator(final String name, final int arity) {
         super(name, arity);
-        this.precondition = new TimeCondition();
+        this.precondition = new TemporalCondition();
     }
 
     /**
@@ -37,7 +39,7 @@ public abstract class AbstractDurativeOperator extends AbstractInstantiatedOpera
      * @param preconditions  the precondition of the operator.
      */
     protected AbstractDurativeOperator(final String name, final int[] parameters, final int[] instantiations,
-                               final TimeCondition preconditions) {
+                               final TemporalCondition preconditions) {
         super(name, parameters, instantiations);
         this.precondition = preconditions;
     }
@@ -47,7 +49,7 @@ public abstract class AbstractDurativeOperator extends AbstractInstantiatedOpera
      *
      * @return the precondition of the operator.
      */
-    public final TimeCondition getPrecondition() {
+    public final TemporalCondition getPrecondition() {
         return this.precondition;
     }
 
@@ -56,7 +58,7 @@ public abstract class AbstractDurativeOperator extends AbstractInstantiatedOpera
      *
      * @param precondition the precondition to set.
      */
-    public final void setPrecondition(final TimeCondition precondition) {
+    public final void setPrecondition(final TemporalCondition precondition) {
         this.precondition = precondition;
     }
 }

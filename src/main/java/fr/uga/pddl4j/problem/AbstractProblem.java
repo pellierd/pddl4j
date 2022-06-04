@@ -34,7 +34,7 @@ import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
-import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
+import fr.uga.pddl4j.problem.operator.OrderingConstraintNetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1018,7 +1018,7 @@ public abstract class AbstractProblem implements Problem {
             }
         } else {
             final int size = subtasks.getChildren().size();
-            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
+            final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(size);
             orderingConstraints = this.initExpression(taskNetwork.getOrdering());
             for (Expression<Integer> c : orderingConstraints.getChildren()) {
                 constraints.set(c.getChildren().get(0).getTaskID().getValue(),
@@ -1100,7 +1100,7 @@ public abstract class AbstractProblem implements Problem {
             }
         } else {
             final int size = method.getSubTasks().getChildren().size();
-            final OrderingConstraintSet constraints = new OrderingConstraintSet(size);
+            final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(size);
             orderingConstraints = this.initExpression(method.getOrdering());
 
             // Code for reordering subtask if totally ordered

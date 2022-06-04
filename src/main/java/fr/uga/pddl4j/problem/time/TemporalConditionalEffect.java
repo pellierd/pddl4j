@@ -17,7 +17,9 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.problem.operator;
+package fr.uga.pddl4j.problem.time;
+
+import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 
 import java.io.Serializable;
 
@@ -27,33 +29,33 @@ import java.io.Serializable;
  * @author D. Pellier
  * @version 1.0 - 10.06.2010
  */
-public class TimeConditionalEffect implements Serializable {
+public class TemporalConditionalEffect implements Serializable {
 
     /**
      * The conditions of the expression.
      */
-    private TimeCondition condition;
+    private TemporalCondition condition;
 
     /**
      * The effects associated to the conditions.
      */
-    private TimeEffect effect;
+    private TemporalEffect effect;
 
     /**
      * Creates a conditional effect from an other. This constructor is the copy constructor.
      *
      * @param other the other conditional bit expression.
      */
-    public TimeConditionalEffect(final TimeConditionalEffect other) {
-        this.condition = new TimeCondition(other.getCondition());
-        this.effect = new TimeEffect(other.getEffect());
+    public TemporalConditionalEffect(final TemporalConditionalEffect other) {
+        this.condition = new TemporalCondition(other.getCondition());
+        this.effect = new TemporalEffect(other.getEffect());
     }
 
     /**
      * Creates a new empty conditional effect.
      */
-    public TimeConditionalEffect() {
-        this(new TimeCondition(), new TimeEffect());
+    public TemporalConditionalEffect() {
+        this(new TemporalCondition(), new TemporalEffect());
     }
 
     /**
@@ -61,8 +63,8 @@ public class TimeConditionalEffect implements Serializable {
      *
      * @param effects the effects.
      */
-    public TimeConditionalEffect(final TimeEffect effects) {
-        this(new TimeCondition(), effects);
+    public TemporalConditionalEffect(final TemporalEffect effects) {
+        this(new TemporalCondition(), effects);
     }
 
     /**
@@ -71,7 +73,7 @@ public class TimeConditionalEffect implements Serializable {
      * @param condition the conditions.
      * @param effect    the effects.
      */
-    public TimeConditionalEffect(TimeCondition condition, TimeEffect effect) {
+    public TemporalConditionalEffect(TemporalCondition condition, TemporalEffect effect) {
         this.setEffect(effect);
         this.setCondition(condition);
     }
@@ -81,7 +83,7 @@ public class TimeConditionalEffect implements Serializable {
      *
      * @return the conditions of the conditional effect.
      */
-    public final TimeCondition getCondition() {
+    public final TemporalCondition getCondition() {
         return this.condition;
     }
 
@@ -90,7 +92,7 @@ public class TimeConditionalEffect implements Serializable {
      *
      * @param conditions the conditions to set.
      */
-    public final void setCondition(TimeCondition conditions) {
+    public final void setCondition(TemporalCondition conditions) {
         this.condition = conditions;
     }
 
@@ -99,7 +101,7 @@ public class TimeConditionalEffect implements Serializable {
      *
      * @return the effects of the conditional effect.
      */
-    public final TimeEffect getEffect() {
+    public final TemporalEffect getEffect() {
         return this.effect;
     }
 
@@ -108,7 +110,7 @@ public class TimeConditionalEffect implements Serializable {
      *
      * @param effects the effects to set
      */
-    public final void setEffect(TimeEffect effects) {
+    public final void setEffect(TemporalEffect effects) {
         this.effect = effects;
     }
 

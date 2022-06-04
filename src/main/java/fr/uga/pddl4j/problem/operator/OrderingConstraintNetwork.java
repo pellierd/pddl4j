@@ -30,14 +30,14 @@ import java.util.List;
  * @author D. Pellier
  * @version 1.0 - 09.10.2020
  */
-public class OrderingConstraintSet extends SquareBitMatrix {
+public class OrderingConstraintNetwork extends SquareBitMatrix {
 
     /**
      * Creates a deep copy from an others set of ordering constraints.
      *
      * @param other The other ordering constraints.
      */
-    public OrderingConstraintSet(final OrderingConstraintSet other) {
+    public OrderingConstraintNetwork(final OrderingConstraintNetwork other) {
         super(other);
     }
 
@@ -46,7 +46,7 @@ public class OrderingConstraintSet extends SquareBitMatrix {
      *
      * @param size the size of ordering constraints.
      */
-    public OrderingConstraintSet(final int size) {
+    public OrderingConstraintNetwork(final int size) {
         super(size);
     }
 
@@ -60,7 +60,7 @@ public class OrderingConstraintSet extends SquareBitMatrix {
         if (this.rows() < 2) {
             return true;
         }
-        final OrderingConstraintSet ordering = new OrderingConstraintSet(this);
+        final OrderingConstraintNetwork ordering = new OrderingConstraintNetwork(this);
         boolean ordered = true;
         int index = 0;
         while (ordering.rows() > 1 && ordered) {
@@ -92,7 +92,7 @@ public class OrderingConstraintSet extends SquareBitMatrix {
      *
      * @return the  list of tasks with no successors.
      */
-    private final List<Integer> getTasksWithNoSuccessors(OrderingConstraintSet matrix) {
+    private final List<Integer> getTasksWithNoSuccessors(OrderingConstraintNetwork matrix) {
         final List<Integer> tasks = new LinkedList<>();
         for (int i = 0; i < matrix.columns(); i++) {
             if (matrix.getRow(i).cardinality() == 0) {
@@ -118,7 +118,7 @@ public class OrderingConstraintSet extends SquareBitMatrix {
      *
      * @return the  list of tasks with no predecessor.
      */
-    private final List<Integer> getTasksWithNoPredecessors(OrderingConstraintSet matrix) {
+    private final List<Integer> getTasksWithNoPredecessors(OrderingConstraintNetwork matrix) {
         final List<Integer> tasks = new LinkedList<>();
         for (int i = 0; i < matrix.columns(); i++) {
             if (matrix.getColumn(i).cardinality() == 0) {

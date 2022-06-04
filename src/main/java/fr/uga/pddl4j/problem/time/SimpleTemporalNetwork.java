@@ -10,7 +10,25 @@ public class SimpleTemporalNetwork implements Serializable {
 
     private List<List<TemporalRelation>> network;
 
-    private SimpleTemporalNetwork(int size) {
+
+    public SimpleTemporalNetwork(final SimpleTemporalNetwork other) {
+        final int size = other.network.size();
+        this.network = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            List<TemporalRelation> list = new ArrayList<>(size);
+            for (int j = 0; j < size; j++) {
+                list.add(other.network.get(i).get(j));
+            }
+            this.network.add(list);
+        }
+        this.update = other.update;
+    }
+
+    public SimpleTemporalNetwork() {
+        this(0);
+    }
+
+    public SimpleTemporalNetwork(int size) {
         this.network = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             List<TemporalRelation> list = new ArrayList<>(size);
@@ -139,5 +157,25 @@ public class SimpleTemporalNetwork implements Serializable {
     }
 
 
+    public void removeRow(int task) {
+    }
 
+    public void removeColumn(int task) {
+    }
+
+    public boolean isTotallyOrdered() {
+        return true;
+    }
+
+    public boolean isAcyclic() {
+        return true;
+    }
+
+    public List<Integer> getTasksWithNoSuccessors() {
+        return new ArrayList<>();
+    }
+
+    public List<Integer> getTasksWithNoPredecessors() {
+        return new ArrayList<>();
+    }
 }

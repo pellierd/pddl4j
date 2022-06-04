@@ -17,16 +17,14 @@
  * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package fr.uga.pddl4j.problem.operator;
+package fr.uga.pddl4j.problem.time;
 
 import fr.uga.pddl4j.problem.numeric.NumericAssignment;
-import fr.uga.pddl4j.util.BitVector;
+import fr.uga.pddl4j.problem.operator.Effect;
+import fr.uga.pddl4j.problem.operator.FluentDescription;
 
 import java.io.Serializable;
-import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * This class implements the effect of the actions.
@@ -37,7 +35,7 @@ import java.util.stream.Collectors;
  * @see FluentDescription
  * @see NumericAssignment
  */
-public class TimeEffect implements Serializable {
+public class TemporalEffect implements Serializable {
 
     /**
      * The effect used to store the 'at start' effect of the effect.
@@ -57,7 +55,7 @@ public class TimeEffect implements Serializable {
     /**
      * Creates new time effect. By default the effect is empty
      */
-    public TimeEffect() {
+    public TemporalEffect() {
         this(new Effect(), new Effect(), new Effect());
     }
 
@@ -66,7 +64,7 @@ public class TimeEffect implements Serializable {
      *
      * @param other the other one.
      */
-    public TimeEffect(final TimeEffect other) {
+    public TemporalEffect(final TemporalEffect other) {
         this(new Effect(other.getAtStartEffect()),
             new Effect(other.getAtEndEffect()),
             new Effect(other.getOverallEffect()));
@@ -79,7 +77,7 @@ public class TimeEffect implements Serializable {
      * @param overall the overall effect.
      * @param atEnd the atEnd effect.
      */
-    public TimeEffect(final Effect atStart, final Effect overall, final Effect atEnd) {
+    public TemporalEffect(final Effect atStart, final Effect overall, final Effect atEnd) {
         this.setAtStartEffect(atStart);
         this.setOverallEffect(overall);
         this.setAtEndEffect(atEnd);
@@ -153,7 +151,7 @@ public class TimeEffect implements Serializable {
 
     /**
      * Return if a specified object is equals to this effect. The specified object is equal to
-     * the time effect if and only if the object is an instance of the class <code>TimeEffect</code>
+     * the time effect if and only if the object is an instance of the class <code>TemporalEffect</code>
      * and it has the same positive and negative timed fluent description and the same numeric assignments.
      *
      * @param object the specified object to be compared.
@@ -162,8 +160,8 @@ public class TimeEffect implements Serializable {
      */
     @Override
     public boolean equals(final Object object) {
-        if (object != null && object instanceof TimeEffect) {
-            TimeEffect other = (TimeEffect) object;
+        if (object != null && object instanceof TemporalEffect) {
+            TemporalEffect other = (TemporalEffect) object;
             return Objects.equals(this.getAtStartEffect(), other.getAtStartEffect())
                 && Objects.equals(this.getAtEndEffect(), other.getAtEndEffect())
                 && Objects.equals(this.getOverallEffect(), other.getOverallEffect());

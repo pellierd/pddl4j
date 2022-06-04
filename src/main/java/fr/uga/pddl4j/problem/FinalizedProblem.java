@@ -40,11 +40,11 @@ import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
-import fr.uga.pddl4j.problem.operator.OrderingConstraintSet;
+import fr.uga.pddl4j.problem.operator.OrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
-import fr.uga.pddl4j.problem.operator.TimeCondition;
-import fr.uga.pddl4j.problem.operator.TimeConditionalEffect;
-import fr.uga.pddl4j.problem.operator.TimeEffect;
+import fr.uga.pddl4j.problem.time.TemporalCondition;
+import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
+import fr.uga.pddl4j.problem.time.TemporalEffect;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
@@ -635,19 +635,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the expression in bit set representation.
      */
-    private TimeEffect finalizeTimeEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
-        final TimeEffect timeEffect = new TimeEffect();
+    private TemporalEffect finalizeTimeEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
+        final TemporalEffect temporalEffect = new TemporalEffect();
         switch (exp.getConnective()) {
             case AT_START:
             case AT_END:
             case OVER_ALL:
                 Effect effect =  null;
                 if (exp.getConnective().equals(Connector.AT_START)) {
-                    effect = timeEffect.getAtStartEffect();
+                    effect = temporalEffect.getAtStartEffect();
                 } else if (exp.getConnective().equals(Connector.AT_END)) {
-                    effect = timeEffect.getAtEndEffect();
+                    effect = temporalEffect.getAtEndEffect();
                 } else {
-                    effect = timeEffect.getOverallEffect();
+                    effect = temporalEffect.getOverallEffect();
                 }
                 Expression<Integer> sub = exp.getChildren().get(0);
                 switch (sub.getConnective()) {
@@ -671,16 +671,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 break;
             case AND:
                 for (Expression<Integer> e : exp.getChildren()) {
-                    TimeEffect te = this.finalizeTimeEffect(e);
-                    timeEffect.getAtStartEffect().getPositiveFluents().or(te.getAtStartEffect().getPositiveFluents());
-                    timeEffect.getAtStartEffect().getNegativeFluents().or(te.getAtStartEffect().getNegativeFluents());
-                    timeEffect.getAtStartEffect().getNumericAssignments().addAll(te.getAtStartEffect().getNumericAssignments());
-                    timeEffect.getAtEndEffect().getPositiveFluents().or(te.getAtEndEffect().getPositiveFluents());
-                    timeEffect.getAtEndEffect().getNegativeFluents().or(te.getAtEndEffect().getNegativeFluents());
-                    timeEffect.getAtEndEffect().getNumericAssignments().addAll(te.getAtEndEffect().getNumericAssignments());
-                    timeEffect.getOverallEffect().getPositiveFluents().or(te.getOverallEffect().getPositiveFluents());
-                    timeEffect.getOverallEffect().getNegativeFluents().or(te.getOverallEffect().getNegativeFluents());
-                    timeEffect.getOverallEffect().getNumericAssignments().addAll(te.getOverallEffect().getNumericAssignments());
+                    TemporalEffect te = this.finalizeTimeEffect(e);
+                    temporalEffect.getAtStartEffect().getPositiveFluents().or(te.getAtStartEffect().getPositiveFluents());
+                    temporalEffect.getAtStartEffect().getNegativeFluents().or(te.getAtStartEffect().getNegativeFluents());
+                    temporalEffect.getAtStartEffect().getNumericAssignments().addAll(te.getAtStartEffect().getNumericAssignments());
+                    temporalEffect.getAtEndEffect().getPositiveFluents().or(te.getAtEndEffect().getPositiveFluents());
+                    temporalEffect.getAtEndEffect().getNegativeFluents().or(te.getAtEndEffect().getNegativeFluents());
+                    temporalEffect.getAtEndEffect().getNumericAssignments().addAll(te.getAtEndEffect().getNumericAssignments());
+                    temporalEffect.getOverallEffect().getPositiveFluents().or(te.getOverallEffect().getPositiveFluents());
+                    temporalEffect.getOverallEffect().getNegativeFluents().or(te.getOverallEffect().getNegativeFluents());
+                    temporalEffect.getOverallEffect().getNumericAssignments().addAll(te.getOverallEffect().getNumericAssignments());
                 }
                 break;
             case TRUE:
@@ -689,7 +689,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             default:
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
-        return timeEffect;
+        return temporalEffect;
     }
 
 
@@ -699,11 +699,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the expression in bit set representation.
      */
-    private List<TimeConditionalEffect> finalizeTimeConditionalEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
-        List<TimeConditionalEffect> effects = new ArrayList<>();
+    private List<TemporalConditionalEffect> finalizeTimeConditionalEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
+        List<TemporalConditionalEffect> effects = new ArrayList<>();
         switch (exp.getConnective()) {
             case WHEN:
-                TimeConditionalEffect tce = new TimeConditionalEffect();
+                TemporalConditionalEffect tce = new TemporalConditionalEffect();
                 tce.setCondition(this.finalizeTimeCondition(exp.getChildren().get(0)));
                 tce.setEffect(this.finalizeTimeEffect(exp.getChildren().get(1)));
                 effects.add(tce);
@@ -711,7 +711,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case AT_START:
             case AT_END:
             case OVER_ALL:
-                tce = new TimeConditionalEffect();
+                tce = new TemporalConditionalEffect();
                 tce.setEffect(this.finalizeTimeEffect(exp));
                 effects.add(tce);
                 break;
@@ -726,11 +726,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             default:
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
         }
-        final TimeConditionalEffect utce = new TimeConditionalEffect();
-        Iterator<TimeConditionalEffect> it = effects.iterator();
+        final TemporalConditionalEffect utce = new TemporalConditionalEffect();
+        Iterator<TemporalConditionalEffect> it = effects.iterator();
         boolean exist = false;
         while (it.hasNext()) {
-            TimeConditionalEffect tcei = it.next();
+            TemporalConditionalEffect tcei = it.next();
             if (tcei.getCondition().isEmpty()) {
                 utce.getEffect().getAtStartEffect().getPositiveFluents().or(tcei.getEffect().getAtStartEffect().getPositiveFluents());
                 utce.getEffect().getAtStartEffect().getNegativeFluents().or(tcei.getEffect().getAtStartEffect().getNegativeFluents());
@@ -1043,19 +1043,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param exp the <code>Expression</code>.
      * @return the condition encoded.
      */
-    protected TimeCondition finalizeTimeCondition(final Expression<Integer> exp) throws UnexpectedExpressionException {
-        final TimeCondition timeCondition = new TimeCondition();
+    protected TemporalCondition finalizeTimeCondition(final Expression<Integer> exp) throws UnexpectedExpressionException {
+        final TemporalCondition temporalCondition = new TemporalCondition();
         switch (exp.getConnective()) {
             case AT_START:
             case AT_END:
             case OVER_ALL:
                 Condition condition = null;
                 if (exp.getConnective().equals(Connector.AT_START)) {
-                    condition = timeCondition.getAtStartCondition();
+                    condition = temporalCondition.getAtStartCondition();
                 } else if (exp.getConnective().equals(Connector.AT_END)) {
-                    condition = timeCondition.getAtEndCondition();
+                    condition = temporalCondition.getAtEndCondition();
                 } else {
-                    condition = timeCondition.getOverallCondition();
+                    condition = temporalCondition.getOverallCondition();
                 }
                 Expression<Integer> sub = exp.getChildren().get(0);
                 switch (sub.getConnective()) {
@@ -1076,16 +1076,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 break;
             case AND:
                 for (Expression<Integer> e : exp.getChildren()) {
-                    TimeCondition ce = this.finalizeTimeCondition(e);
-                    timeCondition.getAtStartCondition().getPositiveFluents().or(ce.getAtStartCondition().getPositiveFluents());
-                    timeCondition.getAtStartCondition().getNegativeFluents().or(ce.getAtStartCondition().getNegativeFluents());
-                    timeCondition.getAtStartCondition().getNumericConstraints().addAll(ce.getAtStartCondition().getNumericConstraints());
-                    timeCondition.getAtEndCondition().getPositiveFluents().or(ce.getAtEndCondition().getPositiveFluents());
-                    timeCondition.getAtEndCondition().getNegativeFluents().or(ce.getAtEndCondition().getNegativeFluents());
-                    timeCondition.getAtEndCondition().getNumericConstraints().addAll(ce.getAtEndCondition().getNumericConstraints());
-                    timeCondition.getOverallCondition().getPositiveFluents().or(ce.getOverallCondition().getPositiveFluents());
-                    timeCondition.getOverallCondition().getNegativeFluents().or(ce.getOverallCondition().getNegativeFluents());
-                    timeCondition.getOverallCondition().getNumericConstraints().addAll(ce.getOverallCondition().getNumericConstraints());
+                    TemporalCondition ce = this.finalizeTimeCondition(e);
+                    temporalCondition.getAtStartCondition().getPositiveFluents().or(ce.getAtStartCondition().getPositiveFluents());
+                    temporalCondition.getAtStartCondition().getNegativeFluents().or(ce.getAtStartCondition().getNegativeFluents());
+                    temporalCondition.getAtStartCondition().getNumericConstraints().addAll(ce.getAtStartCondition().getNumericConstraints());
+                    temporalCondition.getAtEndCondition().getPositiveFluents().or(ce.getAtEndCondition().getPositiveFluents());
+                    temporalCondition.getAtEndCondition().getNegativeFluents().or(ce.getAtEndCondition().getNegativeFluents());
+                    temporalCondition.getAtEndCondition().getNumericConstraints().addAll(ce.getAtEndCondition().getNumericConstraints());
+                    temporalCondition.getOverallCondition().getPositiveFluents().or(ce.getOverallCondition().getPositiveFluents());
+                    temporalCondition.getOverallCondition().getNegativeFluents().or(ce.getOverallCondition().getNegativeFluents());
+                    temporalCondition.getOverallCondition().getNumericConstraints().addAll(ce.getOverallCondition().getNumericConstraints());
                 }
                 break;
             case TRUE:
@@ -1094,7 +1094,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             default:
                 throw new UnexpectedExpressionException(this.toString(exp));
         }
-        return timeCondition;
+        return temporalCondition;
     }
 
     /**
@@ -1886,7 +1886,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);
         // We encode then the ordering constraints
-        final OrderingConstraintSet constraints = new OrderingConstraintSet(tasks.size());
+        final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(tasks.size());
         for (Expression<Integer> c : taskNetwork.getOrderingConstraints().getChildren()) {
             constraints.set(c.getChildren().get(0).getTaskID().getValue(),
                 c.getChildren().get(1).getTaskID().getValue());
