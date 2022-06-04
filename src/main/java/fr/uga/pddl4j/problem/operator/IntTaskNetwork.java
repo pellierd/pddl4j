@@ -24,6 +24,7 @@ import fr.uga.pddl4j.parser.Connector;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * This class implements a task network. This class is used to store compact representation of a task network
@@ -113,13 +114,15 @@ public final class IntTaskNetwork implements Serializable {
      *
      * @param tasks  the tasks of the task network.
      * @param orderingConstraints the orderings constraints of the task network.
+     * @param constraints the constraints of the task network.
      * @param totallyOrdered the boolean flag to indicate if the task network is totally ordered or not.
      */
     public IntTaskNetwork(final Expression<Integer> tasks, final Expression<Integer> orderingConstraints,
-                          final boolean totallyOrdered) {
+                          final Expression<Integer> constraints, final boolean totallyOrdered) {
         super();
         this.tasks = tasks;
         this.orderingConstraints = orderingConstraints;
+        this.constraints = constraints;
         this.isTotallyOrdered = totallyOrdered;
         this.parameters =  new int[0];
         this.instantiations = new int[0];
@@ -286,8 +289,9 @@ public final class IntTaskNetwork implements Serializable {
     public final boolean equals(final Object obj) {
         if (obj != null && obj instanceof IntTaskNetwork) {
             final IntTaskNetwork other = (IntTaskNetwork) obj;
-            return this.getTasks().equals(other.getTasks())
-                && this.getOrderingConstraints().equals(other.getOrderingConstraints());
+            return Objects.equals(this.getTasks(), other.getTasks())
+                && Objects.equals(this.getOrderingConstraints(), other.getOrderingConstraints())
+                && Objects.equals(this.getConstraints(), other.getConstraints());
         }
         return false;
     }
@@ -301,6 +305,6 @@ public final class IntTaskNetwork implements Serializable {
      */
     @Override
     public final int hashCode() {
-        return this.getTasks().hashCode() + this.getOrderingConstraints().hashCode();
+        return Objects.hash(this.getTasks(), this.getOrderingConstraints(), this.getConstraints());
     }
 }
