@@ -19,13 +19,17 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.problem.numeric.NumericConstraint;
+import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
 import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * This class implements a durative method. This class is used to store compact representation of a durative method.
+ * This class implements a durative method. This class is used to store compact representation of durative methods.
  *
  * @author D. Pellier
  * @version 1.0 - 04.06.2022
@@ -38,10 +42,22 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public static final int DEFAULT_TASK_INDEX = -1;
 
+    public static NumericVariable DEFAULT_DURATION = new NumericVariable(NumericVariable.DURATION, Double.NaN);
+
     /**
      * The task carries out by this method.
      */
     private int task;
+
+    /**
+     * The duration of the action.
+     */
+    private NumericVariable duration;
+
+    /**
+     * The duration of the action.
+     */
+    private List<NumericConstraint> durationConstraints;
 
     /**
      * The task network of the method.
@@ -58,6 +74,12 @@ public final class DurativeMethod extends AbstractDurativeOperator {
         super(other);
         this.task = other.getTask();
         this.taskNetwork = new TemporalTaskNetwork(other.taskNetwork);
+        this.durationConstraints = new ArrayList<>();
+        if (this.getDurationConstraints() != null) {
+            this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
+                .collect(Collectors.toList()));
+        }
+        this.duration = new NumericVariable(other.getDuration());
     }
 
     /**
@@ -69,8 +91,10 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public DurativeMethod(final String name, final int arity) {
         super(name, arity);
-        this.task = Method.DEFAULT_TASK_INDEX;
+        this.task = DurativeMethod.DEFAULT_TASK_INDEX;
         this.taskNetwork = new TemporalTaskNetwork();
+        this.durationConstraints = new ArrayList<>();
+        this.duration = DurativeMethod.DEFAULT_DURATION;
     }
 
     /**
@@ -143,5 +167,41 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public final void setTaskNetwork(final TemporalTaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
+    }
+
+    /**
+     * Returns the duration of the method.
+     *
+     * @return the duration of the method.
+     */
+    public final List<NumericConstraint> getDurationConstraints() {
+        return this.durationConstraints;
+    }
+
+    /**
+     * Sets the duration of the method.
+     *
+     * @param constraints the duration to set.
+     */
+    public final void setDurationConstraints(final List<NumericConstraint> constraints) {
+        this.durationConstraints = constraints;
+    }
+
+    /**
+     * Returns the duration of the method.
+     *
+     * @return the duration of the method.
+     */
+    public final NumericVariable getDuration() {
+        return this.duration;
+    }
+
+    /**
+     * Sets the duration of the method.
+     *
+     * @param duration the duration to set.
+     */
+    public final void setDuration(final NumericVariable duration) {
+        this.duration = duration;
     }
 }
