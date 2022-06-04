@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class contains all the methods needed to the instantiate the actions and the metods of a problem.
+ * This class contains all the methods needed to instantiate the actions and the metods of the problem.
  *
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
@@ -305,9 +305,19 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                     taskCopy.substitute(varIndex, constant, this);
                     copy.setTask(taskCopy);
 
+                    if (method.isDurative()) {
+                        final Expression<Integer> duration = new Expression<>(method.getDuration());
+                        duration.substitute(varIndex, constant, this);
+                        copy.setDuration(duration);
+                    }
+
                     final Expression<Integer> subTasksCopy = new Expression<>(method.getSubTasks());
                     subTasksCopy.substitute(varIndex, constant, this);
                     copy.setSubTasks(subTasksCopy);
+
+                    final Expression<Integer> constraints = new Expression<>(method.getConstraints());
+                    constraints.substitute(varIndex, constant, this);
+                    copy.setConstraints(constraints);
 
                     for (int i = 0; i < arity; i++) {
                         copy.setTypeOfParameter(i, method.getTypeOfParameters(i));
