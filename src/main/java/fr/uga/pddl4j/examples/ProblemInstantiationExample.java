@@ -20,6 +20,8 @@ import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemImpl;
 import fr.uga.pddl4j.problem.operator.Action;
 
 import java.io.FileNotFoundException;
@@ -63,8 +65,8 @@ public class ProblemInstantiationExample {
                 // Prints that the domain and the problem were successfully parsed
                 System.out.print("\nparsing domain file \"" + args[0] + "\" done successfully");
                 System.out.print("\nparsing problem file \"" + args[1] + "\" done successfully\n\n");
-                // Create a ADL problem
-                final ADLProblem problem = new ADLProblem(parsedProblem);
+                // Create a problem
+                final Problem problem = new ProblemImpl(parsedProblem);
                 // Instantiate the planning problem
                 problem.instantiate();
                 // Print the list of actions of the instantiated problem

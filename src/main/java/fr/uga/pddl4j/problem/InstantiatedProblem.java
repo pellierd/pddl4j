@@ -177,7 +177,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      * @see IntAction
      */
     private void instantiate(final IntAction action, final int index, final int bound,
-                                    final List<IntAction> actions) {
+                             final List<IntAction> actions) {
         if (bound == actions.size()) {
             return;
         }

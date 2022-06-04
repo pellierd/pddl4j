@@ -978,7 +978,7 @@ public abstract class AbstractProblem implements Problem {
         intMeth.setOrderingConstraints(orderingConstraints);
         // Encode the constraints of the method
         Expression<Integer> constraints = this.initExpression(method.getConstraints(), variables);
-        //intMeth.setConstraints(constraints);
+        intMeth.setConstraints(constraints);
 
         return intMeth;
     }

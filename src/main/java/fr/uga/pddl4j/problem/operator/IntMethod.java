@@ -134,10 +134,9 @@ public final class IntMethod extends AbstractIntOperator {
      *
      *  @param constraints The constraints to set.
      */
-    public final void setLogicalConstraints(final Expression<Integer> constraints) {
+    public final void setConstraints(final Expression<Integer> constraints) {
         this.taskNetwork.setConstraints(constraints);
     }
-
 
     /**
      * Returns the task network of this method.

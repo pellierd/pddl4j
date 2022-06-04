@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.plan;
 
 import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
@@ -50,7 +51,7 @@ public class JsonAdapter implements Serializable {
     /**
      * The current coded problem the plan is based on.
      */
-    private ADLProblem problem;
+    private Problem problem;
 
     /**
      * Plan in its JSON form.
@@ -62,7 +63,7 @@ public class JsonAdapter implements Serializable {
      *
      * @param problem the pddl4j problem representation.
      */
-    public JsonAdapter(ADLProblem problem) {
+    public JsonAdapter(Problem problem) {
         this.problem = problem;
     }
 

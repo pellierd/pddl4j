@@ -1856,7 +1856,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return the list of methods encoded into final compact representation.
      */
     private Method finalizeMethod(final IntMethod method, final Map<Expression<Integer>, Integer> factMap,
-                                    final Map<Expression<Integer>, Integer> taskMap) throws UnexpectedExpressionException {
+                                  final Map<Expression<Integer>, Integer> taskMap) throws UnexpectedExpressionException {
 
         final int arity = method.arity();
         final Method encoded = new Method(method.getName(), arity);
