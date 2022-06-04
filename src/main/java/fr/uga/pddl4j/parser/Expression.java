@@ -491,8 +491,6 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case AT_END_CONSTRAINT:
             case ALWAYS_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
-            case HOLD_AFTER_METHOD_CONSTRAINT:
-            case HOLD_BEFORE_METHOD_CONSTRAINT:
             case AT_END_METHOD_CONSTRAINT:
             case AT_START_METHOD_CONSTRAINT:
             case ALWAYS_METHOD_CONSTRAINT:
@@ -500,13 +498,17 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case SOMETIME_METHOD_CONSTRAINT:
             case SOMETIME_BEFORE_METHOD_CONSTRAINT:
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
-            case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
             case WITHIN_CONSTRAINT:
             case HOLD_AFTER_CONSTRAINT:
             case ALWAYS_WITHIN_CONSTRAINT:
             case HOLD_DURING_CONSTRAINT:
                 this.getChildren().forEach(Expression::toNNF);
+                break;
+            case HOLD_AFTER_METHOD_CONSTRAINT:
+            case HOLD_BEFORE_METHOD_CONSTRAINT:
+            case HOLD_BETWEEN_METHOD_CONSTRAINT:
+                this.moveMethodConstrainInward();
                 break;
             case AT_START:
             case AT_END:
@@ -535,6 +537,71 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 throw new UnexpectedExpressionException(this.toString());
         }
     }
+
+    /**
+     * Moves the method constraint inward the expression. The method deals with expression of the form (and (constraints
+     * gd) ...) or (constraints gd).
+     *
+     * @throws UnexpectedExpressionException
+     */
+    public final void moveMethodConstrainInward() {
+        assert this.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
+            || this.getConnective().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)
+            || this.getConnective().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT);
+
+        Expression<T> child = null;
+        if (this.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
+                || this.getConnective().equals((Connector.HOLD_AFTER_METHOD_CONSTRAINT))) {
+            child = this.getChildren().get(1);
+        } else if (this.getConnective().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT)){
+            child = this.getChildren().get(2);
+        } else {
+            throw new UnexpectedExpressionException(this.getConnective().toString());
+        }
+        switch (child.getConnective()) {
+            case FORALL:
+            case EXISTS:
+                Expression constraint = new Expression<>(this.getConnective());
+                constraint.addChild(child.getChildren().get(0));
+                constraint.moveMethodConstrainInward();
+                this.getChildren().set(0, constraint);
+                this.setConnective(child.getConnective());
+                this.setQuantifiedVariables(child.getQuantifiedVariables());
+                break;
+            case AND:
+            case OR:
+                this.getChildren().clear();
+                for (int i = 0; i < child.getChildren().size(); i++) {
+                    constraint = new Expression<>(this.getConnective());
+                    constraint.addChild(child.getChildren().get(i));
+                    constraint.moveMethodConstrainInward();
+                    this.getChildren().add(constraint);
+                }
+                this.setConnective(child.getConnective());
+                break;
+            case NOT:
+                child.toNNF();
+                if (!child.getConnective().equals(Connector.NOT)) {
+                    this.moveMethodConstrainInward();
+                }
+                break;
+            case IMPLY: // (imply p q)) -> (or (not p) (q))
+                child.setConnective(Connector.OR);
+                final Expression notp = new Expression<>(Connector.NOT);
+                notp.addChild(child.getChildren().get(0));
+                final Expression q = child.getChildren().get(1);
+                child.getChildren().clear();
+                child.getChildren().add(notp);
+                child.getChildren().add(q);
+                this.moveMethodConstrainInward();
+                break;
+            case ATOM:
+                break;
+            default:
+                throw new UnexpectedExpressionException(this.toString());
+        }
+    }
+
 
     /**
      * Moves the negation inward the expression.
