@@ -29,10 +29,11 @@ public class SimpleTemporalNetwork implements Serializable {
     }
 
     public SimpleTemporalNetwork(int size) {
-        this.network = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
+        int numberOfTimePoints = size * 2;
+        this.network = new ArrayList<>(numberOfTimePoints);
+        for (int i = 0; i < numberOfTimePoints; i++) {
             List<TemporalRelation> list = new ArrayList<>(size);
-            for (int j = 0; j < size; j++) {
+            for (int j = 0; j < numberOfTimePoints; j++) {
                 list.add(TemporalRelation.UNIVERSAL);
             }
             this.network.add(list);

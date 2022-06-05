@@ -1429,6 +1429,9 @@ public abstract class AbstractProblem implements Problem {
         str.append("Ordering:\n");
         str.append(this.toString(method.getOrderingConstraints()));
         str.append("\n");
+        str.append("Constraints:\n");
+        str.append(this.toString(method.getConstraints()));
+        str.append("\n");
         return str.toString();
     }
 
@@ -1668,6 +1671,10 @@ public abstract class AbstractProblem implements Problem {
                 str.append(")");
                 break;
             case LESS_ORDERING_CONSTRAINT:
+            case LESS_OR_EQUAL_ORDERING_CONSTRAINT:
+            case GREATER_ORDERING_CONSTRAINT:
+            case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
+            case EQUAL_ORDERING_CONSTRAINT:
                 str.append("(");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(0).getTaskID());

@@ -35,6 +35,7 @@ import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.DurativeAction;
+import fr.uga.pddl4j.problem.operator.DurativeMethod;
 import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
@@ -42,9 +43,12 @@ import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
+import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
 import fr.uga.pddl4j.problem.time.TemporalCondition;
 import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
 import fr.uga.pddl4j.problem.time.TemporalEffect;
+import fr.uga.pddl4j.problem.time.TemporalRelation;
+import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
 import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
@@ -136,6 +140,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * The list of instantiated methods encoded into bit sets.
      */
     private List<Method> methods;
+
+    /**
+     * The list of instantiated durative methods encoded into bit sets.
+     */
+    private List<DurativeMethod> durativeMethods;
 
     /**
      * The list of relevant tasks of the problem.
@@ -286,6 +295,16 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected List<Method> getMethods() {
         return this.methods;
     }
+
+    /**
+     * Returns the list of instantiated durative methods of the problem.
+     *
+     * @return the list of instantiated durative methods of the problem.
+     */
+    public final List<DurativeMethod> getDurativeMethods() {
+        return this.durativeMethods;
+    }
+
 
     /**
      * Extracts the relevant fluents from the instantiated actions. A fluents is relevant if and
@@ -535,28 +554,23 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void finalizeActions()  throws UnexpectedExpressionException {
         this.actions = new ArrayList<>(this.getIntActions().size());
         this.durativeActions = new ArrayList<>(this.getIntActions().size());
-        final List<Action> addedActions = new ArrayList<>();
         int actionIndex = 0;
         for (IntAction intAction : this.getIntActions()) {
             List<IntAction> normalized = this.normalizeAction(intAction);
-            for (IntAction na : normalized) {
+            for (int i = 0 ; i < normalized.size(); i++) {
+                IntAction na = normalized.get(i);
                 if (!na.isDurative()) {
+                    if (i != 0) this.getTaskResolvers().get(actionIndex).add(actions.size());
                     this.actions.add(this.finalizeAction(na));
                 } else {
+                    if (i != 0) this.getTaskResolvers().get(actionIndex).add(-this.durativeActions.size() - 1);
                     this.durativeActions.add(this.finalizeDurativeAction(na));
                 }
             }
-            for (int i  = 1; i < normalized.size(); i++) {
-                // update the index of the relevant action must push in the HTN problem class
-                if (this.getTaskResolvers() != null) {
-                    this.getTaskResolvers().get(actionIndex).add(actions.size() + addedActions.size());
-                }
-                addedActions.add(this.finalizeAction(normalized.get(i)));
-            }
             actionIndex++;
         }
-        this.actions.addAll(addedActions);
     }
+
 
     /**
      * Encode an specified <code>Expression</code> in its <code>BitExp</code> representation.The
@@ -1829,22 +1843,24 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void finalizeMethods() throws UnexpectedExpressionException {
         this.methods = new ArrayList<>(this.getIntMethods().size());
-        final List<Method> addedMethods = new ArrayList<>();
         int methodIndex = this.getRelevantActions().size();
         for (IntMethod intMethod : this.getIntMethods()) {
             List<IntMethod> normalized = this.normalizeMethod(intMethod);
-            this.methods.add(this.finalizeMethod(normalized.get(0), this.getMapOfFluentIndex(), this.mapOfTasksIndex));
-            for (int i  = 1; i < normalized.size(); i++) {
-                if (this.getTaskResolvers() != null) {
-                    this.getTaskResolvers().get(methodIndex).add(methods.size() + addedMethods.size());
+            for (int i = 0; i < normalized.size(); i++) {
+                IntMethod nm = normalized.get(i);
+                if (!nm.isDurative()) {
+                    if (i != 0) this.getTaskResolvers().get(methodIndex).add(methods.size());
+                    this.methods.add(this.finalizeMethod(nm, this.getMapOfFluentIndex(), this.mapOfTasksIndex));
+                } else {
+                    if (i != 0) this.getTaskResolvers().get(methodIndex).add(-this.durativeMethods.size() - 1);
+                    this.durativeMethods.add(this.finalizeDurativeMethod(nm, this.getMapOfFluentIndex(), this.mapOfTasksIndex));
                 }
-                this.methods.add(this.finalizeMethod(normalized.get(i), this.getMapOfFluentIndex(),
-                    this.mapOfTasksIndex));
             }
             methodIndex++;
         }
-        this.methods.addAll(addedMethods);
     }
+
+
 
     /**
      * Encode a list of specified methods into the final compact representation. The specified
@@ -1875,6 +1891,37 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
+     * Encode a list of specified methods into the final compact representation. The specified
+     * maps are used to speed-up the search by mapping the an expression to this index.
+     *
+     * @param method the list of methods to encode.
+     * @param factMap the map that associates at a specified fact its index in the table of relevant fluents.
+     * @param taskMap the map that associates at a specified task its index in the table of relevant tasks.
+     * @return the list of methods encoded into final compact representation.
+     */
+    private DurativeMethod finalizeDurativeMethod(final IntMethod method, final Map<Expression<Integer>, Integer> factMap,
+                                  final Map<Expression<Integer>, Integer> taskMap) throws UnexpectedExpressionException {
+
+        final int arity = method.arity();
+        final DurativeMethod encoded = new DurativeMethod(method.getName(), arity);
+        // Initialize the parameters of the method
+        for (int i = 0; i < arity; i++) {
+            encoded.setValueOfParameter(i, method.getValueOfParameter(i));
+            encoded.setTypeOfParameter(i, method.getTypeOfParameters(i));
+        }
+        // Encode the duration constrains of the method
+        List<NumericConstraint> constraints = this.finalizeNumericConstraints(method.getDuration());
+        encoded.setDurationConstraints(constraints);
+        // Encode the task carried out by the method
+        encoded.setTask(taskMap.get(method.getTask()));
+        // Encode the preconditions of the method
+        encoded.setPrecondition(this.finalizeTimeCondition(method.getPreconditions()));
+        // Encode the task network of the method
+        encoded.setTaskNetwork(this.finalizeTemporalTaskNetwork(method.getTaskNetwork()));
+        return encoded;
+    }
+
+    /**
      * Encode a specified task network.
      *
      * @param taskNetwork the tasknetwork to encode.
@@ -1886,13 +1933,127 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);
         // We encode then the ordering constraints
-        final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(tasks.size());
+        final OrderingConstraintNetwork ordering = new OrderingConstraintNetwork(tasks.size());
         for (Expression<Integer> c : taskNetwork.getOrderingConstraints().getChildren()) {
-            constraints.set(c.getChildren().get(0).getTaskID().getValue(),
+            ordering.set(c.getChildren().get(0).getTaskID().getValue(),
                 c.getChildren().get(1).getTaskID().getValue());
         }
-        final TaskNetwork tn = new TaskNetwork(tasks, constraints);
+        final TaskNetwork tn = new TaskNetwork(tasks, ordering);
         tn.transitiveClosure();
+
+        for (Expression<Integer> e: taskNetwork.getConstraints()) {
+            if (e.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
+                final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
+                final Condition before = tn.getBeforeConstraints(task.getValue());
+                final Expression<Integer> se = e.getChildren().get(1);
+                if (se.getConnective().equals(Connector.NOT)) {
+                    before.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
+                } else {
+                    before.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
+                }
+            } else if (e.getConnective().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)) {
+                final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
+                final Condition after = tn.getAfterConstraints(task.getValue());
+                final Expression<Integer> se = e.getChildren().get(1);
+                if (se.getConnective().equals(Connector.NOT)) {
+                    after.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
+                } else {
+                    after.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
+                }
+            } else { // Between
+                System.out.println(this.toString(e));
+                final Symbol<Integer> task1 = e.getChildren().get(0).getTaskID();
+                final Symbol<Integer> task2 = e.getChildren().get(1).getTaskID();
+                final Condition between = tn.getBetweenConstraints(task1.getValue(), task2.getValue());
+                final Expression<Integer> se = e.getChildren().get(2);
+                if (se.getConnective().equals(Connector.NOT)) {
+                    between.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
+                } else {
+                    between.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
+                }
+            }
+        }
+
+        return tn;
+    }
+
+    /**
+     * Encode a specified task network.
+     *
+     * @param taskNetwork the tasknetwork to encode.
+     * @return the task network into its final bit set representation.
+     * @see TaskNetwork
+     */
+    private TemporalTaskNetwork finalizeTemporalTaskNetwork(IntTaskNetwork taskNetwork) {
+        // We encode first the tasks
+        final List<Integer> tasks = new ArrayList<Integer>();
+        this.encodeTasks(taskNetwork.getTasks(), tasks);
+        // We encode then the ordering constraints
+        final SimpleTemporalNetwork stn = new SimpleTemporalNetwork(tasks.size());
+
+        for (Expression<Integer> tc : taskNetwork.getOrderingConstraints().getChildren()) {
+            if (tc.equals(Connector.LESS_ORDERING_CONSTRAINT)) {
+                Integer task1 = tc.getChildren().get(0).getTaskID().getValue();
+                Integer task2 = tc.getChildren().get(1).getTaskID().getValue();
+                stn.set(task1, task2, TemporalRelation.LESS);
+            } else if (tc.equals(Connector.LESS_OR_EQUAL_ORDERING_CONSTRAINT)) {
+                Integer task1 = tc.getChildren().get(0).getTaskID().getValue();
+                Integer task2 = tc.getChildren().get(1).getTaskID().getValue();
+                stn.set(task1, task2, TemporalRelation.LEQ);
+            } else if (tc.equals(Connector.GREATER_ORDERING_CONSTRAINT)) {
+                Integer task1 = tc.getChildren().get(0).getTaskID().getValue();
+                Integer task2 = tc.getChildren().get(1).getTaskID().getValue();
+                stn.set(task1, task2, TemporalRelation.GREATER);
+            } else if (tc.equals(Connector.GREATER_OR_EQUAL_ORDERING_CONSTRAINT)) {
+                Integer task1 = tc.getChildren().get(0).getTaskID().getValue();
+                Integer task2 = tc.getChildren().get(1).getTaskID().getValue();
+                stn.set(task1, task2, TemporalRelation.GEQ);
+            } else if (tc.equals(Connector.EQUAL_ORDERING_CONSTRAINT)) {
+                Integer task1 = tc.getChildren().get(0).getTaskID().getValue();
+                Integer task2 = tc.getChildren().get(1).getTaskID().getValue();
+                stn.set(task1, task2, TemporalRelation.EQUAL);
+            } else if (tc.equals(Connector.NOT)) {
+                Expression<Integer> neg = tc.getChildren().get(0);
+                Integer task1 = neg.getChildren().get(0).getTaskID().getValue();
+                Integer task2 = neg.getChildren().get(1).getTaskID().getValue();
+                stn.set(task1, task2, TemporalRelation.DIFFERENT);
+            }
+        }
+        final TemporalTaskNetwork tn = new TemporalTaskNetwork(tasks, stn);
+        tn.transitiveClosure();
+
+        for (Expression<Integer> e: taskNetwork.getConstraints()) {
+            if (e.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
+                final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
+                final Condition before = tn.getBeforeConstraints(task.getValue());
+                final Expression<Integer> se = e.getChildren().get(1);
+                if (se.getConnective().equals(Connector.NOT)) {
+                    before.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
+                } else {
+                    before.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
+                }
+            } else if (e.getConnective().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)) {
+                final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
+                final Condition after = tn.getAfterConstraints(task.getValue());
+                final Expression<Integer> se = e.getChildren().get(1);
+                if (se.getConnective().equals(Connector.NOT)) {
+                    after.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
+                } else {
+                    after.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
+                }
+            } else { // Between
+                final Symbol<Integer> task1 = e.getChildren().get(0).getTaskID();
+                final Symbol<Integer> task2 = e.getChildren().get(1).getTaskID();
+                final Condition between = tn.getBetweenConstraints(task1.getValue(), task2.getValue());
+                final Expression<Integer> se = e.getChildren().get(2);
+                if (se.getConnective().equals(Connector.NOT)) {
+                    between.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
+                } else {
+                    between.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
+                }
+            }
+        }
+
         return tn;
     }
 
@@ -1900,6 +2061,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Normalize the methods, i.e, put in disjunctive normal form (DNF) the preconditions. If a method has
      * disjunctive preconditions, a new method is created such all methods after normalization have only conjunctive
      * precondition.
+     * TO DO remove disjunctive expression in contraints.
      *
      * @param method the list of methods to normalized.
      */

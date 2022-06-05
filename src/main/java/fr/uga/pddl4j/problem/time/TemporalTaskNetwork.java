@@ -19,11 +19,14 @@
 
 package fr.uga.pddl4j.problem.time;
 
+import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.DurativeMethod;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -47,6 +50,22 @@ public final class TemporalTaskNetwork implements Serializable {
     private SimpleTemporalNetwork temporalNetwork;
 
     /**
+     * The list of before constraints.
+     */
+    private Map<Integer, Condition> beforeConstraints;
+
+    /**
+     * The list of after constraints.
+     */
+    private Map<Integer, Condition> afterConstraints;
+
+    /**
+     * The list of between constraints.
+     */
+    private Map<Integer, Map<Integer, Condition>> betweenConstraints;
+
+
+    /**
      * Create a new task network. The list of task is set to an empty set with no ordering constraints and not totally
      * ordered.
      */
@@ -54,6 +73,9 @@ public final class TemporalTaskNetwork implements Serializable {
         super();
         this.setTasks(new LinkedList<Integer>());
         this.setOrderingConstraints(new SimpleTemporalNetwork());
+        this.beforeConstraints = new LinkedHashMap<>();
+        this.afterConstraints = new LinkedHashMap<>();
+        this.betweenConstraints = new LinkedHashMap<>();
     }
 
     /**
@@ -66,6 +88,22 @@ public final class TemporalTaskNetwork implements Serializable {
         super();
         this.tasks = new LinkedList<Integer>(other.getTasks());
         this.temporalNetwork = new SimpleTemporalNetwork(other.getOrderingConstraints());
+        this.beforeConstraints = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Condition> e : other.beforeConstraints.entrySet()) {
+            this.beforeConstraints.put(e.getKey(), new Condition(e.getValue()));
+        }
+        this.afterConstraints = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Condition> e : other.afterConstraints.entrySet()) {
+            this.afterConstraints.put(e.getKey(), new Condition(e.getValue()));
+        }
+        this.betweenConstraints = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Map<Integer, Condition>> ei : other.betweenConstraints.entrySet()) {
+            Map<Integer, Condition> map = new LinkedHashMap<>();
+            for (Map.Entry<Integer, Condition> ej : ei.getValue().entrySet()) {
+                map.put(ej.getKey(), new Condition(ej.getValue()));
+            }
+            this.betweenConstraints.put(ei.getKey(), map);
+        }
     }
 
     /**
@@ -97,6 +135,74 @@ public final class TemporalTaskNetwork implements Serializable {
             }
             this.tasks = orderedTasks;
         }*/
+
+        // Initialize the constraints of the task network.
+        this.beforeConstraints = new LinkedHashMap<>();
+        this.afterConstraints = new LinkedHashMap<>();
+        this.betweenConstraints = new LinkedHashMap<>();
+    }
+
+    /**
+     * Returns the condition that must hold before a specific task of the task network.
+     *
+     * @param task the task.
+     * @return the condition that must hold before a task or null if the task is not a task of the task network.
+     */
+    public Condition getBeforeConstraints(int task) {
+        Condition condition = null;
+        if (this.tasks.contains(task)) {
+            condition = this.beforeConstraints.get(task);
+            if (condition == null) {
+                condition = new Condition();
+                this.beforeConstraints.put(task, condition);
+            }
+        }
+        return condition;
+    }
+
+    /**
+     * Returns the condition that must hold after a specific task of the task network.
+     *
+     * @param task the task.
+     * @return the condition that must hold after a task or null if the task is not a task of the task network.
+     */
+    public Condition getAfterConstraints(int task) {
+        Condition condition = null;
+        if (this.tasks.contains(task)) {
+            condition = this.afterConstraints.get(task);
+            if (condition == null) {
+                condition = new Condition();
+                this.afterConstraints.put(task, condition);
+            }
+        }
+        return condition;
+    }
+
+    /**
+     * Returns the condition that must hold between two specific tasks of the task network.
+     *
+     * @param task1 the first task.
+     * @param task2 the second task.
+     * @return the condition that must hold between two tasks or null if t1 or t2 task is not a task of the task network.
+     */
+    public Condition getBetweenConstraints(int task1, int task2) {
+        Condition condition = null;
+        if (this.tasks.contains(task1) && this.tasks.contains(task2)) {
+            Map<Integer, Condition> map1 = this.betweenConstraints.get(task1);
+            if (map1 == null) {
+                map1 = new LinkedHashMap<>();
+                condition = new Condition();
+                map1.put(task2, condition);
+                this.betweenConstraints.put(task1, map1);
+            } else {
+                condition = map1.get(task1);
+                if (condition == null) {
+                    condition = new Condition();
+                    map1.put(task2, condition);
+                }
+            }
+        }
+        return condition;
     }
 
     /**

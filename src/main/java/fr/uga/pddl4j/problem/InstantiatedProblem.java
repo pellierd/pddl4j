@@ -247,6 +247,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 copy.getPreconditions().substitute(var, cons, this);
                 copy.getTask().substitute(var, cons, this);
                 copy.getSubTasks().substitute(var, cons, this);
+                copy.getConstraints().substitute(var, cons, this);
                 copy.setValueOfParameter((-var.getValue() - 1), cons.getValue());
             } else {
                 instantiable = false;
@@ -284,9 +285,11 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             final Expression<Integer> precond = method.getPreconditions();
             precond.simplify();
-            if (!precond.getConnective().equals(Connector.FALSE)) {
-                methods.add(method);
-            }
+            if (precond.getConnective().equals(Connector.FALSE)) return;
+            final Expression<Integer> constraints = method.getConstraints();
+            constraints.simplify();
+            if (constraints.getConnective().equals(Connector.FALSE)) return;
+            methods.add(method);
         } else if (method.getValueOfParameter(index) >= 0) {
             this.instantiate(method, index + 1, bound, methods);
         } else {
