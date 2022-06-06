@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.heuristics.AbstractHeuristic;
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Fluent;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 
@@ -57,7 +57,7 @@ public abstract class AbstractStateHeuristic extends AbstractHeuristic implement
      *
      * @param problem the problem to solve.
      */
-    protected AbstractStateHeuristic(final ADLProblem problem) {
+    protected AbstractStateHeuristic(final Problem problem) {
         this.facts = problem.getFluents();
         this.goal = problem.getGoal();
         this.actions = problem.getActions();

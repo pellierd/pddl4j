@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
@@ -53,7 +53,7 @@ public final class AdjustedSum2 extends RelaxedGraphHeuristic {
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public AdjustedSum2(ADLProblem problem) {
+    public AdjustedSum2(Problem problem) {
         super(problem);
         super.setAdmissible(false);
     }

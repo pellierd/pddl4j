@@ -19,7 +19,6 @@ import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.ProblemImpl;
 import fr.uga.pddl4j.problem.operator.Action;

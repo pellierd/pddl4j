@@ -24,7 +24,8 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceSearch;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemImpl;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
@@ -55,7 +56,7 @@ import java.util.Set;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public class ASP extends AbstractPlanner<ADLProblem> {
+public class ASP extends AbstractPlanner<Problem> {
 
     /**
      * The class logger.
@@ -161,8 +162,8 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public ADLProblem instantiate(ParsedProblemImpl problem) {
-        final ADLProblem pb = new ADLProblem(problem);
+    public Problem instantiate(ParsedProblemImpl problem) {
+        final Problem pb = new ProblemImpl(problem);
         pb.instantiate();
         return pb;
     }
@@ -174,7 +175,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      * @return the plan found or null if no plan was found.
      */
     @Override
-    public Plan solve(final ADLProblem problem) {
+    public Plan solve(final Problem problem) {
         // Creates the A* search strategy
         StateSpaceSearch search = StateSpaceSearch.getInstance(SearchStrategy.Name.ASTAR,
             this.getHeuristic(), this.getHeuristicWeight(), this.getTimeout());
@@ -278,7 +279,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      * @param problem the problem to solve.
      * @return a plan solution for the problem or null if there is no solution
      */
-    public Plan astar(ADLProblem problem) {
+    public Plan astar(Problem problem) {
 
         // First we create an instance of the heuristic to use to guide the search
         final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), problem);
@@ -359,7 +360,7 @@ public class ASP extends AbstractPlanner<ADLProblem> {
      * @param problem the problem.
      * @return the search extracted from the specified node.
      */
-    private Plan extractPlan(final Node node, final ADLProblem problem) {
+    private Plan extractPlan(final Node node, final Problem problem) {
         Node n = node;
         final Plan plan = new SequentialPlan();
         while (n.getAction() != -1) {

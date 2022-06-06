@@ -21,7 +21,7 @@ package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
 
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
@@ -88,7 +88,7 @@ public final class CriticalPath extends RelaxedGraphHeuristic {
      *
      * @param problem the problem.
      */
-    public CriticalPath(ADLProblem problem) {
+    public CriticalPath(Problem problem) {
         super(problem);
         super.setAdmissible(true);
     }

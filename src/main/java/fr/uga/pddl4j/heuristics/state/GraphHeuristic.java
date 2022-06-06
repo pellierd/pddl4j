@@ -19,8 +19,8 @@
 
 package fr.uga.pddl4j.heuristics.state;
 
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Fluent;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
@@ -150,7 +150,7 @@ public abstract class GraphHeuristic extends AbstractStateHeuristic implements P
      *
      * @param problem the problem to be solved.
      */
-    protected GraphHeuristic(final ADLProblem problem) {
+    protected GraphHeuristic(final Problem problem) {
         super(problem);
         this.debug = false;
 

@@ -989,67 +989,72 @@ public abstract class AbstractProblem implements Problem {
     protected void initInitialTaskNetwork() {
         // Encode the parameters of the task network
         final ParsedTaskNetwork taskNetwork = this.getParsedProblem().getInitialTaskNetwork();
-        final int numberOfParameters = taskNetwork.getParameters().size();
-        this.intInitialTaskNetwork = new IntTaskNetwork(numberOfParameters);
-        final List<String> variables = new ArrayList<>(numberOfParameters);
-        for (int i = 0; i < numberOfParameters; i++) {
-            final TypedSymbol<String> parameter = taskNetwork.getParameters().get(i);
-            final String typeImage = this.toStringType(parameter.getTypes());
-            final int type = this.getTypes().indexOf(typeImage);
-            this.intInitialTaskNetwork.setTypeOfParameter(i, type);
-            variables.add(parameter.getValue());
-        }
-        // Encode the tasks of the task network
-        this.intInitialTaskNetwork.setTasks(this.initExpression(taskNetwork.getTasks(), variables));
-        // Encode the ordering constraints of the task network
-        Expression<Integer> orderingConstraints = null;
-        Expression<Integer> subtasks = this.intInitialTaskNetwork.getTasks();
-        if (taskNetwork.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-            orderingConstraints = new Expression<>(Connector.AND);
-            for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
-                final Expression<Integer> constraint = new Expression<>(Connector.LESS_ORDERING_CONSTRAINT);
-                final Expression<Integer> t1 = new Expression<>(Connector.TASK);
-                t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
-                constraint.addChild(t1);
-                final Expression<Integer> t2 = new Expression<>(Connector.TASK);
-                t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
-                constraint.addChild(t2);
-                orderingConstraints.addChild(constraint);
-            }
+        if (taskNetwork == null) {
+            this.intInitialTaskNetwork = new IntTaskNetwork();
         } else {
-            final int size = subtasks.getChildren().size();
-            final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(size);
-            orderingConstraints = this.initExpression(taskNetwork.getOrdering());
-            for (Expression<Integer> c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID().getValue(),
-                    c.getChildren().get(1).getTaskID().getValue());
+            final int numberOfParameters = taskNetwork.getParameters().size();
+            this.intInitialTaskNetwork = new IntTaskNetwork(numberOfParameters);
+
+            final List<String> variables = new ArrayList<>(numberOfParameters);
+            for (int i = 0; i < numberOfParameters; i++) {
+                final TypedSymbol<String> parameter = taskNetwork.getParameters().get(i);
+                final String typeImage = this.toStringType(parameter.getTypes());
+                final int type = this.getTypes().indexOf(typeImage);
+                this.intInitialTaskNetwork.setTypeOfParameter(i, type);
+                variables.add(parameter.getValue());
             }
-            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                Expression<Integer> orderedSubtasks = new Expression<>(Connector.AND);
-                for (int i = 0; i < size; i++) {
-                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
-                    constraints.removeRow(subtaskIndex);
-                    constraints.removeColumn(subtaskIndex);
-                    Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
-                    subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
-                    orderedSubtasks.addChild(st);
-                }
-                this.intInitialTaskNetwork.setTasks(orderedSubtasks);
+            // Encode the tasks of the task network
+            this.intInitialTaskNetwork.setTasks(this.initExpression(taskNetwork.getTasks(), variables));
+            // Encode the ordering constraints of the task network
+            Expression<Integer> orderingConstraints = null;
+            Expression<Integer> subtasks = this.intInitialTaskNetwork.getTasks();
+            if (taskNetwork.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
                 orderingConstraints = new Expression<>(Connector.AND);
-                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
+                for (int i = 0; i < subtasks.getChildren().size() - 1; i++) {
                     final Expression<Integer> constraint = new Expression<>(Connector.LESS_ORDERING_CONSTRAINT);
                     final Expression<Integer> t1 = new Expression<>(Connector.TASK);
                     t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
                     constraint.addChild(t1);
                     final Expression<Integer> t2 = new Expression<>(Connector.TASK);
-                    t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
+                    t2.setTaskID(new Symbol<>(SymbolType.TASK_ID, i + 1));
                     constraint.addChild(t2);
                     orderingConstraints.addChild(constraint);
                 }
+            } else {
+                final int size = subtasks.getChildren().size();
+                final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(size);
+                orderingConstraints = this.initExpression(taskNetwork.getOrdering());
+                for (Expression<Integer> c : orderingConstraints.getChildren()) {
+                    constraints.set(c.getChildren().get(0).getTaskID().getValue(),
+                        c.getChildren().get(1).getTaskID().getValue());
+                }
+                if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
+                    Expression<Integer> orderedSubtasks = new Expression<>(Connector.AND);
+                    for (int i = 0; i < size; i++) {
+                        int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
+                        constraints.removeRow(subtaskIndex);
+                        constraints.removeColumn(subtaskIndex);
+                        Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
+                        subtasks.getChildren().remove(subtaskIndex);
+                        st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
+                        orderedSubtasks.addChild(st);
+                    }
+                    this.intInitialTaskNetwork.setTasks(orderedSubtasks);
+                    orderingConstraints = new Expression<>(Connector.AND);
+                    for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
+                        final Expression<Integer> constraint = new Expression<>(Connector.LESS_ORDERING_CONSTRAINT);
+                        final Expression<Integer> t1 = new Expression<>(Connector.TASK);
+                        t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
+                        constraint.addChild(t1);
+                        final Expression<Integer> t2 = new Expression<>(Connector.TASK);
+                        t2.setTaskID(new Symbol<>(SymbolType.TASK_ID, i + 1));
+                        constraint.addChild(t2);
+                        orderingConstraints.addChild(constraint);
+                    }
+                }
             }
+            this.intInitialTaskNetwork.setOrderingConstraints(orderingConstraints);
         }
-        this.intInitialTaskNetwork.setOrderingConstraints(orderingConstraints);
     }
 
     /**

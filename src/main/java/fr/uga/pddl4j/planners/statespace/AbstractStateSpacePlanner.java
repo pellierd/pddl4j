@@ -24,7 +24,6 @@ import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceSearch;
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -248,7 +247,7 @@ public abstract class AbstractStateSpacePlanner<T extends Problem> extends Abstr
      * @param pb the problem to solve.
      * @return the plan found or null if no plan was found.
      */
-    public Plan solve(final ADLProblem pb) {
+    public Plan solve(final Problem pb) {
         Objects.requireNonNull(pb);
 
         Plan plan = null;

@@ -38,7 +38,7 @@ public class ProblemImpl extends FinalizedProblem {
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(ADLProblem.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(ProblemImpl.class.getName());
 
     /**
      * Create a new ADL problem from a domain and problem.
@@ -118,17 +118,19 @@ public class ProblemImpl extends FinalizedProblem {
             }
         }
 
-        // Collect the task information (symbols and signatures)
-        this.initTasks();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Tasks declared:\n"
-                + this.toString(Data.TASK_SIGNATURES) + "\n");
-        }
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            // Collect the task information (symbols and signatures)
+            this.initTasks();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Tasks declared:\n"
+                    + this.toString(Data.TASK_SIGNATURES) + "\n");
+            }
 
-        // Init the list of primitive task symbols
-        this.initPrimitiveTaskSymbols();
-        // Init the list of compound task symbols
-        this.initCompoundTaskSymbols();
+            // Init the list of primitive task symbols
+            this.initPrimitiveTaskSymbols();
+            // Init the list of compound task symbols
+            this.initCompoundTaskSymbols();
+        }
 
         // Encode the actions of the domain into integer representation
         this.initActions();
@@ -137,11 +139,13 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.INT_ACTIONS));
         }
 
-        // Encode the methods of the domain into integer representation
-        this.initMethods();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Methods declared:\n\n"
-                + this.toString(Data.INT_METHODS));
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            // Encode the methods of the domain into integer representation
+            this.initMethods();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Methods declared:\n\n"
+                    + this.toString(Data.INT_METHODS));
+            }
         }
 
         // Encode the initial state in integer representation
@@ -151,11 +155,13 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.INT_INITIAL_STATE) + "\n");
         }
 
-        // Encode the initial task network
-        this.initInitialTaskNetwork();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initial task network declared:\n"
-                + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            // Encode the initial task network
+            this.initInitialTaskNetwork();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Initial task network declared:\n"
+                    + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
+            }
         }
 
         // Encode the goal in integer representation
@@ -253,21 +259,22 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.INT_GOAL) + "\n");
         }
 
-        this.instantiateInitialTaskNetwork();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initial tasknetwork instantiated:\n"
-                + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
-        }
-        this.instantiateMethods();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Methods instantiated:\n\n"
-                + this.toString(Data.INT_METHODS));
-        }
-
-        this.simplyMethodsWithGroundInertia();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Methods simplified based on ground inertia:\n\n"
-                + this.toString(Data.INT_METHODS));
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            this.instantiateInitialTaskNetwork();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Initial tasknetwork instantiated:\n"
+                    + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
+            }
+            this.instantiateMethods();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Methods instantiated:\n\n"
+                    + this.toString(Data.INT_METHODS));
+            }
+            this.simplyMethodsWithGroundInertia();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Methods simplified based on ground inertia:\n\n"
+                    + this.toString(Data.INT_METHODS));
+            }
         }
     }
 
@@ -299,26 +306,28 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.ACTIONS) + "\n");
         }
 
-        this.extractRelevantTasks();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Relevant tasks:\n"
-                + this.toString(Data.TASKS) + "\n");
-        }
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            this.extractRelevantTasks();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Relevant tasks:\n"
+                    + this.toString(Data.TASKS) + "\n");
+            }
+            this.initTaskResolvers();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Task resolvers:\n\n"
+                    + this.toString(Data.TASK_RESOLVERS) + "\n");
+            }
 
-        this.initTaskResolvers();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Task resolvers:\n\n"
-                + this.toString(Data.TASK_RESOLVERS) + "\n");
-        }
-
-        this.initMapOfTaskIndex();
-        this.finalizeMethods();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Methods:\n\n"
-                + this.toString(Data.METHODS) + "\n");
+            this.initMapOfTaskIndex();
+            this.finalizeMethods();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Methods:\n\n"
+                    + this.toString(Data.METHODS) + "\n");
+            }
         }
 
         this.finalizeInitialState();
+
         if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
             this.finalizeInitialNumericFluent();
             if (this.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
@@ -331,10 +340,12 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.INITIAL_STATE) + "\n");
         }
 
-        this.finalizeInitialTaskNetwork();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initial tasknetwork:\n"
-                + this.toString(Data.INITIAL_TASK_NETWORK));
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            this.finalizeInitialTaskNetwork();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Initial tasknetwork:\n"
+                    + this.toString(Data.INITIAL_TASK_NETWORK));
+            }
         }
 
         this.finalizeGoal();

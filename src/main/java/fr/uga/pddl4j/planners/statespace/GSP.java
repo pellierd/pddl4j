@@ -24,7 +24,8 @@ import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -101,7 +102,7 @@ import java.util.List;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class GSP extends AbstractStateSpacePlanner<ADLProblem> {
+public final class GSP extends AbstractStateSpacePlanner<Problem> {
 
     /**
      * The logger of the class.
@@ -170,8 +171,8 @@ public final class GSP extends AbstractStateSpacePlanner<ADLProblem> {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public ADLProblem instantiate(final ParsedProblemImpl problem) {
-        ADLProblem pb = new ADLProblem(problem);
+    public Problem instantiate(final ParsedProblemImpl problem) {
+        Problem pb = new ProblemImpl(problem);
         pb.instantiate();
         return pb;
     }

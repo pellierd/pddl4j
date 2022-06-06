@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.statespace.search;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import org.openjdk.jol.info.GraphLayout;
@@ -59,7 +59,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param codedProblem the problem to be solved. The problem cannot be null.
      * @return the solution node.
      */
-    public Node search(final ADLProblem codedProblem) {
+    public Node search(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final LinkedList<Node> openList = new LinkedList<>();
         final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), codedProblem);
@@ -112,7 +112,7 @@ public final class HillClimbing extends AbstractStateSpaceSearch {
      * @param heuristic the heuristic used.
      * @return the list of successors from the parent node.
      */
-    private LinkedList<Node> getSuccessors(final Node parent, final ADLProblem problem,
+    private LinkedList<Node> getSuccessors(final Node parent, final Problem problem,
                                            final StateHeuristic heuristic) {
         final LinkedList<Node> successors = new LinkedList<>();
 

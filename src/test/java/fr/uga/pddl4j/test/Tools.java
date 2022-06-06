@@ -8,7 +8,6 @@ import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.ProblemImpl;
 import org.junit.Assert;
@@ -125,7 +124,7 @@ public abstract class Tools {
      * @param problemFile the file file to be tested.
      * @return a coded problem from the parsing file
      */
-    public static ADLProblem generateCodedProblem(String domainFile, String problemFile) {
+    public static Problem generateCodedProblem(String domainFile, String problemFile) {
         try {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
@@ -133,7 +132,7 @@ public abstract class Tools {
             ParsedProblemImpl parsedProblem = parser.parse(domain, problem);
             ErrorManager errorManager = parser.getErrorManager();
             if (errorManager.isEmpty()) {
-                return new ADLProblem(parsedProblem);
+                return new ProblemImpl(parsedProblem);
             }
         } catch (IOException ioExcepion) {
             System.err.println(ioExcepion + " test files not found !");

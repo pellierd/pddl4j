@@ -20,7 +20,7 @@
 package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
@@ -58,7 +58,7 @@ public final class Combo extends RelaxedGraphHeuristic {
      * @param problem the planning problem.
      * @throws NullPointerException if <code>problem == null</code>.
      */
-    public Combo(ADLProblem problem) {
+    public Combo(Problem problem) {
         super(problem);
         this.delta = new SetLevel(problem);
         super.setAdmissible(false);

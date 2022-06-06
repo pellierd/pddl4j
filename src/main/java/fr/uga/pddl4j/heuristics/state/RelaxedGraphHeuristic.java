@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.heuristics.state;
 
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
@@ -123,7 +123,7 @@ public abstract class RelaxedGraphHeuristic extends AbstractStateHeuristic imple
      *
      * @param problem the problem to be solved.
      */
-    protected RelaxedGraphHeuristic(final ADLProblem problem) {
+    protected RelaxedGraphHeuristic(final Problem problem) {
         super(problem);
         // Get the number of relevant facts of the problem
         final int nbRelevantFacts = super.getRevelantFacts().size();

@@ -17,7 +17,7 @@ package fr.uga.pddl4j.heuristics.state;
 
 import fr.uga.pddl4j.heuristics.Heuristic;
 import fr.uga.pddl4j.planners.statespace.search.Node;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Condition;
 
@@ -113,7 +113,7 @@ public interface StateHeuristic extends Heuristic {
      * @param problem the problem for which the heuristic is created.
      * @return the heuristic created.
      */
-    public static StateHeuristic getInstance(final StateHeuristic.Name name, final ADLProblem problem) {
+    public static StateHeuristic getInstance(final StateHeuristic.Name name, final Problem problem) {
         switch (name) {
             case FAST_FORWARD:
                 return new FastForward(problem);

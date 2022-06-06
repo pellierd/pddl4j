@@ -18,7 +18,7 @@ package fr.uga.pddl4j.planners.statespace.search;
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
-import fr.uga.pddl4j.problem.ADLProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.operator.Action;
 
 import java.util.Objects;
@@ -274,7 +274,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
      * @return the solution node or null.
      */
     @Override
-    public Node searchSolutionNode(final ADLProblem codedProblem) {
+    public Node searchSolutionNode(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         return search(codedProblem);
     }
@@ -286,7 +286,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
      * @return the solution plan or null.
      */
     @Override
-    public Plan searchPlan(final ADLProblem codedProblem) {
+    public Plan searchPlan(final Problem codedProblem) {
         Objects.requireNonNull(codedProblem);
         final Node solutionNode = search(codedProblem);
         if (solutionNode != null) {
@@ -304,7 +304,7 @@ public abstract class AbstractStateSpaceSearch implements StateSpaceSearch {
      * @return the solution plan or null is no solution was found.
      */
     @Override
-    public SequentialPlan extractPlan(final Node node, final ADLProblem problem) {
+    public SequentialPlan extractPlan(final Node node, final Problem problem) {
         if (node != null) {
             Node n = node;
             final SequentialPlan plan = new SequentialPlan();
