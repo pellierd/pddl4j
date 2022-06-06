@@ -25,7 +25,8 @@ import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.htn.AbstractHTNPlanner;
-import fr.uga.pddl4j.problem.HTNProblem;
+import fr.uga.pddl4j.problem.Problem;
+import fr.uga.pddl4j.problem.ProblemImpl;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +52,7 @@ import java.util.Spliterator;
  * @version 1.0 - 25.06.2020
  * @since 4.0
  */
-public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> implements STNPlanner<HTNProblem> {
+public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<Problem> implements STNPlanner<Problem> {
 
     /**
      * The logger of the class.
@@ -151,7 +152,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
      *
      * @param problem the planning problem
      */
-    private void initTasksCosts(HTNProblem problem) {
+    private void initTasksCosts(Problem problem) {
         this.costs = new int[problem.getTaskResolvers().size()];
         Arrays.fill(this.costs, -1);
         for (int i = 0; i < problem.getTasks().size(); i++) {
@@ -168,7 +169,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
      * @param problem the planning problem.
      * @param closed the set of task already encountered.
      */
-    private int cost(int task, HTNProblem problem, Set<Integer> closed) {
+    private int cost(int task, Problem problem, Set<Integer> closed) {
         closed.add(task);
         if (this.costs[task] != -1) {
             return this.costs[task];
@@ -203,7 +204,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
      * @param problem the problem to be solved.
      * @return the solution plan or null is no solution was found.
      */
-    protected Plan extractPlan(final AbstractSTNNode node, final HTNProblem problem) {
+    protected Plan extractPlan(final AbstractSTNNode node, final Problem problem) {
         AbstractSTNNode n = node;
         final Plan plan = new SequentialPlan();
         while (n.getParent() != null) {
@@ -226,7 +227,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
      * @param problem the problem to be solved.
      * @return the hierarchy of the solution plan.
      */
-    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final HTNProblem problem) {
+    protected Hierarchy extractHierarchy(final AbstractSTNNode node, final Problem problem) {
 
         // Extract hierarchy of the plan
         final LinkedList<Integer> operators = new LinkedList<>();
@@ -407,7 +408,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
 
         // Encodes and instantiates the problem in a compact representation
         begin = System.currentTimeMillis();
-        HTNProblem pb = this.instantiate(parsedProblem);
+        Problem pb = this.instantiate(parsedProblem);
         this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
         //this.getStatistics().setMemoryUsedForProblemRepresentation(MemoryAgent.getDeepSizeOf(pb));
         long end = System.currentTimeMillis();
@@ -500,8 +501,8 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public HTNProblem instantiate(final ParsedProblemImpl problem) {
-        final HTNProblem pb = new HTNProblem(problem);
+    public Problem instantiate(final ParsedProblemImpl problem) {
+        final Problem pb = new ProblemImpl(problem);
         pb.instantiate();
         return pb;
     }

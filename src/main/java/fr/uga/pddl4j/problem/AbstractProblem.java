@@ -1457,7 +1457,7 @@ public abstract class AbstractProblem implements Problem {
      * @param taskNetwork the task network to print.
      * @return a string representation of the specified method.
      */
-    protected String toString(final IntTaskNetwork taskNetwork) {
+    public String toString(final IntTaskNetwork taskNetwork) {
         final StringBuilder str = new StringBuilder();
         str.append("Parameters:\n");
         for (int i = 0; i < taskNetwork.arity(); i++) {

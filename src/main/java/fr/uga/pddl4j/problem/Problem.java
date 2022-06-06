@@ -19,6 +19,7 @@ import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -141,6 +142,12 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      */
     List<Task> getTasks();
 
+    /**
+     * Returns the relevant operators or resolver for a task.
+     *
+     * @return the relevant operators or resolver for a task.
+     */
+    List<List<Integer>> getTaskResolvers();
 
     /**
      * Returns the goal of the problem or null if the goal can is not reachable.
@@ -178,12 +185,60 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     void instantiate();
 
     /**
-     * Returns a string representation of a specified operator.
+     * Returns a string representation of a specified action.
      *
      * @param action the action.
-     * @return a string representation of the specified operator.
+     * @return a string representation of the specified action.
      */
     String toString(final Action action);
+
+    /**
+     * Returns a string representation of a specified durative action.
+     *
+     * @param action the action.
+     * @return a string representation of the specified durative action.
+     */
+    String toString(final DurativeAction action);
+
+    /**
+     * Returns a string representation of a specified method.
+     *
+     * @param method the method.
+     * @return a string representation of the specified method.
+     */
+    String toString(final Method method);
+
+    /**
+     * Returns a string representation of a specified durative method.
+     *
+     * @param method the method.
+     * @return a string representation of the specified durative method.
+     */
+    String toString(final DurativeMethod method);
+
+    /**
+     * Returns a string representation of a specified task.
+     *
+     * @param task the task.
+     * @return a string representation of the specified task.
+     */
+    String toString(final Task task);
+
+    /**
+     * Returns a string representation of a specified task network.
+     *
+     * @param network the task network..
+     * @return a string representation of the specified task network.
+     */
+    String toString(final TaskNetwork network);
+
+    /**
+     * Returns a string representation of a hierarchical decomposition of plan.
+     *
+     * @param hierarchy the hierarchical decomposition to convert into string represention.
+     * @return the string representation of the he hierarchical decomposition in parameter.
+     */
+    String toString(final Hierarchy hierarchy);
 
     /**
      * Returns a string representation of a state.

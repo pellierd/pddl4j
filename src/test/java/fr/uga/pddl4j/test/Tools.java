@@ -9,7 +9,6 @@ import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.ADLProblem;
-import fr.uga.pddl4j.problem.HTNProblem;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.ProblemImpl;
 import org.junit.Assert;
@@ -261,7 +260,7 @@ public abstract class Tools {
                             if (extension.equals(Tools.PDDL_EXT)) {
                                 bw.write(pb.toString(plan));
                             } else {
-                                bw.write(((HTNProblem) pb).toString(plan.getHierarchy()));
+                                bw.write(pb.toString(plan.getHierarchy()));
                             }
                         }
                         System.out.println("* Solution found for " + currentProblem);
@@ -412,7 +411,7 @@ public abstract class Tools {
                     Problem pb;
                     String typeOfProblem;
                     if (problemParsed.getRequirements().contains(RequireKey.HIERARCHY)) {
-                        pb = new HTNProblem(problemParsed);
+                        pb = new ProblemImpl(problemParsed);
                         typeOfProblem = "HTN";
                     } else if (problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
                         pb = new ProblemImpl(problemParsed);

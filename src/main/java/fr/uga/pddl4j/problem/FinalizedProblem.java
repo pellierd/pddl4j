@@ -1306,7 +1306,48 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         return str.toString();
     }
 
-
+    /**
+     * Returns a string representation of a specified operator.
+     *
+     * @param action     the action.
+     * @return a string representation of the specified operator.
+     */
+    public final String toString(final DurativeAction action) {
+        StringBuilder str = new StringBuilder();
+        str.append("Durative Action ");
+        str.append(action.getName());
+        str.append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < action.arity(); i++) {
+            final int index = action.getValueOfParameter(i);
+            final String type = this.getTypes().get(action.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Duration:\n");
+        str.append(this.toString(action.getDuration()));
+        str.append("\nDuration constraints:");
+        str.append("TO DO\n");
+        str.append("Condition:\n");
+        str.append("TO DO");
+        str.append("\n");
+        str.append("Effects:\n");
+        str.append("TO DO");
+        return str.toString();
+    }
 
     /**
      * Returns a string representation of a state.
@@ -1536,7 +1577,51 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Preconditions:\n");
         str.append(this.toString(method.getPrecondition()));
         str.append("\n");
+        str.append("Ordering:\n");
         str.append(this.toString(method.getTaskNetwork()));
+        str.append("\n");
+        str.append("Constraints:\n");
+        str.append("TO DO");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the specified method.
+     *
+     * @param method the method.
+     * @return a string representation of the specified method.
+     */
+    public final String toString(final DurativeMethod method) {
+        final StringBuilder str = new StringBuilder();
+        str.append("Method ");
+        str.append(method.getName());
+        str.append("\n");
+        str.append("Instantiations:\n");
+        for (int i = 0; i < method.arity(); i++) {
+            final int index = method.getValueOfParameter(i);
+            final String type = this.getTypes().get(method.getTypeOfParameters(i));
+            if (index == -1) {
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
+                str.append(i).append(" - ");
+                str.append(type);
+                str.append(" : ? \n");
+            } else {
+                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i);
+                str.append(" - ");
+                str.append(type);
+                str.append(" : ");
+                str.append(this.getConstantSymbols().get(index));
+                str.append(" \n");
+            }
+        }
+        str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
+        str.append("Preconditions:\n");
+        str.append("TO DO");
+        str.append("Ordering:\n");
+        str.append("TO DO");
+        str.append("\n");
+        str.append("Constraints:\n");
+        str.append("TO DO");
         return str.toString();
     }
 

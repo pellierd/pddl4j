@@ -69,6 +69,8 @@ public class ProblemImpl extends FinalizedProblem {
         accepted.add(RequireKey.NUMERIC_FLUENTS);
         accepted.add(RequireKey.DURATIVE_ACTIONS);
         accepted.add(RequireKey.DURATION_INEQUALITIES);
+        accepted.add(RequireKey.HIERARCHY);
+        accepted.add(RequireKey.METHOD_PRECONDITIONS);
         return accepted;
     }
 
@@ -116,6 +118,18 @@ public class ProblemImpl extends FinalizedProblem {
             }
         }
 
+        // Collect the task information (symbols and signatures)
+        this.initTasks();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Tasks declared:\n"
+                + this.toString(Data.TASK_SIGNATURES) + "\n");
+        }
+
+        // Init the list of primitive task symbols
+        this.initPrimitiveTaskSymbols();
+        // Init the list of compound task symbols
+        this.initCompoundTaskSymbols();
+
         // Encode the actions of the domain into integer representation
         this.initActions();
         if (LOGGER.isDebugEnabled()) {
@@ -123,11 +137,25 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.INT_ACTIONS));
         }
 
+        // Encode the methods of the domain into integer representation
+        this.initMethods();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods declared:\n\n"
+                + this.toString(Data.INT_METHODS));
+        }
+
         // Encode the initial state in integer representation
         this.initInitialState();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initial state declared :\n"
                 + this.toString(Data.INT_INITIAL_STATE) + "\n");
+        }
+
+        // Encode the initial task network
+        this.initInitialTaskNetwork();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial task network declared:\n"
+                + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
         }
 
         // Encode the goal in integer representation
@@ -224,6 +252,23 @@ public class ProblemImpl extends FinalizedProblem {
             LOGGER.debug("Goal simplified base on ground inertia detected:\n"
                 + this.toString(Data.INT_GOAL) + "\n");
         }
+
+        this.instantiateInitialTaskNetwork();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial tasknetwork instantiated:\n"
+                + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
+        }
+        this.instantiateMethods();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods instantiated:\n\n"
+                + this.toString(Data.INT_METHODS));
+        }
+
+        this.simplyMethodsWithGroundInertia();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods simplified based on ground inertia:\n\n"
+                + this.toString(Data.INT_METHODS));
+        }
     }
 
     /**
@@ -236,6 +281,7 @@ public class ProblemImpl extends FinalizedProblem {
             LOGGER.debug("Relevant fluents:\n"
                 + this.toString(Data.FLUENTS) + "\n");
         }
+
         this.initOfMapFluentIndex();
 
         if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
@@ -257,6 +303,12 @@ public class ProblemImpl extends FinalizedProblem {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Relevant tasks:\n"
                 + this.toString(Data.TASKS) + "\n");
+        }
+
+        this.initTaskResolvers();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Task resolvers:\n\n"
+                + this.toString(Data.TASK_RESOLVERS) + "\n");
         }
 
         this.initMapOfTaskIndex();
@@ -292,7 +344,7 @@ public class ProblemImpl extends FinalizedProblem {
         }
 
     }
-    
+
     /**
      * Returns <code>true</code> if this problem is solvable. The method returns <code>false</code> if the goal is
      * simplified to <code>false</code> during the instantiation process, otherwise the method returns
