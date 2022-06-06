@@ -29,7 +29,7 @@ import fr.uga.pddl4j.problem.Problem;
  * @since 4,0
  */
 
-public abstract class AbstractHTNPlanner<T extends Problem> extends AbstractPlanner<T>  implements HTNPlanner<T> {
+public abstract class AbstractHTNPlanner extends AbstractPlanner  implements HTNPlanner {
 
     /**
      * Creates a new planner with a default configuration.

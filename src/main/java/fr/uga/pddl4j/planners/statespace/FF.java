@@ -89,7 +89,7 @@ import java.util.Arrays;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class FF extends AbstractStateSpacePlanner<Problem>  {
+public final class FF extends AbstractStateSpacePlanner  {
 
     /**
      * The class logger.

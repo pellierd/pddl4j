@@ -102,7 +102,7 @@ import java.util.List;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class GSP extends AbstractStateSpacePlanner<Problem> {
+public final class GSP extends AbstractStateSpacePlanner {
 
     /**
      * The logger of the class.

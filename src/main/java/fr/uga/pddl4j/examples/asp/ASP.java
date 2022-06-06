@@ -56,7 +56,7 @@ import java.util.Set;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public class ASP extends AbstractPlanner<Problem> {
+public class ASP extends AbstractPlanner {
 
     /**
      * The class logger.

@@ -31,7 +31,7 @@ import java.util.List;
  * @version 1.0 - 07.06.2016
  * @since 3.6
  */
-public interface StateSpacePlanner<T extends Problem> extends Planner<T> {
+public interface StateSpacePlanner extends Planner {
 
     /**
      * The search strategies setting used for planner configuration.

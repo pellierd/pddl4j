@@ -90,7 +90,7 @@ import picocli.CommandLine;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class HSP extends AbstractStateSpacePlanner<Problem>  {
+public final class HSP extends AbstractStateSpacePlanner  {
 
     /**
      * The class logger.

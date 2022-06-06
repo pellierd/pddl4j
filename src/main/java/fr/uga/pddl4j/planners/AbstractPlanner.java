@@ -41,7 +41,7 @@ import java.io.IOException;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
+public abstract class AbstractPlanner implements Planner {
 
     /**
      * The logger of the class.
@@ -374,7 +374,7 @@ public abstract class AbstractPlanner<T extends Problem> implements Planner<T> {
 
         begin = System.currentTimeMillis();
 
-        T pb = this.instantiate(parsedProblem);
+        Problem pb = this.instantiate(parsedProblem);
         this.getStatistics().setTimeToEncode(System.currentTimeMillis() - begin);
         this.getStatistics().setMemoryUsedForProblemRepresentation(GraphLayout.parseInstance(pb).totalSize());
 

@@ -25,7 +25,7 @@ import fr.uga.pddl4j.problem.Problem;
  * @version 1.0 - 24,11,2021
  * @since 4,0
  */
-public interface STNPlanner<T extends Problem> extends HTNPlanner<T> {
+public interface STNPlanner extends HTNPlanner {
 
     /**
      * The INTERACTIVE_MODE setting for the configuration of the planner.

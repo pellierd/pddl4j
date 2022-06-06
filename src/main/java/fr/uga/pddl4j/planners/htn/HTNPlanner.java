@@ -25,5 +25,5 @@ import fr.uga.pddl4j.problem.Problem;
  * @version 1.0 - 24.11.2021
  * @since 4,0
  */
-public interface HTNPlanner<T extends Problem> extends Planner<T> {
+public interface HTNPlanner extends Planner {
 }

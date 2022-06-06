@@ -52,7 +52,7 @@ import java.util.Spliterator;
  * @version 1.0 - 25.06.2020
  * @since 4.0
  */
-public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<Problem> implements STNPlanner<Problem> {
+public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements STNPlanner {
 
     /**
      * The logger of the class.

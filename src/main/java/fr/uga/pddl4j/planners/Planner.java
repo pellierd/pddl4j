@@ -40,7 +40,7 @@ import java.util.concurrent.Callable;
  * @version 1.0 - 12.04.2016
  * @since 3.0
  */
-public interface Planner<T extends Problem> extends Serializable, Callable<Integer> {
+public interface Planner extends Serializable, Callable<Integer> {
 
     /**
      * The DOMAIN setting used for planner configuration.
@@ -241,7 +241,7 @@ public interface Planner<T extends Problem> extends Serializable, Callable<Integ
      * @param problem the problem to instantiate.
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
-    T instantiate(ParsedProblemImpl problem);
+    Problem instantiate(ParsedProblemImpl problem);
 
     /**
      * Search a plan for the specified planning problem.
@@ -249,7 +249,7 @@ public interface Planner<T extends Problem> extends Serializable, Callable<Integ
      * @param problem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null is no solution was found.
      */
-    Plan solve(final T problem);
+    Plan solve(final Problem problem);
 
     /**
      * Search a plan for the current planner configuration.
