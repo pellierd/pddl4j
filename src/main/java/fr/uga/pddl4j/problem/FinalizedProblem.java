@@ -265,7 +265,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the relevant operators for a task.
      */
-    protected List<List<Integer>> getTaskResolvers() {
+    public List<List<Integer>> getTaskResolvers() {
         return taskResolvers;
     }
 
@@ -274,7 +274,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the initial task network of the problem.
      */
-    protected TaskNetwork getInitialTaskNetwork() {
+    public TaskNetwork getInitialTaskNetwork() {
         return initialTaskNetwork;
     }
 
@@ -283,7 +283,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of relevant tasks of the problem.
      */
-    protected List<Task> getTasks() {
+    public List<Task> getTasks() {
         return this.tasks;
     }
 
@@ -292,7 +292,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the list of instantiated methods of the problem.
      */
-    protected List<Method> getMethods() {
+    public List<Method> getMethods() {
         return this.methods;
     }
 

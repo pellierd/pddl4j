@@ -417,7 +417,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
         if (LOGGER.isInfoEnabled()) {
             StringBuilder strb = new StringBuilder();
             strb.append("\nEncoding ");
-            if (pb.isTotallyOrederd()) {
+            if (pb.isTotallyOrdered()) {
                 strb.append("totally ordered ");
             } else {
                 strb.append("partially ordered ");
@@ -427,7 +427,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner<HTNProblem> 
             strb.append(pb.getMethods().size() + " methods, ");
             strb.append(pb.getFluents().size() + " fluents, ");
             strb.append(pb.getTasks().size() + " tasks)\n\n");
-            if (!pb.isTotallyOrederd()) {
+            if (!pb.isTotallyOrdered()) {
                 strb.append("Unable to solve a problem that isn't totally ordered.\n");
             }
             LOGGER.info(strb);

@@ -241,5 +241,10 @@ public class ADLProblem extends FinalizedProblem {
         return this.getGoal() != null;
     }
 
+    @Override
+    public boolean isTotallyOrdered() {
+        return false;
+    }
+
 
 }

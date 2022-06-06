@@ -25,7 +25,10 @@ import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.DurativeAction;
+import fr.uga.pddl4j.problem.operator.DurativeMethod;
 import fr.uga.pddl4j.problem.operator.Effect;
+import fr.uga.pddl4j.problem.operator.Method;
+import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
 import java.io.Serializable;
 import java.util.List;
@@ -118,6 +121,28 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     List<DurativeAction> getDurativeActions();
 
     /**
+     * Returns the list of instantiated methods of the problem.
+     *
+     * @return the list of instantiated methods of the problem.
+     */
+    List<Method> getMethods();
+
+    /**
+     * Returns the list of instantiated methods of the problem.
+     *
+     * @return the list of instantiated methods of the problem.
+     */
+    List<DurativeMethod> getDurativeMethods();
+
+    /**
+     * The list of relevant tasks of the problem.
+     *
+     * @return the list of relevant tasks of the problem.
+     */
+    List<Task> getTasks();
+
+
+    /**
      * Returns the goal of the problem or null if the goal can is not reachable.
      *
      * @return the goal of the problem.
@@ -130,6 +155,13 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      * @return the initial state of the problem.
      */
     InitialState getInitialState();
+
+    /**
+     * Returns the initial task network of the problem.
+     *
+     * @return the initial task network of the problem.
+     */
+    TaskNetwork getInitialTaskNetwork();
 
     /**
      * Returns <code>true</code> if this problem is solvable. It is not because the method returns <code>true</code>
@@ -218,5 +250,24 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      */
     String toShortString(final AbstractInstantiatedOperator operator);
 
-    boolean simplify(final Expression<Integer> exp);
+    /**
+     * Simply an atomic formula based on the inertia and the initial state of the problem. The atomic formula in
+     * parameter must be an expression of type ATOM. The simplification can be done with totally or partially
+     * instantiated atom. When the atom can be simplified, its connector is modified to TRUE or FALSE.
+     *
+     * @param atom the atomic formula.
+     * @return if the atom can be simplify to TRUE or FALSE.
+     */
+    boolean simplify(final Expression<Integer> atom);
+
+    /**
+     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchical, i.e.,
+     * contains no methods durative or not and no no initial task network. A hierarchical problem is totally ordered if
+     * and only the subtasks of each method of the problem are totally ordered and the initial task network is totally
+     * ordered.
+     *
+     * @return true if the problem is totally ordered, false otherwise.
+     */
+    boolean isTotallyOrdered();
+
 }

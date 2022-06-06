@@ -10,7 +10,6 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.ADLProblem;
 import fr.uga.pddl4j.problem.HTNProblem;
-import fr.uga.pddl4j.problem.NumericProblem;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.ProblemImpl;
 import org.junit.Assert;

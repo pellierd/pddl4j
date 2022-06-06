@@ -193,9 +193,6 @@ public class HTNProblem extends AbstractHTNProblem {
         }
 
 
-
-
-
         this.extractRelevantTasks();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Relevant tasks:\n"
@@ -264,7 +261,7 @@ public class HTNProblem extends AbstractHTNProblem {
      *
      * @return true if the problem is totally ordered, false otherwise.
      */
-    public final boolean isTotallyOrederd() {
+    public final boolean isTotallyOrdered() {
         boolean totallyOrdered = true;
         Iterator<Method> i = this.getMethods().iterator();
         while (i.hasNext() && totallyOrdered) {

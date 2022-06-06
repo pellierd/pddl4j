@@ -17,10 +17,14 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.problem.numeric.NumericVariable;
+import fr.uga.pddl4j.problem.operator.DurativeMethod;
+import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -233,16 +237,54 @@ public class ProblemImpl extends FinalizedProblem {
                 + this.toString(Data.FLUENTS) + "\n");
         }
         this.initOfMapFluentIndex();
+
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
+            this.extractRelevantNumericFluents();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Relevant numeric fluents:\n"
+                    + this.toString(Data.NUMERIC_FLUENTS) + "\n");
+            }
+            this.initMapOfNumericFluentIndex();
+        }
+
         this.finalizeActions();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Actions:\n\n"
                 + this.toString(Data.ACTIONS) + "\n");
         }
+
+        this.extractRelevantTasks();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Relevant tasks:\n"
+                + this.toString(Data.TASKS) + "\n");
+        }
+
+        this.initMapOfTaskIndex();
+        this.finalizeMethods();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Methods:\n\n"
+                + this.toString(Data.METHODS) + "\n");
+        }
+
         this.finalizeInitialState();
+        if (this.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
+            this.finalizeInitialNumericFluent();
+            if (this.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
+                NumericVariable duration = new NumericVariable(NumericVariable.DURATION, 0.0);
+                this.getInitialState().addNumericFluent(duration);
+            }
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initial state:\n"
                 + this.toString(Data.INITIAL_STATE) + "\n");
         }
+
+        this.finalizeInitialTaskNetwork();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initial tasknetwork:\n"
+                + this.toString(Data.INITIAL_TASK_NETWORK));
+        }
+
         this.finalizeGoal();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Goal:\n"
@@ -250,11 +292,12 @@ public class ProblemImpl extends FinalizedProblem {
         }
 
     }
-
+    
     /**
      * Returns <code>true</code> if this problem is solvable. The method returns <code>false</code> if the goal is
      * simplified to <code>false</code> during the instantiation process, otherwise the method returns
-     * <code>true</code>.
+     * <code>true</code>. If the problem is hierarchic, the method checks also that every task in the initial task
+     * network has at least a one resolver.
      *
      * <p>
      * Warning, it is not because the method returns <code>true</code> that the problem is solvable. It just means that
@@ -264,8 +307,35 @@ public class ProblemImpl extends FinalizedProblem {
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
      */
     public boolean isSolvable() {
-        return this.getGoal() != null;
+        boolean isSolvable = this.getGoal() != null;
+        if (this.getInitialTaskNetwork() != null) {
+            Iterator<Integer> i = this.getInitialTaskNetwork().getTasks().iterator();
+            while (i.hasNext() && isSolvable) {
+                isSolvable = i.next() != null;
+            }
+        }
+        return isSolvable;
     }
 
+    /**
+     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchical, i.e.,
+     * contains no methods durative or not and no no initial task network. A hierarchical problem is totally ordered if
+     * and only the subtasks of each method of the problem are totally ordered and the initial task network is totally
+     * ordered.
+     *
+     * @return true if the problem is totally ordered, false otherwise.
+     */
+    public final boolean isTotallyOrdered() {
+        boolean totallyOrdered = true;
+        Iterator<Method> it = this.getMethods().iterator();
+        while (it.hasNext() && totallyOrdered) {
+            totallyOrdered = it.next().getTaskNetwork().isTotallyOrdered();
+        }
+        Iterator<DurativeMethod> jt = this.getDurativeMethods().iterator();
+        while (jt.hasNext() && totallyOrdered) {
+            totallyOrdered = jt.next().getTaskNetwork().isTotallyOrdered();
+        }
+        return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
+    }
 
 }
