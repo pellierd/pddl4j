@@ -1,5 +1,12 @@
 (define (domain satellite2)
-	(:requirements :durative-actions :typing :numeric-fluents :timed-initial-literals :hierarchy)
+	(:requirements
+	    :durative-actions
+	    :equality
+	    :negative-preconditions
+	    :typing
+	    :numeric-fluents
+	    :timed-initial-literals
+	    :hierarchy)
 	(:types
 		calib_direction - direction
 		image_direction - direction
@@ -18,6 +25,7 @@
 		(have_image ?arg0 - image_direction ?arg1 - mode)
 		(calibration_target ?arg0 - instrument ?arg1 - calib_direction)
 		(current-time)
+		(observable ?arg0 - image_direction)
 	)
 
     (:functions
@@ -146,7 +154,7 @@
 		:duration (= ?duration (turn-time ?t_d_new ?t_d_prev))
 		:condition
 			(and
-				(not (= ?t_d_new ?t_d_prev))
+				(at start (not (= ?t_d_new ?t_d_prev)))
 				(at start (pointing ?t_s ?t_d_prev))
 			)
 		:effect

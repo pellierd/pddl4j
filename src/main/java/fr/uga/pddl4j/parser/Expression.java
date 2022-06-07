@@ -3,6 +3,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.parser.lexer.Token;
 import fr.uga.pddl4j.problem.AtomicFormulaSimplifier;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -271,7 +272,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @return the variable of this expression.
      */
     public final Symbol<T> getVariable() {
-        return this.symbol;
+        return this.variable;
     }
 
     /**
@@ -1842,8 +1843,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case EQUAL_ORDERING_CONSTRAINT:
                 str.append("(");
                 str.append(this.getConnective().getImage()).append(" ");
-                str.append(this.arguments.get(0).toString()).append(" ");
-                str.append(this.arguments.get(1).toString());
+                str.append(this.getChildren().get(0).toString()).append(" ");
+                str.append(this.getChildren().get(1).toString());
                 str.append(")");
                 break;
             case NOT:

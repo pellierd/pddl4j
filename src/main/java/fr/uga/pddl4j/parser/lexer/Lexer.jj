@@ -387,7 +387,7 @@ ParsedDomain domain() :
 }
 {
 	try {
-		left_bracket() <DEFINE> left_bracket() <DOMAIN>
+		<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
 			name=domain_name() {
 				this.domain = new ParsedProblemImpl(name);
 			}
@@ -421,11 +421,11 @@ ParsedProblem domain_and_problem() :
 }
 {
 	try {
-    	left_bracket() <DEFINE> left_bracket() <DOMAIN>
+    	<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
             name=domain_name() {
                 this.domain = new ParsedProblemImpl(name);
             }
-        right_bracket()
+        <RIGHT_BRACKET>
         [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
         [LOOKAHEAD(2, { this.isRequirement(RequireKey.TYPING)}) type_def() ]
         [LOOKAHEAD(2) constants_def()]
@@ -438,7 +438,7 @@ ParsedProblem domain_and_problem() :
         }) functions_def()]
         [LOOKAHEAD(2, { this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_DOMAIN)]
         (structure_def())+
-        right_bracket()
+        <RIGHT_BRACKET>
     	//Problem file
     	problem()
     } catch(Throwable e) {
@@ -875,7 +875,7 @@ NamedTypedList comp_task_def() : // ADD HDDL
     NamedTypedList taskID;
 }
 {
-    left_bracket() <TASK> taskID=task_def() right_bracket() {
+    <LEFT_BRACKET> <TASK> taskID=task_def() <RIGHT_BRACKET> {
         return taskID;
     }
 }
@@ -890,7 +890,7 @@ NamedTypedList task_def() : // ADD HDDL
     <PARAMETERS>
     left_bracket()
     typedList=typed_list(Lexer.VARIABLE)
-    right_bracket() {
+    <RIGHT_BRACKET> {
         NamedTypedList l = new NamedTypedList(name);
         for (TypedSymbol<String> s : typedList) {
             l.add(s);
@@ -917,10 +917,10 @@ NamedTypedList atomic_formula_skeleton() :
 	List<TypedSymbol<String>> typedList = null;
 }
 {
-	left_bracket()
+	<LEFT_BRACKET>
 		predicate=predicate()
 		typedList=typed_list(Lexer.VARIABLE)
-	right_bracket() {
+	<RIGHT_BRACKET> {
 		NamedTypedList l = new NamedTypedList(predicate);
 		for (TypedSymbol<String> s : typedList) {
 			l.add(s);
@@ -979,10 +979,10 @@ NamedTypedList atomic_function_skeleton() :
 	List<TypedSymbol<String>> typedList = null;
 }
 {
-	left_bracket()
+	<LEFT_BRACKET>
 		functor=functor()
 		typedList=typed_list(Lexer.VARIABLE)
-	right_bracket()
+	<RIGHT_BRACKET>
 	{
 		NamedTypedList l = new NamedTypedList(functor);
 		for (TypedSymbol<String> s : typedList) {
@@ -1091,11 +1091,11 @@ Expression<String> and_con_gd() :
 	Token end = null;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(LOOKAHEAD(2) child=con_gd() {
 			conGD.addChild(child);
 		})*
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.setBegin(begin);
 		conGD.setEnd(end);
@@ -1112,12 +1112,12 @@ Expression<String> forall_con_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			typedList=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		child=con_gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.setQuantifiedVariables(typedList);
 		conGD.addChild(child);
@@ -1135,9 +1135,9 @@ Expression<String> at_end_con_gd() :
     Token end = null;
 }
 {
-		begin=left_bracket() <AT> <END>
+		begin=<LEFT_BRACKET> <AT> <END>
 			exp=gd()
-		end=right_bracket()
+		end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
@@ -1155,9 +1155,9 @@ Expression<String> always_con_gd() :
 
 }
 {
-	begin=left_bracket() <ALWAYS>
+	begin=<LEFT_BRACKET> <ALWAYS>
 		exp=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
@@ -1174,9 +1174,9 @@ Expression<String> sometime_con_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <SOMETIME>
+	begin=<LEFT_BRACKET> <SOMETIME>
 		exp=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
@@ -1192,10 +1192,10 @@ Expression<String> within_con_gd() :
     Token begin, end;
 }
 {
-	begin=left_bracket() <WITHIN>
+	begin=<LEFT_BRACKET> <WITHIN>
 		time=number()
 		exp=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(time);
 		conGD.addChild(exp);
@@ -1212,9 +1212,9 @@ Expression<String> at_most_once_con_gd() :
     Token begin, end;
 }
 {
-	begin=left_bracket() <AT_MOST_ONCE>
+	begin=<LEFT_BRACKET> <AT_MOST_ONCE>
 		exp=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(exp);
 		conGD.setBegin(begin);
@@ -1232,10 +1232,10 @@ Expression<String> sometime_after_con_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <SOMETIME_AFTER>
+	begin=<LEFT_BRACKET> <SOMETIME_AFTER>
 		gd1=gd()
 		gd2=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(gd1);
 		conGD.addChild(gd2);
@@ -1254,10 +1254,10 @@ Expression<String> sometime_before_con_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <SOMETIME_BEFORE>
+	begin=<LEFT_BRACKET> <SOMETIME_BEFORE>
 		gd1=gd()
 		gd2=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(gd1);
 		conGD.addChild(gd2);
@@ -1274,11 +1274,11 @@ Expression<String> always_within_con_gd() :
     Token begin, end;
 }
 {
-	begin=left_bracket() <ALWAYS_WITHIN>
+	begin=<LEFT_BRACKET> <ALWAYS_WITHIN>
 		time=number()
 		gd1=gd()
 		gd2=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(time);
 		conGD.addChild(gd1);
@@ -1294,11 +1294,11 @@ Expression<String> hold_during_con_gd() :
     Token begin, end;
 }
 {
-	begin=left_bracket() <HOLD_DURING>
+	begin=<LEFT_BRACKET> <HOLD_DURING>
 		lower=number()
 		upper=number()
 		exp=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(lower);
 		conGD.addChild(upper);
@@ -1316,10 +1316,10 @@ Expression<String> hold_after_con_gd() :
     Token begin, end;
 }
 {
-	begin=left_bracket() <HOLD_AFTER>
+	begin=<LEFT_BRACKET> <HOLD_AFTER>
 		time=number()
 		exp=gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		conGD.addChild(time);
 		conGD.addChild(exp);
@@ -1382,10 +1382,10 @@ Expression<String> not_equal_atomic_formula() :
     Token end = null;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<NOT>
 		c=equal_gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 	 	exp.addChild(c);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -1404,10 +1404,10 @@ Expression<String> equal_atomic_formula() :
     Token end = null;
 }
 {
-	begin=left_bracket() t=<EQUAL>
+	begin=<LEFT_BRACKET> t=<EQUAL>
 		arg1=term()
 		arg2=term()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
         exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
             t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	 	args.add(arg1);
@@ -1427,10 +1427,10 @@ Expression<String> and_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <AND> (LOOKAHEAD(2) s=gd() {
+	begin=<LEFT_BRACKET> <AND> (LOOKAHEAD(2) s=gd() {
 		exp.addChild(s);
 	})*
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -1446,10 +1446,10 @@ Expression<String> or_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <OR> (LOOKAHEAD(2) s=gd() {
+	begin=<LEFT_BRACKET> <OR> (LOOKAHEAD(2) s=gd() {
 		exp.addChild(s);
 	})*
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -1465,7 +1465,7 @@ Expression<String> not_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <NOT> s=gd() end=right_bracket()
+	begin=<LEFT_BRACKET> <NOT> s=gd() end=<RIGHT_BRACKET>
 	{
 		exp.addChild(s);
         exp.setBegin(begin);
@@ -1483,7 +1483,7 @@ Expression<String> imply_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <IMPLY> p=gd() q=gd() end=right_bracket()
+	begin=<LEFT_BRACKET> <IMPLY> p=gd() q=gd() end=<RIGHT_BRACKET>
 	{
 		exp.addChild(p);
 		exp.addChild(q);
@@ -1502,12 +1502,12 @@ Expression<String> exists_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <EXISTS>
-		left_bracket()
+	begin=<LEFT_BRACKET> <EXISTS>
+		<LEFT_BRACKET>
 			typedList=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		s=gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setQuantifiedVariables(typedList);
 		exp.addChild(s);
 		exp.setBegin(begin);
@@ -1525,12 +1525,12 @@ Expression<String> forall_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			typedList=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		s=gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setQuantifiedVariables(typedList);
 		exp.addChild(s);
 		exp.setBegin(begin);
@@ -1548,7 +1548,7 @@ Expression<String> atomic_formula(int type) :
     Token end = null;
 }
 {
-	begin=left_bracket() t=predicate() {
+	begin=<LEFT_BRACKET> t=predicate() {
 		exp.setSymbol(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
@@ -1557,7 +1557,7 @@ Expression<String> atomic_formula(int type) :
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
 			args.add(t);
 		})*
-	) end=right_bracket() {
+	) end=<RIGHT_BRACKET> {
 		exp.setArguments(args);
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -1597,9 +1597,9 @@ Expression<String> not_atomic_formula(int type) :
     Token end = null;
 }
 {
-	begin=left_bracket() <NOT>
+	begin=<LEFT_BRACKET> <NOT>
 		s=atomic_formula(type)
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(s);
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -1641,10 +1641,10 @@ Expression<String> greater_comp() :
     Token end = null;
 }
 {
-	begin=left_bracket() <GREAT>
+	begin=<LEFT_BRACKET> <GREAT>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1662,10 +1662,10 @@ Expression<String> greater_equal_comp() :
     Token end = null;
 }
 {
-	begin=left_bracket() <GEQUAL>
+	begin=<LEFT_BRACKET> <GEQUAL>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1683,10 +1683,10 @@ Expression<String> less_equal_comp() :
     Token end = null;
 }
 {
-	begin=left_bracket() <LEQUAL>
+	begin=<LEFT_BRACKET> <LEQUAL>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1704,10 +1704,10 @@ Expression<String> less_comp() :
     Token end = null;
 }
 {
-	begin=left_bracket() <LESS>
+	begin=<LEFT_BRACKET> <LESS>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
     	exp.setBegin(begin);
@@ -1725,10 +1725,10 @@ Expression<String> equal_comp() :
     Token end = null;
 }
 {
-	begin=left_bracket() <EQUAL>
+	begin=<LEFT_BRACKET> <EQUAL>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 	 	exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1805,10 +1805,10 @@ Expression<String> add_op() :
     Token end = null;
 }
 {
-	begin=left_bracket() <ADD>
+	begin=<LEFT_BRACKET> <ADD>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.addChild(op1);
 		exp.addChild(op2);
@@ -1827,10 +1827,10 @@ Expression<String> substract_op() :
     Token end = null;
 }
 {
-	begin=left_bracket() <SUB>
+	begin=<LEFT_BRACKET> <SUB>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1848,10 +1848,10 @@ Expression<String> multiply_op() :
     Token end = null;
 }
 {
-	begin=left_bracket() <MUL>
+	begin=<LEFT_BRACKET> <MUL>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1869,10 +1869,10 @@ Expression<String> divide_op() :
     Token end = null;
 }
 {
-	begin=left_bracket() <DIV>
+	begin=<LEFT_BRACKET> <DIV>
 		op1=f_exp()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -1889,9 +1889,9 @@ Expression<String> unary_op() :
     Token end = null;
 }
 {
-	begin=left_bracket() <SUB>
+	begin=<LEFT_BRACKET> <SUB>
 		op1=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -1908,12 +1908,12 @@ Expression<String> f_head() :
     Token end = null;
 }
 {
-	begin=left_bracket() s=functor() {
+	begin=<LEFT_BRACKET> s=functor() {
 	    	exp.setSymbol(s);
 	    } (LOOKAHEAD(2) s=term() {
 	        args.add(s);
 	    })*
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 	    exp.setArguments(args);
 	    exp.setBegin(begin);
 	    exp.setEnd(end);
@@ -1980,7 +1980,7 @@ ParsedMethod method_def() : // ADD HDDL
 {
 	try {
 		begin=left_bracket() <METHOD> name=method_name()
-			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+			<PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_PRECONDITIONS)})
 			    <PRECONDITION> precondition=pre_gd()
@@ -2013,13 +2013,13 @@ ParsedMethod durative_method_def() : // ADD HDDL2.1
 {
 	try {
 	    begin=left_bracket() <DURATIVE_METHOD> name=method_name()
-	        <PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+	        <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>
 			<TASK> taskID=task_formula(Lexer.TERM)
 			[<DURATION> duration=method_duration_constraint()]
 			[LOOKAHEAD(2, { this.isRequirement(RequireKey.METHOD_PRECONDITIONS)})
 			    <CONDITION> condition=da_gd()
 			]
-            tn = task_network()
+            tn = durative_task_network()
 		end=right_bracket()
 	} catch(Throwable e) {
         this.error(e, token.beginLine, token.beginColumn);
@@ -2051,7 +2051,31 @@ ParsedTaskNetwork task_network() : // ADD HDDL
     | LOOKAHEAD (1)
         (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
         tasks = subtask_def()
-        //[<ORDERING> ordering = htn_ordering_constraints_def()]
+        [<CONSTRAINTS> constraints = htn_constraints_def()]
+        {
+            return new ParsedTaskNetwork(tasks, ordering, constraints, true);
+        }
+}
+
+ParsedTaskNetwork durative_task_network() : // ADD HDDL
+{
+    Expression<String> tasks = null;
+    Expression<String> ordering = new Expression<String>(Connector.AND);
+    Expression<String> constraints = new Expression<String>(Connector.AND);
+    ParsedTaskNetwork tn = null;
+}
+{
+    LOOKAHEAD (1)
+        (<TASKS> | <SUBTASKS>)
+        tasks = subtask_def()
+   	    [<ORDERING> ordering = durative_htn_ordering_constraints_def()]
+   	    [<CONSTRAINTS> constraints = htn_constraints_def()]
+   	    {
+            return new ParsedTaskNetwork(tasks, ordering, constraints, false);
+        }
+    | LOOKAHEAD (1)
+        (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
+        tasks = subtask_def()
         [<CONSTRAINTS> constraints = htn_constraints_def()]
         {
             return new ParsedTaskNetwork(tasks, ordering, constraints, true);
@@ -2086,7 +2110,7 @@ Expression<String> subtask_def() : // ADD HDDL
     |   LOOKAHEAD(2)
             exp=and_subtask()
     |   LOOKAHEAD(3)
-            begin=left_bracket() end=right_bracket() {
+            begin=<LEFT_BRACKET> end=<RIGHT_BRACKET> {
                 exp.setBegin(begin);
                 exp.setEnd(end);
             }
@@ -2104,10 +2128,10 @@ Expression<String> and_subtask() : // ADD HDDL
     Token end = null;
 }
 {
-    begin=left_bracket() <AND> (LOOKAHEAD (2) task=subtask() {
+    begin=<LEFT_BRACKET> <AND> (LOOKAHEAD (2) task=subtask() {
         exp.addChild(task);
     })*
-    end=right_bracket() {
+    end=<RIGHT_BRACKET> {
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
@@ -2123,10 +2147,10 @@ Expression<String> subtask() :  // ADD HDDL
 }
 {
     (   LOOKAHEAD(3)
-            begin=left_bracket()
+            begin=<LEFT_BRACKET>
                 taskID=task_id_symbol()
                 task=task_formula(Lexer.TERM)
-            end=right_bracket() {
+            end=<RIGHT_BRACKET> {
                 task.setTaskID(taskID);
                 task.setBegin(begin);
                 task.setEnd(end);
@@ -2146,7 +2170,7 @@ Expression<String> task_formula(int type) : // ADD HDDL
     Token end = null;
 }
 {
-	begin=left_bracket() t=task_symbol() {
+	begin=<LEFT_BRACKET> t=task_symbol() {
 		exp.setSymbol(t);
 	}
 	(LOOKAHEAD({ type == Lexer.CONSTANT } ) (t=constant() {
@@ -2155,7 +2179,7 @@ Expression<String> task_formula(int type) : // ADD HDDL
 	| LOOKAHEAD({ type == Lexer.TERM }) (t=term() {
 			args.add(t);
 		})*
-	) end=right_bracket() {
+	) end=<RIGHT_BRACKET> {
 		exp.setArguments(args);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -2184,6 +2208,27 @@ Expression<String> htn_ordering_constraints_def() : // ADD HDDL
     }
 }
 
+Expression<String> durative_htn_ordering_constraints_def() : // ADD HDDL2.1
+{
+    Expression<String> exp = null;
+    Expression<String> taskID = null;
+}
+{
+    (   LOOKAHEAD(2)
+            exp=empty_and()
+    |   LOOKAHEAD(2)
+            taskID=durative_htn_ordering_constraint() {
+                exp = new Expression<String>(Connector.AND);
+                exp.addChild(taskID);
+                exp.setLocation(taskID.getLocation());
+            }
+    |   LOOKAHEAD(2)
+            exp = and_ordering_constraints()
+    ) {
+        return exp;
+    }
+}
+
 Expression<String> and_ordering_constraints() : // ADD HDDL
 {
     Expression<String> exp = new Expression<String>(Connector.AND);
@@ -2192,9 +2237,26 @@ Expression<String> and_ordering_constraints() : // ADD HDDL
     Token end = null;
 }
 {
-    begin=left_bracket() <AND> (ordering = htn_ordering_constraint() {
+    begin=<LEFT_BRACKET> <AND> (ordering = htn_ordering_constraint() {
         exp.addChild(ordering);
-    })+ end=right_bracket() {
+    })+ end=<RIGHT_BRACKET> {
+        exp.setBegin(begin);
+        exp.setEnd(end);
+        return exp;
+    }
+}
+
+Expression<String> duraive_and_ordering_constraints() : // ADD HDDL2.1
+{
+    Expression<String> exp = new Expression<String>(Connector.AND);
+    Expression<String> ordering = null;
+    Token begin = null;
+    Token end = null;
+}
+{
+    begin=<LEFT_BRACKET> <AND> (ordering = durative_htn_ordering_constraint() {
+        exp.addChild(ordering);
+    })+ end=<RIGHT_BRACKET> {
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
@@ -2206,24 +2268,33 @@ Expression<String> htn_ordering_constraint() : // ADD HDDL
     Expression<String> exp = null;
 }
 {
-    (   LOOKAHEAD(3, {!this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
-            exp = less_htn_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    exp = less_htn_ordering_constraint() {
+            return exp;
+    }
+}
+
+Expression<String> durative_htn_ordering_constraint() : // ADD HDDL 2.1
+{
+    Expression<String> exp = null;
+}
+{
+    (   LOOKAHEAD(3) // ADD HDDL2.1
             exp = equal_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3) // ADD HDDL2.1
             exp = less_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3) // ADD HDDL2.1
             exp = less_or_equal_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3) // ADD HDDL2.1
             exp = great_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3) // ADD HDDL2.1
             exp = great_or_equal_htn_temporal_ordering_constraint()
-    |   LOOKAHEAD(3, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)}) // ADD HDDL2.1
+    |   LOOKAHEAD(3) // ADD HDDL2.1
                 exp = not_equal_htn_temporal_ordering_constraint()
     ) {
         return exp;
     }
 }
+
 
 Expression<String> less_htn_ordering_constraint() : // ADD HDDL
 {
@@ -2234,7 +2305,7 @@ Expression<String> less_htn_ordering_constraint() : // ADD HDDL
     Token end = null;
 }
 {
-    begin=left_bracket() <LESS> id1=task_id() id2=task_id() end=right_bracket() {
+    begin=<LEFT_BRACKET> <LESS> id1=task_id() id2=task_id() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.setBegin(begin);
@@ -2252,7 +2323,7 @@ Expression<String> equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <EQUAL> id1=timed_task_id() id2=timed_task_id() end=right_bracket() {
+    begin=<LEFT_BRACKET> <EQUAL> id1=timed_task_id() id2=timed_task_id() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.setBegin(begin);
@@ -2270,7 +2341,7 @@ Expression<String> less_htn_temporal_ordering_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <LESS> id1 = timed_task_id() id2 = timed_task_id() end=right_bracket() {
+    begin=<LEFT_BRACKET> <LESS> id1 = timed_task_id() id2 = timed_task_id() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.setBegin(begin);
@@ -2288,7 +2359,7 @@ Expression<String> less_or_equal_htn_temporal_ordering_constraint() : // ADD HDD
      Token end = null;
 }
 {
-    begin=left_bracket() <LEQUAL> id1 = timed_task_id() id2 = timed_task_id() end=right_bracket() {
+    begin=<LEFT_BRACKET> <LEQUAL> id1 = timed_task_id() id2 = timed_task_id() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.setBegin(begin);
@@ -2307,7 +2378,7 @@ Expression<String> great_htn_temporal_ordering_constraint() : // ADD HDDL2.1
      Token end = null;
 }
 {
-    begin=left_bracket() <GREAT> id1 = timed_task_id() id2 = timed_task_id() end=right_bracket() {
+    begin=<LEFT_BRACKET> <GREAT> id1 = timed_task_id() id2 = timed_task_id() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.setBegin(begin);
@@ -2326,7 +2397,7 @@ Expression<String> great_or_equal_htn_temporal_ordering_constraint() : // ADD HD
 
 }
 {
-    begin=left_bracket() <GEQUAL> id1 = timed_task_id() id2 = timed_task_id() end=right_bracket() {
+    begin=<LEFT_BRACKET> <GEQUAL> id1 = timed_task_id() id2 = timed_task_id() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.setBegin(begin);
@@ -2344,7 +2415,7 @@ Expression<String> not_equal_htn_temporal_ordering_constraint() : // ADD HDDL2.1
 
 }
 {
-    begin=left_bracket() <NOT> equal = equal_htn_temporal_ordering_constraint() end=right_bracket() {
+    begin=<LEFT_BRACKET> <NOT> equal = equal_htn_temporal_ordering_constraint() end=<RIGHT_BRACKET> {
         exp.addChild(equal);
         exp.setBegin(begin);
         exp.setEnd(end);
@@ -2369,14 +2440,9 @@ Expression<String> task_id() : // ADD HDDL
 	Symbol<String> id = null;
 }
 {
-    (   LOOKAHEAD(2, { !this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
-	        id = task_id_symbol() {
-                exp = new Expression<String>(Connector.TASK_ID);
-		        exp.setTaskID(id);
-		    }
-	|   LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
-	        exp = timed_task_id()
-	) {
+    id = task_id_symbol() {
+        exp = new Expression<String>(Connector.TASK_ID);
+		exp.setTaskID(id);
 	    return exp;
 	}
 
@@ -2402,7 +2468,7 @@ Expression<String> start_task_id() : // ADD HDDL2.1
     Expression<String> exp = new Expression<String>(Connector.TIMED_TASK_ID);
 }
 {
-    left_bracket() <START> id = task_id_symbol() right_bracket() {
+    <LEFT_BRACKET> <START> id = task_id_symbol() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.setTimeSpecifier(TimeSpecifier.START);
         return exp;
@@ -2415,7 +2481,7 @@ Expression<String> end_task_id() : // ADD HDDL2.1
     Expression<String> exp = new Expression<String>(Connector.TIMED_TASK_ID);
 }
 {
-    left_bracket() <END> id = task_id_symbol() right_bracket() {
+    <LEFT_BRACKET> <END> id = task_id_symbol() <RIGHT_BRACKET> {
         exp.setTaskID(id);
         exp.setTimeSpecifier(TimeSpecifier.END);
         return exp;
@@ -2452,9 +2518,9 @@ Expression<String> and_htn_constraints() :  // ADD HDDL
     Token end = null;
 }
 {
-    begin=left_bracket() <AND> (c = htn_constraint() {
+    begin=<LEFT_BRACKET> <AND> (c = htn_constraint() {
         exp.addChild(c);
-    })+ end=right_bracket() {
+    })+ end=<RIGHT_BRACKET> {
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
@@ -2506,7 +2572,7 @@ Expression<String> hold_before_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <HOLD_BEFORE> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <HOLD_BEFORE> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2524,7 +2590,7 @@ Expression<String> hold_after_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <HOLD_AFTER> id = task_id() effect = effect() end=right_bracket() {
+    begin=<LEFT_BRACKET> <HOLD_AFTER> id = task_id() effect = effect() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(effect);
         exp.setBegin(begin);
@@ -2543,7 +2609,7 @@ Expression<String> hold_between_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <HOLD_BETWEEN> id1 = task_id() id2 = task_id() gd = gd() end=<RIGHT_BRACKET> {
     exp.addChild(id1);
     exp.addChild(id2);
     exp.addChild(gd);
@@ -2563,7 +2629,7 @@ Expression<String> hold_during_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <HOLD_DURING> id1 = task_id() id2 = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id1);
         exp.addChild(id2);
         exp.addChild(gd);
@@ -2582,7 +2648,7 @@ Expression<String> at_end_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <AT> <END> id = task_id() effect = effect() end=right_bracket() {
+    begin=<LEFT_BRACKET> <AT> <END> id = task_id() effect = effect() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(effect);
         exp.setBegin(begin);
@@ -2600,7 +2666,7 @@ Expression<String> at_start_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <AT> <START> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <AT> <START> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2618,7 +2684,7 @@ Expression<String> always_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <ALWAYS> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <ALWAYS> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2636,7 +2702,7 @@ Expression<String> at_most_one_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <AT_MOST_ONCE> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <AT_MOST_ONCE> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2654,7 +2720,7 @@ Expression<String> sometime_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <SOMETIME> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <SOMETIME> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2672,7 +2738,7 @@ Expression<String> sometime_before_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <SOMETIME_BEFORE> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <SOMETIME_BEFORE> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2690,7 +2756,7 @@ Expression<String> sometime_after_htn_constraint() : // ADD HDDL2.1
     Token end = null;
 }
 {
-    begin=left_bracket() <SOMETIME_AFTER> id = task_id() gd = gd() end=right_bracket() {
+    begin=<LEFT_BRACKET> <SOMETIME_AFTER> id = task_id() gd = gd() end=<RIGHT_BRACKET> {
         exp.addChild(id);
         exp.addChild(gd);
         exp.setBegin(begin);
@@ -2735,7 +2801,7 @@ ParsedAction action_def() :
 {
 	try {
 		begin=left_bracket() <ACTION> name=action_name()
-			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+			<PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>
 		    <PRECONDITION> preconds=pre_gd()
 		    <EFFECT> effects=effect()
 		end=right_bracket()
@@ -2763,7 +2829,7 @@ ParsedAction htn_action_def() :
 {
 	try {
 		begin=left_bracket() <ACTION> name=action_name()
-			<PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()
+			<PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>
 		    [LOOKAHEAD(2) <PRECONDITION> preconds=pre_gd()]
 			[LOOKAHEAD(2) <EFFECT> effects=effect()]
 		end=right_bracket()
@@ -2810,7 +2876,7 @@ Expression<String> empty_or() :
     Token end = null;
 }
 {
-	begin=left_bracket() end=right_bracket()
+	begin=<LEFT_BRACKET> end=<RIGHT_BRACKET>
 	{
 		Expression<String> or = new Expression<String>(Connector.OR);
 		or.setBegin(begin);
@@ -2825,7 +2891,7 @@ Expression<String> empty_and() :
     Token end = null;
 }
 {
-	begin=left_bracket() end=right_bracket()
+	begin=<LEFT_BRACKET> end=<RIGHT_BRACKET>
 	{
 		Expression<String> and = new Expression<String>(Connector.AND);
 		and.setBegin(begin);
@@ -2842,11 +2908,11 @@ Expression<String> and_pre_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(s=pre_gd() {
 			exp.addChild(s);
 		})*
-		end=right_bracket()
+		end=<RIGHT_BRACKET>
 	{
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -2863,12 +2929,12 @@ Expression<String> forall_pre_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			vars=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		s=pre_gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.setQuantifiedVariables(vars);
 		exp.addChild(s);
@@ -2886,10 +2952,10 @@ Expression<String> pref_gd() :
     Token end = null;
 }
 {
-	begin=left_bracket() <PREFERENCE>
+	begin=<LEFT_BRACKET> <PREFERENCE>
 		[pref_name=pref_name()]
 		exp=gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setPrefName(pref_name);
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -2929,10 +2995,10 @@ Expression<String> and_c_effect() :
 	Token end = null;
 }
 {
-	begin=left_bracket() <AND> (LOOKAHEAD(2) s=c_effect() {
+	begin=<LEFT_BRACKET> <AND> (LOOKAHEAD(2) s=c_effect() {
 		exp.addChild(s);
 	})*
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -2962,12 +3028,12 @@ Expression<String> forall_effect() :
 	Token end = null;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			vars=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		s=effect()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setQuantifiedVariables(vars);
 		exp.addChild(s);
 		exp.setBegin(begin);
@@ -2985,10 +3051,10 @@ Expression<String> when_con_effect() :
 	Token end = null;
 }
 {
-	begin=left_bracket() <WHEN>
+	begin=<LEFT_BRACKET> <WHEN>
 		condition=gd()
 		effects=cond_effect()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(condition);
 		exp.addChild(effects);
 		exp.setBegin(begin);
@@ -3017,10 +3083,10 @@ Expression<String> and_p_effect() :
 	Token end = null;
 }
 {
-	begin=left_bracket() <AND> (LOOKAHEAD(2) s=p_effect() {
+	begin=<LEFT_BRACKET> <AND> (LOOKAHEAD(2) s=p_effect() {
 		exp.addChild(s);
 	})*
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.setBegin(begin);
         exp.setEnd(end);
@@ -3053,10 +3119,10 @@ Expression<String> increase_total_cost() :
     Token end = null;
 }
 {
-	begin=left_bracket() <INCREASE>
+	begin=<LEFT_BRACKET> <INCREASE>
 		op1=total_cost()
 		op2=numeric_term()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.addChild(op1);
 		exp.addChild(op2);
@@ -3073,7 +3139,7 @@ Expression<String> total_cost() :
     Token end;
 }
 {
-	begin=left_bracket() t=<TOTAL_COST> end=right_bracket() {
+	begin=<LEFT_BRACKET> t=<TOTAL_COST> end=<RIGHT_BRACKET> {
 	Expression<String> exp = new Expression<String>(Connector.FN_HEAD);
 	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
 	    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
@@ -3120,10 +3186,10 @@ Expression<String> assign() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <ASSIGN>
+	begin=<LEFT_BRACKET> <ASSIGN>
 		op1=f_head()
 		op2=f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3139,10 +3205,10 @@ Expression<String> scale_up() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <SCALE_UP>
+	begin=<LEFT_BRACKET> <SCALE_UP>
 		op1=f_head()
 		op2=f_exp()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.addChild(op1);
 		exp.addChild(op2);
@@ -3159,10 +3225,10 @@ Expression<String> scale_down() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <SCALE_DOWN>
+	begin=<LEFT_BRACKET> <SCALE_DOWN>
 		op1=f_head()
 		op2=f_exp()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.addChild(op1);
 		exp.addChild(op2);
@@ -3179,10 +3245,10 @@ Expression<String> increase() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <INCREASE>
+	begin=<LEFT_BRACKET> <INCREASE>
 		op1=f_head()
 		op2=f_exp()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.addChild(op1);
 		exp.addChild(op2);
@@ -3199,10 +3265,10 @@ Expression<String> decrease() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <DECREASE>
+	begin=<LEFT_BRACKET> <DECREASE>
 		op1=f_head()
 		op2=f_exp()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.addChild(op1);
 		exp.addChild(op2);
@@ -3227,9 +3293,9 @@ ParsedAction durative_action_def() :
 	try {
 		begin=left_bracket() <DURATIVE_ACTION> name=da_symbol()
 			<PARAMETERS>
-				left_bracket()
+				<LEFT_BRACKET>
 					parameters=typed_list(Lexer.VARIABLE)
-				right_bracket()
+				<RIGHT_BRACKET>
 			<DURATION> duration=duration_constraint()
 			<CONDITION> condition=da_gd()
 			<EFFECT> effect=da_effect()
@@ -3275,11 +3341,11 @@ Expression<String> and_simple_duration_constraint() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(LOOKAHEAD(2) child=simple_duration_constraint(){
 			exp.addChild(child);
 		})+
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -3317,9 +3383,9 @@ Expression<String> at_start_simple_duration_constraint() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <START>
+	begin=<LEFT_BRACKET> <AT> <START>
 		child=simple_duration_constraint()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3334,9 +3400,9 @@ Expression<String> at_end_simple_duration_constraint() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <END>
+	begin=<LEFT_BRACKET> <AT> <END>
 		child=simple_duration_constraint()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3367,10 +3433,10 @@ Expression<String> equal_d_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <EQUAL>
+	begin=<LEFT_BRACKET> <EQUAL>
 		op1=var_duration()
 		op2=d_value()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3386,10 +3452,10 @@ Expression<String> gequal_d_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <GEQUAL>
+	begin=<LEFT_BRACKET> <GEQUAL>
 		op1=var_duration()
 		op2=d_value()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3405,10 +3471,10 @@ Expression<String> lequal_d_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <LEQUAL>
+	begin=<LEFT_BRACKET> <LEQUAL>
 		op1=var_duration()
 		op2=d_value()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3466,11 +3532,11 @@ Expression<String> and_simple_method_duration_constraint() : // ADD HDDL2.1
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(LOOKAHEAD(2) child=simple_method_duration_constraint(){
 			exp.addChild(child);
 		})+
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -3505,10 +3571,10 @@ Expression<String> equal_method_duration_constraint() : // ADD HDDL2.1
   	Token begin, end;
 }
 {
-  	begin=left_bracket() <EQUAL>
+  	begin=<LEFT_BRACKET> <EQUAL>
   		op1=duration()
   		op2=d_value()
-  	end=right_bracket() {
+  	end=<RIGHT_BRACKET> {
   		exp.addChild(op1);
   		exp.addChild(op2);
   		exp.setBegin(begin);
@@ -3524,10 +3590,10 @@ Expression<String> great_method_duration_constraint() : // ADD HDDL2.1
    	Token begin, end;
 }
 {
-   	begin=left_bracket() <GREAT>
+   	begin=<LEFT_BRACKET> <GREAT>
    		op1=duration()
    		op2=d_value()
-   	end=right_bracket() {
+   	end=<RIGHT_BRACKET> {
    		exp.addChild(op1);
    		exp.addChild(op2);
    		exp.setBegin(begin);
@@ -3543,10 +3609,10 @@ Expression<String> great_or_equal_method_duration_constraint() : // ADD HDDL2.1
    	Token begin, end;
 }
 {
-   	begin=left_bracket() <GEQUAL>
+   	begin=<LEFT_BRACKET> <GEQUAL>
    		op1=duration()
    		op2=d_value()
-   	end=right_bracket() {
+   	end=<RIGHT_BRACKET> {
    		exp.addChild(op1);
    		exp.addChild(op2);
    		exp.setBegin(begin);
@@ -3562,10 +3628,10 @@ Expression<String> less_method_duration_constraint() : // ADD HDDL2.1
    	Token begin, end;
 }
 {
-   	begin=left_bracket() <LESS>
+   	begin=<LEFT_BRACKET> <LESS>
    		op1=duration()
    		op2=d_value()
-   	end=right_bracket() {
+   	end=<RIGHT_BRACKET> {
    		exp.addChild(op1);
    		exp.addChild(op2);
    		exp.setBegin(begin);
@@ -3581,10 +3647,10 @@ Expression<String> less_or_equal_method_duration_constraint() : // ADD HDDL2.1
    	Token begin, end;
 }
 {
-   	begin=left_bracket() <LEQUAL>
+   	begin=<LEFT_BRACKET> <LEQUAL>
    		op1=duration()
    		op2=d_value()
-   	end=right_bracket() {
+   	end=<RIGHT_BRACKET> {
    		exp.addChild(op1);
    		exp.addChild(op2);
    		exp.setBegin(begin);
@@ -3610,7 +3676,7 @@ Expression<String> f_duration() : // ADD HDDL2.1
     Symbol<String> argument;
 }
 {
-    begin=left_bracket() t=<F_DURATION> argument = task_id_symbol() end=right_bracket() {
+    begin=<LEFT_BRACKET> t=<F_DURATION> argument = task_id_symbol() end=<RIGHT_BRACKET> {
         exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
             t.beginLine, t.beginColumn, t.endLine, t.endColumn));
         exp.setArguments(new ArrayList<Symbol<String>>());
@@ -3639,9 +3705,9 @@ Expression<String> at_start_simple_method_duration_constraint() : // ADD HDDL2.1
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <START>
+	begin=<LEFT_BRACKET> <AT> <START>
 		child=simple_duration_constraint()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3656,9 +3722,9 @@ Expression<String> at_end_simple_method_duration_constraint() : // ADD HDDL2.1
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <END>
+	begin=<LEFT_BRACKET> <AT> <END>
 		child=simple_duration_constraint()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3688,12 +3754,12 @@ Expression<String> forall_da_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			typedList=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		child=da_gd()
-	end=right_bracket()
+	end=<RIGHT_BRACKET>
 	{
 		exp.setQuantifiedVariables(typedList);
 		exp.addChild(child);
@@ -3710,11 +3776,11 @@ Expression<String> and_da_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(LOOKAHEAD(2) child=da_gd() {
 			exp.addChild(child);
 		})*
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -3742,10 +3808,10 @@ Expression<String> named_pref_timed_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <PREFERENCE>
+	begin=<LEFT_BRACKET> <PREFERENCE>
 		[pref_name=pref_name()]
 		exp=timed_gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setPrefName(pref_name);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3772,9 +3838,9 @@ Expression<String> over_timed_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <OVER> <ALL>
+	begin=<LEFT_BRACKET> <OVER> <ALL>
 		child=gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3801,9 +3867,9 @@ Expression<String> at_start_timed_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <START>
+	begin=<LEFT_BRACKET> <AT> <START>
 		child=gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3818,9 +3884,9 @@ Expression<String> at_end_timed_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <END>
+	begin=<LEFT_BRACKET> <AT> <END>
 		child=gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -3874,10 +3940,10 @@ Expression<String> da_assign() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <ASSIGN>
+	begin=<LEFT_BRACKET> <ASSIGN>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3893,10 +3959,10 @@ Expression<String> da_scale_up() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <SCALE_UP>
+	begin=<LEFT_BRACKET> <SCALE_UP>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3912,10 +3978,10 @@ Expression<String> da_scale_down() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <SCALE_DOWN>
+	begin=<LEFT_BRACKET> <SCALE_DOWN>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3931,10 +3997,10 @@ Expression<String> da_increase() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <INCREASE>
+	begin=<LEFT_BRACKET> <INCREASE>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3950,10 +4016,10 @@ Expression<String> da_decrease() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <DECREASE>
+	begin=<LEFT_BRACKET> <DECREASE>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -3969,10 +4035,10 @@ Expression<String> when_da_effect() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <WHEN>
+	begin=<LEFT_BRACKET> <WHEN>
 		condition=da_gd()
 		effect=da_effect()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(condition);
 		exp.addChild(effect);
 		exp.setBegin(begin);
@@ -3989,12 +4055,12 @@ Expression<String> forall_da_effect() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			typedList=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		child=da_effect()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setQuantifiedVariables(typedList);
 		exp.addChild(child);
 		exp.setBegin(begin);
@@ -4010,11 +4076,11 @@ Expression<String> and_da_effect() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(LOOKAHEAD(2) child=da_effect() {
 			exp.addChild(child);
 		})*
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -4054,9 +4120,9 @@ Expression<String> at_start_f_assign_da() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <START>
+	begin=<LEFT_BRACKET> <AT> <START>
 		child=f_assign_da()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4072,9 +4138,9 @@ Expression<String> at_end_f_assign_da() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <END>
+	begin=<LEFT_BRACKET> <AT> <END>
 		child=f_assign_da()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4116,9 +4182,9 @@ Expression<String> at_start_a_effect() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <START>
+	begin=<LEFT_BRACKET> <AT> <START>
 		child=a_effect()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4133,9 +4199,9 @@ Expression<String> at_end_a_effect() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT> <END>
+	begin=<LEFT_BRACKET> <AT> <END>
 		child=a_effect()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4162,10 +4228,10 @@ Expression<String> increase_assign_op_t() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <INCREASE>
+	begin=<LEFT_BRACKET> <INCREASE>
 		op1=f_head()
 		op2=f_exp_t()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4181,10 +4247,10 @@ Expression<String> decrease_assign_op_t() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <DECREASE>
+	begin=<LEFT_BRACKET> <DECREASE>
 		op1=f_head()
 		op2=f_exp_t()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4202,20 +4268,20 @@ Expression<String> f_exp_t() :
 }
 {
 	(	LOOKAHEAD(2)
-			begin=left_bracket() <MUL>
+			begin=<LEFT_BRACKET> <MUL>
 				continuous_variable_name=continuous_variable()
 				child=f_exp()
-			end=right_bracket() {
+			end=<RIGHT_BRACKET> {
 			    exp.setBegin(begin);
 			    exp.setEnd(end);
 			    exp.addChild(child);
 			    exp.setVariable(continuous_variable_name);
 			}
 	| 	LOOKAHEAD(2)
-			begin=left_bracket() <MUL>
+			begin=<LEFT_BRACKET> <MUL>
 				child=f_exp()
 				continuous_variable_name=continuous_variable()
-			end=right_bracket()  {
+			end=<RIGHT_BRACKET>  {
                 exp.setBegin(begin);
                 exp.setEnd(end);
                 exp.addChild(child);
@@ -4292,10 +4358,10 @@ Expression<String> da_add_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <ADD>
+	begin=<LEFT_BRACKET> <ADD>
 	(	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	| 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4311,10 +4377,10 @@ Expression<String> da_substract_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <SUB>
+	begin=<LEFT_BRACKET> <SUB>
 		(	LOOKAHEAD(3) (op1=f_head() [op2=f_exp_da()])
 	    | 	LOOKAHEAD(3) ([LOOKAHEAD(2) op2=f_exp_da()] op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		if (op2 != null) exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4330,10 +4396,10 @@ Expression<String> da_multiply_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <MUL>
+	begin=<LEFT_BRACKET> <MUL>
 	    (	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	    | 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4349,10 +4415,10 @@ Expression<String> da_divide_op() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <DIV>
+	begin=<LEFT_BRACKET> <DIV>
 	    (	LOOKAHEAD(3) (op1=f_head() op2=f_exp_da())
 	    | 	LOOKAHEAD(3) (op2=f_exp_da() op1=f_head()))
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4380,15 +4446,15 @@ ParsedProblem pddl_problem() :
 }
 {
 	try {
-		left_bracket() <DEFINE>
-		left_bracket() <PROBLEM>
+		<LEFT_BRACKET> <DEFINE>
+		<LEFT_BRACKET> <PROBLEM>
 			name=problem_name()
-		right_bracket()
-		left_bracket() <P_DOMAIN>
+		<RIGHT_BRACKET>
+		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
                 this.problem = new ParsedProblemImpl(name, domain);
             }
-		right_bracket()
+		<RIGHT_BRACKET>
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
         init()
@@ -4396,7 +4462,7 @@ ParsedProblem pddl_problem() :
 		[LOOKAHEAD(2, {this.isRequirement(RequireKey.CONSTRAINTS)}) pddl_const(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)}) metric_spec()]
 		// [length-spec()] not implemented
-		right_bracket()
+		<RIGHT_BRACKET>
 		<EOF>
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -4415,29 +4481,29 @@ ParsedProblem htn_problem() : // ADD HDDL
 }
 {
 	try {
-		left_bracket() <DEFINE>
-		left_bracket() <PROBLEM>
+		<LEFT_BRACKET> <DEFINE>
+		<LEFT_BRACKET> <PROBLEM>
 			name=problem_name()
-		right_bracket()
-		left_bracket() <P_DOMAIN>
+		<RIGHT_BRACKET>
+		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
 			    this.problem = new ParsedProblemImpl(name, domain);
 		    }
 
-		right_bracket()
+		<RIGHT_BRACKET>
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
 		[LOOKAHEAD(2) object_declaration()]
-        left_bracket() <HTN>
-            [LOOKAHEAD(2) <PARAMETERS> left_bracket() parameters=typed_list(Lexer.VARIABLE) right_bracket()]
+        <LEFT_BRACKET> <HTN>
+            [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
             taskNetwork = task_network() {
                 taskNetwork.setParameters(parameters);
                 this.problem.setInitialTaskNetwork(taskNetwork);
             }
-        right_bracket()
+        <RIGHT_BRACKET>
 		init()
 		[LOOKAHEAD(2) goal()]
 		[LOOKAHEAD(2, {this.isRequirement(RequireKey.NUMERIC_FLUENTS)}) metric_spec()]
-		right_bracket()
+		<RIGHT_BRACKET>
 		<EOF>
 	} catch(Throwable e) {
 		this.error(e, token.beginLine, token.beginColumn);
@@ -4537,10 +4603,10 @@ Expression<String> equal_init_el() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <EQUAL>
+	begin=<LEFT_BRACKET> <EQUAL>
 		op1=constant_f_head()
 		op2=number()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4556,10 +4622,10 @@ Expression<String> timed_literal() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AT>
+	begin=<LEFT_BRACKET> <AT>
 		time=number()
 		literal=literal(Lexer.CONSTANT)
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(time);
 		exp.addChild(literal);
 		exp.setBegin(begin);
@@ -4648,11 +4714,11 @@ Expression<String> and_pref_con_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <AND>
+	begin=<LEFT_BRACKET> <AND>
 		(LOOKAHEAD(2) child=pref_con_gd() {
 			exp.addChild(child);
 		})*
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
         exp.setBegin(begin);
         exp.setEnd(end);
 		return exp;
@@ -4666,10 +4732,10 @@ Expression<String> named_pref_con_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <PREFERENCE>
+	begin=<LEFT_BRACKET> <PREFERENCE>
 		[pref_name=pref_name()]
 		exp=con_gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setPrefName(pref_name);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4685,12 +4751,12 @@ Expression<String> forall_pref_con_gd() :
 	Token begin, end;
 }
 {
-	begin=left_bracket() <FORALL>
-		left_bracket()
+	begin=<LEFT_BRACKET> <FORALL>
+		<LEFT_BRACKET>
 			typedList=typed_list(Lexer.VARIABLE)
-		right_bracket()
+		<RIGHT_BRACKET>
 		child=pref_con_gd()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setQuantifiedVariables(typedList);
 		exp.addChild(child);
 		exp.setBegin(begin);
@@ -4723,11 +4789,11 @@ Expression<String> maximize() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<METRIC>
 		<MAXIMIZE>
 		child=metric_f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4742,11 +4808,11 @@ Expression<String> minimize() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<METRIC>
 		<MINIMIZE>
 		child=metric_f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(child);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4776,10 +4842,10 @@ Expression<String> violated_pref_exp() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<IS_VIOLATED>
 		pref_name=pref_name()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setPrefName(pref_name);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4795,14 +4861,14 @@ Expression<String> constant_f_head() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		functor=functor() {
 		    exp.setSymbol(functor);
 		}
 		(LOOKAHEAD(2) argument=constant(){
 			args.add(argument);
 		})*
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setArguments(args);
 		exp.setBegin(begin);
 		exp.setEnd(end);
@@ -4817,7 +4883,7 @@ Expression<String> total_time() :
 }
 {
 	(LOOKAHEAD(3)
-		begin=left_bracket() t=<TOTAL_TIME> end=right_bracket() {
+		begin=<LEFT_BRACKET> t=<TOTAL_TIME> end=<RIGHT_BRACKET> {
 		    exp.setBegin(begin);
 		    exp.setEnd(end);
 		}
@@ -4852,13 +4918,13 @@ Expression<String> add_op_metric_f_exp() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<ADD>
 		op=metric_f_exp() { exp.addChild(op); }
 		(LOOKAHEAD(2) op=metric_f_exp() {
 			exp.addChild(op);
 		})+
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;
@@ -4872,11 +4938,11 @@ Expression<String> substract_op_metric_f_exp() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<SUB>
 		op1=metric_f_exp()
 		[op2=metric_f_exp()]
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		if (op2 != null) exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4892,11 +4958,11 @@ Expression<String> div_op_metric_f_exp() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<DIV>
 		op1=metric_f_exp()
 		op2=metric_f_exp()
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.addChild(op1);
 		exp.addChild(op2);
 		exp.setBegin(begin);
@@ -4913,13 +4979,13 @@ Expression<String> multi_op_metric_f_exp() :
 	Token begin, end;
 }
 {
-	begin=left_bracket()
+	begin=<LEFT_BRACKET>
 		<MUL>
 		op=metric_f_exp() { exp.addChild(op); }
 		(LOOKAHEAD(2) op=metric_f_exp() {
 			exp.addChild(op);
 		})+
-	end=right_bracket() {
+	end=<RIGHT_BRACKET> {
 		exp.setBegin(begin);
 		exp.setEnd(end);
 		return exp;

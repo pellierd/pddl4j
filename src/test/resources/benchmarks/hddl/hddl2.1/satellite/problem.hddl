@@ -58,7 +58,7 @@
 		(= (turn-time site5 site1) 681.1)
 		(= (turn-time site5 site2) 558.7)
 		(= (turn-time site5 site3) 490.2)
-		(= (turn-time site5 site4) 237.2))
+		(= (turn-time site5 site4) 237.2)
 		(at 500 (observable site1))
 		(at 1000 (not (observable site1)))
 		(at 5 (observable site2))

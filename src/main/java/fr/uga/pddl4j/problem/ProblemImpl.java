@@ -15,14 +15,26 @@ package fr.uga.pddl4j.problem;
  * If not, see <http://www.gnu.org/licenses/>
  */
 
+import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Message;
+import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.plan.Plan;
+import fr.uga.pddl4j.planners.LogLevel;
+import fr.uga.pddl4j.planners.Planner;
+import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.operator.DurativeMethod;
 import fr.uga.pddl4j.problem.operator.Method;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.junit.Assert;
 
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -71,6 +83,7 @@ public class ProblemImpl extends FinalizedProblem {
         accepted.add(RequireKey.DURATION_INEQUALITIES);
         accepted.add(RequireKey.HIERARCHY);
         accepted.add(RequireKey.METHOD_PRECONDITIONS);
+        accepted.add(RequireKey.TIMED_INITIAL_LITERALS);
         return accepted;
     }
 
@@ -399,6 +412,39 @@ public class ProblemImpl extends FinalizedProblem {
             totallyOrdered = jt.next().getTaskNetwork().isTotallyOrdered();
         }
         return totallyOrdered ? this.getInitialTaskNetwork().isTotallyOrdered() : totallyOrdered;
+    }
+
+
+    public static void main(String[] args) {
+
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getRootLogger();
+        loggerConfig.setLevel(Level.ALL);
+        context.updateLoggers();
+
+        Parser parser = new Parser();
+        ParsedProblemImpl parsedProblem = null;
+        try {
+            System.out.println("Parsing start ...");
+            parsedProblem = parser.parse(args[0], args[1]);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        //System.out.println(parsedProblem);
+        ErrorManager errorManager = parser.getErrorManager();
+        if (!errorManager.isEmpty()) {
+            errorManager.printAll();
+        } else {
+            System.out.println("Problem parsed with success");
+            Problem pb = new ProblemImpl(parsedProblem);
+            pb.instantiate();
+            if (pb.isSolvable()) {
+                System.out.println("Problem solvable");
+            } else {
+                System.out.println("Problem not solvable");
+            }
+        }
     }
 
 }

@@ -47,7 +47,7 @@ public class ErrorManager implements Serializable {
     /**
      * The set used to store the messages.
      */
-    private SortedSet<Message> msg;
+    public SortedSet<Message> msg;
 
     /**
      * Creates a new error manager.
