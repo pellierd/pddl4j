@@ -1258,12 +1258,21 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Encode the numeric fluent of the initial state.
      */
     protected void finalizeInitialNumericFluent() {
-        for (Map.Entry<Expression<Integer>, Integer> e : this.mapOfNumericFluentIndex.entrySet()) {
+        for (final Expression<Integer> fluent : this.getIntInitFunctions()) {
+            Integer index = this.mapOfNumericFluentIndex.get(fluent);
+            if (index != null) {
+                Double value = this.getIntInitFunctionCost().get(fluent);
+                NumericVariable var = new NumericVariable(index, value);
+                this.initialState.addNumericFluent(var);
+            }
+        }
+
+        /*for (Map.Entry<Expression<Integer>, Integer> e : this.mapOfNumericFluentIndex.entrySet()) {
             int index = e.getValue();
-            double value = this.getIntInitFunctionCost().get(e.getKey());
+            Double value = this.getIntInitFunctionCost().get(e.getKey());
             NumericVariable fluent = new NumericVariable(index, value);
             this.initialState.addNumericFluent(fluent);
-        }
+        }*/
     }
 
 
@@ -1507,10 +1516,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     public String toString(final NumericVariable variable) {
         final StringBuffer str = new StringBuffer();
-        str.append("(");
-        str.append(variable.getArithmeticOperator());
-        str.append(" ");
-        str.append(this.toString(this.getNumericFluents().get(variable.getNumericFluent())));
+        str.append("(= ");
+        if (variable.getNumericFluent() == NumericVariable.DURATION) {
+            str.append("?duration");
+        } else {
+            str.append(this.toString(this.getNumericFluents().get(variable.getNumericFluent())));
+        }
         str.append(" ");
         str.append(variable.getValue());
         str.append(")");

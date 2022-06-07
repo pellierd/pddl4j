@@ -686,10 +686,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             m.getPreconditions().simplify();
             if (!m.getPreconditions().getConnective().equals(Connector.FALSE)) {
                 toAdd.add(m);
-                for (Expression<Integer> f : this.getIntInitialState()) {
-                    this.toString(f);
-                }
-
             } else {
                 System.out.println("Method "+ i + " can be removed for task " + this.toString(m.getTask()));
                 //System.out.println(this.toString(m));

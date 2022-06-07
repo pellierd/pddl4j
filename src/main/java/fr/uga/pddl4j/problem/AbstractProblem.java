@@ -138,6 +138,11 @@ public abstract class AbstractProblem implements Problem {
     private Set<Expression<Integer>> intInitialState;
 
     /**
+     * The set of timed fluents of the initial state of the problem.
+     */
+    private Set<Expression<Integer>> intInitTimeFluents;
+
+    /**
      * The set of numeric fluent of the initial state of the problem.
      */
     private Set<Expression<Integer>> intInitFunctions;
@@ -800,6 +805,16 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
+     * Returns the list of timed fluent in the form of <code>Expression</code> of the initial state.
+     *
+     * @return the list of timed fluent in the form of <code>Expression</code> of the initial state.
+     * @see Expression
+     */
+    protected Set<Expression<Integer>> getIntTimedFluents() {
+        return this.intInitTimeFluents;
+    }
+
+    /**
      * Returns the map that store the value of the numeric fluents in the form of <code>Expression</code> of the
      * initial state.
      *
@@ -863,6 +878,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initInitialState() {
         this.intInitialState = new LinkedHashSet<>();
+        this.intInitTimeFluents = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
         this.intInitFunctions = new LinkedHashSet<>();
         final Set<Expression<Integer>> init =  this.getParsedProblem().getInit().stream().map(this::initExpression)
@@ -874,7 +890,15 @@ public abstract class AbstractProblem implements Problem {
                     this.intInitFunctionCost.put(exp.getChildren().get(0), exp.getChildren().get(1).getValue());
                     break;
                 case ATOM:
+                case NOT:
                     this.intInitialState.add(exp);
+                    break;
+                case TIMED_LITERAL:
+                    if (exp.getChildren().get(0).getValue() == 0.0) {
+                        this.intInitialState.add(exp.getChildren().get(1));
+                    } else {
+                        this.intInitTimeFluents.add(exp);
+                    }
                     break;
                 default:
                     throw new UnexpectedExpressionException(exp.getConnective().toString());
@@ -1838,11 +1862,13 @@ public abstract class AbstractProblem implements Problem {
                     str.append("\n ");
                     str.append(this.toString(e));
                 }
-                if (this.getIntInitFunctions() != null) {
-                    for (Expression<Integer> e : this.getIntInitFunctions()) {
-                        str.append("\n ");
-                        str.append(this.toString(e));
-                    }
+                for (Expression<Integer> e : this.getIntTimedFluents()) {
+                    str.append("\n ");
+                    str.append(this.toString(e));
+                }
+                for (Expression<Integer> e : this.getIntInitFunctions()) {
+                    str.append("\n ");
+                    str.append(this.toString(e));
                 }
                 str.append(")\n");
                 break;

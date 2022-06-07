@@ -296,12 +296,12 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             if (this.getPredicateSignatures().get(i).size() == 1
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Symbol<Integer>> newTypeDomain = new LinkedHashSet<>();
-                for (Expression<Integer> fact : this.getIntInitialState()) {
-                    if (fact.getConnective().equals(Connector.NOT)) {
-                        fact = fact.getChildren().get(0);
+                for (Expression<Integer> fluent : this.getIntInitialState()) {
+                    if (fluent.getConnective().equals(Connector.NOT)) {
+                        fluent = fluent.getChildren().get(0);
                     }
-                    if (fact.getSymbol().getValue() == i) {
-                        newTypeDomain.add(new Symbol<>(fact.getArguments().get(0)));
+                    if (fluent.getSymbol().getValue() == i) {
+                        newTypeDomain.add(new Symbol<>(fluent.getArguments().get(0)));
                     }
                 }
                 this.inferredDomains.add(newTypeDomain);
@@ -624,14 +624,14 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
             this.predicatesTables.add(pTables);
         }
 
-        for (Expression<Integer> fact : this.getIntInitialState()) {
-            if (fact.getConnective().equals(Connector.NOT)) {
-                fact = fact.getChildren().get(0);
+        for (Expression<Integer> fluent : this.getIntInitialState()) {
+            if (fluent.getConnective().equals(Connector.NOT)) {
+                fluent = fluent.getChildren().get(0);
             }
-            final int arity = this.getPredicateSignatures().get(fact.getSymbol().getValue()).size();
-            final List<IntMatrix> pTables = this.predicatesTables.get(fact.getSymbol().getValue());
+            final int arity = this.getPredicateSignatures().get(fluent.getSymbol().getValue()).size();
+            final List<IntMatrix> pTables = this.predicatesTables.get(fluent.getSymbol().getValue());
             final int[] set = new int[arity];
-            final List<Symbol<Integer>> arguments = fact.getArguments();
+            final List<Symbol<Integer>> arguments = fluent.getArguments();
             for (final IntMatrix intMatrix : pTables) {
                 int indexSize = 0;
                 for (int aSet : set) {
