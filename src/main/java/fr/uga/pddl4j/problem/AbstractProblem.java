@@ -1003,7 +1003,6 @@ public abstract class AbstractProblem implements Problem {
         // Encode the constraints of the method
         Expression<Integer> constraints = this.initExpression(method.getConstraints(), variables);
         intMeth.setConstraints(constraints);
-
         return intMeth;
     }
 

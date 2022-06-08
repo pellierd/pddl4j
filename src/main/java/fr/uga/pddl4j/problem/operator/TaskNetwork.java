@@ -78,7 +78,6 @@ public final class TaskNetwork implements Serializable {
         this.beforeConstraints = new LinkedHashMap<>();
         this.afterConstraints = new LinkedHashMap<>();
         this.betweenConstraints = new LinkedHashMap<>();
-
     }
 
     /**
@@ -261,6 +260,7 @@ public final class TaskNetwork implements Serializable {
     public final void setOrderingConstraints(final OrderingConstraintNetwork constraints) {
         this.orderingConstraints = constraints;
     }
+
 
     /**
      * Decompose a tasks of the network with a specific method.

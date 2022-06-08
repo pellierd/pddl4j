@@ -684,13 +684,15 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             IntMethod m = it.next();
             this.simplifyWithGroundInertia(m.getPreconditions(), false);
             m.getPreconditions().simplify();
-            if (!m.getPreconditions().getConnective().equals(Connector.FALSE)) {
-                toAdd.add(m);
+            this.simplifyWithGroundInertia(m.getConstraints(), false);
+            m.getConstraints().simplify();
+            if (!m.getPreconditions().getConnective().equals(Connector.FALSE)
+                    && !m.getConstraints().getConnective().equals(Connector.FALSE)) {
+                    toAdd.add(m);
             } else {
-                System.out.println("Method "+ i + " can be removed for task " + this.toString(m.getTask()));
+                //System.out.println("Method "+ i + " can be removed for task " + this.toString(m.getTask()));
                 //System.out.println(this.toString(m));
                 toRemove.add(m.getTask());
-                //updateRelevantMethods(i);
                 it.remove();
             }
             i++;

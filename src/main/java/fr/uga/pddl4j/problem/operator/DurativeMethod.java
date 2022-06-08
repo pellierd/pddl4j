@@ -204,4 +204,35 @@ public final class DurativeMethod extends AbstractDurativeOperator {
     public final void setDuration(final NumericVariable duration) {
         this.duration = duration;
     }
+
+    /**
+     * Returns the condition that must hold before a specific task of the task network of the method.
+     *
+     * @param task the task.
+     * @return the condition that must hold before a task or null if the task is not a task of the task network.
+     */
+    public Condition getBeforeConstraints(int task) {
+        return this.taskNetwork.getBeforeConstraints(task);
+    }
+
+    /**
+     * Returns the condition that must hold after a specific task of the task network of the method.
+     *
+     * @param task the task.
+     * @return the condition that must hold after a task or null if the task is not a task of the task network.
+     */
+    public Condition getAfterConstraints(int task) {
+        return this.taskNetwork.getAfterConstraints(task);
+    }
+
+    /**
+     * Returns the condition that must hold between two specific tasks of the task network of the method.
+     *
+     * @param task1 the first task.
+     * @param task2 the second task.
+     * @return the condition that must hold between two tasks or null if t1 or t2 task is not a task of the task network.
+     */
+    public Condition getBetweenConstraints(int task1, int task2) {
+        return this.taskNetwork.getBetweenConstraints(task1, task2);
+    }
 }
