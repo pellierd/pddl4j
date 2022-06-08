@@ -1348,7 +1348,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Duration:\n");
         str.append(this.toString(action.getDuration()));
         str.append("\nDuration constraints:");
-        str.append("TO DO\n");
+        for (NumericConstraint constraints : action.getDurationConstraints()) {
+            str.append("  ");
+            str.append(this.toString(constraints));
+            str.append("\n");
+        }
         str.append("Condition:\n");
         str.append(this.toString(action.getPrecondition()));
         str.append("\n");
@@ -1711,7 +1715,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             }
         }
         str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
-        str.append("Preconditions:\n");
+        str.append("Duration constraints: ");
+        for (NumericConstraint constraints : method.getDurationConstraints()) {
+            str.append("  ");
+            str.append(this.toString(constraints));
+            str.append("\n");
+        }
+        str.append("Condition:\n");
         str.append(this.toString(method.getPrecondition()));
         str.append("Ordering:\n");
         str.append("TO DO");
@@ -1876,6 +1886,106 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("<==\n");
         return str.toString();
 
+    }
+
+    /**
+    * Returns a string representation of a numeric constraints
+     *
+     * @param constraint the numeric constraints.
+     * @return the string representation of the specified numeric constraint.
+        */
+    public String toString(final NumericConstraint constraint) {
+        final StringBuilder str = new StringBuilder();
+        final ArithmeticExpression left = constraint.getLeftExpression();
+        final ArithmeticExpression right = constraint.getRightExpression();
+        switch (constraint.getComparator()) {
+            case EQUAL:
+                str.append("(= ");
+                str.append(this.toString(left));
+                str.append(" ");
+                str.append(this.toString(right));
+                str.append(")");
+                break;
+            case LESS:
+                str.append("(< ");
+                str.append(this.toString(left));
+                str.append(" ");
+                str.append(this.toString(right));
+                str.append(")");
+                break;
+            case LESS_OR_EQUAL:
+                str.append("(<= ");
+                str.append(this.toString(left));
+                str.append(" ");
+                str.append(this.toString(right));
+                str.append(")");
+                break;
+            case GREATER:
+                str.append("(> ");
+                str.append(this.toString(left));
+                str.append(" ");
+                str.append(this.toString(right));
+                str.append(")");
+                break;
+            case GREATER_OR_EQUAL:
+                str.append("(>= ");
+                str.append(this.toString(left));
+                str.append(" ");
+                str.append(this.toString(right));
+                str.append(")");
+                break;
+            default:
+                // do nothing
+                break;
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a numeric expression.
+     *
+     * @param expression the numeric expression.
+     * @return the string representation of the specified numeric expression.
+     */
+    public String toString(final ArithmeticExpression expression) {
+        StringBuilder str = new StringBuilder();
+        switch (expression.getType()) {
+            case NUMBER:
+                str.append(expression.getValue());
+                break;
+            case VARIABLE:
+                str.append("(= ");
+                str.append(this.getNumericFluents().get(expression.getNumericFluent()));
+                str.append(" ");
+                str.append(expression.getValue());
+                str.append(")");
+                break;
+            case OPERATOR:
+                switch (expression.getArithmeticOperator()) {
+                    case UMINUS:
+                        str.append("(");
+                        str.append(expression.getArithmeticOperator().getImage());
+                        str.append(" ");
+                        str.append(this.toString(expression.getLeftExpression()));
+                        str.append(")");
+                        break;
+                    case PLUS:
+                    case DIV:
+                    case MUL:
+                    case MINUS:
+                        str.append("(");
+                        str.append(expression.getArithmeticOperator().getImage());
+                        str.append(" ");
+                        str.append(this.toString(expression.getLeftExpression()));
+                        str.append(" ");
+                        str.append(this.toString(expression.getRightExpression()));
+                        str.append(")");
+                        break;
+                }
+                break;
+        }
+
+        return str.toString();
     }
 
     /**
