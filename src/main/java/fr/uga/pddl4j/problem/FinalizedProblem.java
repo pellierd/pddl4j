@@ -1266,7 +1266,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 this.initialState.addNumericFluent(var);
             }
         }
-
         /*for (Map.Entry<Expression<Integer>, Integer> e : this.mapOfNumericFluentIndex.entrySet()) {
             int index = e.getValue();
             Double value = this.getIntInitFunctionCost().get(e.getKey());
@@ -1591,8 +1590,64 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Ordering:\n");
         str.append(this.toString(method.getTaskNetwork()));
         str.append("\n");
-        str.append("Constraints:\n");
-        str.append("TO DO");
+        str.append("Before constraints:\n");
+        for (Integer task : method.getSubTasks()) {
+            Condition condition = method.getBeforeConstraints(task);
+            final BitSet positive = condition.getPositiveFluents();
+            for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                str.append("(hold-before ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(j)));
+                str.append(")\n");
+            }
+            final BitSet negative = condition.getNegativeFluents();
+            for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                str.append(" (not (hold-before ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(i)));
+                str.append("))\n");
+            }
+        }
+        str.append("After constraints:\n");
+        for (Integer task : method.getSubTasks()) {
+            Condition condition = method.getAfterConstraints(task);
+            final BitSet positive = condition.getPositiveFluents();
+            for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                str.append("(hold-after ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(j)));
+                str.append(")\n");
+            }
+            final BitSet negative = condition.getNegativeFluents();
+            for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                str.append(" (not (hold-after ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(i)));
+                str.append("))\n");
+            }
+        }
+        str.append("Between constraints:\n");
+        for (Integer task1 : method.getSubTasks()) {
+            for (Integer task2 : method.getSubTasks()) {
+                Condition condition = method.getBetweenConstraints(task1, task2);
+                final BitSet positive = condition.getPositiveFluents();
+                for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                    str.append("(hold-between ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task1 + " ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task2 + " ");
+                    str.append(this.toString(this.getFluents().get(j)));
+                    str.append(")\n");
+                }
+                final BitSet negative = condition.getNegativeFluents();
+                for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                    str.append(" (not (hold-between ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task1 + " ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task2 + " ");
+                    str.append(this.toString(this.getFluents().get(i)));
+                    str.append("))\n");
+                }
+            }
+        }
         return str.toString();
     }
 
@@ -1632,7 +1687,64 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("TO DO");
         str.append("\n");
         str.append("Constraints:\n");
-        str.append("TO DO");
+        str.append("Before constraints:\n");
+        for (Integer task : method.getSubTasks()) {
+            Condition condition = method.getBeforeConstraints(task);
+            final BitSet positive = condition.getPositiveFluents();
+            for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                str.append("(hold-before ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(j)));
+                str.append(")\n");
+            }
+            final BitSet negative = condition.getNegativeFluents();
+            for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                str.append(" (not (hold-before ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(i)));
+                str.append("))\n");
+            }
+        }
+        str.append("After constraints:\n");
+        for (Integer task : method.getSubTasks()) {
+            Condition condition = method.getAfterConstraints(task);
+            final BitSet positive = condition.getPositiveFluents();
+            for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                str.append("(hold-after ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(j)));
+                str.append(")\n");
+            }
+            final BitSet negative = condition.getNegativeFluents();
+            for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                str.append(" (not (hold-after ");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task + " ");
+                str.append(this.toString(this.getFluents().get(i)));
+                str.append("))\n");
+            }
+        }
+        str.append("Between constraints:\n");
+        for (Integer task1 : method.getSubTasks()) {
+            for (Integer task2 : method.getSubTasks()) {
+                Condition condition = method.getBetweenConstraints(task1, task2);
+                final BitSet positive = condition.getPositiveFluents();
+                for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
+                    str.append("(hold-between ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task1 + " ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task2 + " ");
+                    str.append(this.toString(this.getFluents().get(j)));
+                    str.append(")\n");
+                }
+                final BitSet negative = condition.getNegativeFluents();
+                for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
+                    str.append(" (not (hold-between ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task1 + " ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + task2 + " ");
+                    str.append(this.toString(this.getFluents().get(i)));
+                    str.append("))\n");
+                }
+            }
+        }
         return str.toString();
     }
 
