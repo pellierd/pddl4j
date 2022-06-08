@@ -1350,7 +1350,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("\nDuration constraints:");
         str.append("TO DO\n");
         str.append("Condition:\n");
-        str.append("TO DO");
+        str.append(this.toString(action.getPrecondition()));
         str.append("\n");
         str.append("Effects:\n");
         str.append("TO DO");
@@ -1376,6 +1376,36 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             str.append(" (not ");
             str.append(this.toString(this.getFluents().get(i)));
             str.append(")\n");
+        }
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a temporal condition.
+     *
+     * @param condition the condition.
+     * @return a string representation of the specified temporal condition.
+     */
+    public final String toString(final TemporalCondition condition) {
+        final StringBuilder str = new StringBuilder("(and\n");
+        final Condition atStart = condition.getAtStartCondition();
+        if (!atStart.isEmpty()) {
+            str.append("  (at start ");
+            str.append(this.toString(atStart));
+            str.append("  )");
+        }
+        final Condition atEnd = condition.getAtEndCondition();
+        if (!atEnd.isEmpty()) {
+            str.append("  (at end ");
+            str.append(this.toString(atEnd));
+            str.append("   )");
+        }
+        final Condition overall = condition.getOverallCondition();
+        if (!overall.isEmpty()) {
+            str.append("  (overall ");
+            str.append(this.toString(atEnd));
+            str.append("   )");
         }
         str.append(")");
         return str.toString();
@@ -1682,7 +1712,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
         str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
         str.append("Preconditions:\n");
-        str.append("TO DO");
+        str.append(this.toString(method.getPrecondition()));
         str.append("Ordering:\n");
         str.append("TO DO");
         str.append("\n");
