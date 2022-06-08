@@ -1,5 +1,9 @@
 package fr.uga.pddl4j.problem.time;
 
+import fr.uga.pddl4j.parser.Connector;
+import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.util.BitSet;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +114,8 @@ public class SimpleTemporalNetwork implements Serializable {
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < this.network.size(); i++) {
             for (int j = 0; j < this.network.size(); j++) {
-                str.append("(T");
+                str.append("(");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(i/2);
                 if (i%2 == 0) {
                     str.append("_start ");
@@ -119,7 +124,7 @@ public class SimpleTemporalNetwork implements Serializable {
                 }
                 str.append(this.get(i, j));
                 str.append(" ");
-                str.append("T");
+                str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(j/2);
                 if (j%2 == 0) {
                     str.append("_start)\n");
@@ -179,4 +184,5 @@ public class SimpleTemporalNetwork implements Serializable {
     public List<Integer> getTasksWithNoPredecessors() {
         return new ArrayList<>();
     }
+
 }

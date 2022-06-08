@@ -1622,7 +1622,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append(this.toString(method.getPrecondition()));
         str.append("\n");
         str.append("Ordering:\n");
-        str.append(this.toString(method.getTaskNetwork()));
+        str.append(method.getOrderingConstraints().toString());
         str.append("\n");
         str.append("Before constraints:\n");
         for (Integer task : method.getSubTasks()) {
@@ -1724,7 +1724,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Condition:\n");
         str.append(this.toString(method.getPrecondition()));
         str.append("Ordering:\n");
-        str.append("TO DO");
+        str.append(method.getOrderingConstraints().toString());
         str.append("\n");
         str.append("Constraints:\n");
         str.append("Before constraints:\n");
@@ -1788,6 +1788,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         return str.toString();
     }
 
+
     /**
      * Returns a string representation of the specified task network.
      *
@@ -1807,27 +1808,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             }
         }
         str.append("Ordering constraints:\n");
-        if (tasknetwork.getOrderingConstraints().cardinality() == 0) {
-            str.append(" ()");
-        } else {
-            BitMatrix constraints = tasknetwork.getOrderingConstraints();
-            int index = 0;
-            for (int r = 0; r < constraints.rows(); r++) {
-                BitSet row = constraints.getRow(r);
-                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
-                    str.append(" C");
-                    str.append(index);
-                    str.append(": ");
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + r);
-                    str.append(" ");
-                    str.append(Connector.LESS_ORDERING_CONSTRAINT.getImage());
-                    str.append(" ");
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c);
-                    str.append("\n");
-                    index++;
-                }
-            }
-        }
+        str.append(tasknetwork.getOrderingConstraints().toString());
         return str.toString();
     }
 

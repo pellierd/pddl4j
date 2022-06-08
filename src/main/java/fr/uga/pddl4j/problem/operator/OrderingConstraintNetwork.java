@@ -19,6 +19,10 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.parser.Connector;
+import fr.uga.pddl4j.parser.Symbol;
+import fr.uga.pddl4j.util.BitMatrix;
+import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.SquareBitMatrix;
 
 import java.util.LinkedList;
@@ -144,6 +148,37 @@ public class OrderingConstraintNetwork extends SquareBitMatrix {
             i++;
         }
         return acyclic;
+    }
+
+
+    /**
+     * Returns a string representation of this ordering constraints.
+     *
+     * @return a string representation of the ordering constraints.
+     */
+    public final String toString() {
+        final StringBuilder str = new StringBuilder();
+        if (this.cardinality() == 0) {
+            str.append(" ()");
+        } else {
+            int index = 0;
+            for (int r = 0; r < this.rows(); r++) {
+                BitSet row = this.getRow(r);
+                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
+                    str.append(" C");
+                    str.append(index);
+                    str.append(": ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + r);
+                    str.append(" ");
+                    str.append(Connector.LESS_ORDERING_CONSTRAINT.getImage());
+                    str.append(" ");
+                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c);
+                    str.append("\n");
+                    index++;
+                }
+            }
+        }
+        return str.toString();
     }
 
 
