@@ -41,6 +41,7 @@ import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
+import fr.uga.pddl4j.problem.operator.Operator;
 import fr.uga.pddl4j.problem.operator.OrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
@@ -1283,26 +1284,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     public final String toString(final Action action) {
         StringBuilder str = new StringBuilder();
-        str.append("Action ").append(action.getName()).append("\n").append("Instantiations:\n");
-        for (int i = 0; i < action.arity(); i++) {
-            final int index = action.getValueOfParameter(i);
-            final String type = this.getTypes().get(action.getTypeOfParameters(i));
-            if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ? \n");
-            } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
-                str.append(" \n");
-            }
-        }
+        str.append("Action ");
+        str.append(action.getName());
+        str.append("\nInstantiations:\n");
+        str.append(this.toStringInstantiations(action));
         str.append("Preconditions:\n");
         str.append(this.toString(action.getPrecondition()));
         str.append("\n");
@@ -1324,11 +1309,35 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         StringBuilder str = new StringBuilder();
         str.append("Durative Action ");
         str.append(action.getName());
+        str.append("\nInstantiations:\n");
+        str.append(this.toStringInstantiations(action));
+        str.append("Duration:\n");
+        str.append(this.toString(action.getDuration()));
+        str.append("\nDuration constraints:");
+        for (NumericConstraint constraints : action.getDurationConstraints()) {
+            str.append("  ");
+            str.append(this.toString(constraints));
+            str.append("\n");
+        }
+        str.append("Condition:\n");
+        str.append(this.toString(action.getPrecondition()));
         str.append("\n");
-        str.append("Instantiations:\n");
-        for (int i = 0; i < action.arity(); i++) {
-            final int index = action.getValueOfParameter(i);
-            final String type = this.getTypes().get(action.getTypeOfParameters(i));
+        str.append("Effects:\n");
+        str.append("TO DO");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a the instantiation of an operator.
+     *
+     * @param operator the operator.
+     * @return a string representation of the instantiation of the specified operator.
+     */
+    private final String toStringInstantiations(final Operator operator) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < operator.arity(); i++) {
+            final int index = operator.getValueOfParameter(i);
+            final String type = this.getTypes().get(operator.getTypeOfParameters(i));
             if (index == -1) {
                 str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                 str.append(i);
@@ -1345,19 +1354,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 str.append(" \n");
             }
         }
-        str.append("Duration:\n");
-        str.append(this.toString(action.getDuration()));
-        str.append("\nDuration constraints:");
-        for (NumericConstraint constraints : action.getDurationConstraints()) {
-            str.append("  ");
-            str.append(this.toString(constraints));
-            str.append("\n");
-        }
-        str.append("Condition:\n");
-        str.append(this.toString(action.getPrecondition()));
-        str.append("\n");
-        str.append("Effects:\n");
-        str.append("TO DO");
         return str.toString();
     }
 
@@ -1598,25 +1594,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final StringBuilder str = new StringBuilder();
         str.append("Method ");
         str.append(method.getName());
-        str.append("\n");
-        str.append("Instantiations:\n");
-        for (int i = 0; i < method.arity(); i++) {
-            final int index = method.getValueOfParameter(i);
-            final String type = this.getTypes().get(method.getTypeOfParameters(i));
-            if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(i).append(" - ");
-                str.append(type);
-                str.append(" : ? \n");
-            } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
-                str.append(" \n");
-            }
-        }
+        str.append("\nInstantiations:\n");
+        str.append(this.toStringInstantiations(method));
         str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
         str.append("Preconditions:\n");
         str.append(this.toString(method.getPrecondition()));
@@ -1695,25 +1674,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final StringBuilder str = new StringBuilder();
         str.append("Method ");
         str.append(method.getName());
-        str.append("\n");
-        str.append("Instantiations:\n");
-        for (int i = 0; i < method.arity(); i++) {
-            final int index = method.getValueOfParameter(i);
-            final String type = this.getTypes().get(method.getTypeOfParameters(i));
-            if (index == -1) {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
-                str.append(i).append(" - ");
-                str.append(type);
-                str.append(" : ? \n");
-            } else {
-                str.append(Symbol.DEFAULT_VARIABLE_SYMBOL).append(i);
-                str.append(" - ");
-                str.append(type);
-                str.append(" : ");
-                str.append(this.getConstantSymbols().get(index));
-                str.append(" \n");
-            }
-        }
+        str.append("\nInstantiations:\n");
+        str.append(this.toStringInstantiations(method));
         str.append("Task: " + this.toString(this.getTasks().get(method.getTask())) + "\n");
         str.append("Duration constraints: ");
         for (NumericConstraint constraints : method.getDurationConstraints()) {
