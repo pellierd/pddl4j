@@ -28,35 +28,9 @@ import java.util.Objects;
 public final class NumericConstraint extends AbstractNumericExpression {
 
     /**
-     * The comparator that can be used in numeric constraints.
-     */
-    public enum Comparator {
-        /**
-         * The comparator equal.
-         */
-        EQUAL,
-        /**
-         * The comparator less.
-         */
-        LESS,
-        /**
-         * The comparator less or equal.
-         */
-        LESS_OR_EQUAL,
-        /**
-         * The comparator greater.
-         */
-        GREATER,
-        /**
-         * The comparator greater or equal.
-         */
-        GREATER_OR_EQUAL;
-    }
-
-    /**
      * The comparator of the numeric constraints.
      */
-    private Comparator comparator;
+    private NumericComparator comparator;
 
     /**
      * Creates a deep copy of numeric constraints.
@@ -76,7 +50,7 @@ public final class NumericConstraint extends AbstractNumericExpression {
      * @param left the left expression of the numeric constraint.
      * @param right the right expression of the numeric constraint.
      */
-    public NumericConstraint(final Comparator comparator, final ArithmeticExpression left,
+    public NumericConstraint(final NumericComparator comparator, final ArithmeticExpression left,
                              final ArithmeticExpression right) {
         super(left, right);
         this.setComparator(comparator);
@@ -87,7 +61,7 @@ public final class NumericConstraint extends AbstractNumericExpression {
      *
      * @return the comparator of the numeric constraint.
      */
-    public final Comparator getComparator() {
+    public final NumericComparator getComparator() {
         return this.comparator;
     }
 
@@ -96,7 +70,7 @@ public final class NumericConstraint extends AbstractNumericExpression {
      *
      * @param comparator the comparator to set.
      */
-    public void setComparator(final Comparator comparator) {
+    public void setComparator(final NumericComparator comparator) {
         this.comparator = comparator;
     }
 
@@ -179,46 +153,13 @@ public final class NumericConstraint extends AbstractNumericExpression {
         final StringBuilder str = new StringBuilder();
         final ArithmeticExpression left = super.getLeftExpression();
         final ArithmeticExpression right = super.getRightExpression();
-        switch (this.getComparator()) {
-            case EQUAL:
-                str.append("(= ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case LESS:
-                str.append("(< ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case LESS_OR_EQUAL:
-                str.append("(<= ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case GREATER:
-                str.append("(> ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case GREATER_OR_EQUAL:
-                str.append("(>= ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            default:
-                // do nothing
-                break;
-        }
+        str.append("(");
+        str.append(this.getComparator().getImage());
+        str.append(" ");
+        str.append(left);
+        str.append(" ");
+        str.append(right);
+        str.append(")");
         return str.toString();
     }
 

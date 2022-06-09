@@ -27,6 +27,7 @@ import fr.uga.pddl4j.problem.numeric.ArithmeticExpression;
 import fr.uga.pddl4j.problem.numeric.ArithmeticOperator;
 import fr.uga.pddl4j.problem.numeric.AssignmentOperator;
 import fr.uga.pddl4j.problem.numeric.NumericAssignment;
+import fr.uga.pddl4j.problem.numeric.NumericComparator;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericFluent;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
@@ -1157,19 +1158,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         NumericConstraint constraint;
         switch (exp.getConnective()) {
             case EQUAL_COMPARISON:
-                constraint = new NumericConstraint(NumericConstraint.Comparator.EQUAL, left, right);
+                constraint = new NumericConstraint(NumericComparator.EQUAL, left, right);
                 break;
             case LESS_COMPARISON:
-                constraint = new NumericConstraint(NumericConstraint.Comparator.LESS, left, right);
+                constraint = new NumericConstraint(NumericComparator.LESS, left, right);
                 break;
             case LESS_OR_EQUAL_COMPARISON:
-                constraint = new NumericConstraint(NumericConstraint.Comparator.LESS_OR_EQUAL, left, right);
+                constraint = new NumericConstraint(NumericComparator.LESS_OR_EQUAL, left, right);
                 break;
             case GREATER_COMPARISON:
-                constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER, left, right);
+                constraint = new NumericConstraint(NumericComparator.GREATER, left, right);
                 break;
             case GREATER_OR_EQUAL_COMPARISON:
-                constraint = new NumericConstraint(NumericConstraint.Comparator.GREATER_OR_EQUAL, left, right);
+                constraint = new NumericConstraint(NumericComparator.GREATER_OR_EQUAL, left, right);
                 break;
             default:
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
@@ -1910,46 +1911,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final StringBuilder str = new StringBuilder();
         final ArithmeticExpression left = constraint.getLeftExpression();
         final ArithmeticExpression right = constraint.getRightExpression();
-        switch (constraint.getComparator()) {
-            case EQUAL:
-                str.append("(= ");
-                str.append(this.toString(left));
-                str.append(" ");
-                str.append(this.toString(right));
-                str.append(")");
-                break;
-            case LESS:
-                str.append("(< ");
-                str.append(this.toString(left));
-                str.append(" ");
-                str.append(this.toString(right));
-                str.append(")");
-                break;
-            case LESS_OR_EQUAL:
-                str.append("(<= ");
-                str.append(this.toString(left));
-                str.append(" ");
-                str.append(this.toString(right));
-                str.append(")");
-                break;
-            case GREATER:
-                str.append("(> ");
-                str.append(this.toString(left));
-                str.append(" ");
-                str.append(this.toString(right));
-                str.append(")");
-                break;
-            case GREATER_OR_EQUAL:
-                str.append("(>= ");
-                str.append(this.toString(left));
-                str.append(" ");
-                str.append(this.toString(right));
-                str.append(")");
-                break;
-            default:
-                // do nothing
-                break;
-        }
+        str.append("(");
+        str.append(constraint.getComparator().getImage());
+        str.append(" ");
+        str.append(this.toString(left));
+        str.append(" ");
+        str.append(this.toString(right));
+        str.append(")");
         return str.toString();
     }
 
