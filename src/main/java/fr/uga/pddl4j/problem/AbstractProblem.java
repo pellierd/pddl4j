@@ -34,7 +34,7 @@ import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
-import fr.uga.pddl4j.problem.operator.OrderingConstraintNetwork;
+import fr.uga.pddl4j.problem.operator.DefaultOrderingConstraintNetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1045,18 +1045,17 @@ public abstract class AbstractProblem implements Problem {
                 }
             } else {
                 final int size = subtasks.getChildren().size();
-                final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(size);
+                final DefaultOrderingConstraintNetwork constraints = new DefaultOrderingConstraintNetwork(size);
                 orderingConstraints = this.initExpression(taskNetwork.getOrdering());
                 for (Expression<Integer> c : orderingConstraints.getChildren()) {
-                    constraints.set(c.getChildren().get(0).getTaskID().getValue(),
+                    constraints.addOrderingConstraint(c.getChildren().get(0).getTaskID().getValue(),
                         c.getChildren().get(1).getTaskID().getValue());
                 }
                 if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
                     Expression<Integer> orderedSubtasks = new Expression<>(Connector.AND);
                     for (int i = 0; i < size; i++) {
                         int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
-                        constraints.removeRow(subtaskIndex);
-                        constraints.removeColumn(subtaskIndex);
+                        constraints.removeTask(subtaskIndex);
                         Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
                         subtasks.getChildren().remove(subtaskIndex);
                         st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
@@ -1128,7 +1127,7 @@ public abstract class AbstractProblem implements Problem {
             }
         } else {
             final int size = method.getSubTasks().getChildren().size();
-            final OrderingConstraintNetwork constraints = new OrderingConstraintNetwork(size);
+            final DefaultOrderingConstraintNetwork constraints = new DefaultOrderingConstraintNetwork(size);
             orderingConstraints = this.initExpression(method.getOrdering());
 
             // Code for reordering subtask if totally ordered

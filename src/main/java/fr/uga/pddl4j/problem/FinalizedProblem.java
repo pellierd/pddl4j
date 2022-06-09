@@ -44,7 +44,7 @@ import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.Operator;
-import fr.uga.pddl4j.problem.operator.OrderingConstraintNetwork;
+import fr.uga.pddl4j.problem.operator.DefaultOrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
 import fr.uga.pddl4j.problem.time.TemporalCondition;
@@ -2261,9 +2261,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);
         // We encode then the ordering constraints
-        final OrderingConstraintNetwork ordering = new OrderingConstraintNetwork(tasks.size());
+        final DefaultOrderingConstraintNetwork ordering = new DefaultOrderingConstraintNetwork(tasks.size());
         for (Expression<Integer> c : taskNetwork.getOrderingConstraints().getChildren()) {
-            ordering.set(c.getChildren().get(0).getTaskID().getValue(),
+            ordering.addOrderingConstraint(c.getChildren().get(0).getTaskID().getValue(),
                 c.getChildren().get(1).getTaskID().getValue());
         }
         final TaskNetwork tn = new TaskNetwork(tasks, ordering);

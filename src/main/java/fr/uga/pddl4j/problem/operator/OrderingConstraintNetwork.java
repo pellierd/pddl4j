@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Damien Pellier <Damien.Pellier@imag.fr>.
+ * Copyright (c) 2022 by Damien Pellier <Damien.Pellier@imag.fr>.
  *
  * This file is part of PDDL4J library.
  *
@@ -19,92 +19,32 @@
 
 package fr.uga.pddl4j.problem.operator;
 
-import fr.uga.pddl4j.parser.Connector;
-import fr.uga.pddl4j.parser.Symbol;
-import fr.uga.pddl4j.util.BitMatrix;
-import fr.uga.pddl4j.util.BitSet;
-import fr.uga.pddl4j.util.SquareBitMatrix;
-
-import java.util.LinkedList;
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * This class implements a set orderings constraints between tasks.
+ * This class implements an orderings constraints network. This class interface is used to deal with ordering
+ * constraints in method.
  *
  * @author D. Pellier
- * @version 1.0 - 09.10.2020
+ * @version 1.0 - 09.06.2022
  */
-public class OrderingConstraintNetwork extends SquareBitMatrix {
+public interface OrderingConstraintNetwork extends Serializable {
 
     /**
-     * Creates a deep copy from an others set of ordering constraints.
+     * Returns <code>true</code> if the orderings constraints is totally ordered.
      *
-     * @param other The other ordering constraints.
+     * @return <code>true</code> if the ordering constraints is totally ordered; <code>false</code> otherwise.
      */
-    public OrderingConstraintNetwork(final OrderingConstraintNetwork other) {
-        super(other);
-    }
-
-    /**
-     * Creates a new set of ordering constraints.
-     *
-     * @param size the size of ordering constraints.
-     */
-    public OrderingConstraintNetwork(final int size) {
-        super(size);
-    }
-
-    /**
-     * Returns <code>true</code> if the orderings constraints is totally ordered. A ordering constraints set with
-     * strictly less than 2 constraints is totally ordered.
-     *
-     * @return <code>true</code> if the ordering constraints set is totally ordered; <code>false</code> otherwise.
-     */
-    public final boolean isTotallyOrdered() {
-        if (this.rows() < 2) {
-            return true;
-        }
-        final OrderingConstraintNetwork ordering = new OrderingConstraintNetwork(this);
-        boolean ordered = true;
-        int index = 0;
-        while (ordering.rows() > 1 && ordered) {
-            List<Integer> tasks = this.getTasksWithNoPredecessors(ordering);
-            ordered = tasks.size() == 1;
-            if (ordered) {
-                ordering.removeRow(tasks.get(0));
-                ordering.removeColumn(tasks.get(0));
-            }
-            index++;
-        }
-        return ordered;
-    }
+    boolean isTotallyOrdered();
 
     /**
      * Returns the list of tasks with no successors. The method works if only if the method
      * <code>transitiveClosure()</code> was previously called.
      *
-     *
      * @return the  list of tasks with no successors.
      */
-    public final List<Integer> getTasksWithNoSuccessors() {
-        return this.getTasksWithNoSuccessors(this);
-    }
-
-    /**
-     * Returns the list of tasks with no successors.  The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
-     *
-     * @return the  list of tasks with no successors.
-     */
-    private final List<Integer> getTasksWithNoSuccessors(OrderingConstraintNetwork matrix) {
-        final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < matrix.columns(); i++) {
-            if (matrix.getRow(i).cardinality() == 0) {
-                tasks.add(i);
-            }
-        }
-        return tasks;
-    }
+    List<Integer> getTasksWithNoSuccessors();
 
     /**
      * Returns the list of tasks with no predecessors.  The method works if only if the method
@@ -112,74 +52,39 @@ public class OrderingConstraintNetwork extends SquareBitMatrix {
      *
      * @return the  list of tasks with no predecessors.
      */
-    public List<Integer> getTasksWithNoPredecessors() {
-        return this.getTasksWithNoPredecessors(this);
-    }
+    List<Integer> getTasksWithNoPredecessors();
 
     /**
-     * Returns the list of tasks with no predecessor. The method works if only if the method
-     * <code>transitiveClosure()</code> was previously called.
+     * Returns if this ordering constraints is acyclic.
      *
-     * @return the  list of tasks with no predecessor.
-     */
-    private final List<Integer> getTasksWithNoPredecessors(OrderingConstraintNetwork matrix) {
-        final List<Integer> tasks = new LinkedList<>();
-        for (int i = 0; i < matrix.columns(); i++) {
-            if (matrix.getColumn(i).cardinality() == 0) {
-                tasks.add(i);
-            }
-        }
-        return tasks;
-    }
-
-    /**
-     * Returns if this orderings constraint set is cyclic.
-     *
-     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code>
+     * @return <code>true</code> if the ordering constraints network is acyclic ordering constraints, <code>false</code>
      *      otherwise.
      */
-    public final boolean isAcyclic() {
-        this.transitiveClosure();
-        final int size = this.rows();
-        boolean acyclic = true;
-        int i = 0;
-        while (i < size && acyclic) {
-            acyclic &= !this.get(i, i);
-            i++;
-        }
-        return acyclic;
-    }
-
+    boolean isAcyclic();
 
     /**
-     * Returns a string representation of this ordering constraints.
-     *
-     * @return a string representation of the ordering constraints.
+     * Compute the transitive closure of the ordering constraints network.
      */
-    public final String toString() {
-        final StringBuilder str = new StringBuilder();
-        if (this.cardinality() == 0) {
-            str.append(" ()");
-        } else {
-            int index = 0;
-            for (int r = 0; r < this.rows(); r++) {
-                BitSet row = this.getRow(r);
-                for (int c = row.nextSetBit(0); c >= 0; c = row.nextSetBit(c + 1)) {
-                    str.append(" C");
-                    str.append(index);
-                    str.append(": ");
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + r);
-                    str.append(" ");
-                    str.append(Connector.LESS_ORDERING_CONSTRAINT.getImage());
-                    str.append(" ");
-                    str.append(Symbol.DEFAULT_TASK_ID_SYMBOL + c);
-                    str.append("\n");
-                    index++;
-                }
-            }
-        }
-        return str.toString();
-    }
+    void transitiveClosure();
 
+    /**
+     * Remove a task of the ordering constraints network.
+     *
+     * @param task the task to removed.
+     */
+    void removeTask(final int task);
 
+    /**
+     * Returns the size of the ordering constraints network, i.e., its number of tasks.
+     *
+     * @return the size of the ordering constraints network, i.e., its number of tasks.
+     */
+    int size();
+
+    /**
+     * Resize the ordering constraints network.
+     *
+     * @param newSize the new size.
+     */
+    void resize(int newSize);
 }

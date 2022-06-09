@@ -19,11 +19,7 @@
 
 package fr.uga.pddl4j.problem.operator;
 
-import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class implements an method. This class is used to store compact representation of a method in a planning
@@ -116,7 +112,7 @@ public final class Method extends AbstractOperator {
      *
      * @return the ordering constraints of the method.
      */
-    public final OrderingConstraintNetwork getOrderingConstraints() {
+    public final DefaultOrderingConstraintNetwork getOrderingConstraints() {
         return this.taskNetwork.getOrderingConstraints();
     }
 
@@ -125,7 +121,7 @@ public final class Method extends AbstractOperator {
      *
      * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final OrderingConstraintNetwork constraints) {
+    public final void setOrderingConstraints(final DefaultOrderingConstraintNetwork constraints) {
         this.taskNetwork.setOrderingConstraints(constraints);
     }
 

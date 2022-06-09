@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * This class implements an task network. This class is used to store compact representation of a task network
@@ -49,7 +48,7 @@ public final class TaskNetwork implements Serializable {
     /**
      * The represents the ordering constraints of the task network.
      */
-    private OrderingConstraintNetwork orderingConstraints;
+    private DefaultOrderingConstraintNetwork orderingConstraints;
 
     /**
      * The list of before constraints.
@@ -74,7 +73,7 @@ public final class TaskNetwork implements Serializable {
     public TaskNetwork() {
         super();
         this.tasks = new LinkedList<Integer>();
-        this.orderingConstraints = new OrderingConstraintNetwork(0);
+        this.orderingConstraints = new DefaultOrderingConstraintNetwork(0);
         this.beforeConstraints = new LinkedHashMap<>();
         this.afterConstraints = new LinkedHashMap<>();
         this.betweenConstraints = new LinkedHashMap<>();
@@ -89,7 +88,7 @@ public final class TaskNetwork implements Serializable {
     public TaskNetwork(final TaskNetwork other) {
         super();
         this.tasks = new LinkedList<Integer>(other.getTasks());
-        this.orderingConstraints = new OrderingConstraintNetwork(other.getOrderingConstraints());
+        this.orderingConstraints = new DefaultOrderingConstraintNetwork(other.getOrderingConstraints());
         this.beforeConstraints = new LinkedHashMap<>();
         for (Map.Entry<Integer, Condition> e : other.beforeConstraints.entrySet()) {
             this.beforeConstraints.put(e.getKey(), new Condition(e.getValue()));
@@ -109,7 +108,7 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Create a new task network with a set of tasks and a set of of orderings constraints. The transitive closure on
+     * Create a new task network with a set of tasks and a set of orderings constraints. The transitive closure on
      * the ordering constraints is done by the constructor. Moreover, if the ordering constraints specified a totally
      * ordered set of tasks. The list of tasks of the task network are ordered to reflect this implicit order.
      * Warning, the constructor does not check that the ordering constraints are not cyclic.
@@ -117,7 +116,7 @@ public final class TaskNetwork implements Serializable {
      * @param tasks       the tasks of the task network.
      * @param constraints the orderings constraints of the task network.
      */
-    public TaskNetwork(final List<Integer> tasks, final OrderingConstraintNetwork constraints) {
+    public TaskNetwork(final List<Integer> tasks, final DefaultOrderingConstraintNetwork constraints) {
         super();
         this.tasks = new LinkedList<Integer>(tasks);
         this.setOrderingConstraints(constraints);
@@ -126,10 +125,10 @@ public final class TaskNetwork implements Serializable {
         if (this.isTotallyOrdered()) {
             LinkedList<Integer> orderedTasks = new LinkedList<>();
             List<Integer> numberOfConstraints = new ArrayList<>();
-            for (int i = 0; i < constraints.rows(); i++) {
-                numberOfConstraints.add(constraints.getRow(i).cardinality());
-                constraints.getRow(i).clear(0, i + 1);
-                constraints.getRow(i).set(i + 1, constraints.columns());
+            for (int i = 0; i < constraints.size(); i++) {
+                numberOfConstraints.add(constraints.getTaskOrderedAfter(i).cardinality());
+                constraints.getTaskOrderedAfter(i).clear(0, i + 1);
+                constraints.getTaskOrderedAfter(i).set(i + 1, constraints.size());
             }
             for (int i = 0; i < numberOfConstraints.size(); i++) {
                 orderedTasks.add(0, this.tasks.get(numberOfConstraints.indexOf(i)));
@@ -248,7 +247,7 @@ public final class TaskNetwork implements Serializable {
      *
      * @return the ordering constraints of the method.
      */
-    public final OrderingConstraintNetwork getOrderingConstraints() {
+    public final DefaultOrderingConstraintNetwork getOrderingConstraints() {
         return this.orderingConstraints;
     }
 
@@ -257,10 +256,9 @@ public final class TaskNetwork implements Serializable {
      *
      * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final OrderingConstraintNetwork constraints) {
+    public final void setOrderingConstraints(final DefaultOrderingConstraintNetwork constraints) {
         this.orderingConstraints = constraints;
     }
-
 
     /**
      * Decompose a tasks of the network with a specific method.
@@ -272,15 +270,15 @@ public final class TaskNetwork implements Serializable {
         final int numberOfSubtasks = method.getSubTasks().size();
         final int newSize = this.tasks.size() - 1 + numberOfSubtasks;
         // Make a copy of the constraints of the task to remove
-        final BitVector row = new BitVector(this.getOrderingConstraints().getRow(task));
+        final BitVector row = new BitVector(this.getOrderingConstraints().getTaskOrderedAfter(task));
         // Remove the task to replace
         this.removeTask(task);
-        // Resize the matrix to add the contraints for the method subtasks
-        this.orderingConstraints.resize(newSize, newSize);
-        // Add the subtasks contraints to the tasknetwork
-        for (int i = 0; i < method.getOrderingConstraints().rows(); i++) {
-            final BitVector cti = method.getOrderingConstraints().getRow(i);
-            final BitVector ri = this.orderingConstraints.getRow(this.tasks.size() + i);
+        // Resize the matrix to add the constraints for the method subtasks
+        this.orderingConstraints.resize(newSize);
+        // Add the subtasks constraints to the task network
+        for (int i = 0; i < method.getOrderingConstraints().size(); i++) {
+            final BitVector cti = method.getOrderingConstraints().getTaskOrderedAfter(i);
+            final BitVector ri = this.orderingConstraints.getTaskOrderedAfter(this.tasks.size() + i);
             ri.or(cti);
             ri.shiftRight(this.tasks.size());
         }
@@ -288,7 +286,7 @@ public final class TaskNetwork implements Serializable {
         for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i + 1)) {
             final int rowIndex = i < task ? i : i - 1;
             for (int j = this.size(); j < newSize; j++) {
-                this.orderingConstraints.set(j, rowIndex);
+                this.orderingConstraints.addOrderingConstraint(j, rowIndex);
             }
         }
         // Update the list of task of the task network
@@ -302,8 +300,7 @@ public final class TaskNetwork implements Serializable {
      */
     public final void removeTask(final int task) {
         this.tasks.remove(task);
-        this.orderingConstraints.removeRow(task);
-        this.orderingConstraints.removeColumn(task);
+        this.orderingConstraints.removeTask(task);
     }
 
     /**
@@ -366,7 +363,6 @@ public final class TaskNetwork implements Serializable {
      * @return <code>true</code> if this task network is equal to an object;
      * <code>false</code> otherwise.
      */
-    @Override
     public final boolean equals(final Object obj) {
         if (obj != null && obj instanceof TaskNetwork) {
             final TaskNetwork other = (TaskNetwork) obj;
@@ -383,7 +379,6 @@ public final class TaskNetwork implements Serializable {
      *
      * @return a hash code value for this task network.
      */
-    @Override
     public final int hashCode() {
         return Objects.hash(this.getTasks(), this.getOrderingConstraints());
     }
