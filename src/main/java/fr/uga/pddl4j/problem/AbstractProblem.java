@@ -1048,7 +1048,7 @@ public abstract class AbstractProblem implements Problem {
                 final DefaultOrderingConstraintNetwork constraints = new DefaultOrderingConstraintNetwork(size);
                 orderingConstraints = this.initExpression(taskNetwork.getOrdering());
                 for (Expression<Integer> c : orderingConstraints.getChildren()) {
-                    constraints.addOrderingConstraint(c.getChildren().get(0).getTaskID().getValue(),
+                    constraints.set(c.getChildren().get(0).getTaskID().getValue(),
                         c.getChildren().get(1).getTaskID().getValue());
                 }
                 if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {

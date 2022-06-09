@@ -1,20 +1,49 @@
+/*
+ * Copyright (c) 2022 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.problem.time;
 
-import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Symbol;
-import fr.uga.pddl4j.util.BitSet;
-
-import java.io.Serializable;
+import fr.uga.pddl4j.problem.operator.AbstractOrderingConstraintNetwork;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleTemporalNetwork implements Serializable {
+/**
+ * This class implements a simple temporal network. This class is used to deal with temporal constraints in methods.
+ *
+ * @author D. Pellier
+ * @version 1.0 - 09.06.2022
+ * @since 4.0
+ */
+public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
 
-    private boolean update;
-
+    /**
+     * The matrix used to the store the temporal network.
+     */
     private List<List<TemporalRelation>> network;
 
-
+    /**
+     * Creates a new simple temporal network from another one. This constructor creates a deep copy of the simple
+     * temporal network in paramter.
+     *
+     * @param other the other simple temporal network to use to make the copy.
+     */
     public SimpleTemporalNetwork(final SimpleTemporalNetwork other) {
         final int size = other.network.size();
         this.network = new ArrayList<>();
@@ -25,13 +54,22 @@ public class SimpleTemporalNetwork implements Serializable {
             }
             this.network.add(list);
         }
-        this.update = other.update;
     }
 
+    /**
+     * Creates a new empty simple temporal network.
+     */
     public SimpleTemporalNetwork() {
         this(0);
     }
 
+    /**
+     * Creates a new simple temporal network with a specified size. The temporal relations between tasks are set to
+     * UNIVERSAL.
+     *
+     * @see TemporalRelation
+     * @param size the number of tasks of the simple temporal network.
+     */
     public SimpleTemporalNetwork(int size) {
         int numberOfTimePoints = size * 2;
         this.network = new ArrayList<>(numberOfTimePoints);
@@ -42,26 +80,39 @@ public class SimpleTemporalNetwork implements Serializable {
             }
             this.network.add(list);
         }
-        this.update = false;
     }
 
-    public TemporalRelation get(int i, int j) {
-        return this.network.get(i).get(j);
+
+    /**
+     * Returns the temporal relation between two specified task.
+     *
+     * @param task1 the first task.
+     * @param task2 the second task.
+     * @return the temporal relation between task1 and task2.
+     */
+    public TemporalRelation get(int task1, int task2) {
+        return this.network.get(task1).get(task2);
     }
 
-    public void set(int i, int j, TemporalRelation relation) {
-        this.network.get(i).set(j, relation);
-        this.network.get(j).set(i, relation.symmetric());
-        this.update = true;
+    /**
+     * Adds an ordering constraints between two specified tasks.
+     *
+     * @param task1 the first task.
+     * @param task2 the second task.
+     * @param relation the temporal relation between task1 and task2.
+     */
+    public void set(int task1, int task2, TemporalRelation relation) {
+        this.network.get(task1).set(task2, relation);
+        this.network.get(task2).set(task1, relation.symmetric());
     }
-
 
     /**
      * Returns if the network is consistent or not.
      *
      * @return if the network is consistent or not.
      */
-    private boolean isConsistent() {
+    @Override
+    public boolean isConsistent() {
         for (int k = 0; k < this.network.size(); k++) {
             for (int i = 0; i < this.network.size(); i++) {
                 for (int j = i + 1; j < this.network.size(); j++) {
@@ -82,8 +133,9 @@ public class SimpleTemporalNetwork implements Serializable {
     }
 
     /**
-     * Compute the transitive closure of the relation.
+     * Compute the transitive closure of the relation in O(n^3).
      */
+    @Override
     public void transitiveClosure() {
         for (int k = 0; k < this.network.size(); k++) {
             for (int i = 0; i < this.network.size(); i++) {
@@ -97,18 +149,79 @@ public class SimpleTemporalNetwork implements Serializable {
     }
 
     /**
+     * TO DO: NOT IMPLEMENTED
+     * Remove a task of the ordering constraints network.
+     *
+     * @param task the task to removed.
+     */
+    @Override
+    public void removeTask(int task) {
+    }
+
+    /**
      * The number of tasks of the simple temporal network.
      *
      * @return number of tasks of the simple temporal network.
      */
+    @Override
     public int size() {
         return this.network.size()/2;
     }
 
     /**
-     * Returns a string representation of the simple task network.
+     * TO DO: NOT IMPLEMENTED
+     * Resize the ordering constraints network.
      *
-     * @return a string representation of the simple task network.
+     * @param newSize the new size.
+     */
+    @Override
+    public void resize(int newSize) {
+    }
+
+
+
+    //public void removeRow(int task) {
+    //}
+
+    public void removeColumn(int task) {
+    }
+
+    /**
+     * TO DO: NOT IMPLEMENTED
+     * Returns <code>true</code> if the simple temporal network is totally ordered.
+     *
+     * @return <code>true</code> if the simple temporal network is totally ordered.; <code>false</code> otherwise.
+     */
+    public boolean isTotallyOrdered() {
+        return true;
+    }
+
+    /**
+     * TO DO: NOT IMPLEMENTED
+     * Returns the list of tasks with no successors. The method works if only if the method
+     * <code>transitiveClosure()</code> was previously called.
+     *
+     * @return the  list of tasks with no successors.
+     */
+    public List<Integer> getTasksWithNoSuccessors() {
+        return new ArrayList<>();
+    }
+
+    /**
+     * TO DO: NOT IMPLEMENTED
+     * Returns the list of tasks with no predecessors. The method works if only if the method
+     * <code>transitiveClosure()</code> was previously called.
+     *
+     * @return the  list of tasks with no predecessors.
+     */
+    public List<Integer> getTasksWithNoPredecessors() {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Returns a string representation of the simple temporal network.
+     *
+     * @return a string representation of the simple temporal network.
      */
     public String toString() {
         StringBuilder str = new StringBuilder();
@@ -136,9 +249,12 @@ public class SimpleTemporalNetwork implements Serializable {
         return str.toString();
     }
 
-
+    /**
+     * TO REMOVED.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
-
         SimpleTemporalNetwork network = new SimpleTemporalNetwork(6);
         // T0_start < T0_end
         network.set(0, 1, TemporalRelation.LESS);
@@ -160,29 +276,6 @@ public class SimpleTemporalNetwork implements Serializable {
         System.out.println(network);
 
         System.out.println("Consistent ? " + network.isConsistent());
-    }
-
-
-    public void removeRow(int task) {
-    }
-
-    public void removeColumn(int task) {
-    }
-
-    public boolean isTotallyOrdered() {
-        return true;
-    }
-
-    public boolean isAcyclic() {
-        return true;
-    }
-
-    public List<Integer> getTasksWithNoSuccessors() {
-        return new ArrayList<>();
-    }
-
-    public List<Integer> getTasksWithNoPredecessors() {
-        return new ArrayList<>();
     }
 
 }

@@ -2263,7 +2263,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         // We encode then the ordering constraints
         final DefaultOrderingConstraintNetwork ordering = new DefaultOrderingConstraintNetwork(tasks.size());
         for (Expression<Integer> c : taskNetwork.getOrderingConstraints().getChildren()) {
-            ordering.addOrderingConstraint(c.getChildren().get(0).getTaskID().getValue(),
+            ordering.set(c.getChildren().get(0).getTaskID().getValue(),
                 c.getChildren().get(1).getTaskID().getValue());
         }
         final TaskNetwork tn = new TaskNetwork(tasks, ordering);

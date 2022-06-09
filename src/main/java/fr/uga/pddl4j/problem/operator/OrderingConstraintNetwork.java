@@ -55,12 +55,12 @@ public interface OrderingConstraintNetwork extends Serializable {
     List<Integer> getTasksWithNoPredecessors();
 
     /**
-     * Returns if this ordering constraints is acyclic.
+     * Returns if this ordering constraints is consistent.
      *
-     * @return <code>true</code> if the ordering constraints network is acyclic ordering constraints, <code>false</code>
+     * @return <code>true</code> if the ordering constraints network is consistent, <code>false</code>
      *      otherwise.
      */
-    boolean isAcyclic();
+    boolean isConsistent();
 
     /**
      * Compute the transitive closure of the ordering constraints network.

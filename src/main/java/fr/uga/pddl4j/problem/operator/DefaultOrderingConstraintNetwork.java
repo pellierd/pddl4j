@@ -43,7 +43,7 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
     private SquareBitMatrix matrix;
 
     /**
-     * Creates a deep copy from an others set of ordering constraints.
+     * Creates a deep copy from an others ordering constraint network.
      *
      * @param other The other ordering constraints.
      */
@@ -52,19 +52,18 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
     }
 
     /**
-     * Creates a new set of ordering constraints.
+     * Creates a new ordering constraint network.
      *
-     * @param size the size of ordering constraints.
+     * @param size the number of tasks of ordering constraint network.
      */
     public DefaultOrderingConstraintNetwork(final int size) {
         this.matrix = new SquareBitMatrix(size);
     }
 
     /**
-     * Returns <code>true</code> if the orderings constraints is totally ordered. A ordering constraints set with
-     * strictly less than 2 constraints is totally ordered.
+     * Returns <code>true</code> if the orderings constraints network is totally ordered.
      *
-     * @return <code>true</code> if the ordering constraints set is totally ordered; <code>false</code> otherwise.
+     * @return <code>true</code> if the ordering constraints network is totally ordered; <code>false</code> otherwise.
      */
     @Override
     public final boolean isTotallyOrdered() {
@@ -91,7 +90,7 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
      * <code>transitiveClosure()</code> was previously called.
      *
      *
-     * @return the  list of tasks with no successors.
+     * @return the list of tasks with no successors.
      */
     @Override
     public final List<Integer> getTasksWithNoSuccessors() {
@@ -142,13 +141,13 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
     }
 
     /**
-     * Returns if this orderings constraint set is cyclic.
+     * Returns if this ordering constraint network is consistent .
      *
-     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code>
+     * @return <code>true</code> if the ordering constraints network is consistent, <code>false</code>
      *      otherwise.
      */
     @Override
-    public final boolean isAcyclic() {
+    public final boolean isConsistent() {
         this.transitiveClosure();
         final int size = this.matrix.rows();
         boolean acyclic = true;
@@ -172,12 +171,12 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
     }
 
     /**
-     * Adds an ordering constraints between two specified tasks.
+     * Sets an ordering constraints between two specified tasks.
      *
      * @param task1 the first task.
      * @param task2 the second task.
      */
-    public void addOrderingConstraint(int task1, int task2) {
+    public void set(int task1, int task2) {
         this.matrix.set(task1, task2);
     }
 
@@ -187,7 +186,7 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
      * @param task1 the first task.
      * @param task2 the second task.
      */
-    public void removeOrderingConstraint(int task1, int task2) {
+    public void clear(int task1, int task2) {
         this.matrix.clear(task1, task1);
     }
 

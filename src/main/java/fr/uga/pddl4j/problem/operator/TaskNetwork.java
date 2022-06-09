@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * This class implements an task network. This class is used to store compact representation of a task network
+ * This class implements a task network. This class is used to store compact representation of a task network
  * in a planning problem.
  *
  * @author D. Pellier
@@ -286,7 +286,7 @@ public final class TaskNetwork implements Serializable {
         for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i + 1)) {
             final int rowIndex = i < task ? i : i - 1;
             for (int j = this.size(); j < newSize; j++) {
-                this.orderingConstraints.addOrderingConstraint(j, rowIndex);
+                this.orderingConstraints.set(j, rowIndex);
             }
         }
         // Update the list of task of the task network
@@ -315,13 +315,13 @@ public final class TaskNetwork implements Serializable {
     }
 
     /**
-     * Returns if this task network contains cyclic ordering constraints.
+     * Returns if this task network has a consistent ordering constraints network.
      *
-     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code>
+     * @return <code>true</code> if this task network has a consistent ordering constraints networks, <code>false</code>
      *      otherwise.
      */
-    public final boolean isAcyclic() {
-        return this.orderingConstraints.isAcyclic();
+    public final boolean isConsistent() {
+        return this.orderingConstraints.isConsistent();
     }
 
     /**

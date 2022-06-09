@@ -299,8 +299,7 @@ public final class TemporalTaskNetwork implements Serializable {
      */
     public final void removeTask(final int task) {
         this.getTasks().remove(task);
-        this.getOrderingConstraints().removeRow(task);
-        this.getOrderingConstraints().removeColumn(task);
+        this.getOrderingConstraints().removeTask(task);
     }
 
     /**
@@ -315,13 +314,13 @@ public final class TemporalTaskNetwork implements Serializable {
     }
 
     /**
-     * Returns if this task network contains cyclic ordering constraints.
+     * Returns if this task network has a consistent ordering constraints network.
      *
-     * @return <code>true</code> if the task network contains acyclic ordering constraints, <code>false</code>
+     * @return <code>true</code> iif this task network has a consistent ordering constraints network, <code>false</code>
      *      otherwise.
      */
-    public final boolean isAcyclic() {
-        return this.getOrderingConstraints().isAcyclic();
+    public final boolean isConsistent() {
+        return this.getOrderingConstraints().isConsistent();
     }
 
     /**
