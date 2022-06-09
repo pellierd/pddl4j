@@ -29,35 +29,9 @@ import java.util.Objects;
 public final class NumericAssignment extends AbstractNumericExpression {
 
     /**
-     * The assignment that can be used in a numeric assignment.
-     */
-    public enum Operator {
-        /**
-         * The operator assign.
-         */
-        ASSIGN,
-        /**
-         * The operator increase.
-         */
-        INCREASE,
-        /**
-         * The operator decrease.
-         */
-        DECREASE,
-        /**
-         * The operator scale-up.
-         */
-        SCALE_UP,
-        /**
-         * The operator scale-down.
-         */
-        SCALE_DOWN;
-    }
-
-    /**
      * The operator of the assignment expression.
      */
-    private Operator operator;
+    private AssignmentOperator operator;
 
     /**
      * Creates a deep copy of numeric assignment.
@@ -76,7 +50,7 @@ public final class NumericAssignment extends AbstractNumericExpression {
      * @param fluent the variable of the numeric assignment.
      * @param expression the arithmetic expression of the numeric assignment.
      */
-    public NumericAssignment(final Operator operator, final NumericVariable fluent,
+    public NumericAssignment(final AssignmentOperator operator, final NumericVariable fluent,
                              final ArithmeticExpression expression) {
         super(fluent, expression);
         this.setOperator(operator);
@@ -87,7 +61,7 @@ public final class NumericAssignment extends AbstractNumericExpression {
      *
      * @param operator the operator to set.
      */
-    public final void setOperator(final Operator operator) {
+    public final void setOperator(final AssignmentOperator operator) {
         this.operator = operator;
     }
 
@@ -96,7 +70,7 @@ public final class NumericAssignment extends AbstractNumericExpression {
      *
      * @return the operator of the numeric assignment.
      */
-    public final Operator getOperator() {
+    public final AssignmentOperator getOperator() {
         return this.operator;
     }
 
@@ -173,45 +147,13 @@ public final class NumericAssignment extends AbstractNumericExpression {
         final StringBuilder str = new StringBuilder();
         final ArithmeticExpression left = super.getLeftExpression();
         final ArithmeticExpression right = super.getRightExpression();
-        switch (this.getOperator()) {
-            case ASSIGN:
-                str.append("(assign ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case INCREASE:
-                str.append("(increase ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case DECREASE:
-                str.append("(decrease ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case SCALE_UP:
-                str.append("(scale-up ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            case SCALE_DOWN:
-                str.append("(scale-down ");
-                str.append(left);
-                str.append(" ");
-                str.append(right);
-                str.append(")");
-                break;
-            default:
-                // do nothing
-        }
+        str.append("(");
+        str.append(this.getOperator().getImage());
+        str.append(" ");
+        str.append(left);
+        str.append(" ");
+        str.append(right);
+        str.append(")");
         return str.toString();
     }
 }

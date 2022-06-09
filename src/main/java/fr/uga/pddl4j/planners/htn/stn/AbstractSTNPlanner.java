@@ -244,7 +244,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
             final Integer task = n.getTask();
             operators.add(0, operator);
             tasks.add(0, task);
-            // Operator is a method
+            // AssignementOperator is a method
             if (operator >= nbactions) {
                 final Method method = problem.getMethods().get(operator - nbactions);
                 methods.add(0, method);

@@ -25,6 +25,7 @@ import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.problem.numeric.ArithmeticExpression;
 import fr.uga.pddl4j.problem.numeric.ArithmeticOperator;
+import fr.uga.pddl4j.problem.numeric.AssignmentOperator;
 import fr.uga.pddl4j.problem.numeric.NumericAssignment;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericFluent;
@@ -50,7 +51,6 @@ import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
 import fr.uga.pddl4j.problem.time.TemporalEffect;
 import fr.uga.pddl4j.problem.time.TemporalRelation;
 import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
-import fr.uga.pddl4j.util.BitMatrix;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
 
@@ -817,19 +817,19 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         NumericAssignment assignment = null;
         switch (exp.getConnective()) {
             case ASSIGN:
-                assignment = new NumericAssignment(NumericAssignment.Operator.ASSIGN, fluent, arithmeticExpression);
+                assignment = new NumericAssignment(AssignmentOperator.ASSIGN, fluent, arithmeticExpression);
                 break;
             case INCREASE:
-                assignment = new NumericAssignment(NumericAssignment.Operator.INCREASE, fluent, arithmeticExpression);
+                assignment = new NumericAssignment(AssignmentOperator.INCREASE, fluent, arithmeticExpression);
                 break;
             case DECREASE:
-                assignment = new NumericAssignment(NumericAssignment.Operator.DECREASE, fluent, arithmeticExpression);
+                assignment = new NumericAssignment(AssignmentOperator.DECREASE, fluent, arithmeticExpression);
                 break;
             case SCALE_UP:
-                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_UP, fluent, arithmeticExpression);
+                assignment = new NumericAssignment(AssignmentOperator.SCALE_UP, fluent, arithmeticExpression);
                 break;
             case SCALE_DOWN:
-                assignment = new NumericAssignment(NumericAssignment.Operator.SCALE_DOWN, fluent, arithmeticExpression);
+                assignment = new NumericAssignment(AssignmentOperator.SCALE_DOWN, fluent, arithmeticExpression);
                 break;
             default:
                 throw new UnexpectedExpressionException(exp.getConnective().toString());
@@ -1323,7 +1323,10 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append(this.toString(action.getPrecondition()));
         str.append("\n");
         str.append("Effects:\n");
-        str.append("TO DO");
+        for (TemporalConditionalEffect effect : action.getConditionalEffects()) {
+            str.append(this.toString(effect));
+            str.append("\n");
+        }
         return str.toString();
     }
 
@@ -1414,45 +1417,111 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * Returns a string representation of a conditional effect.
      *
-     * @param ceffect  the conditional effect.
+     * @param effect  the conditional effect.
      * @return a string representation of the specified condition effect.
      */
-    public final String toString(final ConditionalEffect ceffect) {
+    public final String toString(final ConditionalEffect effect) {
         StringBuilder str = new StringBuilder();
-        if (ceffect.getCondition().isEmpty()) {
-            str.append(this.toString(ceffect.getEffect()));
+        if (effect.getCondition().isEmpty()) {
+            str.append(this.toString(effect.getEffect()));
         } else {
             str.append("(when ");
-            str.append(this.toString(ceffect.getCondition()));
+            str.append(this.toString(effect.getCondition()));
             str.append("\n");
-            str.append(this.toString(ceffect.getEffect()));
+            str.append(this.toString(effect.getEffect()));
             str.append(")");
         }
         return str.toString();
     }
 
     /**
-     * Returns a string representation of a state.
+     * Returns a string representation of a temporal conditional effect.
      *
-     * @param state the state.
-     * @return a string representation of the state.
+     * @param effect  the temporal conditional effect.
+     * @return a string representation of the specified temporal condition effect.
      */
-    public final String toString(final Effect state) {
+    public final String toString(final TemporalConditionalEffect effect) {
+        StringBuilder str = new StringBuilder();
+        if (effect.getCondition().isEmpty()) {
+            str.append(this.toString(effect.getEffect()));
+        } else {
+            str.append("(when ");
+            str.append(this.toString(effect.getCondition()));
+            str.append("\n");
+            str.append(this.toString(effect.getEffect()));
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of the effect of an action.
+     *
+     * @param effect the effect.
+     * @return a string representation of the effect.
+     */
+    public final String toString(final Effect effect) {
         final StringBuilder str = new StringBuilder("(and");
-        final BitSet positive = state.getPositiveFluents();
+        final BitSet positive = effect.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
             str.append(" ");
             str.append(this.toString(this.getFluents().get(j)));
             str.append("\n");
         }
-        final BitSet negative = state.getNegativeFluents();
+        final BitSet negative = effect.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
             str.append(" (not ");
             str.append(this.toString(this.getFluents().get(i)));
             str.append(")\n");
         }
+        for (NumericAssignment assignment : effect.getNumericAssignments()) {
+            str.append(this.toString(assignment));
+            str.append("\n");
+        }
         str.append(")");
         return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a temporal effect.
+     *
+     * @param effect the effect.
+     * @return a string representation of the effect.
+     */
+    public final String toString(final TemporalEffect effect) {
+        final StringBuilder str = new StringBuilder("(and\n");
+        str.append("  (at start ");
+        str.append(this.toString(effect.getAtStartEffect()));
+        str.append("  )\n");
+        str.append("  (at end ");
+        str.append(this.toString(effect.getAtEndEffect()));
+        str.append("  )\n");
+        str.append("  (overall ");
+        str.append(this.toString(effect.getOverallEffect()));
+        str.append("  )\n");
+        str.append(")");
+        return str.toString();
+    }
+
+    /**
+     * Returns a string representation of a numeric assignment.
+     *
+     * @param assignment the assignment.
+     * @return a string representation of a numeric assignment.
+     */
+    public final String toString(final NumericAssignment assignment) {
+        final StringBuilder str = new StringBuilder();
+        final ArithmeticExpression left = assignment.getLeftExpression();
+        final ArithmeticExpression right = assignment.getRightExpression();
+        str.append("(");
+        str.append(assignment.getOperator().getImage());
+        str.append(" ");
+        str.append(this.toString(left));
+        str.append(" ");
+        str.append(this.toString(right));
+        str.append(")");
+        return str.toString();
+
     }
 
     /**

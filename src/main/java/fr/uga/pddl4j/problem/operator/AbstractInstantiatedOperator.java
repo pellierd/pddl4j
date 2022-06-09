@@ -243,7 +243,7 @@ public abstract class AbstractInstantiatedOperator implements Operator {
     /**
      * Returns <code>true</code> if this operator is equal to an object. This
      * method returns <code>true</code> if the object is a not null instance
-     * of the class <code>Operator</code> and both operator have the same name.
+     * of the class <code>AssignementOperator</code> and both operator have the same name.
      *
      * @param obj the object to be compared.
      * @return <code>true</code> if this operator is equal to an object;
