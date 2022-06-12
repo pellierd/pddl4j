@@ -25,11 +25,11 @@ import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
+import fr.uga.pddl4j.problem.operator.DefaultTaskNetwork;
 import fr.uga.pddl4j.problem.operator.DurativeAction;
 import fr.uga.pddl4j.problem.operator.DurativeMethod;
 import fr.uga.pddl4j.problem.operator.Effect;
 import fr.uga.pddl4j.problem.operator.Method;
-import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
 import java.io.Serializable;
 import java.util.List;
@@ -168,7 +168,7 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      *
      * @return the initial task network of the problem.
      */
-    TaskNetwork getInitialTaskNetwork();
+    DefaultTaskNetwork getInitialTaskNetwork();
 
     /**
      * Returns <code>true</code> if this problem is solvable. It is not because the method returns <code>true</code>
@@ -230,7 +230,7 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
      * @param network the task network..
      * @return a string representation of the specified task network.
      */
-    String toString(final TaskNetwork network);
+    String toString(final DefaultTaskNetwork network);
 
     /**
      * Returns a string representation of a hierarchical decomposition of plan.

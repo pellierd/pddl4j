@@ -26,17 +26,17 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * This class implements an abstarct task network. This class is used to store compact representation of a task network
+ * This class implements an abstract task network. This class is used to store compact representation of a task network
  * in a planning problem. This is the first level of implementation of the interface <code>TaskNetwork</code>.
  *
  * @author D. Pellier
  * @version 1.0 - 12.06.2022
  * @since 4.0
  */
-public abstract class AbstractTaskNetwork implements ITaskNetwork {
+public abstract class AbstractTaskNetwork implements TaskNetwork {
 
     /**
-     * The array that defined the list of task of task network. Each task is defined as an integer. The integer
+     * The array that defined the list of task of the task network. Each task is defined as an integer. The integer
      * indicates the index of the task in the task table of the planning problem.
      */
     private LinkedList<Integer> tasks;
@@ -181,7 +181,7 @@ public abstract class AbstractTaskNetwork implements ITaskNetwork {
      *
      * @return the between constraints of task network.
      */
-    protected Map<Integer, Map<Integer, Condition>> getbetweenConstraints() {
+    protected Map<Integer, Map<Integer, Condition>> getBetweenConstraints() {
         return this.betweenConstraints;
     }
 
@@ -246,7 +246,7 @@ public abstract class AbstractTaskNetwork implements ITaskNetwork {
             return Objects.equals(this.getTasks(), other.getTasks())
                 && Objects.equals(this.getBeforeConstraints(), other.getBeforeConstraints())
                 && Objects.equals(this.getAfterConstraints(), other.getAfterConstraints())
-                && Objects.equals(this.getAfterConstraints(), other.getAfterConstraints());
+                && Objects.equals(this.getBetweenConstraints(), other.getBetweenConstraints());
         }
         return false;
     }
@@ -260,6 +260,6 @@ public abstract class AbstractTaskNetwork implements ITaskNetwork {
      */
     public int hashCode() {
         return Objects.hash(this.getTasks(), this.getBeforeConstraints(), this.getAfterConstraints(),
-            this.getbetweenConstraints());
+            this.getBetweenConstraints());
     }
 }

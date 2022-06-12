@@ -44,7 +44,7 @@ public final class Method extends AbstractOperator {
     /**
      * The task network of the method.
      */
-    private TaskNetwork taskNetwork;
+    private DefaultTaskNetwork taskNetwork;
 
     /**
      * Create a new method from a specified method. This constructor create a deep copy of the
@@ -55,7 +55,7 @@ public final class Method extends AbstractOperator {
     public Method(final Method other) {
         super(other);
         this.task = other.getTask();
-        this.taskNetwork = new TaskNetwork(other.taskNetwork);
+        this.taskNetwork = new DefaultTaskNetwork(other.taskNetwork);
     }
 
     /**
@@ -68,7 +68,7 @@ public final class Method extends AbstractOperator {
     public Method(final String name, final int arity) {
         super(name, arity);
         this.task = Method.DEFAULT_TASK_INDEX;
-        this.taskNetwork = new TaskNetwork();
+        this.taskNetwork = new DefaultTaskNetwork();
     }
 
     /**
@@ -130,7 +130,7 @@ public final class Method extends AbstractOperator {
      *
      * @return the task network of this method.
      */
-    public final TaskNetwork getTaskNetwork() {
+    public final DefaultTaskNetwork getTaskNetwork() {
         return this.taskNetwork;
     }
 
@@ -139,7 +139,7 @@ public final class Method extends AbstractOperator {
      *
      * @param taskNetwork the task network to set.
      */
-    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
+    public final void setTaskNetwork(final DefaultTaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
     }
 

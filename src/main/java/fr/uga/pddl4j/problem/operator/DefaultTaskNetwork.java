@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class implements a task network. This class is used to store compact representation of a task network
- * in a planning problem.
+ * This class implements a default task network. This class is used to store compact representation of a task network
+ * in a planning problem and method.
  *
  * @author D. Pellier
  * @version 1.0 - 01.03.2020
  * @since 4.0
  */
-public class DefaultTaskNetwork extends AbstractTaskNetwork {
+public final class DefaultTaskNetwork extends AbstractTaskNetwork {
 
     /**
      * The represents the ordering constraints of the task network.
@@ -58,8 +58,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      */
     public DefaultTaskNetwork(final DefaultTaskNetwork other) {
         super(other);
-        this.setOrderingConstraints(new DefaultOrderingConstraintNetwork(other.getOrderingConstraints()));
-        this.getOrderingConstraints().transitiveClosure();
+        this.orderingConstraints = new DefaultOrderingConstraintNetwork(other.getOrderingConstraints());
     }
 
     /**
@@ -73,6 +72,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      */
     public DefaultTaskNetwork(final List<Integer> tasks, final DefaultOrderingConstraintNetwork constraints) {
         super();
+        this.setTasks(tasks);
         this.setOrderingConstraints(constraints);
         this.getOrderingConstraints().transitiveClosure();
 
@@ -117,7 +117,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      */
     public void decompose(final int task, final Method method) {
         final int numberOfSubtasks = method.getSubTasks().size();
-        final int newSize = this.getTasks().size() - 1 + numberOfSubtasks;
+        final int newSize = this.size() - 1 + numberOfSubtasks;
         // Make a copy of the constraints of the task to remove
         final BitVector row = new BitVector(this.getOrderingConstraints().getTaskOrderedAfter(task));
         // Remove the task to replace
@@ -127,9 +127,9 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
         // Add the subtasks constraints to the task network
         for (int i = 0; i < method.getOrderingConstraints().size(); i++) {
             final BitVector cti = method.getOrderingConstraints().getTaskOrderedAfter(i);
-            final BitVector ri = this.getOrderingConstraints().getTaskOrderedAfter(this.getTasks().size() + i);
+            final BitVector ri = this.getOrderingConstraints().getTaskOrderedAfter(this.size() + i);
             ri.or(cti);
-            ri.shiftRight(this.getTasks().size());
+            ri.shiftRight(this.size());
         }
         // Shifts constraints on added subtasks
         for (int i = row.nextSetBit(0); i >= 0; i = row.nextSetBit(i + 1)) {
@@ -149,8 +149,9 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      */
     public final void removeTask(final int task) {
         super.removeTask(task);
-        this.getOrderingConstraints().removeTask(task);
+        this.orderingConstraints.removeTask(task);
     }
+
 
     /**
      * Returns <code>true</code> if the task network is totally ordered.
@@ -160,7 +161,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
     public boolean isTotallyOrdered() {
         return this.getOrderingConstraints().isTotallyOrdered();
     }
-    
+
     /**
      * Returns if this task network has a consistent ordering constraints network.
      *
@@ -168,7 +169,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      *      otherwise.
      */
     public final boolean isConsistent() {
-        return this.getOrderingConstraints().isConsistent();
+        return this.orderingConstraints.isConsistent();
     }
 
     /**
@@ -179,7 +180,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      * @return the  list of tasks with no successors.
      */
     public final List<Integer> getTasksWithNosSuccessors() {
-        return this.getOrderingConstraints().getTasksWithNoSuccessors();
+        return this.orderingConstraints.getTasksWithNoSuccessors();
     }
 
     /**
@@ -189,7 +190,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
      * @return the  list of tasks with no predecessors.
      */
     public final List<Integer> getTasksWithNoPredecessors() {
-        return this.getOrderingConstraints().getTasksWithNoPredecessors();
+        return this.orderingConstraints.getTasksWithNoPredecessors();
     }
 
     /**
@@ -206,7 +207,7 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
         if (obj != null && obj instanceof DefaultTaskNetwork) {
             final DefaultTaskNetwork other = (DefaultTaskNetwork) obj;
             return super.equals(other)
-                && Objects.equals(this.getOrderingConstraints(), other.getOrderingConstraints());
+                && this.getOrderingConstraints().equals(other.getOrderingConstraints());
         }
         return false;
     }
@@ -221,5 +222,4 @@ public class DefaultTaskNetwork extends AbstractTaskNetwork {
     public final int hashCode() {
         return Objects.hash(super.hashCode(), this.getOrderingConstraints());
     }
-
 }
