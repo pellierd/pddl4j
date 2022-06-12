@@ -27,7 +27,7 @@ PARSER_BEGIN(Lexer)
 package fr.uga.pddl4j.parser.lexer;
 
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.ParsedDerivedPredicate;
 import fr.uga.pddl4j.parser.Parser;
@@ -389,7 +389,7 @@ ParsedDomain domain() :
 	try {
 		<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
 			name=domain_name() {
-				this.domain = new ParsedProblemImpl(name);
+				this.domain = new DefaultParsedProblem(name);
 			}
 		right_bracket()
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
@@ -423,7 +423,7 @@ ParsedProblem domain_and_problem() :
 	try {
     	<LEFT_BRACKET> <DEFINE> <LEFT_BRACKET> <DOMAIN>
             name=domain_name() {
-                this.domain = new ParsedProblemImpl(name);
+                this.domain = new DefaultParsedProblem(name);
             }
         <RIGHT_BRACKET>
         [LOOKAHEAD(2) require_def(Lexer.PARSER_DOMAIN)]
@@ -445,7 +445,7 @@ ParsedProblem domain_and_problem() :
     	this.error(e, token.beginLine, token.beginColumn);
     }
     {
-        return new ParsedProblemImpl(this.domain, this.problem);
+        return new DefaultParsedProblem(this.domain, this.problem);
     }
 }
 
@@ -4452,7 +4452,7 @@ ParsedProblem pddl_problem() :
 		<RIGHT_BRACKET>
 		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
-                this.problem = new ParsedProblemImpl(name, domain);
+                this.problem = new DefaultParsedProblem(name, domain);
             }
 		<RIGHT_BRACKET>
 		[LOOKAHEAD(2) require_def(Lexer.PARSER_PROBLEM)]
@@ -4487,7 +4487,7 @@ ParsedProblem htn_problem() : // ADD HDDL
 		<RIGHT_BRACKET>
 		<LEFT_BRACKET> <P_DOMAIN>
 			domain = domain_problem_name() {
-			    this.problem = new ParsedProblemImpl(name, domain);
+			    this.problem = new DefaultParsedProblem(name, domain);
 		    }
 
 		<RIGHT_BRACKET>

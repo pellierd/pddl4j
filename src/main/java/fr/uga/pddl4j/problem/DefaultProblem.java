@@ -15,15 +15,10 @@ package fr.uga.pddl4j.problem;
  * If not, see <http://www.gnu.org/licenses/>
  */
 
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
-import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
-import fr.uga.pddl4j.plan.Plan;
-import fr.uga.pddl4j.planners.LogLevel;
-import fr.uga.pddl4j.planners.Planner;
-import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.operator.DurativeMethod;
 import fr.uga.pddl4j.problem.operator.Method;
@@ -32,7 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.junit.Assert;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -40,23 +34,25 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * This class implements an ADL problem.
+ * This class implements a default problem. this class allows to realize the instantiation of a problem before its
+ * resolution. For the moment, the instantiation process does not deal with the case of fluent objects.
  *
  * @author D. Pellier
  * @version 4.0 - 04.12.2020
  */
-public class ProblemImpl extends FinalizedProblem {
+public class DefaultProblem extends FinalizedProblem {
 
     /**
      * The logger of the class.
      */
-    private static final Logger LOGGER = LogManager.getLogger(ProblemImpl.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(DefaultProblem.class.getName());
 
     /**
-     * Create a new ADL problem from a domain and problem.
+     * Create a new default problem from a domain and problem.
+     *
      * @param problem The problem.
      */
-    public ProblemImpl(final ParsedProblemImpl problem) {
+    public DefaultProblem(final DefaultParsedProblem problem) {
         super(problem);
     }
 
@@ -88,7 +84,7 @@ public class ProblemImpl extends FinalizedProblem {
     }
 
     /**
-     * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
+     * This method initializes the structures needed to the instantiation process from the PDDL domain and problem
      * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
      * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
      * network of the problem into compact int representation.
@@ -415,6 +411,11 @@ public class ProblemImpl extends FinalizedProblem {
     }
 
 
+    /**
+     * TO DO: Remove
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
@@ -424,7 +425,7 @@ public class ProblemImpl extends FinalizedProblem {
         context.updateLoggers();
 
         Parser parser = new Parser();
-        ParsedProblemImpl parsedProblem = null;
+        DefaultParsedProblem parsedProblem = null;
         try {
             System.out.println("Parsing start ...");
             parsedProblem = parser.parse(args[0], args[1]);
@@ -437,7 +438,7 @@ public class ProblemImpl extends FinalizedProblem {
             errorManager.printAll();
         } else {
             System.out.println("Problem parsed with success");
-            Problem pb = new ProblemImpl(parsedProblem);
+            Problem pb = new DefaultProblem(parsedProblem);
             pb.instantiate();
             if (pb.isSolvable()) {
                 System.out.println("Problem solvable");

@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.examples.asp;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
@@ -25,7 +25,7 @@ import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceSearch;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.ProblemImpl;
+import fr.uga.pddl4j.problem.DefaultProblem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
@@ -162,8 +162,8 @@ public class ASP extends AbstractPlanner {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public Problem instantiate(ParsedProblemImpl problem) {
-        final Problem pb = new ProblemImpl(problem);
+    public Problem instantiate(DefaultParsedProblem problem) {
+        final Problem pb = new DefaultProblem(problem);
         pb.instantiate();
         return pb;
     }

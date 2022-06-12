@@ -20,12 +20,12 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.ProblemImpl;
+import fr.uga.pddl4j.problem.DefaultProblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -158,8 +158,8 @@ public final class HSP extends AbstractStateSpacePlanner  {
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public Problem instantiate(ParsedProblemImpl problem) {
-        Problem pb = new ProblemImpl(problem);
+    public Problem instantiate(DefaultParsedProblem problem) {
+        Problem pb = new DefaultProblem(problem);
         pb.instantiate();
         return pb;
     }

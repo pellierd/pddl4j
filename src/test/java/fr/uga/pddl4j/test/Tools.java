@@ -1,15 +1,15 @@
 package fr.uga.pddl4j.test;
 
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.ProblemImpl;
+import fr.uga.pddl4j.problem.DefaultProblem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -129,10 +129,10 @@ public abstract class Tools {
             final File domain = new File(domainFile);
             final File problem = new File(problemFile);
             Parser parser = new Parser();
-            ParsedProblemImpl parsedProblem = parser.parse(domain, problem);
+            DefaultParsedProblem parsedProblem = parser.parse(domain, problem);
             ErrorManager errorManager = parser.getErrorManager();
             if (errorManager.isEmpty()) {
-                return new ProblemImpl(parsedProblem);
+                return new DefaultProblem(parsedProblem);
             }
         } catch (IOException ioExcepion) {
             System.err.println(ioExcepion + " test files not found !");
@@ -226,7 +226,7 @@ public abstract class Tools {
                 Planner planner = Planner.getInstance(name, config);
 
 
-                ParsedProblemImpl parsedProblem = planner.parse(currentDomain, currentProblem);
+                DefaultParsedProblem parsedProblem = planner.parse(currentDomain, currentProblem);
                 ErrorManager errorManager = planner.getParserErrorManager();
                 if (!errorManager.isEmpty()) {
                     errorManager.printAll();
@@ -394,7 +394,7 @@ public abstract class Tools {
             // Parses the PDDL domain and problem description
             try {
                 Parser parser = new Parser();
-                ParsedProblemImpl problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
+                DefaultParsedProblem problemParsed = parser.parse(new File(currentDomain), new File(currentProblem));
                 ErrorManager errorManager = parser.getErrorManager();
                 if (!errorManager.getMessages(Message.Type.PARSER_ERROR).isEmpty()
                         || !errorManager.getMessages(Message.Type.LEXICAL_ERROR).isEmpty()) {
@@ -410,18 +410,18 @@ public abstract class Tools {
                     Problem pb;
                     String typeOfProblem;
                     if (problemParsed.getRequirements().contains(RequireKey.HIERARCHY)) {
-                        pb = new ProblemImpl(problemParsed);
+                        pb = new DefaultProblem(problemParsed);
                         typeOfProblem = "HTN";
                     } else if (problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
-                        pb = new ProblemImpl(problemParsed);
+                        pb = new DefaultProblem(problemParsed);
                         typeOfProblem = "Temporal";
                     } else if (!problemParsed.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
                             && problemParsed.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)) {
 
-                        pb = new ProblemImpl(problemParsed);
+                        pb = new DefaultProblem(problemParsed);
                         typeOfProblem = "Numeric";
                     } else {
-                        pb = new ProblemImpl(problemParsed);
+                        pb = new DefaultProblem(problemParsed);
                         typeOfProblem = "ADL";
                     }
                     pb.instantiate();

@@ -17,7 +17,7 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
@@ -57,7 +57,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      *
      * @param problem the problem.
      */
-    public PostInstantiatedProblem(final ParsedProblemImpl problem) {
+    public PostInstantiatedProblem(final DefaultParsedProblem problem) {
         super(problem);
     }
 

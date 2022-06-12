@@ -16,12 +16,12 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Connector;
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.ParsedAction;
 import fr.uga.pddl4j.parser.ParsedDerivedPredicate;
 import fr.uga.pddl4j.parser.ParsedMethod;
 import fr.uga.pddl4j.parser.NamedTypedList;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.ParsedTaskNetwork;
@@ -65,7 +65,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * The PDDL problem.
      */
-    private ParsedProblemImpl problem;
+    private DefaultParsedProblem problem;
 
     /**
      * The set of requirements of the problem.
@@ -301,7 +301,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @param problem the problem.
      */
-    public AbstractProblem(final ParsedProblemImpl problem) {
+    public AbstractProblem(final DefaultParsedProblem problem) {
         this();
         this.problem = problem;
     }
@@ -311,7 +311,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the parsed problem used to create this problem.
      */
-    public final ParsedProblemImpl getParsedProblem() {
+    public final DefaultParsedProblem getParsedProblem() {
         return this.problem;
     }
 

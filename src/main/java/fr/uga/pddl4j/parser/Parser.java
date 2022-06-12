@@ -365,7 +365,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed.
      * @throws FileNotFoundException if the specified file does not exist.
      */
-    public ParsedProblemImpl parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
+    public DefaultParsedProblem parseDomainAndProblem(String domainAndProblem) throws FileNotFoundException {
         return this.parseDomainAndProblem(new File(domainAndProblem));
     }
 
@@ -376,7 +376,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed.
      * @throws FileNotFoundException if the specified file does not exist.
      */
-    public ParsedProblemImpl parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
+    public DefaultParsedProblem parseDomainAndProblem(File domainAndProblem) throws FileNotFoundException {
         if (!domainAndProblem.exists()) {
             throw new FileNotFoundException("File  \"" + domainAndProblem.getName() + "\" does not exist.\n");
         }
@@ -406,7 +406,7 @@ public final class Parser implements Callable<Integer> {
         this.checkGoal();
         this.checkProblemConstraints();
         this.checkMetric();
-        return new ParsedProblemImpl(this.getDomain(), this.getProblem());
+        return new DefaultParsedProblem(this.getDomain(), this.getProblem());
     }
 
     /**
@@ -511,7 +511,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    public ParsedProblemImpl parse(String domain, String problem) throws FileNotFoundException {
+    public DefaultParsedProblem parse(String domain, String problem) throws FileNotFoundException {
         return this.parse(new File(domain), new File(problem));
     }
 
@@ -523,7 +523,7 @@ public final class Parser implements Callable<Integer> {
      * @return the problem parsed or null if an error occurred while parsing domain or problem.
      * @throws FileNotFoundException if the specified domain or problem file does not exist.
      */
-    public ParsedProblemImpl parse(File domain, File problem) throws FileNotFoundException {
+    public DefaultParsedProblem parse(File domain, File problem) throws FileNotFoundException {
         if (!domain.exists()) {
             throw new FileNotFoundException("File  \"" + domain.getName() + "\" does not exist.\n");
         }
@@ -534,7 +534,7 @@ public final class Parser implements Callable<Integer> {
         ParsedDomain pddlDomain = this.parseDomain(domain);
         // Parse and check the problem
         ParsedProblem pddlProblem = this.parseProblem(problem);
-        return (pddlDomain != null && pddlProblem != null) ? new ParsedProblemImpl(pddlDomain, pddlProblem) : null;
+        return (pddlDomain != null && pddlProblem != null) ? new DefaultParsedProblem(pddlDomain, pddlProblem) : null;
     }
 
     /**

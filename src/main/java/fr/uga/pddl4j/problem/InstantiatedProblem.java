@@ -17,7 +17,7 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.Expression;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.Constants;
@@ -25,7 +25,6 @@ import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -66,7 +65,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
      *
      * @param problem the problem.
      */
-    public InstantiatedProblem(final ParsedProblemImpl problem) {
+    public InstantiatedProblem(final DefaultParsedProblem problem) {
         super(problem);
     }
 

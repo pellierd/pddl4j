@@ -15,12 +15,12 @@
 
 package fr.uga.pddl4j.examples;
 
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.ProblemImpl;
+import fr.uga.pddl4j.problem.DefaultProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 
 import java.io.FileNotFoundException;
@@ -51,7 +51,7 @@ public class ProblemInstantiationExample {
             // Creates an instance of the PDDL parser
             final Parser parser = new Parser();
             // Parses the domain and the problem files.
-            final ParsedProblemImpl parsedProblem = parser.parse(args[0], args[1]);
+            final DefaultParsedProblem parsedProblem = parser.parse(args[0], args[1]);
             // Gets the error manager of the parser
             final ErrorManager errorManager = parser.getErrorManager();
             // Checks if the error manager contains errors
@@ -65,7 +65,7 @@ public class ProblemInstantiationExample {
                 System.out.print("\nparsing domain file \"" + args[0] + "\" done successfully");
                 System.out.print("\nparsing problem file \"" + args[1] + "\" done successfully\n\n");
                 // Create a problem
-                final Problem problem = new ProblemImpl(parsedProblem);
+                final Problem problem = new DefaultProblem(parsedProblem);
                 // Instantiate the planning problem
                 problem.instantiate();
                 // Print the list of actions of the instantiated problem

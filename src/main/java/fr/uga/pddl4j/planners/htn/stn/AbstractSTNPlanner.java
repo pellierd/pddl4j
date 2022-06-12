@@ -15,9 +15,9 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
-import fr.uga.pddl4j.parser.ParsedProblemImpl;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
@@ -26,7 +26,7 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.htn.AbstractHTNPlanner;
 import fr.uga.pddl4j.problem.Problem;
-import fr.uga.pddl4j.problem.ProblemImpl;
+import fr.uga.pddl4j.problem.DefaultProblem;
 import fr.uga.pddl4j.problem.operator.Action;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.LogManager;
@@ -376,7 +376,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
         final Parser parser = this.getParser();
-        final ParsedProblemImpl parsedProblem = parser.parse(this.getDomain(), this.getProblem());
+        final DefaultParsedProblem parsedProblem = parser.parse(this.getDomain(), this.getProblem());
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -501,8 +501,8 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
      * @return the instantiated planning problem or null if the problem cannot be instantiated.
      */
     @Override
-    public Problem instantiate(final ParsedProblemImpl problem) {
-        final Problem pb = new ProblemImpl(problem);
+    public Problem instantiate(final DefaultParsedProblem problem) {
+        final Problem pb = new DefaultProblem(problem);
         pb.instantiate();
         return pb;
     }

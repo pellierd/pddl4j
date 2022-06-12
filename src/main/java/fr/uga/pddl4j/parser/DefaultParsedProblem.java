@@ -35,7 +35,7 @@ import java.util.Set;
  * @author D. Pellier
  * @version 1.0 - 28.06.2021
  */
-public class ParsedProblemImpl implements ParsedDomain, ParsedProblem {
+public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
 
     /**
      * The name of the domain.
@@ -126,7 +126,7 @@ public class ParsedProblemImpl implements ParsedDomain, ParsedProblem {
     /**
      * Creates a new domain.
      */
-    private ParsedProblemImpl() {
+    private DefaultParsedProblem() {
     }
 
     /**
@@ -134,7 +134,7 @@ public class ParsedProblemImpl implements ParsedDomain, ParsedProblem {
      *
      * @param domain the problemName of the domain.
      */
-    public ParsedProblemImpl(final Symbol<String> domain) {
+    public DefaultParsedProblem(final Symbol<String> domain) {
         this();
         // Attributes of a domain
         this.domainName = domain;
@@ -165,7 +165,7 @@ public class ParsedProblemImpl implements ParsedDomain, ParsedProblem {
      * @param problem the name of the problem.
      * @param domain the name of the domain.
      */
-    public ParsedProblemImpl(final Symbol<String> problem, final Symbol<String> domain) {
+    public DefaultParsedProblem(final Symbol<String> problem, final Symbol<String> domain) {
         this(domain);
         this.problemName = problem;
         this.requirements = new LinkedHashSet<>();
@@ -183,7 +183,7 @@ public class ParsedProblemImpl implements ParsedDomain, ParsedProblem {
      * @param domain the domain.
      * @param problem the problem.
      */
-    public ParsedProblemImpl(final ParsedDomain domain, ParsedProblem problem) {
+    public DefaultParsedProblem(final ParsedDomain domain, ParsedProblem problem) {
         this(domain.getDomainName(), problem.getProblemName());
         this.requirements = new LinkedHashSet<>();
         this.requirements.addAll(domain.getRequirements());
@@ -617,13 +617,13 @@ public class ParsedProblemImpl implements ParsedDomain, ParsedProblem {
      *
      * @param object the other object.
      * @return <code>true</code> if the specified object is a non <code>null</code> instance of
-     *          the class <code>ParsedProblemImpl</code> and has the same problem and domain name;
+     *          the class <code>DefaultParsedProblem</code> and has the same problem and domain name;
      *          <code>false</code> otherwise.
      */
     @Override
     public boolean equals(final Object object) {
-        if (object != null && object instanceof ParsedProblemImpl) {
-            ParsedProblemImpl other = (ParsedProblemImpl) object;
+        if (object != null && object instanceof DefaultParsedProblem) {
+            DefaultParsedProblem other = (DefaultParsedProblem) object;
             return this.problemName == null
                 ? this.domainName.equals(other.domainName) && other.problemName == null
                 : this.domainName.equals(other.domainName) && this.problemName.equals(other.problemName);
