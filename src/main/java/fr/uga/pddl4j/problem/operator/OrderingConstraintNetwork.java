@@ -19,6 +19,8 @@
 
 package fr.uga.pddl4j.problem.operator;
 
+import fr.uga.pddl4j.util.BitVector;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -87,4 +89,5 @@ public interface OrderingConstraintNetwork extends Serializable {
      * @param newSize the new size.
      */
     void resize(int newSize);
+
 }

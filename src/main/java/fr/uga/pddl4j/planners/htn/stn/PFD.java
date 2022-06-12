@@ -164,7 +164,7 @@ public final class PFD extends AbstractSTNPlanner {
                 }
             } else {
                 // Get the list of tasks of the current node with no predecessors
-                currentNode.getTaskNetwork().transitiveClosure();
+                currentNode.getTaskNetwork().getOrderingConstraints().transitiveClosure();
                 final List<Integer> tasks = currentNode.getTaskNetwork().getTasksWithNoPredecessors();
 
                 // Get the current state of the search

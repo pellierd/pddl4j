@@ -2266,8 +2266,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             ordering.set(c.getChildren().get(0).getTaskID().getValue(),
                 c.getChildren().get(1).getTaskID().getValue());
         }
+        ordering.transitiveClosure();
         final TaskNetwork tn = new TaskNetwork(tasks, ordering);
-        tn.transitiveClosure();
 
         for (Expression<Integer> e: taskNetwork.getConstraints()) {
             if (e.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
@@ -2347,8 +2347,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 stn.set(task1, task2, TemporalRelation.DIFFERENT);
             }
         }
+        stn.transitiveClosure();
         final TemporalTaskNetwork tn = new TemporalTaskNetwork(tasks, stn);
-        tn.transitiveClosure();
 
         for (Expression<Integer> e: taskNetwork.getConstraints()) {
             if (e.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
