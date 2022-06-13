@@ -240,6 +240,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * Adds an argument to this expression.
      *
      * @param argument the argument to add.
+     * @return <code>true</code> if the argument was added <code>false</code> otherwise.
      */
     public final boolean addArgument(final Symbol<T> argument) {
         if (this.getArguments() == null) {
@@ -271,6 +272,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * Adds a quantified variable to this expression.
      *
      * @param variable the quantified variable to add.
+     * @return <code>true</code> if the variable was added <code>false</code> otherwise.
      */
     public final boolean addQuantifiedVariable(final TypedSymbol<T> variable) {
         if (this.getQuantifiedVariables() == null) {
@@ -298,7 +300,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Returns the variable of this expression
+     * Returns the variable of this expression.
      *
      * @return the variable of this expression.
      */
@@ -548,6 +550,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case OVER_ALL:
                 this.moveTimeSpecifierInward();
                 break;
+            default:
+                break;
         }
     }
 
@@ -555,7 +559,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * Moves the method constraint inward the expression. The method deals with expression of the form (and (constraints
      * gd) ...) or (constraints gd).
      *
-     * @throws UnexpectedExpressionException
+     * @throws UnexpectedExpressionException if the method is called on an expression which is not a hold-before,
+     *      hold-after or hold-between expression.
      */
     private void moveMethodConstrainInward() {
         assert this.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
@@ -566,7 +571,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         if (this.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
                 || this.getConnector().equals((Connector.HOLD_AFTER_METHOD_CONSTRAINT))) {
             child = this.getChildren().get(1);
-        } else if (this.getConnector().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT)){
+        } else if (this.getConnector().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT)) {
             child = this.getChildren().get(2);
         } else {
             throw new UnexpectedExpressionException(this.getConnector().toString());
@@ -773,8 +778,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      *
      * @param domains the value domains associated with the type of quantified variables.
      * @param simplifier the atomic formula simplifier used to simply atomic formula when it is possible in order to
-     *                   to quickly cut off the instantiation of the logical formula. This parameter can be null. In
-     *                   than case no simplification will be done.
+     *      quickly cut off the instantiation of the logical formula. This parameter can be null. In that case no
+     *      simplification will be done.
      */
     public void expandQuantifiedExpression(Map<T, Set<Symbol<T>>> domains, AtomicFormulaSimplifier<T> simplifier) {
         switch (this.getConnector()) {
@@ -815,7 +820,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 }
                 break;
             case FORALL:
-                Set<Symbol<T>> constants = domains.get(this.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
+                final T type = this.getQuantifiedVariables().get(0).getTypes().get(0).getValue();
+                Set<Symbol<T>> constants = domains.get(type);
                 Expression<T> qExp = this.getChildren().get(0);
                 Symbol<T> var = this.getQuantifiedVariables().get(0);
                 this.setConnector(Connector.AND);
@@ -918,6 +924,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      *
      * @param var  the variable.
      * @param cons the constant.
+     * @return <code>true</code> if at least one occurrence of the specified was substituted; <code>false</code>
+     *      otherwise.
      */
     public boolean substitute(final Symbol<T> var, final  Symbol<T> cons) {
         return this.substitute(var, cons, null);
@@ -928,6 +936,11 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      *
      * @param var  the variable.
      * @param cons the constant.
+     * @param simplifier the atomic formula simplifier used to simply atomic formula when it is possible in order to
+     *      quickly cut off the instantiation of the logical formula. This parameter can be null. In that case no
+     *      simplification will be done.
+     * @return <code>true</code> if at least one occurrence of the specified was substituted; <code>false</code>
+     *      otherwise.
      */
     public boolean substitute(final Symbol<T> var, final  Symbol<T> cons, final AtomicFormulaSimplifier simplifier) {
 
@@ -1082,7 +1095,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
 
     /**
      * This method simplify a specified expression. The rules of simplification are as below:
-     * <ul></ul>
+     * <ul>
      * <li> not true eqv false </li>
      * <li> true ^ phi eqv phi </li>
      * <li> false ^ phi eqv false </li>
@@ -1098,12 +1111,6 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * </ul>
      *
      * @return <code>true</code> if the expression was simplified; <code>false</code> otherwise.
-     * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
-     *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM, WHEN, TRUE,
-     *      FALSE, HOLD_AFTER_METHOD_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT, AT_END_METHOD_CONSTRAINT,
-     *      AT_START_METHOD_CONSTRAINT, ALWAYS_METHOD_CONSTRAINT, AT_MOST_ONCE_METHOD_CONSTRAINT,
-     *      SOMETIME_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
-     *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT.
      */
     public final boolean simplify() {
         boolean simplified = false;
@@ -1377,21 +1384,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                     }
                 }
                 break;
-            case EQUAL_COMPARISON:
-            case GREATER_COMPARISON:
-            case GREATER_OR_EQUAL_COMPARISON:
-            case LESS_COMPARISON:
-            case LESS_OR_EQUAL_COMPARISON:
-            case NUMBER:
-            case TASK_ID:
-            case ATOM:
-            case FN_HEAD:
-            case TRUE:
-            case FALSE:
-            case TASK:
-                break;
             default:
-                throw new UnexpectedExpressionException(this.getConnector().toString());
+                break;
         }
         return simplified;
     }
@@ -1518,7 +1512,6 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      */
     @Override
     public boolean equals(final Object object) {
-        if (this == object) return true;
         if (object != null && object instanceof Expression) {
             final Expression<T> other = (Expression<T>) object;
             return Objects.equals(this.getConnector(), other.getConnector())
@@ -1636,9 +1629,9 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                     || this.getChildren().get(0).isMalformedExpression();
                 break;
             case FN_ATOM:
-                    malformed = this.getChildren().size() != 2
-                        || this.getChildren().get(0).isMalformedExpression()
-                        || !this.getChildren().get(1).getConnector().equals(Connector.NUMBER);
+                malformed = this.getChildren().size() != 2
+                    || this.getChildren().get(0).isMalformedExpression()
+                    || !this.getChildren().get(1).getConnector().equals(Connector.NUMBER);
                 break;
             case ATOM:
             case TASK:
@@ -1796,7 +1789,6 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case FORALL:
             case EXISTS:
-                String off = baseOffset + baseOffset + "  ";
                 str.append(" (");
                 str.append(this.getConnector().getImage());
                 str.append(" (");
@@ -1808,6 +1800,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                     str.append(this.getQuantifiedVariables().get(this.getQuantifiedVariables().size() - 1).toString());
                 }
                 str.append(")\n");
+                String off = baseOffset + baseOffset + "  ";
                 str.append(off);
                 str.append(this.children.get(0).toString(off));
                 str.append(")");
@@ -1945,7 +1938,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     /**
      * Convert an expression in conjunctive normal form (CNF).
      */
-    public void toCNF() throws UnexpectedExpressionException {
+    public void toCNF() {
         switch (this.getConnector()) {
             case WHEN:
                 final Expression<T> antecedent = this.getChildren().get(0);
@@ -1990,15 +1983,14 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 this.getChildren().add(copy);
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnector().toString());
+                break;
         }
     }
 
     /**
      * Convert an expression in disjunctive normal form (DNF).
-     *
      */
-    public void toDNF() throws UnexpectedExpressionException {
+    public void toDNF() {
         switch (this.getConnector()) {
             case OR:
                 List<Expression<T>> children = this.getChildren();
@@ -2079,21 +2071,17 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 this.getChildren().add(and);
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnector().toString());
+                break;
         }
     }
 
     /**
-     * Returns the set of task IDs contains in this expression.
+     * Returns the set of task IDs contains in an expression.
      *
+     * @param exp the expression.
      * @return the set of task IDs contains in exp.
-     * @throws UnexpectedExpressionException if the expression is not a TASK, F_TASK_TIME,
-     *      LESS_ORDERING_CONSTRAINT, LESS_OR_EQUAL_ORDERING_CONSTRAINT, GREATER_ORDERING_CONSTRAINT,
-     *      GREATER_OR_EQUAL_ORDERING_CONSTRAINT, EQUAL_ORDERING_CONSTRAINT, HOLD_BEFORE_METHOD_CONSTRAINT,
-     *      HOLD_AFTER_METHOD_CONSTRAINT, SOMETIME_BEFORE_METHOD_CONSTRAINT, SOMETIME_AFTER_METHOD_CONSTRAINT,
-     *      HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT OR AND.
      */
-    public static Set<Symbol<String>> getTaskIDs(Expression<String> exp) throws UnexpectedExpressionException {
+    public static Set<Symbol<String>> getTaskIDs(Expression<String> exp) {
         Set<Symbol<String>> taskIDs  = new HashSet<Symbol<String>>();
         switch (exp.getConnector()) {
             case TASK:
@@ -2138,27 +2126,57 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnector().toString());
+                break;
         }
         return taskIDs;
     }
 
+    /**
+     * Returns if this expression is a leaf of the syntax tree. An expression is a leaf if it is an ATOM, a TASK,
+     * a FN_HEAD, an EQUAL_ATOM, a TASK_ID, a TIMED_TASK_ID, a TIME_VAR, a NUMBER, TRUE or FALSE.
+     *
+     * @return if this expression is a leaf of the syntax tree.
+     */
     public final boolean isLeaf() {
         return this.getConnector().equals(Connector.ATOM)
             || this.getConnector().equals(Connector.TASK)
             || this.getConnector().equals(Connector.FN_HEAD)
-            || this.getConnector().equals(Connector.EQUAL_ATOM);
+            || this.getConnector().equals(Connector.EQUAL_ATOM)
+            || this.getConnector().equals(Connector.TASK_ID)
+            || this.getConnector().equals(Connector.TIMED_TASK_ID)
+            || this.getConnector().equals(Connector.NUMBER)
+            || this.getConnector().equals(Connector.TRUE)
+            || this.getConnector().equals(Connector.FALSE)
+            || this.getConnector().equals(Connector.TIME_VAR);
+
     }
 
+    /**
+     * Returns an iterator over the children expressions of the expression. this iterator walks the syntax tree of the
+     * expression in depth first.
+     *
+     * @return an iterator over the children expressions of the expression.
+     */
     @Override
-    public Iterator<Expression<T> > iterator() {
+    public Iterator<Expression<T>> iterator() {
         return new PreOrderIterator(this);
     }
 
-    private class PreOrderIterator implements Iterator<Expression<T> > {
+    /**
+     * The inner class used to store the stack of the syntax tree of the expression.
+     */
+    private class PreOrderIterator implements Iterator<Expression<T>> {
 
+        /**
+         * The stack to store the pending subexpressions of the expression.
+         */
         Stack<Expression<T>> stack = new Stack<>();
 
+        /**
+         * Creates a new iterator for an expression.
+         *
+         * @param expression the expression.
+         */
         public PreOrderIterator(Expression<T> expression) {
             if (expression.isLeaf()) {
                 this.stack.push(expression);
@@ -2167,11 +2185,21 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             }
         }
 
+        /**
+         * Returns if there is still an element to iterate.
+         *
+         * @return <code>true</code>if there is still an element to iterate; <code>false</code> otherwise.
+         */
         @Override
         public boolean hasNext() {
             return !this.stack.isEmpty();
         }
 
+        /**
+         * Returns the next expression to iterate.
+         *
+         * @return the next expression to iterate or null if no more element can be iterated.
+         */
         @Override
         public Expression<T> next() {
             Expression<T> expression = stack.remove(0);

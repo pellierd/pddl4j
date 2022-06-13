@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * This class implements a parsed problem from the PDDL parser.
+ * This class implements a parsed problem. This object is returned by the parser after parsing.
  *
  * @author D. Pellier
  * @version 1.0 - 28.06.2021
@@ -725,7 +725,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
             this.renameTaskIDs(tn.getTasks(), taskIDCtx);
             // Rename the tag ID used in the ordering constraints of the method
             this.renameTaskIDs(tn.getOrdering(), taskIDCtx);
-            // In this case enumerate the orderings contraints in the cas of totally ordered
+            // In this case enumerate the orderings constraints in the cas of totally ordered
             if (tn.isTotallyOrdered()) {
                 tn.setOrdering(new Expression<String>(Connector.AND));
                 for (int i = 1; i < tn.getTasks().getChildren().size(); i++) {
@@ -744,8 +744,8 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
+     * @see Expression#simplify()
+     * @see Expression#toNNF() ()
      */
     private final void normalize(ParsedAction action) {
         this.normalize(action, 0);
@@ -758,9 +758,8 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      *
      * @param index the index of the first variable, index, i.e., ?Xi.
      * @return the renamed variable.
-     * @see Expression<String>#renameVariables(Expression
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
+     * @see Expression#simplify()
+     * @see Expression#toNNF() ()
      */
     private Map<String, String> normalize(ParsedAction action, int index) {
         final Map<String, String> context = this.normalizeParameters(action, index);
@@ -778,43 +777,17 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
         return context;
     }
 
-
     /**
      * Normalizes the methods. This method renames the parameters of the operator used in its preconditions, its
      * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
+     * @see Expression#simplify()
+     * @see Expression#toNNF() ()
      */
     private final void normalize(ParsedMethod method) {
         this.normalize(method, 0);
     }
-
-    /**
-     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
-     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
-     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
-     *
-     * @param index the index of the first variable, index, i.e., ?Xi.
-     * @return the renamed variable.
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF() ()
-     */
-    private Map<String, String> normalizeParameters(ParsedOperator operator, int index) {
-        int i = index;
-        // Rename the parameters
-        final Map<String, String> context = new LinkedHashMap<>();
-        final List<TypedSymbol<String>> parameters = operator.getParameters();
-        for (final TypedSymbol<String> params : parameters) {
-            final String image = this.renameVariables(params, i);
-            context.put(image, params.getValue());
-            i++;
-        }
-        return context;
-    }
-
-
 
     /**
      * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, and its
@@ -896,9 +869,8 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      * This method renames the variable of the derived predicated and simplifies its body before converting it into
      * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
      *
-     * @see Expression<String>#renameVariables(Expression)
-     * @see Expression<String>#simplify()
-     * @see Expression<String>#toNNF()
+     * @see Expression#simplify()
+     * @see Expression#toNNF()
      */
     private void normalize(final ParsedDerivedPredicate derivedPredicate) {
         // Rename the head of the derived predicate
@@ -917,6 +889,29 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
     }
 
     /**
+     * Normalizes the operators. This method renames the parameters of the operator used in its preconditions, its
+     * effects and its durative constraints. It also simplifies all the logical expression and converts it into it
+     * negative normal form. Not that imply expression are also replace by their disjunctive equivalence.
+     *
+     * @param index the index of the first variable, index, i.e., ?Xi.
+     * @return the renamed variable.
+     * @see Expression#simplify()
+     * @see Expression#toNNF() ()
+     */
+    private Map<String, String> normalizeParameters(ParsedOperator operator, int index) {
+        int i = index;
+        // Rename the parameters
+        final Map<String, String> context = new LinkedHashMap<>();
+        final List<TypedSymbol<String>> parameters = operator.getParameters();
+        for (final TypedSymbol<String> params : parameters) {
+            final String image = this.renameVariables(params, i);
+            context.put(image, params.getValue());
+            i++;
+        }
+        return context;
+    }
+
+    /**
      * Renames the variables contained in the expression. The variable renames have the form ?X0,..., ?Xn.
      */
     private void renameVariables(Expression<String> exp) {
@@ -931,7 +926,8 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      * @throws MalformedExpressionException if this expression is malformed.
      * @see Expression#isMalformedExpression()
      */
-    private void renameVariables(final Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
+    private void renameVariables(final Expression<String> exp, final Map<String, String> context)
+            throws MalformedExpressionException {
         if (exp.isMalformedExpression()) {
             throw new MalformedExpressionException("Expression " + exp.getConnector() + " is malformed");
         }
@@ -941,7 +937,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
             case EQUAL_ATOM:
             case TASK:
                 for (int i = 0; i < exp.getArguments().size(); i++) {
-                    this.renameVariables( exp.getArguments().get(i), context);
+                    this.renameVariables(exp.getArguments().get(i), context);
                 }
                 break;
             case AND:
@@ -1076,6 +1072,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      * Renames the task ID symbol according to a specific context. The symbol is renamed if only if this symbol is a
      * task ID, otherwise nothing is done.
      *
+     * @paral symbol the task id symbol.
      * @param context the images of the already renamed task ID.
      * @return the old image of the symbol or null if the symbol was not renamed.
      */
@@ -1096,6 +1093,8 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
 
     /**
      * Renames the tag of the tasks contained in the expression. The tag tasks renames have the form T0, ..., Tn.
+     *
+     * @param exp the expression to rename.
      */
     public void renameTaskIDs(Expression<String> exp) {
         this.renameTaskIDs(exp, new LinkedHashMap<>());
@@ -1103,14 +1102,16 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
 
     /**
      * Renames the ID of the task contained in the expression with a specified symbol, i.e., the tag tasks
-     * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are alowed as
-     * tasks expression for the moment in method description.
+     * already renamed. The ID of the task renames have the form T0, ..., Tn. In HDDL, only and expression are allowed
+     * as tasks expression for the moment in method description.
      *
+     * @param exp the expression to rename.
      * @param context the images of the renamed ID of the task.
      * @throws MalformedExpressionException if this expression is not an AND expression.
      * @see Expression#isMalformedExpression()
      */
-    private void renameTaskIDs(Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
+    private void renameTaskIDs(Expression<String> exp, final Map<String, String> context)
+            throws MalformedExpressionException {
         if (exp.isMalformedExpression()) {
             throw new MalformedExpressionException("Expression " + exp.getConnector() + " is malformed");
         }
