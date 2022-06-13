@@ -19,8 +19,8 @@ import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.DefaultProblem;
+import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.operator.Action;
 
 import java.io.FileNotFoundException;

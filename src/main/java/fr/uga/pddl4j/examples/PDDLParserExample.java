@@ -15,10 +15,10 @@
 
 package fr.uga.pddl4j.examples;
 
+import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
-import fr.uga.pddl4j.parser.DefaultParsedProblem;
 
 /**
  * The class is an example class. It shows how to use the library to create a PDDL parser and use it to parse PDDL
