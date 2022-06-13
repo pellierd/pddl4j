@@ -412,9 +412,9 @@ public class DefaultProblem extends FinalizedProblem {
 
 
     /**
-     * TO DO: Remove
+     * TO DO: Remove.
      *
-     * @param args
+     * @param args the domain and the problem to instantiate.
      */
     public static void main(String[] args) {
 

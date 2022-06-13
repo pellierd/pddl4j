@@ -59,8 +59,8 @@ public class ParsedAction extends ParsedAbstractOperator {
      * @param preconds   The goal description that represents the preconditions of the operator.
      * @param effects    The goal description that represents the effects of the operator.
      */
-    public ParsedAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconds,
-                        final Expression<String> effects) {
+    public ParsedAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                        final Expression<String> preconds, final Expression<String> effects) {
         this(name, parameters, preconds, effects, null);
     }
 
@@ -75,8 +75,9 @@ public class ParsedAction extends ParsedAbstractOperator {
      *                      operator.
      * @throws NullPointerException if the specified name, parameters, preconditions or effects are null.
      */
-    public ParsedAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> preconditions,
-                        final Expression<String> effects, final Expression<String> duration) {
+    public ParsedAction(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                        final Expression<String> preconditions, final Expression<String> effects,
+                        final Expression<String> duration) {
         super(name, parameters, preconditions, duration);
         this.effects = effects;
     }

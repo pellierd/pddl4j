@@ -168,7 +168,8 @@ public final class Method extends AbstractOperator {
      *
      * @param task1 the first task.
      * @param task2 the second task.
-     * @return the condition that must hold between two tasks or null if t1 or t2 task is not a task of the task network.
+     * @return the condition that must hold between two tasks or null if t1 or t2 task is not a task of the
+     *      task network.
      */
     public Condition getBetweenConstraints(int task1, int task2) {
         return this.taskNetwork.getBetweenConstraints(task1, task2);

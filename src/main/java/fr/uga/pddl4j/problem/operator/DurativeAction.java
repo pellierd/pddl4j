@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a compact representation for durative actions for the planning process.
+ * This class implements a compact representation for a durative action.
  *
  * @author D. Pellier
  * @version 1.0 - 03.06.2022
@@ -93,7 +93,8 @@ public class DurativeAction extends AbstractDurativeOperator {
      * @param precondition the precondition of the action.
      * @param effect       the effects of the action.
      */
-    public DurativeAction(final String name, final int arity, final TemporalCondition precondition, final TemporalEffect effect) {
+    public DurativeAction(final String name, final int arity, final TemporalCondition precondition,
+            final TemporalEffect effect) {
         this(name, arity);
         this.setPrecondition(precondition);
         this.addConditionalEffect(new TemporalConditionalEffect(effect));

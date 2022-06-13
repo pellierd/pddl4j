@@ -69,7 +69,8 @@ public abstract class ParsedAbstractOperator extends AbstractParsedObject implem
         }
         this.name = new Symbol<String>(other.getName());
         this.parameters = new LinkedList<>();
-        this.parameters.addAll(other.getParameters().stream().map(TypedSymbol<String>::new).collect(Collectors.toList()));
+        this.parameters.addAll(other.getParameters().stream().map(TypedSymbol<String>::new)
+            .collect(Collectors.toList()));
         this.preconditions = new Expression<String>(other.getPreconditions());
         if (this.duration != null) {
             this.duration = new Expression<String>(other.getDuration());

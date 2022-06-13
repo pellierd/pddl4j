@@ -18,23 +18,23 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.Expression;
+import fr.uga.pddl4j.parser.NamedTypedList;
 import fr.uga.pddl4j.parser.ParsedAction;
 import fr.uga.pddl4j.parser.ParsedDerivedPredicate;
 import fr.uga.pddl4j.parser.ParsedMethod;
-import fr.uga.pddl4j.parser.NamedTypedList;
+import fr.uga.pddl4j.parser.ParsedTaskNetwork;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
-import fr.uga.pddl4j.parser.ParsedTaskNetwork;
+import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.TimeSpecifier;
 import fr.uga.pddl4j.parser.TypedSymbol;
-import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
 import fr.uga.pddl4j.problem.operator.AbstractIntOperator;
+import fr.uga.pddl4j.problem.operator.DefaultOrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
-import fr.uga.pddl4j.problem.operator.DefaultOrderingConstraintNetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -699,9 +699,11 @@ public abstract class AbstractProblem implements Problem {
                         image.append("~");
                         image.append(type.getValue());
                     }
-                    argType.add(new Symbol<Integer>(SymbolType.TYPE, this.typeSymbols.indexOf(image.toString())));
+                    argType.add(new Symbol<Integer>(SymbolType.TYPE,
+                        this.typeSymbols.indexOf(image.toString())));
                 } else {
-                    argType.add(new Symbol<Integer>(SymbolType.TYPE, this.typeSymbols.indexOf(types.get(0).getValue())));
+                    argType.add(new Symbol<Integer>(SymbolType.TYPE,
+                        this.typeSymbols.indexOf(types.get(0).getValue())));
                 }
             }
             this.predicateSignatures.add(argType);
@@ -1199,7 +1201,8 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT,
+                            this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1213,7 +1216,8 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT,
+                            this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1227,7 +1231,8 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT,
+                            this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1244,7 +1249,8 @@ public abstract class AbstractProblem implements Problem {
                 final List<TypedSymbol<String>> qvar = exp.getQuantifiedVariables();
                 final String type = this.toStringType(qvar.get(0).getTypes());
                 int typeIndex = this.getTypes().indexOf(type);
-                final TypedSymbol<Integer> intQvar  = new TypedSymbol<Integer>(SymbolType.VARIABLE, -variables.size() - 1);
+                final TypedSymbol<Integer> intQvar  = new TypedSymbol<Integer>(SymbolType.VARIABLE,
+                    -variables.size() - 1);
                 intQvar.addType(new Symbol<>(SymbolType.TYPE, typeIndex));
                 intExp.addQuantifiedVariable(intQvar);
                 newVariables.add(qvar.get(0).getValue());
@@ -1316,7 +1322,8 @@ public abstract class AbstractProblem implements Problem {
                     if (argument.getType().equals(SymbolType.VARIABLE)) {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
-                        args.add(new Symbol<>(SymbolType.CONSTANT, this.getConstantSymbols().indexOf(argument.getValue())));
+                        args.add(new Symbol<>(SymbolType.CONSTANT,
+                            this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded

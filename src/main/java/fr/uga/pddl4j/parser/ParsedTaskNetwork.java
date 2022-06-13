@@ -94,8 +94,8 @@ public class ParsedTaskNetwork implements Serializable {
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
-    public ParsedTaskNetwork(final Expression<String> tasks,
-                             final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedTaskNetwork(final Expression<String> tasks, final Expression<String> ordering,
+                             final Expression<String> constraints, final boolean ordered) {
         super();
         this.setParameters(new ArrayList<>());
         this.setTasks(tasks);
@@ -115,7 +115,8 @@ public class ParsedTaskNetwork implements Serializable {
      * @throws NullPointerException if one of the specified parameter except the precondition is null.
      */
     public ParsedTaskNetwork(final List<TypedSymbol<String>> parameters, final Expression<String> tasks,
-                             final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+                             final Expression<String> ordering, final Expression<String> constraints,
+                             final boolean ordered) {
         super();
         this.setParameters(parameters);
         this.setTasks(tasks);

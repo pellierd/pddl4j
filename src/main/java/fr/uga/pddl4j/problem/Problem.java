@@ -15,8 +15,8 @@
 
 package fr.uga.pddl4j.problem;
 
-import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.plan.Hierarchy;

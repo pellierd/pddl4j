@@ -226,10 +226,8 @@ public class Location implements Serializable {
     /**
      * Returns if an object location is equal to the location.
      *
-     * @return the object is equal to this location if it is an object of the class {@code Location} and iy has the same
-     *  begin and end line and begin and end column.
-     *
-     * @return {@code true} if the specified object is equals to this location.
+     * @return {@code true} if the object is equal to this location, i.e., if it is an object of the class
+     *      {@code Location} and it has the same begin and end line and begin and end column; otherwise {@code false}.
      */
     @Override
     public boolean equals(final Object object) {
@@ -247,6 +245,7 @@ public class Location implements Serializable {
      * Returns the has code value of this location.
      *
      * @return the has code value of this location.
+     * @see Object#hashCode()
      */
     @Override
     public int hashCode() {

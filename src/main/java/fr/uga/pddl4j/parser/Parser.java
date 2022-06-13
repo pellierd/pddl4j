@@ -838,8 +838,9 @@ public final class Parser implements Callable<Integer> {
             && this.problem.getProblemName() != null
             && !this.domain.getDomainName().equals(this.problem.getDomainName())) {
             this.mgr.logParserWarning("domain name \"" + this.problem.getDomainName()
-                + "\" used in problem doest not match.", this.lexer.getFile(), this.problem
-                .getDomainName().getLocation().getBeginLine(), this.problem.getDomainName().getLocation().getBeginColumn());
+                + "\" used in problem doest not match.", this.lexer.getFile(),
+                this.problem.getDomainName().getLocation().getBeginLine(),
+                this.problem.getDomainName().getLocation().getBeginColumn());
             checked = false;
         }
         return checked;
@@ -903,7 +904,8 @@ public final class Parser implements Callable<Integer> {
             }
             if (!consistent) {
                 this.mgr.logParserError("Inconsistent types declaration for type \"" + type.getValue()
-                    + "\"", this.lexer.getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
+                    + "\"", this.lexer.getFile(), type.getLocation().getBeginLine(),
+                    type.getLocation().getBeginColumn());
             }
         }
 
@@ -1155,8 +1157,9 @@ public final class Parser implements Callable<Integer> {
                 Symbol<String> taskSymbol = meth.getTask().getSymbol();
                 if (actionSet.contains(taskSymbol.getValue())) {
                     this.mgr.logParserError("task symbol \"" + taskSymbol.getValue()
-                            + "\" already used as action name",
-                            this.lexer.getFile(), taskSymbol.getLocation().getBeginLine(), taskSymbol.getLocation().getBeginColumn());
+                        + "\" already used as action name",
+                        this.lexer.getFile(), taskSymbol.getLocation().getBeginLine(),
+                        taskSymbol.getLocation().getBeginColumn());
                     checked &= false;
                 }
                 checked &= this.checkParserNode(meth.getSubTasks(), meth.getParameters());
@@ -1169,8 +1172,8 @@ public final class Parser implements Callable<Integer> {
                     for (Symbol<String> id : durativeIds) {
                         if (!taskIds.contains(id)) {
                             this.mgr.logParserError("task id \"" + id + "\" in the durative constraints of the "
-                                + "method " + "\"" + meth.getName() + "\" is undefined",
-                                this.lexer.getFile(), id.getLocation().getBeginLine(), id.getLocation().getBeginColumn());
+                                + "method " + "\"" + meth.getName() + "\" is undefined", this.lexer.getFile(),
+                                id.getLocation().getBeginLine(), id.getLocation().getBeginColumn());
                             checked = false;
                         }
                     }
@@ -1209,7 +1212,7 @@ public final class Parser implements Callable<Integer> {
      * Checks that the orderings constraints are acyclic. It wor
      *
      * @param constraints the ordering constraints expression. We make the assumption that the constraints are described
-     *                    by an AND Expression<String>.
+     *      by an AND expression.
      *
      * @return true if a set of ordering constraints are acyclic, false otherwise.
      */
@@ -1245,7 +1248,8 @@ public final class Parser implements Callable<Integer> {
             Symbol<String> task = entry.getKey();
             if (entry.getValue().contains(task)) {
                 this.mgr.logParserError("cyclical constraint involving the task \"" + task.getValue()
-                    + "\" in method declaration", this.lexer.getFile(), task.getLocation().getBeginLine(), task.getLocation().getBeginColumn());
+                    + "\" in method declaration", this.lexer.getFile(), task.getLocation().getBeginLine(),
+                    task.getLocation().getBeginColumn());
                 check = false;
             }
         }
@@ -1273,8 +1277,9 @@ public final class Parser implements Callable<Integer> {
                 for (Symbol<String> id : orderingIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the ordering constrains of the "
-                                + "initial task network is undefined", this.lexer.getFile(), id.getLocation().getBeginLine(),
-                                id.getLocation().getBeginColumn());
+                            + "initial task network is undefined", this.lexer.getFile(),
+                            id.getLocation().getBeginLine(),
+                            id.getLocation().getBeginColumn());
                         checked = false;
                     }
                 }
@@ -1282,7 +1287,8 @@ public final class Parser implements Callable<Integer> {
                 for (Symbol<String> id : constIds) {
                     if (!taskIds.contains(id)) {
                         this.mgr.logParserError("task id \"" + id + "\" in the constrains of the "
-                            +  "initial task network is undefined", this.lexer.getFile(), id.getLocation().getBeginLine(),
+                            +  "initial task network is undefined", this.lexer.getFile(),
+                            id.getLocation().getBeginLine(),
                             id.getLocation().getBeginColumn());
                         checked = false;
                     }
@@ -1310,8 +1316,9 @@ public final class Parser implements Callable<Integer> {
         if (exp.getConnector().equals(Connector.TASK) && exp.getTaskID() != null) {
             if (!taskIDs.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in initial task network "
-                    + "is already defined", this.lexer
-                    .getFile(), exp.getTaskID().getLocation().getBeginLine(), exp.getTaskID().getLocation().getBeginColumn());
+                    + "is already defined", this.lexer.getFile(),
+                    exp.getTaskID().getLocation().getBeginLine(),
+                    exp.getTaskID().getLocation().getBeginColumn());
                 unique = false;
             }
         } else {
@@ -1345,8 +1352,9 @@ public final class Parser implements Callable<Integer> {
         if (exp.getConnector().equals(Connector.TASK) && exp.getTaskID() != null) {
             if (!taskIds.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in method "
-                    + "\"" + meth.getName() + "\" is already defined", this.lexer
-                    .getFile(), exp.getTaskID().getLocation().getBeginLine(), exp.getTaskID().getLocation().getBeginColumn());
+                    + "\"" + meth.getName() + "\" is already defined", this.lexer.getFile(),
+                    exp.getTaskID().getLocation().getBeginLine(),
+                    exp.getTaskID().getLocation().getBeginColumn());
                 unique = false;
             }
         } else {
@@ -1392,8 +1400,8 @@ public final class Parser implements Callable<Integer> {
                         for (Symbol<String> type : variable.getTypes()) {
                             if (!this.domain.isDeclaredType(type)) {
                                 this.mgr.logParserError("type \"" + type.getValue()
-                                    + "\" used in quantified expression is undefined", this.lexer
-                                    .getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
+                                    + "\" used in quantified expression is undefined", this.lexer.getFile(),
+                                    type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                                 error |= true;
                             }
                         }
@@ -1664,8 +1672,10 @@ public final class Parser implements Callable<Integer> {
             for (Symbol<String> type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getValue() + "\" of the parameter \""
-                            + parameter + "\" in the action \"" + action.getName() + "\" is undefined",
-                        this.lexer.getFile(), parameter.getLocation().getBeginLine(), parameter.getLocation().getBeginColumn());
+                        + parameter + "\" in the action \"" + action.getName() + "\" is undefined",
+                        this.lexer.getFile(),
+                        parameter.getLocation().getBeginLine(),
+                        parameter.getLocation().getBeginColumn());
                     checked = false;
                 }
             }
@@ -1694,8 +1704,10 @@ public final class Parser implements Callable<Integer> {
             for (Symbol<String> type : parameter.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
                     this.mgr.logParserError("type \"" + type.getValue() + "\" of the parameter \""
-                            + parameter + "\" in method \"" + method.getName() + "\" is undefined",
-                        this.lexer.getFile(), parameter.getLocation().getBeginLine(), parameter.getLocation().getBeginColumn());
+                        + parameter + "\" in method \"" + method.getName() + "\" is undefined",
+                        this.lexer.getFile(),
+                        parameter.getLocation().getBeginLine(),
+                        parameter.getLocation().getBeginColumn());
                     checked = false;
                 }
             }
@@ -1750,14 +1762,6 @@ public final class Parser implements Callable<Integer> {
     private boolean checkActionSemantic(ParsedAction action) {
         boolean check = true;
         int i = 0;
-        // Rename the parameters
-        //final Map<String, String> context = new LinkedHashMap<>();
-        //final List<TypedSymbol<String>> parameters = action.getParameters();
-        //for (final TypedSymbol<String> params : parameters) {
-            //final String image = Expression.renameVariables(params, i);
-        //    context.put(image, params.getValue());
-        //    i++;
-        //}
         // Check preconditions
         final Expression<String> preconditions = action.getPreconditions();
         //Expression.renameVariables(preconditions, context);
@@ -1775,7 +1779,6 @@ public final class Parser implements Callable<Integer> {
         }
         // Check effects
         final Expression<String> effects = action.getPreconditions();
-        //Expression.renameVariables(effects, context);
         check &= this.checkExpressionSemantic(effects);
         if (effects.getConnector().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
@@ -1800,17 +1803,8 @@ public final class Parser implements Callable<Integer> {
     private boolean checkMethodSemantic(ParsedMethod method) {
         boolean check = true;
         int i = 0;
-        // Rename the parameters
-        //final Map<String, String> context = new LinkedHashMap<>();
-        //final List<TypedSymbol<String>> parameters = method.getParameters();
-        //for (final TypedSymbol<String> params : parameters) {
-        //    //final String image = Expression.renameVariables(params, i);
-        //    context.put(image, params.getValue());
-        //    i++;
-        //}
         // Check the method preconditions
         final Expression<String> preconditions = method.getPreconditions();
-        //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
         if (preconditions.getConnector().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
@@ -1837,11 +1831,11 @@ public final class Parser implements Callable<Integer> {
      *     <li>duplicated expression</li>
      * </ul>
      *
+     * @param exp the expression to check.
      * @return <code>true</code> if the expression succeeds the test; <code>false</code> otherwise.
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, IMPLY, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM,
      *      WHEN, TRUE and FALSE.
-     * @param exp
      */
     private boolean checkExpressionSemantic(final Expression<String> exp) {
         // Expression cannot be evaluated due to lexical failure

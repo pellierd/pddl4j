@@ -114,9 +114,6 @@ public class NamedTypedList implements Serializable {
      * @param type the type to add.
      */
     public void addType(final Symbol<String> type) {
-         /*if (!type.equals(Parser.OBJECT)) {
-            this.types.remove(Parser.OBJECT);
-        }*/
         if (!this.types.contains(type)) {
             this.types.add(type);
         }

@@ -8,8 +8,8 @@ import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.DefaultProblem;
+import fr.uga.pddl4j.problem.Problem;
 import org.junit.Assert;
 
 import java.io.BufferedReader;

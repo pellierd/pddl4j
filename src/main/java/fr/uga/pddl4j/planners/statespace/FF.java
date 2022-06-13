@@ -23,8 +23,8 @@ import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 
-import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.DefaultProblem;
+import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;

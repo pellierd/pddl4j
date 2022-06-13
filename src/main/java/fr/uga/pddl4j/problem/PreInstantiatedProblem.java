@@ -772,7 +772,9 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @return if the atomic expression was simply or not.
      */
     public boolean simplify(final Expression<Integer> exp) {
-        if (!exp.getConnector().equals(Connector.ATOM)) return false;
+        if (!exp.getConnector().equals(Connector.ATOM)) {
+            return false;
+        }
         final int predicate = exp.getSymbol().getValue();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.

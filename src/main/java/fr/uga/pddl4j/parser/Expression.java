@@ -1928,6 +1928,10 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 str.append(this.getTaskID().getImage());
                 str.append(")");
                 break;
+            case TRUE:
+            case FALSE:
+                str.append(this.getConnector().toString());
+                break;
             default:
                 throw new UnexpectedExpressionException(this.getConnector().toString());
 

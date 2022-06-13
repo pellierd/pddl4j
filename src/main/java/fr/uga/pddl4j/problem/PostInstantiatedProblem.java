@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Connector;
-import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.IntAction;
@@ -688,7 +688,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             m.getConstraints().simplify();
             if (!m.getPreconditions().getConnector().equals(Connector.FALSE)
                     && !m.getConstraints().getConnector().equals(Connector.FALSE)) {
-                    toAdd.add(m);
+                toAdd.add(m);
             } else {
                 //System.out.println("Method "+ i + " can be removed for task " + this.toString(m.getTask()));
                 //System.out.println(this.toString(m));

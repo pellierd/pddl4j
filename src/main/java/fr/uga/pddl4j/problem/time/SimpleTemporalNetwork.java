@@ -21,6 +21,7 @@ package fr.uga.pddl4j.problem.time;
 
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.problem.operator.AbstractOrderingConstraintNetwork;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +82,6 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
             this.network.add(list);
         }
     }
-
 
     /**
      * Returns the temporal relation between two specified task.
@@ -165,7 +165,7 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
      */
     @Override
     public int size() {
-        return this.network.size()/2;
+        return this.network.size() / 2;
     }
 
     /**
@@ -179,12 +179,6 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
     }
 
 
-
-    //public void removeRow(int task) {
-    //}
-
-    public void removeColumn(int task) {
-    }
 
     /**
      * TO DO: NOT IMPLEMENTED
@@ -229,8 +223,8 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
             for (int j = 0; j < this.network.size(); j++) {
                 str.append("(");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                str.append(i/2);
-                if (i%2 == 0) {
+                str.append(i / 2);
+                if (i % 2 == 0) {
                     str.append("_start ");
                 } else {
                     str.append("_end ");
@@ -238,8 +232,8 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
                 str.append(this.get(i, j));
                 str.append(" ");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
-                str.append(j/2);
-                if (j%2 == 0) {
+                str.append(j / 2);
+                if (j % 2 == 0) {
                     str.append("_start)\n");
                 } else {
                     str.append("_end)\n");
@@ -252,7 +246,7 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
     /**
      * TO REMOVED.
      *
-     * @param args
+     * @param args no arguments.
      */
     public static void main(String[] args) {
         SimpleTemporalNetwork network = new SimpleTemporalNetwork(6);

@@ -16,8 +16,8 @@
 package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.Connector;
-import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.problem.operator.Constants;
@@ -285,10 +285,14 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             final Expression<Integer> precond = method.getPreconditions();
             precond.simplify();
-            if (precond.getConnector().equals(Connector.FALSE)) return;
+            if (precond.getConnector().equals(Connector.FALSE)) {
+                return;
+            }
             final Expression<Integer> constraints = method.getConstraints();
             constraints.simplify();
-            if (constraints.getConnector().equals(Connector.FALSE)) return;
+            if (constraints.getConnector().equals(Connector.FALSE)) {
+                return;
+            }
             methods.add(method);
         } else if (method.getValueOfParameter(index) >= 0) {
             this.instantiate(method, index + 1, bound, methods);

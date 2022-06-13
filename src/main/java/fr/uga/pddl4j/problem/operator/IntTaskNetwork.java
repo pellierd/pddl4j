@@ -19,8 +19,8 @@
 
 package fr.uga.pddl4j.problem.operator;
 
-import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.Connector;
+import fr.uga.pddl4j.parser.Expression;
 
 import java.io.Serializable;
 import java.util.Arrays;

@@ -52,7 +52,8 @@ public interface TaskNetwork extends Serializable {
      *
      * @param task1 the first task.
      * @param task2 the second task.
-     * @return the condition that must hold between two tasks or null if t1 or t2 task is not a task of the task network.
+     * @return the condition that must hold between two tasks or null if t1 or t2 task is not a task of the
+     *      task network.
      */
     Condition getBetweenConstraints(int task1, int task2);
 
@@ -101,10 +102,10 @@ public interface TaskNetwork extends Serializable {
     /**
      * Returns if this task network has a consistent ordering constraints network.
      *
-     * @return <code>true</code> if this task network has a consistent ordering constraints networks, <code>false</code>
-     *      otherwise.
+     * @return {@code true} if this task network has a consistent ordering constraints networks,
+     *      {@code false} otherwise.
      */
-     boolean isConsistent();
+    boolean isConsistent();
 
     /**
      * Returns the list of tasks with no successors. The method works if only if the method

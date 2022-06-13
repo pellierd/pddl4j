@@ -32,6 +32,9 @@ public interface Locatable {
 
     /**
      * Returns the location of the object.
+     *
+     * @return the location of the object.
+     * @see Location
      */
     Location getLocation();
 

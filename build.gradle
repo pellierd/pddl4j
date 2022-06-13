@@ -57,7 +57,7 @@ jjdoc {
 compileJava {
     options.compilerArgs += '-proc:none'
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
-//    options.compilerArgs += '-Xlint:none'
+    options.compilerArgs += '-Xlint:unchecked'
 }
 
 compileTestJava {

@@ -63,9 +63,11 @@ public class ParsedMethod extends ParsedAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                        final Expression<String> duration, final Expression<String> preconditions, final Expression<String> tasks,
-                        final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                        final Expression<String> task, final Expression<String> duration,
+                        final Expression<String> preconditions, final Expression<String> tasks,
+                        final Expression<String> ordering, final Expression<String> constraints,
+                        final boolean ordered) {
         super(name, parameters, preconditions, duration);
         this.task = task;
         this.taskNetwork = new ParsedTaskNetwork(tasks, ordering, constraints, ordered);
@@ -83,9 +85,10 @@ public class ParsedMethod extends ParsedAbstractOperator {
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
      */
-    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                        final Expression<String> preconditions, final Expression<String> tasks,
-                        final Expression<String> ordering, final Expression<String> constraints, final boolean ordered) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                        final Expression<String> task, final Expression<String> preconditions,
+                        final Expression<String> tasks, final Expression<String> ordering,
+                        final Expression<String> constraints, final boolean ordered) {
         this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered);
     }
 
@@ -99,9 +102,9 @@ public class ParsedMethod extends ParsedAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                        final Expression<String> duration, final Expression<String> preconditions,
-                        final ParsedTaskNetwork network) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                        final Expression<String> task, final Expression<String> duration,
+                        final Expression<String> preconditions, final ParsedTaskNetwork network) {
         this(name, parameters, task, duration, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
     }
@@ -115,8 +118,9 @@ public class ParsedMethod extends ParsedAbstractOperator {
      * @param preconditions The preconditions of the task. This parameter can be null.
      * @param network the task network of the method.
      */
-    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters, final Expression<String> task,
-                        final Expression<String> preconditions, final ParsedTaskNetwork network) {
+    public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
+                        final Expression<String> task, final Expression<String> preconditions,
+                        final ParsedTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrdering(),
             network.getConstraints(), network.isTotallyOrdered());
     }
