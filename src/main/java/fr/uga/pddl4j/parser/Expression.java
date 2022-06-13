@@ -1,9 +1,27 @@
+/*
+ * Copyright (c) 2022 by Damien Pellier <Damien.Pellier@imag.fr>.
+ *
+ * This file is part of PDDL4J library.
+ *
+ * PDDL4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PDDL4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PDDL4J.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package fr.uga.pddl4j.parser;
 
 import fr.uga.pddl4j.parser.lexer.Token;
 import fr.uga.pddl4j.problem.AtomicFormulaSimplifier;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,12 +33,22 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+/**
+ * This class implements an expression. An expression defines a syntactical tree. It is used by the parser and during
+ * the instantiation process to manipulate a planning problem.
+ *
+ * @param <T> The type of internal representation used. The parser used string presentation. The instantiation process
+ *           used integer representation for efficiency.
+ *
+ * @author Damien Pellier
+ * @version 2.0 - 13.06.2022
+ */
 public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serializable {
 
     /**
-     * The type of the node.
+     * The connector of this expression.
      */
-    private Connector connective;
+    private Connector connector;
 
     /**
      * The symbol used in the atomic formula. The symbol can be a function symbol a predicate symbol or a task symbol.
@@ -33,7 +61,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     private List<Symbol<T>> arguments;
 
     /**
-     * only for parsing: the variable in quantifiers.
+     * The quantified variables of the expression.
      */
     private List<TypedSymbol<T>> quantifiedVariables;
 
@@ -43,7 +71,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     private Double value;
 
     /**
-     * The children expression of this expression.
+     * The children expressions of this expression.
      */
     private List<Expression<T>> children;
 
@@ -78,13 +106,13 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     private Location location;
 
     /**
-     * Creates a new expression from another.
+     * Creates a new expression from another. This constructor creates a deep copy.
      *
      * @param other the other expression.
      */
     public Expression(final Expression<T> other) {
         super();
-        this.setConnective(other.getConnective());
+        this.setConnector(other.getConnector());
         if (other.getSymbol() != null) {
             this.setSymbol(new Symbol<>(other.getSymbol()));
         }
@@ -123,13 +151,14 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Creates a new expression with a specified connective.
+     * Creates a new expression with a specified connector.
      *
-     * @param connective the connective.
+     * @param connector the connector.
+     * @see Connector
      */
-    public Expression(final Connector connective) {
+    public Expression(final Connector connector) {
         super();
-        this.setConnective(connective);
+        this.setConnector(connector);
         this.setSymbol(null);
         this.setArguments(new ArrayList<>());
         this.setQuantifiedVariables(new ArrayList<>());
@@ -151,28 +180,28 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Returns the connective of this expression.
+     * Returns the connector of this expression.
      *
-     * @return the connective of this expression.
+     * @return the connector of this expression.
      */
-    public final Connector getConnective() {
-        return this.connective;
+    public final Connector getConnector() {
+        return this.connector;
     }
 
     /**
-     * Set the connective of this expression.
+     * Set the connector of this expression.
      *
      * @param connective the connective.
      */
-    public final void setConnective(final Connector connective) {
-        this.connective = connective;
+    public final void setConnector(final Connector connective) {
+        this.connector = connective;
     }
 
     /**
      * Returns the symbol to this expression. Expression with a symbol are predicate, function or task formula.
      *
      * @return the symbol the new symbol of this expression. If this expression is not ATOM, a FUNCTION or TASK the
-     * returned symbol is null.
+     *      returned symbol is null.
      */
     public final Symbol<T> getSymbol() {
         return this.symbol;
@@ -188,7 +217,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Returns the arguments of the atomic formula represented by this expression.
+     * Returns the arguments of the atomic formula represented by this expression. Only expression with a symbol such
+     * as predicate, function or task formula have arguments.
      *
      * @return the arguments of the atomic formula represented by this expression.
      */
@@ -197,7 +227,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Sets the argument of the atomic formula represented by this expression.
+     * Sets the argument of the atomic formula represented by this expression. Only expression with a symbol such
+     * as predicate, function or task formula have arguments.
      *
      * @param arguments the arguments of the atomic formula represented by this expression.
      */
@@ -249,9 +280,9 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Returns the numeric value of this parser node.
+     * Returns the numeric value of this expression.
      *
-     * @return the numeric value of this parser node.
+     * @return the numeric value of this expression.
      */
     public final Double getValue() {
         return this.value;
@@ -276,7 +307,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Sets a new variable to this parser node.
+     * Sets a new variable to this expression.
      *
      * @param variable the new variable to set.
      */
@@ -303,7 +334,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Returns the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
+     * Returns the taskID associated to this expression. The taskID is use in HTN planning to make alias of task and in
+     * method constraints, e.g., hold-before, etc.
      *
      * @return the taskID associated to this expression.
      */
@@ -312,7 +344,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Set the taskID associated to this expression. The taskID is only use in HTN planning to make alias of task.
+     * Set the taskID associated to this expression. The taskID is use in HTN planning to make alias of task and in
+     * method constraints, e.g., hold-before, etc.
      *
      * @param taskID the taskID to set.
      */
@@ -371,16 +404,18 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     }
 
     /**
-     * Returns the time specifier of the symbol.
+     * Returns the time specifier of this expression. The time specifiers are used to express the start or the end of
+     * task. It is always associated with the taskID of the expression.
      *
-     * @return the time specifier of the symbol.
+     * @return the time specifier of this expression.
      */
     public final TimeSpecifier getTimeSpecifier() {
         return this.timeSpecifier;
     }
 
     /**
-     * Sets the time specifier of the symbol.
+     * Sets the time specifier of this expression. The time specifiers are used to express the start or the end of
+     * task. It is always associated with the taskID of the expression.
      *
      * @param  timeSpecifier the time specifier to set.
      */
@@ -388,18 +423,21 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         this.timeSpecifier = timeSpecifier;
     }
 
-
     /**
-     * Return the location of the symbol.
+     * Return the location of this expression. The location is used by the parser to store the location of the
+     * expression the file and indicate warning or error. The location is null when expression is used during the
+     * instantiation process to optimize memory used.
      *
-     * @return the location of the symbol.
+     * @return the location of this expression.
      */
     public final Location getLocation() {
         return this.location;
     }
 
     /**
-     * Sets the location of the symbol.
+     * Sets the location of this expression. The location is used by the parser to store the location of the
+     * expression the file and indicate warning or error. The location is null when expression is used during the
+     * instantiation process to optimize memory used.
      *
      * @param location the location to set.
      */
@@ -434,12 +472,12 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     /**
      * Assigns a specified expression to this expression. After the method call the expression is equals to the
      * expression in parameter. The assignment is swallow, i.e., the assignment does not make a deep copy of the content
-     * of the expression in parameter.
+     * of the expression in parameter. After assignment, the specified expression is equal to this expression.
      *
      * @param exp the expression to assigned to this expression.
      */
     public final void assign(Expression<T> exp) {
-        this.setConnective(exp.getConnective());
+        this.setConnector(exp.getConnector());
         this.setSymbol(exp.getSymbol());
         this.setArguments(exp.getArguments());
         this.setQuantifiedVariables(exp.getQuantifiedVariables());
@@ -459,25 +497,19 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @return <code>true</code> if this expression is a literal <code>false</code> otherwise.
      */
     public final boolean isLiteral() {
-        return this.getConnective().equals(Connector.ATOM)
-            || (this.getConnective().equals(Connector.NOT)
+        return this.getConnector().equals(Connector.ATOM)
+            || (this.getConnector().equals(Connector.NOT)
             && this.getChildren().size() == 1
-            && this.getChildren().get(0).getConnective().equals(Connector.ATOM));
+            && this.getChildren().get(0).getConnector().equals(Connector.ATOM));
     }
 
     /**
-     * Sets the expression into negative normal form. After the method call, negation can occurs only before atomic
-     * formula and time specifier (at start, at end, overall) can only occur before literal. The method is applicable on
-     * expressions containing a goal description, i.e., NOT, AND, OR, WHEN, IMPLY, SOMETIME_AFTER, SOMETIME_BEFORE,
-     * FORALL, EXISTS, ALWAYS, AT_MOST_ONCE, WITHIN, HOLD_AFTER, ALWAYS_WITHIN, HOLD_DURING, AT_START, AT_END, OVERALL,
-     * ATOM, EQUAL_ATOM, EQUAL, LESS, LESS_OR_EQUAL, GREATER, GREATER_OR_EQUAL, ASSIGN, INCREASE, DECREASE, SCALE_UP,
-     * SCALE_DOWN, TRUE and FALSE.
-     *
-     * @throws MalformedExpressionException if this expression is malformed.
+     * Sets the expression into negative normal form. After the method call, negation can occur only before atomic
+     * formula with ATOM connector, time specifier (at start, at end, overall) can only occur before literal and method
+     * constraints (hold-before, hold-after and hold-between) can only occur before literal.
      */
     public final void toNNF()  {
-
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case NOT:
                 this.moveNegationInward();
                 break;
@@ -516,26 +548,6 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case OVER_ALL:
                 this.moveTimeSpecifierInward();
                 break;
-            case ATOM:
-            case EQUAL_ATOM:
-            case LESS_COMPARISON:
-            case LESS_OR_EQUAL_COMPARISON:
-            case EQUAL_COMPARISON:
-            case GREATER_COMPARISON:
-            case GREATER_OR_EQUAL_COMPARISON:
-            case ASSIGN:
-            case INCREASE:
-            case DECREASE:
-            case SCALE_UP:
-            case SCALE_DOWN:
-            case TASK_ID:
-            case NUMBER:
-            case TRUE:
-            case FALSE:
-                // Do nothing
-                break;
-            default:
-                throw new UnexpectedExpressionException(this.toString());
         }
     }
 
@@ -545,49 +557,49 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      *
      * @throws UnexpectedExpressionException
      */
-    public final void moveMethodConstrainInward() {
-        assert this.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
-            || this.getConnective().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)
-            || this.getConnective().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT);
+    private void moveMethodConstrainInward() {
+        assert this.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
+            || this.getConnector().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)
+            || this.getConnector().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT);
 
         Expression<T> child = null;
-        if (this.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
-                || this.getConnective().equals((Connector.HOLD_AFTER_METHOD_CONSTRAINT))) {
+        if (this.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)
+                || this.getConnector().equals((Connector.HOLD_AFTER_METHOD_CONSTRAINT))) {
             child = this.getChildren().get(1);
-        } else if (this.getConnective().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT)){
+        } else if (this.getConnector().equals(Connector.HOLD_BETWEEN_METHOD_CONSTRAINT)){
             child = this.getChildren().get(2);
         } else {
-            throw new UnexpectedExpressionException(this.getConnective().toString());
+            throw new UnexpectedExpressionException(this.getConnector().toString());
         }
-        switch (child.getConnective()) {
+        switch (child.getConnector()) {
             case FORALL:
             case EXISTS:
-                Expression constraint = new Expression<>(this.getConnective());
+                Expression constraint = new Expression<>(this.getConnector());
                 constraint.addChild(child.getChildren().get(0));
                 constraint.moveMethodConstrainInward();
                 this.getChildren().set(0, constraint);
-                this.setConnective(child.getConnective());
+                this.setConnector(child.getConnector());
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
                 break;
             case AND:
             case OR:
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
-                    constraint = new Expression<>(this.getConnective());
+                    constraint = new Expression<>(this.getConnector());
                     constraint.addChild(child.getChildren().get(i));
                     constraint.moveMethodConstrainInward();
                     this.getChildren().add(constraint);
                 }
-                this.setConnective(child.getConnective());
+                this.setConnector(child.getConnector());
                 break;
             case NOT:
                 child.toNNF();
-                if (!child.getConnective().equals(Connector.NOT)) {
+                if (!child.getConnector().equals(Connector.NOT)) {
                     this.moveMethodConstrainInward();
                 }
                 break;
             case IMPLY: // (imply p q)) -> (or (not p) (q))
-                child.setConnective(Connector.OR);
+                child.setConnector(Connector.OR);
                 final Expression notp = new Expression<>(Connector.NOT);
                 notp.addChild(child.getChildren().get(0));
                 final Expression q = child.getChildren().get(1);
@@ -610,13 +622,13 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
-    public final void moveNegationInward() {
-        assert this.getConnective().equals(Connector.NOT);
+    private void moveNegationInward() {
+        assert this.getConnector().equals(Connector.NOT);
 
         final Expression<T> child = this.getChildren().get(0);
-        switch (child.getConnective()) {
+        switch (child.getConnector()) {
             case FORALL:
-                this.setConnective(Connector.EXISTS);
+                this.setConnector(Connector.EXISTS);
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
                 Expression<T> negation = new Expression<>(Connector.NOT);
                 negation.addChild(child.getChildren().get(0));
@@ -624,7 +636,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 this.getChildren().set(0, negation);
                 break;
             case EXISTS:
-                this.setConnective(Connector.FORALL);
+                this.setConnector(Connector.FORALL);
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
                 negation = new Expression<>(Connector.NOT);
                 negation.addChild(child.getChildren().get(0));
@@ -632,7 +644,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 this.getChildren().set(0, negation);
                 break;
             case AND:
-                this.setConnective(Connector.OR);
+                this.setConnector(Connector.OR);
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
                     negation = new Expression<>(Connector.NOT);
@@ -642,7 +654,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 }
                 break;
             case OR:
-                this.setConnective(Connector.AND);
+                this.setConnector(Connector.AND);
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
                     negation = new Expression<>(Connector.NOT);
@@ -656,7 +668,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 this.toNNF();
                 break;
             case IMPLY: // (not (imply p q)) -> (imply (not p) (not q))
-                this.setConnective(Connector.IMPLY);
+                this.setConnector(Connector.IMPLY);
                 final Expression notp = new Expression<>(Connector.NOT);
                 notp.addChild(child.getChildren().get(0));
                 notp.toNNF();
@@ -670,14 +682,14 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case AT_START:
             case AT_END:
             case OVER_ALL:
-                this.setConnective(child.getConnective());
-                child.setConnective(Connector.NOT);
+                this.setConnector(child.getConnector());
+                child.setConnector(Connector.NOT);
                 break;
             case TRUE:
-                this.setConnective(Connector.FALSE);
+                this.setConnector(Connector.FALSE);
                 break;
             case FALSE:
-                this.setConnective(Connector.TRUE);
+                this.setConnector(Connector.TRUE);
                 break;
             case EQUAL_COMPARISON:
             case GREATER_COMPARISON:
@@ -700,36 +712,36 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @throws UnexpectedExpressionException if the expression is not composed of expressions that are not FORALL,
      *      EXISTS, AND, OR, NOT, GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL, EQUAL, ATOM or EQUAL_ATOM.
      */
-    public final void moveTimeSpecifierInward() {
-        assert this.getConnective().equals(Connector.AT_START)
-            || this.getConnective().equals(Connector.AT_END)
-            || this.getConnective().equals(Connector.OVER_ALL);
+    private void moveTimeSpecifierInward() {
+        assert this.getConnector().equals(Connector.AT_START)
+            || this.getConnector().equals(Connector.AT_END)
+            || this.getConnector().equals(Connector.OVER_ALL);
 
         final Expression<T> child = this.getChildren().get(0);
-        switch (child.getConnective()) {
+        switch (child.getConnector()) {
             case FORALL:
             case EXISTS:
-                Expression timeExp = new Expression<>(this.getConnective());
+                Expression timeExp = new Expression<>(this.getConnector());
                 timeExp.addChild(child.getChildren().get(0));
                 timeExp.moveTimeSpecifierInward();
                 this.getChildren().set(0, timeExp);
-                this.setConnective(child.getConnective());
+                this.setConnector(child.getConnector());
                 this.setQuantifiedVariables(child.getQuantifiedVariables());
                 break;
             case AND:
             case OR:
                 this.getChildren().clear();
                 for (int i = 0; i < child.getChildren().size(); i++) {
-                    timeExp = new Expression<>(this.getConnective());
+                    timeExp = new Expression<>(this.getConnector());
                     timeExp.addChild(child.getChildren().get(i));
                     timeExp.moveTimeSpecifierInward();
                     this.getChildren().add(timeExp);
                 }
-                this.setConnective(child.getConnective());
+                this.setConnector(child.getConnector());
                 break;
             case NOT:
                 child.toNNF();
-                if (!child.getConnective().equals(Connector.NOT)) {
+                if (!child.getConnector().equals(Connector.NOT)) {
                     this.moveTimeSpecifierInward();
                 }
                 break;
@@ -750,49 +762,55 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     /**
      * Expands the quantified expressions contained in a specified expression.
      *
+     * @param domains the value domains associated with the type of quantified variables.
      */
-    /*public void expandQuantifiedExpression(Map<T, Set<Symbol<T>>> domains) {
+    public void expandQuantifiedExpression(Map<T, Set<Symbol<T>>> domains) {
         this.expandQuantifiedExpression(domains, null);
     }
+
     /**
      * Expands the quantified expressions contained in a specified expression.
      *
+     * @param domains the value domains associated with the type of quantified variables.
+     * @param simplifier the atomic formula simplifier used to simply atomic formula when it is possible in order to
+     *                   to quickly cut off the instantiation of the logical formula. This parameter can be null. In
+     *                   than case no simplification will be done.
      */
     public void expandQuantifiedExpression(Map<T, Set<Symbol<T>>> domains, AtomicFormulaSimplifier<T> simplifier) {
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case AND:
                 Iterator<Expression<T>> i = this.getChildren().iterator();
-                while (i.hasNext() && this.getConnective().equals(Connector.AND)) {
+                while (i.hasNext() && this.getConnector().equals(Connector.AND)) {
                     final Expression<T> ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(Connector.FORALL)
-                        || ei.getConnective().equals(Connector.EXISTS))
+                    if ((ei.getConnector().equals(Connector.FORALL)
+                        || ei.getConnector().equals(Connector.EXISTS))
                         && domains.get(ei.getQuantifiedVariables().get(0).getTypes().get(0).getValue()).isEmpty()) {
                         i.remove();
                     } else {
                         ei.expandQuantifiedExpression(domains, simplifier);
                         // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                        if (ei.getConnective().equals(Connector.FALSE)) {
-                            this.setConnective(Connector.FALSE);
+                        if (ei.getConnector().equals(Connector.FALSE)) {
+                            this.setConnector(Connector.FALSE);
                         }
                     }
                 }
                 break;
             case OR:
                 i = this.getChildren().iterator();
-                while (i.hasNext() && this.getConnective().equals(Connector.OR)) {
+                while (i.hasNext() && this.getConnector().equals(Connector.OR)) {
                     final Expression<T> ei = i.next();
                     // Remove quantified expression where the domain of the quantified variable is empty
-                    if ((ei.getConnective().equals(Connector.FORALL)
-                        || ei.getConnective().equals(Connector.EXISTS))
+                    if ((ei.getConnector().equals(Connector.FORALL)
+                        || ei.getConnector().equals(Connector.EXISTS))
                         && domains.get(ei.getQuantifiedVariables().get(0).getTypes().get(0).getValue()).isEmpty()) {
                         i.remove();
                         continue;
                     }
                     ei.expandQuantifiedExpression(domains, simplifier);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (ei.getConnective().equals(Connector.TRUE)) {
-                        this.setConnective(Connector.TRUE);
+                    if (ei.getConnector().equals(Connector.TRUE)) {
+                        this.setConnector(Connector.TRUE);
                     }
                 }
                 break;
@@ -800,17 +818,17 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 Set<Symbol<T>> constants = domains.get(this.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 Expression<T> qExp = this.getChildren().get(0);
                 Symbol<T> var = this.getQuantifiedVariables().get(0);
-                this.setConnective(Connector.AND);
+                this.setConnector(Connector.AND);
                 this.getChildren().clear();
                 Iterator<Symbol<T>> it = constants.iterator();
-                while (it.hasNext() && this.getConnective().equals(Connector.AND)) {
+                while (it.hasNext() && this.getConnector().equals(Connector.AND)) {
                     Symbol<T> cons = it.next();
                     Expression<T> copy = new Expression<>(qExp);
                     copy.substitute(var, cons, simplifier);
                     this.getChildren().add(copy);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (copy.getConnective().equals(Connector.FALSE)) {
-                        this.setConnective(Connector.FALSE);
+                    if (copy.getConnector().equals(Connector.FALSE)) {
+                        this.setConnector(Connector.FALSE);
                     }
                 }
                 this.expandQuantifiedExpression(domains, simplifier);
@@ -819,17 +837,17 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 constants = domains.get(this.getQuantifiedVariables().get(0).getTypes().get(0).getValue());
                 qExp = this.getChildren().get(0);
                 var = this.getQuantifiedVariables().get(0);
-                this.setConnective(Connector.OR);
+                this.setConnector(Connector.OR);
                 this.getChildren().clear();
                 it = constants.iterator();
-                while (it.hasNext() && this.getConnective().equals(Connector.OR)) {
+                while (it.hasNext() && this.getConnector().equals(Connector.OR)) {
                     Symbol<T> cons = it.next();
                     Expression<T> copy = new Expression<>(qExp);
                     copy.substitute(var, cons, simplifier);
                     this.getChildren().add(copy);
                     // If a child expression is TRUE, the whole disjunction becomes TRUE.
-                    if (copy.getConnective().equals(Connector.TRUE)) {
-                        this.setConnective(Connector.TRUE);
+                    if (copy.getConnector().equals(Connector.TRUE)) {
+                        this.setConnector(Connector.TRUE);
                     }
                 }
                 this.expandQuantifiedExpression(domains, simplifier);
@@ -914,7 +932,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
     public boolean substitute(final Symbol<T> var, final  Symbol<T> cons, final AtomicFormulaSimplifier simplifier) {
 
         boolean updated = false;
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case ATOM:
                 List<Symbol<T>> arguments = this.getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
@@ -964,43 +982,43 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 }
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1.equals(arg2)) {
-                    this.setConnective(Connector.TRUE);
+                    this.setConnector(Connector.TRUE);
                 } else if (arg1.getType().equals(SymbolType.CONSTANT)
                     && arg2.getType().equals(SymbolType.CONSTANT)
                     && arg1.getValue().equals(arg2.getValue())) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
-                    this.setConnective(Connector.FALSE);
+                    this.setConnector(Connector.FALSE);
                 }
                 break;
             case AND:
                 Iterator<Expression<T>> i = this.getChildren().iterator();
-                while (i.hasNext() && this.getConnective().equals(Connector.AND)) {
+                while (i.hasNext() && this.getConnector().equals(Connector.AND)) {
                     final Expression<T> ei = i.next();
                     updated |= ei.substitute(var, cons, simplifier);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(Connector.FALSE)) {
-                        this.setConnective(Connector.FALSE);
+                    if (ei.getConnector().equals(Connector.FALSE)) {
+                        this.setConnector(Connector.FALSE);
                     }
                 }
                 break;
             case OR:
                 i = this.getChildren().iterator();
-                while (i.hasNext() && this.getConnective().equals(Connector.OR)) {
+                while (i.hasNext() && this.getConnector().equals(Connector.OR)) {
                     final Expression<T> ei = i.next();
                     updated |= ei.substitute(var, cons, simplifier);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(Connector.TRUE)) {
-                        this.setConnective(Connector.TRUE);
+                    if (ei.getConnector().equals(Connector.TRUE)) {
+                        this.setConnector(Connector.TRUE);
                     }
                 }
                 break;
             case NOT:
                 final Expression<T> neg = this.getChildren().get(0);
                 neg.substitute(var, cons, simplifier);
-                if (neg.getConnective().equals(Connector.TRUE)) {
-                    this.setConnective(Connector.FALSE);
-                } else if (neg.getConnective().equals(Connector.FALSE)) {
-                    this.setConnective(Connector.TRUE);
+                if (neg.getConnector().equals(Connector.TRUE)) {
+                    this.setConnector(Connector.FALSE);
+                } else if (neg.getConnector().equals(Connector.FALSE)) {
+                    this.setConnector(Connector.TRUE);
                 }
                 break;
             case WHEN:
@@ -1089,7 +1107,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      */
     public final boolean simplify() {
         boolean simplified = false;
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case EQUAL_ATOM:
                 List<Symbol<T>> args = this.getArguments();
                 // Get and substitute the first argument
@@ -1098,69 +1116,69 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 final Symbol<T> arg2 = args.get(1);
                 // The equality is TRUE: arg1 and arg2 are the same variable or the same constant
                 if (arg1.equals(arg2)) {
-                    this.setConnective(Connector.TRUE);
+                    this.setConnector(Connector.TRUE);
                     simplified = true;
                 } else if (arg1.getType().equals(SymbolType.CONSTANT)
                         && arg2.getType().equals(SymbolType.CONSTANT)
                         && !arg1.getValue().equals(arg2.getValue())) {
                     // The equality is ground and the equality is FALSE because arg1 != arg2
-                    this.setConnective(Connector.FALSE);
+                    this.setConnector(Connector.FALSE);
                     simplified = true;
                 }
                 break;
             case AND:
                 int i = 0;
-                while (i < this.getChildren().size() && this.getConnective().equals(Connector.AND)) {
+                while (i < this.getChildren().size() && this.getConnector().equals(Connector.AND)) {
                     final Expression<T> ei = this.getChildren().get(i);
                     simplified &= ei.simplify();
-                    if (ei.getConnective().equals(Connector.FALSE)) {
+                    if (ei.getConnector().equals(Connector.FALSE)) {
                         // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                        this.setConnective(Connector.FALSE);
+                        this.setConnector(Connector.FALSE);
                         simplified = true;
-                    } else if (ei.getConnective().equals(Connector.TRUE)) {
+                    } else if (ei.getConnector().equals(Connector.TRUE)) {
                         // If a child expression is TRUE, we can remove the child expression.
                         this.getChildren().remove(i);
                         simplified = true;
-                    } else if (ei.getConnective().equals(Connector.AND)) {
+                    } else if (ei.getConnector().equals(Connector.AND)) {
                         // If the child expression to add is a conjunction, we can simplify the expression by
                         this.getChildren().remove(i); // removing the inner conjunction.
                         simplified = true;
                         int j = 0;
                         int added = 0;
-                        while (j < ei.getChildren().size() && this.getConnective().equals(Connector.AND)) {
+                        while (j < ei.getChildren().size() && this.getConnector().equals(Connector.AND)) {
                             final Expression<T> ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(Connector.FALSE)) {
-                                this.setConnective(Connector.FALSE);
-                            } else if (!ej.getConnective().equals(Connector.TRUE)) {
+                            if (ej.getConnector().equals(Connector.FALSE)) {
+                                this.setConnector(Connector.FALSE);
+                            } else if (!ej.getConnector().equals(Connector.TRUE)) {
                                 this.getChildren().add(i + added, ej);
                                 added++;
                             }
                             j++;
                         }
                         i += added + 1;
-                    } else if (ei.getConnective().equals(Connector.WHEN)) {
+                    } else if (ei.getConnector().equals(Connector.WHEN)) {
                         // Simplification of the conditional expression.
                         final Expression<T> antecedent = ei.getChildren().get(0);
                         final Expression<T> consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional
                         // effect is removed from the action. In this case, the effect is never applicable
                         // because it requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(Connector.FALSE)) {
+                        if (antecedent.getConnector().equals(Connector.FALSE)) {
                             this.getChildren().remove(i);
                             simplified = true;
-                        } else if (antecedent.getConnective().equals(Connector.TRUE)) {
+                        } else if (antecedent.getConnector().equals(Connector.TRUE)) {
                             // If the antecedent of a conditional effect becomes TRUE, the conditional
                             // effect becomes unconditional.
-                            if (consequent.getConnective().equals(Connector.AND)) {
+                            if (consequent.getConnector().equals(Connector.AND)) {
                                 this.getChildren().remove(i);
                                 int j = 0;
                                 int added = 0;
                                 while (j < consequent.getChildren().size()
-                                    && this.getConnective().equals(Connector.AND)) {
+                                    && this.getConnector().equals(Connector.AND)) {
                                     final Expression<T> ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(Connector.FALSE)) {
-                                        this.setConnective(Connector.FALSE);
-                                    } else if (!ej.getConnective().equals(Connector.TRUE)) {
+                                    if (ej.getConnector().equals(Connector.FALSE)) {
+                                        this.setConnector(Connector.FALSE);
+                                    } else if (!ej.getConnector().equals(Connector.TRUE)) {
                                         this.getChildren().add(i + added, ej);
                                         added++;
                                     }
@@ -1173,7 +1191,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                                 i++;
                                 simplified = true;
                             }
-                        } else if (consequent.getConnective().equals(Connector.TRUE)) {
+                        } else if (consequent.getConnector().equals(Connector.TRUE)) {
                             // If the consequent of a conditional effect becomes TRUE, the conditional
                             // effect is removed because it does not lead to any state transition.
                             this.getChildren().remove(i);
@@ -1187,7 +1205,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 }
                 // Finally, if the conjunction is empty, the expression becomes TRUE.
                 if (this.getChildren().isEmpty()) {
-                    this.setConnective(Connector.TRUE);
+                    this.setConnector(Connector.TRUE);
                     simplified = true;
                 } else if (this.getChildren().size() == 1) {
                     this.assign(this.getChildren().get(0));
@@ -1196,53 +1214,53 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case OR:
                 i = 0;
-                while (i < this.getChildren().size() && this.getConnective().equals(Connector.OR)) {
+                while (i < this.getChildren().size() && this.getConnector().equals(Connector.OR)) {
                     final Expression<T> ei = this.getChildren().get(i);
                     simplified &= ei.simplify();
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(Connector.TRUE)) {
-                        this.setConnective(Connector.TRUE);
+                    if (ei.getConnector().equals(Connector.TRUE)) {
+                        this.setConnector(Connector.TRUE);
                         simplified = true;
-                    } else if (ei.getConnective().equals(Connector.OR)) {
+                    } else if (ei.getConnector().equals(Connector.OR)) {
                         // If the child expression to add is a disjunction, we can simplify the expression by
                         // removing the inner disjunction.
                         this.getChildren().remove(i);
                         simplified = true;
                         int j = 0;
                         int added = 0;
-                        while (j < ei.getChildren().size() && this.getConnective().equals(Connector.OR)) {
+                        while (j < ei.getChildren().size() && this.getConnector().equals(Connector.OR)) {
                             final Expression<T> ej = ei.getChildren().get(j);
-                            if (ej.getConnective().equals(Connector.TRUE)) {
-                                this.setConnective(Connector.TRUE);
-                            } else if (!ej.getConnective().equals(Connector.FALSE)) {
+                            if (ej.getConnector().equals(Connector.TRUE)) {
+                                this.setConnector(Connector.TRUE);
+                            } else if (!ej.getConnector().equals(Connector.FALSE)) {
                                 this.getChildren().add(i + added, ej);
                                 added++;
                             }
                             j++;
                         }
                         i += added + 1;
-                    } else if (ei.getConnective().equals(Connector.WHEN)) {
+                    } else if (ei.getConnector().equals(Connector.WHEN)) {
                         // Simplification of the conditional expression.
                         final Expression<T> antecedent = ei.getChildren().get(0);
                         final Expression<T> consequent = ei.getChildren().get(1);
                         // If the antecedent of a conditional effect becomes FALSE , the conditional effect is
                         // removed from the action. In this case, the effect is never applicable because it
                         // requires FALSE to hold, i.e., the state must be inconsistent.
-                        if (antecedent.getConnective().equals(Connector.FALSE)) {
+                        if (antecedent.getConnector().equals(Connector.FALSE)) {
                             this.getChildren().remove(i);
-                        } else if (antecedent.getConnective().equals(Connector.TRUE)) {
+                        } else if (antecedent.getConnector().equals(Connector.TRUE)) {
                             // If the antecedent of a conditional effect becomes TRUE, the conditional effect
                             // becomes unconditional.
-                            if (consequent.getConnective().equals(Connector.OR)) {
+                            if (consequent.getConnector().equals(Connector.OR)) {
                                 this.getChildren().remove(i);
                                 int j = 0;
                                 int added = 0;
                                 while (j < consequent.getChildren().size()
-                                        && this.getConnective().equals(Connector.OR)) {
+                                        && this.getConnector().equals(Connector.OR)) {
                                     final Expression<T> ej = consequent.getChildren().get(j);
-                                    if (ej.getConnective().equals(Connector.TRUE)) {
-                                        this.setConnective(Connector.TRUE);
-                                    } else if (!ej.getConnective().equals(Connector.FALSE)) {
+                                    if (ej.getConnector().equals(Connector.TRUE)) {
+                                        this.setConnector(Connector.TRUE);
+                                    } else if (!ej.getConnector().equals(Connector.FALSE)) {
                                         this.getChildren().add(i + added, ej);
                                         added++;
                                     }
@@ -1255,7 +1273,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                                 i++;
                                 simplified = true;
                             }
-                        } else if (consequent.getConnective().equals(Connector.TRUE)) {
+                        } else if (consequent.getConnector().equals(Connector.TRUE)) {
                             // If the consequent of a conditional effect becomes TRUE, the conditional
                             // effect is removed because it does not lead to any state transition.
                             this.getChildren().remove(i);
@@ -1269,7 +1287,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 }
                 // Finally, if the disjunction is empty, the expression becomes TRUE.
                 if (this.getChildren().isEmpty()) {
-                    this.setConnective(Connector.TRUE);
+                    this.setConnector(Connector.TRUE);
                     simplified = true;
                 } else if (this.getChildren().size() == 1) {
                     this.assign(this.getChildren().get(0));
@@ -1277,20 +1295,20 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 } else {
                     final Iterator<Expression<T>> it = this.getChildren().iterator();
                     while (it.hasNext()) {
-                        if (it.next().getConnective().equals(Connector.FALSE)) {
+                        if (it.next().getConnector().equals(Connector.FALSE)) {
                             it.remove();
                             simplified = true;
                         }
                     }
                     if (this.getChildren().isEmpty()) {
-                        this.setConnective(Connector.FALSE);
+                        this.setConnector(Connector.FALSE);
                         simplified = true;
                     }
                 }
                 break;
             case IMPLY:
                 // replace imply expression (imply p q) by its equivalent disjunction (or (not p) q)
-                this.setConnective(Connector.OR);
+                this.setConnector(Connector.OR);
                 final Expression notp = new Expression<>(Connector.NOT);
                 notp.addChild(this.getChildren().get(0));
                 this.getChildren().set(0, notp);
@@ -1319,19 +1337,19 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
                 simplified &= this.getChildren().get(0).simplify();
-                if (this.getChildren().get(0).getConnective().equals(Connector.TRUE)) {
-                    this.setConnective(Connector.TRUE);
-                } else if (this.getChildren().get(0).getConnective().equals(Connector.FALSE)) {
-                    this.setConnective(Connector.FALSE);
+                if (this.getChildren().get(0).getConnector().equals(Connector.TRUE)) {
+                    this.setConnector(Connector.TRUE);
+                } else if (this.getChildren().get(0).getConnector().equals(Connector.FALSE)) {
+                    this.setConnector(Connector.FALSE);
                 }
                 break;
             case NOT:
                 final Expression<T> neg = this.getChildren().get(0);
                 simplified &= neg.simplify();
-                if (neg.getConnective().equals(Connector.TRUE)) {
-                    this.setConnective(Connector.FALSE);
-                } else if (neg.getConnective().equals(Connector.FALSE)) {
-                    this.setConnective(Connector.TRUE);
+                if (neg.getConnector().equals(Connector.TRUE)) {
+                    this.setConnector(Connector.FALSE);
+                } else if (neg.getConnector().equals(Connector.FALSE)) {
+                    this.setConnector(Connector.TRUE);
                 }
                 break;
             case WHEN:
@@ -1347,14 +1365,14 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case HOLD_DURING_CONSTRAINT:
                 if (this.getChildren().get(0).getValue() > this.getChildren().get(1).getValue()) {
-                    this.setConnective(Connector.FALSE);
+                    this.setConnector(Connector.FALSE);
                     simplified = true;
                 } else {
                     Expression<T> child = this.getChildren().get(0);
                     simplified &= child.simplify();
-                    if (child.getConnective().equals(Connector.TRUE)
-                        || child.getConnective().equals(Connector.FALSE)) {
-                        this.setConnective(child.getConnective());
+                    if (child.getConnector().equals(Connector.TRUE)
+                        || child.getConnector().equals(Connector.FALSE)) {
+                        this.setConnector(child.getConnector());
                         simplified = true;
                     }
                 }
@@ -1373,7 +1391,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case TASK:
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnector().toString());
         }
         return simplified;
     }
@@ -1385,8 +1403,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
      */
     private final boolean removeDuplicateChild() {
-        assert this.getConnective().equals(Connector.AND)
-            || this.getConnective().equals(Connector.OR);
+        assert this.getConnector().equals(Connector.AND)
+            || this.getConnector().equals(Connector.OR);
         boolean modified = false;
         for (int i = 0; i < this.getChildren().size(); i++) {
             final Expression ei =  this.getChildren().get(i);
@@ -1410,8 +1428,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @return <code>true</code> if the expression was not modified; <code>false</code> otherwise.
      */
     private final boolean removedTautology() {
-        assert this.getConnective().equals(Connector.AND)
-            || this.getConnective().equals(Connector.OR);
+        assert this.getConnector().equals(Connector.AND)
+            || this.getConnector().equals(Connector.OR);
         boolean modified = false;
         for (int i = 0; i < this.getChildren().size(); i++) {
             final Expression ei = this.getChildren().get(i);
@@ -1420,7 +1438,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             for (int j = i + 1; j < this.getChildren().size(); j++) {
                 final Expression ej = this.getChildren().get(j);
                 if (ej.equals(neg)) {
-                    ei.setConnective(Connector.TRUE);
+                    ei.setConnector(Connector.TRUE);
                     this.getChildren().remove(j);
                     j--;
                     modified = true;
@@ -1503,7 +1521,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         if (this == object) return true;
         if (object != null && object instanceof Expression) {
             final Expression<T> other = (Expression<T>) object;
-            return Objects.equals(this.getConnective(), other.getConnective())
+            return Objects.equals(this.getConnector(), other.getConnector())
                 && Objects.equals(this.getSymbol(), other.getSymbol())
                 && Objects.equals(this.getArguments(), other.getArguments())
                 && Objects.equals(this.getValue(), other.getValue())
@@ -1522,7 +1540,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getConnective(), this.getSymbol(), this.getArguments(), this.getValue(),
+        return Objects.hash(this.getConnector(), this.getSymbol(), this.getArguments(), this.getValue(),
             this.getQuantifiedVariables(), this.getVariable(), this.getChildren());
     }
 
@@ -1557,7 +1575,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      */
     public final boolean isMalformedExpression() {
         boolean malformed = false;
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case AND:
             case OR:
                 Iterator<Expression<T>> i = this.getChildren().iterator();
@@ -1620,7 +1638,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case FN_ATOM:
                     malformed = this.getChildren().size() != 2
                         || this.getChildren().get(0).isMalformedExpression()
-                        || !this.getChildren().get(1).getConnective().equals(Connector.NUMBER);
+                        || !this.getChildren().get(1).getConnector().equals(Connector.NUMBER);
                 break;
             case ATOM:
             case TASK:
@@ -1631,7 +1649,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case WITHIN_CONSTRAINT:
             case HOLD_AFTER_CONSTRAINT:
                 malformed = this.getChildren().size() != 2
-                    || !this.getChildren().get(0).getConnective().equals(Connector.NUMBER)
+                    || !this.getChildren().get(0).getConnector().equals(Connector.NUMBER)
                     || this.getChildren().get(1).isMalformedExpression();
                 break;
             case HOLD_BEFORE_METHOD_CONSTRAINT:
@@ -1639,26 +1657,26 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case SOMETIME_BEFORE_METHOD_CONSTRAINT:
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
                 malformed = this.getChildren().size() != 2
-                    || !this.getChildren().get(0).getConnective().equals(Connector.TASK_ID)
+                    || !this.getChildren().get(0).getConnector().equals(Connector.TASK_ID)
                     || this.getChildren().get(1).isMalformedExpression();
                 break;
             case HOLD_DURING_CONSTRAINT:
                 malformed = this.getChildren().size() != 3
-                    || !this.getChildren().get(0).getConnective().equals(Connector.NUMBER)
-                    || !this.getChildren().get(1).getConnective().equals(Connector.NUMBER)
+                    || !this.getChildren().get(0).getConnector().equals(Connector.NUMBER)
+                    || !this.getChildren().get(1).getConnector().equals(Connector.NUMBER)
                     || this.getChildren().get(2).isMalformedExpression();
                 break;
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
                 malformed = this.getChildren().size() != 3
-                    || !this.getChildren().get(0).getConnective().equals(Connector.TASK_ID)
-                    || !this.getChildren().get(1).getConnective().equals(Connector.TASK_ID)
+                    || !this.getChildren().get(0).getConnector().equals(Connector.TASK_ID)
+                    || !this.getChildren().get(1).getConnector().equals(Connector.TASK_ID)
                     || this.getChildren().get(2).isMalformedExpression();
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
                 malformed = this.getChildren().size() != 4
-                    || !this.getChildren().get(0).getConnective().equals(Connector.NUMBER)
-                    || !this.getChildren().get(1).getConnective().equals(Connector.NUMBER)
+                    || !this.getChildren().get(0).getConnector().equals(Connector.NUMBER)
+                    || !this.getChildren().get(1).getConnector().equals(Connector.NUMBER)
                     || this.getChildren().get(2).isMalformedExpression()
                     || this.getChildren().get(3).isMalformedExpression();
                 break;
@@ -1679,13 +1697,13 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
             case EQUAL_ORDERING_CONSTRAINT:
                 malformed = this.getChildren().size() != 2
-                    && this.getChildren().get(0).getConnective().equals(Connector.TASK_ID)
+                    && this.getChildren().get(0).getConnector().equals(Connector.TASK_ID)
                     && this.getChildren().get(0).isMalformedExpression()
-                    && this.getChildren().get(1).getConnective().equals(Connector.TASK_ID)
+                    && this.getChildren().get(1).getConnector().equals(Connector.TASK_ID)
                     && this.getChildren().get(1).isMalformedExpression();
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnector().toString());
 
         }
         return malformed;
@@ -1711,10 +1729,10 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      */
     public String toString(String baseOffset) throws MalformedExpressionException {
         if (this.isMalformedExpression()) {
-            throw new MalformedExpressionException("Expression " + this.getConnective() + " is malformed");
+            throw new MalformedExpressionException("Expression " + this.getConnector() + " is malformed");
         }
         StringBuilder str = new StringBuilder();
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case ATOM:
             case FN_HEAD:
                 str.append("(");
@@ -1745,7 +1763,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case EQUAL_ATOM:
                 str.append("(")
-                    .append(this.getConnective().getImage())
+                    .append(this.getConnector().getImage())
                     .append(" ");
                 for (int i = 0; i < this.getArguments().size() - 1; i++) {
                     str.append(this.getArguments().get(i).toString()).append(" ");
@@ -1756,7 +1774,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case OR:
                 if (!this.getChildren().isEmpty()) {
                     String offset = baseOffset + "  ";
-                    str.append("(").append(this.getConnective().getImage());
+                    str.append("(").append(this.getConnector().getImage());
                     str.append(" ");
                     for (int i = 0; i < this.getChildren().size() - 1; i++) {
                         str.append(this.getChildren().get(i).toString(offset)).append("\n").append(offset);
@@ -1769,7 +1787,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case IMPLY:
                 str.append("(");
-                str.append(this.getConnective().getImage());
+                str.append(this.getConnector().getImage());
                 str.append(" ");
                 str.append(this.getChildren().get(0).toString(baseOffset));
                 str.append(" ");
@@ -1780,7 +1798,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case EXISTS:
                 String off = baseOffset + baseOffset + "  ";
                 str.append(" (");
-                str.append(this.getConnective().getImage());
+                str.append(this.getConnector().getImage());
                 str.append(" (");
                 if (!this.getQuantifiedVariables().isEmpty()) {
                     for (int i = 0; i < this.getQuantifiedVariables().size() - 1; i++) {
@@ -1804,7 +1822,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 if (this.children.isEmpty()) {
                     str.append(this.getVariable());
                 } else {
-                    str.append("(").append(this.getConnective().getImage()).append(" ")
+                    str.append("(").append(this.getConnector().getImage()).append(" ")
                         .append(this.getVariable()).append(" ")
                         .append(this.children.get(0).toString(baseOffset));
                 }
@@ -1831,7 +1849,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
                 str.append("(");
-                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getConnector().getImage()).append(" ");
                 str.append(this.children.get(0).toString(baseOffset)).append(" ");
                 str.append(this.children.get(1).toString(baseOffset));
                 str.append(")");
@@ -1842,7 +1860,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case GREATER_OR_EQUAL_ORDERING_CONSTRAINT:
             case EQUAL_ORDERING_CONSTRAINT:
                 str.append("(");
-                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getConnector().getImage()).append(" ");
                 str.append(this.getChildren().get(0).toString()).append(" ");
                 str.append(this.getChildren().get(1).toString());
                 str.append(")");
@@ -1862,18 +1880,18 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case AT_MOST_ONCE_METHOD_CONSTRAINT:
             case SOMETIME_METHOD_CONSTRAINT:
                 str.append("(");
-                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getConnector().getImage()).append(" ");
                 str.append(this.getChildren().get(0).toString(baseOffset));
                 str.append(")");
                 break;
             case MINIMIZE:
             case MAXIMIZE:
-                str.append(this.getConnective().getImage()).append(" ")
+                str.append(this.getConnector().getImage()).append(" ")
                     .append(this.getChildren().get(0).getValue())
                     .append(")");
                 break;
             case IS_VIOLATED:
-                str.append("(").append(this.getConnective().getImage()).append(")");
+                str.append("(").append(this.getConnector().getImage()).append(")");
                 break;
             case TIMED_LITERAL:
             case WITHIN_CONSTRAINT:
@@ -1883,7 +1901,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case SOMETIME_BEFORE_METHOD_CONSTRAINT:
             case SOMETIME_AFTER_METHOD_CONSTRAINT:
                 str.append("(");
-                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getConnector().getImage()).append(" ");
                 str.append(this.getChildren().get(0).toString()).append(" ");
                 str.append(this.getChildren().get(1).toString(baseOffset));
                 str.append(")");
@@ -1892,7 +1910,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
             case HOLD_DURING_METHOD_CONSTRAINT:
                 str.append("(");
-                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getConnector().getImage()).append(" ");
                 str.append(this.getChildren().get(0).toString()).append(" ");
                 str.append(this.getChildren().get(1).toString()).append(" ");
                 str.append(this.getChildren().get(2).toString(baseOffset));
@@ -1900,7 +1918,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
                 str.append("(");
-                str.append(this.getConnective().getImage()).append(" ");
+                str.append(this.getConnector().getImage()).append(" ");
                 str.append(this.getChildren().get(0).toString()).append(" ");
                 str.append(this.getChildren().get(1).toString()).append(" ");
                 str.append(this.getChildren().get(2).toString(baseOffset));
@@ -1918,7 +1936,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 str.append(")");
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnector().toString());
 
         }
         return str.toString();
@@ -1928,12 +1946,12 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * Convert an expression in conjunctive normal form (CNF).
      */
     public void toCNF() throws UnexpectedExpressionException {
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case WHEN:
                 final Expression<T> antecedent = this.getChildren().get(0);
                 final Expression<T> consequence = this.getChildren().get(1);
                 antecedent.toDNF();
-                this.setConnective(Connector.AND);
+                this.setConnector(Connector.AND);
                 this.getChildren().clear();
                 for (Expression<T> ei : antecedent.getChildren()) {
                     final Expression<T> newWhen = new Expression<>(Connector.WHEN);
@@ -1967,12 +1985,12 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case NOT:
             case TRUE:
                 Expression<T> copy = new Expression<T>(this);
-                this.setConnective(Connector.AND);
+                this.setConnector(Connector.AND);
                 this.getChildren().clear();
                 this.getChildren().add(copy);
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnector().toString());
         }
     }
 
@@ -1981,14 +1999,14 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      *
      */
     public void toDNF() throws UnexpectedExpressionException {
-        switch (this.getConnective()) {
+        switch (this.getConnector()) {
             case OR:
                 List<Expression<T>> children = this.getChildren();
                 int index = 0;
                 while (index < children.size()) {
                     final Expression<T> ei = children.get(index);
                     ei.toDNF();
-                    if (ei.getConnective().equals(Connector.OR)) {
+                    if (ei.getConnector().equals(Connector.OR)) {
                         children.remove(index);
                         for (Expression<T> ej : ei.getChildren()) {
                             children.add(index, ej);
@@ -2009,8 +2027,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                     for (Expression<T> newAnd : dnf.getChildren()) {
                         for (Expression<T> ek : orExp.getChildren()) {
                             ek.getChildren().stream().filter(el -> !newAnd.getChildren().contains(el)).forEach(el -> {
-                                if (el.getConnective().equals(Connector.OR)
-                                    || el.getConnective().equals(Connector.AND)
+                                if (el.getConnector().equals(Connector.OR)
+                                    || el.getConnector().equals(Connector.AND)
                                     && el.getChildren().size() == 1) {
                                     newAnd.getChildren().add(el.getChildren().get(0));
                                 } else {
@@ -2019,7 +2037,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                             });
                             boolean add = true;
                             for (Expression<T> el : newAnd.getChildren()) {
-                                if (el.getConnective().equals(Connector.FALSE)) {
+                                if (el.getConnector().equals(Connector.FALSE)) {
                                     add = false;
                                     break;
                                 }
@@ -2056,12 +2074,12 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case TRUE:
                 Expression<T> and = new Expression<>(Connector.AND);
                 and.getChildren().add(new Expression<>(this));
-                this.setConnective(Connector.OR);
+                this.setConnector(Connector.OR);
                 this.getChildren().clear();
                 this.getChildren().add(and);
                 break;
             default:
-                throw new UnexpectedExpressionException(this.getConnective().toString());
+                throw new UnexpectedExpressionException(this.getConnector().toString());
         }
     }
 
@@ -2077,7 +2095,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      */
     public static Set<Symbol<String>> getTaskIDs(Expression<String> exp) throws UnexpectedExpressionException {
         Set<Symbol<String>> taskIDs  = new HashSet<Symbol<String>>();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case TASK:
                 if (exp.getTaskID() != null) {
                     taskIDs.add(exp.getTaskID());
@@ -2090,8 +2108,8 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 taskIDs.add(exp.getArguments().get(0)); // Add constraints HDDL2.1
                 break;
             case NOT:
-                if (!exp.getChildren().get(0).getConnective().equals(Connector.EQUAL_ATOM)) {
-                    throw new UnexpectedExpressionException(exp.getConnective().toString());
+                if (!exp.getChildren().get(0).getConnector().equals(Connector.EQUAL_ATOM)) {
+                    throw new UnexpectedExpressionException(exp.getConnector().toString());
                 }
                 break;
             case AND:
@@ -2120,16 +2138,16 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return taskIDs;
     }
 
     public final boolean isLeaf() {
-        return this.getConnective().equals(Connector.ATOM)
-            || this.getConnective().equals(Connector.TASK)
-            || this.getConnective().equals(Connector.FN_HEAD)
-            || this.getConnective().equals(Connector.EQUAL_ATOM);
+        return this.getConnector().equals(Connector.ATOM)
+            || this.getConnector().equals(Connector.TASK)
+            || this.getConnector().equals(Connector.FN_HEAD)
+            || this.getConnector().equals(Connector.EQUAL_ATOM);
     }
 
     @Override

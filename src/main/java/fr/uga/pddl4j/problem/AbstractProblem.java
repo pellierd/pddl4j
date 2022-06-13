@@ -606,7 +606,7 @@ public abstract class AbstractProblem implements Problem {
      * @param exp the expression.
      */
     private void initEitherTypes(final Expression<String> exp) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AND:
             case OR:
                 exp.getChildren().forEach(this::initEitherTypes);
@@ -675,7 +675,7 @@ public abstract class AbstractProblem implements Problem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
     }
 
@@ -884,7 +884,7 @@ public abstract class AbstractProblem implements Problem {
         final Set<Expression<Integer>> init =  this.getParsedProblem().getInit().stream().map(this::initExpression)
             .collect(Collectors.toCollection(LinkedHashSet::new));
         for (Expression<Integer> exp : init) {
-            switch (exp.getConnective()) {
+            switch (exp.getConnector()) {
                 case FN_ATOM:
                     this.intInitFunctions.add(exp);
                     this.intInitFunctionCost.put(exp.getChildren().get(0), exp.getChildren().get(1).getValue());
@@ -901,7 +901,7 @@ public abstract class AbstractProblem implements Problem {
                     }
                     break;
                 default:
-                    throw new UnexpectedExpressionException(exp.getConnective().toString());
+                    throw new UnexpectedExpressionException(exp.getConnector().toString());
 
             }
         }
@@ -1190,8 +1190,8 @@ public abstract class AbstractProblem implements Problem {
      */
     protected Expression<Integer> initExpression(final Expression<String> exp,
                                            final List<String> variables) {
-        final Expression<Integer> intExp = new Expression<>(exp.getConnective());
-        switch (exp.getConnective()) {
+        final Expression<Integer> intExp = new Expression<>(exp.getConnector());
+        switch (exp.getConnector()) {
             case EQUAL_ATOM:
                 List<Symbol<Integer>> args = new ArrayList<>(exp.getArguments().size());
                 for (int i = 0; i < exp.getArguments().size(); i++) {
@@ -1332,18 +1332,18 @@ public abstract class AbstractProblem implements Problem {
             case EQUAL_ORDERING_CONSTRAINT:
                 Expression<Integer> t1 = new Expression<>();
                 if (exp.getChildren().get(0).getTimeSpecifier() != null) {
-                    t1.setConnective(Connector.TIMED_TASK_ID);
+                    t1.setConnector(Connector.TIMED_TASK_ID);
                 } else {
-                    t1.setConnective(Connector.TASK_ID);
+                    t1.setConnector(Connector.TASK_ID);
                 }
                 t1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
                     Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
                 intExp.addChild(t1);
                 Expression<Integer> t2 = new Expression<>();
                 if (exp.getChildren().get(0).getTimeSpecifier() != null) {
-                    t2.setConnective(Connector.TIMED_TASK_ID);
+                    t2.setConnector(Connector.TIMED_TASK_ID);
                 } else {
-                    t2.setConnective(Connector.TASK_ID);
+                    t2.setConnector(Connector.TASK_ID);
                 }
                 t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
                     Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
@@ -1545,7 +1545,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected String toString(final Expression<Integer> exp, String baseOffset, final String separator) {
         final StringBuilder str = new StringBuilder();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 str.append("(");
                 str.append(this.getPredicateSymbols().get(exp.getSymbol().getValue()));
@@ -1608,7 +1608,7 @@ public abstract class AbstractProblem implements Problem {
             case OR:
                 String offsetOr = baseOffset + "  ";
                 str.append("(");
-                str.append(exp.getConnective().getImage());
+                str.append(exp.getConnector().getImage());
                 str.append(" ");
                 if (!exp.getChildren().isEmpty()) {
                     for (int i = 0; i < exp.getChildren().size() - 1; i++) {
@@ -1621,7 +1621,7 @@ public abstract class AbstractProblem implements Problem {
                 break;
             case FORALL:
             case EXISTS:
-                str.append(" (").append(exp.getConnective().getImage());
+                str.append(" (").append(exp.getConnector().getImage());
                 str.append(" (");
                 for (TypedSymbol<Integer> var: exp.getQuantifiedVariables()) {
                     str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
@@ -1646,10 +1646,10 @@ public abstract class AbstractProblem implements Problem {
             case F_EXP_T:
             case TRUE:
             case FALSE:
-                str.append(exp.getConnective());
+                str.append(exp.getConnector());
                 break;
             case TIME_VAR:
-                str.append(exp.getConnective().getImage());
+                str.append(exp.getConnector().getImage());
                 break;
             case FN_ATOM:
             case WHEN:
@@ -1671,7 +1671,7 @@ public abstract class AbstractProblem implements Problem {
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
                 str.append("(");
-                str.append(exp.getConnective().getImage());
+                str.append(exp.getConnector().getImage());
                 str.append(" ");
                 str.append(toString(exp.getChildren().get(0), baseOffset));
                 str.append(" ");
@@ -1687,14 +1687,14 @@ public abstract class AbstractProblem implements Problem {
             case NOT:
             case ALWAYS_CONSTRAINT:
                 str.append("(");
-                str.append(exp.getConnective().getImage());
+                str.append(exp.getConnector().getImage());
                 str.append(" ");
                 str.append(toString(exp.getChildren().get(0), baseOffset));
                 str.append(")");
                 break;
             case IS_VIOLATED:
                 str.append("(");
-                str.append(exp.getConnective().getImage());
+                str.append(exp.getConnector().getImage());
                 str.append(")");
                 break;
             case LESS_ORDERING_CONSTRAINT:
@@ -1706,14 +1706,14 @@ public abstract class AbstractProblem implements Problem {
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(0).getTaskID());
                 str.append(" ");
-                str.append(exp.getConnective().getImage());
+                str.append(exp.getConnector().getImage());
                 str.append(" ");
                 str.append(Symbol.DEFAULT_TASK_ID_SYMBOL);
                 str.append(exp.getChildren().get(1).getTaskID());
                 str.append(")");
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return str.toString();
     }

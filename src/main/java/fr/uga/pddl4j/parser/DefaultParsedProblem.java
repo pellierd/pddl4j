@@ -863,7 +863,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
         // Rename the logical constraints
         this.renameVariables(method.getConstraints(), varCtx);
         Expression<String> preconditions = null;
-        if (!method.getPreconditions().getConnective().equals(Connector.AND)) {
+        if (!method.getPreconditions().getConnector().equals(Connector.AND)) {
             preconditions = method.getPreconditions();
         } else {
             preconditions = new Expression<String>(Connector.AND);
@@ -872,7 +872,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
         Iterator<Expression<String>> i = method.getConstraints().getChildren().iterator();
         while (i.hasNext()) {
             final Expression<String> constraint = i.next();
-            switch (constraint.getConnective()) {
+            switch (constraint.getConnector()) {
                 case EQUAL_COMPARISON:
                     preconditions.addChild(constraint);
                     i.remove();
@@ -933,9 +933,9 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      */
     private void renameVariables(final Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
         if (exp.isMalformedExpression()) {
-            throw new MalformedExpressionException("Expression " + exp.getConnective() + " is malformed");
+            throw new MalformedExpressionException("Expression " + exp.getConnector() + " is malformed");
         }
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
             case FN_HEAD:
             case EQUAL_ATOM:
@@ -1015,7 +1015,7 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
     }
 
@@ -1112,9 +1112,9 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
      */
     private void renameTaskIDs(Expression<String> exp, final Map<String, String> context) throws MalformedExpressionException {
         if (exp.isMalformedExpression()) {
-            throw new MalformedExpressionException("Expression " + exp.getConnective() + " is malformed");
+            throw new MalformedExpressionException("Expression " + exp.getConnector() + " is malformed");
         }
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case TASK:
                 // Set a dummy taskID to task if no task taskID was specified
                 if (exp.getTaskID() == null) {

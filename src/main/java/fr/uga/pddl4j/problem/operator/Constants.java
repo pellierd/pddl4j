@@ -29,11 +29,6 @@ package fr.uga.pddl4j.problem.operator;
 public interface Constants {
 
     /**
-     * The default logging level.
-     */
-    static final int DEFAULT_LOGGING_LEVEL = 1;
-
-    /**
      * The default size of the table of relevant facts.
      */
     static final int DEFAULT_RELEVANT_FACTS_TABLE_SIZE = 1000;

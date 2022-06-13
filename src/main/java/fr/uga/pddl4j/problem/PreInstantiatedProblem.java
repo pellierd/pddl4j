@@ -148,7 +148,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp the effect.
      */
     private void extract(final Expression<Integer> exp) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 int predicate = exp.getSymbol().getValue();
                 switch (this.inertia.get(predicate)) {
@@ -178,7 +178,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case NOT:
                 final Expression<Integer> neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(Connector.ATOM)) {
+                if (neg.getConnector().equals(Connector.ATOM)) {
                     predicate = neg.getSymbol().getValue();
                     switch (this.inertia.get(predicate)) {
                         case INERTIA:
@@ -257,7 +257,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @param exp the effect.
      */
     private void extractNumericInertia(final Expression<Integer> exp) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AND:
                 exp.getChildren().forEach(this::extractNumericInertia);
                 break;
@@ -283,7 +283,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
     }
 
@@ -297,7 +297,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 && this.getInertia().get(i).equals(Inertia.INERTIA)) {
                 final Set<Symbol<Integer>> newTypeDomain = new LinkedHashSet<>();
                 for (Expression<Integer> fluent : this.getIntInitialState()) {
-                    if (fluent.getConnective().equals(Connector.NOT)) {
+                    if (fluent.getConnector().equals(Connector.NOT)) {
                         fluent = fluent.getChildren().get(0);
                     }
                     if (fluent.getSymbol().getValue() == i) {
@@ -375,8 +375,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     op1.setTypeOfParameter(index, ti);
                     this.replace(op1.getPreconditions(), inertia, Connector.TRUE, ti, ts);
                     this.replace(op1.getEffects(), inertia, Connector.TRUE, ti, ts);
-                    if (!op1.getPreconditions().getConnective().equals(Connector.FALSE)
-                        && !op1.getEffects().getConnective().equals(Connector.FALSE)) {
+                    if (!op1.getPreconditions().getConnector().equals(Connector.FALSE)
+                        && !op1.getEffects().getConnector().equals(Connector.FALSE)) {
                         newActions.add(op1);
                     }
 
@@ -385,8 +385,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     this.replace(op2.getPreconditions(), inertia, Connector.FALSE, ti, ts);
                     this.replace(op2.getEffects(), inertia, Connector.FALSE, ti, ts);
 
-                    if (!op2.getPreconditions().getConnective().equals(Connector.FALSE)
-                        && !op2.getEffects().getConnective().equals(Connector.FALSE)) {
+                    if (!op2.getPreconditions().getConnector().equals(Connector.FALSE)
+                        && !op2.getEffects().getConnector().equals(Connector.FALSE)) {
                         newActions.add(op2);
                     }
                 }
@@ -409,40 +409,40 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      */
     private void replace(final Expression<Integer> exp, final Expression<Integer> inertia, final Connector connective,
                          final int ti, final int ts) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 if (exp.equals(inertia)) {
-                    exp.setConnective(connective);
+                    exp.setConnector(connective);
                 }
                 break;
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connector.AND)) {
+                while (i.hasNext() && exp.getConnector().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
                     this.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(Connector.FALSE);
-                    } else if (ei.getConnective().equals(Connector.TRUE)) {
+                    if (ei.getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(Connector.FALSE);
+                    } else if (ei.getConnector().equals(Connector.TRUE)) {
                         i.remove();
                     }
                 }
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(Connector.TRUE);
+                    exp.setConnector(Connector.TRUE);
                 }
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connector.OR)) {
+                while (i.hasNext() && exp.getConnector().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
                     this.replace(ei, inertia, connective, ti, ts);
-                    if (ei.getConnective().equals(Connector.TRUE)) {
-                        exp.setConnective(Connector.TRUE);
-                    } else if (ei.getConnective().equals(Connector.FALSE)) {
+                    if (ei.getConnector().equals(Connector.TRUE)) {
+                        exp.setConnector(Connector.TRUE);
+                    } else if (ei.getConnector().equals(Connector.FALSE)) {
                         i.remove();
                     }
                 }
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(Connector.FALSE);
+                    exp.setConnector(Connector.FALSE);
                 }
                 break;
             case FORALL:
@@ -456,10 +456,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                     es.getQuantifiedVariables().get(0).addType(new Symbol<>(SymbolType.TYPE, ts));
                     this.replace(es, inertia, Connector.FALSE, ti, ts);
                     exp.getChildren().clear();
-                    if (exp.getConnective().equals(Connector.FORALL)) {
-                        exp.setConnective(Connector.AND);
+                    if (exp.getConnector().equals(Connector.FORALL)) {
+                        exp.setConnector(Connector.AND);
                     } else {
-                        exp.setConnective(Connector.OR);
+                        exp.setConnector(Connector.OR);
                     }
                     exp.getChildren().add(ei);
                     exp.getChildren().add(es);
@@ -469,10 +469,10 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 break;
             case NOT:
                 this.replace(exp.getChildren().get(0), inertia, connective, ti, ts);
-                if (exp.getChildren().get(0).getConnective().equals(Connector.TRUE)) {
-                    exp.setConnective(Connector.FALSE);
+                if (exp.getChildren().get(0).getConnector().equals(Connector.TRUE)) {
+                    exp.setConnector(Connector.FALSE);
                 } else {
-                    exp.setConnective(Connector.TRUE);
+                    exp.setConnector(Connector.TRUE);
                 }
                 break;
             case AT_START:
@@ -535,7 +535,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      */
     private List<Expression<Integer>> collectUnaryInertia(final Expression<Integer> exp) {
         final List<Expression<Integer>> unaryInertia = new ArrayList<>();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 if (this.getInferredDomains().get(exp.getSymbol().getValue()) != null) {
                     unaryInertia.add(exp);
@@ -625,7 +625,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         }
 
         for (Expression<Integer> fluent : this.getIntInitialState()) {
-            if (fluent.getConnective().equals(Connector.NOT)) {
+            if (fluent.getConnector().equals(Connector.NOT)) {
                 fluent = fluent.getChildren().get(0);
             }
             final int arity = this.getPredicateSignatures().get(fluent.getSymbol().getValue()).size();
@@ -772,7 +772,7 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
      * @return if the atomic expression was simply or not.
      */
     public boolean simplify(final Expression<Integer> exp) {
-        if (!exp.getConnective().equals(Connector.ATOM)) return false;
+        if (!exp.getConnector().equals(Connector.ATOM)) return false;
         final int predicate = exp.getSymbol().getValue();
         // Compute the mask i.e., the vector used to indicate where the constant are located in the
         // atomic expression.
@@ -808,13 +808,13 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
         // 0 then the expression is simplified to FALSE.
         final Inertia inertia = this.getInertia().get(predicate);
         if ((inertia.equals(Inertia.POSITIVE) || inertia.equals(Inertia.INERTIA)) && n == 0) {
-            exp.setConnective(Connector.FALSE);
+            exp.setConnector(Connector.FALSE);
             return true;
         } else if ((inertia.equals(Inertia.NEGATIVE) || inertia.equals(Inertia.INERTIA)) && max == n) {
             // CASE 2: If the expression is a negative inertia and then the number of all possible
             // type-consistent ground instances of the specified expression then the expression is
             // simplified to TRUE.
-            exp.setConnective(Connector.TRUE);
+            exp.setConnector(Connector.TRUE);
             return true;
         } else {
             return false;

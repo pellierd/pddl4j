@@ -358,7 +358,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param facts the set of relevant facts.
      */
     protected void extractRelevantFluents(final Expression<Integer> exp, final Set<Expression<Integer>> facts) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
                 if (inertia == null) {
@@ -476,7 +476,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param fluents the set of relevant facts.
      */
     private void extractRelevantNumericFluents(final Expression<Integer> exp, final Set<Expression<Integer>> fluents) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case FN_HEAD:
                 fluents.add(exp);
                 break;
@@ -519,7 +519,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
 
         }
     }
@@ -582,7 +582,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     private Effect finalizeEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
         final Effect effect = new Effect();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 Integer index = this.mapOfFluentIndex.get(exp);
                 if (index != null) {
@@ -598,7 +598,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case AND:
                 final List<Expression<Integer>> children = exp.getChildren();
                 for (Expression<Integer> ei : children) {
-                    switch (ei.getConnective()) {
+                    switch (ei.getConnector()) {
                         case ATOM:
                             index = this.mapOfFluentIndex.get(ei);
                             if (index != null) {
@@ -623,7 +623,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                             effect.addNumericAssignment(assignment);
                             break;
                         default:
-                            throw new UnexpectedExpressionException(ei.getConnective().toString());
+                            throw new UnexpectedExpressionException(ei.getConnector().toString());
                     }
                 }
                 break;
@@ -639,7 +639,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return effect;
     }
@@ -653,20 +653,20 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     private TemporalEffect finalizeTimeEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
         final TemporalEffect temporalEffect = new TemporalEffect();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AT_START:
             case AT_END:
             case OVER_ALL:
                 Effect effect =  null;
-                if (exp.getConnective().equals(Connector.AT_START)) {
+                if (exp.getConnector().equals(Connector.AT_START)) {
                     effect = temporalEffect.getAtStartEffect();
-                } else if (exp.getConnective().equals(Connector.AT_END)) {
+                } else if (exp.getConnector().equals(Connector.AT_END)) {
                     effect = temporalEffect.getAtEndEffect();
                 } else {
                     effect = temporalEffect.getOverallEffect();
                 }
                 Expression<Integer> sub = exp.getChildren().get(0);
-                switch (sub.getConnective()) {
+                switch (sub.getConnector()) {
                     case ATOM:
                         effect.getPositiveFluents().set(this.getMapOfFluentIndex().get(sub));
                         break;
@@ -682,7 +682,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                         effect.addNumericAssignment(assignment);
                         break;
                     default:
-                        throw new UnexpectedExpressionException(sub.getConnective().toString());
+                        throw new UnexpectedExpressionException(sub.getConnector().toString());
                 }
                 break;
             case AND:
@@ -703,7 +703,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return temporalEffect;
     }
@@ -717,7 +717,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     private List<TemporalConditionalEffect> finalizeTimeConditionalEffect(final Expression<Integer> exp) throws UnexpectedExpressionException {
         List<TemporalConditionalEffect> effects = new ArrayList<>();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case WHEN:
                 TemporalConditionalEffect tce = new TemporalConditionalEffect();
                 tce.setCondition(this.finalizeTimeCondition(exp.getChildren().get(0)));
@@ -740,7 +740,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         final TemporalConditionalEffect utce = new TemporalConditionalEffect();
         Iterator<TemporalConditionalEffect> it = effects.iterator();
@@ -816,7 +816,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final NumericVariable fluent = new NumericVariable(this.mapOfNumericFluentIndex.get(exp.getChildren().get(0)));
         final ArithmeticExpression arithmeticExpression = this.finalizeArithmeticExpression(exp.getChildren().get(1));
         NumericAssignment assignment = null;
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ASSIGN:
                 assignment = new NumericAssignment(AssignmentOperator.ASSIGN, fluent, arithmeticExpression);
                 break;
@@ -833,7 +833,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 assignment = new NumericAssignment(AssignmentOperator.SCALE_DOWN, fluent, arithmeticExpression);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return assignment;
     }
@@ -866,7 +866,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
         // Initialize the effects of the action
         final LinkedList<Expression<Integer>> effects = new LinkedList<>();
-        if (action.getEffects().getConnective().equals(Connector.ATOM)) {
+        if (action.getEffects().getConnector().equals(Connector.ATOM)) {
             effects.add(action.getEffects());
         } else {
             effects.addAll(action.getEffects().getChildren());
@@ -877,7 +877,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         boolean hasUnConditionalEffects = false;
         while (!effects.isEmpty()) { //for (Expression ei : effects) {
             Expression<Integer> ei = effects.poll();
-            final Connector connective = ei.getConnective();
+            final Connector connective = ei.getConnector();
             final List<Expression<Integer>> children = ei.getChildren();
             //System.out.println("EXP " + this.toString(ei));
             switch (connective) {
@@ -968,13 +968,13 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected void finalizeGoal() {
 
-        if (this.getIntGoal().getConnective().equals(Connector.FALSE)) {
+        if (this.getIntGoal().getConnector().equals(Connector.FALSE)) {
             this.goal = null;
         } else {
             this.getIntGoal().toDNF();
             List<Goal> goals = new ArrayList<>(this.getIntGoal().getChildren().size());
             for (Expression<Integer> exp : this.getIntGoal().getChildren()) {
-                if (exp.getConnective().equals(Connector.ATOM)) {
+                if (exp.getConnector().equals(Connector.ATOM)) {
                     Expression<Integer> and = new Expression<>(Connector.AND);
                     and.getChildren().add(exp);
                     goals.add(new Goal(this.finalizeCondition(and)));
@@ -1021,7 +1021,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected Condition finalizeCondition(final Expression<Integer> exp) throws UnexpectedExpressionException {
         final Condition condition = new Condition();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 condition.getPositiveFluents().set(this.getMapOfFluentIndex().get(exp));
                 break;
@@ -1047,7 +1047,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return condition;
     }
@@ -1061,20 +1061,20 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     protected TemporalCondition finalizeTimeCondition(final Expression<Integer> exp) throws UnexpectedExpressionException {
         final TemporalCondition temporalCondition = new TemporalCondition();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AT_START:
             case AT_END:
             case OVER_ALL:
                 Condition condition = null;
-                if (exp.getConnective().equals(Connector.AT_START)) {
+                if (exp.getConnector().equals(Connector.AT_START)) {
                     condition = temporalCondition.getAtStartCondition();
-                } else if (exp.getConnective().equals(Connector.AT_END)) {
+                } else if (exp.getConnector().equals(Connector.AT_END)) {
                     condition = temporalCondition.getAtEndCondition();
                 } else {
                     condition = temporalCondition.getOverallCondition();
                 }
                 Expression<Integer> sub = exp.getChildren().get(0);
-                switch (sub.getConnective()) {
+                switch (sub.getConnector()) {
                     case ATOM:
                         condition.getPositiveFluents().set(this.getMapOfFluentIndex().get(sub));
                         break;
@@ -1124,7 +1124,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         throws UnexpectedExpressionException {
 
         final List<NumericConstraint> constraints = new ArrayList<>();
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AND:
                 for (Expression<Integer> e : exp.getChildren()) {
                     constraints.addAll(this.finalizeNumericConstraints(e));
@@ -1141,7 +1141,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return constraints;
     }
@@ -1156,7 +1156,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         ArithmeticExpression left = this.finalizeArithmeticExpression(exp.getChildren().get(0));
         ArithmeticExpression right = this.finalizeArithmeticExpression(exp.getChildren().get(1));
         NumericConstraint constraint;
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case EQUAL_COMPARISON:
                 constraint = new NumericConstraint(NumericComparator.EQUAL, left, right);
                 break;
@@ -1173,7 +1173,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 constraint = new NumericConstraint(NumericComparator.GREATER_OR_EQUAL, left, right);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return constraint;
     }
@@ -1187,7 +1187,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         ArithmeticExpression arithmeticExpression;
         ArithmeticExpression left;
         ArithmeticExpression right;
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case PLUS:
                 left = this.finalizeArithmeticExpression(exp.getChildren().get(0));
                 right = this.finalizeArithmeticExpression(exp.getChildren().get(1));
@@ -1225,7 +1225,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 arithmeticExpression = new NumericVariable(NumericVariable.DURATION);
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
         return arithmeticExpression;
     }
@@ -1237,7 +1237,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void finalizeInitialState() {
         this.initialState = new InitialState();
         for (final Expression<Integer> fact : this.getIntInitialState()) {
-            switch (fact.getConnective()) {
+            switch (fact.getConnector()) {
                 case ATOM:
                     Integer i = this.mapOfFluentIndex.get(fact);
                     if (i != null) {
@@ -2270,20 +2270,20 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final DefaultTaskNetwork tn = new DefaultTaskNetwork(tasks, ordering);
 
         for (Expression<Integer> e: taskNetwork.getConstraints()) {
-            if (e.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
+            if (e.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
                 final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
                 final Condition before = tn.getBeforeConstraints(task.getValue());
                 final Expression<Integer> se = e.getChildren().get(1);
-                if (se.getConnective().equals(Connector.NOT)) {
+                if (se.getConnector().equals(Connector.NOT)) {
                     before.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
                 } else {
                     before.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
                 }
-            } else if (e.getConnective().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)) {
+            } else if (e.getConnector().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)) {
                 final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
                 final Condition after = tn.getAfterConstraints(task.getValue());
                 final Expression<Integer> se = e.getChildren().get(1);
-                if (se.getConnective().equals(Connector.NOT)) {
+                if (se.getConnector().equals(Connector.NOT)) {
                     after.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
                 } else {
                     after.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
@@ -2294,7 +2294,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 final Symbol<Integer> task2 = e.getChildren().get(1).getTaskID();
                 final Condition between = tn.getBetweenConstraints(task1.getValue(), task2.getValue());
                 final Expression<Integer> se = e.getChildren().get(2);
-                if (se.getConnective().equals(Connector.NOT)) {
+                if (se.getConnector().equals(Connector.NOT)) {
                     between.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
                 } else {
                     between.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
@@ -2351,20 +2351,20 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final TemporalTaskNetwork tn = new TemporalTaskNetwork(tasks, stn);
 
         for (Expression<Integer> e: taskNetwork.getConstraints()) {
-            if (e.getConnective().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
+            if (e.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
                 final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
                 final Condition before = tn.getBeforeConstraints(task.getValue());
                 final Expression<Integer> se = e.getChildren().get(1);
-                if (se.getConnective().equals(Connector.NOT)) {
+                if (se.getConnector().equals(Connector.NOT)) {
                     before.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
                 } else {
                     before.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
                 }
-            } else if (e.getConnective().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)) {
+            } else if (e.getConnector().equals(Connector.HOLD_AFTER_METHOD_CONSTRAINT)) {
                 final Symbol<Integer> task = e.getChildren().get(0).getTaskID();
                 final Condition after = tn.getAfterConstraints(task.getValue());
                 final Expression<Integer> se = e.getChildren().get(1);
-                if (se.getConnective().equals(Connector.NOT)) {
+                if (se.getConnector().equals(Connector.NOT)) {
                     after.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
                 } else {
                     after.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
@@ -2374,7 +2374,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 final Symbol<Integer> task2 = e.getChildren().get(1).getTaskID();
                 final Condition between = tn.getBetweenConstraints(task1.getValue(), task2.getValue());
                 final Expression<Integer> se = e.getChildren().get(2);
-                if (se.getConnective().equals(Connector.NOT)) {
+                if (se.getConnector().equals(Connector.NOT)) {
                     between.getNegativeFluents().set(this.mapOfFluentIndex.get(se.getChildren().get(0)));
                 } else {
                     between.getPositiveFluents().set(this.mapOfFluentIndex.get(se));
@@ -2426,7 +2426,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param tasks the list of task encoded as integer.
      */
     private void encodeTasks(Expression<Integer> exp, List<Integer> tasks) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case TASK:
                 tasks.add(this.mapOfTasksIndex.get(exp));
                 break;

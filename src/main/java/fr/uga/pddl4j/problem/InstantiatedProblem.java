@@ -139,10 +139,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         final List<IntAction> instOps = new ArrayList<>(100);
         action.getPreconditions().expandQuantifiedExpression(this.getDomains(), this);
         action.getPreconditions().simplify();
-        if (!action.getPreconditions().getConnective().equals(Connector.FALSE)) {
+        if (!action.getPreconditions().getConnector().equals(Connector.FALSE)) {
             action.getEffects().expandQuantifiedExpression(this.getDomains(), this);
             action.getEffects().simplify();
-            if (!action.getEffects().getConnective().equals(Connector.FALSE)) {
+            if (!action.getEffects().getConnector().equals(Connector.FALSE)) {
                 this.instantiate(action, 0, bound, instOps);
             }
         }
@@ -185,10 +185,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             final Expression<Integer> precond = action.getPreconditions();
             precond.simplify();
-            if (!precond.getConnective().equals(Connector.FALSE)) {
+            if (!precond.getConnector().equals(Connector.FALSE)) {
                 final Expression<Integer> effect = action.getEffects();
                 effect.simplify();
-                if (!effect.getConnective().equals(Connector.FALSE)) {
+                if (!effect.getConnector().equals(Connector.FALSE)) {
                     actions.add(action);
                 }
             }
@@ -198,10 +198,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 final Symbol<Integer> varIndex = new Symbol<>(SymbolType.VARIABLE, -index - 1);
                 final Expression<Integer> precond = new Expression<>(action.getPreconditions());
                 precond.substitute(varIndex, constant, this);
-                if (!precond.getConnective().equals(Connector.FALSE)) {
+                if (!precond.getConnector().equals(Connector.FALSE)) {
                     final Expression<Integer> effects = new Expression<>(action.getEffects());
                     effects.substitute(varIndex, constant, this);
-                    if (!effects.getConnective().equals(Connector.FALSE)) {
+                    if (!effects.getConnector().equals(Connector.FALSE)) {
                         final IntAction copy = new IntAction(action.getName(), arity);
                         copy.setPreconditions(precond);
                         copy.setEffects(effects);
@@ -285,10 +285,10 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         if (index == arity) {
             final Expression<Integer> precond = method.getPreconditions();
             precond.simplify();
-            if (precond.getConnective().equals(Connector.FALSE)) return;
+            if (precond.getConnector().equals(Connector.FALSE)) return;
             final Expression<Integer> constraints = method.getConstraints();
             constraints.simplify();
-            if (constraints.getConnective().equals(Connector.FALSE)) return;
+            if (constraints.getConnector().equals(Connector.FALSE)) return;
             methods.add(method);
         } else if (method.getValueOfParameter(index) >= 0) {
             this.instantiate(method, index + 1, bound, methods);
@@ -299,7 +299,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 final Expression<Integer> preconditionCopy = new Expression<>(method.getPreconditions());
 
                 preconditionCopy.substitute(varIndex, constant, this);
-                if (!preconditionCopy.getConnective().equals(Connector.FALSE)) {
+                if (!preconditionCopy.getConnector().equals(Connector.FALSE)) {
                     final IntMethod copy = new IntMethod(method.getName(), arity);
                     copy.setPreconditions(preconditionCopy);
                     copy.setOrderingConstraints(new Expression<>(method.getOrderingConstraints()));
@@ -587,7 +587,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
             final IntMethod method = i.next();
             method.getPreconditions().expandQuantifiedExpression(this.getDomains(), this);
             method.getPreconditions().simplify();
-            if (method.getPreconditions().getConnective().equals(Connector.FALSE)) {
+            if (method.getPreconditions().getConnector().equals(Connector.FALSE)) {
                 i.remove();
             }
         }

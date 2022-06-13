@@ -629,7 +629,7 @@ public final class Parser implements Callable<Integer> {
             Expression<String> gd = stackGD.poll();
             List<TypedSymbol<String>> ctx = stackCtx.poll();
             List<TypedSymbol<String>> newCtx = new LinkedList<>(ctx);
-            switch (gd.getConnective()) {
+            switch (gd.getConnector()) {
                 case ATOM:
                 case FN_HEAD:
                 case EQUAL_ATOM:
@@ -682,14 +682,14 @@ public final class Parser implements Callable<Integer> {
                         }
                         checked = !error;
                     }
-                    if (checked && gd.getConnective().equals(Connector.ATOM)
+                    if (checked && gd.getConnector().equals(Connector.ATOM)
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                             .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                             .getName().getLocation().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(Connector.FN_HEAD)
+                    } else if (checked && gd.getConnector().equals(Connector.FN_HEAD)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -738,12 +738,12 @@ public final class Parser implements Callable<Integer> {
         stackGD.addAll(this.problem.getInit());
         while (!stackGD.isEmpty()) {
             Expression<String> gd = stackGD.poll();
-            switch (gd.getConnective()) {
+            switch (gd.getConnector()) {
                 case ATOM:
                 case FN_ATOM:
                     boolean error = false;
                     Expression<String> fluent = null;
-                    if (gd.getConnective().equals(Connector.ATOM)) {
+                    if (gd.getConnector().equals(Connector.ATOM)) {
                         fluent = gd;
                     } else {
                         fluent = gd.getChildren().get(0);
@@ -775,14 +775,14 @@ public final class Parser implements Callable<Integer> {
                         }
                     }
                     checked = !error;
-                    if (checked && gd.getConnective().equals(Connector.ATOM)
+                    if (checked && gd.getConnector().equals(Connector.ATOM)
                         && !this.isDeclaredPredicate(atomSkeleton)) {
                         this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                             .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                             .getName().getLocation().getBeginColumn());
                         checked = false;
-                    } else if (checked && gd.getConnective().equals(Connector.FN_ATOM)
+                    } else if (checked && gd.getConnector().equals(Connector.FN_ATOM)
                         && !this.isDeclaredFunction(atomSkeleton)) {
                         this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                             + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1307,7 +1307,7 @@ public final class Parser implements Callable<Integer> {
      */
     private boolean checkTaskIDsUniquenessFromInitialTaskNetwork(Expression<String> exp, Set<Symbol<String>> taskIDs) {
         boolean unique = true;
-        if (exp.getConnective().equals(Connector.TASK) && exp.getTaskID() != null) {
+        if (exp.getConnector().equals(Connector.TASK) && exp.getTaskID() != null) {
             if (!taskIDs.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in initial task network "
                     + "is already defined", this.lexer
@@ -1342,7 +1342,7 @@ public final class Parser implements Callable<Integer> {
      */
     private boolean checkTaskIDsUniqueness(ParsedMethod meth, Expression<String> exp, Set<Symbol<String>> taskIds) {
         boolean unique = true;
-        if (exp.getConnective().equals(Connector.TASK) && exp.getTaskID() != null) {
+        if (exp.getConnector().equals(Connector.TASK) && exp.getTaskID() != null) {
             if (!taskIds.add(exp.getTaskID())) {
                 this.mgr.logParserError("task id \"" + exp.getTaskID() + "\" in method "
                     + "\"" + meth.getName() + "\" is already defined", this.lexer
@@ -1379,7 +1379,7 @@ public final class Parser implements Callable<Integer> {
             Expression<String> gd = stackGD.poll();
             List<TypedSymbol<String>> ctx = stackCtx.poll();
             List<TypedSymbol<String>> newCtx = new LinkedList<>(ctx);
-            switch (gd.getConnective()) {
+            switch (gd.getConnector()) {
                 case ATOM:
                 case FN_HEAD:
                 case TASK:
@@ -1468,21 +1468,21 @@ public final class Parser implements Callable<Integer> {
 
             }
         }
-        if (checked && gd.getConnective().equals(Connector.ATOM)
+        if (checked && gd.getConnector().equals(Connector.ATOM)
             && !this.isDeclaredPredicate(atomSkeleton)) {
             this.mgr.logParserError("predicate \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                 .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                 .getName().getLocation().getBeginColumn());
             checked = false;
-        } else if (checked && gd.getConnective().equals(Connector.FN_ATOM)
+        } else if (checked && gd.getConnector().equals(Connector.FN_ATOM)
             && !this.isDeclaredFunction(atomSkeleton)) {
             this.mgr.logParserError("function \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
                 .getFile(), atomSkeleton.getName().getLocation().getBeginLine(), atomSkeleton
                 .getName().getLocation().getBeginColumn());
             checked = false;
-        } else if (checked && gd.getConnective().equals(Connector.TASK)
+        } else if (checked && gd.getConnector().equals(Connector.TASK)
             && !this.isDeclaredTask(atomSkeleton)) {
             this.mgr.logParserError("task \"" + atomSkeleton.getName() + "/"
                 + atomSkeleton.getArguments().size() + "\" is undefined", this.lexer
@@ -1762,12 +1762,12 @@ public final class Parser implements Callable<Integer> {
         final Expression<String> preconditions = action.getPreconditions();
         //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
-        if (preconditions.getConnective().equals(Connector.TRUE)) {
+        if (preconditions.getConnector().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is always applicable: "
                     + "action preconditions can be simplified to TRUE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
-        } else if (preconditions.getConnective().equals(Connector.FALSE)) {
+        } else if (preconditions.getConnector().equals(Connector.FALSE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is never applicable: "
                     + "action preconditions can be simplified to FALSE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
@@ -1777,12 +1777,12 @@ public final class Parser implements Callable<Integer> {
         final Expression<String> effects = action.getPreconditions();
         //Expression.renameVariables(effects, context);
         check &= this.checkExpressionSemantic(effects);
-        if (effects.getConnective().equals(Connector.TRUE)) {
+        if (effects.getConnector().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced no effects: "
                     + "action effects can be simplified to TRUE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
             check = false;
-        } else if (effects.getConnective().equals(Connector.FALSE)) {
+        } else if (effects.getConnector().equals(Connector.FALSE)) {
             this.mgr.logParserWarning("Action " + action.getName() + " is produced invalid effects: "
                     + "action effects can be simplified to FALSE.", this.lexer.getFile(),
                 action.getName().getLocation().getBeginLine(), action.getName().getLocation().getBeginColumn());
@@ -1812,12 +1812,12 @@ public final class Parser implements Callable<Integer> {
         final Expression<String> preconditions = method.getPreconditions();
         //Expression.renameVariables(preconditions, context);
         check &= this.checkExpressionSemantic(preconditions);
-        if (preconditions.getConnective().equals(Connector.TRUE)) {
+        if (preconditions.getConnector().equals(Connector.TRUE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is always applicable: "
                     + "method preconditions can be simplified to TRUE.", this.lexer.getFile(),
                 method.getName().getLocation().getBeginLine(), method.getName().getLocation().getBeginColumn());
             check = false;
-        } else if (preconditions.getConnective().equals(Connector.FALSE)) {
+        } else if (preconditions.getConnector().equals(Connector.FALSE)) {
             this.mgr.logParserWarning("Method " + method.getName() + " is never applicable: "
                     + "method preconditions can be simplified to FALSE.", this.lexer.getFile(),
                 method.getName().getLocation().getBeginLine(), method.getName().getLocation().getBeginColumn());
@@ -1853,7 +1853,7 @@ public final class Parser implements Callable<Integer> {
         int column = exp.getLocation().getBeginColumn();
 
         boolean check = true;
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case FORALL:
             case EXISTS:
             case AT_START:
@@ -1876,10 +1876,10 @@ public final class Parser implements Callable<Integer> {
             case HOLD_DURING_METHOD_CONSTRAINT:
                 Expression<String> child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
-                if (child.getConnective().equals(Connector.TRUE)
-                    || child.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(child.getConnective());
-                    this.mgr.logParserWarning(exp.getConnective() + " expression is always " + exp.getConnective()
+                if (child.getConnector().equals(Connector.TRUE)
+                    || child.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(child.getConnector());
+                    this.mgr.logParserWarning(exp.getConnector() + " expression is always " + exp.getConnector()
                             + ".", this.lexer.getFile(), line, column);
                     check = false;
                 }
@@ -1888,26 +1888,26 @@ public final class Parser implements Callable<Integer> {
                 final Expression<String> cause = exp.getChildren().get(0);
                 final Expression<String> consequence = exp.getChildren().get(1);
                 check &= this.checkExpressionSemantic(cause);
-                if (cause.getConnective().equals(Connector.TRUE)) {
+                if (cause.getConnector().equals(Connector.TRUE)) {
                     check &= this.checkExpressionSemantic(consequence);
                     exp.assign(consequence);
                     this.mgr.logParserWarning("IMPLY expression cause always TRUE.", this.lexer.getFile(),
                         line, column);
                     check = false;
-                } else if (cause.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.TRUE);
+                } else if (cause.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.TRUE);
                     this.mgr.logParserWarning("IMPLY expression cause always FALSE.", this.lexer.getFile(),
                         line, column);
                     check = false;
                 } else {
                     check &= this.checkExpressionSemantic(consequence);
-                    if (consequence.getConnective().equals(Connector.TRUE)) {
-                        exp.setConnective(Connector.TRUE);
+                    if (consequence.getConnector().equals(Connector.TRUE)) {
+                        exp.setConnector(Connector.TRUE);
                         this.mgr.logParserWarning("IMPLY expression consequence always TRUE.",
                             this.lexer.getFile(), line, column);
                         check = false;
-                    } else if (consequence.getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(Connector.NOT);
+                    } else if (consequence.getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(Connector.NOT);
                         exp.getChildren().remove(1);
                         this.mgr.logParserWarning("IMPLY expression consequence always FALSE.",
                             this.lexer.getFile(), line, column);
@@ -1919,7 +1919,7 @@ public final class Parser implements Callable<Integer> {
                 check &= this.checkDuplicateChild(exp);
                 check &= this.checkTautology(exp);
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(Connector.TRUE);
+                    exp.setConnector(Connector.TRUE);
                     this.mgr.logParserWarning("AND expression is empty.", this.lexer.getFile(), line, column);
                     check = false;
                 } else if (exp.getChildren().size() == 1) {
@@ -1928,25 +1928,25 @@ public final class Parser implements Callable<Integer> {
                 } else {
                     int i = 0;
                     while (i < exp.getChildren().size()
-                        && !exp.getConnective().equals(Connector.TRUE)
-                        && !exp.getConnective().equals(Connector.FALSE)) {
+                        && !exp.getConnector().equals(Connector.TRUE)
+                        && !exp.getConnector().equals(Connector.FALSE)) {
                         child = exp.getChildren().get(i);
                         int childLine = child.getLocation().getBeginLine();
                         int childColumn = child.getLocation().getBeginColumn();
                         check &= this.checkExpressionSemantic(child);
-                        if (child.getConnective().equals(Connector.FALSE)) {
-                            exp.setConnective(Connector.FALSE);
+                        if (child.getConnector().equals(Connector.FALSE)) {
+                            exp.setConnector(Connector.FALSE);
                             this.mgr.logParserWarning("AND expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always FALSE.",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(Connector.TRUE)) {
+                        } else if (child.getConnector().equals(Connector.TRUE)) {
                             exp.getChildren().remove(i);
                             this.mgr.logParserWarning("AND expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always TRUE.",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(Connector.AND)) {
+                        } else if (child.getConnector().equals(Connector.AND)) {
                             exp.getChildren().remove(i);
                             exp.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
@@ -1963,7 +1963,7 @@ public final class Parser implements Callable<Integer> {
                 check &= this.checkDuplicateChild(exp);
                 check &= this.checkTautology(exp);
                 if (exp.getChildren().isEmpty()) {
-                    exp.setConnective(Connector.TRUE);
+                    exp.setConnector(Connector.TRUE);
                     this.mgr.logParserWarning("OR expression is empty.",  this.lexer.getFile(), line, column);
                     check = false;
                 } else if (exp.getChildren().size() == 1) {
@@ -1972,25 +1972,25 @@ public final class Parser implements Callable<Integer> {
                 } else {
                     int i = 0;
                     while (i < exp.getChildren().size()
-                        && !exp.getConnective().equals(Connector.TRUE)
-                        && !exp.getConnective().equals(Connector.FALSE)) {
+                        && !exp.getConnector().equals(Connector.TRUE)
+                        && !exp.getConnector().equals(Connector.FALSE)) {
                         child = exp.getChildren().get(i);
                         int childLine = child.getLocation().getBeginLine();
                         int childColumn = child.getLocation().getBeginColumn();
                         check &= this.checkExpressionSemantic(child);
-                        if (child.getConnective().equals(Connector.TRUE)) {
-                            exp.setConnective(Connector.TRUE);
+                        if (child.getConnector().equals(Connector.TRUE)) {
+                            exp.setConnector(Connector.TRUE);
                             this.mgr.logParserWarning("OR expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always TRUE.",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(Connector.FALSE)) {
+                        } else if (child.getConnector().equals(Connector.FALSE)) {
                             exp.getChildren().remove(i);
                             this.mgr.logParserWarning("OR expression contains a sub-expression (line "
                                     + childLine + ", column " + childColumn + ") always FALSE. ",
                                 this.lexer.getFile(), line, column);
                             check = false;
-                        } else if (child.getConnective().equals(Connector.OR)) {
+                        } else if (child.getConnector().equals(Connector.OR)) {
                             exp.getChildren().remove(i);
                             exp.getChildren().addAll(i, child.getChildren());
                             i += child.getChildren().size();
@@ -2006,14 +2006,14 @@ public final class Parser implements Callable<Integer> {
             case NOT:
                 child = exp.getChildren().get(0);
                 check &= this.checkExpressionSemantic(child);
-                if (child.getConnective().equals(Connector.NOT)) {
+                if (child.getConnector().equals(Connector.NOT)) {
                     exp.assign(child.getChildren().get(0));
                     this.mgr.logParserWarning("NOT expression contains a double negation that "
                         + "can be removed.", this.lexer.getFile(), line, column);
-                } else if (child.getConnective().equals(Connector.TRUE)) {
-                    exp.setConnective(Connector.FALSE);
-                } else if (child.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.TRUE);
+                } else if (child.getConnector().equals(Connector.TRUE)) {
+                    exp.setConnector(Connector.FALSE);
+                } else if (child.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.TRUE);
                 }
                 break;
             case WHEN:
@@ -2021,13 +2021,13 @@ public final class Parser implements Callable<Integer> {
                 check &= this.checkExpressionSemantic(condition);
                 Expression<String> effect =  exp.getChildren().get(1);
                 check &= this.checkExpressionSemantic(effect);
-                if (condition.getConnective().equals(Connector.TRUE)) {
+                if (condition.getConnector().equals(Connector.TRUE)) {
                     exp.assign(effect);
                     this.mgr.logParserWarning("WHEN expression with condition always TRUE. "
                         + "Effect can be considered as unconditional.", this.lexer.getFile(), line, column);
                     check = false;
-                } else if (condition.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.TRUE);
+                } else if (condition.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.TRUE);
                     this.mgr.logParserWarning("WHEN expression with condition always FALSE. "
                         + "The whole conditional effect can be removed.", this.lexer.getFile(), line, column);
                     check = false;
@@ -2035,7 +2035,7 @@ public final class Parser implements Callable<Integer> {
                 break;
             case EQUAL_ATOM:
                 if (exp.getArguments().get(0).equals(exp.getArguments().get(1))) {
-                    exp.setConnective(Connector.TRUE);
+                    exp.setConnector(Connector.TRUE);
                     this.mgr.logParserWarning("EQUAL expression always TRUE. "
                         + "The expression can be removed.", this.lexer.getFile(), line, column);
                     check = false;
@@ -2051,7 +2051,7 @@ public final class Parser implements Callable<Integer> {
             case WITHIN_CONSTRAINT:
             case HOLD_AFTER_CONSTRAINT:
                 if (exp.getChildren().get(0).getValue() < 0.0) {
-                    this.mgr.logParserError(exp.getConnective().toString()
+                    this.mgr.logParserError(exp.getConnector().toString()
                             + " expression cannot use a time < 0.0. ",  this.lexer.getFile(), line, column);
                     check = false;
                 }
@@ -2064,7 +2064,7 @@ public final class Parser implements Callable<Integer> {
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
                 if (exp.getChildren().get(0).getValue() < 0.0) {
-                    this.mgr.logParserError(exp.getConnective().toString()
+                    this.mgr.logParserError(exp.getConnector().toString()
                         + " expression cannot use a time < 0.0. ",  this.lexer.getFile(), line, column);
                     check = false;
                 }
@@ -2073,15 +2073,15 @@ public final class Parser implements Callable<Integer> {
                 break;
             case HOLD_DURING_CONSTRAINT:
                 if (exp.getChildren().get(0).getValue() > exp.getChildren().get(1).getValue()) {
-                    exp.setConnective(Connector.FALSE);
+                    exp.setConnector(Connector.FALSE);
                     this.mgr.logParserError("HOLD_DURING_CONSTRAINT expression with invalid interval",
                         this.lexer.getFile(), line, column);
                     check = false;
                 } else {
                     check &= this.checkExpressionSemantic(exp.getChildren().get(0));
-                    if (exp.getChildren().get(0).getConnective().equals(Connector.TRUE)
-                        || exp.getChildren().get(0).getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(exp.getChildren().get(0).getConnective());
+                    if (exp.getChildren().get(0).getConnector().equals(Connector.TRUE)
+                        || exp.getChildren().get(0).getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(exp.getChildren().get(0).getConnector());
                         check = false;
                     }
                 }
@@ -2109,8 +2109,8 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
     private boolean checkDuplicateChild(Expression<String> exp) {
-        assert exp.getConnective().equals(Connector.AND)
-            || exp.getConnective().equals(Connector.OR);
+        assert exp.getConnector().equals(Connector.AND)
+            || exp.getConnector().equals(Connector.OR);
         boolean check = true;
         for (int i = 0; i < exp.getChildren().size(); i++) {
             final Expression<String> ei = exp.getChildren().get(i);
@@ -2119,8 +2119,8 @@ public final class Parser implements Callable<Integer> {
                 if (ei.equals(ej)) {
                     exp.getChildren().remove(j);
                     j--;
-                    this.mgr.logParserWarning("Duplicated " + ei.getConnective() + " sub-expression in "
-                            + exp.getConnective().getImage().toUpperCase(Locale.ROOT) + " expression. "
+                    this.mgr.logParserWarning("Duplicated " + ei.getConnector() + " sub-expression in "
+                            + exp.getConnector().getImage().toUpperCase(Locale.ROOT) + " expression. "
                             + "The duplicated sub-expression can be removed.", this.lexer.getFile(),
                             ej.getLocation().getBeginLine(), ej.getLocation().getBeginColumn());
                     check = false;
@@ -2139,8 +2139,8 @@ public final class Parser implements Callable<Integer> {
      * @return <code>true</code> if the expression is well-formed; <code>false</code> otherwise.
      */
     private boolean checkTautology(Expression<String> exp) {
-        assert exp.getConnective().equals(Connector.AND)
-            || exp.getConnective().equals(Connector.OR);
+        assert exp.getConnector().equals(Connector.AND)
+            || exp.getConnector().equals(Connector.OR);
         boolean check = true;
         for (int i = 0; i < exp.getChildren().size(); i++) {
             Expression<String> ei =  exp.getChildren().get(i);
@@ -2149,11 +2149,11 @@ public final class Parser implements Callable<Integer> {
             for (int j = i + 1; j < exp.getChildren().size(); j++) {
                 Expression<String> ej = exp.getChildren().get(j);
                 if (ej.equals(neg)) {
-                    ei.setConnective(Connector.TRUE);
+                    ei.setConnector(Connector.TRUE);
                     exp.getChildren().remove(j);
                     j--;
                     this.mgr.logParserWarning("Tautology detected between sub-expressions in "
-                            + exp.getConnective() + " expression.",
+                            + exp.getConnector() + " expression.",
                         this.lexer.getFile(), exp.getLocation().getBeginLine(), exp.getLocation().getBeginColumn());
                     check = false;
                 }

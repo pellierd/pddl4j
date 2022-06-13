@@ -20,11 +20,11 @@
 package fr.uga.pddl4j.parser;
 
 /**
- * Thrown to indicate that a malformed expression has occurred. An expression is malformed when an expression has wrong
- * number of arguments and when connective is not
- * wrong.
+ * Thrown to indicate that a malformed expression is occurred. An expression is malformed when an expression has wrong
+ * number of arguments or children expression according to its connector.
  *
  * @author Damien Pellier
+ * @version 1.0 - 13-06-2022
  * @see Expression
  */
 public class MalformedExpressionException extends RuntimeException {

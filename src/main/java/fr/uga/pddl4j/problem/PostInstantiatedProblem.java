@@ -98,7 +98,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param exp the effect.
      */
     private void extractGroundInertia(final Expression<Integer> exp) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 Inertia inertia = this.groundInertia.get(exp);
                 if (inertia == null) {
@@ -130,7 +130,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case NOT:
                 final Expression<Integer> neg = exp.getChildren().get(0);
-                if (neg.getConnective().equals(Connector.ATOM)) {
+                if (neg.getConnector().equals(Connector.ATOM)) {
                     inertia = this.groundInertia.get(neg);
                     if (inertia == null) {
                         inertia = Inertia.INERTIA;
@@ -217,7 +217,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param exp the effect.
      */
     private void extractGroundNumericInertia(final Expression<Integer> exp) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AND:
                 exp.getChildren().forEach(this::extractGroundNumericInertia);
                 break;
@@ -243,7 +243,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // Do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().getImage());
+                throw new UnexpectedExpressionException(exp.getConnector().getImage());
         }
     }
 
@@ -260,7 +260,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         for (IntAction a : this.getIntActions()) {
             if (a.isDurative()) {
                 this.simplifyWithGroundNumericInertia(a.getDuration(), false);
-                if (a.getDuration().getConnective().equals(Connector.FALSE)) {
+                if (a.getDuration().getConnector().equals(Connector.FALSE)) {
                     toRemove.add(index);
                     index++;
                     continue;
@@ -270,12 +270,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             // ADD to symplified Numeric function
             this.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
             a.getPreconditions().simplify();
-            if (!a.getPreconditions().getConnective().equals(Connector.FALSE)) {
+            if (!a.getPreconditions().getConnector().equals(Connector.FALSE)) {
                 this.simplifyWithGroundInertia(a.getEffects(), true);
                 // ADD for numeric fluents
                 this.simplifyWithGroundNumericInertia(a.getEffects(), true);
                 a.getEffects().simplify();
-                if (!a.getEffects().getConnective().equals(Connector.FALSE)) {
+                if (!a.getEffects().getConnector().equals(Connector.FALSE)) {
                     toAdd.add(a);
                 } else {
                     toRemove.add(index);
@@ -331,7 +331,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
     protected void simplifyWithGroundInertia(final Expression<Integer> exp, final boolean effect) {
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
                 if (inertia == null) {
@@ -343,26 +343,26 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // antecedents of conditional effects can be simplified to TRUE.
                 if (!effect && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.NEGATIVE))
                     && this.getIntInitialState().contains(exp)) {
-                    exp.setConnective(Connector.TRUE);
+                    exp.setConnector(Connector.TRUE);
                 } else if (!effect
                     && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.POSITIVE))
                     && !this.getIntInitialState().contains(exp)) {
                     // If the antecedent of a conditional effect becomes TRUE, the conditional
                     // effect
                     // becomes unconditional.
-                    exp.setConnective(Connector.FALSE);
+                    exp.setConnector(Connector.FALSE);
                 }
                 break;
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connector.AND)) {
+                while (i.hasNext() && exp.getConnector().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(Connector.FALSE);
+                    if (ei.getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(Connector.FALSE);
                     }
-                    if (ei.getConnective().equals(Connector.TRUE)) {
+                    if (ei.getConnector().equals(Connector.TRUE)) {
                         i.remove();
                     }
                 }
@@ -372,14 +372,14 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connector.OR)) {
+                while (i.hasNext() && exp.getConnector().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(Connector.TRUE)) {
-                        exp.setConnective(Connector.TRUE);
+                    if (ei.getConnector().equals(Connector.TRUE)) {
+                        exp.setConnector(Connector.TRUE);
                     }
-                    if (ei.getConnective().equals(Connector.FALSE)) {
+                    if (ei.getConnector().equals(Connector.FALSE)) {
                         i.remove();
                     }
                 }
@@ -402,10 +402,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundInertia(neg, effect);
                 if (!effect) {
-                    if (neg.getConnective().equals(Connector.TRUE)) {
-                        exp.setConnective(Connector.FALSE);
-                    } else if (neg.getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(Connector.TRUE);
+                    if (neg.getConnector().equals(Connector.TRUE)) {
+                        exp.setConnector(Connector.FALSE);
+                    } else if (neg.getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(Connector.TRUE);
                     }
                 }
                 break;
@@ -469,16 +469,16 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      */
     private void simplifyWithGroundNumericInertia(final Expression<Integer> exp, final boolean effect) {
         //System.out.println(exp.getConnective() + " " + Encoder.toString(exp));
-        switch (exp.getConnective()) {
+        switch (exp.getConnector()) {
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connector.AND)) {
+                while (i.hasNext() && exp.getConnector().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
-                    if (ei.getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(Connector.FALSE);
-                    } else if (ei.getConnective().equals(Connector.TRUE)) {
+                    if (ei.getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(Connector.FALSE);
+                    } else if (ei.getConnector().equals(Connector.TRUE)) {
                         i.remove();
                     }
                 }
@@ -488,13 +488,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case OR:
                 i = exp.getChildren().iterator();
-                while (i.hasNext() && exp.getConnective().equals(Connector.OR)) {
+                while (i.hasNext() && exp.getConnector().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
                     this.simplifyWithGroundNumericInertia(ei, effect);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
-                    if (ei.getConnective().equals(Connector.TRUE)) {
-                        exp.setConnective(Connector.TRUE);
-                    } else if (ei.getConnective().equals(Connector.FALSE)) {
+                    if (ei.getConnector().equals(Connector.TRUE)) {
+                        exp.setConnector(Connector.TRUE);
+                    } else if (ei.getConnector().equals(Connector.FALSE)) {
                         i.remove();
                     }
                 }
@@ -509,10 +509,10 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 final Expression<Integer> neg = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(neg, effect);
                 if (!effect) {
-                    if (neg.getConnective().equals(Connector.TRUE)) {
-                        exp.setConnective(Connector.FALSE);
-                    } else if (neg.getConnective().equals(Connector.FALSE)) {
-                        exp.setConnective(Connector.TRUE);
+                    if (neg.getConnector().equals(Connector.TRUE)) {
+                        exp.setConnector(Connector.FALSE);
+                    } else if (neg.getConnector().equals(Connector.FALSE)) {
+                        exp.setConnector(Connector.TRUE);
                     }
                 }
                 break;
@@ -526,8 +526,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case SCALE_UP:
             case SCALE_DOWN:
                 this.simplifyWithGroundNumericInertia(exp.getChildren().get(1), effect);
-                if (exp.getChildren().get(1).getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.FALSE);
+                if (exp.getChildren().get(1).getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.FALSE);
                     exp.getChildren().clear();
                 }
                 break;
@@ -539,13 +539,13 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 Expression<Integer> op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
                 this.simplifyWithGroundNumericInertia(op2, effect);
-                if (op1.getConnective().equals(Connector.FALSE)
-                    || op2.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.FALSE);
+                if (op1.getConnector().equals(Connector.FALSE)
+                    || op2.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.FALSE);
                     exp.getChildren().clear();
-                } else if (op1.getConnective().equals(Connector.NUMBER)
-                    && op2.getConnective().equals(Connector.NUMBER)) {
-                    switch (exp.getConnective()) {
+                } else if (op1.getConnector().equals(Connector.NUMBER)
+                    && op2.getConnector().equals(Connector.NUMBER)) {
+                    switch (exp.getConnector()) {
                         case PLUS:
                             exp.setValue(op1.getValue() + op2.getValue());
                             break;
@@ -561,18 +561,18 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                         default:
                             throw new UnexpectedExpressionException(this.toString(exp));
                     }
-                    exp.setConnective(Connector.NUMBER);
+                    exp.setConnector(Connector.NUMBER);
 
                 }
                 break;
             case UMINUS:
                 op1 = exp.getChildren().get(0);
-                if (op1.getConnective().equals(Connector.NUMBER)) {
-                    exp.setConnective(Connector.NUMBER);
+                if (op1.getConnector().equals(Connector.NUMBER)) {
+                    exp.setConnector(Connector.NUMBER);
                     exp.setValue(-op1.getValue());
                     exp.getChildren().clear();
-                } else if (op1.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.FALSE);
+                } else if (op1.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.FALSE);
                     exp.getChildren().clear();
                 }
                 break;
@@ -585,46 +585,46 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 op2 = exp.getChildren().get(1);
                 this.simplifyWithGroundNumericInertia(op1, effect);
                 this.simplifyWithGroundNumericInertia(op2, effect);
-                if (op1.getConnective().equals(Connector.FALSE)
-                    || op2.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.FALSE);
+                if (op1.getConnector().equals(Connector.FALSE)
+                    || op2.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.FALSE);
                     exp.getChildren().clear();
-                } else if (op1.getConnective().equals(Connector.NUMBER)
-                    && op2.getConnective().equals(Connector.NUMBER)) {
-                    switch (exp.getConnective()) {
+                } else if (op1.getConnector().equals(Connector.NUMBER)
+                    && op2.getConnector().equals(Connector.NUMBER)) {
+                    switch (exp.getConnector()) {
                         case LESS_COMPARISON:
                             if (op1.getValue() < op2.getValue()) {
-                                exp.setConnective(Connector.TRUE);
+                                exp.setConnector(Connector.TRUE);
                             } else {
-                                exp.setConnective(Connector.FALSE);
+                                exp.setConnector(Connector.FALSE);
                             }
                             break;
                         case LESS_OR_EQUAL_COMPARISON:
                             if (op1.getValue() <= op2.getValue()) {
-                                exp.setConnective(Connector.TRUE);
+                                exp.setConnector(Connector.TRUE);
                             } else {
-                                exp.setConnective(Connector.FALSE);
+                                exp.setConnector(Connector.FALSE);
                             }
                             break;
                         case GREATER_COMPARISON:
                             if (op1.getValue() > op2.getValue()) {
-                                exp.setConnective(Connector.TRUE);
+                                exp.setConnector(Connector.TRUE);
                             } else {
-                                exp.setConnective(Connector.FALSE);
+                                exp.setConnector(Connector.FALSE);
                             }
                             break;
                         case GREATER_OR_EQUAL_COMPARISON:
                             if (op1.getValue() >= op2.getValue()) {
-                                exp.setConnective(Connector.TRUE);
+                                exp.setConnector(Connector.TRUE);
                             } else {
-                                exp.setConnective(Connector.FALSE);
+                                exp.setConnector(Connector.FALSE);
                             }
                             break;
                         case EQUAL_COMPARISON:
                             if (op1.getValue() == op2.getValue()) {
-                                exp.setConnective(Connector.TRUE);
+                                exp.setConnector(Connector.TRUE);
                             } else {
-                                exp.setConnective(Connector.FALSE);
+                                exp.setConnector(Connector.FALSE);
                             }
                             break;
                         default:
@@ -635,12 +635,12 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case F_EXP:
                 Expression<Integer> fexp = exp.getChildren().get(0);
                 this.simplifyWithGroundNumericInertia(fexp, effect);
-                if (fexp.getConnective().equals(Connector.NUMBER)) {
+                if (fexp.getConnector().equals(Connector.NUMBER)) {
                     exp.setValue(fexp.getValue());
-                    exp.setConnective(Connector.NUMBER);
+                    exp.setConnector(Connector.NUMBER);
                     exp.getChildren().clear();
-                } else if (fexp.getConnective().equals(Connector.FALSE)) {
-                    exp.setConnective(Connector.FALSE);
+                } else if (fexp.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.FALSE);
                     exp.getChildren().clear();
                 }
                 break;
@@ -650,9 +650,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                     Double value = this.getIntInitFunctionCost().get(exp);
                     // The numeric fluent is never modified and does not appear in the initial state
                     if (value == null) {
-                        exp.setConnective(Connector.FALSE);
+                        exp.setConnector(Connector.FALSE);
                     } else {
-                        exp.setConnective(Connector.NUMBER);
+                        exp.setConnector(Connector.NUMBER);
                         exp.setValue(value);
                     }
                 }
@@ -665,7 +665,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 // do nothing
                 break;
             default:
-                throw new UnexpectedExpressionException(exp.getConnective().toString());
+                throw new UnexpectedExpressionException(exp.getConnector().toString());
         }
     }
 
@@ -686,8 +686,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             m.getPreconditions().simplify();
             this.simplifyWithGroundInertia(m.getConstraints(), false);
             m.getConstraints().simplify();
-            if (!m.getPreconditions().getConnective().equals(Connector.FALSE)
-                    && !m.getConstraints().getConnective().equals(Connector.FALSE)) {
+            if (!m.getPreconditions().getConnector().equals(Connector.FALSE)
+                    && !m.getConstraints().getConnector().equals(Connector.FALSE)) {
                     toAdd.add(m);
             } else {
                 //System.out.println("Method "+ i + " can be removed for task " + this.toString(m.getTask()));
