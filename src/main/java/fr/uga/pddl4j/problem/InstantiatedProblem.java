@@ -360,7 +360,7 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
                 final IntTaskNetwork copy = new IntTaskNetwork(arity);
                 copy.setOrderingConstraints(new Expression<>(network.getOrderingConstraints()));
 
-                final Expression tasksCopy = new Expression<>(network.getTasks());
+                final Expression<Integer> tasksCopy = new Expression<>(network.getTasks());
                 tasksCopy.substitute(varIndex, constant, this);
                 copy.setTasks(tasksCopy);
 

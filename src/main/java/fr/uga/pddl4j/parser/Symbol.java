@@ -203,6 +203,7 @@ public class Symbol<T> implements Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(final Object object) {
         if (object != null && object instanceof Symbol) {
             Symbol<T> other = (Symbol<T>) object;

@@ -579,7 +579,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         switch (child.getConnector()) {
             case FORALL:
             case EXISTS:
-                Expression constraint = new Expression<>(this.getConnector());
+                Expression<T> constraint = new Expression<>(this.getConnector());
                 constraint.addChild(child.getChildren().get(0));
                 constraint.moveMethodConstrainInward();
                 this.getChildren().set(0, constraint);
@@ -605,9 +605,9 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case IMPLY: // (imply p q)) -> (or (not p) (q))
                 child.setConnector(Connector.OR);
-                final Expression notp = new Expression<>(Connector.NOT);
+                final Expression<T> notp = new Expression<>(Connector.NOT);
                 notp.addChild(child.getChildren().get(0));
-                final Expression q = child.getChildren().get(1);
+                final Expression<T> q = child.getChildren().get(1);
                 child.getChildren().clear();
                 child.getChildren().add(notp);
                 child.getChildren().add(q);
@@ -674,10 +674,10 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case IMPLY: // (not (imply p q)) -> (imply (not p) (not q))
                 this.setConnector(Connector.IMPLY);
-                final Expression notp = new Expression<>(Connector.NOT);
+                final Expression<T> notp = new Expression<>(Connector.NOT);
                 notp.addChild(child.getChildren().get(0));
                 notp.toNNF();
-                final Expression notq = new Expression<>(Connector.NOT);
+                final Expression<T> notq = new Expression<>(Connector.NOT);
                 notq.addChild(child.getChildren().get(1));
                 notq.toNNF();
                 this.getChildren().clear();
@@ -726,7 +726,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         switch (child.getConnector()) {
             case FORALL:
             case EXISTS:
-                Expression timeExp = new Expression<>(this.getConnector());
+                Expression<T> timeExp = new Expression<>(this.getConnector());
                 timeExp.addChild(child.getChildren().get(0));
                 timeExp.moveTimeSpecifierInward();
                 this.getChildren().set(0, timeExp);
@@ -942,7 +942,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @return <code>true</code> if at least one occurrence of the specified was substituted; <code>false</code>
      *      otherwise.
      */
-    public boolean substitute(final Symbol<T> var, final  Symbol<T> cons, final AtomicFormulaSimplifier simplifier) {
+    public boolean substitute(final Symbol<T> var, final  Symbol<T> cons, final AtomicFormulaSimplifier<T> simplifier) {
 
         boolean updated = false;
         switch (this.getConnector()) {
@@ -1316,7 +1316,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case IMPLY:
                 // replace imply expression (imply p q) by its equivalent disjunction (or (not p) q)
                 this.setConnector(Connector.OR);
-                final Expression notp = new Expression<>(Connector.NOT);
+                final Expression<T> notp = new Expression<>(Connector.NOT);
                 notp.addChild(this.getChildren().get(0));
                 this.getChildren().set(0, notp);
                 simplified &= this.simplify();
@@ -1426,11 +1426,11 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             || this.getConnector().equals(Connector.OR);
         boolean modified = false;
         for (int i = 0; i < this.getChildren().size(); i++) {
-            final Expression ei = this.getChildren().get(i);
-            final Expression neg = new Expression<>(Connector.NOT);
+            final Expression<T> ei = this.getChildren().get(i);
+            final Expression<T> neg = new Expression<>(Connector.NOT);
             neg.addChild(ei);
             for (int j = i + 1; j < this.getChildren().size(); j++) {
-                final Expression ej = this.getChildren().get(j);
+                final Expression<T> ej = this.getChildren().get(j);
                 if (ej.equals(neg)) {
                     ei.setConnector(Connector.TRUE);
                     this.getChildren().remove(j);
@@ -1452,7 +1452,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      *          this expression; <code>false</code> otherwise.
      */
     public final boolean contains(final Expression<T> exp) {
-        for (Expression s : this.getChildren()) {
+        for (Expression<T> s : this.getChildren()) {
             if (s.equals(exp) || s.contains(exp)) {
                 return true;
             }
@@ -1472,7 +1472,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
         boolean removed = false;
         Iterator<Expression<T>> it = this.getChildren().iterator();
         while (it.hasNext()) {
-            Expression s = it.next();
+            Expression<T> s = it.next();
             if (s.equals(exp)) {
                 it.remove();
                 removed = true;
@@ -1511,6 +1511,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(final Object object) {
         if (object != null && object instanceof Expression) {
             final Expression<T> other = (Expression<T>) object;
