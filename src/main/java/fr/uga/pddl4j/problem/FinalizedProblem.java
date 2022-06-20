@@ -2208,8 +2208,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * Encode a list of specified methods into the final compact representation. The specified
      * maps are used to speed-up the search by mapping the an expression to this index.
      */
-    protected void finalizeMethods() throws UnexpectedExpressionException {
+    protected void finalizeMethods() {
         this.methods = new ArrayList<>(this.getIntMethods().size());
+        this.durativeMethods = new ArrayList<>(this.getIntMethods().size());
         int methodIndex = this.getRelevantActions().size();
         for (IntMethod intMethod : this.getIntMethods()) {
             List<IntMethod> normalized = this.normalizeMethod(intMethod);

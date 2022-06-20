@@ -196,7 +196,7 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
      * @param task the task.
      * @return a bit vector of the tasks ordered after a specified task.
      */
-    public BitVector getTaskOrderedAfter(int task) {
+    public BitVector  getTaskOrderedAfter(int task) {
         return matrix.getRow(task);
     }
 

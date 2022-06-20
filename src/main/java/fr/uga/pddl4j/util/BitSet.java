@@ -119,7 +119,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
      */
     private void checkInvariants() {
         // Change from the original code
-        // assert(wordsInUse == 0 || words[wordsInUse - 1] != 0);
+        assert(wordsInUse == 0 || words[wordsInUse - 1] != 0);
         assert (wordsInUse >= 0 && wordsInUse <= words.length);
         assert (wordsInUse == words.length || words[wordsInUse] == 0);
     }
