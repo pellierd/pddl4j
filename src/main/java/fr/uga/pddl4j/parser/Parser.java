@@ -284,6 +284,10 @@ public final class Parser implements Callable<Integer> {
             this.domain = this.lexer.domain();
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
+        }
+        if (this.domain == null) {
+            return null;
         }
         this.checkRequirements();
         this.checkTypesDeclaration();
@@ -346,6 +350,10 @@ public final class Parser implements Callable<Integer> {
             this.problem = this.lexer.problem();
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
+        }
+        if (this.problem == null) {
+            return null;
         }
         this.checkDomainName();
         this.checkRequirements();
@@ -388,6 +396,10 @@ public final class Parser implements Callable<Integer> {
             this.lexer.domain_and_problem();
         } catch (ParseException e) {
             e.printStackTrace();
+            return null;
+        }
+        if (this.domain == null || this.problem == null) {
+            return null;
         }
         this.domain = this.lexer.getDomain();
         this.problem = this.lexer.getProblem();
@@ -834,7 +846,6 @@ public final class Parser implements Callable<Integer> {
      */
     private boolean checkDomainName() {
         boolean checked = true;
-
         if (this.domain.getDomainName() != null
             && this.problem.getProblemName() != null
             && !this.domain.getDomainName().equals(this.problem.getDomainName())) {

@@ -2211,19 +2211,19 @@ Expression<String> htn_ordering_constraints_def() : // ADD HDDL
 Expression<String> durative_htn_ordering_constraints_def() : // ADD HDDL2.1
 {
     Expression<String> exp = null;
-    Expression<String> taskID = null;
+    Expression<String> ordering = null;
 }
 {
-    (   LOOKAHEAD(2)
+    (   LOOKAHEAD(3)
             exp=empty_and()
     |   LOOKAHEAD(2)
-            taskID=durative_htn_ordering_constraint() {
+            ordering=durative_htn_ordering_constraint() {
                 exp = new Expression<String>(Connector.AND);
-                exp.addChild(taskID);
-                exp.setLocation(taskID.getLocation());
+                exp.addChild(ordering);
+                exp.setLocation(ordering.getLocation());
             }
-    |   LOOKAHEAD(2)
-            exp = and_ordering_constraints()
+    |     LOOKAHEAD(3)
+            exp = durative_and_ordering_constraints()
     ) {
         return exp;
     }
@@ -2239,14 +2239,14 @@ Expression<String> and_ordering_constraints() : // ADD HDDL
 {
     begin=<LEFT_BRACKET> <AND> (ordering = htn_ordering_constraint() {
         exp.addChild(ordering);
-    })+ end=<RIGHT_BRACKET> {
+    })* end=<RIGHT_BRACKET> {
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
     }
 }
 
-Expression<String> duraive_and_ordering_constraints() : // ADD HDDL2.1
+Expression<String> durative_and_ordering_constraints() : // ADD HDDL2.1
 {
     Expression<String> exp = new Expression<String>(Connector.AND);
     Expression<String> ordering = null;
@@ -2256,7 +2256,7 @@ Expression<String> duraive_and_ordering_constraints() : // ADD HDDL2.1
 {
     begin=<LEFT_BRACKET> <AND> (ordering = durative_htn_ordering_constraint() {
         exp.addChild(ordering);
-    })+ end=<RIGHT_BRACKET> {
+    })* end=<RIGHT_BRACKET> {
         exp.setBegin(begin);
         exp.setEnd(end);
         return exp;
@@ -2279,6 +2279,8 @@ Expression<String> durative_htn_ordering_constraint() : // ADD HDDL 2.1
 }
 {
     (   LOOKAHEAD(3) // ADD HDDL2.1
+            exp = less_htn_ordering_constraint()
+    |   LOOKAHEAD(3) // ADD HDDL2.1
             exp = equal_htn_temporal_ordering_constraint()
     |   LOOKAHEAD(3) // ADD HDDL2.1
             exp = less_htn_temporal_ordering_constraint()
@@ -3899,8 +3901,9 @@ Expression<String> da_effect() :
 	Expression<String> exp;
 }
 {
-	(
-		LOOKAHEAD(2)
+	(   LOOKAHEAD(2)
+    	    exp=empty_and()
+	|	LOOKAHEAD(2)
 			exp=and_da_effect()
 	| 	LOOKAHEAD(2)
 			exp=timed_effect()
