@@ -1696,6 +1696,9 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                     && this.getChildren().get(1).getConnector().equals(Connector.TASK_ID)
                     && this.getChildren().get(1).isMalformedExpression();
                 break;
+            case TIMED_TASK_ID:
+                malformed = this.getTaskID() == null || this.getTimeSpecifier() == null;
+                break;
             default:
                 throw new UnexpectedExpressionException(this.getConnector().toString());
 

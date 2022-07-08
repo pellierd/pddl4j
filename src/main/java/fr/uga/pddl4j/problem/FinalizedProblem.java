@@ -55,6 +55,7 @@ import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -2234,8 +2235,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             methodIndex++;
         }
     }
-
-
 
     /**
      * Encode a list of specified methods into the final compact representation.
