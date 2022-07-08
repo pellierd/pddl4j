@@ -120,11 +120,13 @@ public class BitVector extends BitSet {
      * @param n the number of bit to shift. n must greater or equal 0.
      */
     public final void shiftRight(int n) {
-        final int shift = n / 63;
-        for (int i = 0; i < shift; i++) {
-            this.primitiveShiftRight(63);
+        if (!this.isEmpty()) {
+            final int shift = n / 63;
+            for (int i = 0; i < shift; i++) {
+                this.primitiveShiftRight(63);
+            }
+            this.primitiveShiftRight(n % 63);
         }
-        this.primitiveShiftRight(n % 63);
     }
 
     /**
@@ -150,11 +152,13 @@ public class BitVector extends BitSet {
      * @param n the number of bit to shift. n must greater of equal to 0.
      */
     public final void shiftLeft(int n) {
-        final int shift = n / 63;
-        for (int i = 0; i < shift; i++) {
-            this.primitiveShiftLeft(63);
+        if (!this.isEmpty()) {
+            final int shift = n / 63;
+            for (int i = 0; i < shift; i++) {
+                this.primitiveShiftLeft(63);
+            }
+            this.primitiveShiftLeft(n % 63);
         }
-        this.primitiveShiftLeft(n % 63);
     }
 
     /**

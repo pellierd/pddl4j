@@ -138,20 +138,20 @@ public class PFDTest {
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_PFDPlanner_IPC2020_HDDL_Barman() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/barman" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.HDDL_EXT, Planner.Name.PFD, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2020 Childsnack HDDL benchmarks.
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_PFDPlanner_IPC2020_HDDL_Childsnack() throws Exception {
         final String localTestPath = Tools.HDDL_BENCH_DIR + "ipc2020/childsnack" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",

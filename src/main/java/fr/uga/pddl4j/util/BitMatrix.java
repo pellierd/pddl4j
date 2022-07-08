@@ -58,7 +58,7 @@ public class BitMatrix implements Serializable {
         this.columns = columns;
         this.matrix = new ArrayList<BitVector>(rows);
         for (int i = 0; i < rows; i++) {
-            this.matrix.add(new BitVector(this.columns));
+            this.matrix.add(new BitVector(this.columns + 1));
         }
     }
 

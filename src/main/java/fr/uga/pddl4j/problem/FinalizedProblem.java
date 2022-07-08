@@ -509,6 +509,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 this.extractRelevantNumericFluents(exp.getChildren().get(1), fluents);
                 break;
             case F_EXP:
+            case AT_START:
+            case AT_END:
+            case OVER_ALL:
                 this.extractRelevantNumericFluents(exp.getChildren().get(0), fluents);
                 break;
             case TIME_VAR:

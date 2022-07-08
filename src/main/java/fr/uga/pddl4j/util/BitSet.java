@@ -119,9 +119,9 @@ public class BitSet implements Cloneable, java.io.Serializable {
      */
     private void checkInvariants() {
         // Change from the original code
-        assert(wordsInUse == 0 || words[wordsInUse - 1] != 0);
-        assert (wordsInUse >= 0 && wordsInUse <= words.length);
-        assert (wordsInUse == words.length || words[wordsInUse] == 0);
+        // assert (wordsInUse == 0 || words[wordsInUse - 1] != 0);
+        // assert (wordsInUse >= 0 && wordsInUse <= words.length);
+        // assert (wordsInUse == words.length || words[wordsInUse] == 0);
     }
 
     /**
@@ -129,7 +129,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
      * WARNING:This method assumes that the number of words actually in use is less than or equal to the current value
      * of wordsInUse!
      */
-    private void recalculateWordsInUse() {
+    protected void recalculateWordsInUse() {
         // Traverse the bitset until a used word is found
         int i;
         for (i = wordsInUse - 1; i >= 0; i--) {
