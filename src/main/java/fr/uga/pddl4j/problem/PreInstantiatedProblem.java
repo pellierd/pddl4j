@@ -280,6 +280,8 @@ public abstract class PreInstantiatedProblem extends AbstractProblem {
                 this.numericInertia.set(exp.getChildren().get(0).getSymbol().getValue(), Inertia.FLUENT);
                 break;
             case ATOM:
+            case TRUE:
+            case FALSE:
                 // Do nothing
                 break;
             default:

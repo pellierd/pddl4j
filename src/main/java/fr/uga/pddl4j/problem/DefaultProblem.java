@@ -271,7 +271,7 @@ public class DefaultProblem extends FinalizedProblem {
         if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
             this.instantiateInitialTaskNetwork();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Initial tasknetwork instantiated:\n"
+                LOGGER.debug("Initial task-network instantiated:\n"
                     + this.toString(Data.INT_INITIAL_TASK_NETWORK) + "\n");
             }
             this.instantiateMethods();
