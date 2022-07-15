@@ -1027,7 +1027,7 @@ public abstract class AbstractProblem implements Problem {
             this.intInitialTaskNetwork = this.initTaskNetwork(taskNetwork, parameters, types);
         }
     }
-    
+
     /**
      * Encodes a specified task network into its integer representation.
      *

@@ -22,7 +22,6 @@ package fr.uga.pddl4j.problem.operator;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
-import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +41,9 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public static final int DEFAULT_TASK_INDEX = -1;
 
+    /**
+     * The default duration of the method.
+     */
     public static NumericVariable DEFAULT_DURATION = new NumericVariable(NumericVariable.DURATION, Double.NaN);
 
     /**
@@ -62,7 +64,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
     /**
      * The task network of the method.
      */
-    private TemporalTaskNetwork taskNetwork;
+    private TaskNetwork taskNetwork;
 
     /**
      * Create a new method from a specified method. This constructor create a deep copy of the
@@ -73,7 +75,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
     public DurativeMethod(final DurativeMethod other) {
         super(other);
         this.task = other.getTask();
-        this.taskNetwork = new TemporalTaskNetwork(other.taskNetwork);
+        this.taskNetwork = new TaskNetwork(other.taskNetwork);
         this.durationConstraints = new ArrayList<>();
         if (this.getDurationConstraints() != null) {
             this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
@@ -92,7 +94,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
     public DurativeMethod(final String name, final int arity) {
         super(name, arity);
         this.task = DurativeMethod.DEFAULT_TASK_INDEX;
-        this.taskNetwork = new TemporalTaskNetwork();
+        this.taskNetwork = new TaskNetwork();
         this.durationConstraints = new ArrayList<>();
         this.duration = DurativeMethod.DEFAULT_DURATION;
     }
@@ -139,7 +141,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      * @return the ordering constraints of the method.
      */
     public final SimpleTemporalNetwork getOrderingConstraints() {
-        return this.taskNetwork.getOrderingConstraints();
+        return this.taskNetwork.getTemporalOrdering();
     }
 
     /**
@@ -148,7 +150,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      * @param constraints the orderings constraints to set
      */
     public final void setOrderingConstraints(final SimpleTemporalNetwork constraints) {
-        this.taskNetwork.setOrderingConstraints(constraints);
+        this.taskNetwork.setTemporalOrdering(constraints);
     }
 
     /**
@@ -156,7 +158,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      *
      * @return the task network of this method.
      */
-    public final TemporalTaskNetwork getTaskNetwork() {
+    public final TaskNetwork getTaskNetwork() {
         return this.taskNetwork;
     }
 
@@ -165,7 +167,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      *
      * @param taskNetwork the task network to set.
      */
-    public final void setTaskNetwork(final TemporalTaskNetwork taskNetwork) {
+    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
     }
 

@@ -37,7 +37,6 @@ import fr.uga.pddl4j.problem.operator.Condition;
 import fr.uga.pddl4j.problem.operator.ConditionalEffect;
 import fr.uga.pddl4j.problem.operator.Constants;
 import fr.uga.pddl4j.problem.operator.DefaultOrderingConstraintNetwork;
-import fr.uga.pddl4j.problem.operator.DefaultTaskNetwork;
 import fr.uga.pddl4j.problem.operator.DurativeAction;
 import fr.uga.pddl4j.problem.operator.DurativeMethod;
 import fr.uga.pddl4j.problem.operator.Effect;
@@ -46,16 +45,15 @@ import fr.uga.pddl4j.problem.operator.IntMethod;
 import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.Operator;
+import fr.uga.pddl4j.problem.operator.TaskNetwork;
 import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
 import fr.uga.pddl4j.problem.time.TemporalCondition;
 import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
 import fr.uga.pddl4j.problem.time.TemporalEffect;
 import fr.uga.pddl4j.problem.time.TemporalRelation;
-import fr.uga.pddl4j.problem.time.TemporalTaskNetwork;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -132,7 +130,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * The initial task network.
      */
-    private DefaultTaskNetwork initialTaskNetwork;
+    private TaskNetwork initialTaskNetwork;
 
     /**
      * The list containing for each relevant task at a specified the set of resolvers, i.e., action or methods.
@@ -277,7 +275,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @return the initial task network of the problem.
      */
-    public DefaultTaskNetwork getInitialTaskNetwork() {
+    public TaskNetwork getInitialTaskNetwork() {
         return initialTaskNetwork;
     }
 
@@ -1836,7 +1834,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @param tasknetwork the task network.
      * @return a string representation of the specified task network.
      */
-    public final String toString(final DefaultTaskNetwork tasknetwork) {
+    public final String toString(final TaskNetwork tasknetwork) {
         final StringBuilder str = new StringBuilder();
         str.append("Tasks:\n");
         if (tasknetwork.getTasks().isEmpty()) {
@@ -2292,9 +2290,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param taskNetwork the tasknetwork to encode.
      * @return the task network into its final bit set representation.
-     * @see DefaultTaskNetwork
+     * @see TaskNetwork
      */
-    private DefaultTaskNetwork finalizeTaskNetwork(IntTaskNetwork taskNetwork) {
+    private TaskNetwork finalizeTaskNetwork(IntTaskNetwork taskNetwork) {
         // We encode first the tasks
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);
@@ -2305,7 +2303,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 c.getChildren().get(1).getTaskID().getValue());
         }
         ordering.transitiveClosure();
-        final DefaultTaskNetwork tn = new DefaultTaskNetwork(tasks, ordering);
+        final TaskNetwork tn = new TaskNetwork(tasks, ordering);
 
         for (Expression<Integer> e: taskNetwork.getConstraints()) {
             if (e.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {
@@ -2347,9 +2345,9 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      * @param taskNetwork the tasknetwork to encode.
      * @return the task network into its final bit set representation.
-     * @see DefaultTaskNetwork
+     * @see TaskNetwork
      */
-    private TemporalTaskNetwork finalizeTemporalTaskNetwork(IntTaskNetwork taskNetwork) {
+    private TaskNetwork finalizeTemporalTaskNetwork(IntTaskNetwork taskNetwork) {
         // We encode first the tasks
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);
@@ -2385,7 +2383,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             }
         }
         stn.transitiveClosure();
-        final TemporalTaskNetwork tn = new TemporalTaskNetwork(tasks, stn);
+        final TaskNetwork tn = new TaskNetwork(tasks, stn);
 
         for (Expression<Integer> e: taskNetwork.getConstraints()) {
             if (e.getConnector().equals(Connector.HOLD_BEFORE_METHOD_CONSTRAINT)) {

@@ -16,7 +16,7 @@
 package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.problem.State;
-import fr.uga.pddl4j.problem.operator.DefaultTaskNetwork;
+import fr.uga.pddl4j.problem.operator.TaskNetwork;
 
 import java.util.Objects;
 
@@ -33,7 +33,7 @@ public final class PFDNode extends AbstractSTNNode {
      * The task network that describes the set of tasks to be accomplished and their constraints that have to be
      * verified.
      */
-    private DefaultTaskNetwork taskNetwork;
+    private TaskNetwork taskNetwork;
 
     /**
      * Creates a new node from an other. This constructor creates a deep copy of the node in parameters.
@@ -42,7 +42,7 @@ public final class PFDNode extends AbstractSTNNode {
      */
     public PFDNode(final PFDNode other) {
         super(other);
-        this.setTaskNetwork(new DefaultTaskNetwork(other.getTaskNetwork()));
+        this.setTaskNetwork(new TaskNetwork(other.getTaskNetwork()));
     }
 
     /**
@@ -51,7 +51,7 @@ public final class PFDNode extends AbstractSTNNode {
      */
     public PFDNode() {
         super();
-        this.setTaskNetwork(new DefaultTaskNetwork());
+        this.setTaskNetwork(new TaskNetwork());
     }
 
     /**
@@ -61,7 +61,7 @@ public final class PFDNode extends AbstractSTNNode {
      * @param state       state of this node.
      * @param taskNetwork the task network of the node.
      */
-    public PFDNode(final State state, final DefaultTaskNetwork taskNetwork) {
+    public PFDNode(final State state, final TaskNetwork taskNetwork) {
         super(state, null, DEFAULT_OPERATOR, DEFAULT_TASK);
         this.setTaskNetwork(taskNetwork);
     }
@@ -75,7 +75,7 @@ public final class PFDNode extends AbstractSTNNode {
      * @param operator    the index of the operator applied to reach the node.
      * @param task        the task processed in this node.
      */
-    public PFDNode(final State state, final DefaultTaskNetwork taskNetwork, final PFDNode parent,
+    public PFDNode(final State state, final TaskNetwork taskNetwork, final PFDNode parent,
                    final int operator, final int task) {
         super(state, parent, operator, task);
         this.setTaskNetwork(taskNetwork);
@@ -87,7 +87,7 @@ public final class PFDNode extends AbstractSTNNode {
      *
      * @return the task network of the node.
      */
-    public final DefaultTaskNetwork getTaskNetwork() {
+    public final TaskNetwork getTaskNetwork() {
         return this.taskNetwork;
     }
 
@@ -97,7 +97,7 @@ public final class PFDNode extends AbstractSTNNode {
      *
      * @param taskNetwork the task network of the node.
      */
-    public final void setTaskNetwork(final DefaultTaskNetwork taskNetwork) {
+    public final void setTaskNetwork(final TaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
     }
 
