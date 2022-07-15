@@ -2046,14 +2046,14 @@ ParsedTaskNetwork task_network() : // ADD HDDL
    	    [<ORDERING> ordering = htn_ordering_constraints_def()]
    	    [<CONSTRAINTS> constraints = htn_constraints_def()]
    	    {
-            return new ParsedTaskNetwork(tasks, ordering, constraints, false);
+            return new ParsedTaskNetwork(tasks, ordering, constraints, false, false);
         }
     | LOOKAHEAD (1)
         (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
         tasks = subtask_def()
         [<CONSTRAINTS> constraints = htn_constraints_def()]
         {
-            return new ParsedTaskNetwork(tasks, ordering, constraints, true);
+            return new ParsedTaskNetwork(tasks, ordering, constraints, true, false);
         }
 }
 
@@ -2071,14 +2071,14 @@ ParsedTaskNetwork durative_task_network() : // ADD HDDL
    	    [<ORDERING> ordering = durative_htn_ordering_constraints_def()]
    	    [<CONSTRAINTS> constraints = htn_constraints_def()]
    	    {
-            return new ParsedTaskNetwork(tasks, ordering, constraints, false);
+            return new ParsedTaskNetwork(tasks, ordering, constraints, false, true);
         }
     | LOOKAHEAD (1)
         (<ORDERED_TASKS> | <ORDERED_SUBTASKS>)
         tasks = subtask_def()
         [<CONSTRAINTS> constraints = htn_constraints_def()]
         {
-            return new ParsedTaskNetwork(tasks, ordering, constraints, true);
+            return new ParsedTaskNetwork(tasks, ordering, constraints, true, true);
         }
 }
 
@@ -4498,7 +4498,11 @@ ParsedProblem htn_problem() : // ADD HDDL
 		[LOOKAHEAD(2) object_declaration()]
         <LEFT_BRACKET> <HTN>
             [LOOKAHEAD(2) <PARAMETERS> <LEFT_BRACKET> parameters=typed_list(Lexer.VARIABLE) <RIGHT_BRACKET>]
-            taskNetwork = task_network() {
+            (   LOOKAHEAD(2, {!this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
+                taskNetwork = task_network()
+            |   LOOKAHEAD(2, {this.isRequirement(RequireKey.DURATIVE_ACTIONS)})
+                    taskNetwork = durative_task_network()
+            ) {
                 taskNetwork.setParameters(parameters);
                 this.problem.setInitialTaskNetwork(taskNetwork);
             }

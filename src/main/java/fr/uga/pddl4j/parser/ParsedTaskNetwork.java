@@ -58,6 +58,11 @@ public class ParsedTaskNetwork implements Serializable {
     private boolean isTotallyOrdered;
 
     /**
+     * A boolean to indicate if the task network is durative.
+     */
+    private boolean isDurative;
+
+    /**
      * Create a new task network.
      */
     protected ParsedTaskNetwork() {
@@ -67,6 +72,7 @@ public class ParsedTaskNetwork implements Serializable {
         this.ordering = null;
         this.constraints = null;
         this.isTotallyOrdered = false;
+        this.isDurative = false;
     }
 
     /**
@@ -83,6 +89,7 @@ public class ParsedTaskNetwork implements Serializable {
         this.ordering = new Expression<String>(other.getOrdering());
         this.constraints = new Expression<String>(other.getConstraints());
         this.isTotallyOrdered = other.isTotallyOrdered();
+        this.isDurative = other.isDurative;
     }
 
     /**
@@ -92,16 +99,11 @@ public class ParsedTaskNetwork implements Serializable {
      * @param ordering The ordering constraints between the tasks of the task network.
      * @param constraints The logical constraint between the tasks of the task network.
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
-     * @throws NullPointerException if one of the specified parameter except the precondition is null.
+     * @param durative The flag to indicate if the task network is durative.
      */
     public ParsedTaskNetwork(final Expression<String> tasks, final Expression<String> ordering,
-                             final Expression<String> constraints, final boolean ordered) {
-        super();
-        this.setParameters(new ArrayList<>());
-        this.setTasks(tasks);
-        this.setOrdering(ordering);
-        this.setConstraints(constraints);
-        this.setTotallyOrdered(ordered);
+                             final Expression<String> constraints, final boolean ordered, final boolean durative) {
+        this(new ArrayList<>(), tasks, ordering, constraints, ordered, durative);
     }
 
     /**
@@ -112,17 +114,18 @@ public class ParsedTaskNetwork implements Serializable {
      * @param ordering The ordering constraints between the tasks of the task network.
      * @param constraints The logical constraint between the tasks of the task network.
      * @param ordered The flag to indicate if the tasks of the task network are totally ordered or not.
-     * @throws NullPointerException if one of the specified parameter except the precondition is null.
+     * @param durative The flag to indicate if the task network is durative.
      */
     public ParsedTaskNetwork(final List<TypedSymbol<String>> parameters, final Expression<String> tasks,
                              final Expression<String> ordering, final Expression<String> constraints,
-                             final boolean ordered) {
+                             final boolean ordered, final boolean durative) {
         super();
         this.setParameters(parameters);
         this.setTasks(tasks);
         this.setOrdering(ordering);
         this.setConstraints(constraints);
         this.setTotallyOrdered(ordered);
+        this.setDurative(durative);
     }
 
     /**
@@ -217,6 +220,24 @@ public class ParsedTaskNetwork implements Serializable {
     }
 
     /**
+     * Returns if this task network is durative.
+     *
+     * @return {@code true} if the tasknetworl is durative; {@code false} otherwise.
+     */
+    public final boolean isDurative() {
+        return this.isDurative;
+    }
+
+    /**
+     * Sets the flog of this task network as durative.
+     *
+     * @param durative the durative flag to set.
+     */
+    public final void setDurative(final boolean durative) {
+        this.isDurative = durative;
+    }
+
+    /**
      * Returns the hash code value of the task network.
      *
      * @return the hash code value of the task network.
@@ -224,7 +245,7 @@ public class ParsedTaskNetwork implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.tasks, this.ordering, this.constraints, this.isTotallyOrdered);
+        return Objects.hash(this.tasks, this.ordering, this.constraints, this.isTotallyOrdered, this.isDurative);
     }
 
     /**
@@ -242,7 +263,8 @@ public class ParsedTaskNetwork implements Serializable {
             return this.getTasks().equals(other.getTasks())
                 && this.getOrdering().equals(other.getOrdering())
                 && this.getConstraints().equals(other.getConstraints())
-                && this.isTotallyOrdered() == other.isTotallyOrdered();
+                && this.isTotallyOrdered() == other.isTotallyOrdered()
+                && this.isDurative() == other.isDurative();
         }
         return false;
     }

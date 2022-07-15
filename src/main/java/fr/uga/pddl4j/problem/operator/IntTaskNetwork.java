@@ -67,6 +67,11 @@ public final class IntTaskNetwork implements Serializable {
     private boolean isTotallyOrdered;
 
     /**
+     * A boolean to indicate if the task network is durative.
+     */
+    private boolean isDurative;
+
+    /**
      * Create a new task network. The tasks and the ordering constraints are empty and expression.
      *
      */
@@ -87,6 +92,7 @@ public final class IntTaskNetwork implements Serializable {
         Arrays.fill(this.parameters, -1);
         this.instantiations = new int[arity];
         Arrays.fill(this.instantiations, -1);
+        this.isDurative = false;
     }
 
     /**
@@ -105,6 +111,7 @@ public final class IntTaskNetwork implements Serializable {
         System.arraycopy(other.getParameters(), 0, this.parameters, 0, other.arity());
         this.instantiations = new int[other.arity()];
         System.arraycopy(other.getInstantiations(), 0, this.instantiations, 0, other.arity());
+        this.isDurative = other.isDurative();
     }
 
     /**
@@ -116,9 +123,10 @@ public final class IntTaskNetwork implements Serializable {
      * @param orderingConstraints the orderings constraints of the task network.
      * @param constraints the constraints of the task network.
      * @param totallyOrdered the boolean flag to indicate if the task network is totally ordered or not.
+     * @param durative the boolean flag to indicate if the task network is durative or not.
      */
     public IntTaskNetwork(final Expression<Integer> tasks, final Expression<Integer> orderingConstraints,
-                          final Expression<Integer> constraints, final boolean totallyOrdered) {
+                          final Expression<Integer> constraints, final boolean totallyOrdered, final boolean durative) {
         super();
         this.tasks = tasks;
         this.orderingConstraints = orderingConstraints;
@@ -126,6 +134,7 @@ public final class IntTaskNetwork implements Serializable {
         this.isTotallyOrdered = totallyOrdered;
         this.parameters =  new int[0];
         this.instantiations = new int[0];
+        this.isDurative = durative;
     }
 
     /**
@@ -274,6 +283,23 @@ public final class IntTaskNetwork implements Serializable {
         this.instantiations[index] = value;
     }
 
+    /**
+     * Returns if this task network is durative.
+     *
+     * @return {@code true} if the tasknetworl is durative; {@code false} otherwise.
+     */
+    public final boolean isDurative() {
+        return this.isDurative;
+    }
+
+    /**
+     * Sets the flog of this task network as durative.
+     *
+     * @param durative the durative flag to set.
+     */
+    public final void setDurative(final boolean durative) {
+        this.isDurative = durative;
+    }
 
     /**
      * Returns <code>true</code> if this task network is equal to an object. This
@@ -291,7 +317,8 @@ public final class IntTaskNetwork implements Serializable {
             final IntTaskNetwork other = (IntTaskNetwork) obj;
             return Objects.equals(this.getTasks(), other.getTasks())
                 && Objects.equals(this.getOrderingConstraints(), other.getOrderingConstraints())
-                && Objects.equals(this.getConstraints(), other.getConstraints());
+                && Objects.equals(this.getConstraints(), other.getConstraints())
+                && this.isDurative() == other.isDurative();
         }
         return false;
     }
@@ -305,6 +332,6 @@ public final class IntTaskNetwork implements Serializable {
      */
     @Override
     public final int hashCode() {
-        return Objects.hash(this.getTasks(), this.getOrderingConstraints(), this.getConstraints());
+        return Objects.hash(this.getTasks(), this.getOrderingConstraints(), this.getConstraints(), this.isDurative());
     }
 }

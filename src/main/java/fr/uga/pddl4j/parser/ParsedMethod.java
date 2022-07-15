@@ -62,15 +62,16 @@ public class ParsedMethod extends ParsedAbstractOperator {
      * @param ordering The ordering constraints between the subtasks of the method.
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
+     * @param durative The flag to indicate if the method is durative or not.
      */
     public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
                         final Expression<String> task, final Expression<String> duration,
                         final Expression<String> preconditions, final Expression<String> tasks,
                         final Expression<String> ordering, final Expression<String> constraints,
-                        final boolean ordered) {
+                        final boolean ordered, final boolean durative) {
         super(name, parameters, preconditions, duration);
         this.task = task;
-        this.taskNetwork = new ParsedTaskNetwork(tasks, ordering, constraints, ordered);
+        this.taskNetwork = new ParsedTaskNetwork(tasks, ordering, constraints, ordered, durative);
     }
 
     /**
@@ -84,12 +85,13 @@ public class ParsedMethod extends ParsedAbstractOperator {
      * @param ordering The ordering constraints between the subtasks of the method.
      * @param constraints The constraint on the subtasks of the method.
      * @param ordered The flag to indicate if the subtasks of the method is total ordered or not.
+     * @param durative The flag to indicate if the method is durative or not.
      */
     public ParsedMethod(final Symbol<String> name, final List<TypedSymbol<String>> parameters,
                         final Expression<String> task, final Expression<String> preconditions,
                         final Expression<String> tasks, final Expression<String> ordering,
-                        final Expression<String> constraints, final boolean ordered) {
-        this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered);
+                        final Expression<String> constraints, final boolean ordered, final boolean durative) {
+        this(name, parameters, task, null, preconditions, tasks, ordering, constraints, ordered, durative);
     }
 
     /**
@@ -106,7 +108,7 @@ public class ParsedMethod extends ParsedAbstractOperator {
                         final Expression<String> task, final Expression<String> duration,
                         final Expression<String> preconditions, final ParsedTaskNetwork network) {
         this(name, parameters, task, duration, preconditions, network.getTasks(), network.getOrdering(),
-            network.getConstraints(), network.isTotallyOrdered());
+            network.getConstraints(), network.isTotallyOrdered(), network.isDurative());
     }
 
     /**
@@ -122,7 +124,7 @@ public class ParsedMethod extends ParsedAbstractOperator {
                         final Expression<String> task, final Expression<String> preconditions,
                         final ParsedTaskNetwork network) {
         this(name, parameters, task, preconditions, network.getTasks(), network.getOrdering(),
-            network.getConstraints(), network.isTotallyOrdered());
+            network.getConstraints(), network.isTotallyOrdered(), network.isDurative());
     }
 
     /**
@@ -213,6 +215,24 @@ public class ParsedMethod extends ParsedAbstractOperator {
      */
     public final void setTotallyOrdered(final boolean flag) {
         this.taskNetwork.setTotallyOrdered(flag);
+    }
+
+    /**
+     * Returns the task network of this method.
+     *
+     * @return the tasknetwork of this method.
+     */
+    public final ParsedTaskNetwork getTaskNetwork() {
+        return this.taskNetwork;
+    }
+
+    /**
+     * Sets the task network of this method.
+     *
+     * @param tasknetwork the tasknetwork to set.
+     */
+    public final void setTaskNetwork(ParsedTaskNetwork tasknetwork) {
+        this.taskNetwork = tasknetwork;
     }
 
     /**
