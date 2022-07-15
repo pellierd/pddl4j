@@ -32,7 +32,7 @@ import java.util.List;
  * @version 1.0 - 09.06.2022
  * @since 4.0
  */
-public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
+public class TemporalOrderingConstraintNetwork extends AbstractOrderingConstraintNetwork {
 
     /**
      * The matrix used to the store the temporal network.
@@ -45,7 +45,7 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
      *
      * @param other the other simple temporal network to use to make the copy.
      */
-    public SimpleTemporalNetwork(final SimpleTemporalNetwork other) {
+    public TemporalOrderingConstraintNetwork(final TemporalOrderingConstraintNetwork other) {
         final int size = other.network.size();
         this.network = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -60,7 +60,7 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
     /**
      * Creates a new empty simple temporal network.
      */
-    public SimpleTemporalNetwork() {
+    public TemporalOrderingConstraintNetwork() {
         this(0);
     }
 
@@ -71,7 +71,7 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
      * @see TemporalRelation
      * @param size the number of tasks of the simple temporal network.
      */
-    public SimpleTemporalNetwork(int size) {
+    public TemporalOrderingConstraintNetwork(int size) {
         int numberOfTimePoints = size * 2;
         this.network = new ArrayList<>(numberOfTimePoints);
         for (int i = 0; i < numberOfTimePoints; i++) {
@@ -249,7 +249,7 @@ public class SimpleTemporalNetwork extends AbstractOrderingConstraintNetwork {
      * @param args no arguments.
      */
     public static void main(String[] args) {
-        SimpleTemporalNetwork network = new SimpleTemporalNetwork(6);
+        TemporalOrderingConstraintNetwork network = new TemporalOrderingConstraintNetwork(6);
         // T0_start < T0_end
         network.set(0, 1, TemporalRelation.LESS);
         // T1_start < T1_end

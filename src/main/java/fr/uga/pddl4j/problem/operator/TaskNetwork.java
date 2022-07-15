@@ -19,7 +19,7 @@
 
 package fr.uga.pddl4j.problem.operator;
 
-import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
+import fr.uga.pddl4j.problem.time.TemporalOrderingConstraintNetwork;
 import fr.uga.pddl4j.util.BitVector;
 
 import java.io.Serializable;
@@ -68,7 +68,7 @@ public class TaskNetwork implements Serializable {
     /**
      * The represents the ordering constraints of the task network.
      */
-    private SimpleTemporalNetwork temporalOrderingConstraints;
+    private TemporalOrderingConstraintNetwork temporalOrderingConstraints;
 
     /**
      * The flag used to indicate that the task network is durative.
@@ -95,11 +95,11 @@ public class TaskNetwork implements Serializable {
         this.betweenConstraints = new LinkedHashMap<>();
         this.setDurative(durative);
         if (this.isDurative()) {
-            this.setTemporalOrdering(new SimpleTemporalNetwork());
+            this.setTemporalOrderingConstraints(new TemporalOrderingConstraintNetwork());
             this.setOrderingConstraints(null);
         } else {
             this.setOrderingConstraints(new DefaultOrderingConstraintNetwork(0));
-            this.setTemporalOrdering(null);
+            this.setTemporalOrderingConstraints(null);
         }
     }
 
@@ -132,8 +132,8 @@ public class TaskNetwork implements Serializable {
         if (other.getOrderingConstraints() != null) {
             this.setOrderingConstraints(new DefaultOrderingConstraintNetwork(other.getOrderingConstraints()));
         }
-        if (other.getTemporalOrdering() != null) {
-            this.setTemporalOrdering(new SimpleTemporalNetwork(other.getTemporalOrdering()));
+        if (other.getTemporalOrderingConstraints() != null) {
+            this.setTemporalOrderingConstraints(new TemporalOrderingConstraintNetwork(other.getTemporalOrderingConstraints()));
         }
     }
 
@@ -174,11 +174,11 @@ public class TaskNetwork implements Serializable {
      * @param tasks       the tasks of the task network.
      * @param constraints the temporal orderings constraints of the task network.
      */
-    public TaskNetwork(final List<Integer> tasks, final SimpleTemporalNetwork constraints) {
+    public TaskNetwork(final List<Integer> tasks, final TemporalOrderingConstraintNetwork constraints) {
         this(true);
         this.setTasks(tasks);
-        this.setTemporalOrdering(constraints);
-        this.getTemporalOrdering().transitiveClosure();
+        this.setTemporalOrderingConstraints(constraints);
+        this.getTemporalOrderingConstraints().transitiveClosure();
     }
 
     /**
@@ -331,7 +331,7 @@ public class TaskNetwork implements Serializable {
      *
      * @return the temporal ordering constraints of this temporal task network.
      */
-    public final SimpleTemporalNetwork getTemporalOrdering() {
+    public final TemporalOrderingConstraintNetwork getTemporalOrderingConstraints() {
         return this.temporalOrderingConstraints;
     }
 
@@ -340,7 +340,7 @@ public class TaskNetwork implements Serializable {
      *
      * @param constraints the temporal ordering constraints to set.
      */
-    public final void setTemporalOrdering(final SimpleTemporalNetwork constraints) {
+    public final void setTemporalOrderingConstraints(final TemporalOrderingConstraintNetwork constraints) {
         this.temporalOrderingConstraints = constraints;
     }
 
@@ -404,7 +404,7 @@ public class TaskNetwork implements Serializable {
     public final void removeTask(final int task) {
         this.tasks.remove(task);
         if (this.isDurative()) {
-            this.getTemporalOrdering().removeTask(task);
+            this.getTemporalOrderingConstraints().removeTask(task);
         } else {
             this.orderingConstraints.removeTask(task);
         }
@@ -416,7 +416,7 @@ public class TaskNetwork implements Serializable {
      * @return <code>true</code> if the  task network  is totally ordered; <code>false</code> otherwise.
      */
     public boolean isTotallyOrdered() {
-        return this.isDurative() ? this.getTemporalOrdering().isTotallyOrdered() :
+        return this.isDurative() ? this.getTemporalOrderingConstraints().isTotallyOrdered() :
             this.getOrderingConstraints().isTotallyOrdered();
     }
 
@@ -427,7 +427,7 @@ public class TaskNetwork implements Serializable {
      *      otherwise.
      */
     public final boolean isConsistent() {
-        return this.isDurative() ? this.getTemporalOrdering().isConsistent() :
+        return this.isDurative() ? this.getTemporalOrderingConstraints().isConsistent() :
             this.getOrderingConstraints().isConsistent();
     }
 
@@ -439,7 +439,7 @@ public class TaskNetwork implements Serializable {
      * @return the  list of tasks with no successors.
      */
     public final List<Integer> getTasksWithNosSuccessors() {
-        return this.isDurative() ? this.getTemporalOrdering().getTasksWithNoSuccessors() :
+        return this.isDurative() ? this.getTemporalOrderingConstraints().getTasksWithNoSuccessors() :
             this.getOrderingConstraints().getTasksWithNoSuccessors();
     }
 
@@ -450,7 +450,7 @@ public class TaskNetwork implements Serializable {
      * @return the  list of tasks with no predecessors.
      */
     public final List<Integer> getTasksWithNoPredecessors() {
-        return this.isDurative() ? this.getTemporalOrdering().getTasksWithNoPredecessors() :
+        return this.isDurative() ? this.getTemporalOrderingConstraints().getTasksWithNoPredecessors() :
             this.getOrderingConstraints().getTasksWithNoPredecessors();
     }
 
@@ -473,7 +473,7 @@ public class TaskNetwork implements Serializable {
                 && Objects.equals(this.getAfterConstraints(), other.getAfterConstraints())
                 && Objects.equals(this.getBetweenConstraints(), other.getBetweenConstraints())
                 && Objects.equals(this.getOrderingConstraints(), other.getOrderingConstraints())
-                && Objects.equals(this.getTemporalOrdering(), other.getTemporalOrdering());
+                && Objects.equals(this.getTemporalOrderingConstraints(), other.getTemporalOrderingConstraints());
         }
         return false;
     }
@@ -487,7 +487,7 @@ public class TaskNetwork implements Serializable {
      */
     public int hashCode() {
         return Objects.hash(this.isDurative(), this.getTasks(), this.getBeforeConstraints(), this.getAfterConstraints(),
-            this.getBetweenConstraints(), this.getOrderingConstraints(), this.getTemporalOrdering());
+            this.getBetweenConstraints(), this.getOrderingConstraints(), this.getTemporalOrderingConstraints());
     }
 
 }

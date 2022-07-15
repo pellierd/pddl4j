@@ -21,7 +21,7 @@ package fr.uga.pddl4j.problem.operator;
 
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
-import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
+import fr.uga.pddl4j.problem.time.TemporalOrderingConstraintNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,16 +52,6 @@ public final class DurativeMethod extends AbstractDurativeOperator {
     private int task;
 
     /**
-     * The duration of the action.
-     */
-    private NumericVariable duration;
-
-    /**
-     * The duration of the action.
-     */
-    private List<NumericConstraint> durationConstraints;
-
-    /**
      * The task network of the method.
      */
     private TaskNetwork taskNetwork;
@@ -74,14 +64,8 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public DurativeMethod(final DurativeMethod other) {
         super(other);
-        this.task = other.getTask();
-        this.taskNetwork = new TaskNetwork(other.taskNetwork);
-        this.durationConstraints = new ArrayList<>();
-        if (this.getDurationConstraints() != null) {
-            this.durationConstraints.addAll(other.getDurationConstraints().stream().map(NumericConstraint::new)
-                .collect(Collectors.toList()));
-        }
-        this.duration = new NumericVariable(other.getDuration());
+        this.setTask(other.getTask());
+        this.setTaskNetwork(new TaskNetwork(other.getTaskNetwork()));
     }
 
     /**
@@ -93,10 +77,9 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public DurativeMethod(final String name, final int arity) {
         super(name, arity);
-        this.task = DurativeMethod.DEFAULT_TASK_INDEX;
-        this.taskNetwork = new TaskNetwork();
-        this.durationConstraints = new ArrayList<>();
-        this.duration = DurativeMethod.DEFAULT_DURATION;
+        this.setTask(DurativeMethod.DEFAULT_TASK_INDEX);
+        this.setTaskNetwork(new TaskNetwork());
+        this.setDuration(DurativeMethod.DEFAULT_DURATION);
     }
 
     /**
@@ -132,7 +115,7 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      * @param tasks the subtasks to set.
      */
     public final void setSubTasks(final List<Integer> tasks) {
-        this.taskNetwork.setTasks(tasks);
+        this.getTaskNetwork().setTasks(tasks);
     }
 
     /**
@@ -140,8 +123,8 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      *
      * @return the ordering constraints of the method.
      */
-    public final SimpleTemporalNetwork getOrderingConstraints() {
-        return this.taskNetwork.getTemporalOrdering();
+    public final TemporalOrderingConstraintNetwork getOrderingConstraints() {
+        return this.getTaskNetwork().getTemporalOrderingConstraints();
     }
 
     /**
@@ -149,8 +132,8 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      *
      * @param constraints the orderings constraints to set
      */
-    public final void setOrderingConstraints(final SimpleTemporalNetwork constraints) {
-        this.taskNetwork.setTemporalOrdering(constraints);
+    public final void setOrderingConstraints(final TemporalOrderingConstraintNetwork constraints) {
+        this.getTaskNetwork().setTemporalOrderingConstraints(constraints);
     }
 
     /**
@@ -169,42 +152,6 @@ public final class DurativeMethod extends AbstractDurativeOperator {
      */
     public final void setTaskNetwork(final TaskNetwork taskNetwork) {
         this.taskNetwork = taskNetwork;
-    }
-
-    /**
-     * Returns the duration of the method.
-     *
-     * @return the duration of the method.
-     */
-    public final List<NumericConstraint> getDurationConstraints() {
-        return this.durationConstraints;
-    }
-
-    /**
-     * Sets the duration of the method.
-     *
-     * @param constraints the duration to set.
-     */
-    public final void setDurationConstraints(final List<NumericConstraint> constraints) {
-        this.durationConstraints = constraints;
-    }
-
-    /**
-     * Returns the duration of the method.
-     *
-     * @return the duration of the method.
-     */
-    public final NumericVariable getDuration() {
-        return this.duration;
-    }
-
-    /**
-     * Sets the duration of the method.
-     *
-     * @param duration the duration to set.
-     */
-    public final void setDuration(final NumericVariable duration) {
-        this.duration = duration;
     }
 
     /**

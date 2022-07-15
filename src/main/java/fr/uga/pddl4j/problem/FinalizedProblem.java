@@ -46,7 +46,7 @@ import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.Operator;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
-import fr.uga.pddl4j.problem.time.SimpleTemporalNetwork;
+import fr.uga.pddl4j.problem.time.TemporalOrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.time.TemporalCondition;
 import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
 import fr.uga.pddl4j.problem.time.TemporalEffect;
@@ -2352,7 +2352,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final List<Integer> tasks = new ArrayList<Integer>();
         this.encodeTasks(taskNetwork.getTasks(), tasks);
         // We encode then the ordering constraints
-        final SimpleTemporalNetwork stn = new SimpleTemporalNetwork(tasks.size());
+        final TemporalOrderingConstraintNetwork stn = new TemporalOrderingConstraintNetwork(tasks.size());
 
         for (Expression<Integer> tc : taskNetwork.getOrderingConstraints().getChildren()) {
             if (tc.equals(Connector.LESS_ORDERING_CONSTRAINT)) {
