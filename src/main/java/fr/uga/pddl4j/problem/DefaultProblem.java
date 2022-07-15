@@ -311,8 +311,10 @@ public class DefaultProblem extends FinalizedProblem {
 
         this.finalizeActions();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Actions:\n\n"
-                + this.toString(Data.ACTIONS) + "\n");
+            LOGGER.debug(this.toString(Data.ACTIONS) + "\n");
+            if (this.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
+                LOGGER.debug(this.toString(Data.DURATIVE_ACTIONS) + "\n");
+            }
         }
 
         if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
@@ -330,8 +332,10 @@ public class DefaultProblem extends FinalizedProblem {
             this.initMapOfTaskIndex();
             this.finalizeMethods();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Methods:\n\n"
-                    + this.toString(Data.METHODS) + "\n");
+                LOGGER.debug(this.toString(Data.METHODS) + "\n");
+                if (this.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)) {
+                    LOGGER.debug(this.toString(Data.DURATIVE_METHODS) + "\n");
+                }
             }
         }
 

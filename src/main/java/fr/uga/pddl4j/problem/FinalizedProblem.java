@@ -29,6 +29,7 @@ import fr.uga.pddl4j.problem.numeric.AssignmentOperator;
 import fr.uga.pddl4j.problem.numeric.NumericAssignment;
 import fr.uga.pddl4j.problem.numeric.NumericComparator;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
+import fr.uga.pddl4j.problem.numeric.NumericExpression;
 import fr.uga.pddl4j.problem.numeric.NumericFluent;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
@@ -975,13 +976,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             encoded.setTypeOfParameter(i, action.getTypeOfParameters(i));
         }
 
-        List<NumericConstraint> duration = this.finalizeNumericConstraints(action.getDuration());
-        encoded.setDurationConstraints(duration);
-
-        // Initialize the preconditions of the action
-
+        encoded.setDuration(this.finalizeDuration(action.getDuration()));
         encoded.setPrecondition(this.finalizeTimeCondition(action.getPreconditions()));
-
         encoded.setConditionalEffects(this.finalizeTimeConditionalEffect(action.getEffects()));
 
         return encoded;
@@ -1216,6 +1212,25 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
+     * Encodes the duration of an action or a method.
+     *
+     * @param exp the expression to encode.
+     */
+    private NumericVariable finalizeDuration(final Expression<Integer> exp) {
+        this.toString(exp);
+        NumericVariable duration = new NumericVariable(NumericVariable.DURATION);
+        if (exp.getConnector().equals(Connector.EQUAL_COMPARISON)
+                && exp.getChildren().size() == 2
+                && exp.getChildren().get(0).getConnector().equals(Connector.TIME_VAR)
+                && exp.getChildren().get(1).getConnector().equals(Connector.NUMBER)) {
+            duration.setValue(exp.getChildren().get(1).getValue());
+        } else {
+            throw new UnexpectedExpressionException(exp.getConnector().toString());
+        }
+        return duration;
+    }
+
+    /**
      * Encodes an arithmetic expression.
      *
      * @param exp the expression to encode.
@@ -1352,18 +1367,26 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Duration:\n");
         str.append(this.toString(action.getDuration()));
         str.append("\nDuration constraints:");
-        for (NumericConstraint constraints : action.getDurationConstraints()) {
-            str.append("  ");
-            str.append(this.toString(constraints));
-            str.append("\n");
+        if (action.getDurationConstraints().isEmpty()) {
+            str.append("()\n");
+        } else {
+            for (NumericConstraint constraints : action.getDurationConstraints()) {
+                str.append("  ");
+                str.append(this.toString(constraints));
+                str.append("\n");
+            }
         }
         str.append("Condition:\n");
         str.append(this.toString(action.getPrecondition()));
         str.append("\n");
         str.append("Effects:\n");
-        for (TemporalConditionalEffect effect : action.getConditionalEffects()) {
-            str.append(this.toString(effect));
-            str.append("\n");
+        if (action.getConditionalEffects().isEmpty()) {
+            str.append("(and )");
+        } else {
+            for (TemporalConditionalEffect effect : action.getConditionalEffects()) {
+                str.append(this.toString(effect));
+                str.append("\n");
+            }
         }
         return str.toString();
     }
@@ -1375,18 +1398,28 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return a string representation of the state.
      */
     public final String toString(final Condition state) {
-        final StringBuilder str = new StringBuilder("(and");
+        if (state.isEmpty()) {
+            return "()";
+        }
+        boolean printed = false;
+        final StringBuilder str = new StringBuilder("(and ");
+
         final BitSet positive = state.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
-            str.append(" ");
             str.append(this.toString(this.getFluents().get(j)));
-            str.append("\n");
+            str.append("\n  ");
+            printed = true;
         }
         final BitSet negative = state.getNegativeFluents();
+
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            str.append(" (not ");
+            str.append("(not ");
             str.append(this.toString(this.getFluents().get(i)));
-            str.append(")\n");
+            str.append("\n              ");
+            printed = true;
+        }
+        if (printed) {
+            str.setLength(str.length() - 3);
         }
         str.append(")");
         return str.toString();
@@ -1402,24 +1435,25 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         final StringBuilder str = new StringBuilder("(and\n");
         final Condition atStart = condition.getAtStartCondition();
         if (!atStart.isEmpty()) {
-            str.append("  (at start ");
+            str.append(" (at start ");
             str.append(this.toString(atStart));
-            str.append("  )");
+            str.append(")\n");
         }
         final Condition atEnd = condition.getAtEndCondition();
         if (!atEnd.isEmpty()) {
-            str.append("  (at end ");
+            str.append(" (at end ");
             str.append(this.toString(atEnd));
-            str.append("   )");
+            str.append(")\n");
         }
         final Condition overall = condition.getOverallCondition();
         if (!overall.isEmpty()) {
-            str.append("  (overall ");
-            str.append(this.toString(atEnd));
-            str.append("   )");
+            str.append(" (overall ");
+            str.append(this.toString(overall));
+            str.append(")\n");
         }
         str.append(")");
         return str.toString();
+
     }
 
     /**
@@ -1469,22 +1503,28 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return a string representation of the effect.
      */
     public final String toString(final Effect effect) {
-        final StringBuilder str = new StringBuilder("(and");
+        boolean printed = false;
+        final StringBuilder str = new StringBuilder("(and ");
         final BitSet positive = effect.getPositiveFluents();
         for (int j = positive.nextSetBit(0); j >= 0; j = positive.nextSetBit(j + 1)) {
-            str.append(" ");
             str.append(this.toString(this.getFluents().get(j)));
-            str.append("\n");
+            str.append("\n  ");
+            printed = true;
         }
         final BitSet negative = effect.getNegativeFluents();
         for (int i = negative.nextSetBit(0); i >= 0; i = negative.nextSetBit(i + 1)) {
-            str.append(" (not ");
+            str.append("(not ");
             str.append(this.toString(this.getFluents().get(i)));
-            str.append(")\n");
+            str.append("\n  ");
+            printed = true;
         }
         for (NumericAssignment assignment : effect.getNumericAssignments()) {
             str.append(this.toString(assignment));
-            str.append("\n");
+            str.append("\n  ");
+            printed = true;
+         }
+        if (printed) {
+            str.setLength(str.length() - 3);
         }
         str.append(")");
         return str.toString();
@@ -1498,15 +1538,23 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      */
     public final String toString(final TemporalEffect effect) {
         final StringBuilder str = new StringBuilder("(and\n");
-        str.append("  (at start ");
-        str.append(this.toString(effect.getAtStartEffect()));
-        str.append("  )\n");
-        str.append("  (at end ");
-        str.append(this.toString(effect.getAtEndEffect()));
-        str.append("  )\n");
-        str.append("  (overall ");
-        str.append(this.toString(effect.getOverallEffect()));
-        str.append("  )\n");
+        if (!effect.getAtStartEffect().isEmpty()) {
+            str.append(" (at start ");
+            str.append(this.toString(effect.getAtStartEffect()));
+            str.append(")\n");
+        }
+        if (!effect.getAtEndEffect().isEmpty()) {
+            str.append(" (at end ");
+            str.append(this.toString(effect.getAtEndEffect()));
+            str.append(")\n");
+        }
+        if (!effect.getOverallEffect().isEmpty()) {
+            str.append(" (overall ");
+            System.out.println(effect.getOverallEffect().isEmpty());
+            System.out.println(effect.getOverallEffect());
+            str.append(this.toString(effect.getOverallEffect()));
+            str.append(")\n");
+        }
         str.append(")");
         return str.toString();
     }
@@ -1677,7 +1725,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         str.append("Preconditions:\n");
         str.append(this.toString(method.getPrecondition()));
         str.append("\n");
-        str.append("Ordering:\n");
+        str.append("Ordering constraints:\n");
         str.append(method.getOrderingConstraints().toString());
         str.append("\n");
         str.append("Before constraints:\n");
@@ -1942,7 +1990,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 break;
             case VARIABLE:
                 str.append("(= ");
-                str.append(this.getNumericFluents().get(expression.getNumericFluent()));
+                if (expression.getNumericFluent() == NumericVariable.DURATION) {
+                    str.append("?duration");
+                } else  {
+                    str.append(this.getNumericFluents().get(expression.getNumericFluent()));
+                }
                 str.append(" ");
                 str.append(expression.getValue());
                 str.append(")");
@@ -2009,15 +2061,59 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 }
                 break;
             case ACTIONS:
-                for (Action action : this.getActions()) {
-                    str.append(this.toString(action));
+                str.append("**********************************\n");
+                str.append("* Actions                        *\n");
+                str.append("**********************************\n\n");
+                if (this.getActions().isEmpty()) {
+                    str.append("no actions");
                     str.append(System.lineSeparator());
+                } else {
+                    for (Action action : this.getActions()) {
+                        str.append(this.toString(action));
+                        str.append(System.lineSeparator());
+                    }
+                }
+                break;
+            case DURATIVE_ACTIONS:
+                str.append("**********************************\n");
+                str.append("* Durative Actions               *\n");
+                str.append("**********************************\n\n");
+                if (this.getDurativeActions().isEmpty()) {
+                    str.append("no durative actions");
+                    str.append(System.lineSeparator());
+                } else {
+                    for (DurativeAction action : this.getDurativeActions()) {
+                        str.append(this.toString(action));
+                        str.append(System.lineSeparator());
+                    }
                 }
                 break;
             case METHODS:
-                for (Method method : this.getMethods()) {
-                    str.append(this.toString(method));
+                str.append("**********************************\n");
+                str.append("* Methods                        *\n");
+                str.append("**********************************\n\n");
+                if (this.getMethods().isEmpty()) {
+                    str.append("no methods");
                     str.append(System.lineSeparator());
+                } else {
+                    for (Method method : this.getMethods()) {
+                        str.append(this.toString(method));
+                        str.append(System.lineSeparator());
+                    }
+                }
+                break;
+            case DURATIVE_METHODS:
+                str.append("**********************************\n");
+                str.append("* Durative Methods               *\n");
+                str.append("**********************************\n\n");
+                if (this.getDurativeMethods().isEmpty()) {
+                    str.append("no durative methods");
+                    str.append(System.lineSeparator());
+                } else {
+                    for (DurativeMethod method : this.getDurativeMethods()) {
+                        str.append(this.toString(method));
+                        str.append(System.lineSeparator());
+                    }
                 }
                 break;
             case GOAL:
@@ -2274,8 +2370,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             encoded.setTypeOfParameter(i, method.getTypeOfParameters(i));
         }
         // Encode the duration constrains of the method
-        List<NumericConstraint> constraints = this.finalizeNumericConstraints(method.getDuration());
-        encoded.setDurationConstraints(constraints);
+        encoded.setDuration(this.finalizeDuration(method.getDuration()));
         // Encode the task carried out by the method
         encoded.setTask(this.mapOfTasksIndex.get(method.getTask()));
         // Encode the preconditions of the method

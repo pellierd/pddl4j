@@ -144,9 +144,9 @@ public class Effect extends AbstractFluentDescription {
         final StringBuilder str = new StringBuilder();
         str.append("** Positive fluents **\n");
         str.append(this.getPositiveFluents());
-        str.append("** Negative fluents **\n");
+        str.append("\n** Negative fluents **\n");
         str.append(this.getNegativeFluents());
-        str.append("** Numeric assignment **\n");
+        str.append("\n** Numeric assignment **\n");
         for (NumericAssignment assignment : this.getNumericAssignments()) {
             str.append(assignment);
             str.append("\n");

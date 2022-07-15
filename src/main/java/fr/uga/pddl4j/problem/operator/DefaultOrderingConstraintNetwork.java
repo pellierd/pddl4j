@@ -281,6 +281,7 @@ public class DefaultOrderingConstraintNetwork extends AbstractOrderingConstraint
                     index++;
                 }
             }
+            str.setLength(str.length() - 1);
         }
         return str.toString();
     }

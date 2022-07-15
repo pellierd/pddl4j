@@ -257,9 +257,17 @@ public abstract class AbstractProblem implements Problem {
          */
         ACTIONS,
         /**
+         * The list of durative_actions of the instantiated problem.
+         */
+        DURATIVE_ACTIONS,
+        /**
          * The list of methods of the instantiated problem.
          */
         METHODS,
+        /**
+         * The list of durative methods of the instantiated problem.
+         */
+        DURATIVE_METHODS,
         /**
          * The list of relevant fluents of the instantiated problem.
          */

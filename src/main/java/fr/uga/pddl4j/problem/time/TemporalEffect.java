@@ -66,8 +66,8 @@ public class TemporalEffect implements Serializable {
      */
     public TemporalEffect(final TemporalEffect other) {
         this(new Effect(other.getAtStartEffect()),
-            new Effect(other.getAtEndEffect()),
-            new Effect(other.getOverallEffect()));
+            new Effect(other.getOverallEffect()),
+            new Effect(other.getAtEndEffect()));
     }
 
     /**

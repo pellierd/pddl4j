@@ -41,7 +41,7 @@ public abstract class AbstractIntOperator extends AbstractInstantiatedOperator {
     private Expression<Integer> duration;
 
     /**
-     * Creates a new operator from an other.
+     * Creates a new operator from another.
      *
      * @param other the other operator.
      */
