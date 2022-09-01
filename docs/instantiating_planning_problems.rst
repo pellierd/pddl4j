@@ -54,7 +54,7 @@ The skeleton of this class is given bellow:
     :linenos:
 
 The first part of the main method parses the domain and the problem from the PDDL files (see for more details). If the
-parser succeeds, then a new `ADLProblem <http://pddl4j.imag.fr/repository/pddl4j/api/current/index.html?fr/uga/pddl4j/planners/ADLProblem.html>`_
+parser succeeds, then a new `DefaultProblem <http://pddl4j.imag.fr/repository/pddl4j/api/current/index.html?fr/uga/pddl4j/planners/DefaultProblem.html>`_
 is created from the parsed problem. Then, the method ``instantiate()``is called to instantiate the problem.
 
 .. warning::
