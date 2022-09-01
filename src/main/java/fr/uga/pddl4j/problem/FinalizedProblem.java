@@ -29,7 +29,6 @@ import fr.uga.pddl4j.problem.numeric.AssignmentOperator;
 import fr.uga.pddl4j.problem.numeric.NumericAssignment;
 import fr.uga.pddl4j.problem.numeric.NumericComparator;
 import fr.uga.pddl4j.problem.numeric.NumericConstraint;
-import fr.uga.pddl4j.problem.numeric.NumericExpression;
 import fr.uga.pddl4j.problem.numeric.NumericFluent;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.operator.AbstractInstantiatedOperator;
