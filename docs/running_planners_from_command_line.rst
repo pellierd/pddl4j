@@ -42,7 +42,7 @@ Command line example:
 .. code-block:: bash
 
     java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.FF
-           src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pdd
+           src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
            -t 1000
 
@@ -83,7 +83,7 @@ Command line example:
 .. code-block:: bash
 
    java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.HSP
-        src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pdd
+        src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
            src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
         -e MAX
         -w 1.2
