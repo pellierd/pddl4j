@@ -50,7 +50,7 @@ As sample, find below the command line to launch Fast Forward planner implemente
 
 .. code-block:: bash
 
-  $ java -cp build/libs/pddl4j-4.0.jar fr.uga.pddl4j.planners.statespace.FF \
+  $ java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.FF \
      src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/domain.pddl \
      src/test/resources/benchmarks/pddl/ipc2000/logistics/strips-typed/p01.pddl
 
