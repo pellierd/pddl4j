@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -456,35 +457,44 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
                 }
                 System.exit(0);
             }
-            //System.out.println(pb.toString(plan));
+
             // Print plan solution
+            StringBuilder strb = new StringBuilder();
             if (plan != null) {
                 if (LOGGER.isInfoEnabled()) {
-                    StringBuilder strb = new StringBuilder();
                     strb.append("Found plan as follows:\n");
-                    strb.append(pb.toString(plan));
                     //strb.append("\n\n");
                     //strb.append("Plan decomposition as follows ");
                     //strb.append(pb.toString(plan.getHierarchy()));
-                    strb.append(String.format("\nPlan total cost      : %4.2f%n", plan.cost()));
-                    strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
-                    strb.append(String.format("Searching time       : %4.3fs%n", searchTime));
-                    strb.append(String.format("Total time           : %4.3fs%n%n", searchTime + instantiationTime));
-                    LOGGER.info(strb);
+                    strb.append(pb.toString(plan));
                 }
-                return plan;
+            } else {
+                if (LOGGER.isInfoEnabled()) {
+                    strb.append(String.format(String.format("Problem with no solution plan found%n%n")));
+                    //strb.append("\n\n");
+                    //strb.append("Plan decomposition as follows ==> <==");
+                }
             }
-        }
-
-        if (LOGGER.isInfoEnabled()) {
-            StringBuilder strb = new StringBuilder();
-            strb.append(String.format(String.format("problem with no solution plan found%n%n")));
-            //strb.append("\n\n");
-            //strb.append("Plan decomposition as follows ==> <==");
+            strb.append(String.format("\nPlan total cost      : %4.2f%n", plan.cost()));
             strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
-            strb.append(String.format("Searching time       : %4.3fs%n", 0.0));
-            strb.append(String.format("Total time           : %4.3fs%n%n", instantiationTime));
+            strb.append(String.format("Searching time       : %4.3fs%n", searchTime));
+            strb.append(String.format("Total time           : %4.3fs%n%n", searchTime + instantiationTime));
             LOGGER.info(strb);
+        } else {
+            if (LOGGER.isInfoEnabled()) {
+                StringBuilder strb = new StringBuilder();
+                if (pb.getGoal() == null) {
+                    strb.append(String.format("Goal can be simplified to FALSE. No search will solve it.%n%n"));
+                }
+                if (pb.getInitialTaskNetwork() != null && pb.getInitialTaskNetwork().getTasks().contains(null)) {
+                    strb.append(String.format("One or more tasks of the initial task network has no method " +
+                        "decomposition. No search will solve it.%n%n"));
+                }
+                strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
+                strb.append(String.format("Searching time       : %4.3fs%n", 0.0));
+                strb.append(String.format("Total time           : %4.3fs%n%n", instantiationTime));
+                LOGGER.info(strb);
+            }
         }
         return null;
     }
