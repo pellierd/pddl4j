@@ -33,6 +33,8 @@ import picocli.CommandLine.Parameters;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * This abstract class defines the main methods to access a planner.
@@ -466,7 +468,8 @@ public abstract class AbstractPlanner implements Planner {
      * This method contains the code called by the main method of the planner when planner are launched from
      * command line.
      *
-     * @return the exit return value of the planner: O if every thing is ok; 1 otherwise.
+     * @return the exit return value of the planner: O if every thing is ok; 1 if the error due to an invalid
+     *      configuration of the planner; 2 otherwise.
      */
     @Override
     public Integer call() {
@@ -475,6 +478,12 @@ public abstract class AbstractPlanner implements Planner {
         } catch (InvalidConfigurationException e) {
             LOGGER.fatal(e.getMessage() + "\n");
             return 1;
+        } catch (Throwable t) {
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            LOGGER.fatal(sw.toString());
+            return 2;
         }
         return 0;
     }
