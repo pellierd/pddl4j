@@ -84,7 +84,7 @@ Command line example:
 
    java -cp build/libs/pddl4j-4.0.0.jar fr.uga.pddl4j.planners.statespace.HSP
         src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/domain.pddl
-           src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
+        src/test/resources/benchmarks/pddl/ipc2002/depots/strips-automatic/p01.pddl
         -e MAX
         -w 1.2
         -t 600
