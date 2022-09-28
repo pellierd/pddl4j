@@ -379,7 +379,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
         final Parser parser = this.getParser();
         DefaultParsedProblem parsedProblem = null;
         try {
-            parser.parse(this.getDomain(), this.getProblem());
+            parsedProblem = parser.parse(this.getDomain(), this.getProblem());
         } catch (FileNotFoundException e) {
             LOGGER.fatal(e.getMessage());
         }
