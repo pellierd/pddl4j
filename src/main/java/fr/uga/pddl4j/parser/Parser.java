@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -819,13 +818,14 @@ public final class Parser implements Callable<Integer> {
     }
 
     /**
-     * Check the objects declaration.
+     * Check the objects' declaration.
      *
      * @return <code>true</code> if the objects are well declared; <code>false</code> otherwise.
      */
     private boolean checkObjectsDeclaration() {
         boolean checked = true;
         List<TypedSymbol<String>> objects = this.problem.getObjects();
+        // Check that the type of the objects exists
         for (TypedSymbol<String> object : objects) {
             for (Symbol<String> type : object.getTypes()) {
                 if (!this.domain.isDeclaredType(type)) {
@@ -833,6 +833,43 @@ public final class Parser implements Callable<Integer> {
                         + object.getValue() + "\" is undefined", this.lexer
                         .getFile(), type.getLocation().getBeginLine(), type.getLocation().getBeginColumn());
                     checked = false;
+                }
+            }
+        }
+        // Check that two objects with the same name has not two different types and are not declared twice
+        for (int i = 0; i < objects.size(); i++) {
+            final TypedSymbol oi = objects.get(i);
+            for (int j = i + 1; j < objects.size(); j++) {
+                TypedSymbol oj = objects.get(j);
+                if (oi.getImage().equals(oj.getImage())) {
+                    if (oi.getTypes().equals(oj.getTypes())) {
+                        this.mgr.logParserError("object \"" + oj.getValue() + "\" already declared",
+                            this.lexer.getFile(), oj.getLocation().getBeginLine(), oj.getLocation().getBeginColumn());
+                        checked = false;
+                    } else {
+                        this.mgr.logParserError("objects \"" + oj + "\" and \"" + oi + "\" declared with " +
+                                "different types", this.lexer.getFile(), oj.getLocation().getBeginLine(),
+                            oj.getLocation().getBeginColumn());
+                        checked = false;
+                    }
+                }
+            }
+        }
+        // Check that an object and a constant with the same name has not two different types
+        if (this.domain != null) {
+            List<TypedSymbol<String>> constants = this.domain.getConstants();
+            for (int i = 0; i < objects.size(); i++) {
+                final TypedSymbol o = objects.get(i);
+                for (int j = i + 1; j < constants.size(); j++) {
+                    TypedSymbol c = objects.get(j);
+                    if (o.getImage().equals(c.getImage())) {
+                        if (!o.getTypes().equals(c.getTypes())) {
+                            this.mgr.logParserError("object \"" + o.getValue() + "\" already declared as a " +
+                                    "constant with an other type in the domain", this.lexer.getFile(),
+                                o.getLocation().getBeginLine(), o.getLocation().getBeginColumn());
+                            checked = false;
+                        }
+                    }
                 }
             }
         }
