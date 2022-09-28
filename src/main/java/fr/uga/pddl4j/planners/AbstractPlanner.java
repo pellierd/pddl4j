@@ -264,6 +264,24 @@ public abstract class AbstractPlanner implements Planner {
     }
 
     /**
+     * Throws a {@code InvalidPlannerConfigurationException} with the appropriated message or do nothing if the planner
+     * has a valid configuration.
+     */
+    protected void throwInvalidConfigurationException() throws InvalidConfigurationException {
+        if (!this.getDomainFile().exists()) {
+            throw new InvalidConfigurationException("Domain file does not exist");
+        } else if (!this.getDomainFile().canRead()) {
+            throw new InvalidConfigurationException("Domain file not readable");
+        } else if (!this.getProblemFile().exists()) {
+            throw new InvalidConfigurationException("Problem file does not exist");
+        } else if (!this.getProblemFile().canRead()) {
+            throw new InvalidConfigurationException("Problem file not readable");
+        } else if (this.getTimeout() <= 0) {
+            throw new InvalidConfigurationException("Invalid timeout");
+        }
+    }
+
+    /**
      * Returns the configuration of the planner.
      *
      * @return the configuration of the planner.
@@ -330,16 +348,23 @@ public abstract class AbstractPlanner implements Planner {
      * Solves the problem as defined by the planner configuration.
      *
      * @return the solution plan found or null is no solution was found.
-     * @throws FileNotFoundException domain of problem files does not exist.
+     * @throws InvalidConfigurationException if the planner configuration is invalid.
      */
-    public Plan solve() throws FileNotFoundException {
+    public Plan solve() throws InvalidConfigurationException {
         if (!this.hasValidConfiguration()) {
-            throw new RuntimeException("Invalid planner configuration");
+            this.throwInvalidConfigurationException();
         }
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
-        final DefaultParsedProblem parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
+
+        DefaultParsedProblem parsedProblem = null;
+        try {
+            parsedProblem = this.parser.parse(this.getDomain(), this.getProblem());
+        } catch (FileNotFoundException e) {
+            LOGGER.fatal(e.getMessage());
+        }
+
         ErrorManager errorManager = this.parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
@@ -447,8 +472,8 @@ public abstract class AbstractPlanner implements Planner {
     public Integer call() {
         try {
             this.solve();
-        } catch (FileNotFoundException e) {
-            LOGGER.fatal(e.getMessage());
+        } catch (InvalidConfigurationException e) {
+            LOGGER.fatal(e.getMessage() + "\n");
             return 1;
         }
         return 0;

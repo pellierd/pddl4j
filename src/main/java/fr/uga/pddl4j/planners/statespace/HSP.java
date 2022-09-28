@@ -174,8 +174,11 @@ public final class HSP extends AbstractStateSpacePlanner  {
             final HSP planner = new HSP();
             CommandLine cmd = new CommandLine(planner);
             int exitCode = (int) cmd.execute(args);
+            if (exitCode == 1) {
+                LOGGER.fatal(cmd.getUsageMessage());
+            }
             System.exit(exitCode);
-        } catch (IllegalArgumentException e) {
+        } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());
         }
     }

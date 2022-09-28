@@ -185,7 +185,11 @@ public final class GSP extends AbstractStateSpacePlanner {
     public static void main(final String[] args) {
         try {
             final GSP planner = new GSP();
-            int exitCode = (int) new CommandLine(planner).execute(args);
+            CommandLine cmd = new CommandLine(planner);
+            int exitCode = (int) cmd.execute(args);
+            if (exitCode == 1) {
+                LOGGER.fatal(cmd.getUsageMessage());
+            }
             System.exit(exitCode);
         } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());

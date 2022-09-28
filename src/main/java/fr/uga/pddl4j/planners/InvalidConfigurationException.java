@@ -27,7 +27,7 @@ package fr.uga.pddl4j.planners;
  * @since 4.0
  * @see fr.uga.pddl4j.planners.PlannerConfiguration
  */
-public class InvalidConfigurationException extends RuntimeException {
+public class InvalidConfigurationException extends Exception {
 
     /**
      * Creates a new invalid configuration exception.

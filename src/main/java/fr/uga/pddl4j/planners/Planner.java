@@ -255,9 +255,9 @@ public interface Planner extends Serializable, Callable<Integer> {
      * Search a plan for the current planner configuration.
      *
      * @return the solution plan or null is no solution was found.
-     * @throws FileNotFoundException if the domain or the problem file does not exist.
+     * @throws InvalidConfigurationException if the planner has an invalid configuration to run.
      */
-    Plan solve() throws FileNotFoundException;
+    Plan solve() throws InvalidConfigurationException;
 
     /**
      * Returns the statistics of the planner.

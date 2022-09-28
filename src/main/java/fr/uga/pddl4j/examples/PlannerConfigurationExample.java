@@ -16,6 +16,7 @@
 package fr.uga.pddl4j.examples;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
+import fr.uga.pddl4j.planners.InvalidConfigurationException;
 import fr.uga.pddl4j.planners.LogLevel;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.statespace.HSP;
@@ -62,7 +63,7 @@ public class PlannerConfigurationExample {
         // Runs the planner and print the solution
         try {
             planner.solve();
-        } catch (FileNotFoundException e) {
+        } catch (InvalidConfigurationException e) {
             e.printStackTrace();
         }
 

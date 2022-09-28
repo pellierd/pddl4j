@@ -19,6 +19,7 @@ import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
+import fr.uga.pddl4j.planners.InvalidConfigurationException;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
@@ -161,6 +162,21 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
             && this.getHeuristicWeight() > 0.0
             && this.getHeuristic() != null
             && !this.getSearchStrategies().isEmpty();
+    }
+
+    /**
+     * Throws a {@code InvalidPlannerConfigurationException} with the appropriated message or do nothing if the planner
+     * has a valid configuration.
+     */
+    protected void throwInvalidConfigurationException() throws InvalidConfigurationException {
+        super.throwInvalidConfigurationException();
+        if (this.getHeuristicWeight()  < 0.0) {
+            throw new InvalidConfigurationException("Invalid heuristic weight");
+        } else if (this.getHeuristic() == null) {
+            throw new InvalidConfigurationException("Undefined heuristic");
+        } else if (this.getSearchStrategies().isEmpty()) {
+            throw new InvalidConfigurationException("Undefined search strategies");
+        }
     }
 
     /**

@@ -252,8 +252,11 @@ public final class TFD extends AbstractSTNPlanner {
     public static void main(final String[] args) {
         try {
             final TFD planner = new TFD();
-            final CommandLine cmd = new CommandLine(planner);
+            CommandLine cmd = new CommandLine(planner);
             int exitCode = (int) cmd.execute(args);
+            if (exitCode == 1) {
+                LOGGER.fatal(cmd.getUsageMessage());
+            }
             System.exit(exitCode);
         } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());

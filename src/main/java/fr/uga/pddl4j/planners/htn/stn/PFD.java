@@ -17,6 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.statespace.GSP;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -257,8 +258,11 @@ public final class PFD extends AbstractSTNPlanner {
     public static void main(final String[] args) {
         try {
             final PFD planner = new PFD();
-            final CommandLine cmd = new CommandLine(planner);
+            CommandLine cmd = new CommandLine(planner);
             int exitCode = (int) cmd.execute(args);
+            if (exitCode == 1) {
+                LOGGER.fatal(cmd.getUsageMessage());
+            }
             System.exit(exitCode);
         } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());

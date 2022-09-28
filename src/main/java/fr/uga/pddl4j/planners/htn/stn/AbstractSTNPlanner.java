@@ -22,6 +22,7 @@ import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
+import fr.uga.pddl4j.planners.InvalidConfigurationException;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.htn.AbstractHTNPlanner;
@@ -366,17 +367,22 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
      * Search a plan for the current planner configuration.
      *
      * @return the solution plan or null is no solution was found.
-     * @throws FileNotFoundException if the domain or the problem file does not exist.
+     * @throws InvalidConfigurationException if the planner has an invalid configuration.
      */
-    public Plan solve() throws FileNotFoundException {
+    public Plan solve() throws InvalidConfigurationException {
         if (!this.hasValidConfiguration()) {
-            throw new RuntimeException("Invalid planner configuration");
+            super.throwInvalidConfigurationException();
         }
 
         // Parses the PDDL domain and problem description
         long begin = System.currentTimeMillis();
         final Parser parser = this.getParser();
-        final DefaultParsedProblem parsedProblem = parser.parse(this.getDomain(), this.getProblem());
+        DefaultParsedProblem parsedProblem = null;
+        try {
+            parser.parse(this.getDomain(), this.getProblem());
+        } catch (FileNotFoundException e) {
+            LOGGER.fatal(e.getMessage());
+        }
         ErrorManager errorManager = parser.getErrorManager();
         this.getStatistics().setTimeToParse(System.currentTimeMillis() - begin);
         if (!errorManager.isEmpty()) {
