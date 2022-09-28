@@ -88,7 +88,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
     protected void extractGroundInertia() {
         this.groundInertia = new LinkedHashMap<>(Constants.DEFAULT_RELEVANT_FACTS_TABLE_SIZE);
         for (IntAction a : this.getIntActions()) {
-            extractGroundInertia(a.getEffects());
+            this.extractGroundInertia(a.getEffects());
         }
     }
 
