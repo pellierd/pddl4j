@@ -460,10 +460,6 @@ public class DefaultProblem extends FinalizedProblem {
             } else {
                 System.out.println("Problem not solvable");
             }
-
-            for (DurativeMethod m : pb.getDurativeMethods()) {
-                pb.toString(m);
-            }
         }
     }
 

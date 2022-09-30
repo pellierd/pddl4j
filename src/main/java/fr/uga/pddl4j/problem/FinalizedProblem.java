@@ -553,7 +553,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     /**
      * Encode a list of specified actions into <code>BitSet</code> representation. The specified
      * map is used to speed-up the search by mapping the an expression to this index.
-     *
      */
     protected void finalizeActions()  throws UnexpectedExpressionException {
         this.actions = new ArrayList<>(this.getIntActions().size());
@@ -564,12 +563,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             for (int i = 0; i < normalized.size(); i++) {
                 final IntAction na = normalized.get(i);
                 if (!na.isDurative()) {
-                    if (i != 0) {
+                    if (i != 0 && this.getTaskResolvers() != null) {
                         this.getTaskResolvers().get(actionIndex).add(actions.size());
                     }
                     this.actions.add(this.finalizeAction(na));
                 } else {
-                    if (i != 0) {
+                    if (i != 0 && this.getTaskResolvers() != null) {
                         this.getTaskResolvers().get(actionIndex).add(-this.durativeActions.size() - 1);
                     }
                     this.durativeActions.add(this.finalizeDurativeAction(na));
