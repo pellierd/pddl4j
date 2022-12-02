@@ -259,7 +259,7 @@ public class DefaultProblem extends FinalizedProblem {
         }
         this.simplyActionsWithGroundInertia();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Actions simplified based on ground inertia detected:\n\n"
+            LOGGER.debug("Actions simplified base on ground inertia detected:\n\n"
                 + this.toString(Data.INT_ACTIONS) + "\n");
         }
         this.simplifyGoalWithGroundInertia();
@@ -284,17 +284,6 @@ public class DefaultProblem extends FinalizedProblem {
                 LOGGER.debug("Methods simplified based on ground inertia:\n\n"
                     + this.toString(Data.INT_METHODS));
             }
-            this.extractGroundInertia();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Ground inertia detected after method instantiation:\n\n"
-                    + this.toString(Data.GROUND_INERTIA) + "\n");
-            }
-            this.simplifyGoalWithGroundInertia();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Goal simplified based on ground inertia detected after method instantiation:\n"
-                    + this.toString(Data.INT_GOAL) + "\n");
-            }
-
         }
     }
 

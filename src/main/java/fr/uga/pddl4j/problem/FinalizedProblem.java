@@ -319,8 +319,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void extractRelevantFluents() {
         final Set<Expression<Integer>> facts = new LinkedHashSet<>(10000);
         for (IntAction a : this.getIntActions()) {
-            this.extractRelevantFluents(a.getPreconditions(), facts);
-            this.extractRelevantFluents(a.getEffects(), facts);
+            extractRelevantFluents(a.getPreconditions(), facts);
+            extractRelevantFluents(a.getEffects(), facts);
         }
         for (Expression<Integer> p : this.getIntInitialState()) {
             Inertia inertia = this.getGroundInertia().get(p);
@@ -990,8 +990,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
         if (this.getIntGoal().getConnector().equals(Connector.FALSE)) {
             this.goal = null;
-        } else if (this.getIntGoal().getConnector().equals(Connector.TRUE)) {
-            this.goal = new Goal();
         } else {
             this.getIntGoal().toDNF();
             List<Goal> goals = new ArrayList<>(this.getIntGoal().getChildren().size());
@@ -2118,11 +2116,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 }
                 break;
             case GOAL:
-                if (this.getGoal() == null) {
-                   str.append("never reachable");
-                } else {
-                    str.append(this.toString(this.getGoal()));
-                }
+                str.append(this.toString(this.getGoal()));
                 str.append(System.lineSeparator());
                 break;
             case INITIAL_STATE:

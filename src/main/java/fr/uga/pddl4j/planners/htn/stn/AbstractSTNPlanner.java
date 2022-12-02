@@ -478,11 +478,11 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
 
         if (LOGGER.isInfoEnabled()) {
             StringBuilder strb = new StringBuilder();
-            strb.append(String.format(String.format("problem with no solution plan found%n%n")));
+            strb.append(String.format(String.format("\n%nproblem with no solution plan found%n%n")));
             //strb.append("\n\n");
             //strb.append("Plan decomposition as follows ==> <==");
-            strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
-            strb.append(String.format("Searching time       : %4.3fs%n", 0.0));
+            strb.append(String.format("Encoding time        : %4.3fs", instantiationTime));
+            strb.append(String.format("Searching time       : %4.3fs", 0.0));
             strb.append(String.format("Total time           : %4.3fs%n%n", instantiationTime));
             LOGGER.info(strb);
         }
