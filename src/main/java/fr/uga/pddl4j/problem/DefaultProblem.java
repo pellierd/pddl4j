@@ -17,10 +17,12 @@ package fr.uga.pddl4j.problem;
 
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
+import fr.uga.pddl4j.parser.Expression;
 import fr.uga.pddl4j.parser.Parser;
 import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.problem.numeric.NumericVariable;
 import fr.uga.pddl4j.problem.operator.DurativeMethod;
+import fr.uga.pddl4j.problem.operator.IntAction;
 import fr.uga.pddl4j.problem.operator.Method;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +31,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -262,6 +265,7 @@ public class DefaultProblem extends FinalizedProblem {
             LOGGER.debug("Actions simplified base on ground inertia detected:\n\n"
                 + this.toString(Data.INT_ACTIONS) + "\n");
         }
+
         this.simplifyGoalWithGroundInertia();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Goal simplified base on ground inertia detected:\n"
@@ -288,7 +292,7 @@ public class DefaultProblem extends FinalizedProblem {
     }
 
     /**
-     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation
+     * This method finalizes the domain, i.e., it encodes the planning problem into it final compact representation
      * using bit set.
      */
     protected void finalization() {
@@ -436,7 +440,6 @@ public class DefaultProblem extends FinalizedProblem {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        //System.out.println(parsedProblem);
         ErrorManager errorManager = parser.getErrorManager();
         if (!errorManager.isEmpty()) {
             errorManager.printAll();

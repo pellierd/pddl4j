@@ -317,24 +317,30 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *
      */
     protected void extractRelevantFluents() {
-        final Set<Expression<Integer>> facts = new LinkedHashSet<>(10000);
+        final Set<Expression<Integer>> fluents = new LinkedHashSet<>(10000);
+        // Add relevant fluents from actions
         for (IntAction a : this.getIntActions()) {
-            extractRelevantFluents(a.getPreconditions(), facts);
-            extractRelevantFluents(a.getEffects(), facts);
+            extractRelevantFluents(a.getPreconditions(), fluents);
+            extractRelevantFluents(a.getEffects(), fluents);
         }
+        // Add relevant fluents from the initial state
         for (Expression<Integer> p : this.getIntInitialState()) {
             Inertia inertia = this.getGroundInertia().get(p);
             if (inertia == null) {
                 inertia = Inertia.INERTIA;
             }
             if (this.getIntInitialState().contains(p) && !inertia.equals(Inertia.NEGATIVE)) {
-                facts.add(p);
+                fluents.add(p);
             }
         }
+        // Add relevant fluents from the goal
+        //for (Expression<Integer> p : this.getIntGoal().getChildren()) {
+        //    fluents.add(p);
+        //}
 
-        this.intExpFluents = new ArrayList<>(facts.size());
-        this.fluents = new ArrayList<>(facts.size());
-        for (Expression<Integer> exp : facts) {
+        this.intExpFluents = new ArrayList<>(fluents.size());
+        this.fluents = new ArrayList<>(fluents.size());
+        for (Expression<Integer> exp : fluents) {
             final Expression<Integer> relevant = new Expression<>(exp);
             this.intExpFluents.add(relevant);
             int[] arguments = new int[exp.getArguments().size()];
@@ -984,7 +990,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
     /**
      * Encode a specified goal in a disjunction of <code>BitExp</code>. The specified
-     * map is used to speed-up the search by mapping the an expression to this index.
+     * map is used to speed-up the search by mapping an expression to this index.
+     * The goal of the problem is set to null if it can be simplified to false.
      */
     protected void finalizeGoal() {
 
@@ -1549,8 +1556,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         }
         if (!effect.getOverallEffect().isEmpty()) {
             str.append(" (overall ");
-            System.out.println(effect.getOverallEffect().isEmpty());
-            System.out.println(effect.getOverallEffect());
             str.append(this.toString(effect.getOverallEffect()));
             str.append(")\n");
         }
@@ -2116,8 +2121,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 }
                 break;
             case GOAL:
-                str.append(this.toString(this.getGoal()));
-                str.append(System.lineSeparator());
+                if (this.getGoal() == null) {
+                    str.append("never reachable");
+                } else if (this.getGoal().isEmpty()) {
+                    str.append("always reachable");
+                } else {
+                    str.append(this.toString(this.getGoal()));
+                    str.append(System.lineSeparator());
+                }
                 break;
             case INITIAL_STATE:
                 str.append(this.toString(this.getInitialState()));
@@ -2255,7 +2266,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             }
             this.tasks.add(new Task(task.getSymbol().getValue(), arguments, true));
         }
-        for (Expression<Integer> task : this.getRelevantCompundTasks()) {
+        for (Expression<Integer> task : this.getRelevantCompoundTasks()) {
             int[] arguments = new int[task.getArguments().size()];
             for (int i = 0; i < task.getArguments().size(); i++) {
                 arguments[i] = task.getArguments().get(i).getValue();
@@ -2270,7 +2281,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void initMapOfTaskIndex() {
         List<Expression<Integer>> tasks = new ArrayList<>();
         tasks.addAll(this.getRelevantPrimitiveTasks());
-        tasks.addAll(this.getRelevantCompundTasks());
+        tasks.addAll(this.getRelevantCompoundTasks());
 
         // Create a map of the relevant tasks with their index to speedup the bit set encoding of the methods
         this.mapOfTasksIndex = new LinkedHashMap<>(tasks.size());
@@ -2336,7 +2347,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * @return the list of methods encoded into final compact representation.
      */
     private Method finalizeMethod(final IntMethod method) throws UnexpectedExpressionException {
-
         final int arity = method.arity();
         final Method encoded = new Method(method.getName(), arity);
         // Initialize the parameters of the method

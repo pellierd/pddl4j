@@ -51,14 +51,26 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     private List<Expression<Integer>> relevantPrimitiveTasks;
 
     /**
-     * The list of relevant compund tasks.
+     * The list of relevant primitive tasks in the hierarchy of task obtained by decomposing the initial task network of
+     * the problem.
      */
-    private List<Expression<Integer>> relevantCompundTasks;
+    private List<Expression<Integer>> relevantHierarchicalPrimitiveTasks;
 
     /**
-     * The list of relevant action for a specific task.
+     * The list of relevant compound tasks.
+     */
+    private List<Expression<Integer>> relevantCompoundTasks;
+
+    /**
+     * The list of relevant actions.
      */
     private List<Integer> relevantActions;
+
+    /**
+     * The list of relevant action in the hierarchy of task obtained by decomposing the initial task network of the
+     * problem.
+     */
+    private List<Integer> relevantHierarchicalActions;
 
     /**
      * Creates a new problem from a domain and problem.
@@ -70,32 +82,60 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
     }
 
     /**
-     * Returns the list of relevant primitive tasks. A primitive task is relevant if it can be reach by decomposing the
-     * initial tasks of the problem.
+     * Returns the list of the relevant primitive tasks task of the problem. The list contains also tasks that can not
+     * be reached by decomposing the initial tasks of the problem. To get only primitive tasks produced by the
+     * hierarchical decomposition of the initial task network of the problem used the method
+     * {@code getHierarchicalRelevantPrimitiveTasks()}.
      *
      * @return the list of relevant primitive tasks.
+     * @see InstantiatedProblem#getHierarchicalRelevantPrimitiveTasks
      */
     protected List<Expression<Integer>> getRelevantPrimitiveTasks() {
         return relevantPrimitiveTasks;
     }
 
     /**
-     * Return the list of relevant compund tasks of the problem. A compund task is relevant if it can be reach by
-     * decomposing the initial tasks of the problem.
+     * Returns the list of the relevant primitive tasks of the problem that are present in the task decomposition of the
+     * problem. To get all the primitive tasks used the method {@code getRelevantPrimitiveTasks()}.
      *
-     * @return the list of relevant compund tasks of the problem.
+     * @return the list of hierarchical relevant primitive tasks.
+     * @see InstantiatedProblem#getRelevantPrimitiveTasks
      */
-    protected List<Expression<Integer>> getRelevantCompundTasks() {
-        return relevantCompundTasks;
+    protected List<Expression<Integer>> getHierarchicalRelevantPrimitiveTasks() {
+        return relevantHierarchicalPrimitiveTasks;
     }
 
     /**
-     * Returns the list of relevant actions of the problem.
+     * Return the list of relevant compound tasks of the problem. A compound task is relevant if it can be reach by
+     * decomposing the initial tasks of the problem.
+     *
+     * @return the list of relevant compound tasks of the problem.
+     */
+    protected List<Expression<Integer>> getRelevantCompoundTasks() {
+        return relevantCompoundTasks;
+    }
+
+    /**
+     * Returns the list of relevant actions of the problem. The list contains also action that can not be reached by
+     * decomposing the initial tasks of the problem. To get only actions produced by the hierarchical decomposition of
+     * the initial task network of the problem used the method {@code getRelevantHierarchicalActions()}.
      *
      * @return the list of relevant actions of the problem.
+     * @see InstantiatedProblem#getRelevantHierarchicalActions
      */
     protected List<Integer> getRelevantActions() {
         return relevantActions;
+    }
+
+    /**
+     * Returns the list of the relevant actions of the problem that are present in the task decomposition of the
+     * problem. To get all the actions used the method {@code getRelevantActions()}.
+     *
+     * @return the list of hierarchical relevant primitive tasks.
+     * @see InstantiatedProblem#getRelevantActions
+     */
+    protected List<Integer> getRelevantHierarchicalActions() {
+        return this.relevantHierarchicalActions;
     }
 
     /**
@@ -533,25 +573,25 @@ public abstract class InstantiatedProblem extends PreInstantiatedProblem {
         }
 
         // Initialize the table of relevant methods for each compund task and the table of relevant compound tasks
-        this.relevantCompundTasks = new ArrayList<>(compound.size());
-        this.relevantCompundTasks.addAll(compound);
+        this.relevantCompoundTasks = new ArrayList<>(compound.size());
+        this.relevantCompoundTasks.addAll(compound);
 
         // Initialize the table of relevant actions for each primitive task and the table of relevant primitive tasks
         this.relevantActions = new ArrayList<Integer>(primitiveTaskSet.size());
+        this.relevantHierarchicalActions = new ArrayList<Integer>(primitiveTaskSet.size());
         this.relevantPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
+        this.relevantHierarchicalPrimitiveTasks = new ArrayList<>(primitiveTaskSet.size());
         int index = 0;
         Iterator<Expression<Integer>> i = primitiveTaskSet.iterator();
         while (i.hasNext()) {
-            // The action at index i can be remove because it not reachable from the initial task network.
-            Expression<Integer> primitiveTask = i.next();
-            if (!primtive.contains(primitiveTask)) {
-                this.getIntActions().remove(index);
-                i.remove();
-            } else {
-                this.relevantActions.add(index);
-                this.relevantPrimitiveTasks.add(primitiveTask);
-                index++;
+            final Expression<Integer> primitiveTask = i.next();
+            if (primtive.contains(primitiveTask)) {
+                this.relevantHierarchicalPrimitiveTasks.add(primitiveTask);
+                this.relevantHierarchicalActions.add(index);
             }
+            this.relevantPrimitiveTasks.add(primitiveTask);
+            this.relevantActions.add(index);
+            index++;
         }
         this.getIntMethods().clear();
         this.getIntMethods().addAll(instMethods);

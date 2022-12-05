@@ -267,7 +267,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
             }
             this.simplifyWithGroundInertia(a.getPreconditions(), false);
-            // ADD to symplified Numeric function
+            // ADD to simplified Numeric function
             this.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
             a.getPreconditions().simplify();
             if (!a.getPreconditions().getConnector().equals(Connector.FALSE)) {
@@ -285,22 +285,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             }
             index++;
         }
-
-        // Simplification for HTN
-        /*if (this.getRelevantActions() != null) {
-            final Set<Expression<Integer>> primitiveTasksNoMoreReachable = new HashSet<Expression<Integer>>();
-            // Update the relevant actions for the tasks
-            for (int i = 0; i < this.getRelevantActions().size(); i++) {
-                if (toRemove.contains(this.getRelevantActions().get(i))) {
-                    primitiveTasksNoMoreReachable.add(this.getRelevantPrimitiveTasks().remove(i));
-                    this.getRelevantActions().remove(i);
-                    i--;
-                } else {
-                    this.getRelevantActions().set(i, i);
-                }
-            }
-        }*/
-
 
         this.getIntActions().clear();
         this.getIntActions().addAll(toAdd);
@@ -331,6 +315,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
     protected void simplifyWithGroundInertia(final Expression<Integer> exp, final boolean effect) {
+        Expression<Integer> copy = new Expression<>(exp);
         switch (exp.getConnector()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
@@ -679,7 +664,6 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         final Set<Expression<Integer>> toRemove = new HashSet<>();
         int i = 0;
         Iterator<IntMethod> it = this.getIntMethods().iterator();
-        //for (IntMethod m : this.getIntMethods()) {
         while (it.hasNext()) {
             IntMethod m = it.next();
             this.simplifyWithGroundInertia(m.getPreconditions(), false);
@@ -731,14 +715,14 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 for (int j = 0; j < this.getRelevantMethods().size(); j++) {
                     final List<Integer> relevant = this.getRelevantMethods().get(j);
                     if (relevant.remove(Integer.valueOf(i))) {
-                        System.out.println("remove " + i);
+                        //System.out.println("remove " + i);
                         this.updateRelevantMethods(i);
                         // There is no more relevant method for the compound task
                         if (relevant.isEmpty()) {
-                            tasksNoMoreReachable.add(this.getRelevantCompundTasks().get(j));
-                            this.getRelevantCompundTasks().remove(j);
+                            tasksNoMoreReachable.add(this.getRelevantCompoundTasks().get(j));
+                            this.getRelevantCompoundTasks().remove(j);
                             this.getRelevantMethods().remove(j);
-                            System.out.println("A task is no more reachable");
+                            //System.out.println("A task is no more reachable");
                             j--;
                         }
                         break;
