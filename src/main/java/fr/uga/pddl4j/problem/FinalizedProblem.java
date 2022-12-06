@@ -1894,7 +1894,11 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
         } else {
             for (int i = 0; i < tasknetwork.getTasks().size(); i++) {
                 str.append(" " + Symbol.DEFAULT_TASK_ID_SYMBOL + i + ": ");
-                str.append(this.toString(this.getTasks().get(tasknetwork.getTasks().get(i))));
+                if (tasknetwork.getTasks().get(i) != null) {
+                    str.append(this.toString(this.getTasks().get(tasknetwork.getTasks().get(i))));
+                } else {
+                    str.append("unreachable");
+                }
                 str.append("\n");
             }
         }
