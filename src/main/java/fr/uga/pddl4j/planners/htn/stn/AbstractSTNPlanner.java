@@ -485,8 +485,8 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
                     strb.append(String.format("Goal can be simplified to FALSE. No search will solve it.%n%n"));
                 }
                 if (pb.getInitialTaskNetwork() != null && pb.getInitialTaskNetwork().getTasks().contains(null)) {
-                    strb.append(String.format("One or more tasks of the initial task network has no method " +
-                        "decomposition. No search will solve it.%n%n"));
+                    strb.append(String.format("One or more tasks of the initial task network has no method "
+                        + "decomposition. No search will solve it.%n%n"));
                 }
                 strb.append(String.format("Encoding time        : %4.3fs%n", instantiationTime));
                 strb.append(String.format("Searching time       : %4.3fs%n", 0.0));

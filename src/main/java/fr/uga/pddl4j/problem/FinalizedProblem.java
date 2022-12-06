@@ -46,10 +46,10 @@ import fr.uga.pddl4j.problem.operator.IntTaskNetwork;
 import fr.uga.pddl4j.problem.operator.Method;
 import fr.uga.pddl4j.problem.operator.Operator;
 import fr.uga.pddl4j.problem.operator.TaskNetwork;
-import fr.uga.pddl4j.problem.time.TemporalOrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.time.TemporalCondition;
 import fr.uga.pddl4j.problem.time.TemporalConditionalEffect;
 import fr.uga.pddl4j.problem.time.TemporalEffect;
+import fr.uga.pddl4j.problem.time.TemporalOrderingConstraintNetwork;
 import fr.uga.pddl4j.problem.time.TemporalRelation;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
@@ -1528,7 +1528,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             str.append(this.toString(assignment));
             str.append("\n  ");
             printed = true;
-         }
+        }
         if (printed) {
             str.setLength(str.length() - 3);
         }

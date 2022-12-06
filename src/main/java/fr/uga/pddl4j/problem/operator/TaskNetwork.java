@@ -133,7 +133,8 @@ public class TaskNetwork implements Serializable {
             this.setOrderingConstraints(new DefaultOrderingConstraintNetwork(other.getOrderingConstraints()));
         }
         if (other.getTemporalOrderingConstraints() != null) {
-            this.setTemporalOrderingConstraints(new TemporalOrderingConstraintNetwork(other.getTemporalOrderingConstraints()));
+            this.setTemporalOrderingConstraints(new TemporalOrderingConstraintNetwork(
+                other.getTemporalOrderingConstraints()));
         }
     }
 

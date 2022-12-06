@@ -847,8 +847,8 @@ public final class Parser implements Callable<Integer> {
                             this.lexer.getFile(), oj.getLocation().getBeginLine(), oj.getLocation().getBeginColumn());
                         checked = false;
                     } else {
-                        this.mgr.logParserError("objects \"" + oj + "\" and \"" + oi + "\" declared with " +
-                                "different types", this.lexer.getFile(), oj.getLocation().getBeginLine(),
+                        this.mgr.logParserError("objects \"" + oj + "\" and \"" + oi + "\" declared with "
+                                + "different types", this.lexer.getFile(), oj.getLocation().getBeginLine(),
                             oj.getLocation().getBeginColumn());
                         checked = false;
                     }
@@ -864,8 +864,8 @@ public final class Parser implements Callable<Integer> {
                     TypedSymbol c = objects.get(j);
                     if (o.getImage().equals(c.getImage())) {
                         if (!o.getTypes().equals(c.getTypes())) {
-                            this.mgr.logParserError("object \"" + o.getValue() + "\" already declared as a " +
-                                    "constant with an other type in the domain", this.lexer.getFile(),
+                            this.mgr.logParserError("object \"" + o.getValue() + "\" already declared as a "
+                                    + "constant with an other type in the domain", this.lexer.getFile(),
                                 o.getLocation().getBeginLine(), o.getLocation().getBeginColumn());
                             checked = false;
                         }
