@@ -22,6 +22,7 @@ package fr.uga.pddl4j.parser;
 import fr.uga.pddl4j.parser.lexer.Token;
 import fr.uga.pddl4j.problem.AtomicFormulaSimplifier;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -2020,7 +2021,12 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 for (Expression<T> child : children) {
                     child.toDNF();
                 }
-                Expression<T> dnf = this.getChildren().get(0);
+                final Expression<T> or = new Expression<>(Connector.OR);
+                this.toDNF(0, this, or, new Expression<>(Connector.AND));
+                this.assign(or);
+
+
+                /*Expression<T> dnf = this.getChildren().get(0);
                 for (int i = 1; i < this.getChildren().size(); i++) {
                     final Expression<T> orExp = this.getChildren().get(i);
                     final Expression<T> newOr = new Expression<>(Connector.OR);
@@ -2053,7 +2059,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                     }
                     dnf = newOr;
                 }
-                this.assign(dnf);
+                this.assign(dnf);*/
                 break;
             case ATOM:
             case NOT:
@@ -2080,6 +2086,30 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * Converts recursively an AND expression into DNF. The and expression in parameter must have only child already in
+     * DNF.
+     *
+     * @param index the index of the child of the and expression to convert (initially 0).
+     * @param and The and expression to convert.
+     * @param or the or expression. The or expression is an output parameter.
+     * @param exp the sub and expression under construction.
+     */
+    private void toDNF(int index, Expression<T> and, Expression<T> or, Expression<T> exp) {
+        final List<Expression<T>> andChildren = and.getChildren();
+        if (index == andChildren.size()) {
+            exp.simplify();
+            or.addChild(exp);
+        } else {
+            int newIndex = index + 1;
+            for (Expression<T> child : andChildren.get(index).getChildren()) {
+                Expression<T> newExp = new Expression<>(exp);
+                newExp.addChild(new Expression<>(child));
+                this.toDNF(newIndex, and, or, newExp);
+            }
         }
     }
 
