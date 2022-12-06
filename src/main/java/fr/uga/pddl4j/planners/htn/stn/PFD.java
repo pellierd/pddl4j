@@ -84,7 +84,7 @@ import java.util.PriorityQueue;
     descriptionHeading = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n",
     optionListHeading = "%nOptions:%n")
-public final class PFD extends AbstractSTNPlanner {
+public final class  PFD extends AbstractSTNPlanner {
 
     /**
      * The logger of the class.
@@ -158,9 +158,7 @@ public final class PFD extends AbstractSTNPlanner {
                 }  else {
                     if (LOGGER.isDebugEnabled()) {
                         Plan p = super.extractPlan(currentNode, problem);
-                        LOGGER.debug("\nFound plan as follows:\n" + problem.toString(p));
-                        LOGGER.debug(" But plan does does not reach the goal:\n");
-                        LOGGER.debug(problem.toString(problem.getGoal()) + "\n");
+                        LOGGER.debug("Found plan but goal not reached as follows:\n" + problem.toString(p) + "\n");
                     }
                 }
             } else {

@@ -161,9 +161,7 @@ public final class TFD extends AbstractSTNPlanner {
                 }  else {
                     if (LOGGER.isDebugEnabled()) {
                         Plan p = super.extractPlan(currentNode, problem);
-                        LOGGER.debug("\nFound plan as follows:\n" + problem.toString(p));
-                        LOGGER.debug(" But plan does does not reach the goal:\n");
-                        LOGGER.debug(problem.toString(problem.getGoal()) + "\n");
+                        LOGGER.debug("Found plan but goal not reached as follows:\n" + problem.toString(p) + "\n");
                     }
                 }
             } else {
