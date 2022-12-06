@@ -570,12 +570,12 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             for (int i = 0; i < normalized.size(); i++) {
                 final IntAction na = normalized.get(i);
                 if (!na.isDurative()) {
-                    if (i != 0) {
+                    if (i != 0 && this.getTaskResolvers() != null) {
                         this.getTaskResolvers().get(actionIndex).add(actions.size());
                     }
                     this.actions.add(this.finalizeAction(na));
                 } else {
-                    if (i != 0) {
+                    if (i != 0 && this.getTaskResolvers() != null) {
                         this.getTaskResolvers().get(actionIndex).add(-this.durativeActions.size() - 1);
                     }
                     this.durativeActions.add(this.finalizeDurativeAction(na));
