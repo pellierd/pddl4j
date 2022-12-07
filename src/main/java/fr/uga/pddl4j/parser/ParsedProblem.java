@@ -171,9 +171,6 @@ public interface ParsedProblem extends Serializable {
     /**
      * Normalize the problem. This method renames the variables and then move inward the negation of
      * the goal and the constraints of the problem.
-     *
-     * @see ParsedAction#normalize()
-     * @see ParsedDerivedPredicate#normalize()
      */
     void normalize();
 

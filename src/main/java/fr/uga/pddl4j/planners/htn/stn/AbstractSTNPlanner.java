@@ -369,7 +369,6 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
      *
      * @return the solution plan or null is no solution was found.
      * @throws InvalidConfigurationException if the planner has an invalid configuration.
-     * @throws ProblemNotSupportedException if the problem to solve is not supported.
      */
     public Plan solve() throws InvalidConfigurationException {
         if (!this.hasValidConfiguration()) {

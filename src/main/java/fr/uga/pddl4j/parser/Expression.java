@@ -1561,7 +1561,7 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
      * <li>HOLD_DURING_CONSTRAINT, HOLD_BETWEEN_METHOD_CONSTRAINT, HOLD_DURING_METHOD_CONSTRAINT expressions are
      * well-formed if they have two child well-formed and an time interval value.</li>
      * <li>ALWAYS_WITHIN expression must have at least two children to be considered as well formed and time interval
-     * value.</li>.
+     * value.</li>
      * <li>NUMBER expressions are considered is they have a value.</li>
      * <li>TIME_VAR, IS_VIOLATED exprssions are always considered as well-formed</li>
      * </ul>

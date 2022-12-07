@@ -243,10 +243,7 @@ public interface ParsedDomain extends Serializable {
     /**
      * Normalize the domain. This method rename the variables used in the domain and normalize its
      * ops and derived predicates.
-     *
-     * @see ParsedAction#normalize()
-     * @see ParsedDerivedPredicate#normalize()
-     */
+     **/
     void normalize();
 
     /**

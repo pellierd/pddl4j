@@ -1042,6 +1042,7 @@ public abstract class AbstractProblem implements Problem {
      * @param parsedTaskNetwork the parsed task network.
      * @param parameters the parameters of the task network.
      * @param types the type of parameters.
+     * @return the a integer representation of the task network in parameter.
      */
     protected IntTaskNetwork initTaskNetwork(final ParsedTaskNetwork parsedTaskNetwork, final List<String> parameters,
                                              final List<Integer> types) {

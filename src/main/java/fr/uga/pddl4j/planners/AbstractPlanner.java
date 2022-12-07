@@ -268,6 +268,8 @@ public abstract class AbstractPlanner implements Planner {
     /**
      * Throws a {@code InvalidPlannerConfigurationException} with the appropriated message or do nothing if the planner
      * has a valid configuration.
+     *
+     * @throws InvalidConfigurationException if the configuration of the planner is not valid.
      */
     protected void throwInvalidConfigurationException() throws InvalidConfigurationException {
         if (!this.getDomainFile().exists()) {
