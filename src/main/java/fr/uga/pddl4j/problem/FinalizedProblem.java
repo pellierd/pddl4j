@@ -18,6 +18,7 @@ package fr.uga.pddl4j.problem;
 import fr.uga.pddl4j.parser.Connector;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.Expression;
+import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Symbol;
 import fr.uga.pddl4j.parser.SymbolType;
 import fr.uga.pddl4j.parser.UnexpectedExpressionException;
@@ -54,6 +55,7 @@ import fr.uga.pddl4j.problem.time.TemporalRelation;
 import fr.uga.pddl4j.util.BitSet;
 import fr.uga.pddl4j.util.BitVector;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -262,7 +264,21 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Returns the relevant operators for a task.
+     * Returns the relevant operators for the tasks of the problem. The method return {@code null} if the problem is
+     * not hierarchical. Warning a task may have many resolvers event primitives tasks. The resolvers returned are
+     * indexes of operators. To get the list of resolvers of a specific task {@code t} just write
+     * {@code List<Integer> resolvers = problem.getTaskResolvers().get(t)}
+     *
+     * Two case must be considered. If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPrimtive()}
+     * returns true, the list of resolvers contains either indexes of actions either indexes of durative actions.
+     * If the index is positive the index represents an action. To get the corresponding action just use
+     * {@code problem.getActions(index)}. If the index is negative the index represents a durative action.
+     * To get the corresponding durative action just use problem.getDurativeActions(-index - 1)}.
+     * Symmetrically, if the task {@code t} is compound, i.e., {@code problem.getTask(t).isCmpound()}
+     * returns true, the list of resolvers contains either indexes of method either indexes of durative methods.
+     * If the index is positive the index represents a method. To get the corresponding method just use
+     * {@code problem.getMethods(index)}. If the index is negative the index represents a durative method.
+     * To get the corresponding durative method just use problem.getDurativeMethods(-index - 1)}.
      *
      * @return the relevant operators for a task.
      */
@@ -557,34 +573,36 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode a list of specified actions into <code>BitSet</code> representation. The specified
+     * Encode a list of specified actions into <code>BitSet</code> representation. Several specified
      * map is used to speed-up the search by mapping the an expression to this index.
-     *
      */
     protected void finalizeActions()  throws UnexpectedExpressionException {
         this.actions = new ArrayList<>(this.getIntActions().size());
         this.durativeActions = new ArrayList<>(this.getIntActions().size());
-        int actionIndex = 0;
-        for (IntAction intAction : this.getIntActions()) {
-            List<IntAction> normalized = this.normalizeAction(intAction);
-            for (int i = 0; i < normalized.size(); i++) {
-                final IntAction na = normalized.get(i);
-                if (!na.isDurative()) {
-                    if (i != 0 && this.getTaskResolvers() != null) {
-                        this.getTaskResolvers().get(actionIndex).add(actions.size());
+        // The index of the primitive task is index of the action
+        // This index is used to update the resolvers of the primitive task in the case of HTN problem.
+        int task = 0;
+        for (IntAction action : this.getIntActions()) {
+            // We split action precondition to have only actions with disjunctive precondition
+            List<IntAction> normalizedActionList = this.normalizeAction(action);
+            for (IntAction normalizedAction : normalizedActionList) {
+                if (!normalizedAction.isDurative()) {
+                    // update the resolvers of the primitive task only for hierarchical problem
+                    if (this.taskResolvers != null) {
+                        this.getTaskResolvers().get(task).add(this.actions.size());
                     }
-                    this.actions.add(this.finalizeAction(na));
+                    this.actions.add(this.finalizeAction(normalizedAction));
                 } else {
-                    if (i != 0 && this.getTaskResolvers() != null) {
-                        this.getTaskResolvers().get(actionIndex).add(-this.durativeActions.size() - 1);
+                    // update the resolvers of the primitive task only for hierarchical problem
+                    if (this.taskResolvers != null) {
+                        this.getTaskResolvers().get(task).add(-this.durativeActions.size() - 1);
                     }
-                    this.durativeActions.add(this.finalizeDurativeAction(na));
+                    this.durativeActions.add(this.finalizeDurativeAction(normalizedAction));
                 }
             }
-            actionIndex++;
+            task++;
         }
     }
-
 
     /**
      * Encode an specified <code>Expression</code> in its <code>BitExp</code> representation.The
@@ -2297,16 +2315,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Init the resolvers for each tasks.
+     * Init the resolvers for each task.
      */
     protected void initTaskResolvers() {
-        this.taskResolvers = new ArrayList<>();
-        for (Integer a : this.getRelevantActions()) {
-            List<Integer> l = new ArrayList<>(1);
-            l.add(a);
-            this.taskResolvers.add(l);
+        final int numberOfTasks = this.getRelevantPrimitiveTasks().size() + this.getRelevantCompoundTasks().size();
+        this.taskResolvers = new ArrayList<>(numberOfTasks);
+        for (int i = 0; i < numberOfTasks; i++) {
+            this.taskResolvers.add(new ArrayList<>());
         }
-        this.taskResolvers.addAll(this.getRelevantMethods());
     }
 
     /**
@@ -2317,30 +2333,30 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Encode a list of specified methods into the final compact representation. The specified
-     * maps are used to speed-up the search by mapping the an expression to this index.
+     * Encode a list of specified methods into the final compact representation. Several specified
+     * maps are used to speed-up the search by mapping an expression to this index.
      */
     protected void finalizeMethods() {
         this.methods = new ArrayList<>(this.getIntMethods().size());
         this.durativeMethods = new ArrayList<>(this.getIntMethods().size());
-        int methodIndex = this.getRelevantActions().size();
-        for (IntMethod intMethod : this.getIntMethods()) {
-            List<IntMethod> normalized = this.normalizeMethod(intMethod);
-            for (int i = 0; i < normalized.size(); i++) {
-                final IntMethod nm = normalized.get(i);
-                if (!nm.isDurative()) {
-                    if (i != 0) {
-                        this.getTaskResolvers().get(methodIndex).add(methods.size());
-                    }
-                    this.methods.add(this.finalizeMethod(nm));
+       // For each instantiated methods
+        for (IntMethod method : this.getIntMethods()) {
+            // Normalize the methods, i.e., split methods to have only methods with conjunctive preconditions
+            final List<IntMethod> normalizedMethods = this.normalizeMethod(method);
+            // The task resolvers of current method to finalize
+            final List<Integer> resolvers = this.getTaskResolvers().get(this.mapOfTasksIndex.get(method.getTask()));
+            // For each normalized method we finalize it and update the resolvers of the tasks
+            // If a resolver has an index including in 0 to +infinity, the resolver is a method.
+            // If a resolver has an index including in -1 to -infinity, the resolver is durative method.
+            for (IntMethod normalizedMethod : normalizedMethods) {
+                if (!normalizedMethod.isDurative()) {
+                    resolvers.add(this.methods.size());
+                    this.methods.add(this.finalizeMethod(normalizedMethod));
                 } else {
-                    if (i != 0) {
-                        this.getTaskResolvers().get(methodIndex).add(-this.durativeMethods.size() - 1);
-                    }
-                    this.durativeMethods.add(this.finalizeDurativeMethod(nm));
+                    resolvers.add(-this.durativeMethods.size() - 1);
+                    this.durativeMethods.add(this.finalizeDurativeMethod(normalizedMethod));
                 }
             }
-            methodIndex++;
         }
     }
 

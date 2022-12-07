@@ -313,6 +313,10 @@ public class DefaultProblem extends FinalizedProblem {
             this.initMapOfNumericFluentIndex();
         }
 
+        if (this.getRequirements().contains(RequireKey.HIERARCHY)) {
+            this.initTaskResolvers();
+        }
+
         this.finalizeActions();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(this.toString(Data.ACTIONS) + "\n");
@@ -327,7 +331,7 @@ public class DefaultProblem extends FinalizedProblem {
                 LOGGER.debug("Relevant tasks:\n"
                     + this.toString(Data.TASKS) + "\n");
             }
-            this.initTaskResolvers();
+            //this.initTaskResolvers();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Task resolvers:\n\n"
                     + this.toString(Data.TASK_RESOLVERS) + "\n");
