@@ -268,11 +268,14 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * not hierarchical.
      * <p>
      *     Warning a task may have many resolvers event primitives tasks.
-     * </p> The resolvers returned are
-     * indexes of operators. To get the list of resolvers of a specific task {@code t} just write:
-     * <pre> List<Integer> resolvers = problem.getTaskResolvers().get(t)</pre>
-     *
-     * Two case must be considered.
+     * </p>
+     * <p>
+     * The resolvers returned are indexes of operators. To get the list of resolvers of a specific task {@code t} just write:
+     * <pre>{@code
+     *     List<Integer> resolvers = problem.getTaskResolvers().get(t)
+     * }</pre>
+     *</p>
+     * <p>Two case must be considered.
      * <ul>
      * <li> If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPrimtive()}
      * returns true, the list of resolvers contains either indexes of actions either indexes of durative actions.
@@ -285,6 +288,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      * {@code problem.getMethods(index)}. If the index is negative the index represents a durative method.
      * To get the corresponding durative method just use problem.getDurativeMethods(-index - 1)}.</li>
      * </ul>
+     * </p>
      * @return the relevant operators for a task.
      */
     public List<List<Integer>> getTaskResolvers() {
