@@ -25,6 +25,7 @@ import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.InvalidConfigurationException;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.ProblemNotSupportedException;
 import fr.uga.pddl4j.planners.htn.AbstractHTNPlanner;
 import fr.uga.pddl4j.problem.DefaultProblem;
 import fr.uga.pddl4j.problem.Problem;
@@ -368,6 +369,7 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
      *
      * @return the solution plan or null is no solution was found.
      * @throws InvalidConfigurationException if the planner has an invalid configuration.
+     * @throws ProblemNotSupportedException if the problem to solve is not supported.
      */
     public Plan solve() throws InvalidConfigurationException {
         if (!this.hasValidConfiguration()) {
@@ -434,9 +436,6 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
             strb.append(pb.getMethods().size() + " methods, ");
             strb.append(pb.getFluents().size() + " fluents, ");
             strb.append(pb.getTasks().size() + " tasks)\n\n");
-            if (!pb.isTotallyOrdered()) {
-                strb.append("Unable to solve a problem that isn't totally ordered.\n");
-            }
             LOGGER.info(strb);
         }
 
@@ -452,8 +451,13 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
                 searchTime = (end - begin) / 1000.0;
             } catch (OutOfMemoryError err) {
                 if (LOGGER.isFatalEnabled()) {
-                    LOGGER.fatal("Out of memory during search !");
+                    LOGGER.fatal("Out of memory during search !\n");
                 }
+            } catch (ProblemNotSupportedException e) {
+                if (LOGGER.isFatalEnabled()) {
+                    LOGGER.fatal(e.getMessage() + "\n");
+                }
+            } finally {
                 System.exit(0);
             }
 

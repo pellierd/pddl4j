@@ -425,7 +425,15 @@ public abstract class AbstractPlanner implements Planner {
             }
 
             // Searches for a solution plan
-            final Plan plan = this.solve(pb);
+            Plan plan = null;
+            try {
+                plan = this.solve(pb);
+            } catch (ProblemNotSupportedException e) {
+                if (LOGGER.isFatalEnabled()) {
+                    LOGGER.fatal(e.getMessage());
+                }
+                System.exit(1);
+            }
 
             if (LOGGER.isInfoEnabled()) {
                 final StringBuilder strb = new StringBuilder();

@@ -17,6 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.ProblemNotSupportedException;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
 import fr.uga.pddl4j.problem.operator.Action;
@@ -111,13 +112,19 @@ public final class TFD extends AbstractSTNPlanner {
 
     /**
      * Solves the planning problem and returns the first solution search found. The search method is an implementation
-     * of the total order STN procedure describes in the book of Automated Planning of Ghallab and al. page 239.
+     * of the total order STN procedure describes in the book of Automated Planning of Ghallab and al. page 239. The
+     * method can solve only totally ordered problem. If it is not the case, the method returns null.
      *
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
+     * @throws ProblemNotSupportedException if the problem to solve is not supported by the method.
      */
     @Override
-    public Plan solve(final Problem problem) {
+    public Plan solve(final Problem problem) throws ProblemNotSupportedException {
+        if (!problem.isTotallyOrdered()) {
+            throw new ProblemNotSupportedException("Unable to solve a problem that is not totally ordered");
+        }
+
         // Create the list of pending nodes to explore
         final PriorityQueue<TFDNode> open = new PriorityQueue<>(1000, new Comparator<TFDNode>() {
             public int compare(TFDNode n1, TFDNode n2) {

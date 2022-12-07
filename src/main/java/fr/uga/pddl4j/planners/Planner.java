@@ -248,8 +248,9 @@ public interface Planner extends Serializable, Callable<Integer> {
      *
      * @param problem the problem to be solved. The problem cannot be null.
      * @return the solution plan or null is no solution was found.
+     * @throws ProblemNotSupportedException if the problem to solve is not supported.
      */
-    Plan solve(final Problem problem);
+    Plan solve(final Problem problem) throws ProblemNotSupportedException;
 
     /**
      * Search a plan for the current planner configuration.

@@ -270,7 +270,8 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
      *     Warning a task may have many resolvers event primitives tasks.
      * </p>
      * <p>
-     * The resolvers returned are indexes of operators. To get the list of resolvers of a specific task {@code t} just write:
+     * The resolvers returned are indexes of operators. To get the list of resolvers of a specific task {@code t} just
+     * write:
      * <pre>{@code
      *     List<Integer> resolvers = problem.getTaskResolvers().get(t)
      * }</pre>
@@ -2348,7 +2349,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     protected void finalizeMethods() {
         this.methods = new ArrayList<>(this.getIntMethods().size());
         this.durativeMethods = new ArrayList<>(this.getIntMethods().size());
-       // For each instantiated methods
+        // For each instantiated methods
         for (IntMethod method : this.getIntMethods()) {
             // Normalize the methods, i.e., split methods to have only methods with conjunctive preconditions
             final List<IntMethod> normalizedMethods = this.normalizeMethod(method);

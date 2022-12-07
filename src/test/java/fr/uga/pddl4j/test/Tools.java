@@ -268,7 +268,7 @@ public abstract class Tools {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
                     return;
                 }
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
                 ioe.printStackTrace();
             }
             System.out.println();
