@@ -265,21 +265,26 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
 
     /**
      * Returns the relevant operators for the tasks of the problem. The method return {@code null} if the problem is
-     * not hierarchical. Warning a task may have many resolvers event primitives tasks. The resolvers returned are
-     * indexes of operators. To get the list of resolvers of a specific task {@code t} just write
-     * {@code List<Integer> resolvers = problem.getTaskResolvers().get(t)}
+     * not hierarchical.
+     * <p>
+     *     Warning a task may have many resolvers event primitives tasks.
+     * </p> The resolvers returned are
+     * indexes of operators. To get the list of resolvers of a specific task {@code t} just write:
+     * <pre> List<Integer> resolvers = problem.getTaskResolvers().get(t)</pre>
      *
-     * Two case must be considered. If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPrimtive()}
+     * Two case must be considered.
+     * <ul>
+     * <li> If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPrimtive()}
      * returns true, the list of resolvers contains either indexes of actions either indexes of durative actions.
      * If the index is positive the index represents an action. To get the corresponding action just use
      * {@code problem.getActions(index)}. If the index is negative the index represents a durative action.
-     * To get the corresponding durative action just use problem.getDurativeActions(-index - 1)}.
-     * Symmetrically, if the task {@code t} is compound, i.e., {@code problem.getTask(t).isCmpound()}
+     * To get the corresponding durative action just use problem.getDurativeActions(-index - 1)}.</li>
+     * <li>Symmetrically, if the task {@code t} is compound, i.e., {@code problem.getTask(t).isCmpound()}
      * returns true, the list of resolvers contains either indexes of method either indexes of durative methods.
      * If the index is positive the index represents a method. To get the corresponding method just use
      * {@code problem.getMethods(index)}. If the index is negative the index represents a durative method.
-     * To get the corresponding durative method just use problem.getDurativeMethods(-index - 1)}.
-     *
+     * To get the corresponding durative method just use problem.getDurativeMethods(-index - 1)}.</li>
+     * </ul>
      * @return the relevant operators for a task.
      */
     public List<List<Integer>> getTaskResolvers() {
