@@ -370,7 +370,6 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             for (int i = 0; i < exp.getArguments().size(); i++) {
                 arguments[i] = exp.getArguments().get(i).getValue();
             }
-            System.out.println(this.toString(exp));
             this.fluents.add(new Fluent(exp.getSymbol().getValue(), arguments));
         }
     }
