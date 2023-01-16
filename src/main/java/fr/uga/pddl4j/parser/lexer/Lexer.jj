@@ -1962,6 +1962,7 @@ void structure_def() :
     |	LOOKAHEAD(2, { this.isRequirement(RequireKey.DURATIVE_ACTIONS) // ADD HDDL2.1
                 && this.isRequirement(RequireKey.HIERARCHY)})
             meth = durative_method_def() {
+                this.domain.addMethod(meth);
             }
 	)
 }
