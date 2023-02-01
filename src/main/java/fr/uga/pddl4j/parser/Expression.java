@@ -758,6 +758,11 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
             case LESS_OR_EQUAL_COMPARISON:
             case ATOM:
             case EQUAL_ATOM:
+            case DECREASE:
+            case INCREASE:
+            case SCALE_UP:
+            case SCALE_DOWN:
+            case ASSIGN:
                 // Do nothing
                 break;
             default:

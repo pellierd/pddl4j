@@ -37,7 +37,7 @@ import java.io.File;
  * @version 1.1 - 16.02.16
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ParserTest {
+public class PDDLParserTest {
 
     /**
      * Method that executes tests using IPC 1998 Assembly ADL benchmarks.
