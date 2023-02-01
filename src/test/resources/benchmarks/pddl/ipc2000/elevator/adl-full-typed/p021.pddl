@@ -93,5 +93,3 @@
 
 (:goal (forall (?p - passenger) (served ?p)))
 )
-
-

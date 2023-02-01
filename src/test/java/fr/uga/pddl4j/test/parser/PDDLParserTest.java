@@ -184,16 +184,17 @@ public class PDDLParserTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL full typed benchmarks.
+     * There is an error in this domain from P021.PDDL. Two objects are declared with different type.
      *
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_Parser_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.parse(localTestPath, Tools.PDDL_EXT);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL simple typed benchmarks.

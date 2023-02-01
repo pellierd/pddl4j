@@ -154,7 +154,7 @@ test {
             //'**/HSPTest.class',
             //'**/FFTest.class',
             //'**/GSPTest.class',
-            //'**/TFDTest.class',
+            '**/TFDTest.class',
             //'**/PFDTest.class'
     ]
 

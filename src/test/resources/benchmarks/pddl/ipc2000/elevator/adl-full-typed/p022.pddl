@@ -5,7 +5,7 @@
    (:domain miconic)
    (:objects p0 - going_down
              p1 - conflict_A
-             p4 p3 p0 p2 - conflict_B
+             p4 p3 p2 - conflict_B
              f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 - floor)
 
 
@@ -92,5 +92,3 @@
 
 (:goal (forall (?p - passenger) (served ?p)))
 )
-
-

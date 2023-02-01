@@ -860,8 +860,8 @@ public final class Parser implements Callable<Integer> {
             List<TypedSymbol<String>> constants = this.domain.getConstants();
             for (int i = 0; i < objects.size(); i++) {
                 final TypedSymbol o = objects.get(i);
-                for (int j = i + 1; j < constants.size(); j++) {
-                    TypedSymbol c = objects.get(j);
+                for (int j = 0; j < constants.size(); j++) {
+                    TypedSymbol c = constants.get(j);
                     if (o.getImage().equals(c.getImage())) {
                         if (!o.getTypes().equals(c.getTypes())) {
                             this.mgr.logParserError("object \"" + o.getValue() + "\" already declared as a "
