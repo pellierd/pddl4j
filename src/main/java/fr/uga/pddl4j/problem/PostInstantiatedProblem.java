@@ -193,8 +193,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * AtomicFormulaSimplifier a specified goal expression based on the ground inertia information.
      */
     protected void simplifyGoalWithGroundInertia() {
-        this.simplifyWithGroundInertia(this.getIntGoal(), false);
-        this.simplifyWithGroundNumericInertia(this.getIntGoal(), false);
+        this.simplifyWithGroundInertia(this.getIntGoal());
+        this.simplifyWithGroundNumericInertia(this.getIntGoal());
         this.getIntGoal().simplify();
     }
 
@@ -259,21 +259,21 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         int index = 0;
         for (IntAction a : this.getIntActions()) {
             if (a.isDurative()) {
-                this.simplifyWithGroundNumericInertia(a.getDuration(), false);
+                this.simplifyWithGroundNumericInertia(a.getDuration());
                 if (a.getDuration().getConnector().equals(Connector.FALSE)) {
                     toRemove.add(index);
                     index++;
                     continue;
                 }
             }
-            this.simplifyWithGroundInertia(a.getPreconditions(), false);
+            this.simplifyWithGroundInertia(a.getPreconditions());
             // ADD to simplified Numeric function
-            this.simplifyWithGroundNumericInertia(a.getPreconditions(), false);
+            this.simplifyWithGroundNumericInertia(a.getPreconditions());
             a.getPreconditions().simplify();
             if (!a.getPreconditions().getConnector().equals(Connector.FALSE)) {
-                this.simplifyWithGroundInertia(a.getEffects(), true);
+                this.simplifyWithGroundInertia(a.getEffects());
                 // ADD for numeric fluents
-                this.simplifyWithGroundNumericInertia(a.getEffects(), true);
+                this.simplifyWithGroundNumericInertia(a.getEffects());
                 a.getEffects().simplify();
                 if (!a.getEffects().getConnector().equals(Connector.FALSE)) {
                     toAdd.add(a);
@@ -312,9 +312,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * the planning problem.
      *
      * @param exp    the expression to simply.
-     * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
-    protected void simplifyWithGroundInertia(final Expression<Integer> exp, final boolean effect) {
+    protected void simplifyWithGroundInertia(final Expression<Integer> exp) {
         Expression<Integer> copy = new Expression<>(exp);
         switch (exp.getConnector()) {
             case ATOM:
@@ -324,17 +323,14 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 }
                 // An initial fact, which is a negative ground inertia, is never made FALSE and thus
                 // always satisfied in all reachable world states. All its occurrences in the
-                // preconditions of actions and in the
-                // antecedents of conditional effects can be simplified to TRUE.
-                if (!effect && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.NEGATIVE))
+                // preconditions of actions and in the antecedents of conditional effects can be simplified to TRUE.
+                if ((inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.NEGATIVE))
                     && this.getIntInitialState().contains(exp)) {
                     exp.setConnector(Connector.TRUE);
-                } else if (!effect
-                    && (inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.POSITIVE))
+                } else if ((inertia.equals(Inertia.INERTIA) || inertia.equals(Inertia.POSITIVE))
                     && !this.getIntInitialState().contains(exp)) {
-                    // If the antecedent of a conditional effect becomes TRUE, the conditional
-                    // effect
-                    // becomes unconditional.
+                    // If the antecedent of a conditional effect becomes TRUE, the conditional effect becomes
+                    // unconditional.
                     exp.setConnector(Connector.FALSE);
                 }
                 break;
@@ -342,7 +338,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnector().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
-                    this.simplifyWithGroundInertia(ei, effect);
+                    this.simplifyWithGroundInertia(ei);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnector().equals(Connector.FALSE)) {
                         exp.setConnector(Connector.FALSE);
@@ -359,7 +355,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnector().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
-                    this.simplifyWithGroundInertia(ei, effect);
+                    this.simplifyWithGroundInertia(ei);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnector().equals(Connector.TRUE)) {
                         exp.setConnector(Connector.TRUE);
@@ -381,22 +377,20 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case OVER_ALL:
             case SOMETIME_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
-                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(0));
                 break;
             case NOT:
                 final Expression<Integer> neg = exp.getChildren().get(0);
-                this.simplifyWithGroundInertia(neg, effect);
-                if (!effect) {
-                    if (neg.getConnector().equals(Connector.TRUE)) {
-                        exp.setConnector(Connector.FALSE);
-                    } else if (neg.getConnector().equals(Connector.FALSE)) {
-                        exp.setConnector(Connector.TRUE);
-                    }
+                this.simplifyWithGroundInertia(neg);
+                if (neg.getConnector().equals(Connector.TRUE)) {
+                    exp.setConnector(Connector.FALSE);
+                } else if (neg.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.TRUE);
                 }
                 break;
             case WHEN:
-                this.simplifyWithGroundInertia(exp.getChildren().get(0), false);
-                this.simplifyWithGroundInertia(exp.getChildren().get(1), true);
+                this.simplifyWithGroundInertia(exp.getChildren().get(0));
+                this.simplifyWithGroundInertia(exp.getChildren().get(1));
                 break;
             case EQUAL_ATOM:
                 break;
@@ -418,18 +412,18 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case SOMETIME_BEFORE_CONSTRAINT:
             case WITHIN_CONSTRAINT:
             case HOLD_AFTER_CONSTRAINT:
-                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
-                this.simplifyWithGroundInertia(exp.getChildren().get(1), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(0));
+                this.simplifyWithGroundInertia(exp.getChildren().get(1));
                 break;
             case F_EXP_T:
             case F_EXP:
-                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(0));
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
             case HOLD_DURING_CONSTRAINT:
-                this.simplifyWithGroundInertia(exp.getChildren().get(0), effect);
-                this.simplifyWithGroundInertia(exp.getChildren().get(1), effect);
-                this.simplifyWithGroundInertia(exp.getChildren().get(3), effect);
+                this.simplifyWithGroundInertia(exp.getChildren().get(0));
+                this.simplifyWithGroundInertia(exp.getChildren().get(1));
+                this.simplifyWithGroundInertia(exp.getChildren().get(3));
                 break;
             case FN_ATOM:
             case NUMBER:
@@ -450,16 +444,14 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
      * AtomicFormulaSimplifier a specified expression based on the ground inertia information.
      *
      * @param exp    the expression to simply.
-     * @param effect a boolean to indicate if the expression is an effect or a precondition.
      */
-    private void simplifyWithGroundNumericInertia(final Expression<Integer> exp, final boolean effect) {
-        //System.out.println(exp.getConnective() + " " + Encoder.toString(exp));
+    private void simplifyWithGroundNumericInertia(final Expression<Integer> exp) {
         switch (exp.getConnector()) {
             case AND:
                 Iterator<Expression<Integer>> i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnector().equals(Connector.AND)) {
                     final Expression<Integer> ei = i.next();
-                    this.simplifyWithGroundNumericInertia(ei, effect);
+                    this.simplifyWithGroundNumericInertia(ei);
                     // If a child expression is FALSE, the whole conjunction becomes FALSE.
                     if (ei.getConnector().equals(Connector.FALSE)) {
                         exp.setConnector(Connector.FALSE);
@@ -475,7 +467,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 i = exp.getChildren().iterator();
                 while (i.hasNext() && exp.getConnector().equals(Connector.OR)) {
                     final Expression<Integer> ei = i.next();
-                    this.simplifyWithGroundNumericInertia(ei, effect);
+                    this.simplifyWithGroundNumericInertia(ei);
                     // If a child expression is TRUE, the whole disjunction is TRUE.
                     if (ei.getConnector().equals(Connector.TRUE)) {
                         exp.setConnector(Connector.TRUE);
@@ -492,25 +484,23 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case AT_END:
             case OVER_ALL:
                 final Expression<Integer> neg = exp.getChildren().get(0);
-                this.simplifyWithGroundNumericInertia(neg, effect);
-                if (!effect) {
-                    if (neg.getConnector().equals(Connector.TRUE)) {
-                        exp.setConnector(Connector.FALSE);
-                    } else if (neg.getConnector().equals(Connector.FALSE)) {
-                        exp.setConnector(Connector.TRUE);
-                    }
+                this.simplifyWithGroundNumericInertia(neg);
+                if (neg.getConnector().equals(Connector.TRUE)) {
+                    exp.setConnector(Connector.FALSE);
+                } else if (neg.getConnector().equals(Connector.FALSE)) {
+                    exp.setConnector(Connector.TRUE);
                 }
                 break;
             case WHEN:
-                this.simplifyWithGroundNumericInertia(exp.getChildren().get(0), false);
-                this.simplifyWithGroundNumericInertia(exp.getChildren().get(1), true);
+                this.simplifyWithGroundNumericInertia(exp.getChildren().get(0));
+                this.simplifyWithGroundNumericInertia(exp.getChildren().get(1));
                 break;
             case ASSIGN:
             case INCREASE:
             case DECREASE:
             case SCALE_UP:
             case SCALE_DOWN:
-                this.simplifyWithGroundNumericInertia(exp.getChildren().get(1), effect);
+                this.simplifyWithGroundNumericInertia(exp.getChildren().get(1));
                 if (exp.getChildren().get(1).getConnector().equals(Connector.FALSE)) {
                     exp.setConnector(Connector.FALSE);
                     exp.getChildren().clear();
@@ -522,8 +512,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case DIVISION:
                 Expression<Integer> op1 = exp.getChildren().get(0);
                 Expression<Integer> op2 = exp.getChildren().get(1);
-                this.simplifyWithGroundNumericInertia(op1, effect);
-                this.simplifyWithGroundNumericInertia(op2, effect);
+                this.simplifyWithGroundNumericInertia(op1);
+                this.simplifyWithGroundNumericInertia(op2);
                 if (op1.getConnector().equals(Connector.FALSE)
                     || op2.getConnector().equals(Connector.FALSE)) {
                     exp.setConnector(Connector.FALSE);
@@ -568,8 +558,8 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
             case GREATER_OR_EQUAL_COMPARISON:
                 op1 = exp.getChildren().get(0);
                 op2 = exp.getChildren().get(1);
-                this.simplifyWithGroundNumericInertia(op1, effect);
-                this.simplifyWithGroundNumericInertia(op2, effect);
+                this.simplifyWithGroundNumericInertia(op1);
+                this.simplifyWithGroundNumericInertia(op2);
                 if (op1.getConnector().equals(Connector.FALSE)
                     || op2.getConnector().equals(Connector.FALSE)) {
                     exp.setConnector(Connector.FALSE);
@@ -619,7 +609,7 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
                 break;
             case F_EXP:
                 Expression<Integer> fexp = exp.getChildren().get(0);
-                this.simplifyWithGroundNumericInertia(fexp, effect);
+                this.simplifyWithGroundNumericInertia(fexp);
                 if (fexp.getConnector().equals(Connector.NUMBER)) {
                     exp.setValue(fexp.getValue());
                     exp.setConnector(Connector.NUMBER);
@@ -666,9 +656,9 @@ public abstract class PostInstantiatedProblem extends InstantiatedProblem {
         Iterator<IntMethod> it = this.getIntMethods().iterator();
         while (it.hasNext()) {
             IntMethod m = it.next();
-            this.simplifyWithGroundInertia(m.getPreconditions(), false);
+            this.simplifyWithGroundInertia(m.getPreconditions());
             m.getPreconditions().simplify();
-            this.simplifyWithGroundInertia(m.getConstraints(), false);
+            this.simplifyWithGroundInertia(m.getConstraints());
             m.getConstraints().simplify();
             if (!m.getPreconditions().getConnector().equals(Connector.FALSE)
                     && !m.getConstraints().getConnector().equals(Connector.FALSE)) {

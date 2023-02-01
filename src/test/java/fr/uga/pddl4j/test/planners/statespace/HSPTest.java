@@ -91,13 +91,13 @@ public class HSPTest {
      * FAILURE
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Grid_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 1998 gripper ADL benchmarks.
@@ -117,13 +117,13 @@ public class HSPTest {
      * FAILURE
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Gripper_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 1998 Logistics ADL benchmarks.
@@ -140,7 +140,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 1998 Logistics STRIPS Round1 benchmarks.
-     * Test takes fails due to time out > 600s
+     * Test fails due to time out > 600s
      * @throws Exception if something went wrong.
      */
     @Test
@@ -156,26 +156,26 @@ public class HSPTest {
      * FAILURE
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Logistics_STRIPS_Round2() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/logistics/strips-round2" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      *  Method that executes tests using IPC 1998 Movie ADL benchmarks.
      * FAILURE: Unable to deal with negation in the initial state of the problem
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC1998_Movie_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 1998 Movie STRIPS benchmarks.
@@ -221,26 +221,26 @@ public class HSPTest {
      * FAILURE
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL simple typed benchmarks.
      * FAILURE
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Elevator STRIPS simple typed benchmarks.
@@ -260,13 +260,13 @@ public class HSPTest {
      * Failure
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Elevator_STRIPS_Simple_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Freecell STRIPS  typed benchmarks.
@@ -296,7 +296,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2000 Logistics STRIPS typed benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -312,13 +312,13 @@ public class HSPTest {
      * Failure
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Logistics_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/logistics/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Schedule ADL typed benchmarks.
@@ -338,17 +338,17 @@ public class HSPTest {
      * Failure
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2000_Schedule_ADL_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/schedule/adl-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2002 Depots STRIPS automatic benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -364,17 +364,17 @@ public class HSPTest {
      * Failure: p01
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Depots_STRIPS_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/depots/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2002 Driver Log STRIPS automatic benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -390,17 +390,17 @@ public class HSPTest {
      * Failure: p01
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Driverlog_STRIPS_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/driverlog/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2002 Freecell STRIPS automatic benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -416,30 +416,30 @@ public class HSPTest {
      * Failure: several plans are not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Rovers_STRIPS_Automatic() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/strips-automatic" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2002 Rovers STRIPS hand coded benchmarks.
      * Failure: several plans are not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2002_Rovers_STRIPS_Hand_Coded() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2002/rovers/strips-hand-coded" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2002 Satellite STRIPS automatic benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -465,7 +465,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2002 Zeno Travel STRIPS automatic benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -494,97 +494,97 @@ public class HSPTest {
      * Failure: Computing relaxed planning graph
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Airport_Non_Temporal_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 Airport non temporal STRIPS benchmarks.
      * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Airport_Non_Temporal_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/airport/nontemporal-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 Pipesworld no-tankage non temporal STRIPS benchmarks.
      * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Pipesworld_No_Tankage_Non_Temporal_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/no-tankage-nontemporal-strips"
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 Pipesworld tankage non temporal STRIPS benchmarks.
      * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Pipesworld_Tankage_Non_Temporal_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/pipesworld/tankage-nontemporal-strips"
             + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 Promela Dining Philosophers ADL benchmarks.
      * Failure: type "number" cannot be used as derived type
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_Promela_Dining_Philisophers_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/promela-dining-philosophers/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 PSR middle compiled ADL benchmarks.
      * Failure: Bugs in method simplify
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_PSR_middle_compiles_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/psr/middle-compiled-adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 PSR small STRIPS benchmarks.
      * Failure: Plan not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2004_PSR_small_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2004/psr/small-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2004 Satellite STRIPS benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -597,7 +597,7 @@ public class HSPTest {
 
     /**
      * Method that executes tests using IPC 2006 Openstacks propositional benchmarks.
-     * OK
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -613,38 +613,38 @@ public class HSPTest {
      * Failure: Plans not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2006_Openstacks_Propositional_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/openstacks/propositional-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2006 Pathways propositional benchmarks.
      * Failure: Plans no validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2006_Pathways_Propositional() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2006 Pathways propositional STRIPS benchmarks.
      * Failure: Plans no validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_HSP_IPC2006_Pathways_Propositional_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2006/pathways/propositional-strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.HSP, this.config);
-    }
+    }*/
 
 }

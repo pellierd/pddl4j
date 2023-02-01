@@ -375,17 +375,17 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
     }
 
     /**
-     * Extracts the relevant facts from a specified expression. A ground fact is relevant if and
+     * Extracts the relevant fluents from a specified expression. A fluent is relevant if and
      * only if:
      * <ul>
-     * <li>1. it is an initial fact and not a negative ground inertia, or if</li>
+     * <li>1. it is an initial fluent and not a negative ground inertia, or if</li>
      * <li>2. it is not an initial fact and not a positive ground inertia.</li>
      * </ul>
      *
      * @param exp   the expression.
-     * @param facts the set of relevant facts.
+     * @param fluents the set of relevant fluents.
      */
-    protected void extractRelevantFluents(final Expression<Integer> exp, final Set<Expression<Integer>> facts) {
+    protected void extractRelevantFluents(final Expression<Integer> exp, final Set<Expression<Integer>> fluents) {
         switch (exp.getConnector()) {
             case ATOM:
                 Inertia inertia = this.getGroundInertia().get(exp);
@@ -394,7 +394,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
                 }
                 if ((this.getIntInitialState().contains(exp) && !inertia.equals(Inertia.NEGATIVE))
                     || (!this.getIntInitialState().contains(exp) && !inertia.equals(Inertia.POSITIVE))) {
-                    facts.add(exp);
+                    fluents.add(exp);
                 }
                 break;
             case FN_HEAD:
@@ -404,7 +404,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case AND:
             case OR:
                 for (Expression<Integer> e : exp.getChildren()) {
-                    this.extractRelevantFluents(e, facts);
+                    this.extractRelevantFluents(e, fluents);
                 }
                 break;
             case FORALL:
@@ -417,7 +417,7 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case SOMETIME_CONSTRAINT:
             case AT_MOST_ONCE_CONSTRAINT:
             case NOT:
-                extractRelevantFluents(exp.getChildren().get(0), facts);
+                this.extractRelevantFluents(exp.getChildren().get(0), fluents);
                 break;
             case WHEN:
             case LESS_COMPARISON:
@@ -434,25 +434,24 @@ public abstract class FinalizedProblem extends PostInstantiatedProblem {
             case DIVISION:
             case MINUS:
             case PLUS:
-
             case SOMETIME_AFTER_CONSTRAINT:
             case SOMETIME_BEFORE_CONSTRAINT:
             case WITHIN_CONSTRAINT:
             case HOLD_AFTER_CONSTRAINT:
-                extractRelevantFluents(exp.getChildren().get(0), facts);
-                extractRelevantFluents(exp.getChildren().get(1), facts);
+                extractRelevantFluents(exp.getChildren().get(0), fluents);
+                extractRelevantFluents(exp.getChildren().get(1), fluents);
                 break;
             case F_EXP_T:
             case F_EXP:
                 if (!exp.getChildren().isEmpty()) {
-                    extractRelevantFluents(exp.getChildren().get(0), facts);
+                    extractRelevantFluents(exp.getChildren().get(0), fluents);
                 }
                 break;
             case ALWAYS_WITHIN_CONSTRAINT:
             case HOLD_DURING_CONSTRAINT:
-                extractRelevantFluents(exp.getChildren().get(0), facts);
-                extractRelevantFluents(exp.getChildren().get(1), facts);
-                extractRelevantFluents(exp.getChildren().get(3), facts);
+                extractRelevantFluents(exp.getChildren().get(0), fluents);
+                extractRelevantFluents(exp.getChildren().get(1), fluents);
+                extractRelevantFluents(exp.getChildren().get(3), fluents);
                 break;
             case FN_ATOM:
             case NUMBER:
