@@ -16,12 +16,14 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.InvalidConfigurationException;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.ProblemNotSupportedException;
 import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.planners.statespace.search.Node;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceSearch;
@@ -259,11 +261,14 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
      * Search a solution plan to a specified domain and problem. The method search a solution plan by trying iteratively
      * all the search strategies defined.
      *
-     * @param pb the problem to solve.
+     * @param problem the problem to solve.
      * @return the plan found or null if no plan was found.
+     * @throws ProblemNotSupportedException if the problem to solve is not supported by the planner.
      */
-    public Plan solve(final Problem pb) {
-        Objects.requireNonNull(pb);
+    public Plan solve(final Problem problem) throws ProblemNotSupportedException {
+        if (!this.isSupported(problem)) {
+            throw new ProblemNotSupportedException(("Problem not supported"));
+        }
 
         Plan plan = null;
         final Iterator<SearchStrategy.Name> i = this.getSearchStrategies().iterator();
@@ -274,8 +279,8 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
             LOGGER.info("* Starting " + strategy.name() + " search \n");
             StateSpaceSearch search = StateSpaceSearch.getInstance(strategy, this.getHeuristic(),
                 this.getHeuristicWeight(), timeout);
-            final Node solution = search.searchSolutionNode(pb);
-            plan = (SequentialPlan) search.extractPlan(solution, pb);
+            final Node solution = search.searchSolutionNode(problem);
+            plan = (SequentialPlan) search.extractPlan(solution, problem);
             if (solution != null) {
                 LOGGER.info("* " + strategy.name() + " search succeeded\n");
                 this.getStatistics().setTimeToSearch(search.getSearchingTime());
@@ -288,5 +293,30 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
             timeout -= ((end - begin) / 1000);
         }
         return plan;
+    }
+
+    /**
+     * Returns if a specified problem is supported by the planner.
+     *
+     * @param problem the problem to test.
+     * @return <code>true</code> if the problem is supported <code>false</code> otherwise.
+     */
+    @Override
+    public boolean isSupported(Problem problem) {
+        return (problem.getRequirements().contains(RequireKey.ACTION_COSTS)
+            || problem.getRequirements().contains(RequireKey.CONSTRAINTS)
+            || problem.getRequirements().contains(RequireKey.CONTINOUS_EFFECTS)
+            || problem.getRequirements().contains(RequireKey.DERIVED_PREDICATES)
+            || problem.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
+            || problem.getRequirements().contains(RequireKey.DURATION_INEQUALITIES)
+            || problem.getRequirements().contains(RequireKey.FLUENTS)
+            || problem.getRequirements().contains(RequireKey.GOAL_UTILITIES)
+            || problem.getRequirements().contains(RequireKey.METHOD_CONSTRAINTS)
+            || problem.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)
+            || problem.getRequirements().contains(RequireKey.OBJECT_FLUENTS)
+            || problem.getRequirements().contains(RequireKey.PREFERENCES)
+            || problem.getRequirements().contains(RequireKey.TIMED_INITIAL_LITERALS)
+            || problem.getRequirements().contains(RequireKey.HIERARCHY))
+            ? false : true;
     }
 }

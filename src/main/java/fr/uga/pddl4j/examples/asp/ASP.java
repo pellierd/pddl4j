@@ -17,11 +17,13 @@ package fr.uga.pddl4j.examples.asp;
 
 import fr.uga.pddl4j.heuristics.state.StateHeuristic;
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
 import fr.uga.pddl4j.planners.AbstractPlanner;
 import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.ProblemNotSupportedException;
 import fr.uga.pddl4j.planners.SearchStrategy;
 import fr.uga.pddl4j.planners.statespace.search.StateSpaceSearch;
 import fr.uga.pddl4j.problem.DefaultProblem;
@@ -278,8 +280,13 @@ public class ASP extends AbstractPlanner {
      *
      * @param problem the problem to solve.
      * @return a plan solution for the problem or null if there is no solution
+     * @throws ProblemNotSupportedException if the problem to solve is not supported by the planner.
      */
-    public Plan astar(Problem problem) {
+    public Plan astar(Problem problem) throws ProblemNotSupportedException {
+        // Check if the problem is supported by the planner
+        if (!this.isSupported(problem)) {
+            throw new ProblemNotSupportedException("Problem not supported");
+        }
 
         // First we create an instance of the heuristic to use to guide the search
         final StateHeuristic heuristic = StateHeuristic.getInstance(this.getHeuristic(), problem);
@@ -369,5 +376,30 @@ public class ASP extends AbstractPlanner {
             n = n.getParent();
         }
         return plan;
+    }
+
+    /**
+     * Returns if a specified problem is supported by the planner. Just ADL problem can be solved by this planner.
+     *
+     * @param problem the problem to test.
+     * @return <code>true</code> if the problem is supported <code>false</code> otherwise.
+     */
+    @Override
+    public boolean isSupported(Problem problem) {
+        return (problem.getRequirements().contains(RequireKey.ACTION_COSTS)
+            || problem.getRequirements().contains(RequireKey.CONSTRAINTS)
+            || problem.getRequirements().contains(RequireKey.CONTINOUS_EFFECTS)
+            || problem.getRequirements().contains(RequireKey.DERIVED_PREDICATES)
+            || problem.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
+            || problem.getRequirements().contains(RequireKey.DURATION_INEQUALITIES)
+            || problem.getRequirements().contains(RequireKey.FLUENTS)
+            || problem.getRequirements().contains(RequireKey.GOAL_UTILITIES)
+            || problem.getRequirements().contains(RequireKey.METHOD_CONSTRAINTS)
+            || problem.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)
+            || problem.getRequirements().contains(RequireKey.OBJECT_FLUENTS)
+            || problem.getRequirements().contains(RequireKey.PREFERENCES)
+            || problem.getRequirements().contains(RequireKey.TIMED_INITIAL_LITERALS)
+            || problem.getRequirements().contains(RequireKey.HIERARCHY))
+            ? false : true;
     }
 }

@@ -17,6 +17,7 @@ package fr.uga.pddl4j.planners.htn.stn;
 
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
+import fr.uga.pddl4j.planners.ProblemNotSupportedException;
 import fr.uga.pddl4j.planners.statespace.GSP;
 import fr.uga.pddl4j.problem.Problem;
 import fr.uga.pddl4j.problem.State;
@@ -113,9 +114,13 @@ public final class  PFD extends AbstractSTNPlanner {
      *
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
+     * @throws ProblemNotSupportedException if the problem to solve is not supported by the planner.
      */
     @Override
-    public Plan solve(final Problem problem) {
+    public Plan solve(final Problem problem) throws ProblemNotSupportedException {
+        if (!super.isSupported(problem)) {
+            throw new ProblemNotSupportedException("Problem not supported");
+        }
         // Create the list of pending nodes to explore
         final PriorityQueue<PFDNode> open = new PriorityQueue<>(1000, new Comparator<PFDNode>() {
             public int compare(PFDNode n1, PFDNode n2) {

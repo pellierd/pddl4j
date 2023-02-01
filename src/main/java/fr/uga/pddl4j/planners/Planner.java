@@ -276,6 +276,14 @@ public interface Planner extends Serializable, Callable<Integer> {
     boolean hasValidConfiguration();
 
     /**
+     * Returns if a specified problem is supported by the planner.
+     *
+     * @param problem the problem to test.
+     * @return <code>true</code> if the problem is supported <code>false</code> otherwise.
+     */
+    boolean isSupported(Problem problem);
+
+    /**
      * Create an instance of a planner from a specified configuration.
      *
      * @param name    the name of the planner to create.

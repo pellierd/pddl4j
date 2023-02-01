@@ -15,6 +15,7 @@
 
 package fr.uga.pddl4j.planners.htn.stn;
 
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.ProblemNotSupportedException;
@@ -117,10 +118,13 @@ public final class TFD extends AbstractSTNPlanner {
      *
      * @param problem the problem to be solved.
      * @return a solution search or null if it does not exist.
-     * @throws ProblemNotSupportedException if the problem to solve is not supported by the method.
+     * @throws ProblemNotSupportedException if the problem to solve is not supported by the planner.
      */
     @Override
     public Plan solve(final Problem problem) throws ProblemNotSupportedException {
+        if (!super.isSupported(problem)) {
+            throw new ProblemNotSupportedException("Problem not supported");
+        }
         if (!problem.isTotallyOrdered()) {
             throw new ProblemNotSupportedException("Unable to solve a problem that is not totally ordered");
         }

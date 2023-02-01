@@ -57,7 +57,7 @@ class is given bellow:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 16-48,59-64,158-178,195,260-274,373
+    :lines: 16-67,160-172,173-180,197-198,263-276,405
     :linenos:
 
 The class ASP extends the abstract class `AbstractPlanner <http://pddl4j.imag.fr/repository/pddl4j/api/current/index.html?fr/uga/pddl4j/planners/AbstractPlanner.html>`_
@@ -110,14 +110,14 @@ declaration:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 41-58
+    :lines: 44-60
     :linenos:
 
 and complete the ``main()`` method with the code below:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 260-274
+    :lines: 263-276
     :linenos:
     :emphasize-lines: 268-269
 
@@ -164,14 +164,14 @@ of type double. Note that the weight must be greater than 0.
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 85-93
+    :lines: 88-96
     :linenos:
 
 To complete, we also add the corresponding getters and setters:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 112-156
+    :lines: 115-158
     :linenos:
 
 To test, your complete command line compile once again your planner:
@@ -233,7 +233,7 @@ search strategies. Thus, your ``solve()`` must look like as follows:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 170-195
+    :lines: 173-197
     :linenos:
 
 First, we create an instance of the search strategy for the problem to solve and then, we try to find a plan for this
@@ -353,7 +353,15 @@ Consider the implementation of A* now with PDDL4J and the new ``solve()`` proced
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 275-355
+    :lines: 278-361
+    :linenos:
+
+The method ``isSupported()`` tests if the problem to solved is supported by the method ``solve()``. The planner ASP can
+solve only ADL problem. The code to test if the problem is ADL is given below:
+
+.. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
+    :language: java
+    :lines: 381-404
     :linenos:
 
 The method ``extractPlan()`` extracts a solution plan from the search space by backward chaining the path from the goal
@@ -361,7 +369,7 @@ node to the root node. The code is given below:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 356-373
+    :lines: 363-379
     :linenos:
 
 Finally, you have to change the call to the method ``searchPlan()`` in the method ``solve()`` by the explicit call to
@@ -422,7 +430,7 @@ associated with it. The following code:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 65-84
+    :lines: 68-86
     :linenos:
 
 Step 6.2 Setting and getting the configuration of your planner
@@ -434,7 +442,7 @@ This can be done in your case using the code below:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 224-259
+    :lines: 227-261
     :linenos:
 
 The code is quite simple. It call the method ``getConfigration()`` and ``setConfiguration()`` from the parent class `AbstractPlanner <http://pddl4j.imag.fr/repository/pddl4j/api/current/index.html?fr/uga/pddl4j/planners/AbstractPlanner.html>`_.
@@ -450,7 +458,7 @@ with the default values.
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 210-223
+    :lines: 215-225
     :linenos:
 
 Step 6.4 Defining the method that checks if a configuration is valid or not
@@ -463,7 +471,7 @@ already defined in the library
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 196-209
+    :lines: 199-211
     :linenos:
 
 Step 6.5 Redefining the constructors of your planner
@@ -474,8 +482,8 @@ can be done with the code below:
 
 .. literalinclude:: ../src/main/java/fr/uga/pddl4j/examples/asp/ASP.java
     :language: java
-    :lines: 95-111
+    :lines: 98-113
     :linenos:
 
 .. note::
-    The final code of the planner code is available `here <https://github.com/pellierd/pddl4j/tree/devel/src/main/java/fr/uga/pddl4j/examples/asp/ASP.java>`_.
+    The final code of the planner code is available `here <https://github.com/pellierd/pddl4j/tree/master/src/main/java/fr/uga/pddl4j/examples/asp/ASP.java>`_.

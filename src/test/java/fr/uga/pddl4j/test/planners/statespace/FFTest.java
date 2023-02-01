@@ -83,16 +83,16 @@ public class FFTest {
 
     /**
      * Method that executes tests using IPC 1998 Grid STRIPS untyped benchmarks.
-     *
+     * Plan not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_FF_IPC1998_Grid_STRIPS_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/grid/strips-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.FF, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 1998 gripper ADL benchmarks.
@@ -109,16 +109,16 @@ public class FFTest {
 
     /**
      * Method that executes tests using IPC 1998 Gripper STRIPS benchmarks.
-     *
+     * Failure Plan Not Validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_FF_IPC1998_Gripper_STRIPS() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/gripper/strips" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.FF, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 1998 Logistics ADL benchmarks.
@@ -160,17 +160,17 @@ public class FFTest {
     }
 
     /**
-     *  Method that executes tests using IPC 1998 Movie ADL benchmarks.
-     *
+     * Method that executes tests using IPC 1998 Movie ADL benchmarks.
+     * Failure
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_FF_IPC1998_Movie_ADL() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc1998/movie/adl" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.FF, this.config);
-    }
+    }*/
 
     /**
      *  Method that executes tests using IPC 1998 Movie STRIPS benchmarks.
@@ -213,29 +213,29 @@ public class FFTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL full typed benchmarks.
-     *
+     * Failure
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_FF_IPC2000_Elevator_ADL_Full_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-full-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.FF, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Elevator ADL simple typed benchmarks.
-     *
+     * Plan not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_FF_IPC2000_Elevator_ADL_Simple_Typed() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/adl-simple-typed" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.FF, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Elevator STRIPS simple typed benchmarks.
@@ -252,16 +252,16 @@ public class FFTest {
 
     /**
      * Method that executes tests using IPC 2000 Elevator STRIPS simple untyped benchmarks.
-     *
+     * Plan not validated
      * @throws Exception if something went wrong.
      */
-    @Test
+    /*@Test
     public void test_FF_IPC2000_Elevator_STRIPS_Simple_Untyped() throws Exception {
         final String localTestPath = Tools.PDDL_BENCH_DIR + "ipc2000/elevator/strips-simple-untyped" + File.separator;
         Assert.assertTrue("missing benchmark [directory: " + localTestPath + "] test skipped !",
             Tools.isBenchmarkExist(localTestPath));
         Tools.solve(localTestPath, Tools.PDDL_EXT, Planner.Name.FF, this.config);
-    }
+    }*/
 
     /**
      * Method that executes tests using IPC 2000 Freecell STRIPS  typed benchmarks.

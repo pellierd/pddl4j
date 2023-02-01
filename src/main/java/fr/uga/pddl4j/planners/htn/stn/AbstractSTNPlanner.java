@@ -19,6 +19,7 @@ import fr.uga.pddl4j.parser.DefaultParsedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.parser.Message;
 import fr.uga.pddl4j.parser.Parser;
+import fr.uga.pddl4j.parser.RequireKey;
 import fr.uga.pddl4j.plan.Hierarchy;
 import fr.uga.pddl4j.plan.Plan;
 import fr.uga.pddl4j.plan.SequentialPlan;
@@ -509,6 +510,31 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
     @Override
     public boolean hasValidConfiguration() {
         return super.hasValidConfiguration();
+    }
+
+    /**
+     * Returns if a specified problem is supported by the planner.
+     *
+     * @param problem the problem to test.
+     * @return <code>true</code> if the problem is supported <code>false</code> otherwise.
+     */
+    @Override
+    public boolean isSupported(Problem problem) {
+        return (problem.getRequirements().contains(RequireKey.ACTION_COSTS)
+            || problem.getRequirements().contains(RequireKey.CONSTRAINTS)
+            || problem.getRequirements().contains(RequireKey.CONTINOUS_EFFECTS)
+            || problem.getRequirements().contains(RequireKey.DERIVED_PREDICATES)
+            || problem.getRequirements().contains(RequireKey.DURATIVE_ACTIONS)
+            || problem.getRequirements().contains(RequireKey.DURATION_INEQUALITIES)
+            || problem.getRequirements().contains(RequireKey.FLUENTS)
+            || problem.getRequirements().contains(RequireKey.GOAL_UTILITIES)
+            || problem.getRequirements().contains(RequireKey.METHOD_CONSTRAINTS)
+            || problem.getRequirements().contains(RequireKey.NUMERIC_FLUENTS)
+            || problem.getRequirements().contains(RequireKey.OBJECT_FLUENTS)
+            || problem.getRequirements().contains(RequireKey.PREFERENCES)
+            || problem.getRequirements().contains(RequireKey.TIMED_INITIAL_LITERALS)
+            || !problem.getRequirements().contains(RequireKey.HIERARCHY))
+            ? false : true;
     }
 
     /**
