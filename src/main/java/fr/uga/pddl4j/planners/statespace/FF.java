@@ -20,6 +20,7 @@
 package fr.uga.pddl4j.planners.statespace;
 
 import fr.uga.pddl4j.parser.DefaultParsedProblem;
+import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.planners.SearchStrategy;
 
@@ -114,6 +115,19 @@ public final class FF extends AbstractStateSpacePlanner  {
     }
 
     /**
+     * This method return the default arguments of the planner.
+     *
+     * @return the default arguments of the planner.
+     * @see PlannerConfiguration
+     */
+    public static PlannerConfiguration getDefaultConfiguration() {
+        PlannerConfiguration config = Planner.getDefaultConfiguration();
+        config.setProperty(FF.SEARCH_STRATEGIES_SETTING, SearchStrategy.Name.ENFORCED_HILL_CLIMBING
+            + " " + SearchStrategy.Name.ASTAR);
+        return config;
+    }
+
+    /**
      * Sets the weight of the heuristic.
      *
      * @param weight the weight of the heuristic. The weight must be greater than 0.
@@ -151,7 +165,6 @@ public final class FF extends AbstractStateSpacePlanner  {
             && this.getSearchStrategies().size() == 2
             && this.getSearchStrategies().get(0).equals(SearchStrategy.Name.ENFORCED_HILL_CLIMBING)
             && this.getSearchStrategies().get(1).equals(SearchStrategy.Name.ASTAR);
-
     }
 
     /**

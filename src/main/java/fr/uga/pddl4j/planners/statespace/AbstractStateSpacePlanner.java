@@ -31,6 +31,7 @@ import fr.uga.pddl4j.problem.Problem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -243,13 +244,15 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
     /**
      * Converts string in a list of search strategies.
      *
-     * @param str the input string in the form [s1, ..., sn].
+     * @param str the input string in the form s1 ... sn. The delimiter can be any space.
      * @return a list of search strategies.
      */
     private static List<SearchStrategy.Name> toSearchStrategies(final String str) {
-        List<SearchStrategy.Name> list = new ArrayList<>();
-        if (!str.isEmpty() && !str.equals("[]")) {
-            String[] tab = str.substring(1, str.length() - 1).split(",");
+        final List<SearchStrategy.Name> list = new ArrayList<>();
+        String tmp = str.replaceAll("^\\s+", "");
+        tmp = tmp.replaceAll("\\s+$", "");
+        if (!tmp.isEmpty()) {
+            final String[] tab = tmp.split("\\s+");
             for (String e : tab) {
                 list.add(SearchStrategy.Name.valueOf(e));
             }
@@ -276,7 +279,8 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
         while (plan == null && i.hasNext()) {
             final long begin = System.currentTimeMillis();
             final SearchStrategy.Name strategy = i.next();
-            LOGGER.info("* Starting " + strategy.name() + " search \n");
+            LOGGER.info("* Starting " + strategy.name() + " search with "
+                + this.getConfiguration().getProperty(AbstractStateSpacePlanner.HEURISTIC_SETTING) + " heuristic \n");
             StateSpaceSearch search = StateSpaceSearch.getInstance(strategy, this.getHeuristic(),
                 this.getHeuristicWeight(), timeout);
             final Node solution = search.searchSolutionNode(problem);

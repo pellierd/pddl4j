@@ -10,6 +10,10 @@ import fr.uga.pddl4j.planners.Planner;
 import fr.uga.pddl4j.planners.PlannerConfiguration;
 import fr.uga.pddl4j.problem.DefaultProblem;
 import fr.uga.pddl4j.problem.Problem;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.Assert;
 
 import java.io.BufferedReader;
@@ -363,6 +367,13 @@ public abstract class Tools {
      * @param extension the extension of the file.
      */
     public static void instantiate(String currentTestPath, String extension) {
+        // Remove log
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        LoggerConfig loggerConfig = config.getRootLogger();
+        loggerConfig.setLevel(Level.OFF);
+        context.updateLoggers();
+
         String currentDomain = currentTestPath + "domain" + extension;
         boolean oneDomainPerProblem = false;
         String problemFile;
@@ -426,12 +437,24 @@ public abstract class Tools {
                     }
                     pb.instantiate();
                     Assert.assertTrue(pb != null);
-                    if (pb.isSolvable()) {
-                        System.out.println(" * "  + typeOfProblem + " problem instantiated (" + pb.getActions().size()
-                            + " actions, " + pb.getFluents().size() + " fluents) is solvable.");
+                    System.out.print(" * "  + typeOfProblem + " problem instantiated (");
+                    System.out.print(pb.getActions().size() + " actions, ");
+                    System.out.print(pb.getDurativeActions().size() + " durative actions, ");
+                    if (pb.getMethods() != null) {
+                        System.out.print(pb.getMethods().size() + " methods, ");
                     } else {
-                        System.out.println(" * "  + typeOfProblem + " problem instantiated (" + pb.getActions().size()
-                            + " actions, " + pb.getFluents().size() + " fluents) is not solvable.");
+                        System.out.print(0 + " methods, ");
+                    }
+                    if (pb.getDurativeMethods() != null) {
+                        System.out.print(pb.getDurativeMethods().size() + " durative methods, ");
+                    } else {
+                        System.out.print(0 + " durative methods, ");
+                    }
+                    System.out.print(pb.getFluents().size() + " fluents) ");
+                    if (pb.isSolvable()) {
+                        System.out.println("is solvable.");
+                    } else {
+                        System.out.println("is not solvable.");
                     }
                 } catch (OutOfMemoryError err) {
                     System.err.println("ERR: " + err.getMessage() + " - test aborted");
