@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This abstract class defines the main methods to access a state based planner.
@@ -224,7 +223,7 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
         if (configuration.getProperty(StateSpacePlanner.SEARCH_STRATEGIES_SETTING) == null) {
             this.setSearchStrategies(StateSpacePlanner.DEFAULT_SEARCH_STRATEGIES);
         } else {
-            this.setSearchStrategies(AbstractStateSpacePlanner.toSearchStrategies(configuration.getProperty(
+            this.setSearchStrategies(SearchStrategy.toSearchStrategies(configuration.getProperty(
                 StateSpacePlanner.SEARCH_STRATEGIES_SETTING)));
         }
         if (configuration.getProperty(StateSpacePlanner.WEIGHT_HEURISTIC_SETTING) == null) {
@@ -239,25 +238,6 @@ public abstract class AbstractStateSpacePlanner extends AbstractPlanner implemen
             this.setHeuristic(StateHeuristic.Name.valueOf(configuration.getProperty(
                 StateSpacePlanner.HEURISTIC_SETTING)));
         }
-    }
-
-    /**
-     * Converts string in a list of search strategies.
-     *
-     * @param str the input string in the form s1 ... sn. The delimiter can be any space.
-     * @return a list of search strategies.
-     */
-    private static List<SearchStrategy.Name> toSearchStrategies(final String str) {
-        final List<SearchStrategy.Name> list = new ArrayList<>();
-        String tmp = str.replaceAll("^\\s+", "");
-        tmp = tmp.replaceAll("\\s+$", "");
-        if (!tmp.isEmpty()) {
-            final String[] tab = tmp.split("\\s+");
-            for (String e : tab) {
-                list.add(SearchStrategy.Name.valueOf(e));
-            }
-        }
-        return list;
     }
 
     /**

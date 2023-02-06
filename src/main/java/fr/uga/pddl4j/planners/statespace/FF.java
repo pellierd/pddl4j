@@ -101,8 +101,7 @@ public final class FF extends AbstractStateSpacePlanner  {
      * Creates a new planner with default parameters.
      */
     public FF() {
-        super();
-        this.setSearchStrategies(Arrays.asList(SearchStrategy.Name.ENFORCED_HILL_CLIMBING, SearchStrategy.Name.ASTAR));
+        this(FF.getDefaultConfiguration());
     }
 
     /**
@@ -122,8 +121,8 @@ public final class FF extends AbstractStateSpacePlanner  {
      */
     public static PlannerConfiguration getDefaultConfiguration() {
         PlannerConfiguration config = Planner.getDefaultConfiguration();
-        config.setProperty(FF.SEARCH_STRATEGIES_SETTING, SearchStrategy.Name.ENFORCED_HILL_CLIMBING
-            + " " + SearchStrategy.Name.ASTAR);
+        config.setProperty(FF.SEARCH_STRATEGIES_SETTING, Arrays.asList(SearchStrategy.Name.ENFORCED_HILL_CLIMBING,
+            SearchStrategy.Name.ASTAR));
         return config;
     }
 

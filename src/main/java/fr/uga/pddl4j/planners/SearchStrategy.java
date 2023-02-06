@@ -16,6 +16,8 @@
 package fr.uga.pddl4j.planners;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This interface is used to define all the common methods of the search strategies.
@@ -57,4 +59,23 @@ public interface SearchStrategy extends Serializable {
         HILL_CLIMBING,
     }
 
+    /**
+     * Converts string in a list of search strategies.
+     *
+     * @param str the input string in the form [s1,..., sn]. The delimiter can be any space and s must be valid name
+     *            of strategy.
+     * @return a list of search strategies.
+     * @throws java.lang.IllegalArgumentException if the string str as input is not valide
+     */
+    public static List<Name> toSearchStrategies(String str) throws IllegalArgumentException {
+        final List<SearchStrategy.Name> list = new ArrayList<>();
+        if (str.startsWith("[") && str.endsWith("]")) {
+            final String[] tab = str.substring(1, str.length() - 1).split(",");
+            for (String e : tab) {
+                list.add(SearchStrategy.Name.valueOf(e.replaceAll("\\s", "")));
+            }
+            return list;
+        }
+        throw new IllegalArgumentException("Invalid search strategy");
+    }
 }

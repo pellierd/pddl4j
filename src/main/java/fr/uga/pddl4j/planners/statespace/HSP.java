@@ -180,6 +180,7 @@ public final class HSP extends AbstractStateSpacePlanner  {
             System.exit(exitCode);
         } catch (Throwable e) {
             LOGGER.fatal(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
