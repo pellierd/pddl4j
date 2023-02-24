@@ -50,7 +50,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This class contains all the methods needed to encode a planning problem into int representation before
+ * This class contains all the methods needed to encode a planning problem into
+ * int representation before
  * instantiation.
  *
  * @author D. Pellier
@@ -169,7 +170,8 @@ public abstract class AbstractProblem implements Problem {
     private IntTaskNetwork intInitialTaskNetwork;
 
     /**
-     * The enum used to list the set of internal data structures needed by the instantiation process.
+     * The enum used to list the set of internal data structures needed by the
+     * instantiation process.
      */
     protected enum Data {
         /**
@@ -383,7 +385,7 @@ public abstract class AbstractProblem implements Problem {
      *
      * @return the list of task symbols of the problem.
      */
-    protected List<String> getTaskSymbols() {
+    public final List<String> getTaskSymbols() {
         return this.taskSymbols;
     }
 
@@ -433,8 +435,10 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Instantiates the problem. This method calls in this order the methods initialization(), preinstantiation(),
-     * instantiation(), postinstantiation() and finalization(). This methods must be override in each concrete classe.
+     * Instantiates the problem. This method calls in this order the methods
+     * initialization(), preinstantiation(),
+     * instantiation(), postinstantiation() and finalization(). This methods must be
+     * override in each concrete classe.
      */
     public final void instantiate() {
         this.initialization();
@@ -445,34 +449,43 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * This methods initializes the structures needed to the instantiation process from the PDDL domain and problem
-     * given in parameters of the constructor of the class. First, it collects the constants, the types, the predicate,
-     * the function and the tasks symbols. Then, it encodes the actions, the methods, the goal and the initial tasks
+     * This methods initializes the structures needed to the instantiation process
+     * from the PDDL domain and problem
+     * given in parameters of the constructor of the class. First, it collects the
+     * constants, the types, the predicate,
+     * the function and the tasks symbols. Then, it encodes the actions, the
+     * methods, the goal and the initial tasks
      * network of the problem into compact int representation.
      */
     protected abstract void initialization();
 
     /**
-     * This method carries out all the necessary treatment to preinstantiate the problem. In particular, it calculates
-     * the static properties (Inertia) of the problem in order to prune as soon as possible the actions that can never
+     * This method carries out all the necessary treatment to preinstantiate the
+     * problem. In particular, it calculates
+     * the static properties (Inertia) of the problem in order to prune as soon as
+     * possible the actions that can never
      * be triggered.
      */
     protected abstract void preinstantiation();
 
     /**
-     * This methods carries out the instantiation of the planning operators and the goal of the problem in to actions.
+     * This methods carries out the instantiation of the planning operators and the
+     * goal of the problem in to actions.
      */
     protected abstract void instantiation();
 
     /**
-     * This method carries out all the necessary treatment to postinstantiate the problem. In particular, it simplifies
-     * the actions instantiated based on static properties based on the initial state information of the problem in
+     * This method carries out all the necessary treatment to postinstantiate the
+     * problem. In particular, it simplifies
+     * the actions instantiated based on static properties based on the initial
+     * state information of the problem in
      * order to prune the actions that can never be triggered.
      */
     protected abstract void postinstantiation();
 
     /**
-     * This methods finalize the domain, i.e., it encodes the planning problem into it final compact representation
+     * This methods finalize the domain, i.e., it encodes the planning problem into
+     * it final compact representation
      * using bit set.
      */
     protected abstract void finalization();
@@ -480,7 +493,8 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Init the list of requirement of the problem.
      *
-     * @throws RequirementNotSupportedException if the requirements of the domain and the problem are not supported.
+     * @throws RequirementNotSupportedException if the requirements of the domain
+     *                                          and the problem are not supported.
      */
     protected void initRequirements() throws RequirementNotSupportedException {
         this.requirements = new LinkedHashSet<RequireKey>();
@@ -499,7 +513,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the list of type symbols form the list declared in the domain. The corresponding domain of values
+     * Initializes the list of type symbols form the list declared in the domain.
+     * The corresponding domain of values
      * of the type is created. The domain is empty.
      */
     protected void initTypes() {
@@ -516,7 +531,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the constants declared in the domain and the problem and initialise the domains of values of each
+     * Initializes the constants declared in the domain and the problem and
+     * initialise the domains of values of each
      * type.
      */
     protected void initConstants() {
@@ -540,9 +556,12 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the composite type, i.e., type of the form (either t1 t2), through a specified domain and
-     * problem and creates their respective domain. Warning: constants must be collected before using this method. It
-     * is necessary to correctly initialized the domain of the either types collected.
+     * Initializes the composite type, i.e., type of the form (either t1 t2),
+     * through a specified domain and
+     * problem and creates their respective domain. Warning: constants must be
+     * collected before using this method. It
+     * is necessary to correctly initialized the domain of the either types
+     * collected.
      */
     protected void initEitherTypes() {
         // Collect the types from the predicates declaration
@@ -689,7 +708,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the predicate information (symbols and signatures) declared in the domain.
+     * Initializes the predicate information (symbols and signatures) declared in
+     * the domain.
      */
     protected void initPredicates() {
         final List<NamedTypedList> predicates = this.problem.getPredicates();
@@ -709,10 +729,10 @@ public abstract class AbstractProblem implements Problem {
                         image.append(type.getValue());
                     }
                     argType.add(new Symbol<Integer>(SymbolType.TYPE,
-                        this.typeSymbols.indexOf(image.toString())));
+                            this.typeSymbols.indexOf(image.toString())));
                 } else {
                     argType.add(new Symbol<Integer>(SymbolType.TYPE,
-                        this.typeSymbols.indexOf(types.get(0).getValue())));
+                            this.typeSymbols.indexOf(types.get(0).getValue())));
                 }
             }
             this.predicateSignatures.add(argType);
@@ -720,7 +740,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the function information (symbols and signatures) declared in the domain.
+     * Initializes the function information (symbols and signatures) declared in the
+     * domain.
      */
     protected void initFunctions() {
         final List<NamedTypedList> functions = this.problem.getFunctions();
@@ -747,7 +768,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Initializes the tasks information (symbols and signatures) declared in the domain.
+     * Initializes the tasks information (symbols and signatures) declared in the
+     * domain.
      */
     protected void initTasks() {
         final List<NamedTypedList> tasks = this.problem.getTasks();
@@ -806,9 +828,11 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns the list of fluent in the form of <code>Expression</code> of the initial state.
+     * Returns the list of fluent in the form of <code>Expression</code> of the
+     * initial state.
      *
-     * @return the list of fluent in the form of <code>Expression</code> of the initial state.
+     * @return the list of fluent in the form of <code>Expression</code> of the
+     *         initial state.
      * @see Expression
      */
     protected Set<Expression<Integer>> getIntInitialState() {
@@ -816,9 +840,11 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns the list of timed fluent in the form of <code>Expression</code> of the initial state.
+     * Returns the list of timed fluent in the form of <code>Expression</code> of
+     * the initial state.
      *
-     * @return the list of timed fluent in the form of <code>Expression</code> of the initial state.
+     * @return the list of timed fluent in the form of <code>Expression</code> of
+     *         the initial state.
      * @see Expression
      */
     protected Set<Expression<Integer>> getIntTimedFluents() {
@@ -826,11 +852,13 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns the map that store the value of the numeric fluents in the form of <code>Expression</code> of the
+     * Returns the map that store the value of the numeric fluents in the form of
+     * <code>Expression</code> of the
      * initial state.
      *
-     * @return the map that store the value of the numeric fluents in the form of <code>Expression</code> of the
-     *      initial state.
+     * @return the map that store the value of the numeric fluents in the form of
+     *         <code>Expression</code> of the
+     *         initial state.
      * @see Expression
      */
     protected Map<Expression<Integer>, Double> getIntInitFunctionCost() {
@@ -848,9 +876,11 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns the list of numeric fluents in the form of <code>Expression</code> of the initial state.
+     * Returns the list of numeric fluents in the form of <code>Expression</code> of
+     * the initial state.
      *
-     * @return the list of numeric fluents in the form of <code>Expression</code> of the initial state.
+     * @return the list of numeric fluents in the form of <code>Expression</code> of
+     *         the initial state.
      * @see Expression
      */
     protected Set<Expression<Integer>> getIntInitFunctions() {
@@ -892,8 +922,8 @@ public abstract class AbstractProblem implements Problem {
         this.intInitTimeFluents = new LinkedHashSet<>();
         this.intInitFunctionCost = new LinkedHashMap<>();
         this.intInitFunctions = new LinkedHashSet<>();
-        final Set<Expression<Integer>> init =  this.getParsedProblem().getInit().stream().map(this::initExpression)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+        final Set<Expression<Integer>> init = this.getParsedProblem().getInit().stream().map(this::initExpression)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         for (Expression<Integer> exp : init) {
             switch (exp.getConnector()) {
                 case FN_ATOM:
@@ -933,7 +963,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initActions() {
         this.intActions = this.getParsedProblem().getActions().stream().map(this::initActions)
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -974,7 +1004,7 @@ public abstract class AbstractProblem implements Problem {
      */
     protected void initMethods() {
         this.intMethods = this.getParsedProblem().getMethods().stream()
-            .map(this::initMethod).collect(Collectors.toList());
+                .map(this::initMethod).collect(Collectors.toList());
     }
 
     /**
@@ -1040,12 +1070,12 @@ public abstract class AbstractProblem implements Problem {
      * Encodes a specified task network into its integer representation.
      *
      * @param parsedTaskNetwork the parsed task network.
-     * @param parameters the parameters of the task network.
-     * @param types the type of parameters.
+     * @param parameters        the parameters of the task network.
+     * @param types             the type of parameters.
      * @return the a integer representation of the task network in parameter.
      */
     protected IntTaskNetwork initTaskNetwork(final ParsedTaskNetwork parsedTaskNetwork, final List<String> parameters,
-                                             final List<Integer> types) {
+            final List<Integer> types) {
         final int numberOfParameters = parsedTaskNetwork.getParameters().size();
         final IntTaskNetwork intTaskNetwork = new IntTaskNetwork(numberOfParameters);
         for (int i = 0; i < numberOfParameters; i++) {
@@ -1057,7 +1087,7 @@ public abstract class AbstractProblem implements Problem {
         intTaskNetwork.setTasks(this.initExpression(parsedTaskNetwork.getTasks(), parameters));
         // Encode the ordering constraints of the task network
         intTaskNetwork.setOrderingConstraints(this.initOrderingConstraints(parsedTaskNetwork.getTasks(),
-            parsedTaskNetwork.getOrdering(), parsedTaskNetwork.isTotallyOrdered(), parsedTaskNetwork.isDurative()));
+                parsedTaskNetwork.getOrdering(), parsedTaskNetwork.isTotallyOrdered(), parsedTaskNetwork.isDurative()));
         // Encode the constraints of the task network
         intTaskNetwork.setConstraints(this.initExpression(parsedTaskNetwork.getConstraints(), parameters));
         return intTaskNetwork;
@@ -1066,10 +1096,12 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Encode the ordering constraints of method.
      *
-     * @param tasks the expression that represents the tasks.
-     * @param constraints the ordering constraints to encode.
-     * @param totallyOrdered the flag to indicate if the tasks are marked as totally ordered.
-     * @param totallyOrdered the flag to indicate if the constraints are marked as durative.
+     * @param tasks          the expression that represents the tasks.
+     * @param constraints    the ordering constraints to encode.
+     * @param totallyOrdered the flag to indicate if the tasks are marked as totally
+     *                       ordered.
+     * @param totallyOrdered the flag to indicate if the constraints are marked as
+     *                       durative.
      */
     private Expression<Integer> initOrderingConstraints(Expression<String> tasks,
             Expression<String> constraints, boolean totallyOrdered, boolean durative) {
@@ -1115,38 +1147,42 @@ public abstract class AbstractProblem implements Problem {
             }
         } else {
             orderingConstraints = this.initExpression(constraints);
-            // we could check is the ordering constraint are totally ordered even if they are declared as not and encode
+            // we could check is the ordering constraint are totally ordered even if they
+            // are declared as not and encode
             // the orderering constraints as tottaly ordered if it is the case.
 
             // Code for reordering subtask if totally ordered
-            /*for (Expression<Integer> c : orderingConstraints.getChildren()) {
-                constraints.set(c.getChildren().get(0).getTaskID().getValue(),
-                    c.getChildren().get(1).getTaskID().getValue());
-            }
-            if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
-                Expression<Integer> orderedSubtasks = new Expression<>(Connector.AND);
-                for (int i = 0; i < size; i++) {
-                    int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
-                    constraints.removeRow(subtaskIndex);
-                    constraints.removeColumn(subtaskIndex);
-                    Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
-                    subtasks.getChildren().remove(subtaskIndex);
-                    st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
-                    orderedSubtasks.addChild(st);
-                }
-                intMeth.setSubTasks(orderedSubtasks);
-                orderingConstraints = new Expression<>(Connector.AND);
-                for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
-                    final Expression<Integer> constraint = new Expression<>(Connector.LESS_ORDERING_CONSTRAINT);
-                    final Expression<Integer> t1 = new Expression<>(Connector.TASK);
-                    t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
-                    constraint.addChild(t1);
-                    final Expression<Integer> t2 = new Expression<>(Connector.TASK);
-                    t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
-                    constraint.addChild(t2);
-                    orderingConstraints.addChild(constraint);
-                }
-            }*/
+            /*
+             * for (Expression<Integer> c : orderingConstraints.getChildren()) {
+             * constraints.set(c.getChildren().get(0).getTaskID().getValue(),
+             * c.getChildren().get(1).getTaskID().getValue());
+             * }
+             * if (constraints.isTotallyOrdered() && subtasks.getChildren().size() > 1) {
+             * Expression<Integer> orderedSubtasks = new Expression<>(Connector.AND);
+             * for (int i = 0; i < size; i++) {
+             * int subtaskIndex = constraints.getTasksWithNoPredecessors().get(0);
+             * constraints.removeRow(subtaskIndex);
+             * constraints.removeColumn(subtaskIndex);
+             * Expression<Integer> st = subtasks.getChildren().get(subtaskIndex);
+             * subtasks.getChildren().remove(subtaskIndex);
+             * st.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
+             * orderedSubtasks.addChild(st);
+             * }
+             * intMeth.setSubTasks(orderedSubtasks);
+             * orderingConstraints = new Expression<>(Connector.AND);
+             * for (int i = 0; i < orderedSubtasks.getChildren().size() - 1; i++) {
+             * final Expression<Integer> constraint = new
+             * Expression<>(Connector.LESS_ORDERING_CONSTRAINT);
+             * final Expression<Integer> t1 = new Expression<>(Connector.TASK);
+             * t1.setTaskID(new Symbol<>(SymbolType.TASK_ID, i));
+             * constraint.addChild(t1);
+             * final Expression<Integer> t2 = new Expression<>(Connector.TASK);
+             * t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,i + 1));
+             * constraint.addChild(t2);
+             * orderingConstraints.addChild(constraint);
+             * }
+             * }
+             */
         }
 
         return orderingConstraints;
@@ -1166,7 +1202,8 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Encodes an specified expression into its integer representation.
      *
-     * <p>Notes:
+     * <p>
+     * Notes:
      * <ul>
      * <li>equal predicate used specified value of -1.</li>
      * <li>variables used negative values in [-1,-infinity[.</li>
@@ -1177,7 +1214,7 @@ public abstract class AbstractProblem implements Problem {
      * @return the integer representation of the specified expression.
      */
     protected Expression<Integer> initExpression(final Expression<String> exp,
-                                           final List<String> variables) {
+            final List<String> variables) {
         final Expression<Integer> intExp = new Expression<>(exp.getConnector());
         switch (exp.getConnector()) {
             case EQUAL_ATOM:
@@ -1188,7 +1225,7 @@ public abstract class AbstractProblem implements Problem {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
                         args.add(new Symbol<>(SymbolType.CONSTANT,
-                            this.getConstantSymbols().indexOf(argument.getValue())));
+                                this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1203,7 +1240,7 @@ public abstract class AbstractProblem implements Problem {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
                         args.add(new Symbol<>(SymbolType.CONSTANT,
-                            this.getConstantSymbols().indexOf(argument.getValue())));
+                                this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1218,7 +1255,7 @@ public abstract class AbstractProblem implements Problem {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
                         args.add(new Symbol<>(SymbolType.CONSTANT,
-                            this.getConstantSymbols().indexOf(argument.getValue())));
+                                this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 intExp.setArguments(args);
@@ -1235,8 +1272,8 @@ public abstract class AbstractProblem implements Problem {
                 final List<TypedSymbol<String>> qvar = exp.getQuantifiedVariables();
                 final String type = this.toStringType(qvar.get(0).getTypes());
                 int typeIndex = this.getTypes().indexOf(type);
-                final TypedSymbol<Integer> intQvar  = new TypedSymbol<Integer>(SymbolType.VARIABLE,
-                    -variables.size() - 1);
+                final TypedSymbol<Integer> intQvar = new TypedSymbol<Integer>(SymbolType.VARIABLE,
+                        -variables.size() - 1);
                 intQvar.addType(new Symbol<>(SymbolType.TYPE, typeIndex));
                 intExp.addQuantifiedVariable(intQvar);
                 newVariables.add(qvar.get(0).getValue());
@@ -1309,12 +1346,12 @@ public abstract class AbstractProblem implements Problem {
                         args.add(new Symbol<>(SymbolType.VARIABLE, -variables.indexOf(argument.getValue()) - 1));
                     } else {
                         args.add(new Symbol<>(SymbolType.CONSTANT,
-                            this.getConstantSymbols().indexOf(argument.getValue())));
+                                this.getConstantSymbols().indexOf(argument.getValue())));
                     }
                 }
                 if (exp.getTaskID() != null) { // TaskID is null the task carried out by a method is encoded
                     intExp.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                        Integer.valueOf(exp.getTaskID().getValue().substring(1))));
+                            Integer.valueOf(exp.getTaskID().getValue().substring(1))));
                 }
                 intExp.setArguments(args);
                 break;
@@ -1330,7 +1367,7 @@ public abstract class AbstractProblem implements Problem {
                     t1.setConnector(Connector.TASK_ID);
                 }
                 t1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
+                        Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
                 intExp.addChild(t1);
                 Expression<Integer> t2 = new Expression<>();
                 if (exp.getChildren().get(0).getTimeSpecifier() != null) {
@@ -1339,25 +1376,25 @@ public abstract class AbstractProblem implements Problem {
                     t2.setConnector(Connector.TASK_ID);
                 }
                 t2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
+                        Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
                 intExp.addChild(t2);
                 break;
             case HOLD_BEFORE_METHOD_CONSTRAINT:
             case HOLD_AFTER_METHOD_CONSTRAINT:
                 final Expression<Integer> t = new Expression<>(Connector.TASK_ID);
                 t.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
+                        Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
                 intExp.addChild(t);
                 intExp.addChild(this.initExpression(exp.getChildren().get(1)));
                 break;
             case HOLD_BETWEEN_METHOD_CONSTRAINT:
                 final Expression<Integer> task1 = new Expression<>(Connector.TASK_ID);
                 task1.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
+                        Integer.valueOf(exp.getChildren().get(0).getTaskID().getValue().substring(1))));
                 intExp.addChild(task1);
                 final Expression<Integer> task2 = new Expression<>(Connector.TASK_ID);
                 task2.setTaskID(new Symbol<>(SymbolType.TASK_ID,
-                    Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
+                        Integer.valueOf(exp.getChildren().get(1).getTaskID().getValue().substring(1))));
                 intExp.addChild(task2);
                 intExp.addChild(this.initExpression(exp.getChildren().get(2)));
                 break;
@@ -1370,7 +1407,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Returns a string representation of the specified action.
      *
-     * @param action         the operator to print.
+     * @param action the operator to print.
      * @return a string representation of the specified operator.
      */
     protected String toString(final IntAction action) {
@@ -1456,9 +1493,9 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns a  string representation of the specified operator.
+     * Returns a string representation of the specified operator.
      *
-     * @param operator  the operator.
+     * @param operator the operator.
      * @return a string representation of the specified operator.
      */
     protected String toString(final AbstractIntOperator operator) {
@@ -1520,7 +1557,7 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Returns a string representation of an expression.
      *
-     * @param exp the expression.
+     * @param exp       the expression.
      * @param separator the string separator between predicate symbol and arguments.
      * @return a string representation of the specified expression.
      */
@@ -1531,9 +1568,10 @@ public abstract class AbstractProblem implements Problem {
     /**
      * Returns a string representation of an expression.
      *
-     * @param exp the expression.
+     * @param exp        the expression.
      * @param baseOffset the offset white space from the left used for indentation.
-     * @param separator  the string separator between predicate symbol and arguments.
+     * @param separator  the string separator between predicate symbol and
+     *                   arguments.
      * @return a string representation of the specified expression node.
      */
     protected String toString(final Expression<Integer> exp, String baseOffset, final String separator) {
@@ -1608,7 +1646,7 @@ public abstract class AbstractProblem implements Problem {
                         str.append(toString(exp.getChildren().get(i), offsetOr)).append("\n").append(offsetOr);
                     }
                     str.append(toString(exp.getChildren().get(
-                        exp.getChildren().size() - 1), offsetOr));
+                            exp.getChildren().size() - 1), offsetOr));
                 }
                 str.append(")");
                 break;
@@ -1616,7 +1654,7 @@ public abstract class AbstractProblem implements Problem {
             case EXISTS:
                 str.append(" (").append(exp.getConnector().getImage());
                 str.append(" (");
-                for (TypedSymbol<Integer> var: exp.getQuantifiedVariables()) {
+                for (TypedSymbol<Integer> var : exp.getQuantifiedVariables()) {
                     str.append(Symbol.DEFAULT_VARIABLE_SYMBOL);
                     str.append(-var.getValue() - 1);
                     str.append(" - ");
@@ -1712,10 +1750,12 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns a string representation of the internal data structure used during instantiation process.
+     * Returns a string representation of the internal data structure used during
+     * instantiation process.
      *
      * @param data the internal data structure.
-     * @return a string representation of the internal data structure used during instantiation process.
+     * @return a string representation of the internal data structure used during
+     *         instantiation process.
      */
     protected String toString(final Data data) {
         final StringBuilder str = new StringBuilder();
@@ -1874,7 +1914,8 @@ public abstract class AbstractProblem implements Problem {
     }
 
     /**
-     * Returns a short string representation of the specified operator, i.e., its name and its
+     * Returns a short string representation of the specified operator, i.e., its
+     * name and its
      * instantiated parameters.
      *
      * @param operator  the operator.
