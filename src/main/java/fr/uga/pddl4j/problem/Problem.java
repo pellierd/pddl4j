@@ -101,6 +101,13 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     List<List<Symbol<Integer>>> getPredicateSignatures();
 
     /**
+     * Returns the list of task symbols of the problem.
+     *
+     * @return the list of task symbols of the problem.
+     */
+    List<String> getTaskSymbols();
+
+    /**
      * Returns the list of relevant fluents used the problem.
      *
      * @return the list of relevant fluents used the problem.
@@ -143,29 +150,50 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     List<Task> getTasks();
 
     /**
-     * Returns the relevant operators for the tasks of the problem. The method return {@code null} if the problem is
+     * 
+     * Returns the relevant operators for the tasks of the problem. The method
+     * return {@code null} if the problem is
      * not hierarchical.
-     * <p>
-     *     Warning a task may have many resolvers event primitives tasks.
+     * 
+     * Warning a task may have many resolvers event primitives tasks.
      * </p>
-     * The resolvers returned are indexes of operators. To get the list of resolvers of a specific task {@code t} just
+     * 
+     * The resolvers returned are indexes of operators. To get the list of resolvers
+     * of a specific task {@code t} just
+     * 
      * write:
+     * 
      * <pre>{@code
      *     List<Integer> resolvers = problem.getTaskResolvers().get(t)
+     * 
      * }</pre>
+     * 
      * Two case must be considered.
      * <ul>
-     * <li> If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPrimtive()}
-     * returns true, the list of resolvers contains either indexes of actions either indexes of durative actions.
-     * If the index is positive the index represents an action. To get the corresponding action just use
-     * {@code problem.getActions(index)}. If the index is negative the index represents a durative action.
-     * To get the corresponding durative action just use {@code problem.getDurativeActions(-index - 1)}.</li>
-     * <li>Symmetrically, if the task {@code t} is compound, i.e., {@code problem.getTask(t).isCompound()}
-     * returns true, the list of resolvers contains either indexes of method either indexes of durative methods.
-     * If the index is positive the index represents a method. To get the corresponding method just use
-     * {@code problem.getMethods(index)}. If the index is negative the index represents a durative method.
-     * To get the corresponding durative method just use {@code problem.getDurativeMethods(-index - 1)}.</li>
+     * 
+     * <li>If the task {@code t} is primitive, i.e., {@code problem.getTask(t).isPr
+     * mtive()}
+     * returns true, the list of resolvers contains either indexes of acti
+     * ns either indexes of durative actions.
+     * If the index is positive the index represents an action. To get the c
+     * rresponding action just use
+     * {@code problem.getActions(index)}. If the index i
+     * negative the index represents a durative action.
+     * To get the corresponding durative action just use {@code pr
+     * blem.getDurativeActions(-index - 1)}.</li>
+     * <li>Symmetrically, if the task {@code t} is compound, i.e., {@code problem.g
+     * tTask(t).isCompound()}
+     * returns true, the list of resolvers contains either indexes of met
+     * od either indexes of durative methods.
+     * If the index is positive the index represents a method. To get the co
+     * responding method just use
+     * {@code problem.getMethods(index)}. If the index i
+     * negative the index represents a durative method.
+     * To get the corresponding durative method just use
+     * {@code problem.getDurativeMethods(-index - 1)}.</li>
+     * 
      * </ul>
+     * 
      * @return the relevant operators for a task.
      */
     List<List<Integer>> getTaskResolvers();
@@ -192,8 +220,11 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     TaskNetwork getInitialTaskNetwork();
 
     /**
-     * Returns <code>true</code> if this problem is solvable. It is not because the method returns <code>true</code>
-     * that the problem is solvable. It just means that instantiation process can not exclude the fact that the problem
+     * 
+     * Returns <code>true</code> if this problem is solvable. It is not because t
+     * e method returns <code>true</code>
+     * that the problem is solvable. It just means that instantiation process can
+     * not exclude the fact that the problem
      * is solvable.
      *
      * @return <code>true</code> if this problem is solvable; <code>false</code>.
@@ -256,8 +287,11 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     /**
      * Returns a string representation of a hierarchical decomposition of plan.
      *
-     * @param hierarchy the hierarchical decomposition to convert into string represention.
-     * @return the string representation of the he hierarchical decomposition in parameter.
+     * 
+     * @param hierarchy the hierarchical decomposition to convert into string re
+     *                  resention.
+     * @return the string representation of the he hierarchical decomposition in
+     *         parameter.
      */
     String toString(final Hierarchy hierarchy);
 
@@ -318,7 +352,9 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     String toString(final ConditionalEffect effect);
 
     /**
-     * Returns a short string representation of the specified operator, i.e., its name and its
+     * 
+     * Returns a short string representation of the specified operator, i.e., its
+     * name and its
      * instantiated parameters. This method can be used for actions and methods.
      *
      * @param operator the operator.
@@ -327,9 +363,13 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     String toShortString(final AbstractInstantiatedOperator operator);
 
     /**
-     * Simply an atomic formula based on the inertia and the initial state of the problem. The atomic formula in
-     * parameter must be an expression of type ATOM. The simplification can be done with totally or partially
-     * instantiated atom. When the atom can be simplified, its connector is modified to TRUE or FALSE.
+     * 
+     * Simply an atomic formula based on the inertia and the initial state of the p
+     * oblem. The atomic formula in
+     * parameter must be an expression of type ATOM. The simplification can be done
+     * ith totally or partially
+     * instantiated atom. When the atom can be simplified, its connector is modified
+     * to TRUE or FALSE.
      *
      * @param atom the atomic formula.
      * @return if the atom can be simplify to TRUE or FALSE.
@@ -337,9 +377,13 @@ public interface Problem extends Serializable, AtomicFormulaSimplifier<Integer> 
     boolean simplify(final Expression<Integer> atom);
 
     /**
-     * Returns true if the problem is totally ordered. The method returns true if the problem is not hierarchical, i.e.,
-     * contains no methods durative or not and no no initial task network. A hierarchical problem is totally ordered if
-     * and only the subtasks of each method of the problem are totally ordered and the initial task network is totally
+     * 
+     * Returns true if the problem is totally ordered. The method returns tr
+     * e if the problem is not hierarchical, i.e.,
+     * contains no methods durative or not and no no initial task network. A hiera
+     * chical problem is totally ordered if
+     * and only the subtasks of each method of the problem are totally ordered and
+     * the initial task network is totally
      * ordered.
      *
      * @return true if the problem is totally ordered, false otherwise.
