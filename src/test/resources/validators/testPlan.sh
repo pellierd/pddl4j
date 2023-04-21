@@ -2,7 +2,7 @@
 
 XM=256m
 VERSION=4.0.0
-
+COMMANDTIMEOUT=300
 # Planner Data
 statespace=fr.uga.pddl4j.planners.statespace.HSP
 heuristic="MAX"
@@ -30,13 +30,7 @@ benchmarks=("blocks" "depots" "gripper" "logistics")
 # benchmark_types
 #  The array of types of problem (of the benchmark at the same index) we want to plan.
 #  The size of this array must be the same as "ipc_folders" and "benchmarks".
-benchmark_types=("strips-typed" "strips-automatic" "strips" "strip-round1")
-
-# nb_pddl_to_do
-#  Variable that represents the number of pddl problem to run in each beachmark
-#  The default value: 20 represents the min max number of problem’s files
-#  between the 4 default benchmarks folder.
-nb_pddl_to_do=20
+benchmark_types=("strips-typed" "strips-automatic" "strips" "strips-round1")
 
 # index_folder
 #  Variable used to navigate between folders
@@ -55,7 +49,7 @@ function configuration() {
     for (($((index_folder = 0)); $index_folder < ${#benchmarks[@]}; $((index_folder++)))); do
         echo "# ${benchmarks[index_folder]} output folder"
         rm -rf "${benchmarks[index_folder]}"
-        # mkdir "${benchmarks[index_folder]}"
+        mkdir "${benchmarks[index_folder]}"
     done
     echo
 }
@@ -64,22 +58,17 @@ function configuration() {
 function run_benchmarks() {
     for (($((index_folder = 0)); $index_folder < ${#benchmarks[@]}; $((index_folder++)))); do
         # Create the right path to use for this loop
+        echo "Find the number of pddl problem in the folder:"
         complete_path="$path/${ipc_folders[index_folder]}/${benchmarks[index_folder]}/${benchmark_types[index_folder]}"
-
-        # Execute 20 HSP Planifications
-        echo "### Execute 20 HSP planifications on ${benchmarks[index_folder]}"
+        pushd $complete_path
+        pddl_files=($(printf "%s " p*.pddl))
+        popd
+        # Execute HSP Planifications
+        nbfiles=${#pddl_files[@]}
+        echo "### Execute ${nbfiles} HSP planifications on ${benchmarks[index_folder]}"
         echo
-        for (($((index_file = 1)); $index_file <= $nb_pddl_to_do; $((index_file++)))); do
-            # Find the correct name of the pddl problem (example sp001.pddl or p011.pddl or p111.pddl)
-            if [ ${index_file} -lt 10 ]; then
-                problem_name=p00${index_file}.pddl
-            else
-                if [ ${index_file} -lt 100 ]; then
-                    problem_name=p0${index_file}.pddl
-                else
-                    problem_name=p${index_file}.pddl
-                fi
-            fi
+        for (($((index_file = 0)); $index_file <= $((${nbfiles}-1)); $((index_file++)))); do
+            problem_name=${pddl_files[index_file]}
             # Solve using HSP Planner
             solveHSP
         done
@@ -90,7 +79,7 @@ function run_benchmarks() {
 # Run HSP Planner
 function solveHSP() {
     echo "# Plan ${problem_name}"
-    timeout 60 \
+    timeout $COMMANDTIMEOUT \
     java \
         -Xms${XM} \
         -Xmx${XM} \
@@ -102,7 +91,7 @@ function solveHSP() {
         --log=${logLevel} \
         --timeout=${timeout} \
         --weight=${weight} \
-        >${benchmarks[index_folder]}/${benchmarks[index_folder]}_${index_file}.txt
+        >${benchmarks[index_folder]}/${benchmarks[index_folder]}_$((${index_file}+1)).txt
 }
 # MUST BE RUN FROM PDDL4J/
 # bash ./src/test/resources/validators/testPlan.sh
