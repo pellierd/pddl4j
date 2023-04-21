@@ -55,7 +55,7 @@ function configuration() {
     for (($((index_folder = 0)); $index_folder < ${#benchmarks[@]}; $((index_folder++)))); do
         echo "# ${benchmarks[index_folder]} output folder"
         rm -rf "${benchmarks[index_folder]}"
-        mkdir "${benchmarks[index_folder]}"
+        # mkdir "${benchmarks[index_folder]}"
     done
     echo
 }
@@ -90,7 +90,7 @@ function run_benchmarks() {
 # Run HSP Planner
 function solveHSP() {
     echo "# Plan ${problem_name}"
-
+    timeout 60 \
     java \
         -Xms${XM} \
         -Xmx${XM} \
