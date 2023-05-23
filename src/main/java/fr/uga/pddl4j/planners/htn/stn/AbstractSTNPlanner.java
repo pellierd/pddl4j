@@ -453,11 +453,11 @@ public abstract class AbstractSTNPlanner extends AbstractHTNPlanner implements S
                 if (LOGGER.isFatalEnabled()) {
                     LOGGER.fatal("Out of memory during search !\n");
                 }
+                System.exit(0);
             } catch (ProblemNotSupportedException e) {
                 if (LOGGER.isFatalEnabled()) {
                     LOGGER.fatal(e.getMessage() + "\n");
                 }
-            } finally {
                 System.exit(0);
             }
 
