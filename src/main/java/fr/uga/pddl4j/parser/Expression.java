@@ -1751,18 +1751,21 @@ public class Expression<T> implements Locatable, Iterable<Expression<T>>, Serial
                 break;
             case TASK:
                 str.append("(");
+                if (this.getTaskID() != null) {
+                    str.append(this.getTaskID()).append(" (");
+                }
                 str.append(this.getSymbol());
                 str.append(" ");
                 if (!this.getArguments().isEmpty()) {
-                    if (this.getTaskID() != null) {
-                        str.append(this.getTaskID()).append(" (");
-                    }
                     for (int i = 0; i < this.getArguments().size() - 1; i++) {
                         str.append(this.getArguments().get(i).toString()).append(" ");
                     }
                     str.append(this.getArguments().get(this.getArguments().size() - 1).toString());
                 }
                 str.append(")");
+                if (this.getTaskID() != null) {
+                    str.append(")");
+                }
                 break;
             case EQUAL_ATOM:
                 str.append("(")
