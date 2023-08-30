@@ -1,165 +1,165 @@
 (define (problem blocks-49-1)
 (:domain blocks)
 (:objects
-    W1
-    V1
-    U1
-    T1
-    S1
-    R1
-    Q1
-    P1
-    O1
-    N1
-    M1
-    L1
-    K1
-    J1
-    I1
-    H1
-    G1
-    F1
-    E1
-    D1
-    C1
-    B1
-    A1
-    Z
-    Y
-    X
-    W
-    V
-    U
-    T
-    S
-    R
-    Q
-    P
-    O
-    N
-    M
-    L
-    K
-    J
-    I
-    H
-    G
-    F
-    E
-    D
-    C
-    A
-    B
+    w1
+    v1
+    u1
+    t1
+    s1
+    r1
+    q1
+    p1
+    o1
+    n1
+    m1
+    l1
+    k1
+    j1
+    i1
+    h1
+    g1
+    f1
+    e1
+    d1
+    c1
+    b1
+    a1
+    z
+    y
+    x
+    w
+    v
+    u
+    t
+    s
+    r
+    q
+    p
+    o
+    n
+    m
+    l
+    k
+    j
+    i
+    h
+    g
+    f
+    e
+    d
+    c
+    a
+    b
  - block)
 (:init
-    (CLEAR H1)
-    (CLEAR O)
-    (CLEAR D)
-    (CLEAR R1)
-    (CLEAR N)
-    (CLEAR Q1)
-    (CLEAR C)
-    (CLEAR A1)
-    (ONTABLE Z)
-    (ONTABLE D1)
-    (ONTABLE T1)
-    (ONTABLE G1)
-    (ONTABLE I1)
-    (ONTABLE Q1)
-    (ONTABLE C)
-    (ONTABLE A1)
-    (ON H1 E1)
-    (ON E1 B)
-    (ON B T)
-    (ON T M)
-    (ON M F1)
-    (ON F1 C1)
-    (ON C1 S)
-    (ON S K)
-    (ON K O1)
-    (ON O1 B1)
-    (ON B1 V)
-    (ON V U)
-    (ON U K1)
-    (ON K1 U1)
-    (ON U1 Y)
-    (ON Y R)
-    (ON R V1)
-    (ON V1 J1)
-    (ON J1 N1)
-    (ON N1 E)
-    (ON E Q)
-    (ON Q I)
-    (ON I Z)
-    (ON O X)
-    (ON X S1)
-    (ON S1 L)
-    (ON L F)
-    (ON F H)
-    (ON H W)
-    (ON W P)
-    (ON P J)
-    (ON J A)
-    (ON A D1)
-    (ON D W1)
-    (ON W1 P1)
-    (ON P1 M1)
-    (ON M1 G)
-    (ON G T1)
-    (ON R1 G1)
-    (ON N L1)
-    (ON L1 I1)
-    (HANDEMPTY)
+    (clear h1)
+    (clear o)
+    (clear d)
+    (clear r1)
+    (clear n)
+    (clear q1)
+    (clear c)
+    (clear a1)
+    (ontable z)
+    (ontable d1)
+    (ontable t1)
+    (ontable g1)
+    (ontable i1)
+    (ontable q1)
+    (ontable c)
+    (ontable a1)
+    (on h1 e1)
+    (on e1 b)
+    (on b t)
+    (on t m)
+    (on m f1)
+    (on f1 c1)
+    (on c1 s)
+    (on s k)
+    (on k o1)
+    (on o1 b1)
+    (on b1 v)
+    (on v u)
+    (on u k1)
+    (on k1 u1)
+    (on u1 y)
+    (on y r)
+    (on r v1)
+    (on v1 j1)
+    (on j1 n1)
+    (on n1 e)
+    (on e q)
+    (on q i)
+    (on i z)
+    (on o x)
+    (on x s1)
+    (on s1 l)
+    (on l f)
+    (on f h)
+    (on h w)
+    (on w p)
+    (on p j)
+    (on j a)
+    (on a d1)
+    (on d w1)
+    (on w1 p1)
+    (on p1 m1)
+    (on m1 g)
+    (on g t1)
+    (on r1 g1)
+    (on n l1)
+    (on l1 i1)
+    (handempty)
 )
 (:goal (and
-    (ON Q L1)
-    (ON L1 H1)
-    (ON H1 E1)
-    (ON E1 N)
-    (ON N B)
-    (ON B P)
-    (ON P F1)
-    (ON F1 T1)
-    (ON T1 G)
-    (ON G G1)
-    (ON G1 A1)
-    (ON A1 S)
-    (ON S S1)
-    (ON S1 R)
-    (ON R I1)
-    (ON I1 H)
-    (ON H K1)
-    (ON K1 D1)
-    (ON D1 M1)
-    (ON M1 J)
-    (ON J N1)
-    (ON N1 Q1)
-    (ON Q1 B1)
-    (ON B1 F)
-    (ON F I)
-    (ON I P1)
-    (ON P1 Z)
-    (ON Z T)
-    (ON T X)
-    (ON X Y)
-    (ON Y V1)
-    (ON V1 U)
-    (ON U E)
-    (ON E D)
-    (ON D W1)
-    (ON W1 W)
-    (ON W C)
-    (ON C R1)
-    (ON R1 O1)
-    (ON O1 K)
-    (ON K U1)
-    (ON U1 V)
-    (ON V O)
-    (ON O J1)
-    (ON J1 C1)
-    (ON C1 M)
-    (ON M L)
-    (ON L A)
+    (on q l1)
+    (on l1 h1)
+    (on h1 e1)
+    (on e1 n)
+    (on n b)
+    (on b p)
+    (on p f1)
+    (on f1 t1)
+    (on t1 g)
+    (on g g1)
+    (on g1 a1)
+    (on a1 s)
+    (on s s1)
+    (on s1 r)
+    (on r i1)
+    (on i1 h)
+    (on h k1)
+    (on k1 d1)
+    (on d1 m1)
+    (on m1 j)
+    (on j n1)
+    (on n1 q1)
+    (on q1 b1)
+    (on b1 f)
+    (on f i)
+    (on i p1)
+    (on p1 z)
+    (on z t)
+    (on t x)
+    (on x y)
+    (on y v1)
+    (on v1 u)
+    (on u e)
+    (on e d)
+    (on d w1)
+    (on w1 w)
+    (on w c)
+    (on c r1)
+    (on r1 o1)
+    (on o1 k)
+    (on k u1)
+    (on u1 v)
+    (on v o)
+    (on o j1)
+    (on j1 c1)
+    (on c1 m)
+    (on m l)
+    (on l a)
 )
 )
 )

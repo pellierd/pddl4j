@@ -13,7 +13,7 @@
 	  anorient)
 
   (:constants cold hot - temperature
-	      cylindrical - ashape 
+	      cylindrical - ashape
 	      polisher roller lathe grinder punch drill-press
 	      spray-painter immersion-painter - machine
               polished rough smooth - surface)
@@ -72,10 +72,10 @@
 			      (not (temperature ?x ?oldtemp))))))
 
   (:action do-lathe
-	   :parameters (?x - part) 
+	   :parameters (?x - part)
 	   :precondition (and (not (busy lathe))
 			      (not (scheduled ?x)))
-	   :effect (and 
+	   :effect (and
 		    (busy lathe)
 		    (scheduled ?x)
 		    (surface-condition ?x rough)
@@ -93,11 +93,11 @@
 			    (not (painted ?x ?oldpaint))))))
 
   (:action do-grind
-	   :parameters (?x - part) 
+	   :parameters (?x - part)
 	   :precondition (and (not (busy grinder))
 			      (not (scheduled ?x)))
 	   :effect (and
-		    (busy GRINDER)
+		    (busy grinder)
 		    (scheduled ?x)
 		    (surface-condition ?x smooth)
 		    (when (not (objscheduled))
@@ -110,7 +110,7 @@
 			      (not (painted ?x ?oldpaint))))))
 
   (:action do-punch
-	   :parameters (?x - part ?width - width  ?orient - anorient)  
+	   :parameters (?x - part ?width - width  ?orient - anorient)
 	   :precondition (and
 			  (has-bit punch ?width)
 			  (can-orient punch ?orient)
@@ -125,7 +125,7 @@
 		    (surface-condition ?x rough)
 		    (when (not (objscheduled))
 		      (objscheduled))
-		    (forall (?oldsurface - surface) 
+		    (forall (?oldsurface - surface)
 			    (when (surface-condition ?x ?oldsurface)
 			      (not (surface-condition ?x ?oldsurface))))))
 
@@ -146,12 +146,12 @@
 		      (objscheduled))))
 
   (:action do-spray-paint
-	   :parameters (?x - part ?newpaint - colour) 
+	   :parameters (?x - part ?newpaint - colour)
 	   :precondition (and
 			  (has-paint spray-painter ?newpaint)
 			  (not (busy spray-painter))
 			  (not (scheduled ?x))
-			  (temperature ?x COLD))
+			  (temperature ?x cold))
 	   :effect (and
 		    (busy spray-painter)
 		    (scheduled ?x)
@@ -164,9 +164,9 @@
 		    (forall (?oldpaint - colour)
 			    (when (painted ?x ?oldpaint)
 			      (not (painted ?x ?oldpaint))))))
-  
-  (:action do-immersion-paint     
-           :parameters (?x - part ?newpaint - colour) 
+
+  (:action do-immersion-paint
+           :parameters (?x - part ?newpaint - colour)
            :precondition (and
                           (has-paint immersion-painter ?newpaint)
                           (not (busy immersion-painter))
@@ -180,7 +180,7 @@
                     (forall (?oldpaint - colour)
                             (when (painted ?x ?oldpaint)
                               (not (painted ?x ?oldpaint))))))
-  
+
   (:action do-time-step
            :parameters ()
            :precondition (objscheduled)

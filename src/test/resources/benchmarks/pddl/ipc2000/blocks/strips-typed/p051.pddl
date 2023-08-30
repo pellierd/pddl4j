@@ -1,89 +1,89 @@
 (define (problem blocks-25-0)
 (:domain blocks)
 (:objects
-    Y
-    X
-    W
-    V
-    U
-    T
-    S
-    R
-    Q
-    P
-    O
-    N
-    M
-    L
-    K
-    J
-    I
-    H
-    G
-    F
-    E
-    D
-    C
-    A
-    B
+    y
+    x
+    w
+    v
+    u
+    t
+    s
+    r
+    q
+    p
+    o
+    n
+    m
+    l
+    k
+    j
+    i
+    h
+    g
+    f
+    e
+    d
+    c
+    a
+    b
  - block)
 (:init
-    (CLEAR A)
-    (CLEAR U)
-    (CLEAR X)
-    (CLEAR P)
-    (ONTABLE B)
-    (ONTABLE F)
-    (ONTABLE E)
-    (ONTABLE P)
-    (ON A V)
-    (ON V C)
-    (ON C R)
-    (ON R S)
-    (ON S H)
-    (ON H O)
-    (ON O D)
-    (ON D W)
-    (ON W Y)
-    (ON Y G)
-    (ON G J)
-    (ON J Q)
-    (ON Q M)
-    (ON M B)
-    (ON U I)
-    (ON I K)
-    (ON K T)
-    (ON T F)
-    (ON X N)
-    (ON N L)
-    (ON L E)
-    (HANDEMPTY)
+    (clear a)
+    (clear u)
+    (clear x)
+    (clear p)
+    (ontable b)
+    (ontable f)
+    (ontable e)
+    (ontable p)
+    (on a v)
+    (on v c)
+    (on c r)
+    (on r s)
+    (on s h)
+    (on h o)
+    (on o d)
+    (on d w)
+    (on w y)
+    (on y g)
+    (on g j)
+    (on j q)
+    (on q m)
+    (on m b)
+    (on u i)
+    (on i k)
+    (on k t)
+    (on t f)
+    (on x n)
+    (on n l)
+    (on l e)
+    (handempty)
 )
 (:goal (and
-    (ON L T)
-    (ON T W)
-    (ON W N)
-    (ON N O)
-    (ON O S)
-    (ON S Y)
-    (ON Y A)
-    (ON A R)
-    (ON R C)
-    (ON C G)
-    (ON G J)
-    (ON J D)
-    (ON D B)
-    (ON B K)
-    (ON K P)
-    (ON P M)
-    (ON M X)
-    (ON X E)
-    (ON E V)
-    (ON V F)
-    (ON F I)
-    (ON I Q)
-    (ON Q H)
-    (ON H U)
+    (on l t)
+    (on t w)
+    (on w n)
+    (on n o)
+    (on o s)
+    (on s y)
+    (on y a)
+    (on a r)
+    (on r c)
+    (on c g)
+    (on g j)
+    (on j d)
+    (on d b)
+    (on b k)
+    (on k p)
+    (on p m)
+    (on m x)
+    (on x e)
+    (on e v)
+    (on v f)
+    (on f i)
+    (on i q)
+    (on q h)
+    (on h u)
 )
 )
 )

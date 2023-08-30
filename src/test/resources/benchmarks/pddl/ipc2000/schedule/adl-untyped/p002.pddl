@@ -1,53 +1,53 @@
 (define (problem schedule-2-1)
 (:domain schedule)
 (:objects
-    CIRCULAR
-    TWO
-    THREE
-    BLUE
-    YELLOW
-    BACK
-    RED
-    B0
-    FRONT
-    ONE
-    BLACK
-    OBLONG
-    A0
+    circular
+    two
+    three
+    blue
+    yellow
+    back
+    red
+    b0
+    front
+    one
+    black
+    oblong
+    a0
 )
 (:init
-    (SHAPE A0 OBLONG)
-    (SURFACE-CONDITION A0 SMOOTH)
-    (PAINTED A0 BLACK)
-    (HAS-HOLE A0 THREE BACK)
-    (TEMPERATURE A0 COLD)
-    (SHAPE B0 CIRCULAR)
-    (SURFACE-CONDITION B0 SMOOTH)
-    (PAINTED B0 YELLOW)
-    (HAS-HOLE B0 THREE BACK)
-    (TEMPERATURE B0 COLD)
-    (CAN-ORIENT DRILL-PRESS BACK)
-    (CAN-ORIENT PUNCH BACK)
-    (CAN-ORIENT DRILL-PRESS FRONT)
-    (CAN-ORIENT PUNCH FRONT)
-    (HAS-PAINT IMMERSION-PAINTER YELLOW)
-    (HAS-PAINT SPRAY-PAINTER YELLOW)
-    (HAS-PAINT IMMERSION-PAINTER BLUE)
-    (HAS-PAINT SPRAY-PAINTER BLUE)
-    (HAS-PAINT IMMERSION-PAINTER BLACK)
-    (HAS-PAINT SPRAY-PAINTER BLACK)
-    (HAS-PAINT IMMERSION-PAINTER RED)
-    (HAS-PAINT SPRAY-PAINTER RED)
-    (HAS-BIT DRILL-PRESS THREE)
-    (HAS-BIT PUNCH THREE)
-    (HAS-BIT DRILL-PRESS TWO)
-    (HAS-BIT PUNCH TWO)
-    (HAS-BIT DRILL-PRESS ONE)
-    (HAS-BIT PUNCH ONE)
-    (PART B0)
-    (PART A0)
+    (shape a0 oblong)
+    (surface-condition a0 smooth)
+    (painted a0 black)
+    (has-hole a0 three back)
+    (temperature a0 cold)
+    (shape b0 circular)
+    (surface-condition b0 smooth)
+    (painted b0 yellow)
+    (has-hole b0 three back)
+    (temperature b0 cold)
+    (can-orient drill-press back)
+    (can-orient punch back)
+    (can-orient drill-press front)
+    (can-orient punch front)
+    (has-paint immersion-painter yellow)
+    (has-paint spray-painter yellow)
+    (has-paint immersion-painter blue)
+    (has-paint spray-painter blue)
+    (has-paint immersion-painter black)
+    (has-paint spray-painter black)
+    (has-paint immersion-painter red)
+    (has-paint spray-painter red)
+    (has-bit drill-press three)
+    (has-bit punch three)
+    (has-bit drill-press two)
+    (has-bit punch two)
+    (has-bit drill-press one)
+    (has-bit punch one)
+    (part b0)
+    (part a0)
 )
 (:goal (and
-    (PAINTED A0 YELLOW)
-    (PAINTED B0 BLUE)
+    (painted a0 yellow)
+    (painted b0 blue)
 )))

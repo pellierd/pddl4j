@@ -64,11 +64,11 @@
 			      (not (temperature ?x ?oldtemp))))))
 
   (:action do-lathe
-	   :parameters (?x) 
+	   :parameters (?x)
 	   :precondition (and (part ?x)
 			      (not (busy lathe))
 			      (not (scheduled ?x)))
-	   :effect (and 
+	   :effect (and
 		    (busy lathe)
 		    (scheduled ?x)
 		    (surface-condition ?x rough)
@@ -86,12 +86,12 @@
 			    (not (painted ?x ?oldpaint))))))
 
   (:action do-grind
-	   :parameters (?x) 
+	   :parameters (?x)
 	   :precondition (and (part ?x)
 			      (not (busy grinder))
 			      (not (scheduled ?x)))
 	   :effect (and
-		    (busy GRINDER)
+		    (busy grinder)
 		    (scheduled ?x)
 		    (surface-condition ?x smooth)
 		    (when (not (objscheduled))
@@ -104,7 +104,7 @@
 			      (not (painted ?x ?oldpaint))))))
 
   (:action do-punch
-	   :parameters (?x ?width ?orient) 
+	   :parameters (?x ?width ?orient)
 	   :precondition (and
 			  (part ?x)
 			  (has-bit punch ?width)
@@ -120,7 +120,7 @@
 		    (surface-condition ?x rough)
 		    (when (not (objscheduled))
 		      (objscheduled))
-		    (forall (?oldsurface) 
+		    (forall (?oldsurface)
 			    (when (surface-condition ?x ?oldsurface)
 			      (not (surface-condition ?x ?oldsurface))))))
 
@@ -142,7 +142,7 @@
 		      (objscheduled))))
 
   (:action do-spray-paint
-	   :parameters (?x ?newpaint) 
+	   :parameters (?x ?newpaint)
 	   :precondition (and
 			  (part ?x)
 			  (has-paint spray-painter ?newpaint)
@@ -163,7 +163,7 @@
 			      (not (painted ?x ?oldpaint))))))
 
   (:action do-immersion-paint
-           :parameters (?x ?newpaint) 
+           :parameters (?x ?newpaint)
            :precondition (and
                           (part ?x)
                           (has-paint immersion-painter ?newpaint)
@@ -178,7 +178,7 @@
                     (forall (?oldpaint)
                             (when (painted ?x ?oldpaint)
                               (not (painted ?x ?oldpaint))))))
-  
+
   (:action do-time-step
            :parameters ()
            :precondition (objscheduled)

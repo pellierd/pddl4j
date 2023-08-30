@@ -813,7 +813,7 @@ Symbol<String> primitive_type() :
 (	t=<OBJECT_TYPE>
 |	t=<NUMBER_TYPE>
 | 	t=<SYMBOL>) {
-	    return new Symbol<String>(SymbolType.TYPE, t.image.toLowerCase(),
+	    return new Symbol<String>(SymbolType.TYPE, t.image,
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
     }
 }
@@ -849,7 +849,7 @@ Symbol<String> constant() :
 	| 	t=<END>
 	| 	t=<START>
 	| 	t=<OVER>) {
-	return new Symbol<String>(SymbolType.CONSTANT, t.image.toLowerCase(),
+	return new Symbol<String>(SymbolType.CONSTANT, t.image,
 	    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 }
 }
@@ -905,7 +905,7 @@ Symbol<String> task_symbol() : // ADD HDDL
  }
  {
  	t=<SYMBOL> {
- 		return new Symbol<String>(SymbolType.TASK, t.image.toLowerCase(),
+ 		return new Symbol<String>(SymbolType.TASK, t.image,
  		 t.beginLine, t.beginColumn, t.endLine, t.endColumn);
  	}
  }
@@ -939,7 +939,7 @@ Symbol<String> predicate() :
 | 	t=<END>
 | 	t=<START>
 | 	t=<OVER>) {
-		return new Symbol<String>(SymbolType.PREDICATE, t.image.toLowerCase(),
+		return new Symbol<String>(SymbolType.PREDICATE, t.image,
 		 t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -950,7 +950,7 @@ Symbol<String> variable() :
 }
 {
 	t=<VARIABLE_SYMBOL> {
-	    return new Symbol<String>(SymbolType.VARIABLE, t.image.toLowerCase(),
+	    return new Symbol<String>(SymbolType.VARIABLE, t.image,
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -1003,7 +1003,7 @@ Symbol<String> functor() :
 	| t=<END>
     | t=<START>
     | t=<OVER>) {
-	    return new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+	    return new Symbol<String>(SymbolType.FUNCTOR, t.image,
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -1050,7 +1050,7 @@ List<Symbol<String>> function_type() :
 			|| this.isRequirement(RequireKey.FLUENTS)
 			|| this.isRequirement(RequireKey.ACTION_COSTS)})
 		t=<NUMBER_TYPE> {
-			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image.toLowerCase(),
+			typesList.add(new Symbol<String>(SymbolType.TYPE, t.image,
 			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			return typesList;
 		}
@@ -1408,7 +1408,7 @@ Expression<String> equal_atomic_formula() :
 		arg1=term()
 		arg2=term()
 	end=<RIGHT_BRACKET> {
-        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
             t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	 	args.add(arg1);
 	 	args.add(arg2);
@@ -2089,7 +2089,7 @@ Symbol<String> method_name() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.ACTION, t.image.toLowerCase(),
+		return new Symbol<String>(SymbolType.ACTION, t.image,
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -2432,7 +2432,7 @@ Symbol<String> task_id_symbol() : // ADD HDDL
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.TASK_ID, t.image.toLowerCase(),
+		return new Symbol<String>(SymbolType.TASK_ID, t.image,
 		 t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -2853,7 +2853,7 @@ Symbol<String> action_name() :
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.ACTION, t.image.toLowerCase(),
+		return new Symbol<String>(SymbolType.ACTION, t.image,
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -2972,7 +2972,7 @@ Symbol<String> pref_name() :
 }
 {
 	t=<SYMBOL> {
-		return new Symbol<String>(SymbolType.PREFERENCE, t.image.toLowerCase(),
+		return new Symbol<String>(SymbolType.PREFERENCE, t.image,
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -3144,7 +3144,7 @@ Expression<String> total_cost() :
 {
 	begin=<LEFT_BRACKET> t=<TOTAL_COST> end=<RIGHT_BRACKET> {
 	Expression<String> exp = new Expression<String>(Connector.FN_HEAD);
-	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+	exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
 	    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 	exp.setArguments(new ArrayList<Symbol<String>>());
 	exp.setBegin(begin);
@@ -3320,7 +3320,7 @@ Symbol<String> da_symbol() :
 }
 {
 	t=<SYMBOL> {
-	return new Symbol<String>(SymbolType.ACTION, t.image.toLowerCase(),
+	return new Symbol<String>(SymbolType.ACTION, t.image,
 	    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 }
 }
@@ -3494,7 +3494,7 @@ Expression<String> var_duration() :
 {
 	t=<VAR_DURATION>
 	{
-		exp.setVariable(new Symbol<String>(SymbolType.DURATION_VARIABLE, t.image.toLowerCase(),
+		exp.setVariable(new Symbol<String>(SymbolType.DURATION_VARIABLE, t.image,
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 		return exp;
 	}
@@ -3680,7 +3680,7 @@ Expression<String> f_duration() : // ADD HDDL2.1
 }
 {
     begin=<LEFT_BRACKET> t=<F_DURATION> argument = task_id_symbol() end=<RIGHT_BRACKET> {
-        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+        exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
             t.beginLine, t.beginColumn, t.endLine, t.endColumn));
         exp.setArguments(new ArrayList<Symbol<String>>());
         exp.setBegin(begin);
@@ -4307,7 +4307,7 @@ Symbol<String> continuous_variable() :
 }
 {
 	t=<CONTINUOUS_VARIABLE>  {
-		return new Symbol<String>(SymbolType.CONTINUOUS_VARIABLE, t.image.toLowerCase(),
+		return new Symbol<String>(SymbolType.CONTINUOUS_VARIABLE, t.image,
 		    t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -4526,7 +4526,7 @@ Symbol<String> problem_name() :
 { Token t = null; }
 {
 	t=<SYMBOL> {
-	    return new Symbol<String>(SymbolType.PROBLEM, t.image.toLowerCase(),
+	    return new Symbol<String>(SymbolType.PROBLEM, t.image,
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -4535,7 +4535,7 @@ Symbol<String> domain_problem_name() :
 { Token t = null; }
 {
 	t=<SYMBOL> {
-	    return new Symbol<String>(SymbolType.DOMAIN, t.image.toLowerCase(),
+	    return new Symbol<String>(SymbolType.DOMAIN, t.image,
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
     }
 }
@@ -4544,7 +4544,7 @@ Symbol<String> domain_name() :
 { Token t = null; }
 {
 	t=<SYMBOL> {
-	    return new Symbol<String>(SymbolType.DOMAIN, t.image.toLowerCase(),
+	    return new Symbol<String>(SymbolType.DOMAIN, t.image,
 	        t.beginLine, t.beginColumn, t.endLine, t.endColumn);
 	}
 }
@@ -4897,7 +4897,7 @@ Expression<String> total_time() :
 		}
 | 	LOOKAHEAD(2)
 		t=<TOTAL_TIME>) {
-			exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image.toLowerCase(),
+			exp.setSymbol(new Symbol<String>(SymbolType.FUNCTOR, t.image,
 			    t.beginLine, t.beginColumn, t.endLine, t.endColumn));
 			exp.setArguments(new ArrayList<Symbol<String>>());
 			exp.setLocation(exp.getSymbol().getLocation());

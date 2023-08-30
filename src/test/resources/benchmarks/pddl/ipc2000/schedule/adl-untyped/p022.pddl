@@ -1,109 +1,109 @@
 (define (problem schedule-9-0)
 (:domain schedule)
 (:objects
-    I0
-    H0
-    G0
-    F0
-    E0
-    D0
-    C0
-    CIRCULAR
-    TWO
-    THREE
-    BLUE
-    YELLOW
-    BACK
-    RED
-    B0
-    FRONT
-    ONE
-    BLACK
-    OBLONG
-    A0
+    i0
+    h0
+    g0
+    f0
+    e0
+    d0
+    c0
+    circular
+    two
+    three
+    blue
+    yellow
+    back
+    red
+    b0
+    front
+    one
+    black
+    oblong
+    a0
 )
 (:init
-    (SHAPE A0 CIRCULAR)
-    (SURFACE-CONDITION A0 SMOOTH)
-    (PAINTED A0 BLACK)
-    (HAS-HOLE A0 ONE FRONT)
-    (TEMPERATURE A0 COLD)
-    (SHAPE B0 CIRCULAR)
-    (SURFACE-CONDITION B0 ROUGH)
-    (PAINTED B0 YELLOW)
-    (HAS-HOLE B0 THREE BACK)
-    (TEMPERATURE B0 COLD)
-    (SHAPE C0 CYLINDRICAL)
-    (SURFACE-CONDITION C0 SMOOTH)
-    (PAINTED C0 BLUE)
-    (HAS-HOLE C0 ONE BACK)
-    (TEMPERATURE C0 COLD)
-    (SHAPE D0 CIRCULAR)
-    (SURFACE-CONDITION D0 SMOOTH)
-    (PAINTED D0 BLUE)
-    (HAS-HOLE D0 TWO BACK)
-    (TEMPERATURE D0 COLD)
-    (SHAPE E0 OBLONG)
-    (SURFACE-CONDITION E0 POLISHED)
-    (PAINTED E0 BLUE)
-    (HAS-HOLE E0 THREE BACK)
-    (TEMPERATURE E0 COLD)
-    (SHAPE F0 CIRCULAR)
-    (SURFACE-CONDITION F0 POLISHED)
-    (PAINTED F0 YELLOW)
-    (HAS-HOLE F0 TWO BACK)
-    (TEMPERATURE F0 COLD)
-    (SHAPE G0 CIRCULAR)
-    (SURFACE-CONDITION G0 ROUGH)
-    (PAINTED G0 YELLOW)
-    (HAS-HOLE G0 TWO BACK)
-    (TEMPERATURE G0 COLD)
-    (SHAPE H0 OBLONG)
-    (SURFACE-CONDITION H0 POLISHED)
-    (PAINTED H0 YELLOW)
-    (HAS-HOLE H0 TWO FRONT)
-    (TEMPERATURE H0 COLD)
-    (SHAPE I0 OBLONG)
-    (SURFACE-CONDITION I0 POLISHED)
-    (PAINTED I0 BLUE)
-    (HAS-HOLE I0 ONE FRONT)
-    (TEMPERATURE I0 COLD)
-    (CAN-ORIENT DRILL-PRESS BACK)
-    (CAN-ORIENT PUNCH BACK)
-    (CAN-ORIENT DRILL-PRESS FRONT)
-    (CAN-ORIENT PUNCH FRONT)
-    (HAS-PAINT IMMERSION-PAINTER YELLOW)
-    (HAS-PAINT SPRAY-PAINTER YELLOW)
-    (HAS-PAINT IMMERSION-PAINTER BLUE)
-    (HAS-PAINT SPRAY-PAINTER BLUE)
-    (HAS-PAINT IMMERSION-PAINTER BLACK)
-    (HAS-PAINT SPRAY-PAINTER BLACK)
-    (HAS-PAINT IMMERSION-PAINTER RED)
-    (HAS-PAINT SPRAY-PAINTER RED)
-    (HAS-BIT DRILL-PRESS THREE)
-    (HAS-BIT PUNCH THREE)
-    (HAS-BIT DRILL-PRESS TWO)
-    (HAS-BIT PUNCH TWO)
-    (HAS-BIT DRILL-PRESS ONE)
-    (HAS-BIT PUNCH ONE)
-    (PART I0)
-    (PART H0)
-    (PART G0)
-    (PART F0)
-    (PART E0)
-    (PART D0)
-    (PART C0)
-    (PART B0)
-    (PART A0)
+    (shape a0 circular)
+    (surface-condition a0 smooth)
+    (painted a0 black)
+    (has-hole a0 one front)
+    (temperature a0 cold)
+    (shape b0 circular)
+    (surface-condition b0 rough)
+    (painted b0 yellow)
+    (has-hole b0 three back)
+    (temperature b0 cold)
+    (shape c0 cylindrical)
+    (surface-condition c0 smooth)
+    (painted c0 blue)
+    (has-hole c0 one back)
+    (temperature c0 cold)
+    (shape d0 circular)
+    (surface-condition d0 smooth)
+    (painted d0 blue)
+    (has-hole d0 two back)
+    (temperature d0 cold)
+    (shape e0 oblong)
+    (surface-condition e0 polished)
+    (painted e0 blue)
+    (has-hole e0 three back)
+    (temperature e0 cold)
+    (shape f0 circular)
+    (surface-condition f0 polished)
+    (painted f0 yellow)
+    (has-hole f0 two back)
+    (temperature f0 cold)
+    (shape g0 circular)
+    (surface-condition g0 rough)
+    (painted g0 yellow)
+    (has-hole g0 two back)
+    (temperature g0 cold)
+    (shape h0 oblong)
+    (surface-condition h0 polished)
+    (painted h0 yellow)
+    (has-hole h0 two front)
+    (temperature h0 cold)
+    (shape i0 oblong)
+    (surface-condition i0 polished)
+    (painted i0 blue)
+    (has-hole i0 one front)
+    (temperature i0 cold)
+    (can-orient drill-press back)
+    (can-orient punch back)
+    (can-orient drill-press front)
+    (can-orient punch front)
+    (has-paint immersion-painter yellow)
+    (has-paint spray-painter yellow)
+    (has-paint immersion-painter blue)
+    (has-paint spray-painter blue)
+    (has-paint immersion-painter black)
+    (has-paint spray-painter black)
+    (has-paint immersion-painter red)
+    (has-paint spray-painter red)
+    (has-bit drill-press three)
+    (has-bit punch three)
+    (has-bit drill-press two)
+    (has-bit punch two)
+    (has-bit drill-press one)
+    (has-bit punch one)
+    (part i0)
+    (part h0)
+    (part g0)
+    (part f0)
+    (part e0)
+    (part d0)
+    (part c0)
+    (part b0)
+    (part a0)
 )
 (:goal (and
-    (PAINTED I0 YELLOW)
-    (SURFACE-CONDITION F0 SMOOTH)
-    (PAINTED E0 YELLOW)
-    (PAINTED F0 RED)
-    (PAINTED D0 YELLOW)
-    (PAINTED G0 RED)
-    (PAINTED B0 RED)
-    (PAINTED A0 RED)
-    (SHAPE B0 CYLINDRICAL)
+    (painted i0 yellow)
+    (surface-condition f0 smooth)
+    (painted e0 yellow)
+    (painted f0 red)
+    (painted d0 yellow)
+    (painted g0 red)
+    (painted b0 red)
+    (painted a0 red)
+    (shape b0 cylindrical)
 )))

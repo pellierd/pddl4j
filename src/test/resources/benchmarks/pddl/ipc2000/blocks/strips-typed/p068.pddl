@@ -1,115 +1,115 @@
 (define (problem blocks-33-1)
 (:domain blocks)
 (:objects
-    G1
-    F1
-    E1
-    D1
-    C1
-    B1
-    A1
-    Z
-    Y
-    X
-    W
-    V
-    U
-    T
-    S
-    R
-    Q
-    P
-    O
-    N
-    M
-    L
-    K
-    J
-    I
-    H
-    G
-    F
-    E
-    D
-    C
-    A
-    B
+    g1
+    f1
+    e1
+    d1
+    c1
+    b1
+    a1
+    z
+    y
+    x
+    w
+    v
+    u
+    t
+    s
+    r
+    q
+    p
+    o
+    n
+    m
+    l
+    k
+    j
+    i
+    h
+    g
+    f
+    e
+    d
+    c
+    a
+    b
  - block)
 (:init
-    (CLEAR D)
-    (CLEAR D1)
-    (CLEAR L)
-    (CLEAR E1)
-    (CLEAR U)
-    (CLEAR Z)
-    (ONTABLE Y)
-    (ONTABLE D1)
-    (ONTABLE A1)
-    (ONTABLE R)
-    (ONTABLE N)
-    (ONTABLE Z)
-    (ON D M)
-    (ON M W)
-    (ON W F)
-    (ON F F1)
-    (ON F1 X)
-    (ON X I)
-    (ON I Q)
-    (ON Q C1)
-    (ON C1 K)
-    (ON K J)
-    (ON J O)
-    (ON O V)
-    (ON V B1)
-    (ON B1 C)
-    (ON C B)
-    (ON B S)
-    (ON S G)
-    (ON G G1)
-    (ON G1 T)
-    (ON T P)
-    (ON P H)
-    (ON H Y)
-    (ON L E)
-    (ON E A)
-    (ON A A1)
-    (ON E1 R)
-    (ON U N)
-    (HANDEMPTY)
+    (clear d)
+    (clear d1)
+    (clear l)
+    (clear e1)
+    (clear u)
+    (clear z)
+    (ontable y)
+    (ontable d1)
+    (ontable a1)
+    (ontable r)
+    (ontable n)
+    (ontable z)
+    (on d m)
+    (on m w)
+    (on w f)
+    (on f f1)
+    (on f1 x)
+    (on x i)
+    (on i q)
+    (on q c1)
+    (on c1 k)
+    (on k j)
+    (on j o)
+    (on o v)
+    (on v b1)
+    (on b1 c)
+    (on c b)
+    (on b s)
+    (on s g)
+    (on g g1)
+    (on g1 t)
+    (on t p)
+    (on p h)
+    (on h y)
+    (on l e)
+    (on e a)
+    (on a a1)
+    (on e1 r)
+    (on u n)
+    (handempty)
 )
 (:goal (and
-    (ON T N)
-    (ON N C)
-    (ON C G1)
-    (ON G1 V)
-    (ON V A)
-    (ON A I)
-    (ON I Y)
-    (ON Y B1)
-    (ON B1 F)
-    (ON F B)
-    (ON B H)
-    (ON H J)
-    (ON J Z)
-    (ON Z U)
-    (ON U P)
-    (ON P E1)
-    (ON E1 E)
-    (ON E G)
-    (ON G Q)
-    (ON Q D)
-    (ON D L)
-    (ON L F1)
-    (ON F1 A1)
-    (ON A1 M)
-    (ON M S)
-    (ON S W)
-    (ON W O)
-    (ON O D1)
-    (ON D1 C1)
-    (ON C1 X)
-    (ON X K)
-    (ON K R)
+    (on t n)
+    (on n c)
+    (on c g1)
+    (on g1 v)
+    (on v a)
+    (on a i)
+    (on i y)
+    (on y b1)
+    (on b1 f)
+    (on f b)
+    (on b h)
+    (on h j)
+    (on j z)
+    (on z u)
+    (on u p)
+    (on p e1)
+    (on e1 e)
+    (on e g)
+    (on g q)
+    (on q d)
+    (on d l)
+    (on l f1)
+    (on f1 a1)
+    (on a1 m)
+    (on m s)
+    (on s w)
+    (on w o)
+    (on o d1)
+    (on d1 c1)
+    (on c1 x)
+    (on x k)
+    (on k r)
 )
 )
 )

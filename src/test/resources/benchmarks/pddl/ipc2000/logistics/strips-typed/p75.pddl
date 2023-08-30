@@ -1,230 +1,230 @@
 (define (problem logistics-37-0)
 (:domain logistics)
 (:objects
-    APN4
-    APN3
-    APN2
-    APN1
- - AIRPLANE
-    APT13
-    APT12
-    APT11
-    APT10
-    APT9
-    APT8
-    APT7
-    APT6
-    APT5
-    APT4
-    APT3
-    APT2
-    APT1
- - AIRPORT
-    POS1
-    POS2
-    POS3
-    POS4
-    POS5
-    POS6
-    POS7
-    POS8
-    POS9
-    POS10
-    POS11
-    POS12
-    POS13
- - LOCATION
-    CIT13
-    CIT12
-    CIT11
-    CIT10
-    CIT9
-    CIT8
-    CIT7
-    CIT6
-    CIT5
-    CIT4
-    CIT3
-    CIT2
-    CIT1
- - CITY
-    TRU13
-    TRU12
-    TRU11
-    TRU10
-    TRU9
-    TRU8
-    TRU7
-    TRU6
-    TRU5
-    TRU4
-    TRU3
-    TRU2
-    TRU1
- - TRUCK
-    OBJ133
-    OBJ132
-    OBJ131
-    OBJ123
-    OBJ122
-    OBJ121
-    OBJ113
-    OBJ112
-    OBJ111
-    OBJ103
-    OBJ102
-    OBJ101
-    OBJ93
-    OBJ92
-    OBJ91
-    OBJ83
-    OBJ82
-    OBJ81
-    OBJ73
-    OBJ72
-    OBJ71
-    OBJ63
-    OBJ62
-    OBJ61
-    OBJ53
-    OBJ52
-    OBJ51
-    OBJ43
-    OBJ42
-    OBJ41
-    OBJ33
-    OBJ32
-    OBJ31
-    OBJ23
-    OBJ22
-    OBJ21
-    OBJ13
-    OBJ12
-    OBJ11
- - PACKAGE
+    apn4
+    apn3
+    apn2
+    apn1
+ - airplane
+    apt13
+    apt12
+    apt11
+    apt10
+    apt9
+    apt8
+    apt7
+    apt6
+    apt5
+    apt4
+    apt3
+    apt2
+    apt1
+ - airport
+    pos1
+    pos2
+    pos3
+    pos4
+    pos5
+    pos6
+    pos7
+    pos8
+    pos9
+    pos10
+    pos11
+    pos12
+    pos13
+ - location
+    cit13
+    cit12
+    cit11
+    cit10
+    cit9
+    cit8
+    cit7
+    cit6
+    cit5
+    cit4
+    cit3
+    cit2
+    cit1
+ - city
+    tru13
+    tru12
+    tru11
+    tru10
+    tru9
+    tru8
+    tru7
+    tru6
+    tru5
+    tru4
+    tru3
+    tru2
+    tru1
+ - truck
+    obj133
+    obj132
+    obj131
+    obj123
+    obj122
+    obj121
+    obj113
+    obj112
+    obj111
+    obj103
+    obj102
+    obj101
+    obj93
+    obj92
+    obj91
+    obj83
+    obj82
+    obj81
+    obj73
+    obj72
+    obj71
+    obj63
+    obj62
+    obj61
+    obj53
+    obj52
+    obj51
+    obj43
+    obj42
+    obj41
+    obj33
+    obj32
+    obj31
+    obj23
+    obj22
+    obj21
+    obj13
+    obj12
+    obj11
+ - package
 )
 (:init
-    (AT APN1 APT12)
-    (AT APN2 APT8)
-    (AT APN3 APT5)
-    (AT APN4 APT6)
-    (AT TRU1 POS1)
-    (AT OBJ11 POS1)
-    (AT OBJ12 POS1)
-    (AT OBJ13 POS1)
-    (AT TRU2 POS2)
-    (AT OBJ21 POS2)
-    (AT OBJ22 POS2)
-    (AT OBJ23 POS2)
-    (AT TRU3 POS3)
-    (AT OBJ31 POS3)
-    (AT OBJ32 POS3)
-    (AT OBJ33 POS3)
-    (AT TRU4 POS4)
-    (AT OBJ41 POS4)
-    (AT OBJ42 POS4)
-    (AT OBJ43 POS4)
-    (AT TRU5 POS5)
-    (AT OBJ51 POS5)
-    (AT OBJ52 POS5)
-    (AT OBJ53 POS5)
-    (AT TRU6 POS6)
-    (AT OBJ61 POS6)
-    (AT OBJ62 POS6)
-    (AT OBJ63 POS6)
-    (AT TRU7 POS7)
-    (AT OBJ71 POS7)
-    (AT OBJ72 POS7)
-    (AT OBJ73 POS7)
-    (AT TRU8 POS8)
-    (AT OBJ81 POS8)
-    (AT OBJ82 POS8)
-    (AT OBJ83 POS8)
-    (AT TRU9 POS9)
-    (AT OBJ91 POS9)
-    (AT OBJ92 POS9)
-    (AT OBJ93 POS9)
-    (AT TRU10 POS10)
-    (AT OBJ101 POS10)
-    (AT OBJ102 POS10)
-    (AT OBJ103 POS10)
-    (AT TRU11 POS11)
-    (AT OBJ111 POS11)
-    (AT OBJ112 POS11)
-    (AT OBJ113 POS11)
-    (AT TRU12 POS12)
-    (AT OBJ121 POS12)
-    (AT OBJ122 POS12)
-    (AT OBJ123 POS12)
-    (AT TRU13 POS13)
-    (AT OBJ131 POS13)
-    (AT OBJ132 POS13)
-    (AT OBJ133 POS13)
-    (IN-CITY POS1 CIT1)
-    (IN-CITY APT1 CIT1)
-    (IN-CITY POS2 CIT2)
-    (IN-CITY APT2 CIT2)
-    (IN-CITY POS3 CIT3)
-    (IN-CITY APT3 CIT3)
-    (IN-CITY POS4 CIT4)
-    (IN-CITY APT4 CIT4)
-    (IN-CITY POS5 CIT5)
-    (IN-CITY APT5 CIT5)
-    (IN-CITY POS6 CIT6)
-    (IN-CITY APT6 CIT6)
-    (IN-CITY POS7 CIT7)
-    (IN-CITY APT7 CIT7)
-    (IN-CITY POS8 CIT8)
-    (IN-CITY APT8 CIT8)
-    (IN-CITY POS9 CIT9)
-    (IN-CITY APT9 CIT9)
-    (IN-CITY POS10 CIT10)
-    (IN-CITY APT10 CIT10)
-    (IN-CITY POS11 CIT11)
-    (IN-CITY APT11 CIT11)
-    (IN-CITY POS12 CIT12)
-    (IN-CITY APT12 CIT12)
-    (IN-CITY POS13 CIT13)
-    (IN-CITY APT13 CIT13)
+    (at apn1 apt12)
+    (at apn2 apt8)
+    (at apn3 apt5)
+    (at apn4 apt6)
+    (at tru1 pos1)
+    (at obj11 pos1)
+    (at obj12 pos1)
+    (at obj13 pos1)
+    (at tru2 pos2)
+    (at obj21 pos2)
+    (at obj22 pos2)
+    (at obj23 pos2)
+    (at tru3 pos3)
+    (at obj31 pos3)
+    (at obj32 pos3)
+    (at obj33 pos3)
+    (at tru4 pos4)
+    (at obj41 pos4)
+    (at obj42 pos4)
+    (at obj43 pos4)
+    (at tru5 pos5)
+    (at obj51 pos5)
+    (at obj52 pos5)
+    (at obj53 pos5)
+    (at tru6 pos6)
+    (at obj61 pos6)
+    (at obj62 pos6)
+    (at obj63 pos6)
+    (at tru7 pos7)
+    (at obj71 pos7)
+    (at obj72 pos7)
+    (at obj73 pos7)
+    (at tru8 pos8)
+    (at obj81 pos8)
+    (at obj82 pos8)
+    (at obj83 pos8)
+    (at tru9 pos9)
+    (at obj91 pos9)
+    (at obj92 pos9)
+    (at obj93 pos9)
+    (at tru10 pos10)
+    (at obj101 pos10)
+    (at obj102 pos10)
+    (at obj103 pos10)
+    (at tru11 pos11)
+    (at obj111 pos11)
+    (at obj112 pos11)
+    (at obj113 pos11)
+    (at tru12 pos12)
+    (at obj121 pos12)
+    (at obj122 pos12)
+    (at obj123 pos12)
+    (at tru13 pos13)
+    (at obj131 pos13)
+    (at obj132 pos13)
+    (at obj133 pos13)
+    (in-city pos1 cit1)
+    (in-city apt1 cit1)
+    (in-city pos2 cit2)
+    (in-city apt2 cit2)
+    (in-city pos3 cit3)
+    (in-city apt3 cit3)
+    (in-city pos4 cit4)
+    (in-city apt4 cit4)
+    (in-city pos5 cit5)
+    (in-city apt5 cit5)
+    (in-city pos6 cit6)
+    (in-city apt6 cit6)
+    (in-city pos7 cit7)
+    (in-city apt7 cit7)
+    (in-city pos8 cit8)
+    (in-city apt8 cit8)
+    (in-city pos9 cit9)
+    (in-city apt9 cit9)
+    (in-city pos10 cit10)
+    (in-city apt10 cit10)
+    (in-city pos11 cit11)
+    (in-city apt11 cit11)
+    (in-city pos12 cit12)
+    (in-city apt12 cit12)
+    (in-city pos13 cit13)
+    (in-city apt13 cit13)
 )
 (:goal (and
-    (AT OBJ62 APT11)
-    (AT OBJ41 APT1)
-    (AT OBJ53 POS10)
-    (AT OBJ92 APT2)
-    (AT OBJ51 POS9)
-    (AT OBJ93 APT6)
-    (AT OBJ103 POS2)
-    (AT OBJ132 POS6)
-    (AT OBJ31 POS3)
-    (AT OBJ122 POS5)
-    (AT OBJ123 POS13)
-    (AT OBJ13 POS11)
-    (AT OBJ42 POS3)
-    (AT OBJ22 POS10)
-    (AT OBJ133 APT7)
-    (AT OBJ91 POS7)
-    (AT OBJ52 APT4)
-    (AT OBJ102 POS5)
-    (AT OBJ71 APT6)
-    (AT OBJ111 POS7)
-    (AT OBJ43 POS2)
-    (AT OBJ101 POS2)
-    (AT OBJ82 APT10)
-    (AT OBJ32 POS5)
-    (AT OBJ61 APT7)
-    (AT OBJ81 APT7)
-    (AT OBJ72 POS11)
-    (AT OBJ83 POS7)
-    (AT OBJ121 POS7)
-    (AT OBJ112 POS13)
-    (AT OBJ73 APT10)
-    (AT OBJ11 POS4)
-    (AT OBJ33 POS3)
-    (AT OBJ113 POS3)
-    (AT OBJ21 APT10)
-    (AT OBJ131 APT5)
-    (AT OBJ23 POS4)
+    (at obj62 apt11)
+    (at obj41 apt1)
+    (at obj53 pos10)
+    (at obj92 apt2)
+    (at obj51 pos9)
+    (at obj93 apt6)
+    (at obj103 pos2)
+    (at obj132 pos6)
+    (at obj31 pos3)
+    (at obj122 pos5)
+    (at obj123 pos13)
+    (at obj13 pos11)
+    (at obj42 pos3)
+    (at obj22 pos10)
+    (at obj133 apt7)
+    (at obj91 pos7)
+    (at obj52 apt4)
+    (at obj102 pos5)
+    (at obj71 apt6)
+    (at obj111 pos7)
+    (at obj43 pos2)
+    (at obj101 pos2)
+    (at obj82 apt10)
+    (at obj32 pos5)
+    (at obj61 apt7)
+    (at obj81 apt7)
+    (at obj72 pos11)
+    (at obj83 pos7)
+    (at obj121 pos7)
+    (at obj112 pos13)
+    (at obj73 apt10)
+    (at obj11 pos4)
+    (at obj33 pos3)
+    (at obj113 pos3)
+    (at obj21 apt10)
+    (at obj131 apt5)
+    (at obj23 pos4)
 )
 )
 )

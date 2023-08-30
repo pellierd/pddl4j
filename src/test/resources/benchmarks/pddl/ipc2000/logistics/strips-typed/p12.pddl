@@ -1,4 +1,4 @@
-(Define (problem logistics-7-1)
+(define (problem logistics-7-1)
 (:domain logistics)
 (:objects
  apn1 - airplane

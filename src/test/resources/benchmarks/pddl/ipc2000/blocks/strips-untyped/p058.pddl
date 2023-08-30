@@ -1,97 +1,97 @@
 (define (problem blocks-28-1)
 (:domain blocks)
 (:objects
-    B1
-    A1
-    Z
-    Y
-    X
-    W
-    V
-    U
-    T
-    S
-    R
-    Q
-    P
-    O
-    N
-    M
-    L
-    K
-    J
-    I
-    H
-    G
-    F
-    E
-    D
-    C
-    A
-    B
+    b1
+    a1
+    z
+    y
+    x
+    w
+    v
+    u
+    t
+    s
+    r
+    q
+    p
+    o
+    n
+    m
+    l
+    k
+    j
+    i
+    h
+    g
+    f
+    e
+    d
+    c
+    a
+    b
 )
 (:init
-    (CLEAR U)
-    (CLEAR T)
-    (CLEAR W)
-    (ONTABLE B1)
-    (ONTABLE O)
-    (ONTABLE L)
-    (ON U A)
-    (ON A F)
-    (ON F Y)
-    (ON Y S)
-    (ON S D)
-    (ON D I)
-    (ON I G)
-    (ON G J)
-    (ON J A1)
-    (ON A1 K)
-    (ON K V)
-    (ON V R)
-    (ON R B1)
-    (ON T O)
-    (ON W N)
-    (ON N Z)
-    (ON Z B)
-    (ON B E)
-    (ON E Q)
-    (ON Q X)
-    (ON X C)
-    (ON C M)
-    (ON M H)
-    (ON H P)
-    (ON P L)
-    (HANDEMPTY)
+    (clear u)
+    (clear t)
+    (clear w)
+    (ontable b1)
+    (ontable o)
+    (ontable l)
+    (on u a)
+    (on a f)
+    (on f y)
+    (on y s)
+    (on s d)
+    (on d i)
+    (on i g)
+    (on g j)
+    (on j a1)
+    (on a1 k)
+    (on k v)
+    (on v r)
+    (on r b1)
+    (on t o)
+    (on w n)
+    (on n z)
+    (on z b)
+    (on b e)
+    (on e q)
+    (on q x)
+    (on x c)
+    (on c m)
+    (on m h)
+    (on h p)
+    (on p l)
+    (handempty)
 )
 (:goal (and
-    (ON A X)
-    (ON X F)
-    (ON F E)
-    (ON E M)
-    (ON M P)
-    (ON P H)
-    (ON H G)
-    (ON G B1)
-    (ON B1 U)
-    (ON U A1)
-    (ON A1 O)
-    (ON O B)
-    (ON B R)
-    (ON R L)
-    (ON L T)
-    (ON T W)
-    (ON W Z)
-    (ON Z I)
-    (ON I D)
-    (ON D N)
-    (ON N S)
-    (ON S V)
-    (ON V Y)
-    (ON Y Q)
-    (ON Q C)
-    (ON C J)
-    (ON J K)
+    (on a x)
+    (on x f)
+    (on f e)
+    (on e m)
+    (on m p)
+    (on p h)
+    (on h g)
+    (on g b1)
+    (on b1 u)
+    (on u a1)
+    (on a1 o)
+    (on o b)
+    (on b r)
+    (on r l)
+    (on l t)
+    (on t w)
+    (on w z)
+    (on z i)
+    (on i d)
+    (on d n)
+    (on n s)
+    (on s v)
+    (on v y)
+    (on y q)
+    (on q c)
+    (on c j)
+    (on j k)
 )
 )
 )

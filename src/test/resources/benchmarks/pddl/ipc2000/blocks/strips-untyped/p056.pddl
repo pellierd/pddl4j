@@ -1,93 +1,93 @@
 (define (problem blocks-27-1)
 (:domain blocks)
 (:objects
-    A1
-    Z
-    Y
-    X
-    W
-    V
-    U
-    T
-    S
-    R
-    Q
-    P
-    O
-    N
-    M
-    L
-    K
-    J
-    I
-    H
-    G
-    F
-    E
-    D
-    C
-    A
-    B
+    a1
+    z
+    y
+    x
+    w
+    v
+    u
+    t
+    s
+    r
+    q
+    p
+    o
+    n
+    m
+    l
+    k
+    j
+    i
+    h
+    g
+    f
+    e
+    d
+    c
+    a
+    b
 )
 (:init
-    (CLEAR N)
-    (CLEAR H)
-    (ONTABLE P)
-    (ONTABLE K)
-    (ON N Y)
-    (ON Y O)
-    (ON O E)
-    (ON E U)
-    (ON U P)
-    (ON H C)
-    (ON C F)
-    (ON F G)
-    (ON G Z)
-    (ON Z I)
-    (ON I D)
-    (ON D W)
-    (ON W J)
-    (ON J A1)
-    (ON A1 M)
-    (ON M X)
-    (ON X A)
-    (ON A R)
-    (ON R V)
-    (ON V S)
-    (ON S L)
-    (ON L Q)
-    (ON Q B)
-    (ON B T)
-    (ON T K)
-    (HANDEMPTY)
+    (clear n)
+    (clear h)
+    (ontable p)
+    (ontable k)
+    (on n y)
+    (on y o)
+    (on o e)
+    (on e u)
+    (on u p)
+    (on h c)
+    (on c f)
+    (on f g)
+    (on g z)
+    (on z i)
+    (on i d)
+    (on d w)
+    (on w j)
+    (on j a1)
+    (on a1 m)
+    (on m x)
+    (on x a)
+    (on a r)
+    (on r v)
+    (on v s)
+    (on s l)
+    (on l q)
+    (on q b)
+    (on b t)
+    (on t k)
+    (handempty)
 )
 (:goal (and
-    (ON L D)
-    (ON D B)
-    (ON B Y)
-    (ON Y A)
-    (ON A E)
-    (ON E H)
-    (ON H O)
-    (ON O W)
-    (ON W J)
-    (ON J S)
-    (ON S F)
-    (ON F Z)
-    (ON Z G)
-    (ON G A1)
-    (ON A1 V)
-    (ON V U)
-    (ON U X)
-    (ON X K)
-    (ON K I)
-    (ON I N)
-    (ON N Q)
-    (ON Q C)
-    (ON C M)
-    (ON M T)
-    (ON T P)
-    (ON P R)
+    (on l d)
+    (on d b)
+    (on b y)
+    (on y a)
+    (on a e)
+    (on e h)
+    (on h o)
+    (on o w)
+    (on w j)
+    (on j s)
+    (on s f)
+    (on f z)
+    (on z g)
+    (on g a1)
+    (on a1 v)
+    (on v u)
+    (on u x)
+    (on x k)
+    (on k i)
+    (on i n)
+    (on n q)
+    (on q c)
+    (on c m)
+    (on m t)
+    (on t p)
+    (on p r)
 )
 )
 )

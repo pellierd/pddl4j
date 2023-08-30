@@ -1,69 +1,69 @@
 (define (problem schedule-4-0)
 (:domain schedule)
 (:objects
-    D0
-    C0
-    CIRCULAR
-    TWO
-    THREE
-    BLUE
-    YELLOW
-    BACK
-    RED
-    B0
-    FRONT
-    ONE
-    BLACK
-    OBLONG
-    A0
+    d0
+    c0
+    circular
+    two
+    three
+    blue
+    yellow
+    back
+    red
+    b0
+    front
+    one
+    black
+    oblong
+    a0
 )
 (:init
-    (SHAPE A0 CYLINDRICAL)
-    (SURFACE-CONDITION A0 POLISHED)
-    (PAINTED A0 RED)
-    (HAS-HOLE A0 ONE BACK)
-    (TEMPERATURE A0 COLD)
-    (SHAPE B0 OBLONG)
-    (SURFACE-CONDITION B0 POLISHED)
-    (PAINTED B0 YELLOW)
-    (HAS-HOLE B0 ONE BACK)
-    (TEMPERATURE B0 COLD)
-    (SHAPE C0 CIRCULAR)
-    (SURFACE-CONDITION C0 SMOOTH)
-    (PAINTED C0 BLUE)
-    (HAS-HOLE C0 ONE BACK)
-    (TEMPERATURE C0 COLD)
-    (SHAPE D0 OBLONG)
-    (SURFACE-CONDITION D0 ROUGH)
-    (PAINTED D0 BLUE)
-    (HAS-HOLE D0 THREE FRONT)
-    (TEMPERATURE D0 COLD)
-    (CAN-ORIENT DRILL-PRESS BACK)
-    (CAN-ORIENT PUNCH BACK)
-    (CAN-ORIENT DRILL-PRESS FRONT)
-    (CAN-ORIENT PUNCH FRONT)
-    (HAS-PAINT IMMERSION-PAINTER YELLOW)
-    (HAS-PAINT SPRAY-PAINTER YELLOW)
-    (HAS-PAINT IMMERSION-PAINTER BLUE)
-    (HAS-PAINT SPRAY-PAINTER BLUE)
-    (HAS-PAINT IMMERSION-PAINTER BLACK)
-    (HAS-PAINT SPRAY-PAINTER BLACK)
-    (HAS-PAINT IMMERSION-PAINTER RED)
-    (HAS-PAINT SPRAY-PAINTER RED)
-    (HAS-BIT DRILL-PRESS THREE)
-    (HAS-BIT PUNCH THREE)
-    (HAS-BIT DRILL-PRESS TWO)
-    (HAS-BIT PUNCH TWO)
-    (HAS-BIT DRILL-PRESS ONE)
-    (HAS-BIT PUNCH ONE)
-    (PART D0)
-    (PART C0)
-    (PART B0)
-    (PART A0)
+    (shape a0 cylindrical)
+    (surface-condition a0 polished)
+    (painted a0 red)
+    (has-hole a0 one back)
+    (temperature a0 cold)
+    (shape b0 oblong)
+    (surface-condition b0 polished)
+    (painted b0 yellow)
+    (has-hole b0 one back)
+    (temperature b0 cold)
+    (shape c0 circular)
+    (surface-condition c0 smooth)
+    (painted c0 blue)
+    (has-hole c0 one back)
+    (temperature c0 cold)
+    (shape d0 oblong)
+    (surface-condition d0 rough)
+    (painted d0 blue)
+    (has-hole d0 three front)
+    (temperature d0 cold)
+    (can-orient drill-press back)
+    (can-orient punch back)
+    (can-orient drill-press front)
+    (can-orient punch front)
+    (has-paint immersion-painter yellow)
+    (has-paint spray-painter yellow)
+    (has-paint immersion-painter blue)
+    (has-paint spray-painter blue)
+    (has-paint immersion-painter black)
+    (has-paint spray-painter black)
+    (has-paint immersion-painter red)
+    (has-paint spray-painter red)
+    (has-bit drill-press three)
+    (has-bit punch three)
+    (has-bit drill-press two)
+    (has-bit punch two)
+    (has-bit drill-press one)
+    (has-bit punch one)
+    (part d0)
+    (part c0)
+    (part b0)
+    (part a0)
 )
 (:goal (and
-    (SURFACE-CONDITION A0 ROUGH)
-    (SHAPE C0 CYLINDRICAL)
-    (PAINTED C0 BLACK)
-    (PAINTED B0 BLACK)
+    (surface-condition a0 rough)
+    (shape c0 cylindrical)
+    (painted c0 black)
+    (painted b0 black)
 )))

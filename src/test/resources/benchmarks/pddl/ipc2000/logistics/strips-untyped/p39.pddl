@@ -1,182 +1,182 @@
 (define (problem logistics-19-0)
 (:domain logistics)
 (:objects
-    APT7
-    POS7
-    CIT7
-    TRU7
-    OBJ73
-    OBJ72
-    OBJ71
-    APT6
-    POS6
-    CIT6
-    TRU6
-    OBJ63
-    OBJ62
-    OBJ61
-    APN2
-    APT5
-    POS5
-    CIT5
-    TRU5
-    OBJ53
-    OBJ52
-    OBJ51
-    APT4
-    POS4
-    CIT4
-    TRU4
-    OBJ43
-    OBJ42
-    OBJ41
-    APT3
-    POS3
-    CIT3
-    TRU3
-    OBJ33
-    OBJ32
-    OBJ31
-    APT2
-    POS2
-    CIT2
-    TRU2
-    OBJ23
-    OBJ22
-    OBJ21
-    APN1
-    APT1
-    POS1
-    CIT1
-    TRU1
-    OBJ13
-    OBJ12
-    OBJ11
+    apt7
+    pos7
+    cit7
+    tru7
+    obj73
+    obj72
+    obj71
+    apt6
+    pos6
+    cit6
+    tru6
+    obj63
+    obj62
+    obj61
+    apn2
+    apt5
+    pos5
+    cit5
+    tru5
+    obj53
+    obj52
+    obj51
+    apt4
+    pos4
+    cit4
+    tru4
+    obj43
+    obj42
+    obj41
+    apt3
+    pos3
+    cit3
+    tru3
+    obj33
+    obj32
+    obj31
+    apt2
+    pos2
+    cit2
+    tru2
+    obj23
+    obj22
+    obj21
+    apn1
+    apt1
+    pos1
+    cit1
+    tru1
+    obj13
+    obj12
+    obj11
 )
 (:init
-    (PACKAGE OBJ11)
-    (PACKAGE OBJ12)
-    (PACKAGE OBJ13)
-    (PACKAGE OBJ21)
-    (PACKAGE OBJ22)
-    (PACKAGE OBJ23)
-    (PACKAGE OBJ31)
-    (PACKAGE OBJ32)
-    (PACKAGE OBJ33)
-    (PACKAGE OBJ41)
-    (PACKAGE OBJ42)
-    (PACKAGE OBJ43)
-    (PACKAGE OBJ51)
-    (PACKAGE OBJ52)
-    (PACKAGE OBJ53)
-    (PACKAGE OBJ61)
-    (PACKAGE OBJ62)
-    (PACKAGE OBJ63)
-    (PACKAGE OBJ71)
-    (PACKAGE OBJ72)
-    (PACKAGE OBJ73)
-    (TRUCK TRU1)
-    (TRUCK TRU2)
-    (TRUCK TRU3)
-    (TRUCK TRU4)
-    (TRUCK TRU5)
-    (TRUCK TRU6)
-    (TRUCK TRU7)
-    (CITY CIT1)
-    (CITY CIT2)
-    (CITY CIT3)
-    (CITY CIT4)
-    (CITY CIT5)
-    (CITY CIT6)
-    (CITY CIT7)
-    (LOCATION POS1)
-    (LOCATION APT1)
-    (LOCATION POS2)
-    (LOCATION APT2)
-    (LOCATION POS3)
-    (LOCATION APT3)
-    (LOCATION POS4)
-    (LOCATION APT4)
-    (LOCATION POS5)
-    (LOCATION APT5)
-    (LOCATION POS6)
-    (LOCATION APT6)
-    (LOCATION POS7)
-    (LOCATION APT7)
-    (AIRPORT APT1)
-    (AIRPORT APT2)
-    (AIRPORT APT3)
-    (AIRPORT APT4)
-    (AIRPORT APT5)
-    (AIRPORT APT6)
-    (AIRPORT APT7)
-    (AIRPLANE APN1)
-    (AIRPLANE APN2)
-    (AT APN1 APT6)
-    (AT APN2 APT5)
-    (AT TRU1 POS1)
-    (AT OBJ11 POS1)
-    (AT OBJ12 POS1)
-    (AT OBJ13 POS1)
-    (AT TRU2 POS2)
-    (AT OBJ21 POS2)
-    (AT OBJ22 POS2)
-    (AT OBJ23 POS2)
-    (AT TRU3 POS3)
-    (AT OBJ31 POS3)
-    (AT OBJ32 POS3)
-    (AT OBJ33 POS3)
-    (AT TRU4 POS4)
-    (AT OBJ41 POS4)
-    (AT OBJ42 POS4)
-    (AT OBJ43 POS4)
-    (AT TRU5 POS5)
-    (AT OBJ51 POS5)
-    (AT OBJ52 POS5)
-    (AT OBJ53 POS5)
-    (AT TRU6 POS6)
-    (AT OBJ61 POS6)
-    (AT OBJ62 POS6)
-    (AT OBJ63 POS6)
-    (AT TRU7 POS7)
-    (AT OBJ71 POS7)
-    (AT OBJ72 POS7)
-    (AT OBJ73 POS7)
-    (IN-CITY POS1 CIT1)
-    (IN-CITY APT1 CIT1)
-    (IN-CITY POS2 CIT2)
-    (IN-CITY APT2 CIT2)
-    (IN-CITY POS3 CIT3)
-    (IN-CITY APT3 CIT3)
-    (IN-CITY POS4 CIT4)
-    (IN-CITY APT4 CIT4)
-    (IN-CITY POS5 CIT5)
-    (IN-CITY APT5 CIT5)
-    (IN-CITY POS6 CIT6)
-    (IN-CITY APT6 CIT6)
-    (IN-CITY POS7 CIT7)
-    (IN-CITY APT7 CIT7)
+    (package obj11)
+    (package obj12)
+    (package obj13)
+    (package obj21)
+    (package obj22)
+    (package obj23)
+    (package obj31)
+    (package obj32)
+    (package obj33)
+    (package obj41)
+    (package obj42)
+    (package obj43)
+    (package obj51)
+    (package obj52)
+    (package obj53)
+    (package obj61)
+    (package obj62)
+    (package obj63)
+    (package obj71)
+    (package obj72)
+    (package obj73)
+    (truck tru1)
+    (truck tru2)
+    (truck tru3)
+    (truck tru4)
+    (truck tru5)
+    (truck tru6)
+    (truck tru7)
+    (city cit1)
+    (city cit2)
+    (city cit3)
+    (city cit4)
+    (city cit5)
+    (city cit6)
+    (city cit7)
+    (location pos1)
+    (location apt1)
+    (location pos2)
+    (location apt2)
+    (location pos3)
+    (location apt3)
+    (location pos4)
+    (location apt4)
+    (location pos5)
+    (location apt5)
+    (location pos6)
+    (location apt6)
+    (location pos7)
+    (location apt7)
+    (airport apt1)
+    (airport apt2)
+    (airport apt3)
+    (airport apt4)
+    (airport apt5)
+    (airport apt6)
+    (airport apt7)
+    (airplane apn1)
+    (airplane apn2)
+    (at apn1 apt6)
+    (at apn2 apt5)
+    (at tru1 pos1)
+    (at obj11 pos1)
+    (at obj12 pos1)
+    (at obj13 pos1)
+    (at tru2 pos2)
+    (at obj21 pos2)
+    (at obj22 pos2)
+    (at obj23 pos2)
+    (at tru3 pos3)
+    (at obj31 pos3)
+    (at obj32 pos3)
+    (at obj33 pos3)
+    (at tru4 pos4)
+    (at obj41 pos4)
+    (at obj42 pos4)
+    (at obj43 pos4)
+    (at tru5 pos5)
+    (at obj51 pos5)
+    (at obj52 pos5)
+    (at obj53 pos5)
+    (at tru6 pos6)
+    (at obj61 pos6)
+    (at obj62 pos6)
+    (at obj63 pos6)
+    (at tru7 pos7)
+    (at obj71 pos7)
+    (at obj72 pos7)
+    (at obj73 pos7)
+    (in-city pos1 cit1)
+    (in-city apt1 cit1)
+    (in-city pos2 cit2)
+    (in-city apt2 cit2)
+    (in-city pos3 cit3)
+    (in-city apt3 cit3)
+    (in-city pos4 cit4)
+    (in-city apt4 cit4)
+    (in-city pos5 cit5)
+    (in-city apt5 cit5)
+    (in-city pos6 cit6)
+    (in-city apt6 cit6)
+    (in-city pos7 cit7)
+    (in-city apt7 cit7)
 )
 (:goal (and
-    (AT OBJ21 APT3)
-    (AT OBJ62 APT6)
-    (AT OBJ43 APT4)
-    (AT OBJ42 POS2)
-    (AT OBJ73 APT7)
-    (AT OBJ63 APT2)
-    (AT OBJ13 POS7)
-    (AT OBJ11 POS4)
-    (AT OBJ61 APT3)
-    (AT OBJ52 POS3)
-    (AT OBJ41 POS3)
-    (AT OBJ12 POS5)
-    (AT OBJ51 APT7)
-    (AT OBJ72 POS2)
-    (AT OBJ31 APT4)
-    (AT OBJ32 POS3)
-    (AT OBJ33 APT4)
-    (AT OBJ22 POS1)
-    (AT OBJ23 POS2)
+    (at obj21 apt3)
+    (at obj62 apt6)
+    (at obj43 apt4)
+    (at obj42 pos2)
+    (at obj73 apt7)
+    (at obj63 apt2)
+    (at obj13 pos7)
+    (at obj11 pos4)
+    (at obj61 apt3)
+    (at obj52 pos3)
+    (at obj41 pos3)
+    (at obj12 pos5)
+    (at obj51 apt7)
+    (at obj72 pos2)
+    (at obj31 apt4)
+    (at obj32 pos3)
+    (at obj33 apt4)
+    (at obj22 pos1)
+    (at obj23 pos2)
 )
 )
 )

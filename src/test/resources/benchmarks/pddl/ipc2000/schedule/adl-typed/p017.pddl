@@ -1,91 +1,91 @@
 (define (problem schedule-7-1)
 (:domain schedule)
 (:objects
-    G0
-    F0
-    E0
-    D0
-    C0
-    B0
-    A0
+    g0
+    f0
+    e0
+    d0
+    c0
+    b0
+    a0
  - part
-    CIRCULAR
-    OBLONG
+    circular
+    oblong
  - ashape
-    BLUE
-    YELLOW
-    RED
-    BLACK
+    blue
+    yellow
+    red
+    black
  - colour
-    TWO
-    THREE
-    ONE
+    two
+    three
+    one
  - width
-    BACK
-    FRONT
+    back
+    front
  - anorient
 )
 (:init
-    (SHAPE A0 CIRCULAR)
-    (SURFACE-CONDITION A0 ROUGH)
-    (PAINTED A0 YELLOW)
-    (HAS-HOLE A0 THREE BACK)
-    (TEMPERATURE A0 COLD)
-    (SHAPE B0 CYLINDRICAL)
-    (SURFACE-CONDITION B0 POLISHED)
-    (PAINTED B0 RED)
-    (HAS-HOLE B0 ONE BACK)
-    (TEMPERATURE B0 COLD)
-    (SHAPE C0 CIRCULAR)
-    (SURFACE-CONDITION C0 ROUGH)
-    (PAINTED C0 YELLOW)
-    (HAS-HOLE C0 THREE FRONT)
-    (TEMPERATURE C0 COLD)
-    (SHAPE D0 OBLONG)
-    (SURFACE-CONDITION D0 POLISHED)
-    (PAINTED D0 RED)
-    (HAS-HOLE D0 TWO BACK)
-    (TEMPERATURE D0 COLD)
-    (SHAPE E0 CYLINDRICAL)
-    (SURFACE-CONDITION E0 POLISHED)
-    (PAINTED E0 BLUE)
-    (HAS-HOLE E0 TWO FRONT)
-    (TEMPERATURE E0 COLD)
-    (SHAPE F0 OBLONG)
-    (SURFACE-CONDITION F0 POLISHED)
-    (PAINTED F0 BLACK)
-    (HAS-HOLE F0 TWO BACK)
-    (TEMPERATURE F0 COLD)
-    (SHAPE G0 CIRCULAR)
-    (SURFACE-CONDITION G0 POLISHED)
-    (PAINTED G0 BLACK)
-    (HAS-HOLE G0 ONE FRONT)
-    (TEMPERATURE G0 COLD)
-    (CAN-ORIENT DRILL-PRESS BACK)
-    (CAN-ORIENT PUNCH BACK)
-    (CAN-ORIENT DRILL-PRESS FRONT)
-    (CAN-ORIENT PUNCH FRONT)
-    (HAS-PAINT IMMERSION-PAINTER YELLOW)
-    (HAS-PAINT SPRAY-PAINTER YELLOW)
-    (HAS-PAINT IMMERSION-PAINTER BLUE)
-    (HAS-PAINT SPRAY-PAINTER BLUE)
-    (HAS-PAINT IMMERSION-PAINTER BLACK)
-    (HAS-PAINT SPRAY-PAINTER BLACK)
-    (HAS-PAINT IMMERSION-PAINTER RED)
-    (HAS-PAINT SPRAY-PAINTER RED)
-    (HAS-BIT DRILL-PRESS THREE)
-    (HAS-BIT PUNCH THREE)
-    (HAS-BIT DRILL-PRESS TWO)
-    (HAS-BIT PUNCH TWO)
-    (HAS-BIT DRILL-PRESS ONE)
-    (HAS-BIT PUNCH ONE)
+    (shape a0 circular)
+    (surface-condition a0 rough)
+    (painted a0 yellow)
+    (has-hole a0 three back)
+    (temperature a0 cold)
+    (shape b0 cylindrical)
+    (surface-condition b0 polished)
+    (painted b0 red)
+    (has-hole b0 one back)
+    (temperature b0 cold)
+    (shape c0 circular)
+    (surface-condition c0 rough)
+    (painted c0 yellow)
+    (has-hole c0 three front)
+    (temperature c0 cold)
+    (shape d0 oblong)
+    (surface-condition d0 polished)
+    (painted d0 red)
+    (has-hole d0 two back)
+    (temperature d0 cold)
+    (shape e0 cylindrical)
+    (surface-condition e0 polished)
+    (painted e0 blue)
+    (has-hole e0 two front)
+    (temperature e0 cold)
+    (shape f0 oblong)
+    (surface-condition f0 polished)
+    (painted f0 black)
+    (has-hole f0 two back)
+    (temperature f0 cold)
+    (shape g0 circular)
+    (surface-condition g0 polished)
+    (painted g0 black)
+    (has-hole g0 one front)
+    (temperature g0 cold)
+    (can-orient drill-press back)
+    (can-orient punch back)
+    (can-orient drill-press front)
+    (can-orient punch front)
+    (has-paint immersion-painter yellow)
+    (has-paint spray-painter yellow)
+    (has-paint immersion-painter blue)
+    (has-paint spray-painter blue)
+    (has-paint immersion-painter black)
+    (has-paint spray-painter black)
+    (has-paint immersion-painter red)
+    (has-paint spray-painter red)
+    (has-bit drill-press three)
+    (has-bit punch three)
+    (has-bit drill-press two)
+    (has-bit punch two)
+    (has-bit drill-press one)
+    (has-bit punch one)
 )
 (:goal (and
-    (SURFACE-CONDITION B0 ROUGH)
-    (PAINTED C0 BLUE)
-    (PAINTED G0 YELLOW)
-    (PAINTED E0 BLACK)
-    (PAINTED F0 YELLOW)
-    (SHAPE G0 CYLINDRICAL)
-    (SURFACE-CONDITION E0 SMOOTH)
+    (surface-condition b0 rough)
+    (painted c0 blue)
+    (painted g0 yellow)
+    (painted e0 black)
+    (painted f0 yellow)
+    (shape g0 cylindrical)
+    (surface-condition e0 smooth)
 )))
