@@ -1217,11 +1217,11 @@ public class DefaultParsedProblem implements ParsedDomain, ParsedProblem {
             str.append("\n  )\n");
         }
         if (!this.tasks.isEmpty()) {
-            str.append("(:tasks ");
             for (NamedTypedList p : this.tasks) {
-                str.append("\n  ").append(p);
+                str.append("(:task ");
+                str.append(p);
+                str.append(")\n");
             }
-            str.append("\n  )\n");
         }
         if (this.constraints != null) {
             str.append("(:constraints ").append("  ").append(this.constraints).append(")\n");
